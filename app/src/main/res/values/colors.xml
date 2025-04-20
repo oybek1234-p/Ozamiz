@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="iconColor">#6D6D6D</color>
+    <color name="likeColor">#E91E63</color>
+    <color name="yellow">#BB7000</color>
+    <color name="green">#0F9063</color>
+    <color name="rejected">#C12317</color>
+</resources>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="?colorSurface"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/photo"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout7"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+        <uz.oybek.ozamiz.ui.base.MyToolBar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/akkauntga_kirish"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/gmail_button"
+                style="@style/Headline2_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_24"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:background="@drawable/round_lay_stroke"
+                android:drawablePadding="@dimen/dimen_12"
+                android:elevation="@dimen/dimen_4"
+                android:foreground="?selectableItemBackgroundBorderless"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/dimen_18"
+                android:paddingVertical="@dimen/dimen_12"
+                android:text="@string/google_orqali_kirish"
+                android:textColor="?colorPrimary"
+                app:drawableStartCompat="@drawable/google_ic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/phone_view" />
+
+            <TextView
+                android:id="@+id/email_button"
+                style="@style/Headline2_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_24"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:background="@drawable/round_lay_stroke"
+                android:drawablePadding="@dimen/dimen_12"
+                android:drawableTint="?colorPrimary"
+                android:elevation="@dimen/dimen_4"
+                android:foreground="?selectableItemBackgroundBorderless"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="@dimen/dimen_18"
+                android:paddingVertical="@dimen/dimen_12"
+                android:text="Email orqali kirish"
+                android:textColor="?colorPrimary"
+                app:drawableStartCompat="@drawable/mail_24px"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/gmail_button" />
+
+            <TextView
+                style="@style/Subtitle1_14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_24"
+                android:layout_marginTop="@dimen/dimen_18"
+                android:layout_marginBottom="@dimen/dimen_24"
+                android:text="Ilovadan foydalanish uchun akkauntga kiring"
+                android:textColor="?colorOnSurface"
+                app:layout_constraintEnd_toEndOf="@+id/email_button"
+                app:layout_constraintStart_toStartOf="@+id/email_button"
+                app:layout_constraintTop_toBottomOf="@+id/email_button" />
+
+        </LinearLayout>
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/skip_button"
+            style="@style/Widget.Material3.Button.ElevatedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:layout_marginEnd="@dimen/dimen_8"
+            android:enabled="true"
+            android:text="@string/keyinroq"
+            android:visibility="gone"
+            app:icon="@drawable/arrow_right"
+            app:iconGravity="textEnd"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/toolbar" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/continue_button"
+            style="@style/FilledButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dimen_24"
+            android:layout_marginBottom="160dp"
+            android:enabled="true"
+            android:text="@string/davom_etish"
+            android:visibility="gone"
+            app:icon="@drawable/arrow_right"
+            app:iconGravity="textEnd"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/dimen_12"
+            android:indeterminate="true"
+            app:layout_constraintBottom_toTopOf="@+id/continue_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

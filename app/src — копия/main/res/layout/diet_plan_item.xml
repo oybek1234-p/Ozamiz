@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:padding="16dp"
+    android:background="?colorSurface"
+    android:layout_marginTop="@dimen/dimen_4"
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/photo_view"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="centerCrop"
+        app:shapeAppearance="@style/RadiusImageView12"
+        android:background="?colorSurfaceContainerLow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/name_view"
+        style="@style/Title3_17"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_12"
+        android:text="@string/obed"
+        android:textColor="?colorOnSurface"
+        app:layout_constraintBottom_toBottomOf="@+id/photo_view"
+        app:layout_constraintStart_toEndOf="@+id/photo_view"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/time_view"
+        style="@style/Title3_17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_8"
+        android:text="@string/time_ex"
+        android:textColor="?colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/name_view" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/dimen_8"
+        app:layout_constraintTop_toBottomOf="@+id/photo_view">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/food_view"
+            style="@style/Headline2_16"
+            android:textColor="?colorOnSurface"
+            android:text="Ovqat, 2 bo’lak non va salat bilan"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/description_view"
+            style="@style/Text1_16"
+            android:textColor="?colorOnSurface"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:text="Hohlagan uy ovqatingizni yesangiz bo’ladi"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/warning_view"
+            style="@style/Text2_15"
+            android:gravity="center_vertical"
+            android:drawablePadding="@dimen/dimen_8"
+            android:textColor="@color/rejected"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:text="Osh, hamirlik ovqat va shirinlik haftasiga 1 marta"
+            app:drawableStartCompat="@drawable/warning_24px"
+            app:drawableTint="@color/rejected" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/open_foods_button"
+            android:text="Ovqatlarni ko’rish"
+            style="@style/Headline2_16"
+            android:textColor="?colorPrimary"
+            android:paddingVertical="@dimen/dimen_12"
+            app:drawableEndCompat="@drawable/arrow_right"
+            app:drawableTint="?colorPrimary" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

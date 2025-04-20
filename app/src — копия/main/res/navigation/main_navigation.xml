@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/authFragment">
+
+    <fragment
+        android:id="@+id/authFragment"
+        android:name="uz.oybek.ozamiz.ui.AuthFragment"
+        android:label="AuthFragment" />
+    <fragment
+        android:id="@+id/loginGmailFragment"
+        android:name="uz.oybek.ozamiz.ui.LoginGmailFragment"
+        android:label="LoginGmailFragment" />
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="uz.oybek.ozamiz.ui.SplashFragment"
+        android:label="SplashFragment" />
+
+    <fragment
+        android:id="@+id/home"
+        android:name="uz.oybek.ozamiz.ui.HomeFragment"
+        android:label="HomeFragment" />
+
+    <fragment
+        android:id="@+id/foods"
+        android:name="uz.oybek.ozamiz.ui.diet.DietFragment"
+        android:label="DietFragment" />
+    <fragment
+        android:id="@+id/mealsFragment"
+        android:name="uz.oybek.ozamiz.ui.diet.MealsFragment"
+        android:label="MealsFragment" />
+    <fragment
+        android:id="@+id/mealAddFragment"
+        android:name="uz.oybek.ozamiz.ui.diet.MealAddFragment"
+        android:label="MealAddFragment" />
+</navigation>

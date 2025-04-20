@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ToolbarTitleApearence" parent="TextAppearance.AppCompat.Title">
+        <item name="fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="RoundedCornersDialog" parent="@style/Theme.MaterialComponents.Dialog">
+        <item name="dialogCornerRadius">16dp</item>
+        <item name="android:solidColor">#00000000</item>
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+    </style>
+
+</resources>

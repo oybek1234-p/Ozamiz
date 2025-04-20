@@ -1,0 +1,74 @@
+ <resources>
+    <style name="Base.Ozamiz" parent="Theme.Material3.Light.NoActionBar">
+
+        <item name="backgroundColor">?colorSurface</item>
+        <item name="android:windowBackground">?backgroundColor</item>
+        <item name="android:statusBarColor">?colorSurfaceContainerLowest</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="colorPrimary">#6750A4</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#EADDFF</item>
+        <item name="colorOnPrimaryContainer">#21005D</item>
+        <item name="colorSecondary">#625B71</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSecondaryContainer">#E8DEF8</item>
+        <item name="colorOnSecondaryContainer">#1D192B</item>
+        <item name="colorTertiary">#7D5260</item>
+        <item name="colorOnTertiary">#FFFFFF</item>
+        <item name="colorTertiaryContainer">#FFD8E4</item>
+        <item name="colorOnTertiaryContainer">#31111D</item>
+        <item name="colorError">#B3261E</item>
+        <item name="colorOnError">#FFFFFF</item>
+        <item name="colorErrorContainer">#FFDAD6</item>
+        <item name="colorOnErrorContainer">#410002</item>
+
+        <item name="colorPrimaryFixed">#EADDFF</item>
+        <item name="colorPrimaryFixedDim">#D0BCFF</item>
+        <item name="colorOnPrimaryFixed">#21005D</item>
+        <item name="colorOnPrimaryFixedVariant">#6750A4</item>
+        <item name="colorSecondaryFixed">#E8DEF8</item>
+        <item name="colorSecondaryFixedDim">#CCC2DC</item>
+        <item name="colorOnSecondaryFixed">#1D192B</item>
+        <item name="colorOnSecondaryFixedVariant">#4A4458</item>
+
+        <item name="colorTertiaryFixed">#FFD8E4</item>
+        <item name="colorTertiaryFixedDim">#EFB8C8</item>
+        <item name="colorOnTertiaryFixed">#31111D</item>
+        <item name="colorOnTertiaryFixedVariant">#7D5260</item>
+
+        <item name="colorOutline">#979797</item>
+        <item name="colorOutlineVariant">#FDF4F4F4</item>
+
+        <item name="colorSurfaceDim">#DED8E1</item>
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorSurfaceBright">#FEF7FF</item>
+
+        <item name="colorSurfaceContainerLowest">#FFFFFF</item>
+        <item name="colorSurfaceContainerLow">#F7F2FA</item>
+        <item name="colorSurfaceContainer">#F3EDF7</item>
+        <item name="colorSurfaceContainerHigh">#E6E0EC</item>
+        <item name="colorSurfaceContainerHighest">#DED8E1</item>
+        <item name="colorOnSurface">#1D1B20</item>
+        <item name="colorOnSurfaceVariant">#777777</item>
+
+        <item name="colorSurfaceInverse">#322F35</item>
+        <item name="colorOnSurfaceInverse">#F5EFF7</item>
+
+        <item name="contentScrim">#000000</item>
+        <item name="android:shadowColor">#000000</item>
+    </style>
+
+    <style name="Theme.Ozamiz" parent="Base.Ozamiz" />
+
+     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+         <item name="backgroundColor">?colorSurface</item>
+         <item name="android:windowBackground">?backgroundColor</item>
+         <item name="android:statusBarColor">?colorSurfaceContainerLowest</item>
+         <item name="android:windowLightStatusBar">true</item>
+         <item name="windowSplashScreenBackground">@color/white</item>
+         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+         <item name="postSplashScreenTheme">@style/Theme.Ozamiz</item>
+     </style>
+
+</resources>

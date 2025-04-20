@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/authFragment">
+
+    <fragment
+        android:id="@+id/authFragment"
+        android:name="uz.oybek.ozamiz.ui.AuthFragment"
+        android:label="AuthFragment" />
+    <fragment
+        android:id="@+id/loginGmailFragment"
+        android:name="uz.oybek.ozamiz.ui.LoginGmailFragment"
+        android:label="LoginGmailFragment" />
+
+    <fragment
+        android:id="@+id/splashFragment"
+        android:name="uz.oybek.ozamiz.ui.SplashFragment"
+        android:label="SplashFragment" />
+
+    <fragment
+        android:id="@+id/home"
+        android:name="uz.oybek.ozamiz.ui.HomeFragment"
+        android:label="HomeFragment" />
+
+    <fragment
+        android:id="@+id/getMainInfo"
+        android:name="uz.oybek.ozamiz.ui.getinfo.GetMainInfoFragment"
+        android:label="MainInfo" />
+    <fragment
+        android:id="@+id/setupRemindersFragment"
+        android:name="uz.oybek.ozamiz.ui.getinfo.SetupRemindersFragment"
+        android:label="SetupRemindersFragment" />
+    <dialog
+        android:id="@+id/customTimePickerDialogFragment"
+        android:name="uz.oybek.ozamiz.ui.getinfo.CustomTimePickerDialogFragment"
+        android:label="CustomTimePickerDialogFragment" />
+    <fragment
+        android:id="@+id/editExerciseReminderFragment"
+        android:name="uz.oybek.ozamiz.ui.getinfo.EditExerciseReminderFragment"
+        android:label="EditExerciseReminderFragment" />
+
+</navigation>

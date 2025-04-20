@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="FilledButton" parent="ThemeOverlay.Material3.Button">
+        <item name="fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="OutlineButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="CircleImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="RadiusImageView12">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/dimen_12</item>
+    </style>
+
+    <attr name="arrowEnabled" format="boolean" />
+    <attr name="title" format="string" />
+    <attr name="iconRes" format="reference" />
+    <attr name="subtitle" format="string" />
+
+    <declare-styleable name="TextInfoButton">
+        <attr name="title" />
+        <attr name="arrowEnabled" />
+        <attr name="iconRes" />
+        <attr name="subtitle" />
+    </declare-styleable>
+
+    <style name="SheetStyle" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+        <item name="android:colorBackground">?colorSurface</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="shapeAppearance">@style/SheetAppearance</item>
+    </style>
+
+    <style name="SheetAppearance" parent="ShapeAppearance.MaterialComponents.LargeComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/dimen_24</item>
+    </style>
+
+</resources>

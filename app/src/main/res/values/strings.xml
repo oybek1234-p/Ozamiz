@@ -1,0 +1,44 @@
+<resources>
+    <string name="app_name">Ozamiz</string>
+    <string name="daqiqa_oldin">daqiqa oldin</string>
+    <string name="sohat_oldin">soat oldin</string>
+    <string name="kun_oldin">kun oldin</string>
+    <string name="oy_oldin">oy oldin</string>
+    <string name="yil_oldin">yil oldin</string>
+    <string name="yaqinda">yaqinda</string>
+    <string name="no_internet">Internet mavjud emas</string>
+    <string name="yopish">Yopish</string>
+    <string name="akkauntga_kirish">Akkauntga kirish</string>
+    <string name="google_orqali_kirish">Google orqali kirish</string>
+    <string name="keyinroq">Keyinroq</string>
+    <string name="davom_etish">Davom etish</string>
+    <string name="your_web_client_id">1088123216096-d8qikb3bivrkkiaar410pbkc3qc3d94t.apps.googleusercontent.com</string>
+    <string name="biz_bilan_bog_lanish">Biz bilan bog\'laning</string>
+    <string name="internet_invalid">Internet yaxshi emas!</string>
+    <string name="insert_email">Emailni kiriting</string>
+    <string name="insert_password">Parolni kiriting</string>
+    <string name="invalid_password">Parol kamida 6 ta belgidan iborat</string>
+    <string name="retry_later">Keyinroq urinib ko\'ring!</string>
+    <string name="weak_password">Havfsiz paroq kiriting!</string>
+    <string name="o_tkazib_yuborish">O\'tkazib yuborish</string>
+    <string name="email_or_pass_not_valid">Email yoki parol notogri</string>
+    <string name="operator">Operator</string>
+    <string name="boshlash">Boshlash</string>
+    <string name="ismingizni_kiriting">Izmingizni kiriting</string>
+    <string name="obed">Obed</string>
+
+        <!-- ... boshqa stringlar ... -->
+        <string name="cancel">Bekor qilish</string>
+        <string name="save">Saqlash</string>
+    <string name="time_ex">13:00</string>
+    <string name="kaloriya">Kaloriya</string>
+    <string name="oqsillar">Oqsillar</string>
+    <string name="_16_187_g">16/187 g</string>
+    <string name="protein">Protein</string>
+    <string name="yog">Yog\'</string>
+    <string name="yeyildi">Yeyildi</string>
+    <string name="nonushta">Nonushta</string>
+    <string name="kechki_ovqat">Kechki ovqat</string>
+    <string name="tamaddi">Tamaddi</string>
+    <string name="nomi">Nomi</string>
+</resources>

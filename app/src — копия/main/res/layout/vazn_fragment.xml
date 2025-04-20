@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="?colorSurface"
+    android:layout_height="match_parent">
+
+    <uz.oybek.ozamiz.ui.base.MyToolBar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="Hozirgi vazningizni kiriting"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/input_lay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Vazningiz kg"
+        app:hintEnabled="true"
+        android:layout_margin="@dimen/dimen_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:helperText="Misol: 80 kg"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:maxLength="3"
+            android:inputType="numberDecimal"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/next_button"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/dimen_24"
+        android:layout_height="wrap_content"
+        android:text="@string/davom_etish"
+        android:layout_marginHorizontal="@dimen/dimen_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/input_lay" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //Title
+
+    <style name="Title2_20">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+
+    </style>
+
+    <style name="Title4_24">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+
+    <style name="Title3_17">
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    //Headline
+
+    <style name="Headline1_16">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Headline2_16">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="Headline3_15">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    //Text
+
+    <style name="Text1_16">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Text1_14">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Text2_15">
+        <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    //Subtitle
+
+    <style name="Subtitle1_14">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Subtitle2_14">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="Subtitle3_13">
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    //Caption
+
+    <style name="Caption1_13">
+        <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <style name="Caption2_12">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Caption3_11">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">@font/roboto_regular</item>
+    </style>
+
+    <style name="Caption4_11">
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+</resources>

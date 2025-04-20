@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "730315334265",
+    "firebase_url": "https://ozamiz-a2288-default-rtdb.firebaseio.com",
+    "project_id": "ozamiz-a2288",
+    "storage_bucket": "ozamiz-a2288.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730315334265:android:1468c77e70ea83b7226aa8",
+        "android_client_info": {
+          "package_name": "uz.oybek.ozamiz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwuIg-6duMZz9NYjY_Q-qjhEc-G_jQ0wM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

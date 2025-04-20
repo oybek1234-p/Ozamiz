@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+   app:cardElevation="@dimen/dimen_4"
+    app:cardCornerRadius="@dimen/dimen_12"
+    app:cardBackgroundColor="?colorSurface"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dimen_18"
+        android:background="?colorSurface"
+        >
+
+        <TextView
+            android:id="@+id/textView3"
+            style="@style/Title3_17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/kaloriya"
+            android:textColor="?colorOnSurface"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/calorie_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="10"
+            app:trackCornerRadius="@dimen/dimen_4"
+            app:indicatorDirectionLinear="leftToRight"
+            app:trackStopIndicatorSize="0dp"
+            app:indicatorTrackGapSize="0dp"
+            android:indeterminate="false"
+            android:layout_marginTop="@dimen/dimen_8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3"
+            app:trackThickness="@dimen/dimen_8" />
+        
+        <TextView
+            android:id="@+id/calorie_got"
+            android:layout_marginTop="@dimen/dimen_4"
+            style="@style/Title3_17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:text="200"
+            android:textColor="?colorOnSurface"
+            app:layout_constraintStart_toStartOf="@+id/calorie_view"
+            app:layout_constraintTop_toBottomOf="@+id/calorie_view" />
+
+        <TextView
+            android:id="@+id/eaten_view"
+            android:layout_marginStart="@dimen/dimen_12"
+            style="@style/Text1_14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/yeyildi"
+            android:textColor="?colorOnSurfaceVariant"
+            app:layout_constraintBottom_toBottomOf="@+id/calorie_got"
+            app:layout_constraintStart_toEndOf="@+id/calorie_got"
+            app:layout_constraintTop_toTopOf="@+id/calorie_got" />
+
+        <TextView
+            android:id="@+id/eaten_view2"
+            style="@style/Text1_14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/dimen_12"
+            android:text="Qoldi"
+            android:textColor="?colorOnSurfaceVariant"
+            app:layout_constraintBottom_toBottomOf="@+id/calorie_need"
+            app:layout_constraintEnd_toStartOf="@+id/calorie_need"
+            app:layout_constraintTop_toTopOf="@+id/calorie_need"
+            app:layout_constraintVertical_bias="1.0" />
+
+        <TextView
+            android:id="@+id/calorie_need"
+            style="@style/Title3_17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_4"
+            android:text="1550"
+            android:textSize="18sp"
+            android:textColor="?colorOnSurface"
+            app:layout_constraintEnd_toEndOf="@+id/calorie_view"
+            app:layout_constraintTop_toBottomOf="@+id/calorie_view" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_18"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/calorie_got">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text2_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/oqsillar"
+                    android:textColor="?colorOnSurfaceVariant" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/carb_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_4"
+                    android:indeterminate="false"
+                    android:progress="10"
+                    app:indicatorDirectionLinear="leftToRight"
+                    app:indicatorTrackGapSize="0dp"
+                    app:trackCornerRadius="@dimen/dimen_4"
+                    app:trackStopIndicatorSize="0dp"
+                    app:trackThickness="@dimen/dimen_4" />
+
+                <TextView
+                    android:id="@+id/carbs_text"
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_4"
+                    android:text="@string/_16_187_g"
+                    android:textColor="?colorOnSurface" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dimen_14"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text2_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/protein"
+                    android:textColor="?colorOnSurfaceVariant" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/protein_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_4"
+                    android:indeterminate="false"
+                    android:progress="20"
+                    app:indicatorDirectionLinear="leftToRight"
+                    app:indicatorTrackGapSize="0dp"
+                    app:trackCornerRadius="@dimen/dimen_4"
+                    app:trackStopIndicatorSize="0dp"
+                    app:trackThickness="@dimen/dimen_4" />
+
+                <TextView
+                    android:id="@+id/protein_text"
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_4"
+                    android:text="2/75 g"
+                    android:textColor="?colorOnSurface" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dimen_14"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text2_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/yog"
+                    android:textColor="?colorOnSurfaceVariant" />
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/fat_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_4"
+                    android:indeterminate="false"
+                    android:progress="100"
+                    app:indicatorDirectionLinear="leftToRight"
+                    app:indicatorTrackGapSize="0dp"
+                    app:trackCornerRadius="@dimen/dimen_4"
+                    app:trackStopIndicatorSize="0dp"
+                    app:trackThickness="@dimen/dimen_4" />
+
+                <TextView
+                    android:id="@+id/fat_text"
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_4"
+                    android:text="10/49 g"
+                    android:textColor="?colorOnSurface" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView4"
+            style="@style/Text2_15"
+            android:layout_width="wrap_content"
+            android:drawableTint="?colorPrimary"
+            android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/dimen_8"
+            android:layout_marginTop="@dimen/dimen_24"
+            android:text="Kaloriya yoqildi:"
+            app:drawableStartCompat="@drawable/fire_ic"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+        <TextView
+            android:id="@+id/calorie_burned"
+            style="@style/Title3_17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="?colorOnSurface"
+            android:layout_marginStart="@dimen/dimen_12"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/textView4"
+            app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+        <TextView
+            android:id="@+id/calorie_help"
+            style="@style/Text1_14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:text="Intensiv mashqlar, Yurish, Raqsga tushish, sport orqali kaloriya yoqotasiz"
+            android:textColor="?colorOnSurfaceVariant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textView4"
+            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.google.android.material.card.MaterialCardView>

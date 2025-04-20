@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/dimen_18"
+    android:layout_marginTop="@dimen/dimen_8"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardElevation="1dp"
+    app:cardCornerRadius="@dimen/dimen_10">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dimen_14">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/iv_reminder_icon"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearanceOverlay="@style/RadiusImageView12"
+            tools:src="@drawable/food_ic" />
+
+        <TextView
+            android:id="@+id/tv_reminder_name"
+            style="@style/Headline2_16"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dimen_14"
+            android:layout_marginEnd="@dimen/dimen_8"
+            android:textColor="?colorOnSurface"
+            app:layout_constraintEnd_toStartOf="@+id/tv_reminder_time"
+            app:layout_constraintStart_toEndOf="@id/iv_reminder_icon"
+            app:layout_constraintTop_toTopOf="@+id/iv_reminder_icon"
+            tools:text="Nonushta" />
+
+        <TextView
+            android:id="@+id/tv_description"
+            style="@style/Text1_14"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_2"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:layout_marginStart="@dimen/dimen_14"
+            android:layout_marginEnd="@dimen/dimen_8"
+            android:textColor="?colorOnSurface"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_reminder_time"
+            app:layout_constraintStart_toEndOf="@id/iv_reminder_icon"
+            app:layout_constraintTop_toBottomOf="@+id/tv_reminder_name"
+            tools:text="Haqida" />
+
+        <TextView
+            android:id="@+id/tv_reminder_time"
+            style="@style/Subtitle2_14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?colorPrimary"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_edit_reminder"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="07:00" />
+
+        <ImageView
+            android:id="@+id/iv_edit_reminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dimen_12"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="@dimen/dimen_6"
+            android:src="@drawable/edit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?colorOnSurfaceVariant" />
+
+        <!-- O'chirish ikonkasini bu yerdan olib tashladik -->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

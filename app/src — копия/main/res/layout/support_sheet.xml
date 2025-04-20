@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/round_lay"
+        android:backgroundTint="?colorSurfaceContainerLowest"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/phone_View"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/dimen_24"
+            android:paddingVertical="@dimen/dimen_24"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/boglanish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Biz bilan aloqa"
+                android:drawableStart="@drawable/admin_ic"
+                android:drawablePadding="@dimen/dimen_12"
+                android:layout_gravity="center_horizontal"
+                style="@style/Title2_20"
+                android:layout_marginBottom="@dimen/dimen_18"
+                android:textColor="?colorOnSurface" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/callview"
+                style="@style/FilledButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/operator"
+                android:padding="@dimen/dimen_12"
+                app:icon="@drawable/call_ic"
+                app:iconGravity="textStart"
+                app:tint="@color/white" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/request_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableTint="@color/white"
+                android:text="Telegram"
+                style="@style/Widget.Material3.Button.TonalButton"
+                app:icon="@drawable/telegram_ic"
+                app:iconGravity="textStart" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

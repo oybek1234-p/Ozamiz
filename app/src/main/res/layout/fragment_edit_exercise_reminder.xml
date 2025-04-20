@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurface">
+
+    <uz.oybek.ozamiz.ui.base.MyToolBar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:title="Piyoda yurish" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toTopOf="@id/ll_buttons">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/dimen_18">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/iv_exercise_image"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="@dimen/dimen_18"
+                android:layout_marginTop="@dimen/dimen_12"
+                app:shapeAppearanceOverlay="@style/RadiusImageView12"
+                tools:src="@drawable/sport_ic" />
+
+            <TextView
+                android:id="@+id/tv_exercise_name"
+                style="@style/Title4_24"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18"
+                android:gravity="center"
+                android:layout_marginHorizontal="@dimen/dimen_18"
+                android:textColor="?colorOnSurface"
+                tools:text="Piyoda yurish" />
+
+            <TextView
+                android:id="@+id/tv_exercise_description"
+                style="@style/Text2_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="@dimen/dimen_8"
+                android:layout_marginHorizontal="@dimen/dimen_18"
+                android:textColor="?colorOnSurfaceVariant"
+                android:lineSpacingMultiplier="1.2"
+                tools:text="Yog'larni yoqish va qon aylanishini yaxshilash uchun ajoyib mashq. Kamida 30 daqiqa tavsiya etiladi." />
+
+            <TextView
+                style="@style/Headline2_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:layout_marginStart="@dimen/dimen_18"
+                android:text="Eslatma vaqti"
+                android:textColor="?colorOnSurface" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_set_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_8"
+                android:layout_marginHorizontal="@dimen/dimen_18"
+                app:cardCornerRadius="@dimen/dimen_12"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?colorOutline"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/dimen_14"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/date_ic"
+                        app:tint="?colorPrimary"/>
+
+                    <TextView
+                        android:id="@+id/tv_selected_time"
+                        style="@style/Headline2_16"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimen_12"
+                        android:textColor="?colorOnSurface"
+                        tools:text="16:30" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/edit"
+                        app:tint="?colorOnSurfaceVariant"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/ll_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/dimen_18"
+        android:paddingTop="@dimen/dimen_12"
+        android:paddingBottom="@dimen/dimen_18"
+        android:background="?colorSurfaceContainerLowest"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_exercise"
+            style="@style/FilledButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/save" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_delete_exercise"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_4"
+            android:text="Eslatmani o'chirish"
+            android:textColor="?colorError"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

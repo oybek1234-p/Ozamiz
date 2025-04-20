@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/home"
+        android:title="Asosiy"
+        android:icon="@drawable/home_ic"
+        />
+
+    <item android:id="@+id/foods"
+        android:title="Ovqatlar"
+        android:icon="@drawable/food_ic"
+        />
+
+    <item android:id="@+id/sport"
+        android:title="Mashqlar"
+        android:icon="@drawable/sport_ic"
+        />
+
+    <item android:icon="@drawable/profile_ic"
+        android:title="Profil"
+        android:id="@+id/profile"
+        />
+</menu>
