@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/meal_root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="16dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image_meal_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/oval_back"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/breakfast_ic" />
+
+        <TextView
+            android:id="@+id/text_meal_name"
+            style="@style/Headline2_16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textColor="?colorOnSurface"
+            app:layout_constraintStart_toEndOf="@+id/image_meal_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Nonushta" />
+
+        <TextView
+            android:id="@+id/text_meal_calories"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="?colorOnSurfaceVariant"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@+id/button_add_meal"
+            app:layout_constraintStart_toStartOf="@+id/text_meal_name"
+            app:layout_constraintTop_toBottomOf="@+id/text_meal_name"
+            tools:text="250 kal" />
+
+        <TextView
+            android:id="@+id/text_meal_reminder_time"
+            style="@style/Caption2_12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dimen_12"
+            android:textColor="#5F5F5F"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/text_meal_name"
+            app:layout_constraintStart_toEndOf="@+id/text_meal_name"
+            app:layout_constraintTop_toTopOf="@+id/text_meal_name"
+            tools:text="07:00"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_add_meal"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:paddingHorizontal="@dimen/dimen_8"
+            android:paddingVertical="@dimen/dimen_2"
+            android:src="@drawable/add_ic"
+            android:text="Qo'shish"
+            android:textColor="?colorPrimary"
+            android:textSize="13sp"
+            app:icon="@drawable/add_ic"
+            app:iconPadding="@dimen/dimen_4"
+            app:iconTint="?colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_meal_logs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:paddingTop="8dp"/>
+
+</LinearLayout>

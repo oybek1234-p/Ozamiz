@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?colorSurfaceContainerLowest">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_select_exercises"
+        style="@style/Widget.MaterialComponents.Toolbar.Surface"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:navigationIcon="@drawable/close_ic"
+        app:title="@string/select_exercises"
+        app:menu="@menu/select_done_menu"/> <!-- "Done" tugmasi uchun menyu -->
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchView_exercises"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/round_lay"
+        app:iconifiedByDefault="false"
+        app:queryHint="@string/search_exercises_hint" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_all_exercises"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_exercise_selectable" />
+
+    <!-- Tanlangan mashqlarni ko'rsatish uchun (ixtiyoriy, pastki qismda) -->
+    <TextView
+        android:id="@+id/textView_selected_count"
+        style="@style/TextLabelMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:gravity="center"
+        tools:text="3 ta mashq tanlandi" />
+
+</LinearLayout>

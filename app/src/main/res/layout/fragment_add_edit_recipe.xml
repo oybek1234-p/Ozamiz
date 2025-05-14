@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurface">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout_add_edit_recipe"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_add_edit_recipe"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/add_edit_menu"
+            app:navigationIcon="@drawable/arrow_back"
+            app:navigationIconTint="?colorOnSurface"
+            app:titleTextColor="?colorOnSurface"
+            tools:title="Yangi Retsept Qo'shish"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                style="@style/Headline2_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Retsept Rasmi"
+                android:textColor="?colorOnSurface"/>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_imagePicker_recipe"
+                style="@style/ImagePickerCardStyle"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginTop="8dp">
+                <include
+                    android:id="@+id/include_image_picker_recipe"
+                    layout="@layout/include_image_picker"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_recipe_name"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Retsept Nomi*">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_recipe_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                style="@style/Headline2_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Kategoriyalarni tanlang"
+                android:textColor="?colorOnSurface"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroup_categories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="8dp"/>
+                <ProgressBar android:id="@+id/progressBar_categories" style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true" android:visibility="gone" tools:visibility="visible"/>
+            </FrameLayout>
+
+            <TextView
+                style="@style/Headline2_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Ozuqaviy qiymati (ixtiyoriy)"
+                android:textColor="?colorOnSurface"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout_calories"
+                    style="@style/InputLayoutColumn"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    android:hint="Kaloriya">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editText_calories"
+                        style="@style/InputEditTextColumn"
+                        android:inputType="number"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout_protein"
+                    style="@style/InputLayoutColumn"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    android:hint="Oqsil (g)">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editText_protein"
+                        style="@style/InputEditTextColumn"
+                        android:inputType="numberDecimal"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout_fat"
+                    style="@style/InputLayoutColumn"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    android:hint="Yog' (g)">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editText_fat"
+                        style="@style/InputEditTextColumn"
+                        android:inputType="numberDecimal"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/textInputLayout_carbs"
+                    style="@style/InputLayoutColumn"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    android:hint="Uglevod (g)">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editText_carbs"
+                        style="@style/InputEditTextColumn"
+                        android:inputType="numberDecimal"/>
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_prep_time"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:suffixText="daqiqa"
+                android:hint="Tayyorlash vaqti (ixtiyoriy)">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_prep_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                style="@style/Headline2_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Masalliqlar"
+                android:textColor="?colorOnSurface"/>
+            <LinearLayout
+                android:id="@+id/linearLayout_ingredients_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_add_ingredient"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/add_ingredient"
+                app:icon="@drawable/add_ic"/>
+
+            <TextView
+                style="@style/Headline2_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Tayyorlash Qadamlari"
+                android:textColor="?colorOnSurface"/>
+            <LinearLayout
+                android:id="@+id/linearLayout_steps_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_add_step"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Qadam qo'shish +"
+                app:icon="@drawable/add_ic"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_video_url"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Video URL (ixtiyoriy)">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_video_url"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                style="@style/Headline2_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Teglar (ixtiyoriy)"
+                android:textColor="?colorOnSurface"/>
+            <LinearLayout
+                android:id="@+id/linearLayout_tags_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="vertical"/>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_add_tag"
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Teg qo'shish +"
+                app:icon="@drawable/add_ic"/>
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/checkbox_is_popular"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Mashhur retseptlar ro'yxatiga qo'shish"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_save_recipe"
+                    style="@style/FilledButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/save"/>
+
+                <ProgressBar
+                    android:id="@+id/progressBar_save_recipe"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorSize="24dp"
+                    app:indicatorColor="?colorOnPrimary" />
+            </FrameLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?colorSurfaceContainerLowest"
+    app:behavior_peekHeight="500dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <!-- Handle for dragging -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:background="?colorOutlineVariant" />
+
+    <!-- Media Content Area (Only ImageView for GIF/Animation) -->
+    <ImageView
+        android:id="@+id/imageView_exercise_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
+        android:scaleType="fitCenter"
+        tools:src="@drawable/placeholder_exercise" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="20dp">
+
+        <TextView
+            android:id="@+id/textView_exercise_name_dialog"
+            style="@style/Title3_17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?colorOnSurface"
+            tools:text="Star Jumps" />
+
+        <TextView
+            android:id="@+id/textView_exercise_duration_reps_dialog"
+            style="@style/Text2_15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="?colorOnSurfaceVariant"
+            tools:text="Duration: 00:20" />
+
+        <TextView
+            android:id="@+id/textView_exercise_description_dialog"
+            style="@style/TextBodyMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="?colorOnSurfaceVariant"
+            android:lineSpacingMultiplier="1.1"
+            android:maxLines="6"
+            android:ellipsize="end"
+            tools:text="Start in a squat position with your hands touching your feet.\nJump up, spread your legs apart and raise your arms overhead to your sides.\nReturn to the start position, and do the next rep." />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_close_dialog"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            android:text="@string/close" />
+
+    </LinearLayout>
+
+</LinearLayout>

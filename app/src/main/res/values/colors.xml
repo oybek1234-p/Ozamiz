@@ -8,4 +8,19 @@
     <color name="yellow">#BB7000</color>
     <color name="green">#0F9063</color>
     <color name="rejected">#C12317</color>
+
+    <color name="chip_background_color">#FFFFFF</color> <!-- Lighter gray for chips -->
+    <color name="chip_text_color">#333333</color> <!-- Darker text for chips -->
+    <color name="warning_background_color">#FFF8E1</color> <!-- Very light yellow/orange -->
+    <color name="warning_stroke_color">#FFE0B2</color> <!-- Light orange -->
+    <color name="colorWarning">#FFB74D</color> <!-- Standard warning orange -->
+
+    <color name="colorPrimary">?colorPrimary</color>
+    <color name="colorOutlineVariant">?colorOutlineVariant</color>
+    <color name="colorSecondary">?colorSecondary</color>
+    <color name="colorTertiary">?colorTertiary</color>
+    <color name="colorPrimaryContainerApha">#1FEADDFF</color> <!-- Example: PrimaryContainer with ~12% alpha -->
+    <color name="grey">#888888</color>
+
+
 </resources>

@@ -9,7 +9,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.core.view.doOnLayout
 import androidx.core.view.postDelayed
 import androidx.lifecycle.MutableLiveData
 import com.bumptech.glide.Glide
@@ -47,14 +46,12 @@ fun ImageView.loadPhoto(string: Any?, blur: Boolean = false) {
     } catch (e: Exception) {
         handleException(e)
     }
-    doOnLayout {
-        var req = Glide.with(appContext).load(loadUrl)
-        if (blur && notBlur.not()) {
-            req = req.transform(BlurTransformation(70))
-        }
-        req.transition(DrawableTransitionOptions.withCrossFade(150))
-            .override(measuredWidth, measuredHeight).into(this)
+    var req = Glide.with(appContext).load(loadUrl)
+    if (blur && notBlur.not()) {
+        req = req.transform(BlurTransformation(70))
     }
+    req.transition(DrawableTransitionOptions.withCrossFade(150))
+        .override(measuredWidth, measuredHeight).into(this)
 }
 
 fun TextInputLayout.setEditTextErrorIf(errorText: String, condition: () -> Boolean) {

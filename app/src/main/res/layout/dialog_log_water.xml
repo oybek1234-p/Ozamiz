@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?colorSurfaceContainerLowest"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        style="@style/Title2_20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:text="@string/log_water_title"
+        android:textColor="?colorOnSurface" />
+
+    <TextView
+        style="@style/Text1_16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:drawablePadding="@dimen/dimen_8"
+        android:text="Suvni ovqatdan 20 minut olding iching"
+        android:textColor="?colorOnSurface"
+        app:drawableStartCompat="@drawable/info_ic" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_12"
+        android:baselineAligned="false"
+        android:orientation="horizontal">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_glass"
+            style="@style/WaterPresetCard">
+
+            <LinearLayout style="@style/WaterPresetLayout">
+
+                <ImageView
+                    style="@style/WaterPresetIcon"
+                    android:visibility="gone"
+                    android:src="@drawable/water_full_24px" />
+
+                <TextView
+                    style="@style/WaterPresetLabel"
+                    android:text="@string/water_preset_glass" />
+
+                <TextView
+                    style="@style/WaterPresetAmount"
+                    android:text="@string/water_amount_glass" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_small_bottle"
+            style="@style/WaterPresetCard"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp">
+
+            <LinearLayout style="@style/WaterPresetLayout">
+
+                <ImageView
+                    style="@style/WaterPresetIcon"
+                    android:visibility="gone"
+                    android:src="@drawable/bottle_mini" />
+
+                <TextView
+                    style="@style/WaterPresetLabel"
+                    android:gravity="center"
+                    android:text="0.5 litr" />
+
+                <TextView
+                    style="@style/WaterPresetAmount"
+                    android:text="@string/water_amount_small_bottle" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_large_bottle"
+            style="@style/WaterPresetCard">
+
+            <LinearLayout style="@style/WaterPresetLayout">
+
+                <ImageView
+                    style="@style/WaterPresetIcon"
+                    android:visibility="gone"
+                    android:src="@drawable/water_bottle_24px" />
+
+                <TextView
+                    style="@style/WaterPresetLabel"
+                    android:text="1 litr" />
+
+                <TextView
+                    style="@style/WaterPresetAmount"
+                    android:text="@string/water_amount_large_bottle" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout_waterAmount"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="@string/enter_water_amount_hint"
+        app:suffixText="ml">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_waterAmount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLength="5" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_cancel_water"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:text="@string/cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_add_water_confirm"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/add" />
+    </LinearLayout>
+
+</LinearLayout>

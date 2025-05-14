@@ -50,7 +50,7 @@
         <item name="colorSurfaceContainerHigh">#E6E0EC</item>
         <item name="colorSurfaceContainerHighest">#DED8E1</item>
         <item name="colorOnSurface">#1D1B20</item>
-        <item name="colorOnSurfaceVariant">#777777</item>
+        <item name="colorOnSurfaceVariant">#5A5A5A</item>
 
         <item name="colorSurfaceInverse">#322F35</item>
         <item name="colorOnSurfaceInverse">#F5EFF7</item>
@@ -67,7 +67,6 @@
          <item name="android:statusBarColor">?colorSurfaceContainerLowest</item>
          <item name="android:windowLightStatusBar">true</item>
          <item name="windowSplashScreenBackground">@color/white</item>
-         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
          <item name="postSplashScreenTheme">@style/Theme.Ozamiz</item>
      </style>
 

@@ -40,7 +40,7 @@ object LocalUser {
                 gender = getInt("gender", -1)
                 age = getInt("age", -1)
                 height = getInt("height", -1)
-                weight = getInt("weight", -1)
+                weight = getFloat("weight", -1f).toDouble()
                 problems = getStringSet("problems", null)?.toList()
 
                 val settingsJson = getString("reminderSettingsJson", null)
@@ -76,7 +76,7 @@ object LocalUser {
                 putInt("gender", gender)
                 putInt("age", age)
                 putInt("height", height)
-                putInt("weight", weight)
+                putFloat("weight", weight.toFloat())
                 if (problems != null) {
                     putStringSet("problems", problems?.toSet())
                 } else {

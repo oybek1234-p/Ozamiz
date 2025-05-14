@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal"> <!-- Tema rangiga moslashadi -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M12,3C8.5,3 5,9 5,14c0,3.86 3.14,7 7,7s7,-3.14 7,-7C19,9 15.5,3 12,3zM12,19c-2.76,0 -5,-2.24 -5,-5 0,-4.16 2.61,-9 5,-9 2.39,0 5,4.84 5,9C17,16.76 14.76,19 12,19z"/>
+</vector>

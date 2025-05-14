@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- Add search or other actions if needed for meal set list -->
+    <item
+        android:id="@+id/action_add_meal_set"
+        android:title="Set qo'shish"
+        android:icon="@drawable/add_ic"
+        app:showAsAction="ifRoom"
+        android:visible="false"/> <!-- Shown for admin -->
+</menu>

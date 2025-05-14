@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.PermissionController
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.UserRepository
-import uz.oybek.ozamiz.data.valid
 import uz.oybek.ozamiz.databinding.FragmentAuthBinding
 import uz.oybek.ozamiz.handleException
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -144,10 +143,10 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
             isSigning = false
             closeFragment()
             isSigning = false
-            if (user!!.name.isEmpty()) {
-                 navigate(R.id.getMainInfo)
+            if (user.name.isEmpty()) {
+                navigate(R.id.getMainInfo)
             } else {
-                  mainActivity()?.recreateUi(true)
+                mainActivity()?.recreateUi(true)
             }
         }
     }
@@ -178,7 +177,7 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
                 loginGoogle()
             }
             emailButton.setOnClickListener {
-                  navigate(R.id.loginGmailFragment)
+                navigate(R.id.loginGmailFragment)
             }
         }
     }

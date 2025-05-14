@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="16dp"
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/imageView_exercise_selectable_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="centerCrop"
+        tools:src="@drawable/placeholder_exercise"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView_exercise_selectable_name"
+            style="@style/TextBodyLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Squats" />
+
+        <TextView
+            android:id="@+id/textView_exercise_selectable_details"
+            style="@style/TextBodyMedium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="?colorOnSurfaceVariant"
+            tools:text="00:30" />
+
+    </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/checkBox_exercise_selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:clickable="false"/> <!-- Clickni item'ning o'ziga beramiz -->
+
+</LinearLayout>

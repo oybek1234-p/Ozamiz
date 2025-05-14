@@ -1,10 +1,16 @@
 <resources>
+    <!-- Existing strings -->
     <string name="app_name">Ozamiz</string>
     <string name="daqiqa_oldin">daqiqa oldin</string>
     <string name="sohat_oldin">soat oldin</string>
     <string name="kun_oldin">kun oldin</string>
     <string name="oy_oldin">oy oldin</string>
     <string name="yil_oldin">yil oldin</string>
+    <string name="ask_alternative_title">Boshqa narsa yesam bo\'ladimi?</string>
+    <string name="ask_alternative_hint">Masalan: Manti yesam bo\'ladimi?</string>
+    <string name="no_recommendation">Tavsiya hozircha yo\'q</string>
+    <string name="recommendation_info_text">Bu tavsiyalar sizning o\'tgan haftadagi ovqatlanishingizga asoslangan.</string>
+    <string name="error_loading_food_history">O\'tgan ovqatlanish tarixini yuklashda xatolik: %1$s</string>
     <string name="yaqinda">yaqinda</string>
     <string name="no_internet">Internet mavjud emas</string>
     <string name="yopish">Yopish</string>
@@ -26,10 +32,6 @@
     <string name="boshlash">Boshlash</string>
     <string name="ismingizni_kiriting">Izmingizni kiriting</string>
     <string name="obed">Obed</string>
-
-        <!-- ... boshqa stringlar ... -->
-        <string name="cancel">Bekor qilish</string>
-        <string name="save">Saqlash</string>
     <string name="time_ex">13:00</string>
     <string name="kaloriya">Kaloriya</string>
     <string name="oqsillar">Oqsillar</string>
@@ -41,4 +43,272 @@
     <string name="kechki_ovqat">Kechki ovqat</string>
     <string name="tamaddi">Tamaddi</string>
     <string name="nomi">Nomi</string>
+    <string name="title_home">Asosiy</string>
+    <string name="title_foods">Ovqatlar</string>
+    <string name="title_sport">Mashqlar</string>
+    <string name="title_profile">Profil</string>
+    <string name="subtitle_what_to_eat">Nima yeyish mumkin?</string>
+    <string name="category_breakfast">Nonushta</string>
+    <string name="category_lunch">Tushlik</string>
+    <string name="category_dinner">Kechki ovqat</string>
+    <string name="category_snack">Tamaddi</string>
+    <string name="empty_food_list">Bu kategoriyada hali ovqatlar yo\'q.</string>
+    <string name="edit">Tahrirlash</string>
+    <string name="delete">O\'chirish</string>
+    <string name="cancel">Bekor qilish</string>
+    <string name="confirm_delete_title">O\'chirishni tasdiqlang</string>
+    <string name="confirm_delete_message">\'%1$s\'ni o\'chirishga ishonchingiz komilmi?</string>
+    <string name="confirm_delete_message_generic">\'%1$s\'ni o\'chirishga ishonchingiz komilmi?</string>
+    <string name="yes_delete">Ha, o\'chirish</string>
+    <string name="no">Yo\'q</string>
+    <string name="food_deleted_success">Ovqat muvaffaqiyatli o\'chirildi</string>
+    <string name="error_deleting">O\'chirishda xatolik: %1$s</string>
+    <string name="error_loading_next_page">Keyingi sahifani yuklashda xatolik</string>
+    <string name="generic_error_format">Xatolik: %1$s</string>
+    <string name="recipe">Retsept</string>
+    <string name="preparation">Tayyorlash</string>
+    <string name="no_recipe">Retsept kiritilmagan</string>
+
+    <string name="discover_title">Mashqlar</string>
+    <string name="search">Qidirish</string>
+    <string name="see_all">Barchasi</string>
+    <string name="start_workout">Boshlash</string>
+    <string name="watch_ad_to_unlock">Reklama ko\'rib ochish</string>
+    <string name="exercises_title_format">%d Mashq</string>
+    <string name="repetitions_format">x%d</string>
+    <string name="no_workouts_found">Mashqlar topilmadi</string>
+    <string name="add_workout_or_category">Workout yoki kategoriya qo\'shish</string>
+
+    <string name="search_workouts_hint">Workoutlarni qidirish...</string>
+    <string name="search_no_results">Qidiruv natijasi topilmadi</string>
+    <string name="remove_image">Rasmni olib tashlash</string>
+    <string name="category_name_hint">Kategoriya nomi</string>
+    <string name="order_hint">Tartib raqami</string>
+    <string name="workout_name_hint">Workout nomi</string>
+    <string name="description_optional_hint">Tavsif (ixtiyoriy)</string>
+    <string name="categories">Kategoriyalar</string>
+    <string name="exercises">Mashqlar</string>
+    <string name="select_or_order_exercises">Mashqlarni tanlash / Tartiblash</string>
+    <string name="estimated_duration_minutes_hint">Taxminiy davomiyligi (daqiqa)</string>
+    <string name="difficulty_level_hint">Qiyinlik darajasi</string>
+    <string name="target_areas">Maqsadli mushaklar</string>
+    <string name="tags_comma_separated_hint">Teglar (vergul bilan ajrating)</string>
+    <string name="order_in_category_hint">Kategoriya ichidagi tartibi</string>
+    <string name="requires_premium_subscription">Premium obuna talab qilinadi</string>
+    <string name="requires_ad_view_if_not_premium">Premium bo\'lmasa, reklama ko\'rish kerak</string>
+    <string name="exercise_name_hint">Mashq nomi</string>
+    <string name="exercise_description_how_to_hint">Mashq tavsifi / Qanday bajariladi</string>
+    <string name="duration_seconds_hint">Davomiyligi (sekund)</string>
+    <string name="repetitions_hint">Takrorlashlar soni</string>
+    <string name="voice_instruction_url_optional_hint">Ovozli yo\'riqnoma URL (ixtiyoriy)</string>
+    <string name="add_gif_or_image">GIF yoki rasm qo\'shish</string>
+    <string name="no_exercises_selected">Mashq tanlanmagan</string>
+
+    <string name="error_loading_detail">Ma\'lumot yuklashda xatolik</string>
+    <string name="calories_format">%d kal</string>
+    <string name="add_food_title">Ovqat qo\'shish</string>
+    <string name="edit_food_title">Ovqatni tahrirlash</string>
+    <string name="add_image">Rasm qo\'shish</string>
+    <string name="food_name_hint">Nomi</string>
+    <string name="calories_hint">Kaloriya (kal)</string>
+    <string name="preparation_hint">Tayyorlash (ixtiyoriy)</string>
+    <string name="ingredient_hint">Masalliq %1$d</string>
+    <string name="add_ingredient">Qo\'shish +</string>
+    <string name="save">Saqlash</string>
+    <string name="error_enter_name">Nomini kiriting</string>
+    <string name="error_select_image">Rasm tanlang</string>
+    <string name="food_added_success">Muvaffaqiyatli qo\'shildi</string>
+    <string name="food_edited_success">Muvaffaqiyatli tahrirlandi</string>
+    <string name="error_saving">Saqlashda xatolik: %1$s</string>
+    <string name="action_delete">O\'chirish</string>
+    <string name="error_data_not_found">Ma\'lumot topilmadi</string>
+    <string name="loading">Yuklanmoqda...</string>
+    <string name="sample_food_title">Protein packed oatmeal</string>
+    <string name="sample_calories">378 kal</string>
+    <string name="home_title">Asosiy</string>
+    <string name="daily_calorie_goal_title">Yeyish kerak</string>
+    <string name="target_calories_format">Bugungi limit %d kaloriya</string>
+    <string name="consumed_calories_format">%1$d / %2$d kal</string>
+    <string name="meals_title">Ovqatlanish</string>
+    <string name="add_meal_description">Ovqat qo\'shish uchun + tugmasini bosing</string>
+    <string name="food_list_button">Ovqatlar Ro\'yxati</string>
+    <string name="water_intake_title">Suv</string>
+    <string name="target_water_format">Ichish kerak: %.1f ml</string>
+    <string name="consumed_water_format">%1$d / %2$d ml</string>
+    <string name="water_benefits_link">Suv ichish foydalari haqida</string>
+    <string name="exercise_title">Harakatlar</string>
+    <string name="target_exercise_format">Yoqish kerak: %d kal</string>
+    <string name="burned_calories_format">%1$d / %2$d kal yoqildi</string>
+    <string name="exercise_benefits_link">Sportning foydalari haqida</string>
+    <string name="reminders_title">Eslatmalar</string>
+    <string name="meal_calories_format">%1$d / %2$d kal</string>
+    <string name="breakfast">Nonushta</string>
+    <string name="lunch">Tushlik</string>
+    <string name="dinner">Kechki ovqat</string>
+    <string name="snack">Tamaddi</string>
+
+
+    <string name="add_workout">Workout Qo\'shish</string>
+    <string name="add_category">Kategoriya Qo\'shish</string>
+    <string name="add_exercise">Mashq Qo\'shish</string>
+    <string name="no_workouts_in_category">Bu kategoriyada workoutlar hozircha yo\'q.</string>
+    <string name="close">Yopish</string>
+
+    <string name="tts_get_ready_for">Tayyorlaning! Keyingi mashq: %1$s</string>
+    <string name="tts_start">Boshladik: %1$s</string>
+    <string name="tts_rest">Dam oling</string>
+    <string name="tts_rest_next">Dam oling. Keyingi: %1$s</string>
+    <string name="tts_rest_last">Dam oling. Bu oxirgi mashq edi!</string>
+    <string name="tts_workout_complete">Tabriklaymiz! Mashq tugadi!</string>
+    <string name="tts_paused">Pauza</string>
+    <string name="tts_resumed">Davom etamiz</string>
+    <string name="tts_skipped">O\'tkazildi</string>
+    <string name="tts_previous">Oldingi mashq</string>
+    <string name="tts_first_exercise">Bu birinchi mashq</string>
+
+
+    <string name="repetitions_format_long">Takrorlashlar: x%d</string>
+
+
+    <string name="select_exercises">Mashqlarni Tanlash</string>
+    <string name="search_exercises_hint">Mashqlarni qidirish...</string>
+    <string name="done">Tayyor</string>
+    <string name="selected_count_format">%d ta mashq tanlandi</string>
+
+    <string name="skip">O\'tkazish</string>
+    <string name="previous">Oldingi</string>
+    <string name="pause">Pauza</string>
+    <string name="resume">Davom etish</string>
+    <string name="confirm_exit_workout_title">Mashqdan chiqish</string>
+    <string name="confirm_exit_workout_message">Haqiqatan ham mashqni tark etmoqchimisiz? Progress saqlanmaydi.</string>
+    <string name="exit">Chiqish</string>
+    <string name="stay">Qolish</string>
+    <string name="workout_finished_title">Mashq Yakunlandi!</string>
+
+    <string name="logged_item_food_format">%1$s (%2$d kal)</string>
+    <string name="logged_item_water_format">%1$d ml</string>
+    <string name="logged_item_exercise_format">%1$s (%2$d daq, %3$d kal)</string>
+    <string name="reminder_format">%1$s: %2$s</string>
+    <string name="search_food_hint">Ovqat qidirish…</string>
+    <string name="or_enter_manually">Yoki qo\'lda kiriting:</string>
+    <string name="add_food_photo_optional">Rasm yuklash (ixtiyoriy)</string>
+    <string name="calories_hint_required">Kaloriya (Majburiy)</string>
+    <string name="protein_hint">Oqsil</string>
+    <string name="fat_hint">Yog\'</string>
+
+    <string name="ask_ai_hint">Qaysi ovqat haqida bilmoqchisiz?</string>
+    <string name="ask_ai_button">Tekshirish</string>
+    <string name="daily_calorie_summary_format">Bugungi maqsad: %1$d kkal / Yeyildi: %2$d kkal</string>
+    <string name="meal_section_title_format">%1$s (Maqsad: %2$d kkal / Yeyildi: %3$d kkal)</string>
+    <string name="meal_section_remaining_format">~%d kkal qoldi</string>
+    <string name="see_more_meal_sets">Boshqa %1$s Variantlari</string> <!-- Example: Boshqa Nonushta Variantlari -->
+    <string name="log_this_meal_button_desc">%1$s uchun ovqat qo\'shish</string> <!-- Example: Nonushta uchun ovqat qo'shish -->
+    <string name="calories_format_approx">%d kal</string>
+    <string name="ai_analysis_error">AI bilan bog\'lanishda xatolik</string>
+    <string name="today_recommendations">Bugungi Tavsiyalar</string>
+
+    <string name="today_recommendations_title">Bugungi Tavsiyalar</string>
+    <string name="see_more_meal_sets_format">Barcha %1$s Variantlari</string>
+    <string name="log_this_meal_type_desc">%1$s uchun ovqat qo\'shish</string>
+    <string name="ai_suggestion_title">AI Taklifi: %1$s</string>
+    <string name="log_ai_meal_button">Shuni Logga Qo\'shish</string>
+    <string name="error_parsing_ai_response">AI javobini tushunishda xatolik</string>
+    <string name="log_add_success_ai">AI taklifi logga qo\'shildi</string>
+    <string name="log_add_error_ai">AI taklifini logga qo\'shishda xato</string>
+
+    <string name="carbs_hint">Uglevod</string>
+    <string name="log_food_title_format">%s</string>
+    <string name="log_food_subtitle_format">Bugun %sga nima ovqat yedingiz ?</string>
+    <string name="edit_log_food_title_format">%s tahrirlash</string>
+    <string name="error_food_name_required">Ovqat nomini kiriting</string>
+    <string name="error_calories_required">Kaloriyani kiriting</string>
+    <string name="error_saving_log">Log saqlashda xatolik</string>
+    <string name="log_saved_successfully">Muvaffaqiyatli saqlandi</string>
+    <string name="upload_meal_photo">Ovqat rasmi (Ixtiyoriy)</string>
+    <string name="tap_to_add_photo">Rasm qo\'shish</string>
+    <string name="describe_your_meal">Bugun nima yedingiz?</string>
+    <string name="food_description_hint">Misol: Bir kosa sho\'rva va pomidor bodring salat</string>
+    <string name="analyze_and_save">Taxlil qilish</string>
+    <string name="error_photo_required">Iltimos, ovqat rasmini yuklang</string>
+    <string name="error_description_required">Iltimos, ovqatni tavsiflang</string>
+    <string name="analyzing">Taxlil qilinmoqda…</string>
+    <string name="saving">Saqlanmoqda…</string>
+    <string name="save_changes">O\'zgarishlarni saqlash</string>
+    <string name="analysis_result_title">AI Taxmin Natijasi</string>
+    <string name="estimated_calories_format">%d kal</string>
+    <string name="protein_short">Oqsil</string>
+    <string name="fat_short">Yog\'</string>
+    <string name="carbs_short">Uglevod</string>
+    <string name="not_available_short">N/A</string>
+    <string name="nutritional_insights">Foydali/Zararli Jihatlari</string>
+    <string name="no_insights_available">Qo\'shimcha ma\'lumot topilmadi.</string>
+    <string name="pfc_estimation_disclaimer">Bu AI tomonidan berilgan taxminiy ozuqaviy qiymatlar.</string>
+    <string name="got_it">Tushunarli</string>
+    <string name="estimated_macros">Makronutrientlar</string>
+    <string name="recognized_ingredients">Ko\'ringan Masalliqlar</string>
+    <string name="retry_or_cancel">Qayta kiritish</string>
+    <string name="save_to_log">Logga Saqlash</string>
+    <string name="recommendations_warnings">Rekomend</string>
+    <string name="log_water_title">Qancha suv ichdingiz?</string>
+    <string name="select_preset_or_enter">Tayyor hajmni tanlang yoki o\'zingiz kiriting:</string>
+    <string name="water_preset_glass">Stakan</string>
+    <string name="water_preset_small_bottle">Kichik Butilka</string>
+    <string name="water_preset_large_bottle">Katta Butilka</string>
+    <string name="water_amount_glass">250 ml</string>
+    <string name="water_amount_small_bottle">500 ml</string>
+    <string name="water_amount_large_bottle">1000 ml</string>
+    <string name="enter_water_amount_hint">Hajmni kiriting (Millitr)</string>
+    <string name="add">Qo\'shish</string>
+    <string name="error_invalid_water_amount">Iltimos, to\'g\'ri miqdor kiriting.</string>
+    <string name="water_logged_successfully">Suv miqdori qo\'shildi</string>
+    <string name="error_logging_water">Suv qo\'shishda xatolik</string>
+    <string name="log_exercise_button_desc">Bajarilgan mashqni qo\'shish</string>
+    <string name="edit_reminders_button_desc">Eslatmalarni tahrirlash</string>
+    <string name="start">Boshlash</string>
+    <string name="exercise_log_format">%1$s (%2$d daq)</string>
+    <string name="exercise_log_calories_format">-%d kal</string>
+    <string name="reminder_display_format">%1$s: %2$s</string>
+    <string name="more_info">Ko\'proq ma\'lumot</string>
+
+    <!-- New Strings for Exercise Logging & Reminders -->
+    <string name="log_exercise_title">Mashq Qo\'shish</string>
+    <string name="edit_exercise_log_title">Mashq Logini Tahrirlash</string>
+    <string name="select_activity_type">Mashq turini tanlang:</string>
+    <string name="enter_duration_minutes">Davomiyligini kiriting (daqiqa):</string>
+    <string name="duration_hint">Daqiqa</string>
+    <string name="error_select_exercise_type">Iltimos, mashq turini tanlang.</string>
+    <string name="error_enter_valid_duration">Iltimos, to\'g\'ri davomiylik kiriting (0 dan katta).</string>
+    <string name="exercise_log_saved_success">Mashq logi muvaffaqiyatli saqlandi.</string>
+    <string name="no_exercise_logs_yet">Hali mashq loglari yo\'q</string>
+    <string name="no_upcoming_reminders">Yaqin orada eslatmalar yo\'q</string>
+    <string name="unit_kcal">kal</string>
+    <string name="unit_ml">ml</string>
+    <string name="unit_kcal_burned">kal</string>
+    <string name="unit_water">suv</string>
+    <string name="unit_minute">daq</string>
+
+    <string name="reminder_started_placeholder">eslatmasi boshlandi (implementatsiya qilinadi)</string> <!-- Placeholder for start button -->
+
+
+    <!-- ... existing strings ... -->
+    <string name="all_recipes_title">Barcha Retseptlar</string>
+    <string name="search_results_title">Qidiruv: \'%1$s\'</string>
+    <string name="error_loading_filters">Filtrlarni yuklashda xatolik: %1$s</string>
+    <string name="meal_set_title_breakfast">Nonushta Setlari</string>
+    <string name="meal_set_title_lunch">Tushlik Setlari</string>
+    <string name="meal_set_title_dinner">Kechki Ovqat Setlari</string>
+    <string name="meal_set_title_snack">Tamaddi Setlari</string>
+    <string name="foods_title">Ovqatlar</string> <!-- Default title -->
+    <string name="empty_list_message">Ro\'yxat bo\'sh</string>
+    <string name="empty_search_message">Qidiruv natijasi topilmadi</string>
+    <string name="add_20_seconds">+20s</string>
+    <string name="ready_to_go">Tayyorlaning</string>
+    <string name="take_a_rest">Dam oling</string>
+    <string name="next_exercise_format">Keyingisi</string>
+    <string name="butun_tana">Butun tana</string>
+    <string name="oyoqlar">Oyoqlar</string>
+    <string name="qorin_uchun">Qorin uchun</string>
+    <string name="qo_llar">Qo\'llar</string>
+    <string name="dumba">Dumba</string>
+
 </resources>

@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurfaceContainerLowest">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:visibility="gone"
+            app:title="@string/home_title"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/Title2_20"
+            app:titleTextColor="?attr/colorOnSurface" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/contentScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp"> <!-- Padding bottom for Nav -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp">
+
+                <!-- Calorie Goal -->
+                <TextView
+                    android:id="@+id/text_daily_summary_title"
+                    style="@style/Title3_17"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/daily_calorie_goal_title"
+                    android:textColor="?attr/colorOnSurface"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/text_target_calories"
+                    style="@style/Headline2_16"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="18sp"
+                    tools:text="Yeyish mumkin: 1750 kkal gacha" />
+
+                <TextView
+                    android:id="@+id/text_consumed_calories"
+                    style="@style/Headline2_16"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:textColor="?attr/colorPrimary"
+                    tools:text="850 / 1750 kkal" />
+
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progress_calories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="16dp"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:indicatorTrackGapSize="0dp"
+                    app:trackColor="?attr/colorSurfaceContainerHighest"
+                    app:trackCornerRadius="12dp"
+                    app:trackStopIndicatorSize="0dp"
+                    app:trackThickness="16dp"
+                    tools:progress="60" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <TextView
+                            style="@style/Headline2_16"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/meals_title"
+                            android:textColor="?attr/colorOnSurface" />
+
+                        <TextView
+                            style="@style/Subtitle1_14"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/add_meal_description"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:visibility="gone" />
+
+                        <include
+                            android:id="@+id/layout_breakfast"
+                            layout="@layout/item_home_meal" />
+
+                        <include
+                            android:id="@+id/layout_lunch"
+                            layout="@layout/item_home_meal" />
+
+                        <include
+                            android:id="@+id/layout_dinner"
+                            layout="@layout/item_home_meal" />
+
+                        <include
+                            android:id="@+id/layout_snack"
+                            layout="@layout/item_home_meal" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Food List Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_food_list"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginHorizontal="@dimen/dimen_18"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/food_list_button"
+                    android:textColor="?colorPrimary"
+                    app:icon="@drawable/food_ic"
+                    app:iconGravity="textStart"
+                    app:iconTint="?attr/colorPrimary" />
+
+                <!-- Water Intake Section Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:id="@+id/icon_water"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/water_full_24px"
+                                app:layout_constraintBottom_toBottomOf="@id/title_water"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="@id/title_water"
+                                app:tint="@color/blue" />
+
+                            <TextView
+                                android:id="@+id/title_water"
+                                style="@style/Headline2_16"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:text="@string/water_intake_title"
+                                android:textColor="?attr/colorOnSurface"
+                                app:layout_constraintEnd_toStartOf="@id/button_add_water"
+                                app:layout_constraintStart_toEndOf="@id/icon_water"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_add_water"
+                                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="35dp"
+                                android:backgroundTint="@color/blue"
+                                android:contentDescription="@string/add"
+                                android:fontFamily="@font/roboto_regular"
+                                android:paddingVertical="0dp"
+                                android:paddingEnd="@dimen/dimen_18"
+                                android:text="Suv ichdim"
+                                android:textColor="@color/white"
+                                android:textSize="12sp"
+                                app:icon="@drawable/add_ic"
+                                app:iconGravity="textStart"
+                                app:iconPadding="@dimen/dimen_8"
+                                app:iconSize="20dp"
+                                app:iconTint="@color/white"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <TextView
+                            android:id="@+id/text_target_water"
+                            style="@style/Text2_15"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:textColor="?attr/colorOnSurface"
+                            tools:text="Kunlik maqsad: 2.5 litr" />
+
+                        <TextView
+                            android:id="@+id/text_consumed_water"
+                            style="@style/Headline2_16"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="@color/blue"
+                            tools:text="1000 / 2500 ml" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress_water"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackColor="?attr/colorSurfaceContainerHighest"
+                            app:trackCornerRadius="4dp"
+                            app:trackStopIndicatorSize="0dp"
+                            app:trackThickness="12dp"
+                            tools:progress="40" />
+
+                        <TextView
+                            android:id="@+id/text_water_info"
+                            style="@style/Subtitle2_14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="@string/more_info"
+                            android:textColor="?attr/colorPrimary"
+                            android:visibility="gone"
+                            app:drawableEndCompat="@drawable/arrow_right"
+                            app:drawableTint="?attr/colorPrimary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <!-- Exercise Section Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:id="@+id/icon_exercise"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/sport_ic"
+                                app:layout_constraintBottom_toBottomOf="@id/title_exercise"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="@id/title_exercise"
+                                app:tint="@color/yellow" /> <!-- Changed tint -->
+
+
+                            <TextView
+                                android:id="@+id/title_exercise"
+                                style="@style/Headline2_16"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:text="Jismoniy faollik"
+                                android:textColor="?attr/colorOnSurface"
+                                app:layout_constraintEnd_toStartOf="@id/button_add_exercise_log"
+                                app:layout_constraintStart_toEndOf="@id/icon_exercise"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_add_exercise_log"
+                                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="35dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:paddingVertical="0dp"
+                                android:textColor="@color/white"
+                                app:iconTint="@color/white"
+                                android:paddingEnd="@dimen/dimen_18"
+                                android:text="Mashq qildim"
+                                android:textSize="13sp"
+                                android:backgroundTint="@color/yellow"
+                                app:icon="@drawable/add_ic"
+                                app:iconGravity="textStart"
+                                app:iconPadding="@dimen/dimen_8"
+                                app:iconSize="20dp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+                            <!-- Removed shapeAppearanceOverlay="@style/CircleImageView" -->
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <TextView
+                            android:id="@+id/text_target_exercise"
+                            style="@style/Text2_15"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:drawablePadding="@dimen/dimen_8"
+                            android:gravity="center_vertical"
+                            android:textColor="?attr/colorOnSurface"
+                            app:drawableStartCompat="@drawable/fire_ic"
+                            app:drawableTint="?colorOnSurfaceVariant"
+                            tools:ignore="UseCompatTextViewDrawableXml"
+                            tools:text="Bugun yoqish shart: 500 kal" />
+
+                        <TextView
+                            android:id="@+id/text_burned_calories"
+                            style="@style/Text1_16"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="@color/yellow"
+                            tools:text="150 / 500 kkal yoqildi" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress_exercise"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackColor="?attr/colorSurfaceContainerHighest"
+                            app:trackCornerRadius="4dp"
+                            app:trackStopIndicatorSize="0dp"
+                            app:trackThickness="12dp"
+                            tools:progress="30" />
+
+                        <LinearLayout
+                            android:id="@+id/layout_exercise_logs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="vertical"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <!-- Text shown when no exercise logs exist -->
+                        <TextView
+                            android:id="@+id/text_no_exercise_logs"
+                            style="@style/Text1_14"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_horizontal"
+                            android:text="@string/no_exercise_logs_yet"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <!-- More info link (currently hidden) -->
+                        <TextView
+                            android:id="@+id/text_exercise_info"
+                            style="@style/Text1_14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:text="@string/more_info"
+                            android:textColor="?attr/colorPrimary"
+                            android:visibility="gone"
+                            app:drawableEndCompat="@drawable/arrow_right"
+                            app:drawableTint="?attr/colorPrimary" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Reminders Section Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="1dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <ImageView
+                                android:id="@+id/icon_reminder"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/notify_ic"
+                                app:layout_constraintBottom_toBottomOf="@id/title_reminder"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="@id/title_reminder"
+                                app:tint="?attr/colorPrimary" />
+
+                            <TextView
+                                android:id="@+id/title_reminder"
+                                style="@style/Headline2_16"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/reminders_title"
+                                android:textColor="?attr/colorOnSurface"
+                                app:layout_constraintEnd_toStartOf="@id/button_add_reminder"
+                                app:layout_constraintStart_toEndOf="@id/icon_reminder"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_add_reminder"
+                                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:contentDescription="@string/edit_reminders_button_desc"
+                                app:icon="@drawable/edit"
+                                app:iconGravity="textStart"
+                                app:iconSize="20dp"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+                            <!-- Removed shapeAppearanceOverlay -->
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <!-- Container for enabled exercise reminders -->
+                        <LinearLayout
+                            android:id="@+id/layout_reminders"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="vertical"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <!-- Text shown when no exercise reminders are enabled -->
+                        <TextView
+                            android:id="@+id/text_no_reminders"
+                            style="@style/Text1_14"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_horizontal"
+                            android:text="@string/no_upcoming_reminders"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressBarOverall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -66,7 +66,7 @@ class GetInfoViewModel : ViewModel() {
                     currentUser.gender = gender
                     currentUser.age = age
                     currentUser.height = height
-                    currentUser.weight = weight
+                    currentUser.weight = weight.toDouble()
                     currentUser.problems = problems?.toList()?: emptyList() // Muammolar (null bo'lsa bo'sh set)
                 }
                 _navigationEvent.postValue(Event(GetInfoNavigationEvent.ShowToast("Ma'lumotlar saqlandi!")))

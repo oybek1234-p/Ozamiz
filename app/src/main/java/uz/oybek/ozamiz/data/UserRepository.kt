@@ -23,7 +23,7 @@ object UserRepository {
         LocalUser.getUser()
     }
 
-    val usersReference: DatabaseReference by lazy {
+    private val usersReference: DatabaseReference by lazy {
         FirebaseInstances.database.getReference("users")
     }
 
@@ -181,15 +181,15 @@ object UserRepository {
         }
     }
 
-    suspend fun authFirebaseUser(): User? {
+    suspend fun authFirebaseUser(): User {
         val firebaseUser = FirebaseInstances.auth.currentUser
         if (firebaseUser == null || firebaseUser.uid.isEmpty()) {
-            return null
+            return User()
         }
         val id = firebaseUser.uid
         val isNewUser: Boolean
         val networkUser = loadUser(id)
-        isNewUser = networkUser.valid.not()
+        isNewUser = (networkUser == null || networkUser.valid.not())
         return if (isNewUser) {
             val pushToken = AppNotification.loadToken()
             val newUser = User(
@@ -218,7 +218,7 @@ object UserRepository {
         usersReference.child(LocalUser.user.uid).child(User::pushToken.name).setValue(newPushToken)
     }
 
-    suspend fun loadUser(id: String) = suspendCoroutine { sus ->
+    private suspend fun loadUser(id: String) = suspendCoroutine { sus ->
         val reference = usersReference.child(id)
         reference.get().addOnSuccessListener {
             val loadedUser = it.getValueSafe(User::class.java)
@@ -242,8 +242,8 @@ object UserRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 userLoading = false
                 val loadedUser = snapshot.getValue(User::class.java)
-                if (loadedUser.valid) {
-                    LocalUser.user = loadedUser!!
+                if (loadedUser!!.valid) {
+                    LocalUser.user = loadedUser
                     LocalUser.saveUser()
                 }
                 result.invoke(loadedUser)

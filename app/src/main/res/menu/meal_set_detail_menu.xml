@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_edit_meal_set"
+        android:title="Tahrirlash"
+        android:icon="@drawable/edit"
+        app:showAsAction="ifRoom"
+        android:visible="false"/> <!-- Visible only for admin -->
+    <item
+        android:id="@+id/action_delete_meal_set"
+        android:title="O'chirish"
+        android:icon="@drawable/delete_ic"
+        app:showAsAction="ifRoom"
+        android:visible="false"/> <!-- Visible only for admin -->
+    <!-- Add share action if needed -->
+</menu>

@@ -10,7 +10,7 @@
         android:icon="@drawable/food_ic"
         />
 
-    <item android:id="@+id/sport"
+    <item android:id="@+id/discoverFragment"
         android:title="Mashqlar"
         android:icon="@drawable/sport_ic"
         />

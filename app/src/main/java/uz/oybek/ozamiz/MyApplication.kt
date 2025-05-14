@@ -2,10 +2,13 @@ package uz.oybek.ozamiz
 
 import android.app.Application
 import android.content.Context
-import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
-import com.google.firebase.initialize
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestoreSettings
+import com.google.firebase.firestore.persistentCacheSettings
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -22,24 +25,21 @@ class MyApplication : Application() {
 
         GlobalScope.launch(Dispatchers.IO) {
             initFirebase()
-//            try {
-//                MobileAds.initialize(
-//                    appContext
-//                )
-//            } catch (e: Exception) {
-//                handleException(e)
-//            }
         }
     }
 
     private fun initFirebase() {
-        try {
-            Firebase.initialize(this)
-            FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
-                DebugAppCheckProviderFactory.getInstance()
-            )
-        } catch (e: Exception) {
-            handleException(e)
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+        FirebaseApp.initializeApp(this)
+
+        val settings = firestoreSettings {
+            setLocalCacheSettings(persistentCacheSettings {})
         }
+        FirebaseFirestore.getInstance().firestoreSettings = settings
+
+        // Initialize App Check
+        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+            DebugAppCheckProviderFactory.getInstance()
+        )
     }
 }

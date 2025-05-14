@@ -29,13 +29,11 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import com.google.firebase.firestore.auth.User
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.LocalUser
 import uz.oybek.ozamiz.data.SocialMedia
 import uz.oybek.ozamiz.data.UserRepository
-import uz.oybek.ozamiz.data.valid
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
 import uz.oybek.ozamiz.databinding.SupportSheetBinding
@@ -86,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         val user = LocalUser.user
         var new = false
         if (LocalUser.user.valid) {
-            if (user.name.isEmpty() || user.gender == -1 || user.age == -1 || user.height == -1 || user.weight == -1) {
+            if (user.name.isEmpty() || user.gender == -1 || user.age == -1 || user.height == -1 || user.weight == -1.0) {
                 graph.setStartDestination(R.id.getMainInfo)
                 new = true
             } else {
@@ -98,14 +96,14 @@ class MainActivity : AppCompatActivity() {
         navHost.navController.setGraph(graph, Bundle().apply {
             putBoolean("new", new)
         })
-
+        LocalUser.user.premium = true
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
     }
 
     private fun initUser() {
         LocalUser.getUser()
-        UserRepository.observeCurrentUser {  }
+        UserRepository.observeCurrentUser { }
     }
 
     fun showSupportSheet() {

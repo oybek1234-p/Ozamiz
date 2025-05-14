@@ -45,4 +45,114 @@
         <item name="cornerSize">@dimen/dimen_24</item>
     </style>
 
+        <!-- Chip stili -->
+        <style name="Widget.App.Chip" parent="Widget.Material3.Chip.Assist">
+            <!-- Assist chip ko'rinishidan meros oladi -->
+            <item name="chipBackgroundColor">@color/chip_background_color</item>
+            <item name="android:textColor">@color/chip_text_color</item>
+            <item name="chipCornerRadius">8dp</item>
+            <item name="closeIconVisible">false</item> <!-- O'chirish ikonasini yashirish -->
+            <item name="chipStrokeWidth">0dp</item> <!-- Stroke ni olib tashlash -->
+        </style>
+
+        <!-- Tanlanadigan Chip stili (Filter/Input) -->
+        <style name="Widget.App.Chip.Selectable" parent="Widget.Material3.Chip.Filter">
+            <!-- Filter chip ko'rinishidan meros oladi -->
+            <item name="chipBackgroundColor">@color/chip_category_background_selector</item>
+            <item name="android:textColor">@color/chip_category_text_selector</item>
+            <item name="chipStrokeWidth">1dp</item>
+            <item name="chipCornerRadius">8dp</item>
+            <item name="checkedIconVisible">false</item> <!-- Checked ikonasini yashirish -->
+            <item name="closeIconVisible">false</item>
+        </style>
+
+        <style name="TextDisplayLarge" parent="TextAppearance.Material3.DisplayLarge"/>
+        <style name="TextHeadlineMedium" parent="TextAppearance.Material3.HeadlineMedium"/>
+        <style name="TextHeadlineSmall" parent="TextAppearance.Material3.HeadlineSmall"/>
+        <style name="TextTitleLarge" parent="TextAppearance.Material3.TitleLarge"/>
+        <style name="TextTitleMedium" parent="TextAppearance.Material3.TitleMedium"/>
+        <style name="TextTitleSmall" parent="TextAppearance.Material3.TitleSmall"/>
+        <style name="TextBodyLarge" parent="TextAppearance.Material3.BodyLarge"/>
+        <style name="TextBodyMedium" parent="TextAppearance.Material3.BodyMedium"/>
+        <style name="TextBodySmall" parent="TextAppearance.Material3.BodySmall"/>
+        <style name="TextLabelMedium" parent="TextAppearance.Material3.LabelMedium">
+            <item name="android:textColor">?colorOnSurfaceVariant</item>
+        </style>
+
+
+        <style name="ShapeAppearance.App.LargeComponent.Modal" parent="ShapeAppearance.Material3.LargeComponent">
+            <item name="cornerFamily">rounded</item>
+            <item name="cornerSizeTopLeft">16dp</item>
+            <item name="cornerSizeTopRight">16dp</item>
+            <item name="cornerSizeBottomLeft">0dp</item>
+            <item name="cornerSizeBottomRight">0dp</item>
+        </style>
+
+    <style name="MacroItemLayout">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="MacroItemIcon">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+
+    </style>
+
+    <style name="MacroItemLabel" parent="Headline3_15">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?colorOnSurface</item>
+    </style>
+
+    <style name="MacroItemValue" parent="Text1_14">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?colorOnSurfaceVariant</item>
+    </style>
+
+        <style name="WaterPresetCard" parent="Widget.Material3.CardView.Outlined">
+            <item name="android:layout_width">0dp</item>
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:layout_weight">1</item>
+            <item name="cardCornerRadius">12dp</item>
+            <item name="android:clickable">true</item>
+            <item name="android:focusable">true</item>
+            <item name="android:foreground">?attr/selectableItemBackground</item>
+            <item name="cardBackgroundColor">?colorSurfaceContainerLowest</item>
+            <item name="strokeWidth">1dp</item>
+            <item name="strokeColor">?colorOutlineVariant</item>
+        </style>
+
+        <style name="WaterPresetLayout">
+            <item name="android:layout_width">match_parent</item>
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:orientation">vertical</item>
+            <item name="android:padding">12dp</item>
+            <item name="android:gravity">center</item>
+        </style>
+
+        <style name="WaterPresetIcon">
+            <item name="android:layout_width">32dp</item>
+            <item name="android:layout_height">32dp</item>
+            <item name="android:layout_marginBottom">8dp</item>
+        </style>
+
+        <style name="WaterPresetLabel" parent="Text2_15">
+            <item name="android:layout_width">wrap_content</item>
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:textColor">?colorOnSurface</item>
+        </style>
+
+        <style name="WaterPresetAmount" parent="Text1_14">
+            <item name="android:layout_width">wrap_content</item>
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:textColor">?colorOnSurfaceVariant</item>
+            <item name="android:layout_marginTop">2dp</item>
+        </style>
+
 </resources>

@@ -1,3 +1,5 @@
+package uz.oybek.ozamiz.data.info
+
 import androidx.annotation.DrawableRes
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.ui.getinfo.ReminderItem
@@ -34,8 +36,8 @@ sealed class MealsType(
 
     data object Snack : MealsType(
         id = "snack",
-        name = "Yengil ovqat",
-        iconRes = R.drawable.snack2,
+        name = "Tamaddi",
+        iconRes = R.drawable.snack_ic,
         description = ""
     )
 
@@ -51,6 +53,10 @@ sealed class MealsType(
     }
 
     companion object {
-        val mealTypes = listOf(Breakfast, Lunch, Dinner)
+        val mealTypes = listOf(Breakfast, Lunch, Dinner, Snack)
+
+        fun fromId(id: String?): MealsType? {
+            return mealTypes.find { it.id.equals(id, ignoreCase = true) }
+        }
     }
 }

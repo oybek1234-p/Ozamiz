@@ -17,7 +17,6 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.UserRepository
 import uz.oybek.ozamiz.data.firebase.FirebaseInstances
-import uz.oybek.ozamiz.data.valid
 import uz.oybek.ozamiz.databinding.LoginGmailFragmentBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 

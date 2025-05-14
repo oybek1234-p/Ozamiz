@@ -1,6 +1,5 @@
 package uz.oybek.ozamiz.ui.getinfo // Yoki loyihadagi mos paket
 
-import MealsType
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.LocalUser
 import uz.oybek.ozamiz.data.UserRepository
+import uz.oybek.ozamiz.data.info.MealsType
 import java.util.Locale
 
 open class Event<out T>(private val content: T) {

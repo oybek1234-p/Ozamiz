@@ -1,0 +1,219 @@
+<!-- res/layout/fragment_recipe_detail.xml -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurfaceContainerLowest">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout_recipe_detail"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        >
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar_recipe_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="?colorSurface"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
+            app:statusBarScrim="@android:color/transparent"
+            app:titleEnabled="true"
+            app:expandedTitleTextColor="@android:color/transparent"
+            app:collapsedTitleTextColor="?colorOnSurface"
+            app:collapsedTitleTextAppearance="@style/Title3_17"
+            >
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7">
+
+                <ImageView
+                    android:id="@+id/imageView_recipe_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="@string/app_name"
+                    tools:src="@drawable/placeholder_food" />
+
+                <!-- Play Video Button -->
+                <ImageButton
+                    android:id="@+id/button_play_video"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/play_ic"
+                    app:tint="@color/white"
+                    android:background="@drawable/oval_background_with_opacity"
+                    android:scaleType="centerInside"
+                    android:contentDescription="Videoni ijro etish"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
+            </FrameLayout>
+
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar_recipe_detail"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@android:color/transparent"
+                app:layout_collapseMode="pin"
+                app:menu="@menu/recipe_detail_menu_enhanced"
+                app:navigationIcon="@drawable/arrow_back"
+                app:navigationIconTint="@color/white"
+                app:title="" />
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="24dp"
+            android:paddingBottom="88dp">  <!-- Increased padding for FAB -->
+
+            <TextView
+                android:id="@+id/textView_recipe_title_detail"
+                style="@style/Title2_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:textColor="?colorOnSurface"
+                tools:text="Qaynatilgan Tuxum va Salat Salat Salat Salat Salat" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_18"
+                    android:layout_height="@dimen/dimen_18"
+                    android:src="@drawable/fire_ic"
+                    app:tint="?colorError"
+                    android:layout_marginEnd="6dp"/>
+
+                <TextView
+                    android:id="@+id/textView_recipe_calories_detail"
+                    style="@style/Text1_14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurfaceVariant"
+                    tools:text="350 kkal" />
+
+                <ImageView
+                    android:layout_width="@dimen/dimen_18"
+                    android:layout_height="@dimen/dimen_18"
+                    android:src="@drawable/date_ic"
+                    app:tint="?colorSecondary"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="6dp"/>
+
+                <TextView
+                    android:id="@+id/textView_recipe_time_detail"
+                    style="@style/Text1_14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurfaceVariant"
+                    tools:text="15 daq" />
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="16dp"/>
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="16dp"
+                android:text="Masalliqlar"
+                android:textColor="?colorOnSurface" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout_ingredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp">
+                <TextView style="@style/Text1_16" android:layout_marginBottom="6dp" tools:text="- Tuxum: 2 dona" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="?colorOnSurfaceVariant"/>
+                <TextView style="@style/Text1_16" android:layout_marginBottom="6dp" tools:text="- Pomidor/Bodring: 150gr" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="?colorOnSurfaceVariant"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/textView_no_ingredients"
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp"
+                android:text="Masalliqlar kiritilmagan"
+                android:textColor="?colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="16dp"/>
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
+                android:text="Tayyorlash Qadamlari"
+                android:textColor="?colorOnSurface" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout_steps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp">
+                <TextView style="@style/Text1_16" android:layout_marginBottom="8dp" tools:text="1. Tuxumni qaynatib oling." android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="?colorOnSurface"/>
+                <TextView style="@style/Text1_16" android:layout_marginBottom="8dp" tools:text="2. Sabzavotlarni to'g'rang." android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="?colorOnSurface"/>
+                <TextView style="@style/Text1_16" android:layout_marginBottom="8dp" tools:text="3. Hammasini aralashtiring va tuz qo'shing." android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="?colorOnSurface"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/textView_no_steps"
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingHorizontal="16dp"
+                android:text="Tayyorlash qadamlari kiritilmagan"
+                android:textColor="?colorOnSurfaceVariant"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar_recipe_detail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

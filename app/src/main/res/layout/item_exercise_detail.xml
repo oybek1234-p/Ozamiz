@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp"
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground">
+
+    <!-- Using ShapeableImageView for rounded corners -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imageView_exercise_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/RadiusImageView12"
+        tools:src="@drawable/placeholder_exercise"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView_exercise_name"
+            style="@style/Headline3_15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textColor="?colorOnSurface"
+            tools:text="STAR JUMPS" />
+
+        <TextView
+            android:id="@+id/textView_exercise_duration_reps"
+            style="@style/Text2_15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="?colorOnSurfaceVariant"
+            tools:text="00:20" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView_info_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/info_ic"
+        android:visibility="visible"
+        app:tint="?colorOnSurfaceVariant"
+        tools:visibility="visible" />
+
+</LinearLayout>
