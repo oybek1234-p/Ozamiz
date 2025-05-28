@@ -123,7 +123,7 @@
             <item name="android:clickable">true</item>
             <item name="android:focusable">true</item>
             <item name="android:foreground">?attr/selectableItemBackground</item>
-            <item name="cardBackgroundColor">?colorSurfaceContainerLowest</item>
+            <item name="cardBackgroundColor">@color/white</item>
             <item name="strokeWidth">1dp</item>
             <item name="strokeColor">?colorOutlineVariant</item>
         </style>
@@ -133,6 +133,7 @@
             <item name="android:layout_height">wrap_content</item>
             <item name="android:orientation">vertical</item>
             <item name="android:padding">12dp</item>
+            <item name="background">@color/white</item>
             <item name="android:gravity">center</item>
         </style>
 
@@ -142,16 +143,16 @@
             <item name="android:layout_marginBottom">8dp</item>
         </style>
 
-        <style name="WaterPresetLabel" parent="Text2_15">
+        <style name="WaterPresetLabel" parent="Headline3_15">
             <item name="android:layout_width">wrap_content</item>
             <item name="android:layout_height">wrap_content</item>
             <item name="android:textColor">?colorOnSurface</item>
         </style>
 
-        <style name="WaterPresetAmount" parent="Text1_14">
+        <style name="WaterPresetAmount" parent="Text2_15">
             <item name="android:layout_width">wrap_content</item>
             <item name="android:layout_height">wrap_content</item>
-            <item name="android:textColor">?colorOnSurfaceVariant</item>
+            <item name="android:textColor">?colorOnSurface</item>
             <item name="android:layout_marginTop">2dp</item>
         </style>
 

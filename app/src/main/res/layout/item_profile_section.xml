@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingHorizontal="24dp"
+    android:paddingVertical="16dp"
+    android:gravity="center_vertical"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/icon_section_profile"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="20dp"
+        app:tint="?attr/colorOnSurfaceVariant"
+        tools:src="@drawable/settings_ic"/>
+
+    <TextView
+        android:id="@+id/text_section_title_profile"
+        style="@style/Text1_16"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/colorOnSurface"
+        tools:text="Sozlamalar"/>
+
+    <ImageView
+        android:id="@+id/icon_chevron_right_profile"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/arrow_right"
+        app:tint="?attr/colorOnSurfaceVariant"
+        android:visibility="visible"/>
+</LinearLayout>

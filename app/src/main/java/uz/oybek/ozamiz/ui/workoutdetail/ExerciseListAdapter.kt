@@ -10,6 +10,7 @@ import uz.oybek.ozamiz.data.workouts.Exercise
 import uz.oybek.ozamiz.databinding.ItemExerciseDetailBinding
 import uz.oybek.ozamiz.ui.discover.ExerciseDiffCallback
 import uz.oybek.ozamiz.ui.loadPhoto
+import uz.oybek.ozamiz.ui.showToast
 import java.util.Locale
 
 class ExerciseListAdapter(
@@ -38,17 +39,11 @@ class ExerciseListAdapter(
                     onItemClick(getItem(bindingAdapterPosition))
                 }
             }
-            // Optionally, keep the info icon click if it should do the same action
-            // binding.imageViewInfoIcon.setOnClickListener {
-            //     if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
-            //         onItemClick(getItem(bindingAdapterPosition))
-            //     }
-            // }
         }
 
         fun bind(exercise: Exercise) {
-            binding.textViewExerciseName.text = exercise.name
-            // Load image or GIF into the ShapeableImageView
+            binding.textViewExerciseName.text = exercise.name.lowercase().capitalize()
+
             binding.imageViewExerciseIcon.loadPhoto(exercise.mediaUrl ?: R.drawable.placeholder_exercise) // Use placeholder if URL is null
 
             // Format duration or repetitions text

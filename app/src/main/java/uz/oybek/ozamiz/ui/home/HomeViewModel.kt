@@ -13,8 +13,9 @@ import uz.oybek.ozamiz.data.info.ExerciseLog
 import uz.oybek.ozamiz.data.info.FoodLog
 import uz.oybek.ozamiz.data.info.MealsType
 import uz.oybek.ozamiz.data.info.WaterLog
-import uz.oybek.ozamiz.data.logs.DailyLogRepository // DailyLogCacheManager endi kerak emas
+import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.utils.NutritionCalculator
+import uz.oybek.ozamiz.reminders.ReminderScheduler
 import uz.oybek.ozamiz.ui.getinfo.ExerciseType
 import uz.oybek.ozamiz.ui.getinfo.ReminderItem
 import uz.oybek.ozamiz.ui.getinfo.ReminderType
@@ -50,20 +51,15 @@ class HomeViewModel : ViewModel() {
                     isLoading = false // Ensure loading is false
                 )
             }
-            // Trigger background check/update for targets in DB if needed
             recalculateTargetsIfNeeded(initialUser)
         } else {
-            // Handle case where no valid user is cached locally
             _uiState.update { it.copy(isLoading = false, errorMessage = "Foydalanuvchi sozlanmagan") }
         }
 
-        // 2. Start background observers for RTDB updates (User and Logs)
-        // These will first return cached data (if available) then network updates
         observeUserUpdatesFromRepository()
         observeLogs()
     }
 
-    // Observes updates pushed to LocalUser by UserRepository's RTDB listener
     private fun observeUserUpdatesFromRepository() {
         viewModelScope.launch {
             LocalUser.userLive.observeForever { user ->
@@ -73,13 +69,13 @@ class HomeViewModel : ViewModel() {
                         val needsRecalc = previousState.user?.let { oldUser ->
                             user.gender != oldUser.gender || user.age != oldUser.age || user.height != oldUser.height ||
                                     user.weight != oldUser.weight || user.activityLevel != oldUser.activityLevel ||
-                                    user.weightGoal != oldUser.weightGoal || user.targetCalories <= 0 ||
+                                     user.targetCalories <= 0 ||
                                     user.targetWaterMl <= 0 || user.targetCaloriesBurned <= 0
                         } ?: true
 
                         val settingsChanged = previousState.user?.reminderSettings != user.reminderSettings
 
-                        var newState = previousState.copy(user = user) // Start with updated user
+                        var newState = previousState.copy(user = user)
 
                         if (needsRecalc) {
                             val newTargetCalories = NutritionCalculator.calculateTargetCalories(user)
@@ -92,7 +88,6 @@ class HomeViewModel : ViewModel() {
                                 targetCaloriesBurned = newTargetBurned,
                                 mealCalorieDistribution = newDistribution
                             )
-                            // Trigger background DB update if targets were recalculated
                             if(user.targetCalories != newTargetCalories || user.targetWaterMl != newTargetWater || user.targetCaloriesBurned != newTargetBurned) {
                                 viewModelScope.launch {
                                     UserRepository.updateUser { dbUser ->
@@ -110,35 +105,31 @@ class HomeViewModel : ViewModel() {
                                 enabledExerciseReminders = remindersResult.first,
                                 mealReminderTimes = remindersResult.second
                             )
+                            // Trigger re-scheduling of alarms since reminder settings changed
+                            ReminderScheduler.scheduleAllActiveReminders(uz.oybek.ozamiz.appContext)
                         }
 
-                        // Recalculate progress using the latest logs from the state
-                        newState = calculateProgress(user, newState.dailyLogData) // Use logs from current state
-
-                        _uiState.value = newState // Update the state flow
+                        newState = calculateProgress(user, newState.dailyLogData)
+                        _uiState.value = newState
                     }
-                } else if (previousState.user != null) { // Handle logout
+                } else if (previousState.user != null) {
                     _uiState.value = HomeUiState(isLoading = false, errorMessage = "Foydalanuvchi tizimdan chiqdi")
                 }
             }
         }
     }
 
-    // Observes log updates from RTDB (listener provides cache first, then network)
     private fun observeLogs() {
         viewModelScope.launch {
             dailyLogRepository.observeTodayLogs()
                 .collectLatest { result ->
-                    // Listener gives updates from RTDB cache/network
                     when (result) {
-                        is DataWrapper.Loading -> { /* Ignore loading state here */ }
+                        is DataWrapper.Loading -> { /* Ignore */ }
                         is DataWrapper.Success -> {
                             val logs = result.data
-                            // Update state with new logs and recalculated progress
                             _uiState.update { currentState ->
-                                // Crucially, calculate progress using the *user* currently in the state
                                 calculateProgress(currentState.user, logs).copy(
-                                    errorMessage = null, // Clear error on success
+                                    errorMessage = null,
                                     dailyLogData = logs,
                                     todayExerciseLogs = logs.exerciseLogs?.values
                                         ?.sortedByDescending { it.timestamp as? Long ?: 0L }
@@ -147,18 +138,12 @@ class HomeViewModel : ViewModel() {
                             }
                         }
                         is DataWrapper.Error -> {
-                            // Show error, keep potentially stale logs in UI?
                             _uiState.update { it.copy(errorMessage = result.error) }
-                            // Option: Clear logs visually on error
-                            // _uiState.update { calculateProgress(it.user, DailyLogData()) }
                         }
                     }
                 }
         }
     }
-
-    // --- Helper methods (recalculateTargetsIfNeeded, processReminders, calculateProgress) ---
-    // These remain mostly the same, ensuring they read from/update the _uiState correctly
 
     private fun recalculateTargetsIfNeeded(user: User?) {
         if (user == null || !user.valid) return
@@ -177,11 +162,10 @@ class HomeViewModel : ViewModel() {
             needsDbUpdate = true
         }
         if (newTargetBurned <= 0) {
-            newTargetBurned = 300 // Example default
+            newTargetBurned = 300
             needsDbUpdate = true
         }
 
-        // Only trigger DB update if values actually changed
         if (needsDbUpdate) {
             viewModelScope.launch {
                 UserRepository.updateUser { dbUser ->
@@ -193,7 +177,6 @@ class HomeViewModel : ViewModel() {
         }
 
         val distribution = NutritionCalculator.distributeCaloriesForMeals(newTargetCalories)
-        // Update UI state only if targets or distribution differ from current state
         _uiState.update { currentState ->
             if (currentState.targetCalories != newTargetCalories ||
                 currentState.targetWaterMl != newTargetWater ||
@@ -204,20 +187,10 @@ class HomeViewModel : ViewModel() {
                     targetWaterMl = newTargetWater,
                     targetCaloriesBurned = newTargetBurned,
                     mealCalorieDistribution = distribution
-                    // Ensure user object in state reflects these potentially new targets IF needsDbUpdate was true?
-                    // Or rely on observeUserUpdatesFromRepository to update the user object later.
-                    // Let's keep it simple: update targets/distribution here. The user object will update via its observer.
                 )
             } else {
-                currentState // No change needed
+                currentState
             }
-        }
-    }
-
-    private fun fetchAndSetReminders(user: User?) {
-        val result = processReminders(user)
-        if (_uiState.value.enabledExerciseReminders != result.first || _uiState.value.mealReminderTimes != result.second) {
-            _uiState.update { it.copy(enabledExerciseReminders = result.first, mealReminderTimes = result.second) }
         }
     }
 
@@ -227,8 +200,9 @@ class HomeViewModel : ViewModel() {
         }
         val exerciseReminders = mutableListOf<ReminderItem>()
         val mealTimes = mutableMapOf<String, String>()
+
         user.reminderSettings?.forEach { (id, timeValue) ->
-            val timeString = timeValue as? String
+            val timeString = timeValue // Already String? in User model
             if (timeString != null) {
                 val parts = timeString.split(":")
                 if (parts.size == 2) {
@@ -238,7 +212,7 @@ class HomeViewModel : ViewModel() {
                         val formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute)
                         if (MealsType.mealTypes.any { it.id == id }) {
                             mealTimes[id] = formattedTime
-                        } else if (ExerciseType.getDefaultExerciseTypes().any { it.id == id }) {
+                        } else { // Assume exercise if not meal
                             val exerciseType = ExerciseType.getExerciseTypeById(id)
                             exerciseReminders.add(
                                 ReminderItem(
@@ -256,7 +230,6 @@ class HomeViewModel : ViewModel() {
         return Pair(exerciseReminders, mealTimes)
     }
 
-    // Calculates progress based on provided user and logs, returns a *new* state object
     private fun calculateProgress(user: User?, logs: DailyLogData?): HomeUiState {
         val foodLogs = logs?.foodLogs?.values?.toList() ?: emptyList()
         val waterLogs = logs?.waterLogs?.values?.toList() ?: emptyList()
@@ -272,7 +245,6 @@ class HomeViewModel : ViewModel() {
             mealConsumed[log.mealType] = current + log.calories
         }
 
-        // Return a copy of the *current* state with updated progress fields
         return _uiState.value.copy(
             consumedCalories = consumedCalories,
             consumedWaterMl = consumedWaterMl,
@@ -281,12 +253,10 @@ class HomeViewModel : ViewModel() {
         )
     }
 
-    // --- Action Functions ---
-
     suspend fun addWaterLog(amountMl: Int): DataWrapper<Unit> {
         if (amountMl <= 0) return DataWrapper.Error("Miqdor 0 dan katta bo'lishi kerak")
         val waterLog = WaterLog(amountMl = amountMl)
-        return dailyLogRepository.addWaterLog(waterLog) // Triggers observeLogs
+        return dailyLogRepository.addWaterLog(waterLog)
     }
 
     fun deleteFoodLog(log: FoodLog) {
@@ -295,7 +265,6 @@ class HomeViewModel : ViewModel() {
             if (result is DataWrapper.Error) {
                 _uiState.update { it.copy(errorMessage = "Ovqat logini o'chirishda xato: ${result.error}") }
             }
-            // UI updates via observeLogs
         }
     }
 
@@ -314,7 +283,6 @@ class HomeViewModel : ViewModel() {
             if (result is DataWrapper.Error) {
                 _uiState.update { it.copy(errorMessage = "Mashq logini o'chirishda xato: ${result.error}") }
             }
-            // UI updates via observeLogs
         }
     }
 

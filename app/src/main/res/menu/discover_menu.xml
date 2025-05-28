@@ -11,12 +11,18 @@
 
     <item
         android:id="@+id/action_add_workout_category"
-        android:title="Kategoriya qo'shish"
+        android:title="Workout Kategoriya qo'shish"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_add_workout"
         android:title="Workout qo'shish"
         app:showAsAction="never" />
-
-
+    <item
+        android:id="@+id/action_add_exercise"
+        android:title="Mashq qo'shish"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_add_video"
+        android:title="Video qo'shish"
+        app:showAsAction="never" />
 </menu>

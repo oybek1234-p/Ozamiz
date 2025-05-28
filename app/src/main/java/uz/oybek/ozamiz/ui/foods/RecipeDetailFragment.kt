@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.ui.foods
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -18,11 +17,9 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.foods.Recipe
 import uz.oybek.ozamiz.data.info.MealsType
 import uz.oybek.ozamiz.databinding.FragmentRecipeDetailBinding
-import uz.oybek.ozamiz.openLink
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.loadPhoto
 import uz.oybek.ozamiz.ui.showToast
-import java.util.Locale
 
 class RecipeDetailFragment : BaseFragment<FragmentRecipeDetailBinding>() {
 
@@ -54,14 +51,17 @@ class RecipeDetailFragment : BaseFragment<FragmentRecipeDetailBinding>() {
                     viewModel.onEditRecipeClick()
                     true
                 }
+
                 R.id.action_share_recipe -> {
                     viewModel.onShareRecipeClick()
                     true
                 }
+
                 R.id.action_delete -> {
                     showDeleteConfirmationDialog()
                     true
                 }
+
                 else -> false
             }
         }
@@ -103,30 +103,33 @@ class RecipeDetailFragment : BaseFragment<FragmentRecipeDetailBinding>() {
                 if (findNavController().currentDestination?.id != R.id.recipeDetailFragment) return@let
                 when (navEvent) {
                     is RecipeDetailNavigationEvent.NavigateToEditRecipe -> {
-                        val bundle = Bundle().apply {
-                            putString(
-                                "recipeJson", Gson().toJson(navEvent.recipe)
-                            )
-                        }
                         if (findNavController().currentDestination?.id == R.id.recipeDetailFragment) {
                             findNavController().navigate(
-                                R.id.action_recipeDetailFragment_to_addEditRecipeFragment, bundle
+                                RecipeDetailFragmentDirections.actionRecipeDetailFragmentToAddEditRecipeFragment(
+                                    recipeJson = Gson().toJson(navEvent.recipe)
+                                )
                             )
                         }
                     }
+
                     is RecipeDetailNavigationEvent.ShareRecipe -> {
                         shareRecipe(navEvent.recipe)
                     }
+
                     is RecipeDetailNavigationEvent.ShowMealTypeSelection -> {
                         showMealTypeDialog(navEvent.availableTypes)
                     }
+
                     is RecipeDetailNavigationEvent.NavigateBackWithMessage -> {
                         showToast(navEvent.message)
                         findNavController().popBackStack()
                     }
                     // O'ZGARISH: YoutubePlayerFragment ga navigatsiya
                     is RecipeDetailNavigationEvent.NavigateToYoutubePlayer -> {
-                        val action = RecipeDetailFragmentDirections.actionRecipeDetailFragmentToYoutubePlayerFragment(navEvent.videoId)
+                        val action =
+                            RecipeDetailFragmentDirections.actionRecipeDetailFragmentToYoutubePlayerFragment(
+                                navEvent.videoId
+                            )
                         findNavController().navigate(action)
                     }
                 }

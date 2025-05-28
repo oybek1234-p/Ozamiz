@@ -40,11 +40,12 @@
 
             <TextView
                 android:id="@+id/title_view"
-                style="@style/Headline2_16"
+                style="@style/Headline3_15"
+                android:paddingEnd="@dimen/dimen_24"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Bugun nima ovqat yedingiz"
-                android:textColor="?colorOnSurface"/>
+                android:textColor="?colorPrimary"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_foodDescription_log"
@@ -52,7 +53,7 @@
                 app:hintEnabled="false"
                 app:helperTextEnabled="true"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp">
+                android:layout_marginTop="@dimen/dimen_18">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editText_foodDescription_log"
@@ -62,41 +63,25 @@
                     android:textSize="15sp"
                     android:hint="@string/food_description_hint"
                     android:ellipsize="none"
-                    android:textColorHint="?colorOnSurfaceVariant"
                     android:inputType="textMultiLine|textCapSentences"
                     android:minLines="3"
                     android:gravity="top"
                     android:imeOptions="actionDone"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                style="@style/Text2_15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_8"
-                android:text="Ovqat miqdorini kiriting(Kosa, tarelka, stakan, piyola)"
-                android:textColor="@color/yellow"/>
 
             <TextView
-                style="@style/Text2_15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_8"
-                android:text="Har bir yegan narsangizni yozing"
-                android:textColor="@color/yellow"/>
-
-            <TextView
-                style="@style/Text1_14"
+                style="@style/Subtitle2_14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
                 android:text="@string/upload_meal_photo"
-                android:textColor="?colorOnSurface"/>
+                android:textColor="?colorPrimary"/>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_imagePicker_log"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_gravity="start"
                 android:layout_marginTop="@dimen/dimen_8"
                 app:cardCornerRadius="16dp"
@@ -129,7 +114,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/photo_ic"
-                            app:tint="?colorOnSurfaceVariant"/>
+                            app:tint="?colorOnSurface"/>
                         <TextView
                             style="@style/Caption2_12"
                             android:layout_width="match_parent"

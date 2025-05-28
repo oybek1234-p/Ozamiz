@@ -50,7 +50,7 @@
         <item name="colorSurfaceContainerHigh">#E6E0EC</item>
         <item name="colorSurfaceContainerHighest">#DED8E1</item>
         <item name="colorOnSurface">#1D1B20</item>
-        <item name="colorOnSurfaceVariant">#5A5A5A</item>
+        <item name="colorOnSurfaceVariant">#6C6C6C</item>
 
         <item name="colorSurfaceInverse">#322F35</item>
         <item name="colorOnSurfaceInverse">#F5EFF7</item>

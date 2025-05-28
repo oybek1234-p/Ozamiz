@@ -1,12 +1,17 @@
 package uz.oybek.ozamiz.data.utils
 
 import uz.oybek.ozamiz.data.User
-import uz.oybek.ozamiz.data.WeightGoal
 import uz.oybek.ozamiz.data.info.ActivityLevel
 import uz.oybek.ozamiz.data.info.GenderEnum
+import uz.oybek.ozamiz.data.weightGoalModifier
 import kotlin.math.roundToInt
 
 object NutritionCalculator {
+
+    fun getIdealWeight(heightM: Double): Pair<Int, Int> {
+        val pair = Pair((18.5 * heightM * heightM).toInt(),(24.9 * heightM * heightM).toInt())
+        return pair
+    }
 
     /**
      * Mifflin-St Jeor formulasidan foydalanib Bazal Metabolizm Tezligini (BMR) hisoblaydi.
@@ -37,9 +42,7 @@ object NutritionCalculator {
     fun calculateTargetCalories(user: User): Int {
         val tdee = calculateTDEE(user)
         if (tdee <= 0) return 2000
-
-        val weightGoal = WeightGoal.fromId(user.weightGoal)
-        val target = tdee + weightGoal.calorieModifier
+        val target = tdee + weightGoalModifier
 
         val minimumCalories = 1200.0
         return maxOf(target, minimumCalories).roundToInt()

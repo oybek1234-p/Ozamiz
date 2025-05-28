@@ -1,7 +1,12 @@
-package uz.oybek.ozamiz.ui.getinfo // ViewModel bilan bir xil paket
+package uz.oybek.ozamiz.ui.getinfo
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -9,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentSetupRemindersBinding
+import uz.oybek.ozamiz.reminders.ReminderScheduler
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.showToast
 
@@ -19,6 +25,16 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
     private lateinit var reminderAdapter: ReminderAdapter
     private var pendingTimePickerItemId: String? = null
 
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                ReminderScheduler.scheduleAllActiveReminders(requireContext().applicationContext)
+            } else {
+                showToast("Eslatmalar uchun ruxsat berilmadi.")
+            }
+        }
+
+
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentSetupRemindersBinding {
@@ -26,6 +42,7 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
     }
 
     override fun viewCreated(bind: FragmentSetupRemindersBinding) {
+        checkAndRequestNotificationPermission()
         setupToolbar(bind)
         setupRecyclerView(bind)
         setupFragmentResultListeners()
@@ -37,12 +54,35 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
 
         bind.btnContinue.setOnClickListener {
             viewModel.saveSettings()
-
         }
     }
 
+    private fun checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when {
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {}
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    // Foydalanuvchiga tushuntirish kerak
+                    // showToast("Eslatmalar uchun ruxsat kerak.") // Yoki dialog
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                else -> {
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        }
+    }
+
+
     private fun setupToolbar(bind: FragmentSetupRemindersBinding) {
         bind.toolbar.title = "Eslatmalarni Sozlash"
+        bind.toolbar.setNavigationIcon(R.drawable.arrow_back) // Back button
+        bind.toolbar.setNavigationOnClickListener {
+            if (isAdded) findNavController().popBackStack()
+        }
     }
 
     private fun setupRecyclerView(bind: FragmentSetupRemindersBinding) {
@@ -74,8 +114,12 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
             viewModel.processExerciseEditResult(
                 itemId = bundle.getString(EditExerciseReminderFragment.RESULT_ITEM_ID),
                 action = bundle.getString(EditExerciseReminderFragment.RESULT_ACTION),
+                name = bundle.getString(EditExerciseReminderFragment.RESULT_ITEM_NAME),
+                iconRes = bundle.getInt(EditExerciseReminderFragment.RESULT_ITEM_ICON_RES),
                 hour = bundle.getInt(EditExerciseReminderFragment.RESULT_ITEM_HOUR, -1),
-                minute = bundle.getInt(EditExerciseReminderFragment.RESULT_ITEM_MINUTE, -1)
+                minute = bundle.getInt(EditExerciseReminderFragment.RESULT_ITEM_MINUTE, -1),
+                description = bundle.getString(EditExerciseReminderFragment.RESULT_ITEM_DESCRIPTION),
+                imageUrl = bundle.getString(EditExerciseReminderFragment.RESULT_ITEM_IMAGE_URL)
             )
         }
 
@@ -87,7 +131,6 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
 
             if (selectedTypeId != null) {
                 val defaultExerciseInfo = ExerciseType.getExerciseTypeById(selectedTypeId)
-
                 val newItem = ReminderItem(
                     id = selectedTypeId,
                     name = defaultExerciseInfo.name,
@@ -95,10 +138,9 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
                     type = ReminderType.EXERCISE,
                     description = defaultExerciseInfo.description,
                     imageUrl = defaultExerciseInfo.defaultImageUrl,
-                    hour = null,
+                    hour = null, // Vaqt keyin belgilanadi
                     minute = null
                 )
-
                 navigateToEditExercise(newItem, true)
             }
         }
@@ -108,8 +150,7 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
         viewModel.reminderListLiveData.observe(viewLifecycleOwner) { list ->
             if (this::reminderAdapter.isInitialized) {
                 binding.recyclerViewReminders.post {
-                    reminderAdapter.submitList(list)
-                    reminderAdapter.notifyDataSetChanged()
+                    reminderAdapter.submitList(list.toMutableList()) // Submit a new list instance
                 }
             }
         }
@@ -133,22 +174,17 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
     private fun navigateToHome() {
         if (!isAdded) return
         val navController = findNavController()
-        val previousDestinationId = navController.previousBackStackEntry?.destination?.id
-        val currentDestinationId = navController.currentDestination?.id
-
-        if (currentDestinationId == R.id.setupRemindersFragment) {
-            if (previousDestinationId == R.id.getMainInfo) {
-                navController.navigate(R.id.home)
-            } else {
-                closeFragment()
-            }
+        if (navController.currentDestination?.id == R.id.setupRemindersFragment) {
+            // Check if came from GetMainInfo or Profile
+            val cameFromGetInfo = navController.previousBackStackEntry?.destination?.id == R.id.getMainInfo
+            mainActivity()?.recreateUi(cameFromGetInfo) // Recreate UI, pass if it's new user flow
         }
     }
+
 
     private fun showSelectExerciseTypeSheet() {
         if (!isAdded) return
         val bottomSheet = SelectExerciseTypeBottomSheet()
-
         val addedExerciseIds =
             viewModel.reminderListLiveData.value?.filter { it.type == ReminderType.EXERCISE }
                 ?.map { it.id } ?: emptyList()
@@ -164,7 +200,8 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
 
     private fun navigateToEditExercise(item: ReminderItem, isNew: Boolean) {
         if (!isAdded) return
-        val canDelete = !isNew
+        val canDelete = !isNew && (viewModel.reminderListLiveData.value?.count { it.type == ReminderType.EXERCISE && it.id != item.id } ?: 0) > 0
+
 
         val bundle = bundleOf(
             EditExerciseReminderFragment.ARG_ITEM_ID to item.id,
@@ -193,6 +230,5 @@ class SetupRemindersFragment : BaseFragment<FragmentSetupRemindersBinding>(),
             timePicker.show(parentFragmentManager, CustomTimePickerDialogFragment.TAG)
         }
     }
-
 
 }

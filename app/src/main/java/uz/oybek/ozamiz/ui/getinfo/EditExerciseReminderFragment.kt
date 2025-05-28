@@ -18,7 +18,7 @@ class EditExerciseReminderFragment : BaseFragment<FragmentEditExerciseReminderBi
 
     companion object {
         const val RESULT_KEY_EDIT_EXERCISE = "EditExerciseResultKey"
-        const val RESULT_ACTION = "ResultAction"
+        const val RESULT_ACTION = "ResultAction" // "save" or "delete"
         const val RESULT_ITEM_ID = "ResultItemId"
         const val RESULT_ITEM_NAME = "ResultItemName"
         const val RESULT_ITEM_HOUR = "ResultItemHour"
@@ -27,6 +27,7 @@ class EditExerciseReminderFragment : BaseFragment<FragmentEditExerciseReminderBi
         const val RESULT_ITEM_DESCRIPTION = "ResultItemDescription"
         const val RESULT_ITEM_IMAGE_URL = "ResultItemImageUrl"
 
+
         const val ARG_ITEM_ID = "ArgItemId"
         const val ARG_ITEM_NAME = "ArgItemName"
         const val ARG_ITEM_ICON_RES = "ArgItemIconRes"
@@ -34,7 +35,7 @@ class EditExerciseReminderFragment : BaseFragment<FragmentEditExerciseReminderBi
         const val ARG_ITEM_MINUTE = "ArgItemMinute"
         const val ARG_ITEM_DESCRIPTION = "ArgItemDescription"
         const val ARG_ITEM_IMAGE_URL = "ArgItemImageUrl"
-        const val ARG_IS_NEW = "ArgIsNew"
+        const val ARG_IS_NEW = "ArgIsNew" // To differentiate between adding new and editing
         const val ARG_CAN_DELETE = "ArgCanDelete"
     }
 
@@ -46,7 +47,8 @@ class EditExerciseReminderFragment : BaseFragment<FragmentEditExerciseReminderBi
         super.onCreate(savedInstanceState)
         parseArguments()
         if (currentReminderItem == null && !isNewExercise) {
-
+            // If editing an existing item and it's null, something went wrong.
+            // Maybe log an error or show a toast before popping.
             if (isAdded) {
                 findNavController().popBackStack()
             }
@@ -94,19 +96,29 @@ class EditExerciseReminderFragment : BaseFragment<FragmentEditExerciseReminderBi
             setupListeners(bind, it)
             setupTimePickerResultListener()
         } ?: run {
-            if (isAdded) findNavController().popBackStack()
+            if (isNewExercise) {
+                // This case should ideally not happen if arguments are passed correctly for new item.
+                // If it does, initialize with some defaults or handle error.
+                showToast("Yangi mashq uchun ma'lumotlar topilmadi.")
+                if (isAdded) findNavController().popBackStack()
+            } else if (isAdded) {
+                // Already handled in onCreate, but as a fallback.
+                findNavController().popBackStack()
+            }
         }
     }
 
     private fun setupToolbar(bind: FragmentEditExerciseReminderBinding) {
         bind.toolbar.title =
-            if (isNewExercise) "Yangi Mashq Qo'shish" else currentReminderItem?.name
-                ?: "Mashqni Tahrirlash"
+            if (isNewExercise) "Yangi Mashq Eslatmasi" else currentReminderItem?.name
+                ?: "Mashq Eslatmasi"
         bind.toolbar.setUpBackButton(this)
     }
 
     private fun loadData(bind: FragmentEditExerciseReminderBinding, item: ReminderItem) {
         Glide.with(this).load(item.iconRes)
+            .placeholder(R.drawable.sport_ic) // Placeholder for exercises
+            .error(R.drawable.sport_ic)
             .into(bind.ivExerciseImage)
         bind.tvExerciseName.text = item.name
         bind.tvExerciseDescription.text = item.description ?: "Tavsif mavjud emas"
@@ -126,12 +138,17 @@ class EditExerciseReminderFragment : BaseFragment<FragmentEditExerciseReminderBi
             item.hour, item.minute, "${item.name} vaqtini belgilang"
         )
         if (isAdded) {
+            // Show using childFragmentManager if this fragment is hosting the dialog,
+            // or parentFragmentManager if the dialog is shown by a parent fragment.
+            // Assuming SetupRemindersFragment is the one showing this, use parentFragmentManager.
+            // If EditExerciseReminderFragment itself shows another dialog, then use childFragmentManager.
             timePicker.show(parentFragmentManager, CustomTimePickerDialogFragment.TAG)
         }
     }
 
     private fun setupTimePickerResultListener() {
         if (!isAdded) return
+        // Listen on parentFragmentManager as the dialog is shown by parent
         parentFragmentManager.setFragmentResultListener(
             CustomTimePickerDialogFragment.REQUEST_KEY, viewLifecycleOwner
         ) { _, bundle ->
@@ -153,8 +170,8 @@ class EditExerciseReminderFragment : BaseFragment<FragmentEditExerciseReminderBi
                 RESULT_ACTION to "save",
                 RESULT_ITEM_ID to item.id,
                 RESULT_ITEM_NAME to item.name,
-                RESULT_ITEM_HOUR to (item.hour ?: -1),
-                RESULT_ITEM_MINUTE to (item.minute ?: -1),
+                RESULT_ITEM_HOUR to (item.hour ?: -1), // Send -1 if null
+                RESULT_ITEM_MINUTE to (item.minute ?: -1), // Send -1 if null
                 RESULT_ITEM_ICON_RES to item.iconRes,
                 RESULT_ITEM_DESCRIPTION to item.description,
                 RESULT_ITEM_IMAGE_URL to item.imageUrl

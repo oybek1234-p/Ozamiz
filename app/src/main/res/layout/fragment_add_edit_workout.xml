@@ -33,7 +33,7 @@
                 android:id="@+id/include_image_picker_workout"
                 layout="@layout/include_image_picker"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="200dp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_workout_name"

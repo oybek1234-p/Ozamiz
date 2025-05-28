@@ -12,11 +12,13 @@
         android:background="?colorSurface"
         android:layout_height="match_parent">
 
+
         <ImageView
             android:id="@+id/photo"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
+            android:src="@drawable/splash_photo"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout7"
             app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
@@ -24,6 +26,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:title="@string/akkauntga_kirish"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +40,33 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:id="@+id/title_view"
+                style="@style/Title4_24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18"
+                android:text="Sog'lom va tez ozing"
+                android:layout_gravity="center"
+                android:textColor="?colorOnSurface"
+                app:layout_constraintBottom_toBottomOf="@+id/photo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/subtitle"
+                style="@style/Text2_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_24"
+                android:layout_marginTop="@dimen/dimen_8"
+                android:text="Bu ilova sizga ozishda yordam beradi"
+                android:gravity="center"
+                android:textColor="?colorOnSurfaceVariant"
+                app:layout_constraintBottom_toTopOf="@+id/start"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
                 android:id="@+id/gmail_button"
@@ -65,7 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/dimen_24"
-                android:layout_marginTop="@dimen/dimen_24"
+                android:layout_marginTop="@dimen/dimen_12"
                 android:background="@drawable/round_lay_stroke"
                 android:drawablePadding="@dimen/dimen_12"
                 android:drawableTint="?colorPrimary"
@@ -76,23 +106,11 @@
                 android:paddingVertical="@dimen/dimen_12"
                 android:text="Email orqali kirish"
                 android:textColor="?colorPrimary"
+                android:layout_marginBottom="@dimen/dimen_24"
                 app:drawableStartCompat="@drawable/mail_24px"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/gmail_button" />
-
-            <TextView
-                style="@style/Subtitle1_14"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/dimen_24"
-                android:layout_marginTop="@dimen/dimen_18"
-                android:layout_marginBottom="@dimen/dimen_24"
-                android:text="Ilovadan foydalanish uchun akkauntga kiring"
-                android:textColor="?colorOnSurface"
-                app:layout_constraintEnd_toEndOf="@+id/email_button"
-                app:layout_constraintStart_toStartOf="@+id/email_button"
-                app:layout_constraintTop_toBottomOf="@+id/email_button" />
 
         </LinearLayout>
 
@@ -131,14 +149,18 @@
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progress_bar"
-            android:layout_width="wrap_content"
-            android:visibility="gone"
-            android:layout_height="wrap_content"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/round_lay"
+            android:padding="@dimen/dimen_12"
+            android:elevation="@dimen/dimen_2"
+            android:backgroundTint="?colorSurfaceContainerLow"
             android:layout_marginBottom="@dimen/dimen_12"
             android:indeterminate="true"
             app:layout_constraintBottom_toTopOf="@+id/continue_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

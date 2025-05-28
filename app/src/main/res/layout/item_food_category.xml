@@ -7,15 +7,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:padding="4dp"
+    android:padding="8dp"
     android:clickable="true"
     android:focusable="true"
     android:background="?android:attr/selectableItemBackground">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_category_image_container"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         app:cardCornerRadius="32dp"
         app:cardElevation="1dp"
         app:strokeWidth="1dp"
@@ -32,13 +32,13 @@
 
     <TextView
         android:id="@+id/textView_category_name"
-        style="@style/Caption1_13"
+        style="@style/Text1_14"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
         android:maxWidth="80dp"
-        android:maxLines="1"
+        android:maxLines="2"
         android:ellipsize="end"
         android:textColor="?colorOnSurface"
         tools:text="Yog'siz Ovqatlar" />

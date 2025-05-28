@@ -51,9 +51,8 @@ class AddEditRecipeViewModel(application: Application) : AndroidViewModel(applic
     private var initialRecipeJson: String? = null
 
     fun initialize(recipeJson: String?) {
-        Log.d(TAG, "Initializing ViewModel, recipeJson: ${recipeJson != null}")
         initialRecipeJson = recipeJson
-        loadAvailableCategories() // Kategoriyalarni yuklashni boshlash
+        loadAvailableCategories()
 
         if (recipeJson != null) {
             try {

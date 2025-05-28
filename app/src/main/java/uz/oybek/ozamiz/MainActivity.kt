@@ -14,8 +14,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -29,6 +27,7 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.LocalUser
@@ -37,6 +36,7 @@ import uz.oybek.ozamiz.data.UserRepository
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
 import uz.oybek.ozamiz.databinding.SupportSheetBinding
+import uz.oybek.ozamiz.reminders.ReminderScheduler
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.visibleOrGone
 
@@ -53,6 +53,14 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         PermissionController.getInstance().onPermissionResult(requestCode, grantResults)
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Ruxsat berildi, eslatmalarni qayta rejalashtirish mumkin
+                ReminderScheduler.scheduleAllActiveReminders(this)
+            } else {
+                // Ruxsat berilmadi
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -64,6 +72,10 @@ class MainActivity : AppCompatActivity() {
     private val updateLauncher = registerForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) {}
+
+    companion object {
+        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 101
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -96,21 +108,24 @@ class MainActivity : AppCompatActivity() {
         navHost.navController.setGraph(graph, Bundle().apply {
             putBoolean("new", new)
         })
-        LocalUser.user.premium = true
+        // LocalUser.user.premium = true // Development uchun
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
     }
 
     private fun initUser() {
         LocalUser.getUser()
-        UserRepository.observeCurrentUser { }
+        UserRepository.observeCurrentUser {
+            // Re-schedule reminders if user data (especially reminderSettings) changes
+            it?.let { ReminderScheduler.scheduleAllActiveReminders(this) }
+        }
     }
 
     fun showSupportSheet() {
         val dialog = BottomSheetDialog(this, R.style.SheetStyle)
-        val binding = SupportSheetBinding.inflate(LayoutInflater.from(this), null, false)
-        dialog.setContentView(binding.root)
-        binding.apply {
+        val bindingDialog = SupportSheetBinding.inflate(LayoutInflater.from(this), null, false)
+        dialog.setContentView(bindingDialog.root)
+        bindingDialog.apply {
             callview.setOnClickListener {
                 dialog.dismiss()
                 openPhoneCall(this@MainActivity, "+998971871415")
@@ -138,7 +153,6 @@ class MainActivity : AppCompatActivity() {
             val appUpdateInfoTask = appUpdateManager.appUpdateInfo
             val listener = InstallStateUpdatedListener {
                 if (it.installStatus() == InstallStatus.DOWNLOADED) {
-                    // Complete the update if downloaded
                     appUpdateManager.completeUpdate()
                 }
             }
@@ -147,9 +161,11 @@ class MainActivity : AppCompatActivity() {
 
             appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
                 if (isDestroyed || isFinishing) return@addOnSuccessListener
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE) {
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
+                        AppUpdateType.FLEXIBLE
+                    )
+                ) { // Ensure flexible is allowed
                     try {
-                        // Start the update flow using the registered launcher
                         appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
                             launcher,
@@ -165,17 +181,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun requestNotificationPermission() {
-        val permissionState =
-            ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS);
 
-        if (permissionState == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1
-            );
-        }
-    }
-
+    @OptIn(DelicateCoroutinesApi::class)
     private fun initInternetConnectivity() {
         val networkRequest =
             NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -186,7 +193,7 @@ class MainActivity : AppCompatActivity() {
         var hasInternet = connectivityManager.activeNetwork != null
         if (connectivityManager.activeNetwork == null) {
             MainScope().launch {
-                internetBottomSheet.show()
+                if (!isFinishing && !isDestroyed) internetBottomSheet.show()
             }
         }
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
@@ -197,21 +204,33 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 hasInternet = true
-                lifecycleScope.launch {
-                    internetBottomSheet.dismiss()
+                if (internetBottomSheet.isShowing) {
+                    lifecycleScope.launch {
+                        try {
+                            if (!isFinishing && !isDestroyed) {
+                                internetBottomSheet.dismiss()
+                            }
+                        } catch (e: Exception) {
+                            handleException(e)
+                        }
+                    }
+                }
+                try {
                     try {
                         val currentFragment = navHost.childFragmentManager.fragments[0]
                         if (currentFragment is BaseFragment<*>) currentFragment.onInternetAvailable()
                     } catch (e: Exception) {
                         handleException(e)
                     }
+                } catch (e: Exception) {
+                    //
                 }
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
                 if (isFinishing || isDestroyed) return
-                if (window.decorView.isAttachedToWindow) {
+                if (window.decorView.isAttachedToWindow && !internetBottomSheet.isShowing) {
                     lifecycleScope.launch {
                         internetBottomSheet.show()
                     }
@@ -224,19 +243,21 @@ class MainActivity : AppCompatActivity() {
 
     private val internetBottomSheet: BottomSheetDialog by lazy {
         BottomSheetDialog(this).apply {
-            val binding =
+            val dialogBinding =
                 NoInternetDialogBinding.inflate(LayoutInflater.from(this@MainActivity), null, false)
-            setContentView(binding.root)
-            binding.button.setOnClickListener {
+            setContentView(dialogBinding.root)
+            dialogBinding.button.setOnClickListener {
                 dismiss()
             }
+            setCancelable(false)
+            setCanceledOnTouchOutside(false)
         }
     }
 
     private var bottomSetUp = false
     private var bottomNavShown = true
 
-    fun initCurrentUser() {
+    fun initCurrentUser() { // Not used currently
         UserRepository.observeCurrentUser {
 
         }
@@ -244,7 +265,7 @@ class MainActivity : AppCompatActivity() {
 
     private val decelerateInterpolator = DecelerateInterpolator(1.5f)
     fun showBottomSheet(show: Boolean, animate: Boolean) {
-        if (bottomNavShown == show) return
+        if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return // Avoid redundant animations
         bottomNavShown = show
         binding.bottomNavView.apply {
             if (!bottomSetUp && show) {
@@ -254,22 +275,22 @@ class MainActivity : AppCompatActivity() {
                 visibleOrGone(true)
             }
             if (!show && !isVisible) return
-            if (show) {
-                translationY = 120.toFloat()
-            }
+
+            val targetY = if (show) 0f else measuredHeight.toFloat()
             if (animate) {
-                binding.root.post {
-                    animate().setDuration(180).setInterpolator(decelerateInterpolator)
-                        .translationY(if (show) 0f else measuredHeight.toFloat()).withEndAction {
-                            if (!show) {
-                                visibleOrGone(false)
-                            }
-                        }.start()
-                }
+                if (show) translationY =
+                    measuredHeight.toFloat() // Set initial position for slide in
+
+                animate().setDuration(180).setInterpolator(decelerateInterpolator)
+                    .translationY(targetY).withEndAction {
+                        if (!show) {
+                            visibleOrGone(false)
+                        }
+                    }.start()
             } else {
+                translationY = targetY
                 visibleOrGone(show)
             }
         }
     }
-
 }

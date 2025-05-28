@@ -11,13 +11,13 @@ plugins {
 android {
     namespace = "uz.oybek.ozamiz"
     compileSdk = 34
-
+    
     defaultConfig {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.0"
+        versionCode = 6
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.androidx.paging.common.android)
     implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.transport.api)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
@@ -79,7 +80,6 @@ dependencies {
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.google.firebase:firebase-appcheck-debug:18.0.0")
-   // implementation("com.google.android.gms:play-services-ads:23.4.0")
     implementation("com.google.android.play:app-update:2.1.0")
 
     implementation("com.aallam.openai:openai-client:3.8.0")
@@ -99,6 +99,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("com.google.android.gms:play-services-base:18.2.0")
+
     implementation ("com.github.ozcanalasalvar.picker:wheelview:2.0.7")
     implementation ("com.github.ozcanalasalvar.picker:datepicker:2.0.7")
     implementation("com.google.ai.client.generativeai:generativeai:0.3.0")

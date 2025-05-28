@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.LocalUser
 import uz.oybek.ozamiz.data.UserRepository
 import uz.oybek.ozamiz.data.info.MealsType
+import uz.oybek.ozamiz.reminders.ReminderScheduler
 import java.util.Locale
 
 open class Event<out T>(private val content: T) {
@@ -36,7 +38,7 @@ class SetupRemindersViewModel : ViewModel() {
     val navigationEventLiveData: LiveData<Event<SetupReminderNavigationEvent>> =
         _navigationEventLiveData
 
-    private val defaultMealIds = setOf("breakfast", "snack1", "lunch", "snack2", "dinner")
+    private val defaultMealIds = MealsType.mealTypes.map { it.id }.toSet()
 
     init {
         loadAndInitializeReminders()
@@ -45,78 +47,52 @@ class SetupRemindersViewModel : ViewModel() {
     private fun loadAndInitializeReminders() {
         _isLoadingLiveData.value = true
         viewModelScope.launch {
-            val savedSettings: Map<String, Any?>? = LocalUser.user.reminderSettings
+            val user = LocalUser.user
+            val savedSettings: Map<String, String?>? = user.reminderSettings
 
-            if (savedSettings != null) {
-                val default = getDefaultMealReminders()
-                val reminders = savedSettings.map {
-                    val isMeal = it.key in defaultMealIds
-                    var item: ReminderItem? = null
-                    item = if (isMeal) {
-                        default.find { d -> d.id == it.key }
-                    } else {
-                        ExerciseType.getExerciseTypeById(it.key).let {
-                            ReminderItem(
-                                id = it.id,
-                                name = it.name,
-                                iconRes = it.iconRes,
-                                type = ReminderType.EXERCISE,
-                                description = it.description,
-                                imageUrl = it.defaultImageUrl
-                            )
-                        }
-                    }
-                    item.apply {
-                        parseAndSetTime(this!!, it.value as? String)
-                    }
-                }
-                val list = reminders.filterNotNull().toMutableList()
-                sortReminderList(list)
-                _reminderListLiveData.postValue(list)
-                _isLoadingLiveData.postValue(false)
-            } else {
-                val currentList = getDefaultMealReminders().toMutableList()
+            val currentList = mutableListOf<ReminderItem>()
 
-                applyDefaultTimes(currentList)
-                sortReminderList(currentList)
-                _reminderListLiveData.postValue(currentList)
-                _isLoadingLiveData.postValue(false)
+            // Add default meal reminders
+            MealsType.mealTypes.forEach { mealType ->
+                val reminder = mealType.toReminder()
+                parseAndSetTime(reminder, savedSettings?.get(mealType.id))
+                currentList.add(reminder)
             }
+            applyDefaultTimesIfNeeded(currentList.filter { it.type == ReminderType.MEAL }.toMutableList())
+
+
+            // Add saved exercise reminders
+            savedSettings?.forEach { (id, timeString) ->
+                if (!defaultMealIds.contains(id)) { // If not a meal, assume it's an exercise
+                    val exerciseType = ExerciseType.getExerciseTypeById(id)
+                    val exerciseReminder = ReminderItem(
+                        id = exerciseType.id,
+                        name = exerciseType.name,
+                        iconRes = exerciseType.iconRes,
+                        type = ReminderType.EXERCISE,
+                        description = exerciseType.description,
+                        imageUrl = exerciseType.defaultImageUrl
+                    )
+                    parseAndSetTime(exerciseReminder, timeString)
+                    currentList.add(exerciseReminder)
+                }
+            }
+            sortReminderList(currentList)
+            _reminderListLiveData.postValue(currentList)
+            _isLoadingLiveData.postValue(false)
         }
     }
 
-    private fun getDefaultMealReminders(): List<ReminderItem> {
-        return MealsType.mealTypes.map { it.toReminder() }.toMutableList().apply {
-            add(ExerciseType.getExerciseTypeById("walking").let {
-                ReminderItem(
-                    id = it.id,
-                    name = it.name,
-                    iconRes = it.iconRes,
-                    type = ReminderType.EXERCISE,
-                    description = it.description,
-                    imageUrl = it.defaultImageUrl
-                )
-            })
-            add(ExerciseType.getExerciseTypeById("dance").let {
-                ReminderItem(
-                    id = it.id,
-                    name = it.name,
-                    iconRes = it.iconRes,
-                    type = ReminderType.EXERCISE,
-                    description = it.description,
-                    imageUrl = it.defaultImageUrl
-                )
-            })
-        }
-    }
 
-    private fun applyDefaultTimes(list: MutableList<ReminderItem>) {
+    private fun applyDefaultTimesIfNeeded(mealReminders: MutableList<ReminderItem>) {
         val defaultTimes = mapOf(
-            "breakfast" to Pair(7, 0), "lunch" to Pair(13, 0), "dinner" to Pair(19, 0)
+            MealsType.Breakfast.id to Pair(7, 0),
+            MealsType.Lunch.id to Pair(13, 0),
+            MealsType.Dinner.id to Pair(19, 0)
         )
-        list.filter { it.type == ReminderType.MEAL }.forEach { item ->
-            defaultTimes[item.id]?.let { time ->
-                if (!item.isValidTimeSet()) {
+        mealReminders.forEach { item ->
+            if (!item.isValidTimeSet()) { // Only apply if user hasn't set a time
+                defaultTimes[item.id]?.let { time ->
                     item.hour = time.first
                     item.minute = time.second
                 }
@@ -133,13 +109,13 @@ class SetupRemindersViewModel : ViewModel() {
                 if (parts.size == 2) {
                     val hour = parts[0].toIntOrNull()
                     val minute = parts[1].toIntOrNull()
-                    if (hour != null && minute != null) {
+                    if (hour != null && minute != null && hour in 0..23 && minute in 0..59) {
                         item.hour = hour
                         item.minute = minute
                     }
                 }
             } catch (e: Exception) {
-                //
+                // Invalid format, leave time as null
             }
         }
     }
@@ -154,49 +130,49 @@ class SetupRemindersViewModel : ViewModel() {
             item.minute = minute
 
             sortReminderList(currentList)
-            _reminderListLiveData.value = currentList
-
-            if (item.type == ReminderType.MEAL) {
-                applyAutomaticTimeSuggestions(itemId, hour, minute, currentList)
-            }
+            _reminderListLiveData.value = currentList // Notify UI
         }
     }
 
     fun processExerciseEditResult(
-        itemId: String?, action: String?, hour: Int = -1, minute: Int = -1
+        itemId: String?, action: String?,
+        name: String?, iconRes: Int?, hour: Int?, minute: Int?,
+        description: String?, imageUrl: String?
     ) {
         if (itemId == null || action == null) return
 
         val currentList = _reminderListLiveData.value ?: mutableListOf()
-        val newList = currentList.toMutableList() // Ishlash uchun nusxa olish
+        val newList = currentList.toMutableList()
 
         val existingIndex = newList.indexOfFirst { it.id == itemId }
 
         when (action) {
             "save" -> {
-                val finalHour = if (hour == -1) null else hour
-                val finalMinute = if (minute == -1) null else minute
-
-                if (existingIndex != -1) {
-                    val updatedItem =
-                        newList[existingIndex].copy(hour = finalHour, minute = finalMinute)
-                    newList[existingIndex] = updatedItem
+                if (hour == null || minute == null || hour == -1 || minute == -1) {
+                    // Time not set or invalid, treat as disabled for this specific exercise
+                    if (existingIndex != -1) {
+                        newList[existingIndex] = newList[existingIndex].copy(hour = null, minute = null)
+                    }
+                    // If it's a new item and time isn't set, don't add it yet, or add as disabled.
+                    // For simplicity, we'll assume time must be set to "save" an exercise reminder.
+                    // If it can be saved without time, adjust logic.
                 } else {
-                    val exerciseType = ExerciseType.getExerciseTypeById(itemId)
-                    val newItem = ReminderItem(
-                        id = itemId,
-                        name = exerciseType.name,
-                        iconRes = exerciseType.iconRes,
-                        type = ReminderType.EXERCISE,
-                        description = exerciseType.description,
-                        imageUrl = exerciseType.defaultImageUrl,
-                        hour = finalHour,
-                        minute = finalMinute
-                    )
-                    newList.add(newItem)
+                    if (existingIndex != -1) { // Editing existing
+                        newList[existingIndex] = newList[existingIndex].copy(
+                            hour = hour,
+                            minute = minute
+                            // name, iconRes etc., if they can be changed in EditExerciseReminderFragment
+                        )
+                    } else if (name != null && iconRes != null) { // Adding new
+                        val newItem = ReminderItem(
+                            id = itemId, name = name, iconRes = iconRes,
+                            type = ReminderType.EXERCISE, description = description,
+                            imageUrl = imageUrl, hour = hour, minute = minute
+                        )
+                        newList.add(newItem)
+                    }
                 }
             }
-
             "delete" -> {
                 if (existingIndex != -1) {
                     newList.removeAt(existingIndex)
@@ -208,41 +184,29 @@ class SetupRemindersViewModel : ViewModel() {
     }
 
 
-    private fun applyAutomaticTimeSuggestions(
-        changedItemId: String,
-        changedHour: Int,
-        changedMinute: Int,
-        listToUpdate: MutableList<ReminderItem>?
-    ) {
-
-    }
-
     private fun sortReminderList(list: MutableList<ReminderItem>) {
-        list.sortWith(compareBy<ReminderItem, Int?>(nullsLast()) { it.hour }.thenBy(nullsLast()) { it.minute }
-            .thenBy { it.id })
+        list.sortWith(compareBy<ReminderItem, Int?>(nullsLast()) { it.hour }
+            .thenBy(nullsLast()) { it.minute }
+            .thenBy { it.id }) // Sort by ID as a tie-breaker
     }
 
     fun saveSettings() {
         val currentList = _reminderListLiveData.value ?: return
-        val notSet = currentList.filter { it.hour == null || it.minute == null }
-        if (notSet.isNotEmpty()) {
-            _navigationEventLiveData.postValue(Event(SetupReminderNavigationEvent.ShowToast("${notSet.first().name} vaqtni belgilang!")))
-            return
+
+        // Filter out reminders where time is not set (null hour or minute)
+        // Only save reminders that have a valid time.
+        val settingsToSave = currentList.filter { it.isValidTimeSet() }
+            .associate {
+                it.id to String.format(Locale.getDefault(), "%02d:%02d", it.hour, it.minute)
+            }
+
+        UserRepository.updateUser { user ->
+            user.reminderSettings = settingsToSave
         }
-        val settings = currentList.map {
-            Pair(
-                it.id, "${
-                    String.format(
-                        Locale.getDefault(), "%02d", it.hour
-                    )
-                }:${String.format(Locale.getDefault(), "%02d", it.minute)}"
-            )
-        }
-        UserRepository.updateUser {
-            it.reminderSettings = settings.toMap()
-        }
+        // Schedule alarms based on the saved settings
+        ReminderScheduler.scheduleAllActiveReminders(appContext)
+
         _navigationEventLiveData.postValue(Event(SetupReminderNavigationEvent.ShowToast("Sozlamalar saqlandi!")))
         _navigationEventLiveData.postValue(Event(SetupReminderNavigationEvent.NavigateToHome))
     }
-
 }

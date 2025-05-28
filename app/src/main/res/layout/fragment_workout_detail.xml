@@ -77,7 +77,7 @@
             android:id="@+id/layout_workout_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dimen_18"
+            android:layout_marginTop="@dimen/dimen_12"
             android:gravity="center_vertical"
             android:orientation="horizontal">
             <!-- Content added dynamically -->
@@ -89,18 +89,21 @@
             style="@style/Title3_17"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"
             android:text="Haqida"
             android:textColor="?colorOnSurface" />
 
         <TextView
             android:id="@+id/textView_workout_detail_description"
-            style="@style/Text1_16"
+            style="@style/Text2_15"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:maxLines="3"
+            android:ellipsize="end"
             android:lineSpacingMultiplier="1.1"
-            android:textColor="?colorOnSurfaceVariant"
+            android:textColor="?colorOnSurface"
             tools:text="Super effective intense workout for weight loss. You can burn calories all day long!" />
 
         <!-- Tags ChipGroup -->

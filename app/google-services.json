@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "730315334265-9i2ni3pse8jo5il4lvsj090oiskomb35.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uz.oybek.ozamiz",
+            "certificate_hash": "70c4a852e2901fa2a9e1e5e9bb70dec44e1b4011"
+          }
+        },
+        {
           "client_id": "730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com",
           "client_type": 3
         }

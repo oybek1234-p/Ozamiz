@@ -5,9 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.DataWrapper
+import uz.oybek.ozamiz.data.workouts.Video
+import uz.oybek.ozamiz.data.workouts.VideoRepository
 import uz.oybek.ozamiz.data.workouts.Workout
 import uz.oybek.ozamiz.data.workouts.WorkoutCategory
 import uz.oybek.ozamiz.data.workouts.WorkoutRepository
@@ -17,16 +22,19 @@ import java.util.concurrent.atomic.AtomicInteger
 
 sealed class DiscoverNavigationEvent {
     data class NavigateToWorkoutDetail(val workoutId: String) : DiscoverNavigationEvent()
+    data class NavigateToVideoDetail(val video: Video) : DiscoverNavigationEvent()
     object NavigateToAddWorkout : DiscoverNavigationEvent()
-    object NavigateToWorkoutList : DiscoverNavigationEvent()
     data class NavigateToCategoryWorkoutList(val categoryId: String, val categoryName: String): DiscoverNavigationEvent()
+    data class NavigateToCategoryVideoList(val categoryId: String, val categoryName: String): DiscoverNavigationEvent()
     object NavigateToAddWorkoutCategory : DiscoverNavigationEvent()
     object NavigateToAddExercise : DiscoverNavigationEvent()
+    object NavigateToAddVideo : DiscoverNavigationEvent()
 }
 
 class DiscoverViewModel : ViewModel() {
 
     private val workoutRepository = WorkoutRepository()
+    private val videoRepository = VideoRepository()
 
     private val _uiState = MutableStateFlow(DiscoverUiState())
     val uiState: StateFlow<DiscoverUiState> = _uiState.asStateFlow()
@@ -34,175 +42,188 @@ class DiscoverViewModel : ViewModel() {
     private val _navigationEvent = MutableLiveData<Event<DiscoverNavigationEvent>>()
     val navigationEvent: LiveData<Event<DiscoverNavigationEvent>> = _navigationEvent
 
-    private var loadCategoriesJob: Job? = null
-    private var loadWorkoutsJob: Job? = null
-    private var categoryJobs = mutableListOf<Job>() // Track individual category loading jobs
+    private var loadAllDataJob: Job? = null
 
     init {
         loadInitialData()
     }
 
     fun loadInitialData(isRefresh: Boolean = false) {
-        // Avoid restarting if already loading unless it's a refresh
         if (_uiState.value.isOverallLoading && !isRefresh) return
         if (_uiState.value.isRefreshing && isRefresh) return
 
-        // Cancel previous loading jobs
-        loadCategoriesJob?.cancel()
-        loadWorkoutsJob?.cancel()
-        categoryJobs.forEach { it.cancel() }
-        categoryJobs.clear()
+        loadAllDataJob?.cancel()
 
         _uiState.update {
             it.copy(
-                isLoadingCategories = true,
-                isLoadingWorkouts = true, // Assume workouts will load after categories
+                isLoadingCategories = true, // Boshida kategoriyalar yuklanadi
+                isLoadingWorkouts = true,   // Ularga qarab workoutlar
+                isLoadingVideos = true,     // va videolar
                 isRefreshing = isRefresh,
                 errorMessage = null,
                 searchResults = null,
-                // Clear data only on refresh
-                categories = if (isRefresh) emptyList() else it.categories,
-                workoutsByCategory = if (isRefresh) emptyMap() else it.workoutsByCategory
+                videoSearchResults = null,
+                categories = it.categories,
+                workoutCategorySections = it.workoutCategorySections,
+                videoCategorySections = it.videoCategorySections
             )
         }
 
-        loadCategoriesAndWorkouts()
-    }
+        loadAllDataJob = viewModelScope.launch {
+            // 1. Kategoriyalarni yuklash
+            when (val categoryResult = workoutRepository.getWorkoutCategoriesFlow().firstOrNull { it !is DataWrapper.Loading }) {
+                is DataWrapper.Success -> {
+                    val categories = categoryResult.data
+                    _uiState.update { it.copy(isLoadingCategories = false, categories = categories) }
 
-    private fun loadCategoriesAndWorkouts() {
-        loadCategoriesJob = viewModelScope.launch {
-            workoutRepository.getWorkoutCategoriesFlow()
-                .catch { e ->
-                    handleException(e as Exception, "DiscoverGetCategories")
-                    _uiState.update { it.copy(isLoadingCategories = false, isLoadingWorkouts = false, isRefreshing = false, errorMessage = "Kategoriya yuklashda xatolik") }
-                }
-                .collectLatest { categoryResult ->
-                    when(categoryResult) {
-                        is DataWrapper.Success -> {
-                            val categories = categoryResult.data
-                            // Update categories and mark category loading as finished
-                            _uiState.update { it.copy(isLoadingCategories = false, categories = categories) }
-                            // Now load workouts for these categories
-                            loadWorkoutsForCategories(categories)
+                    if (categories.isNotEmpty()) {
+                        // 2. Har bir kategoriya uchun workout va videolarni parallel yuklash
+                        val workoutLoadingJobs = mutableListOf<Job>()
+                        val videoLoadingJobs = mutableListOf<Job>()
+
+                        val tempWorkoutsByCategory = mutableMapOf<String, List<Workout>>()
+                        val tempVideosByCategory = mutableMapOf<String, List<Video>>()
+
+                        categories.forEach { category ->
+                            workoutLoadingJobs.add(launch {
+                                try {
+                                    val result = workoutRepository.getWorkoutsByCategoryFlow(category.id, limit = 6)
+                                        .first { it !is DataWrapper.Loading }
+
+                                    if (result is DataWrapper.Success && result.data.isNotEmpty()) {
+                                        tempWorkoutsByCategory[category.id] = result.data
+                                    }
+
+                                    updateWorkoutSections(categories, tempWorkoutsByCategory)
+                                } catch (e: Exception) {
+                                    handleException(e, "LoadWorkoutsForCat_${category.id}")
+                                }
+                            })
+
+                            videoLoadingJobs.add(launch {
+                                try {
+                                    val result = videoRepository.getVideosByWorkoutCategoryFlow(category.id)
+                                        .first { it !is DataWrapper.Loading }
+
+                                    if (result is DataWrapper.Success && result.data.isNotEmpty()) {
+                                        tempVideosByCategory[category.id] = result.data
+                                    }
+
+                                    updateVideoSections(categories, tempVideosByCategory)
+                                } catch (e: Exception) {
+                                    handleException(e, "LoadVideosForWorkoutCat_${category.id}")
+                                }
+                            })
                         }
-                        is DataWrapper.Error -> {
-                            // Stop all loading on category error
-                            _uiState.update { it.copy(isLoadingCategories = false, isLoadingWorkouts = false, isRefreshing = false, errorMessage = categoryResult.error) }
+
+                        // Barcha workout va video yuklash joblari tugashini kutish
+                        // Bu joyda joinAll() ishlatish UI ni bloklashi mumkin,
+                        // chunki collectLatest har bir natija kelganda UI'ni yangilaydi.
+                        // Loading state'larni individual boshqarish yaxshiroq.
+                        // Biz onCompletion orqali umumiy loadingni tugatamiz.
+                        val allSubJobs = workoutLoadingJobs + videoLoadingJobs
+                        if (allSubJobs.isNotEmpty()) {
+                            try {
+                                allSubJobs.joinAll()
+                            } finally {
+                                _uiState.update { it.copy(isLoadingWorkouts = false, isLoadingVideos = false, isRefreshing = false) }
+                            }
+                        } else {
+                            _uiState.update { it.copy(isLoadingWorkouts = false, isLoadingVideos = false, isRefreshing = false) }
                         }
-                        is DataWrapper.Loading -> {
-                            // Categories are loading, keep isLoadingCategories = true
-                            _uiState.update { it.copy(isLoadingCategories = true) }
-                        }
+
+                    } else { // Kategoriyalar yo'q
+                        _uiState.update { it.copy(isLoadingWorkouts = false, isLoadingVideos = false, isRefreshing = false) }
                     }
                 }
-        }
-    }
-
-    private fun loadWorkoutsForCategories(categories: List<WorkoutCategory>) {
-        // Cancel previous workout jobs only
-        categoryJobs.forEach { it.cancel() }
-        categoryJobs.clear()
-        val workoutsMap = _uiState.value.workoutsByCategory.toMutableMap()
-
-        // If no categories, workouts are done loading
-        if (categories.isEmpty()) {
-            _uiState.update { it.copy(isLoadingWorkouts = false, isRefreshing = false) }
-            return
-        }
-
-        _uiState.update { it.copy(isLoadingWorkouts = true) } // Mark workouts as loading
-
-        // Counter for completed initial loads
-        val loadedCount = AtomicInteger(0)
-        val totalToLoad = categories.size
-
-        categories.forEach { category ->
-            val job = viewModelScope.launch { // Launch separate job for each category
-                workoutRepository.getWorkoutsByCategoryFlow(category.id, limit = 6)
-                    .catch { e ->
-                        handleException(e as Exception, "LoadWorkoutsForCategory_${category.id}")
-                        // Mark this category as "loaded" (even with error) for the counter
-                        if (loadedCount.incrementAndGet() >= totalToLoad) {
-                            _uiState.update { it.copy(isLoadingWorkouts = false, isRefreshing = false) }
-                        }
-                    }
-                    .collectLatest { result ->
-                        var isInitialLoadCompleteForThisCategory = false
-                        when(result) {
-                            is DataWrapper.Success -> {
-                                workoutsMap[category.id] = result.data
-                                isInitialLoadCompleteForThisCategory = true
-                            }
-                            is DataWrapper.Error -> {
-                                workoutsMap.remove(category.id) // Remove potentially stale data
-                                isInitialLoadCompleteForThisCategory = true // Mark as done even on error
-                            }
-                            is DataWrapper.Loading -> {
-                                // Still loading, don't increment counter yet
-                            }
-                        }
-                        // Update the map in the UI state
-                        _uiState.update {
-                            it.copy(workoutsByCategory = workoutsMap.toMap())
-                        }
-
-                        // Increment counter and check if all initial loads are done
-                        if (isInitialLoadCompleteForThisCategory) {
-                            if (loadedCount.incrementAndGet() >= totalToLoad) {
-                                _uiState.update { it.copy(isLoadingWorkouts = false, isRefreshing = false) }
-                            }
-                        }
-                    }
+                is DataWrapper.Error -> {
+                    _uiState.update { it.copy(isLoadingCategories = false, isLoadingWorkouts = false, isLoadingVideos = false, isRefreshing = false, errorMessage = (it.errorMessage ?: "") + "\n" + categoryResult.error) }
+                }
+                null -> { // Flow biror narsa qaytarmasa (kamdan-kam holat)
+                    _uiState.update { it.copy(isLoadingCategories = false, isLoadingWorkouts = false, isLoadingVideos = false, isRefreshing = false, errorMessage = "Kategoriyalarni yuklashda noma'lum xatolik") }
+                }
+                else -> {} // Loading
             }
-            categoryJobs.add(job) // Add job to the list to be managed
         }
     }
 
+    private fun updateWorkoutSections(allCategories: List<WorkoutCategory>, workoutsMap: Map<String, List<Workout>>) {
+        val sections = allCategories.mapNotNull { category ->
+            workoutsMap[category.id]?.let { workouts ->
+                if (workouts.isNotEmpty()) {
+                    Pair(category, workouts)
+                } else null
+            }
+        }
+        _uiState.update { it.copy(workoutCategorySections = sections, isLoadingWorkouts = false) }
+    }
 
-    fun searchWorkouts(query: String) {
-        loadCategoriesJob?.cancel()
-        loadWorkoutsJob?.cancel()
-        categoryJobs.forEach { it.cancel() }
-        categoryJobs.clear()
+    private fun updateVideoSections(allCategories: List<WorkoutCategory>, videosMap: Map<String, List<Video>>) {
+        val sections = allCategories.mapNotNull { category ->
+            videosMap[category.id]?.let { videos ->
+                if (videos.isNotEmpty()) {
+                    Pair(category, videos) // Adapter WorkoutCategory va List<Video> kutadi
+                } else null
+            }
+        }
+        _uiState.update { it.copy(videoCategorySections = sections, isLoadingVideos = false) }
+    }
 
+
+    fun search(query: String) {
+        loadAllDataJob?.cancel()
         if (query.isBlank()) {
             clearSearch()
             return
         }
-        _uiState.update { it.copy(isLoadingWorkouts = true, searchResults = emptyList(), errorMessage = null, isLoadingCategories = false, isRefreshing = false) } // Stop other loadings
+        _uiState.update { it.copy(isLoadingWorkouts = true, isLoadingVideos = false, searchResults = emptyList(), videoSearchResults = null, errorMessage = null, isLoadingCategories = false, isRefreshing = false) }
 
         viewModelScope.launch {
-            // searchWorkoutsOnce uses get(), benefiting from cache but not real-time
-            when (val result = workoutRepository.searchWorkoutsOnce(query)) {
-                is DataWrapper.Success -> {
-                    _uiState.update { it.copy(isLoadingWorkouts = false, searchResults = result.data) }
-                }
-                is DataWrapper.Error -> {
-                    _uiState.update { it.copy(isLoadingWorkouts = false, errorMessage = result.error, searchResults = emptyList()) }
-                    handleException(Exception(result.error), "DiscoverSearch")
-                }
-                is DataWrapper.Loading -> {}
+            val workoutSearchDeferred = async { workoutRepository.searchWorkoutsOnce(query) }
+            // TODO: VideoRepository.searchVideosOnce(query)
+            // val videoSearchDeferred = async { videoRepository.searchVideosOnce(query) }
+
+            val workoutResult = workoutSearchDeferred.await()
+            // val videoResult = videoSearchDeferred.await()
+
+            var workoutData: List<Workout> = emptyList()
+            var combinedError: String? = null
+
+            when (workoutResult) {
+                is DataWrapper.Success -> workoutData = workoutResult.data
+                is DataWrapper.Error -> combinedError = "Workout qidiruv xatosi: ${workoutResult.error}"
+                else -> {}
             }
+            // TODO: videoResult
+            _uiState.update { it.copy(isLoadingWorkouts = false, isLoadingVideos = false, searchResults = workoutData, errorMessage = combinedError) }
         }
     }
 
+
     fun clearSearch() {
-        // When search is cleared, reload the initial category/workout view
-        _uiState.update { it.copy(searchResults = null) }
-        loadInitialData() // Reload the default view
+        _uiState.update { it.copy(searchResults = null, videoSearchResults = null) }
+        loadInitialData()
     }
 
     fun onWorkoutClicked(workoutId: String) {
         _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToWorkoutDetail(workoutId))
     }
+    fun onVideoClicked(video: Video) {
+        _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToVideoDetail(video))
+    }
 
-    fun onSeeAllClicked(category: WorkoutCategory) {
+    fun onSeeAllWorkoutsClicked(category: WorkoutCategory) {
         _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToCategoryWorkoutList(category.id, category.name))
+    }
+
+    fun onSeeAllVideosClicked(categoryId: String, categoryName: String) {
+        _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToCategoryVideoList(categoryId, categoryName))
     }
 
     fun onAddWorkoutClicked() { _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToAddWorkout) }
     fun onAddWorkoutCategoryClicked() { _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToAddWorkoutCategory) }
     fun onAddExerciseClicked() { _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToAddExercise) }
+    fun onAddVideoClicked() { _navigationEvent.value = Event(DiscoverNavigationEvent.NavigateToAddVideo) }
 
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
@@ -210,8 +231,6 @@ class DiscoverViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        loadCategoriesJob?.cancel()
-        loadWorkoutsJob?.cancel()
-        categoryJobs.forEach { it.cancel() }
+        loadAllDataJob?.cancel()
     }
 }

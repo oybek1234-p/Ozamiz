@@ -1,12 +1,19 @@
 package uz.oybek.ozamiz.ui
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -33,7 +40,6 @@ import uz.oybek.ozamiz.ui.getinfo.ReminderItem
 import uz.oybek.ozamiz.ui.getinfo.ReminderType
 import uz.oybek.ozamiz.ui.home.HomeUiState
 import uz.oybek.ozamiz.ui.home.HomeViewModel
-import java.util.Locale
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
@@ -94,9 +100,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun setupSingleMealSection(
         mealBinding: ItemHomeMealBinding, // Receive the specific binding
-        iconRes: Int,
-        title: String,
-        mealType: String
+        iconRes: Int, title: String, mealType: String
     ) {
         mealBinding.imageMealIcon.setImageResource(iconRes)
         mealBinding.textMealName.text = title
@@ -157,7 +161,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun displayEnabledExerciseReminders(bind: FragmentHomeBinding, reminders: List<ReminderItem>) {
+    private fun displayEnabledExerciseReminders(
+        bind: FragmentHomeBinding, reminders: List<ReminderItem>
+    ) {
         bind.layoutReminders.removeAllViews() // Clear previous reminders
         if (reminders.isEmpty()) {
             bind.textNoReminders.isVisible = true // Show "No reminders" text
@@ -174,10 +180,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
                 reminderBinding.textReminderItemDetails.text = String.format(
                     getString(R.string.reminder_display_format), // "Name: HH:MM"
-                    reminder.name,
-                    reminder.getTimeAsString() // Should format HH:MM
+                    reminder.name, reminder.getTimeAsString() // Should format HH:MM
                 )
-                reminderBinding.textReminderItemDetails.setTextColor(getThemeColor(requireContext(), com.google.android.material.R.attr.colorOnSurface))
+                reminderBinding.textReminderItemDetails.setTextColor(
+                    getThemeColor(
+                        requireContext(), com.google.android.material.R.attr.colorOnSurface
+                    )
+                )
 
                 // Set "Start" button listener
                 reminderBinding.buttonStartReminder.setOnClickListener {
@@ -204,10 +213,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+
     private fun updateUiWithState(bind: FragmentHomeBinding, state: HomeUiState) {
         bind.textTargetCalories.text =
             getString(R.string.target_calories_format, state.targetCalories)
-        bind.textTargetWater.text = "Kunlik maqsad: ${state.targetWaterMl} ml yoki ${(state.targetWaterMl / 250)} stakan"
+        bind.textTargetWater.text = "Kunlik maqsad: ${state.targetWaterMl} ml"
         bind.textTargetExercise.text =
             getString(R.string.target_exercise_format, state.targetCaloriesBurned)
 
@@ -240,7 +250,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             target = state.targetCaloriesBurned,
             unit = "kal energiya yoqildi",
             treatExceedingAsError = false
-            )
+        )
         updateMealProgress(
             bind.layoutBreakfast.textMealCalories,
             state.mealConsumedCalories["breakfast"],
@@ -287,6 +297,55 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             else -> com.google.android.material.R.attr.colorPrimary
         }
         indicator.setIndicatorColor(getThemeColor(requireContext(), colorAttr))
+    }
+
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permissionState = ContextCompat.checkSelfPermission(
+                requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
+            )
+            if (permissionState == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(
+                    requireActivity(), arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 0
+                )
+            }
+        }
+    }
+
+    private fun requestIgnoreBatteryOptimizations() {
+        val packageName = requireContext().packageName
+        val pm = requireContext().getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            AlertDialog.Builder(requireContext()).setTitle("Eslatmalar uchun Muhim Sozlama")
+                .setMessage("Eslatmalarning o'z vaqtida va ishonchli ishlashi uchun, iltimos, ilovamiz uchun batareya optimallashtirishni o'chirib qo'ying. Bu sozlamani o'zgartirmasangiz, ba'zi eslatmalar kechikishi yoki umuman ishlamasligi mumkin.")
+                .setPositiveButton("Sozlamalarga o'tish") { dialog, _ ->
+                    try {
+                        val intent = Intent().apply {
+                            action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                            data = Uri.parse("package:$packageName")
+                        }
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        try {
+                            val intent = Intent().apply {
+                                action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                            }
+                            startActivity(intent)
+                        } catch (e2: Exception) {
+                            showToast("Batareya sozlamalarini ochishda xatolik. Iltimos, qo'lda sozlang.")
+                        }
+                    }
+                    dialog.dismiss()
+                }.setNegativeButton("Keyinroq") { dialog, _ ->
+                    dialog.dismiss()
+                    // Foydalanuvchiga bu sozlama muhimligini yana bir bor eslatish mumkin
+                    showToast("Eslatmalar to'liq ishlamasligi mumkin.")
+                }.setCancelable(false).show()
+        } else {
+            // Optimallashtirish allaqachon o'chirilgan
+            // showToast("Batareya optimallashtirish allaqachon o'chirilgan.")
+        }
     }
 
     private fun updateMealProgress(textView: TextView, consumed: Int?, target: Int?) {
@@ -367,6 +426,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             isFocusable = true
             setOnClickListener { showEditDeleteDialog(logData) }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        requestNotificationPermission()
     }
 
     // Updated displayReminders to use ItemHomeReminderBinding

@@ -17,6 +17,6 @@
 
     <item android:icon="@drawable/profile_ic"
         android:title="Profil"
-        android:id="@+id/profile"
+        android:id="@+id/profileFragment"
         />
 </menu>

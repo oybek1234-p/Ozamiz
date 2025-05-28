@@ -14,6 +14,15 @@
         android:background="?android:colorBackground"
         app:elevation="0dp">
 
+        <!-- Toolbar (agar kerak bo'lsa) -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_discover"
+            app:title="@string/discover_title"
+            app:titleCentered="true"
+            app:menu="@menu/discover_menu"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"/>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -22,23 +31,20 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- NestedScrollView o'rniga FrameLayout ishlatamiz, chunki asosiy list RecyclerView bo'ladi -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Asosiy RecyclerView: Kategoriyalar va ularning workout'larini ko'rsatadi -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_discover_main"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="16dp"
+                android:paddingBottom="88dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_workout_category_section"
                 android:visibility="visible"/>
 
-            <!-- Qidiruv natijalari uchun RecyclerView (main ustiga chiqadi) -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_search_results"
                 android:layout_width="match_parent"
@@ -47,11 +53,10 @@
                 android:clipToPadding="false"
                 android:paddingHorizontal="8dp"
                 android:background="?android:colorBackground"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_workout_search"
-            tools:visibility="gone" />
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_workout_search"
+                tools:visibility="gone" />
 
-            <!-- Bo'sh holat uchun TextView -->
             <TextView
                 android:id="@+id/textView_empty_discover"
                 style="@style/TextBodyLarge"
@@ -75,14 +80,13 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <!-- Admin uchun FAB (Floating Action Button) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_discover_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginBottom="100dp"
-        android:layout_marginHorizontal="@dimen/dimen_48"
+        android:layout_marginHorizontal="@dimen/dimen_18"
         android:contentDescription="@string/add_workout_or_category"
         android:src="@drawable/add_ic"
         android:visibility="gone"

@@ -10,7 +10,6 @@ import uz.oybek.ozamiz.data.workouts.Workout
 import uz.oybek.ozamiz.databinding.ItemWorkoutSearchBinding // Search item layoutini qayta ishlatamiz
 import uz.oybek.ozamiz.ui.loadPhoto
 
-// WorkoutListFragment uchun asosiy adapter (item_workout_search.xml ishlatadi)
 class WorkoutListAdapter(
     private val onItemClick: (Workout) -> Unit
 ) : ListAdapter<Workout, WorkoutListAdapter.ViewHolder>(WorkoutDiffCallback()) {

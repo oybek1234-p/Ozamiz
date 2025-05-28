@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?colorSurface">
 
     <uz.oybek.ozamiz.ui.base.MyToolBar
         android:id="@+id/toolbar"
@@ -14,185 +16,331 @@
         app:title="Profil ma'lumotlari" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView_main_info"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/save_button_container"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/dimen_18">
+            android:paddingTop="@dimen/dimen_12"
+            android:paddingBottom="80dp"
+            android:paddingHorizontal="@dimen/dimen_18">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:src="@drawable/profile_photo"
+                />
 
             <TextView
+                style="@style/Text1_16"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ozish safaringizni biz bilan boshlayotganingizdan xursandmiz! Keling, avval maqsadlaringizni aniqlab olaylik"
-                android:textColor="?colorOnSurface"
-                style="@style/Text2_15"
-                />
+                android:gravity="center"
+                android:layout_marginTop="@dimen/dimen_12"
+                android:layout_marginBottom="16dp"
+                android:text="Sizga mos sog‘lom reja tuzishimiz uchun, bir nechta savollarga javob bering"
+                android:textColor="?colorOnSurface" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/name_view"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Ismingiz"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
+                android:layout_marginTop="@dimen/dimen_12"
+                app:helperText="Masalan: Nigora yoki Botir"
+                android:hint="Ismingiz*">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
-
 
             <TextView
                 style="@style/Headline2_16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_18"
-                android:text="Jinsingizni belgilang"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:text="Jinsingizni belgilang*"
                 android:textColor="?colorOnSurface" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/male"
-                style="@style/Widget.Material3.Button.TonalButton"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:checkable="true"
-                android:text="Erkak"
-                app:icon="@drawable/man_ic"
-                app:iconGravity="textStart"
-                app:iconTint="?colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/female"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_4"
-                android:text="Ayol"
-                app:icon="@drawable/woman_ic"
-                app:iconGravity="textStart"
-                app:iconTint="?colorPrimary"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/male" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/male"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:text="Erkak"
+                    app:strokeColor="?colorPrimary"
+                    app:icon="@drawable/man_ic"
+                    app:iconGravity="textStart" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/female"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    app:strokeColor="?colorPrimary"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Ayol"
+                    app:icon="@drawable/woman_ic"
+                    app:iconGravity="textStart" />
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/age_view"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:hint="Yoshingiz"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar">
+                app:helperText="Masalan: 34 yosh"
+                android:layout_marginTop="16dp"
+                android:hint="Yoshingiz*">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:maxLength="2" />
+                    android:inputType="number"
+                    android:maxLength="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/height_lay"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:hint="Buyingiz sm"
-                app:helperText="Misol: 170 sm"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar">
+                android:layout_marginTop="16dp"
+                android:hint="Bo'yingiz (sm)*"
+                app:helperText="Masalan: 160 sm"
+                app:suffixText="sm">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
+                    android:inputType="number"
                     android:maxLength="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/weight_input"
+                android:id="@+id/manzil_view"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
-                android:hint="Vazningiz kg"
-                app:helperText="Misol: 80 kg"
-                app:hintEnabled="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar">
+                android:drawableStart="@drawable/location_ic"
+                android:hint="@string/yashaydi">
+
+                <AutoCompleteTextView
+                    android:textSize="15sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Sizning kundalik harakatingiz qanday?"
+                android:textColor="?colorOnSurface" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/harakat_view"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_8"
+                android:drawableStart="@drawable/location_ic"
+                android:hint="Harakatingizni belgilang">
+
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:inputType="none" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:text="Hozirda vazningiz qancha?"
+                android:textColor="?colorOnSurface" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/weight_input"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false"
+                android:layout_marginTop="@dimen/dimen_8"
+                app:suffixText="kg">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
-                    android:maxLength="3" />
+                    android:hint="Vazningiz (kg)*"
+                    android:maxLength="5" /> <!-- 999.9 -->
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_12"
+                app:cardBackgroundColor="?colorSurfaceContainerLow"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="@dimen/dimen_12"
+                    >
+
+                    <TextView
+                        android:id="@+id/textView_ideal_weight_info"
+                        style="@style/Headline2_16"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Siz uchun ideal vazn:"
+                        android:textColor="?colorPrimary"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/textView_ideal_weight_range"
+                        style="@style/Title3_17"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?colorOnSurface"
+                        android:visibility="gone"
+                        tools:text="60.5 kg - 75.2 kg"
+                        tools:visibility="visible" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:text="Nechi kilogacha ozmoqchisiz?"
+                android:textColor="?colorOnSurface" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/target_weight_view"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:hintEnabled="false"
+                android:layout_marginTop="@dimen/dimen_8"
+                app:helperText="Masalan: 70 kg"
+                app:suffixText="kg">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:hint="Siz istagan vazn (kg)"
+                    android:maxLength="5" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/target_weight_warning"
+                style="@style/Caption1_13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="?colorError"
+                android:visibility="gone"
+                tools:text="Bu maqsad juda keskin yoki sog'lom vazn chegarasidan tashqarida." />
+
 
             <TextView
                 style="@style/Headline2_16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:layout_marginTop="@dimen/dimen_24"
-                android:text="Qaysi biri sizga aloqador?"
+                android:text="Qaysi biri sizga aloqador? (ixtiyoriy)"
                 android:textColor="?colorOnSurface" />
 
             <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:chipSpacingHorizontal="8dp"
+                android:visibility="gone"
+                app:singleSelection="false">
+
+            </com.google.android.material.chip.ChipGroup>
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/bog_lanish"
+                android:textColor="?colorOnSurface" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/mobil_raqam_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_8"
-                android:id="@+id/chip_group"
-                app:singleSelection="false">
+                android:hint="Telefon raqam"
+                app:helperText="Nomeringiz hech kimga ko'rinmaydi">
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/diabet"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:text="Qandli diabet" />
+                    android:inputType="numberDecimal" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/emizikli"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:layout_marginStart="@dimen/dimen_12"
-                    android:text="Emiziklik ayol" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/homilador"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="true"
-                    android:visibility="gone"
-                    android:text="Homilador" />
-            </com.google.android.material.chip.ChipGroup>
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="@dimen/dimen_24"
-                android:layout_height="@dimen/dimen_24"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/dimen_12" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/save"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_24"
-                android:text="Saqlash" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/save_button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:background="?colorSurfaceContainerLow"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/save"
+            style="@style/FilledButton"
+            android:layout_width="match_parent"
+            app:icon="@drawable/arrow_right"
+            app:iconGravity="textEnd"
+            app:iconPadding="@dimen/dimen_8"
+            android:layout_height="wrap_content"
+            android:text="@string/davom_etish" />
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

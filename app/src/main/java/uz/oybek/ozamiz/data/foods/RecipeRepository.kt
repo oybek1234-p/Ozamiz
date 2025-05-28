@@ -20,6 +20,10 @@ class RecipeRepository {
     private val recipeCollection = firestore.collection("recipes")
     private val PAGINATION_LIMIT = 10L
 
+    init {
+
+
+    }
     fun getRecipes(
         categoryId: String? = null, mealType: String? = null, lastVisible: DocumentSnapshot? = null
     ): Flow<DataWrapper<Pair<List<Recipe>, DocumentSnapshot?>>> = callbackFlow {

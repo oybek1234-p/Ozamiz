@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.IntentSenderRequest
@@ -41,32 +42,33 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
 
     private var isSigning = false
 
+
     private val intentSenderLauncher =
         registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data = result.data
                 if (data != null) {
                     try {
-                        val credential = oneTapClient?.getSignInCredentialFromIntent(data)
-                        val idToken = credential?.googleIdToken
-                        if (idToken != null) {
-                            val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-                            if (context != null && activity != null) {
-                                viewModel.sendState.postVal(SendState.Sending)
-                                viewModel.signInGoogle(firebaseCredential) {
-                                    if (it) {
-                                        verified()
-                                    } else {
-                                        viewModel.sendState.postVal(SendState.Input())
-                                        isSigning = false
-                                    }
+                    val credential = oneTapClient?.getSignInCredentialFromIntent(data)
+                    val idToken = credential?.googleIdToken
+                    if (idToken != null) {
+                        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+
+                        if (context != null && activity != null) {
+                            viewModel.sendState.postVal(SendState.Sending)
+                            viewModel.signInGoogle(firebaseCredential) {
+                                if (it) {
+                                    verified()
+                                } else {
+                                    viewModel.sendState.postVal(SendState.Input())
+                                    isSigning = false
                                 }
-                            } else {
-                                isSigning = false
                             }
+                        } else {
+                            isSigning = false
                         }
+                    }
                     } catch (e: Exception) {
-                        // Handle exception
                         handleException(e)
                         isSigning = false
                     }
@@ -126,10 +128,10 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
         }
     }
 
-
     private fun verified() {
         viewModel.sendState.postVal(SendState.Sending)
         isSigning = true
+
         lifecycleScope.launch {
             if (activity == null) {
                 isSigning = false
@@ -154,9 +156,10 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
     private fun initGoogleAuth() {
         if (activity == null) return
         oneTapClient = Identity.getSignInClient(requireActivity())
+
         signInRequest = BeginSignInRequest.builder().setGoogleIdTokenRequestOptions(
             BeginSignInRequest.GoogleIdTokenRequestOptions.builder().setSupported(true)
-                .setServerClientId(getString(R.string.your_web_client_id))
+                .setServerClientId("730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com")
                 .setFilterByAuthorizedAccounts(false).build()
         ).build()
     }
@@ -172,9 +175,22 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
         bind.apply {
             toolbar.setUpBackButton(this@AuthFragment)
             toolbar.isVisible = false
+
             Glide.with(requireContext()).load(R.drawable.splash_photo).into(photo)
             gmailButton.setOnClickListener {
                 loginGoogle()
+            }
+            viewModel.sendState.observe(viewLifecycleOwner) {
+                when (it) {
+                    is SendState.Input -> {
+                        gmailButton.isVisible = true
+                        progressBar.isVisible = false
+                    }
+                    is SendState.Sending -> {
+                        progressBar.isVisible = true
+                    }
+                    else -> {}
+                }
             }
             emailButton.setOnClickListener {
                 navigate(R.id.loginGmailFragment)

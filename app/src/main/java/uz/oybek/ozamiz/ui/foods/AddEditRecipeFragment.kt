@@ -146,14 +146,12 @@ class AddEditRecipeFragment : BaseFragment<FragmentAddEditRecipeBinding>() {
             }
 
 
-            // Tahrirlash rejimida maydonlarni to'ldirish (faqat bir marta)
-            if (!state.isLoading && state.recipeToEdit != null && bind.editTextRecipeName.text.isNullOrEmpty() && viewModel.selectedImageUri == null) {
-                Log.d(TAG, "Populating fields for editing recipe: ${state.recipeToEdit.name}")
+            if (state.recipeToEdit != null) {
                 populateFieldsForEditing(bind, state.recipeToEdit)
             }
 
             bind.checkboxIsPopular.isVisible = LocalUser.user.admin()
-            // Checkbox holatini UI o'zgarmasa, state'dan o'rnatish
+
             if (state.recipeToEdit != null && !bind.checkboxIsPopular.isPressed) {
                 bind.checkboxIsPopular.isChecked = state.recipeToEdit.isPopular
             }

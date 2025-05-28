@@ -100,10 +100,9 @@ class FoodListFragment : BaseFragment<FragmentFoodListBinding>() {
         bind.recyclerViewFoodList.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = foodListAdapter
-            itemAnimator = null // Optional: Disable default animations for smoother updates
+            itemAnimator = null
         }
 
-        // Filter Category Adapter
         filterCategoryAdapter = FilterCategoryAdapter { selectedCategory ->
             viewModel.onCategorySelected(selectedCategory?.id)
         }

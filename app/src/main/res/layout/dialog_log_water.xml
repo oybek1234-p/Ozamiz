@@ -23,7 +23,8 @@
         android:layout_marginBottom="12dp"
         android:drawablePadding="@dimen/dimen_8"
         android:text="Suvni ovqatdan 20 minut olding iching"
-        android:textColor="?colorOnSurface"
+        android:textColor="#AC5F00"
+        android:drawableTint="@color/yellow"
         app:drawableStartCompat="@drawable/info_ic" />
 
     <LinearLayout
@@ -37,7 +38,9 @@
             android:id="@+id/card_glass"
             style="@style/WaterPresetCard">
 
-            <LinearLayout style="@style/WaterPresetLayout">
+            <LinearLayout
+                android:background="@color/white"
+                style="@style/WaterPresetLayout">
 
                 <ImageView
                     style="@style/WaterPresetIcon"
@@ -60,7 +63,9 @@
             android:layout_marginStart="12dp"
             android:layout_marginEnd="12dp">
 
-            <LinearLayout style="@style/WaterPresetLayout">
+            <LinearLayout style="@style/WaterPresetLayout"
+                android:background="@color/white"
+                >
 
                 <ImageView
                     style="@style/WaterPresetIcon"
@@ -82,7 +87,9 @@
             android:id="@+id/card_large_bottle"
             style="@style/WaterPresetCard">
 
-            <LinearLayout style="@style/WaterPresetLayout">
+            <LinearLayout
+                android:background="@color/white"
+                style="@style/WaterPresetLayout">
 
                 <ImageView
                     style="@style/WaterPresetIcon"
@@ -103,7 +110,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout_waterAmount"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
@@ -115,6 +122,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
+            android:textSize="15sp"
             android:inputType="number"
             android:maxLength="5" />
     </com.google.android.material.textfield.TextInputLayout>

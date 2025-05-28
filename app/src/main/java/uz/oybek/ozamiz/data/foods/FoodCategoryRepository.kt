@@ -35,10 +35,10 @@ class FoodCategoryRepository {
                     if (snapshot != null) {
                         try {
                             val categories = snapshot.documents.mapNotNull { doc ->
-                                doc.toObject<FoodCategory>()?.copy(id = doc.id)
+                                doc.toObject<FoodCategory>()
                             }
                             trySend(DataWrapper.Success(categories))
-                        } catch (e: Exception) {
+                         } catch (e: Exception) {
                             trySend(DataWrapper.Error("Kategoriya ma'lumotlarini o'qishda xatolik"))
                         }
                     } else {

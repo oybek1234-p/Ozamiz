@@ -18,7 +18,7 @@
     <string name="google_orqali_kirish">Google orqali kirish</string>
     <string name="keyinroq">Keyinroq</string>
     <string name="davom_etish">Davom etish</string>
-    <string name="your_web_client_id">1088123216096-d8qikb3bivrkkiaar410pbkc3qc3d94t.apps.googleusercontent.com</string>
+    <string name="your_web_client_id">730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com</string>
     <string name="biz_bilan_bog_lanish">Biz bilan bog\'laning</string>
     <string name="internet_invalid">Internet yaxshi emas!</string>
     <string name="insert_email">Emailni kiriting</string>
@@ -127,12 +127,12 @@
     <string name="sample_calories">378 kal</string>
     <string name="home_title">Asosiy</string>
     <string name="daily_calorie_goal_title">Yeyish kerak</string>
-    <string name="target_calories_format">Bugungi limit %d kaloriya</string>
+    <string name="target_calories_format">Kunlik:   %d kaloriya</string>
     <string name="consumed_calories_format">%1$d / %2$d kal</string>
     <string name="meals_title">Ovqatlanish</string>
     <string name="add_meal_description">Ovqat qo\'shish uchun + tugmasini bosing</string>
     <string name="food_list_button">Ovqatlar Ro\'yxati</string>
-    <string name="water_intake_title">Suv</string>
+    <string name="water_intake_title">Suv ichish</string>
     <string name="target_water_format">Ichish kerak: %.1f ml</string>
     <string name="consumed_water_format">%1$d / %2$d ml</string>
     <string name="water_benefits_link">Suv ichish foydalari haqida</string>
@@ -311,4 +311,86 @@
     <string name="qo_llar">Qo\'llar</string>
     <string name="dumba">Dumba</string>
 
+    <!-- Mavjud stringlaringiz bu yerda qoladi -->
+    <!-- Quyidagilar yangi yoki profil uchun o'zgartirilgan stringlar -->
+
+    <string name="app_name_full">Ozamiz - Sog\'lom Hayot Tarzi</string>
+
+    <!-- GetMainInfoFragment uchun stringlar (agar o'zgartirilgan bo'lsa) -->
+    <string name="get_info_title_new">Keling, tanishaylik!</string>
+    <string name="get_info_title_edit">Ma\'lumotlarni tahrirlash</string>
+    <string name="get_info_welcome_message">Ozish safaringizni biz bilan boshlayotganingizdan xursandmiz! Keling, avval siz haqingizda va maqsadlaringizni aniqlab olaylik.</string>
+    <string name="name_hint_asterisk">Ismingiz*</string>
+    <string name="select_gender_asterisk">Jinsingizni belgilang*</string>
+    <string name="gender_male">Erkak</string>
+    <string name="gender_female">Ayol</string>
+    <string name="age_hint_asterisk">Yoshingiz*</string>
+    <string name="height_cm_hint_asterisk">Bo\'yingiz (sm)*</string>
+    <string name="weight_kg_hint_asterisk">Vazningiz (kg)*</string>
+    <string name="ideal_weight_range_info">Siz uchun ideal vazn diapazoni:</string>
+    <string name="ideal_weight_range_format">%.1f kg - %.1f kg</string>
+    <string name="target_weight_kg_hint_optional">Maqsad vazningiz (kg)</string>
+    <string name="your_weight_goal_asterisk">Vazn maqsadingiz*</string>
+    <string name="your_activity_level_asterisk">Faollik darajangiz*</string>
+    <string name="related_health_conditions_optional">Qaysi biri sizga aloqador? (ixtiyoriy)</string>
+    <string name="save_and_continue">Saqlash va Davom etish</string>
+    <string name="problem_diabetes">Qandli diabet</string>
+    <string name="problem_lactating">Emizikli ayol</string>
+    <string name="problem_pregnant">Homilador ayol</string>
+    <string name="problem_cardiovascular">Yurak qon-tomir</string>
+    <string name="error_name_short">Ismingiz kamida 2 belgidan iborat bo\'lishi kerak.</string>
+    <string name="error_select_gender">Iltimos, jinsingizni tanlang.</string>
+    <string name="error_invalid_age">Yoshingizni to\'g\'ri kiriting (10 dan katta).</string>
+    <string name="error_invalid_height">Bo\'yingizni to\'g\'ri kiriting (50–250 sm).</string>
+    <string name="error_invalid_weight">Vazningizni to\'g\'ri kiriting (20–500 kg).</string>
+    <string name="error_invalid_target_weight">Maqsad vaznni to\'g\'ri kiriting (20–500 kg).</string>
+    <string name="error_target_weight_lose_vs_current">Ozish uchun maqsad vazn joriy vazndan kichik bo\'lishi kerak.</string>
+    <string name="error_target_weight_gain_vs_current">Semirish uchun maqsad vazn joriy vazndan katta bo\'lishi kerak.</string>
+    <string name="warning_target_weight_too_low">Bu maqsad juda keskin. Sog\'ligingiz uchun xavfli darajada past bo\'lishi mumkin.</string>
+    <string name="warning_target_weight_too_high">Bu maqsad juda katta. Sog\'ligingiz uchun xavfli darajada yuqori bo\'lishi mumkin.</string>
+    <string name="info_saved_success">Ma\'lumotlar muvaffaqiyatli saqlandi!</string>
+    <string name="error_saving_info">Ma\'lumotlarni saqlashda xatolik: %1$s</string>
+    <string name="error_enter_target_weight">Ozish yoki semirishni tanlagan bo\'lsangiz, iltimos, maqsad vaznni kiriting.</string>
+
+    <string name="profile_title">Profil</string>
+    <string name="my_information">Ma\'lumotlar</string>
+    <string name="reminders">Eslatmalar</string>
+    <string name="help_and_support">Biz bilan bog\'laning</string>
+    <string name="about_app">Ilova haqida</string>
+    <string name="rate_app">Ilovani baholash</string>
+    <string name="logout">Chiqish</string>
+    <string name="logout_confirmation_title">Chiqishni tasdiqlang</string>
+    <string name="logout_confirmation_message">Haqiqatan ham akkauntingizdan chiqmoqchimisiz?</string>
+    <string name="default_user_name">Foydalanuvchi</string>
+
+    <!-- AboutFragment uchun stringlar -->
+    <string name="app_version_format">Versiya: %1$s</string>
+    <string name="developed_by_format">Ishlab chiquvchi: %1$s</string>
+    <string name="contact_info_format">Bog\'lanish: %1$s</string>
+    <string name="all_rights_reserved">© 2024 Ozamiz. Barcha huquqlar himoyalangan.</string>
+    <string name="app_logo_description">Ilova logotipi</string>
+
+    <!-- Asosiy menyu uchun (agar o'zgargan bo'lsa) -->
+    <string name="home">Asosiy</string>
+    <string name="foods">Ovqatlar</string>
+    <string name="bog_lanish">Bog\'lanish</string>
+    <string name="yashaydi">Yashash manzil</string>
+    <string name="butun_uzbekiston">Butun O\'zbekiston</string>
+    <string name="toshkent">Toshkent</string>
+    <string name="xorazm">Xorazm</string>
+    <string name="andi">Andijon</string>
+    <string name="navoiy">Navoiy</string>
+    <string name="farg_ona">Farg\'ona</string>
+    <string name="jizzah">Jizzax</string>
+    <string name="naman">Namangan</string>
+    <string name="qo_qon">Qo\'qon</string>
+    <string name="toshkentVil">Toshkent viloyat</string>
+    <string name="samarqand">Samarqand</string>
+    <string name="nukus">Nukus</string>
+    <string name="qashqa">Qashqadaryo</string>
+    <string name="sirdaryo">Sirdaryo</string>
+    <string name="surxon">Surhandaryo</string>
+    <string name="termiz">Termiz</string>
+    <string name="buxoro">Buxoro</string>
+    <string name="hammasi">Hammasi</string>
 </resources>

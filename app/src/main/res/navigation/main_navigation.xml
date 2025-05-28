@@ -6,6 +6,38 @@
     app:startDestination="@id/splashFragment">
 
     <fragment
+        android:id="@+id/profileFragment"
+        android:name="uz.oybek.ozamiz.ui.profile.ProfileFragment"
+        android:label="@string/profile_title"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_getMainInfoFragment"
+            app:destination="@id/getMainInfo" >
+            <argument
+                android:name="new"
+                app:argType="boolean"
+                android:defaultValue="false" /> <!-- Profil tahrirlashda "new" false bo'ladi -->
+        </action>
+        <action
+            android:id="@+id/action_profileFragment_to_setupRemindersFragment"
+            app:destination="@id/setupRemindersFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_authFragment"
+            app:destination="@id/authFragment"
+            app:popUpTo="@id/main_navigation"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_profileFragment_to_aboutFragment"
+            app:destination="@id/aboutFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aboutFragment"
+        android:name="uz.oybek.ozamiz.ui.profile.AboutFragment"
+        android:label="Ilova haqida"
+        tools:layout="@layout/fragment_about" />
+
+    <fragment
         android:id="@+id/foodAlternativesFragment"
         android:name="uz.oybek.ozamiz.ui.foods.FoodAlternativesFragment"
         android:label="FoodAlternativesFragment"
@@ -364,6 +396,28 @@
         android:name="uz.oybek.ozamiz.ui.discover.DiscoverFragment"
         android:label="DiscoverFragment"
         tools:layout="@layout/fragment_discover">
+
+        <action
+            android:id="@+id/action_discoverFragment_to_addEditVideoFragment"
+            app:destination="@id/addEditVideoFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_discoverFragment_to_videoListFragment"
+            app:destination="@id/videoListFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_discoverFragment_to_videoDetailFragment"
+            app:destination="@id/videoDetailFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
         <action
             android:id="@+id/action_discoverFragment_to_workoutDetailFragment"
             app:destination="@id/workoutDetailFragment"
@@ -573,6 +627,66 @@
         <action
             android:id="@+id/action_recipeDetailFragment_to_youtubePlayerFragment"
             app:destination="@id/youtubePlayerFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <!-- Video bilan bog'liq fragmentlar -->
+    <!-- VIDEO BILAN BO'GLIQ FRAGMENTLAR -->
+    <fragment
+        android:id="@+id/videoListFragment"
+        android:name="uz.oybek.ozamiz.ui.discover.VideoListFragment"
+        android:label="VideoListFragment"
+        tools:layout="@layout/fragment_video_list">
+        <argument
+            android:name="categoryId"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="listTitle"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_videoListFragment_to_videoDetailFragment"
+            app:destination="@id/videoDetailFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_videoListFragment_to_addEditVideoFragment"
+            app:destination="@id/addEditVideoFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/addEditVideoFragment"
+        android:name="uz.oybek.ozamiz.ui.discover.AddEditVideoFragment"
+        android:label="AddEditVideoFragment"
+        tools:layout="@layout/fragment_add_edit_video">
+        <argument
+            android:name="videoJson"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/videoDetailFragment"
+        android:name="uz.oybek.ozamiz.ui.discover.VideoDetailFragment"
+        android:label="VideoDetailFragment"
+        tools:layout="@layout/fragment_video_detail">
+        <argument
+            android:name="videoJson"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_videoDetailFragment_to_addEditVideoFragment"
+            app:destination="@id/addEditVideoFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
