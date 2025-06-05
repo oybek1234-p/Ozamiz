@@ -1,6 +1,10 @@
+// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\data\UserRepository.kt
 package uz.oybek.ozamiz.data
 
+import android.net.Uri
+import android.util.Log
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -11,17 +15,64 @@ import com.google.firebase.messaging.messaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.ImageUploader
+import uz.oybek.ozamiz.MainActivity
 import uz.oybek.ozamiz.data.firebase.FirebaseInstances
+import uz.oybek.ozamiz.data.model.StreakInfo
 import uz.oybek.ozamiz.data.utils.FirebaseUtils.getValueSafe
 import uz.oybek.ozamiz.handleException
+import uz.oybek.ozamiz.ui.showToast
+import java.util.Calendar
+import java.util.Date
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 object UserRepository {
 
+    private const val PAYMENT_CHECK_PHOTOS_PATH = "payment_checks"
+
     init {
         LocalUser.getUser()
     }
+
+    suspend fun uploadPremiumCheckData(userId: String, checkImageUri: Uri): DataWrapper<Unit> {
+        if (userId.isBlank()) return DataWrapper.Error("Foydalanuvchi ID si bo'sh")
+        val userSpecificPaymentPath = "$PAYMENT_CHECK_PHOTOS_PATH/$userId" // <<< YENI YO'L
+
+        return try {
+            val uploadResult = ImageUploader.uploadImage(checkImageUri, userSpecificPaymentPath) // <<< O'ZGARTIRILDI
+            when (uploadResult) {
+                is DataWrapper.Success -> {
+                    val imageUrl = uploadResult.data
+                    val updates = mapOf(
+                        User::paymentChecking.name to true,
+                        User::paymentCheckPhotoUrl.name to imageUrl,
+                        // User::premiumDate.name to ServerValue.TIMESTAMP // Mark submission time
+                    )
+                    usersReference.child(userId).updateChildren(updates).await()
+                    // Update local user
+                    updateUser {
+                        it.paymentChecking = true
+                        it.paymentCheckPhotoUrl = imageUrl
+                        // it.premiumDate = System.currentTimeMillis() // Approximate, server time is better
+                    }
+                    DataWrapper.Success(Unit)
+                }
+                is DataWrapper.Error -> {
+                    DataWrapper.Error("Chek rasmini yuklashda xatolik: ${uploadResult.error}")
+                }
+                is DataWrapper.Loading -> {
+                    // This should ideally not be returned by uploadImage, but handle if it does
+                    DataWrapper.Loading()
+                }
+            }
+        } catch (e: Exception) {
+            handleException(e, "UploadPremiumCheckDataError")
+            DataWrapper.Error(e.localizedMessage ?: "Chek ma'lumotlarini yuklashda xatolik")
+        }
+    }
+
 
     private val usersReference: DatabaseReference by lazy {
         FirebaseInstances.database.getReference("users")
@@ -31,23 +82,65 @@ object UserRepository {
     private var userLoading = false
 
     private fun saveUserNetwork() {
-        if (user.valid) {
-            usersReference.child(user.uid).setValue(user).addOnSuccessListener { }
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        if (user.valid && user.uid == currentUid) {
+            val userMap = mapOf(
+                "uid" to user.uid,
+                "name" to user.name,
+                "admin" to user.isAdmin,
+                "phoneNumber" to user.phoneNumber,
+                "gmail" to user.gmail,
+                "lastSeenTime" to user.lastSeenTime,
+                "age" to user.age,
+                "height" to user.height,
+                "weight" to user.weight,
+                "targetWeight" to user.targetWeight,
+                "startWeight" to user.startWeight,
+                "activityLevel" to user.activityLevel,
+                "targetCalories" to user.targetCalories,
+                "targetWaterMl" to user.targetWaterMl,
+                "targetCaloriesBurned" to user.targetCaloriesBurned,
+                "problems" to user.problems,
+                "reminderSettings" to user.reminderSettings,
+                "streakInfo" to user.streakInfo,
+                "lastWeightLogTimestamp" to user.lastWeightLogTimestamp,
+                "avatarUrl" to user.avatarUrl,
+                "hasSeenWeightPhotoInfo" to user.hasSeenWeightPhotoInfo,
+                "registerDate" to user.registerDate,
+                "premium" to user.premium,
+                "premiumDate" to user.premiumDate,
+                "paymentChecking" to user.paymentChecking,
+                "paymentCheckPhotoUrl" to user.paymentCheckPhotoUrl,
+                "gender" to user.gender,
+                "manzil" to user.manzil,
+                "pushToken" to user.pushToken
+            )
+            usersReference.child(user.uid).setValue(userMap)
+                .addOnSuccessListener {}
         }
     }
+
 
     fun removeLastSeenListener(listener: ValueEventListener) {
         usersReference.child(user.uid).child(User::lastSeenTime.name).removeEventListener(listener)
     }
 
-    fun setPremium(userId: String, premium: Boolean) {
+    fun setPremium(userId: String, premium: Boolean, approved: Boolean) { // Added 'approved'
         if (userId.isEmpty()) return
-        usersReference.child(userId).updateChildren(
-            mapOf(
-                User::premium.name to premium, User::premiumDate.name to System.currentTimeMillis()
-            )
+        val updates = mutableMapOf<String, Any?>(
+            User::premium.name to premium,
+            User::paymentChecking.name to false // No longer checking
         )
+        if (approved) {
+            updates[User::premiumDate.name] = ServerValue.TIMESTAMP // Set premium start date
+        } else {
+            updates[User::paymentCheckPhotoUrl.name] = null // Clear photo URL on rejection
+            // Optionally clear premiumDate too, or set to 0
+            updates[User::premiumDate.name] = 0L
+        }
+        usersReference.child(userId).updateChildren(updates)
     }
+
 
     fun observeLastSeen(userId: String, onChange: (time: Long) -> Unit): ValueEventListener? {
         if (userId.isEmpty()) return null
@@ -100,6 +193,18 @@ object UserRepository {
             }
         }
     }
+
+    suspend fun getPendingPremiumUsers(): DataWrapper<List<User>> {
+        return try {
+            val snapshot = usersReference.orderByChild(User::paymentChecking.name).equalTo(true).get().await()
+            val users = snapshot.children.mapNotNull { it.getValue(User::class.java) }
+            DataWrapper.Success(users)
+        } catch (e: Exception) {
+            handleException(e, "GetPendingPremiumUsersError")
+            DataWrapper.Error(e.localizedMessage ?: "Tekshiruvdagi foydalanuvchilarni yuklashda xatolik")
+        }
+    }
+
 
     fun setUnreadNotificationsZero() {
         if (user.valid) {
@@ -187,28 +292,44 @@ object UserRepository {
             return User()
         }
         val id = firebaseUser.uid
-        val isNewUser: Boolean
         val networkUser = loadUser(id)
-        isNewUser = (networkUser == null || networkUser.valid.not())
+        val isNewUser = (networkUser == null || networkUser.valid.not())
+
         return if (isNewUser) {
             val pushToken = AppNotification.loadToken()
+
             val newUser = User(
                 uid = id,
-                "",
-                firebaseUser.phoneNumber ?: "",
-                firebaseUser.email ?: "",
-                System.currentTimeMillis(),
-                0,
-                false,
-                0L,
-                pushToken ?: ""
+                name = "",
+                phoneNumber = firebaseUser.phoneNumber ?: "",
+                gmail = firebaseUser.email ?: "",
+                lastSeenTime = System.currentTimeMillis(),
+                unreadMessages = 0,
+                premium = false,
+                premiumDate = 0L,
+                pushToken = pushToken ?: "",
+                registerDate = Date(),
+                startWeight = null,
+                paymentChecking = false,
+                paymentCheckPhotoUrl = null,
+                isAdmin = false
             )
             createNewUserAndSet(newUser)
             newUser
         } else {
-            LocalUser.user = networkUser!!
+            val userWithIntegrity = networkUser!!.copy(
+                streakInfo = networkUser.streakInfo ?: StreakInfo(),
+                registerDate = networkUser.registerDate ?: Date(),
+                startWeight = networkUser.startWeight, // Keep existing startWeight or null
+                paymentChecking = networkUser.paymentChecking,
+                paymentCheckPhotoUrl = networkUser.paymentCheckPhotoUrl,
+                premium = networkUser.premium,
+                premiumDate = networkUser.premiumDate,
+                isAdmin = networkUser.isAdmin || id == "r7o2q6Ttd1XVY9w6M4gW1lqKqB52" // TODO: Replace with actual admin check logic
+            )
+            LocalUser.user = userWithIntegrity
             LocalUser.saveUser()
-            networkUser
+            userWithIntegrity
         }
     }
 
@@ -222,7 +343,17 @@ object UserRepository {
         val reference = usersReference.child(id)
         reference.get().addOnSuccessListener {
             val loadedUser = it.getValueSafe(User::class.java)
-            sus.resume(loadedUser)
+            val userWithIntegrity = loadedUser?.copy(
+                streakInfo = loadedUser.streakInfo ?: StreakInfo(),
+                registerDate = loadedUser.registerDate ?: Date(),
+                startWeight = loadedUser.startWeight,
+                paymentChecking = loadedUser.paymentChecking,
+                paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
+                premium = loadedUser.premium,
+                premiumDate = loadedUser.premiumDate,
+                isAdmin = loadedUser.isAdmin
+            )
+            sus.resume(userWithIntegrity)
         }.addOnFailureListener {
             sus.resume(null)
         }
@@ -241,12 +372,22 @@ object UserRepository {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 userLoading = false
-                val loadedUser = snapshot.getValue(User::class.java)
-                if (loadedUser!!.valid) {
-                    LocalUser.user = loadedUser
+                val loadedUser = snapshot.getValue(User::class.java) ?: return
+                val userWithIntegrity = loadedUser.copy(
+                    streakInfo = loadedUser.streakInfo ?: StreakInfo(),
+                    registerDate = loadedUser.registerDate ?: Date(),
+                    startWeight = loadedUser.startWeight,
+                    paymentChecking = loadedUser.paymentChecking,
+                    paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
+                    premium = loadedUser.premium,
+                    premiumDate = loadedUser.premiumDate,
+                    isAdmin = loadedUser.isAdmin
+                )
+                if (userWithIntegrity.valid) {
+                    LocalUser.user = userWithIntegrity
                     LocalUser.saveUser()
                 }
-                result.invoke(loadedUser)
+                result.invoke(userWithIntegrity)
             }
         })
     }

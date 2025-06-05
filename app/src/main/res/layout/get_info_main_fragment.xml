@@ -34,7 +34,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_gravity="center"
-                android:src="@drawable/profile_photo"
+                android:src="@drawable/weight_icon"
                 />
 
             <TextView
@@ -196,13 +196,15 @@
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
                     android:hint="Vazningiz (kg)*"
-                    android:maxLength="5" /> <!-- 999.9 -->
+                    android:maxLength="5" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_12"
+                android:visibility="gone"
+                android:id="@+id/idealWeight_con"
                 app:cardBackgroundColor="?colorSurfaceContainerLow"
                 >
                 <LinearLayout

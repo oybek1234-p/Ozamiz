@@ -2,31 +2,33 @@ package uz.oybek.ozamiz.ui.discover
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.workouts.Exercise
 import uz.oybek.ozamiz.databinding.DialogSelectExercisesBinding
-import uz.oybek.ozamiz.ui.showToast
+import uz.oybek.ozamiz.gson
 
-class SelectExercisesDialogFragment : BottomSheetDialogFragment() {
+class SelectExercisesDialogFragment : BottomSheetDialogFragment(), ExerciseItemAdminActions {
 
     companion object {
         const val TAG = "SelectExercisesDialog"
@@ -63,10 +65,6 @@ class SelectExercisesDialogFragment : BottomSheetDialogFragment() {
             val parentLayout = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
             parentLayout?.let { bottomSheet ->
                 val behaviour = BottomSheetBehavior.from(bottomSheet)
-                val layoutParams = bottomSheet.layoutParams
-                // Match parent qilsa bo'ladi, lekin scroll ishlamay qolishi mumkin
-                // layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                // bottomSheet.layoutParams = layoutParams
                 behaviour.state = BottomSheetBehavior.STATE_EXPANDED
                 behaviour.skipCollapsed = true
             }
@@ -89,8 +87,8 @@ class SelectExercisesDialogFragment : BottomSheetDialogFragment() {
                 R.id.action_done_selection -> {
                     setFragmentResult(
                         REQUEST_KEY, bundleOf(
-                        RESULT_SELECTED_IDS to ArrayList(selectableAdapter.getSelectedIds())
-                    ))
+                            RESULT_SELECTED_IDS to ArrayList(selectableAdapter.getSelectedIds())
+                        ))
                     dismiss()
                     true
                 }
@@ -100,10 +98,13 @@ class SelectExercisesDialogFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupRecyclerView() {
-        selectableAdapter = SelectableExerciseAdapter { selectedIds ->
-            binding.textViewSelectedCount.text = getString(R.string.selected_count_format, selectedIds.size)
-            binding.textViewSelectedCount.isVisible = selectedIds.isNotEmpty()
-        }
+        selectableAdapter = SelectableExerciseAdapter(
+            onSelectionChanged = { selectedIds ->
+                binding.textViewSelectedCount.text = getString(R.string.selected_count_format, selectedIds.size)
+                binding.textViewSelectedCount.isVisible = selectedIds.isNotEmpty()
+            },
+            adminActionsListener = this
+        )
         binding.recyclerViewAllExercises.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = selectableAdapter
@@ -123,47 +124,65 @@ class SelectExercisesDialogFragment : BottomSheetDialogFragment() {
             }
         })
     }
-// Fayl: uz/oybek/ozamiz/ui/admin/SelectExercisesDialogFragment.kt
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                // collectLatest o'rniga collect ishlatib ko'ramiz
-                adminWorkoutViewModel.uiState.collect { parentState ->
-                    Log.d(SelectExercisesDialogFragment.TAG, "Observing parent state: isLoading=${parentState.isLoading}, exercises=${parentState.allExercises.size}") // Log qo'shamiz
+                adminWorkoutViewModel.uiState.collectLatest { parentState ->
+                    binding.progressBarSelectExercises.isVisible = parentState.isLoading
 
-                    // Progress Bar holatini sozlash (agar dialogda bo'lsa)
-                    // binding.progressBarSelectExercises.isVisible = parentState.isLoading
-
-                    if (!parentState.isLoading) { // Faqat yuklanish tugaganda
+                    if (!parentState.isLoading) {
                         if (parentState.allExercises.isNotEmpty()) {
-                            Log.d(SelectExercisesDialogFragment.TAG, "Submitting original list with ${parentState.allExercises.size} exercises")
                             selectableAdapter.submitOriginalList(parentState.allExercises)
-                            // Boshlang'ich tanlovni faqat bir marta o'rnatish
-                            if (binding.recyclerViewAllExercises.adapter?.itemCount ?: 0 > 0 && selectableAdapter.getSelectedIds().isEmpty()) {
-                                Log.d(SelectExercisesDialogFragment.TAG, "Setting initial selection: $initialSelectedIds")
+                            if (binding.recyclerViewAllExercises.adapter?.itemCount ?: 0 > 0 && selectableAdapter.getSelectedIds().isEmpty() && initialSelectedIds.isNotEmpty() && parentState.selectedExerciseIds.containsAll(initialSelectedIds) ) {
                                 selectableAdapter.setInitialSelection(initialSelectedIds)
+                            } else if (binding.recyclerViewAllExercises.adapter?.itemCount ?: 0 > 0 && selectableAdapter.getSelectedIds().isEmpty() && parentState.selectedExerciseIds.isNotEmpty()){
+                                selectableAdapter.setInitialSelection(parentState.selectedExerciseIds)
                             }
+
                             val currentSelectedCount = selectableAdapter.getSelectedIds().size
                             binding.textViewSelectedCount.text = getString(R.string.selected_count_format, currentSelectedCount)
                             binding.textViewSelectedCount.isVisible = currentSelectedCount > 0
-                            binding.recyclerViewAllExercises.isVisible = true // RecyclerView ni ko'rsatish
+                            binding.recyclerViewAllExercises.isVisible = true
+                            binding.textViewNoExercisesAvailable.isVisible = false
                         } else {
-                            Log.d(SelectExercisesDialogFragment.TAG, "No exercises found in parent state after loading.")
-                            binding.textViewSelectedCount.text = "Mashqlar topilmadi"
-                            binding.textViewSelectedCount.isVisible = true
-                            binding.recyclerViewAllExercises.isVisible = false // RecyclerView ni yashirish
-                            selectableAdapter.submitList(emptyList()) // Adapterni tozalash
+                            binding.textViewSelectedCount.isVisible = false
+                            binding.recyclerViewAllExercises.isVisible = false
+                            binding.textViewNoExercisesAvailable.text = "Mashqlar topilmadi"
+                            binding.textViewNoExercisesAvailable.isVisible = true
+                            selectableAdapter.submitList(emptyList())
                         }
                     } else {
-                        // Yuklanayotganda RecyclerView ni yashirish yoki progress ko'rsatish
                         binding.recyclerViewAllExercises.isVisible = false
                         binding.textViewSelectedCount.isVisible = false
-                        Log.d(SelectExercisesDialogFragment.TAG,"Parent state is loading...")
+                        binding.textViewNoExercisesAvailable.text = "Yuklanmoqda..."
+                        binding.textViewNoExercisesAvailable.isVisible = true
                     }
                 }
             }
         }
+    }
+
+    override fun onEditExercise(exercise: Exercise) {
+
+        val action = AddEditWorkoutFragmentDirections.actionAddEditWorkoutFragmentToAddEditExerciseFragment(
+            gson!!.toJson(exercise))
+        findNavController().navigate(R.id.addEditExerciseFragment,action.arguments)
+       // adminWorkoutViewModel.onEditExerciseClicked(exercise)
+        dismiss()
+    }
+
+    override fun onDeleteExercise(exercise: Exercise) {
+        if (!isAdded) return
+        AlertDialog.Builder(requireContext())
+            .setTitle("Mashqni o'chirish")
+            .setMessage("'${exercise.name}' mashqini o'chirmoqchimisiz? Bu mashq barcha workoutlardan ham o'chiriladi.")
+            .setPositiveButton(R.string.yes_delete) { dialog, _ ->
+                adminWorkoutViewModel.onDeleteExerciseConfirmed(exercise)
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     override fun onDestroyView() {

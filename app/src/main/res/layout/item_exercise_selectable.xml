@@ -42,11 +42,38 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layout_admin_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageButton
+            android:id="@+id/button_edit_exercise"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/edit"
+            app:tint="?colorPrimary"/>
+
+        <ImageButton
+            android:id="@+id/button_delete_exercise"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/delete_ic"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/delete"
+            app:tint="?colorError"/>
+    </LinearLayout>
+
     <CheckBox
         android:id="@+id/checkBox_exercise_selected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:clickable="false"/> <!-- Clickni item'ning o'ziga beramiz -->
+        android:clickable="false"/>
 
 </LinearLayout>

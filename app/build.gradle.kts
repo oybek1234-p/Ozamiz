@@ -10,14 +10,14 @@ plugins {
 
 android {
     namespace = "uz.oybek.ozamiz"
-    compileSdk = 34
-    
+    compileSdk = 35
+
     defaultConfig {
         applicationId = "uz.oybek.ozamiz"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.1"
+        versionCode = 11
+        versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -61,16 +61,15 @@ dependencies {
     implementation(libs.androidx.paging.common.android)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.transport.api)
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-
+    
     val nav_version = "2.8.1"
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
-
-    //Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
 
     implementation("com.github.vacxe:phonemask:1.0.5")
@@ -85,24 +84,27 @@ dependencies {
     implementation("com.aallam.openai:openai-client:3.8.0")
     implementation("com.google.android.play:review:2.0.1")
 
-    implementation ("com.google.android.flexbox:flexbox:3.0.0")
-    implementation ("com.github.stfalcon-studio:StfalconImageViewer:v1.0.1")
-    implementation ("jp.wasabeef:glide-transformations:4.3.0")
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+    implementation("com.github.stfalcon-studio:StfalconImageViewer:v1.0.1")
+    implementation("jp.wasabeef:glide-transformations:4.3.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
 
     implementation("com.airbnb.android:lottie:6.0.0")
-    implementation ("id.zelory:compressor:3.0.1")
-    implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation("id.zelory:compressor:3.0.1")
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     implementation("io.coil-kt:coil:2.6.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     implementation("com.google.android.gms:play-services-base:18.2.0")
 
-    implementation ("com.github.ozcanalasalvar.picker:wheelview:2.0.7")
-    implementation ("com.github.ozcanalasalvar.picker:datepicker:2.0.7")
-    implementation("com.google.ai.client.generativeai:generativeai:0.3.0")
+    implementation("com.github.ozcanalasalvar.picker:wheelview:2.0.7")
+    implementation("com.github.ozcanalasalvar.picker:datepicker:2.0.7")
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation("com.google.firebase:firebase-analytics") // (Ixtiyoriy, lekin ko'pincha birga ishlatiladi)
 }

@@ -12,6 +12,7 @@
     app:cardBackgroundColor="?colorSurfaceContainerLowest">
 
     <LinearLayout
+        android:padding="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -45,19 +46,19 @@
                 style="@style/Text1_14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="8dp"
                 android:maxLines="2"
                 android:ellipsize="end"
-                android:textColor="?colorOnSurfaceVariant"
+                android:textColor="?colorOnSurface"
                 tools:text="2 ta qaynatilgan tuxum, pomidor va bodring" />
 
             <TextView
                 android:id="@+id/textView_idea_calories"
-                style="@style/Caption2_12"
+                style="@style/Subtitle2_14"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="?colorOnSurfaceVariant"
+                android:layout_marginTop="8dp"
+                android:textColor="?colorPrimary"
                 tools:text="~ 250 kkal" />
 
         </LinearLayout>

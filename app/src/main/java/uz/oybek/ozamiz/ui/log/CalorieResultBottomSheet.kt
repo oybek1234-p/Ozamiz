@@ -13,14 +13,17 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.info.MealsType
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemWarningTextBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.dialogs.FirstLogCongratulationDialog
 import uz.oybek.ozamiz.ui.loadPhoto
 import uz.oybek.ozamiz.ui.showToast
 import java.util.Locale
@@ -66,7 +69,7 @@ class CalorieResultBottomSheet : BaseFragment<BottomSheetCalorieResultBinding>()
     private var about: String = ""
     private var mealType: String = ""
 
-    private val viewModel: LogFoodViewModel by activityViewModels() // Use shared ViewModel
+    private val viewModel: LogFoodViewModel by activityViewModels()
 
     companion object {
         const val TAG = "CalorieResultBottomSheet";
@@ -123,6 +126,8 @@ class CalorieResultBottomSheet : BaseFragment<BottomSheetCalorieResultBinding>()
     private fun displayResults() {
         binding.textViewEstimatedCalories.text =
             getString(R.string.estimated_calories_format, calories)
+        val meal = MealsType.fromId(mealType)!!
+        binding.imageViewIllustration.loadPhoto(meal.iconRes)
         binding.foodName.text = about
         binding.textViewEstimatedProtein.text = formatMacro(protein)
         binding.textViewEstimatedFat.text = formatMacro(fat)
@@ -174,7 +179,7 @@ class CalorieResultBottomSheet : BaseFragment<BottomSheetCalorieResultBinding>()
 
     private fun setupActionButtons() {
         binding.buttonSaveToLog.setOnClickListener {
-            viewModel.confirmAndSaveLog() // Trigger save via ViewModel
+            viewModel.confirmAndSaveLog()
         }
         binding.backView.setOnClickListener {
             setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to "dismiss")) // Notify dismiss
@@ -192,18 +197,28 @@ class CalorieResultBottomSheet : BaseFragment<BottomSheetCalorieResultBinding>()
                 val isSaving = state is LogFoodUiState.Saving
                 binding.progressBarSave.isVisible = isSaving // Show/hide progress bar
                 binding.buttonSaveToLog.isVisible = !isSaving
-                binding.buttonRetryAnalysis.isVisible = !isSaving
                 binding.backView.isEnabled = !isSaving
                 binding.buttonSaveToLog.text = if(isSaving) "" else getString(R.string.save_to_log)
 
-
-                if (state is LogFoodUiState.Success) {
-                    closeFragment()
-                    closeFragment()
-                    viewModel.stateHandled()
-                } else if (state is LogFoodUiState.Error) {
-                    showToast(state.message)
-                    viewModel.stateHandled()
+                when(state) {
+                    is LogFoodUiState.ShowFirstLogCongratulation -> {
+                        if (isAdded && findNavController().currentDestination?.id == R.id.calorieResultBottomSheet) {
+                            FirstLogCongratulationDialog.newInstance().show(parentFragmentManager, FirstLogCongratulationDialog.TAG)
+                        }
+                        viewModel.stateHandled()
+                        closeFragment()
+                        closeFragment()
+                    }
+                    is LogFoodUiState.Success -> {
+                        closeFragment()
+                        closeFragment()
+                        viewModel.stateHandled()
+                    }
+                    is LogFoodUiState.Error -> {
+                        showToast(state.message)
+                        viewModel.stateHandled()
+                    }
+                    else -> {}
                 }
             }
         }

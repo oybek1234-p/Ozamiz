@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- Styles for PhotoUploadInfoFragment -->
+    <style name="PhotoGuidelineItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_marginTop">12dp</item>
+    </style>
+
+    <style name="PhotoGuidelineIcon">
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="tint">?colorPrimary</item>
+    </style>
+
+    <style name="PhotoGuidelineText" parent="TextBodyLarge">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textColor">?colorOnSurface</item>
+        <item name="android:lineSpacingMultiplier">1.1</item>
+    </style>
+
     <style name="FilledButton" parent="Widget.Material3.Button.IconButton.Filled">
         <item name="fontFamily">@font/roboto_medium</item>
     </style>
@@ -48,8 +72,8 @@
         <!-- Chip stili -->
         <style name="Widget.App.Chip" parent="Widget.Material3.Chip.Assist">
             <!-- Assist chip ko'rinishidan meros oladi -->
-            <item name="chipBackgroundColor">@color/chip_background_color</item>
-            <item name="android:textColor">@color/chip_text_color</item>
+            <item name="chipBackgroundColor">#316750A4</item>
+            <item name="android:textColor">@color/colorPrimary</item>
             <item name="chipCornerRadius">8dp</item>
             <item name="closeIconVisible">false</item> <!-- O'chirish ikonasini yashirish -->
             <item name="chipStrokeWidth">0dp</item> <!-- Stroke ni olib tashlash -->
@@ -143,13 +167,13 @@
             <item name="android:layout_marginBottom">8dp</item>
         </style>
 
-        <style name="WaterPresetLabel" parent="Headline3_15">
+        <style name="WaterPresetLabel" parent="Headline2_16">
             <item name="android:layout_width">wrap_content</item>
             <item name="android:layout_height">wrap_content</item>
             <item name="android:textColor">?colorOnSurface</item>
         </style>
 
-        <style name="WaterPresetAmount" parent="Text2_15">
+        <style name="WaterPresetAmount" parent="Text1_14">
             <item name="android:layout_width">wrap_content</item>
             <item name="android:layout_height">wrap_content</item>
             <item name="android:textColor">?colorOnSurface</item>

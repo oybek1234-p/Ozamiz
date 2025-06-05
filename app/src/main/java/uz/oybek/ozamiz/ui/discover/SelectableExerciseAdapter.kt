@@ -2,31 +2,41 @@ package uz.oybek.ozamiz.ui.discover
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.LocalUser
+import uz.oybek.ozamiz.data.admin
 import uz.oybek.ozamiz.data.workouts.Exercise
 import uz.oybek.ozamiz.databinding.ItemExerciseSelectableBinding
 import uz.oybek.ozamiz.ui.loadPhoto
 import java.util.*
 
+interface ExerciseItemAdminActions {
+    fun onEditExercise(exercise: Exercise)
+    fun onDeleteExercise(exercise: Exercise)
+}
+
 class SelectableExerciseAdapter(
-    private val onSelectionChanged: (List<String>) -> Unit // Tanlangan ID'lar listini qaytaradi
+    private val onSelectionChanged: (List<String>) -> Unit,
+    private val adminActionsListener: ExerciseItemAdminActions?
 ) : ListAdapter<Exercise, SelectableExerciseAdapter.ViewHolder>(ExerciseDiffCallback()) {
 
     private val selectedIds = mutableSetOf<String>()
-    private var originalList: List<Exercise> = emptyList() // Qidiruv uchun to'liq list
+    private var originalList: List<Exercise> = emptyList()
+    private val isAdmin = LocalUser.user.admin()
 
     fun setInitialSelection(ids: List<String>) {
         selectedIds.clear()
         selectedIds.addAll(ids)
-        notifyDataSetChanged() // Boshlang'ich tanlovni ko'rsatish uchun
+        notifyDataSetChanged()
     }
 
     fun submitOriginalList(list: List<Exercise>) {
-        originalList = list
-        submitList(list) // Adapterga ham berish
+        originalList = list.sortedBy { it.name } // Ensure consistent order
+        submitList(originalList)
     }
 
     fun filter(query: String?) {
@@ -34,19 +44,17 @@ class SelectableExerciseAdapter(
             originalList
         } else {
             originalList.filter {
-                it.name.contains(query, ignoreCase = true)
-                // TODO: Tavsif bo'yicha ham qidirish qo'shilishi mumkin
+                it.name.contains(query, ignoreCase = true) ||
+                        it.description?.contains(query, ignoreCase = true) == true
             }
         }
         submitList(filteredList)
     }
 
     fun getSelectedIds(): List<String> {
-        // Tanlangan ID'larni original listdagi tartibda qaytarish (agar tartib muhim bo'lsa)
-        // Hozircha oddiy set ni listga aylantiramiz
-        return selectedIds.toList()
+        // Return selected IDs in the order they appear in the original (sorted) list
+        return originalList.filter { selectedIds.contains(it.id) }.map { it.id }
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemExerciseSelectableBinding.inflate(
@@ -68,23 +76,31 @@ class SelectableExerciseAdapter(
                     toggleSelection(getItem(bindingAdapterPosition))
                 }
             }
+            binding.buttonEditExercise.setOnClickListener {
+                if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                    adminActionsListener?.onEditExercise(getItem(bindingAdapterPosition))
+                }
+            }
+            binding.buttonDeleteExercise.setOnClickListener {
+                if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                    adminActionsListener?.onDeleteExercise(getItem(bindingAdapterPosition))
+                }
+            }
         }
 
         fun bind(exercise: Exercise) {
             binding.textViewExerciseSelectableName.text = exercise.name
             binding.imageViewExerciseSelectableIcon.loadPhoto(exercise.mediaUrl ?: R.drawable.placeholder_exercise)
 
-            val details = if (exercise.durationSeconds != null && exercise.durationSeconds!! > 0) {
-                val minutes = exercise.durationSeconds!! / 60
-                val seconds = exercise.durationSeconds!! % 60
-                if (minutes > 0) String.format(Locale.getDefault(), "%d:%02d min", minutes, seconds)
-                else String.format(Locale.getDefault(), "00:%02d sek", seconds)
-            } else if (exercise.repetitions != null && exercise.repetitions!! > 0) {
-                 itemView.context.getString(R.string.repetitions_format, exercise.repetitions)
-            } else { "" }
+            val details = exercise.getDurationOrRepsText()
             binding.textViewExerciseSelectableDetails.text = details
+            binding.textViewExerciseSelectableDetails.isVisible = details.isNotEmpty()
 
             binding.checkBoxExerciseSelected.isChecked = selectedIds.contains(exercise.id)
+
+            binding.layoutAdminActions.isVisible = isAdmin
+            binding.buttonEditExercise.isVisible = isAdmin
+            binding.buttonDeleteExercise.isVisible = isAdmin
         }
     }
 
@@ -94,17 +110,16 @@ class SelectableExerciseAdapter(
         } else {
             selectedIds.add(exercise.id)
         }
-        notifyItemChanged(currentList.indexOf(exercise)) // Faqat o'zgargan itemni yangilash
-        onSelectionChanged(selectedIds.toList()) // Listenerga xabar berish
+        notifyItemChanged(currentList.indexOf(exercise))
+        onSelectionChanged(getSelectedIds()) // Use sorted list of IDs
     }
 
-    // DiffUtil (ExerciseDiffCallback oldingi javobda berilgan, qayta ishlating)
-     class ExerciseDiffCallback : DiffUtil.ItemCallback<Exercise>() {
+    class ExerciseDiffCallback : DiffUtil.ItemCallback<Exercise>() {
         override fun areItemsTheSame(oldItem: Exercise, newItem: Exercise): Boolean {
             return oldItem.id == newItem.id
         }
         override fun areContentsTheSame(oldItem: Exercise, newItem: Exercise): Boolean {
-            return oldItem == newItem // Agar Exercise data class bo'lsa
+            return oldItem == newItem
         }
     }
 }

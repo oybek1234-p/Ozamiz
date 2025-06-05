@@ -1,12 +1,11 @@
 package uz.oybek.ozamiz.ui.foods
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
-import android.widget.SearchView
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -22,10 +21,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.LocalUser
 import uz.oybek.ozamiz.data.foods.FoodAdvice
 import uz.oybek.ozamiz.data.foods.FoodCategory
 import uz.oybek.ozamiz.data.foods.SimpleMealIdea
 import uz.oybek.ozamiz.data.info.MealsType
+import uz.oybek.ozamiz.data.upcomingMeal
 import uz.oybek.ozamiz.databinding.FragmentFoodsBinding
 import uz.oybek.ozamiz.databinding.ItemFoodAdviceBinding
 import uz.oybek.ozamiz.databinding.ItemSimpleMealIdeaBinding
@@ -42,7 +43,7 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
     private lateinit var lunchIdeasAdapter: SimpleMealIdeaAdapter
     private lateinit var dinnerIdeasAdapter: SimpleMealIdeaAdapter
     private lateinit var snackIdeasAdapter: SimpleMealIdeaAdapter
-    private lateinit var foodAdviceAdapter: FoodAdviceAdapter
+
     private lateinit var popularRecipesAdapter: RecipeHorizontalAdapter
 
     init {
@@ -65,14 +66,38 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
         bind.swipeRefreshLayoutFoods.setOnRefreshListener {
             viewModel.loadInitialData(isRefresh = true)
         }
+
+        parentFragmentManager.setFragmentResultListener(
+            AddEditCategoryDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val success = bundle.getBoolean(AddEditCategoryDialog.RESULT_SUCCESS)
+            if (success) {
+                viewModel.loadInitialData(isRefresh = true)
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            "addEditSimpleMealRequestKey",
+            viewLifecycleOwner
+        ) { _, _ ->
+            viewModel.loadInitialData(isRefresh = true) // Oddiy variant qo'shilsa/tahrirlansa qayta yuklash
+        }
+        parentFragmentManager.setFragmentResultListener(
+            "addEditFoodAdviceRequestKey", // AddEditFoodAdviceDialog'dan keladigan unique key
+            viewLifecycleOwner
+        ) { _, _ ->
+            // viewModel.loadInitialData(isRefresh = true) // Maslahat qo'shilsa/tahrirlansa qayta yuklash (hozircha o'chirilgan)
+        }
+
     }
 
     private fun setupToolbarMenu() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.recipe_feed_menu, menu)
+                menuInflater.inflate(R.menu.recipe_feed_menu, menu) // recipe_feed_menu ishlatiladi
 
-                val searchItem = menu.findItem(R.id.action_search_recipe)
+                val searchItem = menu.findItem(R.id.action_search_recipe) // ID ni to'g'rilash
                 val searchView = searchItem?.actionView as? SearchView
                 searchView?.queryHint = getString(R.string.search_food_hint)
                 searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -80,29 +105,33 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
                         if (!query.isNullOrBlank()) {
                             viewModel.onSearchRequested(query)
                             searchView.clearFocus()
+                            searchItem.collapseActionView()
                         }
                         return true
                     }
+
                     override fun onQueryTextChange(newText: String?): Boolean {
                         return true
                     }
                 })
 
-                val addAdminItem = menu.findItem(R.id.action_add_item_foodlist)
-                addAdminItem?.isVisible = viewModel.uiState.value.isUserAdmin
+                // Admin uchun item endi FoodsFragment ichida emas, umumiy menu orqali boshqariladi
+                // yoki FAB orqali (agar shunday qaror qilingan bo'lsa)
+                // val addAdminItem = menu.findItem(R.id.action_add_admin_item)
+                // addAdminItem?.isVisible = viewModel.uiState.value.isUserAdmin
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
-                    R.id.action_add_item_foodlist -> { viewModel.onAdminAddClick(); true }
+                    // R.id.action_add_admin_item -> { viewModel.onAdminAddClick(); true } // Bu qism o'chiriladi
                     else -> false
                 }
             }
 
             override fun onPrepareMenu(menu: Menu) {
                 super.onPrepareMenu(menu)
-                val addAdminItem = menu.findItem(R.id.action_add_item_foodlist)
-                addAdminItem?.isVisible = viewModel.uiState.value.isUserAdmin
+                // val addAdminItem = menu.findItem(R.id.action_add_admin_item)
+                // addAdminItem?.isVisible = viewModel.uiState.value.isUserAdmin
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
@@ -111,7 +140,11 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
     private fun setupRecyclerViews(bind: FragmentFoodsBinding) {
         foodCategoryAdapter = FoodCategoryAdapter(
             onItemClick = { category -> viewModel.onCategoryClick(category) },
-            onEditClick = { category -> showAddEditCategoryDialog(category) }
+            onEditClick = { category ->
+                if (viewModel.uiState.value.isUserAdmin) showAddEditCategoryDialog(
+                    category
+                )
+            } // Admin tekshiruvi
         )
         bind.recyclerViewFoodCategories.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -119,34 +152,39 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
             itemAnimator = null
         }
 
-        breakfastIdeasAdapter = SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
+        breakfastIdeasAdapter =
+            SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
         bind.recyclerViewBreakfastIdeas.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = breakfastIdeasAdapter
             itemAnimator = null
         }
-        lunchIdeasAdapter = SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
+        lunchIdeasAdapter =
+            SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
         bind.recyclerViewLunchIdeas.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = lunchIdeasAdapter
             itemAnimator = null
         }
-        dinnerIdeasAdapter = SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
+        dinnerIdeasAdapter =
+            SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
         bind.recyclerViewDinnerIdeas.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = dinnerIdeasAdapter
             itemAnimator = null
         }
-        snackIdeasAdapter = SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
+        snackIdeasAdapter =
+            SimpleMealIdeaAdapter { mealIdea -> viewModel.onSimpleMealIdeaClick(mealIdea) }
         bind.recyclerViewSnackIdeas.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = snackIdeasAdapter
             itemAnimator = null
         }
-
-        foodAdviceAdapter = FoodAdviceAdapter()
         popularRecipesAdapter = RecipeHorizontalAdapter(
-            onItemClick = { recipe -> viewModel.onPopularRecipeClick(recipe) }
+            onItemClick = { recipe -> viewModel.onCategoryClick(LocalUser.user.upcomingMeal().let {
+                val meal = MealsType.fromId(it)!!
+                FoodCategory(meal.name.lowercase().trim(),meal.name)
+            }) }
         )
         bind.recyclerViewPopularRecipes.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -159,21 +197,47 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
         bind.buttonSeeAllRecipes.setOnClickListener {
             viewModel.onSeeAllRecipesClick()
         }
-        bind.buttonSeeAllBreakfast.setOnClickListener { viewModel.onSeeAllSimpleMealsClick(MealsType.Breakfast.id, getString(R.string.breakfast) + " Variantlari") }
-        bind.buttonSeeAllLunch.setOnClickListener { viewModel.onSeeAllSimpleMealsClick(MealsType.Lunch.id, getString(R.string.lunch) + " Variantlari") }
-        bind.buttonSeeAllDinner.setOnClickListener { viewModel.onSeeAllSimpleMealsClick(MealsType.Dinner.id, getString(R.string.dinner) + " Variantlari") }
-        bind.buttonSeeAllSnack.setOnClickListener { viewModel.onSeeAllSimpleMealsClick(MealsType.Snack.id, getString(R.string.snack) + " Variantlari") }
+        bind.buttonSeeAllBreakfast.setOnClickListener {
+            viewModel.onSeeAllSimpleMealsClick(
+                MealsType.Breakfast.id,
+                getString(R.string.breakfast) + " Variantlari"
+            )
+        }
+        bind.buttonSeeAllLunch.setOnClickListener {
+            viewModel.onSeeAllSimpleMealsClick(
+                MealsType.Lunch.id,
+                getString(R.string.lunch) + " Variantlari"
+            )
+        }
+        bind.buttonSeeAllDinner.setOnClickListener {
+            viewModel.onSeeAllSimpleMealsClick(
+                MealsType.Dinner.id,
+                getString(R.string.dinner) + " Variantlari"
+            )
+        }
+        bind.buttonSeeAllSnack.setOnClickListener {
+            viewModel.onSeeAllSimpleMealsClick(
+                MealsType.Snack.id,
+                getString(R.string.snack) + " Variantlari"
+            )
+        }
 
-        bind.fabAddFoodItem.setOnClickListener {
-            showAdminAddOptionsDialog()
+        bind.fabAddFoodItem.setOnClickListener { // FAB admin uchun
+            if (viewModel.uiState.value.isUserAdmin) {
+                showAdminAddOptionsDialog()
+            }
+        }
+
+        bind.heavyFoodsButton.setOnClickListener {
+            viewModel.onHeavyFoodsClick()
         }
     }
+
     private fun showAdminAddOptionsDialog() {
         val options = arrayOf(
             "Retsept Qo'shish",
             "Kategoriya Qo'shish",
-            "Oddiy Variant Qo'shish",
-            "Maslahat Qo'shish"
+            "Oddiy Variant Qo'shish"
         )
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Admin Amallari")
@@ -184,21 +248,27 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
                             findNavController().navigate(R.id.action_foods_to_addEditRecipeFragment)
                         }
                     }
+
                     1 -> {
                         if (findNavController().currentDestination?.id == R.id.foods) {
                             showAddEditCategoryDialog(null)
                         }
                     }
+
                     2 -> {
                         if (findNavController().currentDestination?.id == R.id.foods) {
-                            findNavController().navigate(R.id.addEditSimpleMealIdeaDialog)
+//                            val action = FoodsFragmentDirections.actionFoodsToAddEditSimpleMealIdeaDialog(null)
+//                            findNavController().navigate(action)
                         }
                     }
+                    /* Maslahatlar hozircha o'chirilgan
                     3 -> {
                         if (findNavController().currentDestination?.id == R.id.foods) {
-                            findNavController().navigate(R.id.addEditFoodAdviceDialog)
+                             val action = FoodsFragmentDirections.actionFoodsToAddEditFoodAdviceDialog(null)
+                            findNavController().navigate(action)
                         }
                     }
+                    */
                 }
                 dialog.dismiss()
             }
@@ -207,11 +277,12 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
     }
 
     private fun showAddEditCategoryDialog(category: FoodCategory?) {
-        val bundle = if (category != null) {
-            Bundle().apply { putString("categoryJson", com.google.gson.Gson().toJson(category)) }
-        } else null
         if (findNavController().currentDestination?.id == R.id.foods) {
-            findNavController().navigate(R.id.action_foods_to_addEditCategoryDialog, bundle)
+            val action =
+                FoodsFragmentDirections.actionFoodsToAddEditCategoryDialog(categoryJson = category?.let {
+                    com.google.gson.Gson().toJson(it)
+                })
+            findNavController().navigate(action)
         }
     }
 
@@ -221,55 +292,54 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collectLatest { state ->
                     bind.progressBarFoodsOverall.isVisible = state.isOverallLoading
-                    bind.swipeRefreshLayoutFoods.isRefreshing = state.isOverallLoading && !state.categories.isEmpty() // Show refresh only if content exists
-                    bind.scrollViewContent.isVisible = !state.isOverallLoading || !state.categories.isEmpty()
+                    bind.swipeRefreshLayoutFoods.isRefreshing =
+                        state.isOverallLoading && !state.categories.isEmpty()
+                    bind.scrollViewContent.isVisible =
+                        !state.isOverallLoading || !state.categories.isEmpty()
 
-
-                    // Categories
                     bind.recyclerViewFoodCategories.isVisible = !state.isLoadingCategories || state.categories.isNotEmpty()
                     bind.textViewCategoriesTitle.isVisible = !state.isLoadingCategories || state.categories.isNotEmpty()
                     if (!state.isLoadingCategories) foodCategoryAdapter.submitList(state.categories)
 
-
-                    // Popular Recipes
+                    bind.textViewPopularRecipesTitle.text = MealsType.fromId(LocalUser.user.upcomingMeal())?.name + " retseptari"
                     bind.recyclerViewPopularRecipes.isVisible = !state.isLoadingPopularRecipes || state.popularRecipes.isNotEmpty()
                     bind.textViewPopularRecipesTitle.isVisible = !state.isLoadingPopularRecipes || state.popularRecipes.isNotEmpty()
-                    bind.buttonSeeAllRecipes.isVisible = !state.isLoadingPopularRecipes || state.popularRecipes.isNotEmpty()
-                    if(!state.isLoadingPopularRecipes) popularRecipesAdapter.submitList(state.popularRecipes)
+
+                    bind.buttonSeeAllRecipes.isVisible =
+                        !state.isLoadingPopularRecipes || state.popularRecipes.isNotEmpty()
+                    if (!state.isLoadingPopularRecipes) popularRecipesAdapter.submitList(state.popularRecipes)
 
 
-                    // Simple Meal Ideas - visibility controlled by overall loading
-                    val showSimpleMealIdeas = !state.isLoadingSimpleMealIdeas || state.simpleMealIdeasByMealType.isNotEmpty()
+                    val showSimpleMealIdeas =
+                        !state.isLoadingSimpleMealIdeas || state.simpleMealIdeasByMealType.isNotEmpty()
 
-                    bind.buttonSeeAllBreakfast.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Breakfast.id].isNullOrEmpty()
-                    breakfastIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Breakfast.id] ?: emptyList())
-                    bind.recyclerViewBreakfastIdeas.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Breakfast.id].isNullOrEmpty()
-                    bind.textViewBreakfastIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Breakfast.id].isNullOrEmpty()
+                      bind.buttonSeeAllBreakfast.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Breakfast.id].isNullOrEmpty()
+                       breakfastIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Breakfast.id] ?: emptyList())
+                       bind.recyclerViewBreakfastIdeas.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Breakfast.id].isNullOrEmpty()
+                       bind.textViewBreakfastIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Breakfast.id].isNullOrEmpty()
 
-                    bind.buttonSeeAllLunch.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Lunch.id].isNullOrEmpty()
-                    lunchIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Lunch.id] ?: emptyList())
-                    bind.recyclerViewLunchIdeas.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Lunch.id].isNullOrEmpty()
-                    bind.textViewLunchIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Lunch.id].isNullOrEmpty()
+                       bind.buttonSeeAllLunch.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Lunch.id].isNullOrEmpty()
+                       lunchIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Lunch.id] ?: emptyList())
+                     bind.recyclerViewLunchIdeas.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Lunch.id].isNullOrEmpty()
+                     bind.textViewLunchIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Lunch.id].isNullOrEmpty()
 
-                    bind.buttonSeeAllDinner.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Dinner.id].isNullOrEmpty()
-                    dinnerIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Dinner.id] ?: emptyList())
+                        bind.buttonSeeAllDinner.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Dinner.id].isNullOrEmpty()
+                      dinnerIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Dinner.id] ?: emptyList())
                     bind.recyclerViewDinnerIdeas.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Dinner.id].isNullOrEmpty()
-                    bind.textViewDinnerIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Dinner.id].isNullOrEmpty()
+                       bind.textViewDinnerIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Dinner.id].isNullOrEmpty()
 
-                    bind.buttonSeeAllSnack.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Snack.id].isNullOrEmpty()
-                    snackIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Snack.id] ?: emptyList())
-                    bind.recyclerViewSnackIdeas.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Snack.id].isNullOrEmpty()
-                    bind.textViewSnackIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Snack.id].isNullOrEmpty()
+                       bind.buttonSeeAllSnack.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Snack.id].isNullOrEmpty()
+                       snackIdeasAdapter.submitList(state.simpleMealIdeasByMealType[MealsType.Snack.id] ?: emptyList())
+                       bind.recyclerViewSnackIdeas.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Snack.id].isNullOrEmpty()
+                      bind.textViewSnackIdeasTitle.isVisible = showSimpleMealIdeas && !state.simpleMealIdeasByMealType[MealsType.Snack.id].isNullOrEmpty()
 
-
-                    bind.fabAddFoodItem.isVisible = state.isUserAdmin
+                    bind.fabAddFoodItem.isVisible = state.isUserAdmin // Admin FAB ko'rinishi
 
                     state.errorMessage?.let { message ->
                         showToast(message)
                         viewModel.clearError()
                     }
-
-                    requireActivity().invalidateOptionsMenu()
+                    requireActivity().invalidateOptionsMenu() // Menuni yangilash (admin item uchun)
                 }
             }
         }
@@ -287,29 +357,44 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
                         )
                         findNavController().navigate(action)
                     }
+
                     is FoodsNavigationEvent.NavigateToRecipeDetail -> {
-                        val action = FoodsFragmentDirections.actionFoodsToRecipeDetailFragment(recipeJson = navEvent.recipeJson)
+                        val action =
+                            FoodsFragmentDirections.actionFoodsToRecipeDetailFragment(recipeJson = navEvent.recipeJson)
                         findNavController().navigate(action)
                     }
-                    is FoodsNavigationEvent.ShowAdminAddOptions -> {
-                        showAdminAddOptionsDialog()
-                    }
+
                     is FoodsNavigationEvent.NavigateToSimpleMealList -> {
-                        val action = FoodsFragmentDirections.actionFoodsFragmentToSimpleMealListFragment(
-                            mealType = navEvent.mealType,
-                            listTitle = navEvent.listTitle
-                        )
+                        val action =
+                            FoodsFragmentDirections.actionFoodsFragmentToSimpleMealListFragment(
+                                mealType = navEvent.mealType,
+                                listTitle = navEvent.listTitle
+                            )
                         findNavController().navigate(action)
                     }
+
                     is FoodsNavigationEvent.ShowSimpleMealDetail -> {
                         val bottomSheet = SimpleMealDetailBottomSheet.newInstance(navEvent.mealIdea)
                         bottomSheet.show(parentFragmentManager, SimpleMealDetailBottomSheet.TAG)
                     }
+
+                    is FoodsNavigationEvent.NavigateToMonthlyMealPlan -> {
+
+                    }
+
+                    is FoodsNavigationEvent.NavigateToHeavyFoods -> {
+                        navigate(R.id.heavyFoodsFragment)
+                    }
+
+                    is FoodsNavigationEvent.NavigateToFoodAdvice -> {
+
+                    }
+
+                    else -> {} // Boshqa eventlar uchun
                 }
             }
         }
     }
-
 
     override fun onDestroyView() {
         binding.recyclerViewFoodCategories.adapter = null
@@ -325,7 +410,6 @@ class FoodsFragment : BaseFragment<FragmentFoodsBinding>() {
 class SimpleMealIdeaAdapter(
     private val onItemClick: (SimpleMealIdea) -> Unit
 ) : ListAdapter<SimpleMealIdea, SimpleMealIdeaAdapter.ViewHolder>(SimpleMealIdeaDiffCallback()) {
-
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -354,7 +438,10 @@ class SimpleMealIdeaAdapter(
             binding.imageViewIdea.loadPhoto(idea.imageUrl ?: R.drawable.placeholder_food)
             binding.textViewIdeaDescription.text = idea.description
             if (idea.estimatedCalories != null && idea.estimatedCalories!! > 0) {
-                binding.textViewIdeaCalories.text = itemView.context.getString(R.string.calories_format_approx, idea.estimatedCalories)
+                binding.textViewIdeaCalories.text = itemView.context.getString(
+                    R.string.calories_format_approx,
+                    idea.estimatedCalories
+                )
                 binding.textViewIdeaCalories.visibility = android.view.View.VISIBLE
             } else {
                 binding.textViewIdeaCalories.visibility = android.view.View.GONE
@@ -373,7 +460,8 @@ class SimpleMealIdeaAdapter(
     }
 }
 
-class FoodAdviceAdapter : ListAdapter<FoodAdvice, FoodAdviceAdapter.ViewHolder>(FoodAdviceDiffCallback()) {
+class FoodAdviceAdapter :
+    ListAdapter<FoodAdvice, FoodAdviceAdapter.ViewHolder>(FoodAdviceDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemFoodAdviceBinding.inflate(

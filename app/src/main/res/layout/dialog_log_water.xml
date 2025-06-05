@@ -7,11 +7,18 @@
     android:orientation="vertical"
     android:padding="24dp">
 
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="100dp"
+        android:src="@drawable/water_full_24px"
+        android:layout_gravity="center"
+        app:tint="@color/blue" />
     <TextView
         style="@style/Title2_20"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:visibility="gone"
         android:layout_marginBottom="20dp"
         android:text="@string/log_water_title"
         android:textColor="?colorOnSurface" />
@@ -21,6 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
+        android:visibility="gone"
         android:drawablePadding="@dimen/dimen_8"
         android:text="Suvni ovqatdan 20 minut olding iching"
         android:textColor="#AC5F00"
@@ -137,6 +145,7 @@
             android:id="@+id/button_cancel_water"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="0dp"
+            android:visibility="gone"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
@@ -146,6 +155,8 @@
             android:id="@+id/button_add_water_confirm"
             style="@style/Widget.Material3.Button"
             android:layout_width="0dp"
+            app:icon="@drawable/add_ic"
+            app:iconGravity="textStart"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"

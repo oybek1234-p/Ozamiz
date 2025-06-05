@@ -16,8 +16,8 @@
         android:background="?selectableItemBackgroundBorderless"
         android:elevation="@dimen/dimen_2"
         android:padding="@dimen/dimen_12"
-        android:src="@drawable/close_ic"
-        app:tint="?colorOnSurfaceVariant" />
+        android:src="@drawable/arrow_back"
+        app:tint="?colorOnSurface" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -32,36 +32,53 @@
             android:paddingEnd="24dp"
             android:paddingBottom="100dp">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imageView_illustration"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="@dimen/dimen_48"
-                android:layout_marginBottom="12dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/food_ic"
-                app:shapeAppearanceOverlay="@style/RadiusImageView12" />
 
-            <TextView
-                android:id="@+id/food_name"
-                style="@style/Text1_16"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:textColor="?colorOnSurface" />
+                android:layout_marginTop="64dp"
+                >
 
-            <TextView
-                android:id="@+id/textView_estimatedCalories"
-                style="@style/TextAppearance.Material3.TitleLarge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="4dp"
-                android:textColor="?colorPrimary"
-                android:textStyle="bold"
-                tools:text="~ 480 kkal" />
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageView_illustration"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center_horizontal"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/breakfast_ic"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:shapeAppearanceOverlay="@style/RadiusImageView12" />
+
+                <TextView
+                    android:id="@+id/food_name"
+                    style="@style/Title3_17"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginStart="@dimen/dimen_12"
+                    android:ellipsize="end"
+                    android:lines="2"
+                    android:maxLines="2"
+                    android:text="2 sih shashlik va oq non"
+                    android:textColor="?colorOnSurfaceVariant"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageView_illustration"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/textView_estimatedCalories"
+                    style="@style/TextAppearance.Material3.TitleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="?colorPrimary"
+                    android:layout_marginStart="@dimen/dimen_12"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/imageView_illustration"
+                    tools:text="~ 480 kkal" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/textView_calorieInsights"
@@ -114,6 +131,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
@@ -181,6 +199,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:visibility="gone"
                 android:gravity="center_horizontal"
                 android:text="@string/pfc_estimation_disclaimer"
                 android:textColor="#979797" />
@@ -208,6 +227,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                android:visibility="gone"
                 android:text="@string/retry_or_cancel" />
 
             <com.google.android.material.button.MaterialButton
@@ -217,6 +237,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                app:icon="@drawable/check_ic"
+                app:iconGravity="textStart"
                 android:text="@string/save_to_log" />
         </LinearLayout>
 

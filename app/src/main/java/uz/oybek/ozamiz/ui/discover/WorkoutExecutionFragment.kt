@@ -105,6 +105,7 @@ class WorkoutExecutionFragment : Fragment() {
                                 }
 
                                 WorkoutExecutionNavigationEvent.WorkoutFinished -> {
+
                                     findNavController().navigate(R.id.action_workoutExecutionFragment_to_home)
                                 }
 

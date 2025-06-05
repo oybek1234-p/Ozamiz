@@ -207,7 +207,6 @@ class AddEditRecipeFragment : BaseFragment<FragmentAddEditRecipeBinding>() {
     }
 
     private fun populateCategoryChips(bind: FragmentAddEditRecipeBinding, categories: List<FoodCategory>, selectedIds: List<String>) {
-        Log.d(TAG, "Populating category chips. Count=${categories.size}, Selected=${selectedIds}")
         bind.chipGroupCategories.removeAllViews()
         categories.forEach { category ->
             val chip = Chip(requireContext(), null, com.google.android.material.R.style.Base_Widget_Material3_Chip).apply {
@@ -216,7 +215,6 @@ class AddEditRecipeFragment : BaseFragment<FragmentAddEditRecipeBinding>() {
                 isClickable = true
                 tag = category.id
                 isChecked = selectedIds.contains(category.id)
-                Log.d(TAG, "Creating chip: ${category.name}, ID=${category.id}, isChecked=${isChecked}")
                 setOnCheckedChangeListener { _, _ -> updateSelectedCategoriesInViewModel(bind) }
             }
             bind.chipGroupCategories.addView(chip)

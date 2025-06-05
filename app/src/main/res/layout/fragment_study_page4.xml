@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="?colorSurface"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_finish_study"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <ImageView
+                android:id="@+id/image_study_page4"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:src="@drawable/app_info_photo"
+                android:contentDescription="Ilova yordami illustratsiyasi" />
+
+            <TextView
+                android:id="@+id/title_study_page4"
+                style="@style/Title2_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:visibility="gone"
+                android:text="📘 Yolg‘iz emassiz – biz siz bilanmiz!"
+                android:textColor="?colorOnSurface" />
+
+            <TextView
+                android:id="@+id/explanation_study_page4"
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginTop="12dp"
+                android:lineSpacingMultiplier="1.3"
+                android:text="Ozingiz yolg‘iz harakat qilganingizda motivatsiya tez tugaydi. Lekin Ozamiz sizga har kuni yo‘l ko‘rsatadi, eslatadi, va rag‘batlantiradi."
+                android:textColor="?colorOnSurface" />
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="📲 Ilova sizga qanday yordam beradi?"
+                android:textColor="?colorOnSurface" />
+
+            <!-- Tayyor ovqat rejasi -->
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="🥗 Tayyor ovqat rejasi"
+                android:textColor="?colorOnSurface" />
+            <TextView
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="?colorOnSurface"
+                android:text="• Har kuni sizga 4 mahal ovqatdan bir nechtasini tanlab beramiz\n• Oddiy, do‘kondan topiladigan, mahalliy ovqatlar\n• Miqdori, tartibi va takrorlanmasligi nazoratda" />
+
+            <!-- Uy sharoitida oddiy mashqlar -->
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="💪 Uy sharoitida oddiy mashqlar"
+                android:textColor="?colorOnSurface" />
+            <TextView
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="?colorOnSurface"
+                android:text="• Kuniga 10–20 daqiqa mashqlarni video orqali ko‘rsatamiz\n• Qimmat sport zali shart emas – uyda yengil harakat yetarli" />
+
+            <!-- Ogohlantirish va eslatmalar -->
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="⏰ Ogohlantirish va eslatmalar"
+                android:textColor="?colorOnSurface" />
+            <TextView
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="?colorOnSurface"
+                android:text="• Ovqat, suv ichish va mashq uchun eslatmalar (push notification)\n• “Bugun harakat qilganingiz yo‘q” degan xabarlardan uyalmaslik kerak – ular sizga yordam berish uchun!" />
+
+            <!-- Natijani ko‘rib borasiz -->
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="📈 Natijani ko‘rib borasiz"
+                android:textColor="?colorOnSurface" />
+            <TextView
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="?colorOnSurface"
+                android:text="• Har hafta vazn va rasm yuklaysiz\n• O‘zgarishlaringizni grafikda ko‘rasiz – bu motivatsiya beradi" />
+
+            <!-- Boshqalar bilan birga -->
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                android:text="🧑‍🤝‍🧑 Boshqalar bilan birga"
+                android:textColor="?colorOnSurface" />
+            <TextView
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:visibility="gone"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="?colorOnSurfaceVariant"
+                android:text="• Ilova ichida boshqa ayollar bilan marafonlar, fikr almashish, reytinglar\n• Raqobat emas – bir-biringizga kuch bo‘lish" />
+
+            <TextView
+                android:id="@+id/key_idea_title_study_page4"
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="✅ Yakuniy xulosa:"
+                android:textColor="?colorOnSurface" />
+
+            <TextView
+                android:id="@+id/key_idea_content_study_page4"
+                style="@style/Text1_16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingMultiplier="1.3"
+                android:textColor="?colorOnSurface"
+                android:text="Siz ovqatni tanlash, mashqni o‘ylash, rejani yozish bilan qiynalmaysiz.\n“Ozamiz” siz uchun barchasini o‘ylagan. Siz faqat amal qilasiz — natija o‘zingizni hayratda qoldiradi." />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_finish_study"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Tushunarli, Boshladik!"
+        app:icon="@drawable/check_ic"
+        app:iconGravity="textStart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

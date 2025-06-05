@@ -95,8 +95,6 @@ class FoodsRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
-
-    // getAllSimpleMealIdeas endi Flow qaytaradi
     fun getAllSimpleMealIdeasFlow(): Flow<DataWrapper<List<SimpleMealIdea>>> = callbackFlow {
         trySend(DataWrapper.Loading())
         val listenerRegistration =
@@ -123,7 +121,6 @@ class FoodsRepository {
                 }
         awaitClose { listenerRegistration.remove() }
     }
-
 
     suspend fun addSimpleMealIdea(idea: SimpleMealIdea): DataWrapper<String> {
         return try {
@@ -157,7 +154,6 @@ class FoodsRepository {
         }
     }
 
-    // getAllFoodAdvice endi Flow qaytaradi
     fun getAllFoodAdviceFlow(): Flow<DataWrapper<List<FoodAdvice>>> = callbackFlow {
         trySend(DataWrapper.Loading())
         val listenerRegistration = foodAdviceCollection.orderBy("order", Query.Direction.ASCENDING)

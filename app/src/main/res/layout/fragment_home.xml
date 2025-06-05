@@ -17,11 +17,44 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:visibility="gone"
             app:title="@string/home_title"
             app:titleCentered="true"
             app:titleTextAppearance="@style/Title2_20"
-            app:titleTextColor="?attr/colorOnSurface" />
+            app:titleTextColor="?attr/colorOnSurface">
+
+            <!-- Streak Display Elements -->
+            <LinearLayout
+                android:id="@+id/streak_display_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:paddingHorizontal="@dimen/dimen_18"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/image_streak_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/fire_ic"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/text_streak_count"
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="0"
+                    android:textColor="?attr/colorPrimary"
+                    tools:text="3" />
+            </LinearLayout>
+        </com.google.android.material.appbar.MaterialToolbar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -43,6 +76,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingTop="16dp"
+                android:clipToPadding="false"
                 android:background="?colorSurfaceContainerLow"
                 android:paddingBottom="16dp">
 
@@ -64,7 +98,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="24dp"
+
                     android:layout_marginEnd="16dp"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                     app:cardCornerRadius="12dp"
@@ -79,16 +113,35 @@
                         android:background="?colorSurfaceContainerLowest"
                         android:paddingHorizontal="18sp">
 
-                        <TextView
-                            android:id="@+id/text_target_calories"
-                            style="@style/Text1_16"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="18dp"
-                            android:layout_marginEnd="16dp"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="18sp"
-                            tools:text="Kunlik:    1750 kkal gacha" />
+                            android:orientation="horizontal"
+                            >
+                            <TextView
+                                android:id="@+id/text_target_calories"
+                                style="@style/Text1_16"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="18dp"
+                                android:layout_marginEnd="16dp"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="18sp"
+                                android:text="Ovqat nazorati"
+                                />
+
+                            <TextView
+                                android:id="@+id/text_consumed"
+                                style="@style/Headline2_16"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:gravity="end"
+                                android:layout_gravity="bottom|end"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                tools:text="850 / 1750 kkal" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/text_consumed_calories"
@@ -97,7 +150,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="16dp"
                             android:layout_marginTop="4dp"
-                            android:textColor="?colorOnSurface"                           tools:text="850 / 1750 kkal" />
+                            tools:text="850 / 1750 kkal" />
 
 
                         <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -157,7 +210,6 @@
                     app:iconGravity="textStart"
                     app:iconTint="?attr/colorPrimary" />
 
-                <!-- Water Intake Section Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -205,14 +257,14 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/button_add_water"
-                                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                                style="@style/Widget.Material3.Button.IconButton.Filled"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:contentDescription="@string/add"
                                 android:paddingVertical="0dp"
                                 android:paddingEnd="@dimen/dimen_18"
-                                android:text="Suv"
-                                android:textSize="12sp"
+                                android:text="Suv ichdim"
+                                android:textSize="14sp"
                                 app:icon="@drawable/add_ic"
                                 app:iconGravity="textStart"
                                 app:iconPadding="@dimen/dimen_8"
@@ -254,18 +306,15 @@
                             tools:progress="40" />
 
                         <TextView
-                            android:id="@+id/text_water_info"
-                            style="@style/Subtitle2_14"
+                            style="@style/Caption1_13"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:text="@string/more_info"
-                            android:textColor="?attr/colorPrimary"
-                            android:visibility="gone"
-                            app:drawableEndCompat="@drawable/arrow_right"
-                            app:drawableTint="?attr/colorPrimary" />
+                            android:text="Suv ichish tanani tozalaydi, ishtahani kamaytiradi va vazn tashlashni osonlashtiradi."
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                      />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -297,7 +346,7 @@
                                 android:id="@+id/icon_exercise"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
-                                android:src="@drawable/sport_ic"
+                                android:src="@drawable/fire_ic"
                                 app:layout_constraintBottom_toBottomOf="@id/title_exercise"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="@id/title_exercise"
@@ -310,7 +359,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="12dp"
-                                android:text="Jismoniy faollik"
+                                android:text="Harakat"
                                 android:fontFamily="@font/roboto_bold"
                                 android:textColor="?attr/colorPrimary"
                                 app:layout_constraintEnd_toStartOf="@id/button_add_exercise_log"
@@ -319,13 +368,13 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/button_add_exercise_log"
-                                style="@style/Widget.Material3.Button.IconButton.Outlined"
+                                style="@style/Widget.Material3.Button.IconButton.Filled"
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:paddingVertical="0dp"
                                 android:paddingEnd="@dimen/dimen_18"
-                                android:text="Mashq"
-                                android:textSize="13sp"
+                                android:text="Mashq qildim"
+                                android:textSize="14sp"
                                 app:icon="@drawable/add_ic"
                                 app:iconGravity="textStart"
                                 app:iconPadding="@dimen/dimen_8"
@@ -337,16 +386,17 @@
 
                         <TextView
                             android:id="@+id/text_target_exercise"
-                            style="@style/Text1_16"
+                            style="@style/Text1_14"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
                             android:drawablePadding="@dimen/dimen_8"
+                            android:text="🕒 Mashq qiling \n🚶‍♀️ Piyoda yuring\n🕺 Raqsga tushing"
                             android:gravity="center_vertical"
                             android:textColor="?attr/colorOnSurface"
                             app:drawableTint="?colorOnSurfaceVariant"
                             tools:ignore="UseCompatTextViewDrawableXml"
-                            tools:text="Bugun yoqish shart: 500 kal" />
+                        />
 
                         <TextView
                             android:id="@+id/text_burned_calories"
@@ -379,7 +429,6 @@
                             android:visibility="gone"
                             tools:visibility="visible" />
 
-                        <!-- Text shown when no exercise logs exist -->
                         <TextView
                             android:id="@+id/text_no_exercise_logs"
                             style="@style/Text1_14"
@@ -392,28 +441,237 @@
                             android:visibility="gone"
                             tools:visibility="visible" />
 
-                        <!-- More info link (currently hidden) -->
                         <TextView
-                            android:id="@+id/text_exercise_info"
-                            style="@style/Text1_14"
+                            style="@style/Caption1_13"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
                             android:clickable="true"
                             android:focusable="true"
-                            android:text="@string/more_info"
-                            android:textColor="?attr/colorPrimary"
-                            android:visibility="gone"
-                            app:drawableEndCompat="@drawable/arrow_right"
-                            app:drawableTint="?attr/colorPrimary" />
+                            android:text="Harakat yog‘ni eritab, ozishga va sog‘lom bo‘lishga yordam beradi."
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                  />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Reminders Section Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_weight_goal_progress_section"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="4dp"
+                    app:strokeWidth="0dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?colorSurfaceContainerLowest"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:id="@+id/text_weight_goal_title"
+                                style="@style/Title3_17"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="Vazn"
+                                android:textColor="?colorOnSurface"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/icon_weight_goal_arrow"/>
+
+                            <ImageView
+                                android:id="@+id/icon_weight_goal_arrow"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/arrow_right"
+                                app:tint="?colorOnSurfaceVariant"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="@id/text_weight_goal_title"
+                                app:layout_constraintBottom_toBottomOf="@id/text_weight_goal_title"/>
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                        <TextView
+                            android:id="@+id/text_current_weight_on_goal_card"
+                            style="@style/Title4_24"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:textColor="?colorOnSurface"
+                            tools:text="80.0 kg" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress_weight_goal_bar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackColor="?attr/colorSurfaceContainerHighest"
+                            app:trackCornerRadius="8dp"
+                            app:trackStopIndicatorSize="0dp"
+                            app:trackThickness="12dp"
+                            tools:progress="0" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp">
+
+                            <TextView
+                                android:id="@+id/text_initial_weight_goal_label"
+                                style="@style/Text2_15"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentStart="true"
+                                android:textColor="?colorOnSurfaceVariant"
+                                tools:text="80.0 kg" />
+
+                            <TextView
+                                android:id="@+id/text_target_weight_goal_label"
+                                style="@style/Text2_15"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:textColor="?colorOnSurfaceVariant"
+                                tools:text="70.0 kg" />
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="8dp"
+                                app:cardBackgroundColor="?colorSurfaceContainer"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="0dp">
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:gravity="center"
+                                    android:padding="12dp">
+                                    <TextView
+                                        style="@style/TextLabelMedium"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Progress" />
+                                    <TextView
+                                        android:id="@+id/text_weight_lost_on_goal"
+                                        style="@style/Title3_17"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?colorPrimary"
+                                        tools:text="0.0 kg" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="8dp"
+                                app:cardBackgroundColor="?colorSurfaceContainer"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="0dp">
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:gravity="center"
+                                    android:padding="12dp">
+                                    <TextView
+                                        style="@style/TextLabelMedium"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Qoldi" />
+                                    <TextView
+                                        android:id="@+id/text_weight_remaining_on_goal"
+                                        style="@style/Title3_17"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:textColor="?colorOnSurface"
+                                        tools:text="10.0 kg" />
+                                </LinearLayout>
+                            </com.google.android.material.card.MaterialCardView>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/text_goal_start_date_on_goal"
+                            style="@style/Caption2_12"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            android:gravity="start"
+                            android:textColor="?colorOnSurfaceVariant"
+                            tools:text="Boshlangan sana: 15-Avgust, 2023"/>
+
+                        <TextView
+                            android:id="@+id/text_active_days_on_goal"
+                            style="@style/Caption2_12"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:visibility="gone"
+                            android:gravity="start"
+                            android:textColor="?colorOnSurfaceVariant"
+                            tools:text="Aktiv kunlar: 5 kun"/>
+
+
+                        <TextView
+                            style="@style/Headline3_15"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="Ozasiz"
+                            android:textColor="?colorPrimary" />
+
+                        <TextView
+                            android:id="@+id/text_timeline1_on_goal"
+                            style="@style/Text1_14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="?colorOnSurface"
+                            tools:text="1-hafta: ~0.8 kg"/>
+
+                        <TextView
+                            android:id="@+id/text_timeline3_on_goal"
+                            style="@style/Text1_14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="?colorOnSurface"
+                            tools:text="1 oyda: ~3–4 kg"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+                <!-- END OF NEW WEIGHT GOAL SECTION -->
+
+
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
+                    android:visibility="gone"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
@@ -425,6 +683,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
+                        android:visibility="gone"
                         android:background="?colorSurfaceContainerLowest"
                         android:padding="18sp">
 
@@ -465,11 +724,9 @@
                                 app:iconSize="20dp"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
-                            <!-- Removed shapeAppearanceOverlay -->
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <!-- Container for enabled exercise reminders -->
                         <LinearLayout
                             android:id="@+id/layout_reminders"
                             android:layout_width="match_parent"
@@ -479,7 +736,6 @@
                             android:visibility="gone"
                             tools:visibility="visible" />
 
-                        <!-- Text shown when no exercise reminders are enabled -->
                         <TextView
                             android:id="@+id/text_no_reminders"
                             style="@style/Text1_14"
@@ -494,13 +750,9 @@
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-
             </LinearLayout>
-
         </androidx.core.widget.NestedScrollView>
-
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBarOverall"
@@ -510,5 +762,27 @@
         android:indeterminate="true"
         android:visibility="gone"
         tools:visibility="visible" />
+
+    <!-- Container for the First Log Congratulation Dialog -->
+    <FrameLayout
+        android:id="@+id/first_log_congratulation_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        tools:visibility="gone"/>
+
+    <!-- Container for the Streak Dialog -->
+    <FrameLayout
+        android:id="@+id/streak_info_dialog_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        tools:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

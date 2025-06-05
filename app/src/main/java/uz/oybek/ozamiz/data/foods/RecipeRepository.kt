@@ -70,10 +70,11 @@ class RecipeRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
-    fun getLatestRecipes(limit: Int = 5): Flow<DataWrapper<List<Recipe>>> = callbackFlow {
+    fun getLatestRecipes(meal: String, limit: Int = 8): Flow<DataWrapper<List<Recipe>>> = callbackFlow {
         trySend(DataWrapper.Loading())
         val listenerRegistration =
             recipeCollection.orderBy("createdAt", Query.Direction.DESCENDING).limit(limit.toLong())
+                .whereArrayContains(Recipe::categoryIds.name,meal.lowercase().trim())
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
                         handleException(error, "GetLatestRecipesError")
@@ -88,7 +89,7 @@ class RecipeRepository {
                     if (snapshot != null) {
                         val recipes = snapshot.documents.mapNotNull { doc ->
                             doc.toObject<Recipe>()?.copy(id = doc.id)
-                        }
+                        }.shuffled()
                         trySend(DataWrapper.Success(recipes))
                     } else {
                         trySend(DataWrapper.Success(emptyList()))

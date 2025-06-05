@@ -24,7 +24,7 @@ import java.time.LocalDate
 object ChatGptFoodAnalyzer {
 
     private const val API_KEY =
-        "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"
+        "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"
     private const val TAG = "ChatGptFoodAnalyzer"
 
     private val openAI: OpenAI? by lazy {
@@ -32,38 +32,41 @@ object ChatGptFoodAnalyzer {
     }
 
     suspend fun analyzeFood(
-        imageUri: Uri?, description: String
+        imageUri: Uri?, description: String, mealTime: String
     ): DataWrapper<GeminiAnalysisResult> {
         val client =
             openAI ?: return DataWrapper.Error("OpenAI API sozlanmagan (kalit yetishmayapti)")
         if (description.isBlank()) return DataWrapper.Error("Iltimos, ovqatni tavsiflang.")
 
         val systemPrompt = """
-        Siz professional oziq-ovqat tahlilchisiz va foydalanuvchining maqsadi ozish. Foydalanuvchi: ${LocalUser.user.age} yosh, ${LocalUser.user.weight} kg, jinsi: ${if (LocalUser.user.gender == 0) "Erkak" else "Ayol"}.
-
+        Siz professional oziq-ovqat tahlilchisiz va foydalanuvchining maqsadi ozish. Foydalanuvchi: ${LocalUser.user.age} yosh, ${LocalUser.user.weight} kg, jinsi: ${if (LocalUser.user.gender == 0) "Erkak" else "Ayol"}
+        Ovqat vaqti: $mealTime
         Faqat quyidagi 7 qatorlik formatda javob yozing (agar qiymat noma'lum bo'lsa '-' qo'ying):
+        Odamni ovqat vaqtida qarab ogoxlantir tavsiyada ,qanday ovqat yeyish mumkin, yoki mumkin emas
         🔥 Kaloriyalar: [taxminiy_son] kkal
         🥩 Protein: [son.son] g
         🧈 Yog': [son.son] g
         🍚 Uglevodlar: [son.son] g
-        🥗 Tarkib: [ingredient1, ingredient2]
+        🥗 Tarkib: [food(kal),food2(cal), ingredient1, ingredient2]
         ✅/❗️ Foyda/Kamchilik: [qisqa_fikr_1]
         💡 Tavsiya: [ozish_uchun_qisqa_maslahat]
-
-        Misol:
-        🔥 Kaloriyalar: 450 kkal
-        🥩 Protein: 25.5 g
-        🧈 Yog': 18.2 g
-        🍚 Uglevodlar: 45.0 g
-        🥗 Tarkib: guruch, sabzi, go'sht, yog'
-        ❗️ Osh yog'li bo'lishi mumkin.
-        💡 Tushlikda kichik porsiyada, non bilan emas. Haftada 1 marta.
+        
+        Misol(mealTime: dinner, userInput: 1 kosa Osh va oq non non):
+        🔥 Kaloriyalar: n kkal
+        🥩 Protein: n g
+        🧈 Yog': n g
+        🍚 Uglevodlar: n g
+        🥗 Tarkib: Osh(450 kal),(oq non 150 kal)
+        ❗️ Oshni ikki haftada 1 marta yeyish mumkin 
+        ❗️ Kechasi non yemang!(Semirtiradi)
+        💡 Kechki ovqatda Non, guruch, osh, makaron, yog‘li ovqatlardan kechqurun saqlaning
+        💡 Agar ochlik sezilsa, 1 stakan suv yoki bodring, qatiq ichish mumkin
 
         Faqat shu formatda, boshqa matnsiz javob ber. Kaloriyani taxmin qilishga harakat qil.
         """.trimIndent()
 
         val chatCompletionRequest = ChatCompletionRequest(
-            model = ModelId("gpt-4o"), // Yoki "gpt-3.5-turbo"
+            model = ModelId("gpt-4o"),
             messages = listOf(
                 ChatMessage(ChatRole.System, systemPrompt),
                 ChatMessage(ChatRole.User, description) // Foydalanuvchi tavsifi
@@ -116,7 +119,7 @@ object ChatGptFoodAnalyzer {
             }
 
             DataWrapper.Success(
-                GeminiAnalysisResult(calories, protein, fat, carbs, ingredients, insights)
+                GeminiAnalysisResult(calories, protein, fat, carbs, ingredients, insights,"")
             )
 
         } catch (e: Exception) {

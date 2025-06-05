@@ -14,7 +14,7 @@
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@drawable/close_ic"
         app:title="@string/select_exercises"
-        app:menu="@menu/select_done_menu"/> <!-- "Done" tugmasi uchun menyu -->
+        app:menu="@menu/select_done_menu"/>
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/searchView_exercises"
@@ -26,18 +26,43 @@
         app:iconifiedByDefault="false"
         app:queryHint="@string/search_exercises_hint" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView_all_exercises"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingBottom="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_exercise_selectable" />
+        android:layout_weight="1">
 
-    <!-- Tanlangan mashqlarni ko'rsatish uchun (ixtiyoriy, pastki qismda) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView_all_exercises"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_exercise_selectable" />
+
+        <ProgressBar
+            android:id="@+id/progressBar_select_exercises"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            tools:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/textView_no_exercises_available"
+            style="@style/TextBodyLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Mashqlar topilmadi yoki yuklanmoqda..."
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+    </FrameLayout>
+
+
     <TextView
         android:id="@+id/textView_selected_count"
         style="@style/TextLabelMedium"

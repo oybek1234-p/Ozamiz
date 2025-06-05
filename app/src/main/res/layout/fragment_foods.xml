@@ -43,16 +43,86 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:clipToOutline="false"
+                android:clipToPadding="false"
+                android:orientation="vertical"
+                android:padding="@dimen/dimen_18">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/dayCount"
+                        style="@style/Title2_20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bugun 1-kun"
+                        android:visibility="gone"
+                        android:textColor="?colorOnSurface"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/heavyFoodsButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/dimen_12"
+                    app:cardBackgroundColor="?colorSurface"
+                    app:cardElevation="@dimen/dimen_2"
+                    app:contentPadding="@dimen/dimen_12">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imageView3"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:src="@drawable/plov_icon"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:shapeAppearance="@style/CircleImageView" />
+
+                        <TextView
+                            android:id="@+id/textView9"
+                            style="@style/Headline2_16"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dimen_12"
+                            android:drawableEnd="@drawable/arrow_right"
+                            android:text="Semirtiradigan ovqatlar"
+                            android:textColor="?colorOnSurface"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@+id/imageView3"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            style="@style/Text2_15"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:text="Kaloriyasi yuqori ovqatlar buyicha tavisiyalar"
+                            android:textColor="?colorOnSurfaceVariant"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@+id/textView9"
+                            app:layout_constraintTop_toBottomOf="@+id/textView9" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
                 <TextView
                     android:id="@+id/textView_categories_title"
                     style="@style/Title3_17"
+                    android:layout_marginTop="@dimen/dimen_12"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="16dp"
-                    android:text="Ovqat Kategoriyalari"
+                    android:text="Kategoriyalar"
                     android:textColor="?colorOnSurface" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -62,23 +132,23 @@
                     android:layout_marginTop="8dp"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="5"
                     tools:listitem="@layout/item_food_category" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    >
 
                     <TextView
                         android:id="@+id/textView_popular_recipes_title"
                         style="@style/Title3_17"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
                         android:layout_marginTop="24dp"
-                        android:text="Retseptlar"
+                        android:text="Foydali retseptlar"
                         android:textColor="?colorOnSurface" />
 
                     <com.google.android.material.button.MaterialButton
@@ -87,7 +157,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|center_vertical"
-                        android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:text="Barchasi"
                         app:icon="@drawable/arrow_right"
@@ -101,7 +170,7 @@
                     android:layout_marginTop="8dp"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
                     tools:listitem="@layout/item_recipe_horizontal" />
@@ -110,12 +179,12 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="24dp">
+                    android:layout_marginTop="24dp"
+                    >
 
                     <TextView
                         android:id="@+id/textView_breakfast_ideas_title"
-                        style="@style/Text2_15"
+                        style="@style/Title3_17"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -132,10 +201,9 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:text="Barchasi"
-                        android:visibility="gone"
-                        tools:visibility="visible"
                         app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd" />
+                        app:iconGravity="textEnd"
+                        tools:visibility="visible" />
                 </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -144,7 +212,7 @@
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
                     tools:listitem="@layout/item_simple_meal_idea" />
@@ -152,12 +220,12 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                >
 
                     <TextView
                         android:id="@+id/textView_lunch_ideas_title"
-                        style="@style/Text2_15"
+                        style="@style/Title3_17"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -174,10 +242,9 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:text="Barchasi"
-                        android:visibility="gone"
-                        tools:visibility="visible"
                         app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd" />
+                        app:iconGravity="textEnd"
+                        tools:visibility="visible" />
                 </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -186,21 +253,20 @@
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
                     tools:listitem="@layout/item_simple_meal_idea" />
 
-
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                   >
 
                     <TextView
                         android:id="@+id/textView_dinner_ideas_title"
-                        style="@style/Text2_15"
+                        style="@style/Title3_17"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
@@ -217,10 +283,9 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:text="Barchasi"
-                        android:visibility="gone"
-                        tools:visibility="visible"
                         app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd" />
+                        app:iconGravity="textEnd"
+                        tools:visibility="visible" />
                 </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -229,7 +294,7 @@
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
                     tools:listitem="@layout/item_simple_meal_idea" />
@@ -238,8 +303,8 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+               >
 
                     <TextView
                         android:id="@+id/textView_snack_ideas_title"
@@ -260,10 +325,9 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"
                         android:text="Barchasi"
-                        android:visibility="gone"
-                        tools:visibility="visible"
                         app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd" />
+                        app:iconGravity="textEnd"
+                        tools:visibility="visible" />
                 </RelativeLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -272,7 +336,7 @@
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
+                    android:visibility="gone"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:itemCount="3"
                     tools:listitem="@layout/item_simple_meal_idea" />

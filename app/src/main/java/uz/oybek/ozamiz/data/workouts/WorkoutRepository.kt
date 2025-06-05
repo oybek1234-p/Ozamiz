@@ -8,9 +8,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.AudioUploader
 import uz.oybek.ozamiz.ImageUploader
@@ -274,10 +276,12 @@ class WorkoutRepository {
         }
     }
 
-    // Removed mediaUri parameter, handled in ViewModel
     suspend fun addExercise(exercise: Exercise): DataWrapper<String> {
         return try {
-            val exerciseToSave = exercise.copy(id = "") // Ensure ID is empty for Firestore auto-ID
+            if (exercise.id.isEmpty()) {
+                exercise.id = System.currentTimeMillis().toString()
+            }
+            val exerciseToSave = exercise.copy()
             val docRef = exerciseCollection.add(exerciseToSave).await()
             DataWrapper.Success(docRef.id)
         } catch (e: Exception) {

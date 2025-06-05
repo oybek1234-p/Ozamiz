@@ -130,7 +130,6 @@ class WorkoutDetailFragment : BaseFragment<FragmentWorkoutDetailBinding>() {
                                 bind.layoutActionButtonContainer.isVisible = false
                                 // Xatolik xabarini ko'rsatish mumkin
                             } else if (!state.isLoadingExercises){
-                                // Yuklanish tugagan ammo workout null (topilmadi)
                                 bind.nestedScrollView.isVisible = true // Show empty state text
                                 bind.textViewWorkoutDetailTitle.text = "Workout topilmadi"
                                 bind.textViewWorkoutDetailDescription.text = ""

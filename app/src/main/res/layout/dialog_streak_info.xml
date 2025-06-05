@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="?attr/colorSurfaceContainerLowest"
+    android:paddingBottom="16dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:background="?colorOutlineVariant" />
+
+    <ImageView
+        android:id="@+id/image_streak_dialog_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/fire_ic"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="12dp"
+        app:tint="@color/yellow" />
+
+    <TextView
+        android:id="@+id/text_streak_dialog_title"
+        style="@style/Title2_20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Siz 3 kundan beri qat'iy rejimdasiz!"
+        android:gravity="center"
+        android:textColor="?colorOnSurface" />
+
+    <LinearLayout
+        android:id="@+id/layout_streak_progress"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="24dp"
+        android:gravity="center_vertical">
+        <!-- Fire icons will be added programmatically here -->
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_streak_progress_days"
+        style="@style/Headline3_15"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/dimen_12"
+        android:textColor="?colorOnSurfaceVariant"
+        tools:text="3 / 7 kun" />
+
+    <TextView
+        android:id="@+id/text_streak_dialog_message"
+        style="@style/Text1_16"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginHorizontal="24dp"
+        android:gravity="center"
+        android:textColor="?colorOnSurface"
+        android:text="Ketma-ketlikni to'xtatmang. Bu sizni maqsadingiz sari olib boradi." />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_streak_dialog_continue"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginHorizontal="24dp"
+        android:text="Maqsad sari"
+        app:icon="@drawable/arrow_right"
+        app:iconGravity="textEnd" />
+
+</LinearLayout>

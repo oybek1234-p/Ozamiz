@@ -58,7 +58,7 @@ class DailyLogRepository {
             }
             override fun onCancelled(error: DatabaseError) {
                 handleException(error.toException(), "ObserveTodayLogsCancelled") // Handle exception
-                trySend(DataWrapper.Error(error.message)); close(error.toException())
+                trySend(DataWrapper.Error(error.message)); close()
             }
         }
         todayLogRef.addValueEventListener(listener)

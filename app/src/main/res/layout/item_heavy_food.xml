@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/dimen_12"
+    android:layout_marginTop="@dimen/dimen_8"
+    app:cardBackgroundColor="?colorSurface"
+    app:cardElevation="@dimen/dimen_2">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/dimen_12">
+
+        <ImageView
+            android:id="@+id/food_image"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            tools:src="@drawable/placeholder_food"
+            tools:visibility="visible"
+            app:shapeAppearanceOverlay="@style/RadiusImageView12Top"/>
+
+        <TextView
+            android:id="@+id/food_name"
+            style="@style/Headline2_16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?colorOnSurface"
+            tools:text="Osh" />
+
+        <TextView
+            android:id="@+id/food_calories"
+            style="@style/Caption1_13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="?colorOnSurfaceVariant"
+            tools:text="~500 kkal" />
+
+
+        <TextView
+            android:id="@+id/food_description"
+            style="@style/Text1_16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="?colorOnSurface"
+            android:lineSpacingMultiplier="1.1"
+            tools:text="Har 10–14 kunda 1 marta, 1 kosa (150–200g), Faqat tushlikda" />
+
+        <TextView
+            android:id="@+id/food_advice"
+            style="@style/Text2_15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="?colorOnSurfaceVariant"
+            android:lineSpacingMultiplier="1.1"
+            android:visibility="gone"
+            tools:visibility="visible"
+            tools:text="Yog'sizroq tayyorlashga harakat qiling." />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -14,6 +14,16 @@
         android:background="?attr/colorSurface"
         app:elevation="0dp">
 
+        <!-- Toolbar can be added here if needed, or use the one from MainActivity -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_profile_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="@string/profile_title"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/Title2_20"
+            app:titleTextColor="?attr/colorOnSurface" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -27,6 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
 
             <!-- Header Section -->
             <LinearLayout
@@ -42,7 +53,6 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:scaleType="centerCrop"
-                    android:padding="12dp"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                     tools:src="@drawable/user_photo_placeholder" />
 
@@ -56,26 +66,149 @@
                     tools:text="Oybek" />
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/premium_active_c"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="@dimen/dimen_12"
+                android:layout_marginBottom="2dp"
+                android:background="@drawable/round_lay"
+                android:backgroundTint="@color/green"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="@dimen/dimen_12"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/dimen_8"
+                    android:drawableTint="?colorOnPrimary"
+                    android:text="@string/premium"
+                    android:textColor="?colorOnPrimary"
+                    app:drawableEndCompat="@drawable/star_ic" />
+
+                <TextView
+                    android:id="@+id/premiumExpireDate"
+                    style="@style/Subtitle1_14"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_8"
+                    android:textColor="?colorOnPrimary"
+                    tools:text="Premium 24.08.2024 gacha amal qiladi"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/premium_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/dimen_18"
+                android:layout_marginTop="@dimen/dimen_12"
+                android:layout_marginBottom="2dp"
+                android:background="@drawable/round_lay"
+                android:backgroundTint="?colorSurfaceContainerLowest"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="@dimen/dimen_12"
+                tools:visibility="gone">
+
+                <TextView
+                    style="@style/Title3_17"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Premiumda ko'proq"
+                    android:textColor="?colorOnSurface" />
+
+
+                <TextView
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_12"
+                    android:drawableStart="@drawable/check_ic"
+                    android:drawablePadding="8dp"
+                    android:text="Sun'iy intellekt bilan ovqat tahlili"
+                    android:textColor="?colorPrimary"
+                    app:drawableTint="@color/green" />
+
+
+                <TextView
+                    style="@style/Subtitle3_13"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:paddingEnd="@dimen/dimen_12"
+                    android:text="Har kuni foydali maslahatlar, tavsiyalar va ogoxlantirishlar"
+                    android:layout_marginTop="@dimen/dimen_4"
+                    android:textColor="?colorOnSurfaceVariant" />
+                <TextView
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_12"
+                    android:drawablePadding="8dp"
+                    android:text="@string/reklama_yo_q"
+                    android:textColor="?colorPrimary"
+                    app:drawableStartCompat="@drawable/check_ic"
+                    app:drawableTint="@color/green" />
+
+                <TextView
+                    style="@style/Headline3_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:text="1 oy davomida premium"
+                    android:layout_marginTop="@dimen/dimen_12"
+                    android:textColor="?colorPrimary"
+                    app:drawableStartCompat="@drawable/check_ic"
+                    app:drawableTint="@color/green" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/premium_button"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen_12"
+                    android:text="@string/premiumga_o_tish"
+                    app:icon="@drawable/star_ic"
+                    app:iconGravity="textStart" />
+
+            </LinearLayout>
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="8dp"/>
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="16dp"/>
 
             <!-- Profile Sections -->
             <include
                 android:id="@+id/section_my_info"
                 layout="@layout/item_profile_section" />
-
+            <include
+                android:id="@+id/section_weight_history"
+                layout="@layout/item_profile_section" />
             <include
                 android:id="@+id/section_reminders"
                 layout="@layout/item_profile_section" />
 
+            <!-- Admin Section (conditionally visible) -->
+            <include
+                android:id="@+id/section_admin_premium_users"
+                layout="@layout/item_profile_section"
+                android:visibility="gone"
+                tools:visibility="visible"/>
+
             <include
                 android:id="@+id/section_support"
                 layout="@layout/item_profile_section" />
-
             <include
                 android:id="@+id/section_rate_app"
+                layout="@layout/item_profile_section" />
+            <include
+                android:id="@+id/section_about_app"
                 layout="@layout/item_profile_section" />
 
             <Space
@@ -92,6 +225,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginBottom="88dp"
                 android:visibility="gone"
+                tools:visibility="visible"
                 android:text="@string/logout"
                 android:textColor="?colorError"
                 app:iconTint="?colorError"

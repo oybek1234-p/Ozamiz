@@ -72,7 +72,7 @@
     <string name="discover_title">Mashqlar</string>
     <string name="search">Qidirish</string>
     <string name="see_all">Barchasi</string>
-    <string name="start_workout">Boshlash</string>
+    <string name="start_workout">Mashqni boshlash</string>
     <string name="watch_ad_to_unlock">Reklama ko\'rib ochish</string>
     <string name="exercises_title_format">%d Mashq</string>
     <string name="repetitions_format">x%d</string>
@@ -198,9 +198,9 @@
 
     <string name="ask_ai_hint">Qaysi ovqat haqida bilmoqchisiz?</string>
     <string name="ask_ai_button">Tekshirish</string>
-    <string name="daily_calorie_summary_format">Bugungi maqsad: %1$d kkal / Yeyildi: %2$d kkal</string>
-    <string name="meal_section_title_format">%1$s (Maqsad: %2$d kkal / Yeyildi: %3$d kkal)</string>
-    <string name="meal_section_remaining_format">~%d kkal qoldi</string>
+    <string name="daily_calorie_summary_format">Bugungi maqsad: %1$d kal / Yeyildi: %2$d kal</string>
+    <string name="meal_section_title_format">%1$s (Maqsad: %2$d kal / Yeyildi: %3$d kal)</string>
+    <string name="meal_section_remaining_format">~%d kal qoldi</string>
     <string name="see_more_meal_sets">Boshqa %1$s Variantlari</string> <!-- Example: Boshqa Nonushta Variantlari -->
     <string name="log_this_meal_button_desc">%1$s uchun ovqat qo\'shish</string> <!-- Example: Nonushta uchun ovqat qo'shish -->
     <string name="calories_format_approx">%d kal</string>
@@ -224,10 +224,10 @@
     <string name="error_calories_required">Kaloriyani kiriting</string>
     <string name="error_saving_log">Log saqlashda xatolik</string>
     <string name="log_saved_successfully">Muvaffaqiyatli saqlandi</string>
-    <string name="upload_meal_photo">Ovqat rasmi (Ixtiyoriy)</string>
+    <string name="upload_meal_photo">Ovqat rasmini yuklang (Ixtiyoriy)</string>
     <string name="tap_to_add_photo">Rasm qo\'shish</string>
     <string name="describe_your_meal">Bugun nima yedingiz?</string>
-    <string name="food_description_hint">Misol: Bir kosa sho\'rva va pomidor bodring salat</string>
+    <string name="food_description_hint">Misol: 1 kosa sho‘rva, 1 bo‘lak non, 1 piyola choy, 1 dona bodring</string>
     <string name="analyze_and_save">Taxlil qilish</string>
     <string name="error_photo_required">Iltimos, ovqat rasmini yuklang</string>
     <string name="error_description_required">Iltimos, ovqatni tavsiflang</string>
@@ -247,8 +247,8 @@
     <string name="estimated_macros">Makronutrientlar</string>
     <string name="recognized_ingredients">Ko\'ringan Masalliqlar</string>
     <string name="retry_or_cancel">Qayta kiritish</string>
-    <string name="save_to_log">Logga Saqlash</string>
-    <string name="recommendations_warnings">Rekomend</string>
+    <string name="save_to_log">Saqlash</string>
+    <string name="recommendations_warnings">Tavsiya</string>
     <string name="log_water_title">Qancha suv ichdingiz?</string>
     <string name="select_preset_or_enter">Tayyor hajmni tanlang yoki o\'zingiz kiriting:</string>
     <string name="water_preset_glass">Stakan</string>
@@ -393,4 +393,56 @@
     <string name="termiz">Termiz</string>
     <string name="buxoro">Buxoro</string>
     <string name="hammasi">Hammasi</string>
+
+    <string name="meal_calories_target_not_set">Maqsad belgilanmagan</string>
+    <string name="meal_calories_target_only_format">%d kal</string> <!-- Masalan: "415 kal" -->
+    <string name="meal_calories_remaining_format">%d kal qoldi</string>
+    <string name="meal_calories_slightly_exceeded_format">Yetarli</string>
+    <string name="meal_calories_greatly_exceeded_format">Ko\'proq yeyildi</string>
+
+    <string name="unit_kcal_eaten">%d kal yeyildi</string>
+    <string name="unit_ml_drunk">%d stakan ichildi</string>
+    <string name="unit_kcal_burned_exercise">%d kal yoqildi</string>
+
+    <string name="error_user_not_found">Foydalanuvchi topilmadi.</string>
+    <string name="error_invalid_weight_input">Iltimos, to\'g\'ri vazn kiriting.</string>
+    <string name="weight_history_title">Vazn Tarixi</string>
+    <string name="weight_photo_log_button">Vazn va Surat Tarixi</string>
+    <string name="yetarli">✔ Yetarli</string>
+    <string name="bugunga_yetarli">✔ Bugunga yetarli</string>
+    <string name="premium">Premium</string>
+    <string name="yuborish">Yuborish</string>
+    <string name="ovqatlar_bo_yicha_cheksiz_maslahatlar">Ovqatlar bo‘yicha cheksiz maslahatlar</string>
+    <string name="reklama_yo_q">Reklamalarsiz foydalaning</string>
+    <string name="_35000_sum">35000 sum</string>
+    <string name="sotib_olish">Sotib olish</string>
+    <string name="premiumga_o_tish">Premiumga o\'tish</string>
+
+
+    <string name="premium_tekshirilmoqda">Premium tekshirilmoqda...</string>
+    <string name="premium_expiry_date_format">Premium %s gacha amal qiladi</string>
+    <string name="payment_check_title">To\'lovni Tasdiqlash</string>
+    <string name="payment_card_info_text">To\'lovni amalga oshirish uchun karta raqami:</string>
+    <string name="upload_check_button_text">Chek rasmini yuklash</string>
+    <string name="copy_card_number">Karta raqamini nusxalash</string>
+    <string name="card_number_copied">Karta raqami nusxalandi</string>
+    <string name="payment_instruction_text">Iltimos, yuqoridagi karta raqamiga %s so\'m miqdorida to\'lovni amalga oshiring va to\'lov chekining rasmini yuklang.</string>
+    <string name="submit_check_button_text">Chekni Yuborish</string>
+    <string name="error_upload_check_photo">Chek rasmini yuklashda xatolik.</string>
+    <string name="check_submitted_successfully">Chek muvaffaqiyatli yuborildi. Admin tekshiruvini kuting.</string>
+    <string name="admin_verification_list_title">Premium Tekshiruvlari</string>
+    <string name="no_pending_verifications">Tekshiruv uchun to\'lovlar yo\'q.</string>
+    <string name="admin_verification_detail_title">To\'lovni Tekshirish</string>
+    <string name="user_details_title">Foydalanuvchi Ma\'lumotlari</string>
+    <string name="payment_check_image_title">To\'lov Cheki Rasmi</string>
+    <string name="approve_payment">Tasdiqlash</string>
+    <string name="reject_payment">Rad Etish</string>
+    <string name="facebook_app_id">1852595262260195</string>
+    <string name="premium_required_title">Premium Kerak</string>
+    <string name="premium_required_message">Bu funksiyadan foydalanish uchun Premium obunaga o\'ting. Dastlabki 3 kun yoki 3 kunlik ketma-ketlikdan so\'ng bu funksiya pullik bo\'ladi.</string>
+    <string name="go_to_premium">Premiumga O\'tish</string>
+    <string name="admin_premium_verifications">Premium Tekshiruv</string> <!-- ProfileFragmentdagi button uchun -->
+    <string name="image_load_error_placeholder_text">Rasmni yuklab bo\'lmadi</string>
+    <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida yozing (Ixtiyoriy)</string>
+
 </resources>

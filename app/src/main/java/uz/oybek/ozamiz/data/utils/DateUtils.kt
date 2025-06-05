@@ -23,7 +23,7 @@ object DateUtils {
     fun getDayHour(date: Long): String {
         try {
             val dateObj = Date(date)
-            val dateFormat = SimpleDateFormat("HH:mm")
+            val dateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
             return dateFormat.format(dateObj)
         } catch (e: Exception) {
 
@@ -57,11 +57,20 @@ object DateUtils {
     }
 
     fun calculateDaysBetween(startMillis: Long, endMillis: Long): Long {
-        val startDate = Date(startMillis)
-        val endDate = Date(endMillis)
-        val diffInMillis = endDate.time - startDate.time
+        if (startMillis == 0L || endMillis == 0L || startMillis > endMillis) return 0L
+        val startDate = Calendar.getInstance().apply { timeInMillis = startMillis; clearTime() }
+        val endDate = Calendar.getInstance().apply { timeInMillis = endMillis; clearTime() }
+        val diffInMillis = endDate.timeInMillis - startDate.timeInMillis
         return TimeUnit.MILLISECONDS.toDays(diffInMillis)
     }
+
+    private fun Calendar.clearTime() {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+
 
     fun getDay(long: Long): Int {
         date.time = long
@@ -88,7 +97,7 @@ object DateUtils {
         return isSameDay(date, System.currentTimeMillis())
     }
 
-    val sdf = SimpleDateFormat("dd MMMM", Locale.getDefault())
+    val sdf = SimpleDateFormat("dd MMMM", Locale("uz", "UZ")) // Default to Uzbek
 
     fun getDateDay(date: Long): String {
         // Define the format for hours and minutes
@@ -97,6 +106,12 @@ object DateUtils {
         // Convert the long date to a Date object and format it
         return sdf.format(Date(date))
     }
+    fun formatDateForDisplay(date: Date?): String {
+        if (date == null) return "N/A"
+        val sdf = SimpleDateFormat("dd MMMM, yyyy", Locale("uz", "UZ"))
+        return sdf.format(date)
+    }
+
 
     private fun Date.getTimeAgo(): String {
         val now = Calendar.getInstance().time

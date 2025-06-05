@@ -5,9 +5,13 @@
 
     <color name="iconColor">#6D6D6D</color>
     <color name="likeColor">#E91E63</color>
-    <color name="yellow">#BB7000</color>
+    <color name="yellow">#FFAA00</color>
     <color name="green">#0F9063</color>
     <color name="rejected">#C12317</color>
+
+    <color name="green_alpha_10">#1A0F9063</color> <!-- Green with 10% alpha -->
+    <color name="red_alpha_10">#1AC12317</color>   <!-- Red with 10% alpha -->
+    <color name="grey_alpha_50">#80888888</color> <!-- Grey with 50% alpha -->
 
     <color name="chip_background_color">#FFFFFF</color> <!-- Lighter gray for chips -->
     <color name="chip_text_color">#333333</color> <!-- Darker text for chips -->

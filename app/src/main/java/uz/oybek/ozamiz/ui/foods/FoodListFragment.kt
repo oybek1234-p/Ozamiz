@@ -140,11 +140,13 @@ class FoodListFragment : BaseFragment<FragmentFoodListBinding>() {
     }
 
     private fun setupAdminFeatures(bind: FragmentFoodListBinding) {
-        // Setup FloatingActionButton visibility for admins
-        bind.fabAddFoodListItem.isVisible = LocalUser.user.admin()
+        val isAdmin = LocalUser.user.admin()
+        bind.fabAddFoodListItem.isVisible = isAdmin
         bind.fabAddFoodListItem.setOnClickListener {
             viewModel.onAddRecipeClick()
         }
+        val addItem = bind.toolbarFoodList.menu.findItem(R.id.action_add_item_foodlist)
+        addItem?.isVisible = isAdmin
     }
 
     private fun observeViewModel(bind: FragmentFoodListBinding) {

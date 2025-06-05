@@ -14,7 +14,6 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.google.android.material.chip.Chip
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
@@ -42,8 +42,7 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
-                viewModel.selectedImageUri = it
-                updateImagePickerState(binding, it) // UI ni darhol yangilash
+                viewModel.updateSelectedImageUri(it) // Use ViewModel method
             }
         }
 
@@ -71,7 +70,6 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
                     showDeleteConfirmation()
                     true
                 }
-
                 else -> false
             }
         }
@@ -88,9 +86,7 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
 
     private fun setupListeners(bind: FragmentAddEditWorkoutBinding) {
         bind.includeImagePickerWorkout.buttonRemoveImage.setOnClickListener {
-            viewModel.selectedImageUri = null
-            val imageUrl = viewModel.uiState.value.workoutToEdit?.imageUrl
-            updateImagePickerState(bind, imageUrl?.let { Uri.parse(it) })
+            viewModel.updateSelectedImageUri(null)
         }
         bind.includeImagePickerWorkout.cardImagePicker.setOnClickListener {
             pickImageLauncher.launch("image/*")
@@ -99,7 +95,7 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
         bind.editTextWorkoutName.doAfterTextChanged { viewModel.updateName(it.toString()) }
         bind.editTextWorkoutDescription.doAfterTextChanged { viewModel.updateDescription(it.toString()) }
         bind.editTextWorkoutDuration.doAfterTextChanged { viewModel.updateDuration(it.toString()) }
-        bind.editTextWorkoutCalories.doAfterTextChanged { viewModel.updateCalories(it.toString()) } // Kaloriya uchun listener
+        bind.editTextWorkoutCalories.doAfterTextChanged { viewModel.updateCalories(it.toString()) }
         bind.editTextWorkoutOrder.doAfterTextChanged { viewModel.updateOrder(it.toString()) }
         bind.editTextWorkoutTags.doAfterTextChanged {
             viewModel.updateTags(it.toString().split(",").map { tag -> tag.trim() })
@@ -110,14 +106,10 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
             )
         }
         bind.switchRequiresPremium.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updatePremium(
-                isChecked
-            )
+            viewModel.updatePremium(isChecked)
         }
         bind.switchRequiresAd.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.updateAdRequired(
-                isChecked
-            )
+            viewModel.updateAdRequired(isChecked)
         }
 
         bind.chipGroupWorkoutCategories.setOnCheckedStateChangeListener { group, checkedIds ->
@@ -156,32 +148,20 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
                             bind.toolbarAddEditWorkout.menu.findItem(R.id.action_delete_item)
                         deleteMenuItem?.isVisible = state.canDelete
 
-                        bind.progressBarCategoriesWorkout.isVisible = state.isLoading
+                        bind.progressBarCategoriesWorkout.isVisible = state.isLoading && state.allCategories.isEmpty()
 
                         if (!state.isLoading) {
-                            populateCategoryChips(
-                                bind, state.allCategories, state.selectedCategoryIds
-                            )
-                            displaySelectedExercises(
-                                bind, state.selectedExerciseIds, state.allExercises
-                            )
+                            if (bind.chipGroupWorkoutCategories.childCount == 0 || state.allCategories.size != bind.chipGroupWorkoutCategories.childCount) {
+                                populateCategoryChips(bind, state.allCategories, state.selectedCategoryIds)
+                            }
+                            displaySelectedExercises(bind, state.selectedExerciseIds, state.allExercises)
 
                             if (state.workoutToEdit != null && bind.editTextWorkoutName.text.isNullOrEmpty()) {
                                 populateFieldsForEditing(bind, state.workoutToEdit)
-                                if (viewModel.selectedImageUri == null) {
-                                    updateImagePickerState(
-                                        bind,
-                                        state.workoutToEdit.imageUrl?.let { Uri.parse(it) })
-                                }
-                            } else if (state.workoutToEdit == null) {
-                                if (viewModel.selectedImageUri == null) {
-                                    updateImagePickerState(bind, null)
-                                }
-                                displaySelectedExercises(
-                                    bind, state.selectedExerciseIds, state.allExercises
-                                )
                             }
+                            updateImagePickerState(bind, state.imageUriToDisplay)
                         }
+
 
                         state.errorMessage?.let {
                             showToast(it)
@@ -198,13 +178,12 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
                             is AdminWorkoutNavigation.ShowToast -> showToast(navEvent.message)
                             is AdminWorkoutNavigation.NavigateBack -> findNavController().popBackStack()
                             is AdminWorkoutNavigation.ShowExerciseSelectionDialog -> {
-                                val initialIds =
-                                    ArrayList(viewModel.uiState.value.selectedExerciseIds)
-                                val bundle =
-                                    bundleOf(SelectExercisesDialogFragment.ARG_INITIAL_SELECTED_IDS to initialIds)
-                                findNavController().navigate(
-                                    R.id.selectExercisesDialogFragment, bundle
-                                )
+                                val initialIds = ArrayList(viewModel.uiState.value.selectedExerciseIds)
+                                val bundle = bundleOf(SelectExercisesDialogFragment.ARG_INITIAL_SELECTED_IDS to initialIds)
+                                findNavController().navigate(R.id.selectExercisesDialogFragment, bundle)
+                            }
+                            is AdminWorkoutNavigation.NavigateToEditExercise -> {
+
                             }
                         }
                     }
@@ -221,13 +200,21 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
                 viewModel.updateSelectedExercises(selectedIds.toList())
             }
         }
+        // AddEditExerciseFragment dan natijani qabul qilish
+        setFragmentResultListener(AddEditExerciseViewModel.REQUEST_KEY_EXERCISE_MODIFIED) { _, bundle ->
+            val toastMessage = bundle.getString("toastMessage")
+            toastMessage?.let { showToast(it) }
+            // Refresh the list of all exercises in the ViewModel
+            viewModel.refreshExercisesAfterModification()
+        }
     }
+
 
     private fun populateFieldsForEditing(bind: FragmentAddEditWorkoutBinding, workout: Workout) {
         bind.editTextWorkoutName.setText(workout.name)
         bind.editTextWorkoutDescription.setText(workout.description ?: "")
         bind.editTextWorkoutDuration.setText(workout.durationMinutes?.toString() ?: "")
-        bind.editTextWorkoutCalories.setText(workout.estimatedCaloriesBurned?.toString() ?: "") // Kaloriyani to'ldirish
+        bind.editTextWorkoutCalories.setText(workout.estimatedCaloriesBurned?.toString() ?: "")
         bind.editTextWorkoutOrder.setText(workout.order.toString())
         bind.editTextWorkoutTags.setText(workout.tags?.joinToString(", ") ?: "")
         bind.autoCompleteWorkoutDifficulty.setText(workout.difficultyLevel ?: "", false)
@@ -239,7 +226,6 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
             bind.chipGroupTargetAreas.children.filterIsInstance<Chip>()
                 .find { it.text == areaName }?.isChecked = true
         }
-        // Kategoriya chiplari observeViewModel ichida to'ldiriladi/tanlanadi
     }
 
     private fun populateCategoryChips(
@@ -257,7 +243,7 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
             val chip = Chip(
                 requireContext(),
                 null,
-                com.google.android.material.R.style.Widget_Material3_Chip_Filter // Filter chip stilini ishlatish
+                com.google.android.material.R.style.Widget_Material3_Chip_Filter
             ).apply {
                 text = category.name
                 isCheckable = true
@@ -279,9 +265,7 @@ class AddEditWorkoutFragment : BaseFragment<FragmentAddEditWorkoutBinding>() {
         val exercisesMap = allExercises.associateBy { it.id }
         val displayText =
             selectedIds.mapNotNull { id -> exercisesMap[id] }.mapIndexed { index, exercise ->
-                val durationRep =
-                    if (exercise.durationSeconds != null) "${exercise.durationSeconds}s" else "x${exercise.repetitions}"
-                "${index + 1}. ${exercise.name} ($durationRep)"
+                "${index + 1}. ${exercise.name} (${exercise.getDurationOrRepsText()})"
             }.joinToString("\n")
         bind.textViewSelectedExercises.text = displayText
     }

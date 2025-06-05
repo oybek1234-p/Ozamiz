@@ -22,13 +22,6 @@ data class ExerciseType(
                     "https://example.com/walking.jpg"
                 ),
                 ExerciseType(
-                    "yoga",
-                    "Yoga",
-                    R.drawable.yoga_icon,
-                    "Yoga tanani bo‘shashtiradi, ongni tinchlantiradi va sog‘liqni yaxshilaydi. U bel, bo‘yin og‘rig‘ini kamaytiradi, nafasni chuqurlashtiradi va stressdan xalos qiladi. Har kuni 15–30 daqiqa yoga qilish yetarli. Eng yaxshi vaqt — ertalab soat 6:00–8:00 yoki kechqurun 18:00 atrofida. Yoga uyquni yaxshilaydi va kayfiyatni ko‘taradi. Uzoq umr va sog‘lom hayot uchun foydali odatdir.",
-                    "https://example.com/yoga.jpg"
-                ),
-                ExerciseType(
                     "dance",
                     "Raqs",
                     R.drawable.dancing,

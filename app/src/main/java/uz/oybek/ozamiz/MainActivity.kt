@@ -27,8 +27,8 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.LocalUser
 import uz.oybek.ozamiz.data.SocialMedia
@@ -39,6 +39,8 @@ import uz.oybek.ozamiz.databinding.SupportSheetBinding
 import uz.oybek.ozamiz.reminders.ReminderScheduler
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.visibleOrGone
+import uz.oybek.ozamiz.util.LivesManager // LivesManager importi
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,6 +49,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    init {
+        signOut = Runnable {
+            if (UserRepository.user.valid.not()) return@Runnable
+            UserRepository.signOut()
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
@@ -55,7 +65,6 @@ class MainActivity : AppCompatActivity() {
         PermissionController.getInstance().onPermissionResult(requestCode, grantResults)
         if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Ruxsat berildi, eslatmalarni qayta rejalashtirish mumkin
                 ReminderScheduler.scheduleAllActiveReminders(this)
             } else {
                 // Ruxsat berilmadi
@@ -75,52 +84,68 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 101
+        var signOut: Runnable? = null
+        private const val WEIGHT_LOG_INTERVAL_DAYS = 7
+        fun getWeightLogIntervalDays(): Int = WEIGHT_LOG_INTERVAL_DAYS
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
-        super.onCreate(null)
+        super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        initUser()
+        initUser() // Bu yerda LocalUser yuklanadi va LivesManager chaqiriladi
 
         binding.apply {
             navHost = (supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment)
             navcontroller = navHost.navController
             NavigationUI.setupWithNavController(binding.bottomNavView, navcontroller)
         }
-
         val inflater = navHost.navController.navInflater
         val graph = inflater.inflate(R.navigation.main_navigation)
         val user = LocalUser.user
-        var new = false
-        if (LocalUser.user.valid) {
+
+        if (user.valid) {
+            if (user.registerDate == null) {
+                UserRepository.updateUser {
+                    it.registerDate = Calendar.getInstance()
+                        .apply { add(Calendar.YEAR, -1) }.time
+                }
+            }
             if (user.name.isEmpty() || user.gender == -1 || user.age == -1 || user.height == -1 || user.weight == -1.0) {
                 graph.setStartDestination(R.id.getMainInfo)
-                new = true
             } else {
-                graph.setStartDestination(R.id.home)
+                graph.setStartDestination(R.id.home) // Yoki darslar ekrani
             }
         } else {
             graph.setStartDestination(R.id.authFragment)
         }
-        navHost.navController.setGraph(graph, Bundle().apply {
-            putBoolean("new", new)
-        })
-        // LocalUser.user.premium = true // Development uchun
+        navHost.navController.graph = graph
+
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
     }
 
     private fun initUser() {
-        LocalUser.getUser()
+        LocalUser.getUser() // Birinchi navbatda lokal foydalanuvchini yuklash
+        // Foydalanuvchi ma'lumotlari yuklangandan keyin jonlarni tekshirish
+        if (LocalUser.user.valid) {
+            lifecycleScope.launch(Dispatchers.IO) { // Orqa fonda bajarish
+                LivesManager.checkAndRefillLives()
+            }
+        }
+        // Firebase'dan foydalanuvchi o'zgarishlarini kuzatish
         UserRepository.observeCurrentUser {
-            // Re-schedule reminders if user data (especially reminderSettings) changes
-            it?.let { ReminderScheduler.scheduleAllActiveReminders(this) }
+            it?.let { currentUser ->
+                if (currentUser.valid) { // Agar valid foydalanuvchi kelsa
+                    // Bu yerda ham jonlarni tekshirish mumkin, agar kerak bo'lsa
+                    // lifecycleScope.launch(Dispatchers.IO) { LivesManager.checkAndRefillLives() }
+                    ReminderScheduler.scheduleAllActiveReminders(this)
+                }
+            }
         }
     }
-
     fun showSupportSheet() {
         val dialog = BottomSheetDialog(this, R.style.SheetStyle)
         val bindingDialog = SupportSheetBinding.inflate(LayoutInflater.from(this), null, false)
@@ -164,7 +189,7 @@ class MainActivity : AppCompatActivity() {
                 if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
                         AppUpdateType.FLEXIBLE
                     )
-                ) { // Ensure flexible is allowed
+                ) {
                     try {
                         appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
@@ -181,8 +206,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    @OptIn(DelicateCoroutinesApi::class)
     private fun initInternetConnectivity() {
         val networkRequest =
             NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -192,50 +215,48 @@ class MainActivity : AppCompatActivity() {
             getSystemService(ConnectivityManager::class.java) as ConnectivityManager
         var hasInternet = connectivityManager.activeNetwork != null
         if (connectivityManager.activeNetwork == null) {
-            MainScope().launch {
+            lifecycleScope.launch(Dispatchers.Main) {
                 if (!isFinishing && !isDestroyed) internetBottomSheet.show()
             }
         }
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                if (isFinishing || isDestroyed) return
-                if (hasInternet) {
-                    return
-                }
-                hasInternet = true
-                if (internetBottomSheet.isShowing) {
-                    lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    if (isFinishing || isDestroyed) return@launch
+                    if (hasInternet) {
+                        return@launch
+                    }
+                    hasInternet = true
+                    if (internetBottomSheet.isShowing) {
                         try {
                             if (!isFinishing && !isDestroyed) {
                                 internetBottomSheet.dismiss()
                             }
+                        } catch (e: IllegalArgumentException) {
+                            // Activity is likely finishing
                         } catch (e: Exception) {
                             handleException(e)
                         }
                     }
-                }
-                try {
                     try {
-                        val currentFragment = navHost.childFragmentManager.fragments[0]
+                        val currentFragment = navHost.childFragmentManager.fragments.getOrNull(0)
                         if (currentFragment is BaseFragment<*>) currentFragment.onInternetAvailable()
                     } catch (e: Exception) {
                         handleException(e)
                     }
-                } catch (e: Exception) {
-                    //
                 }
             }
 
             override fun onLost(network: Network) {
                 super.onLost(network)
-                if (isFinishing || isDestroyed) return
-                if (window.decorView.isAttachedToWindow && !internetBottomSheet.isShowing) {
-                    lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.Main) {
+                    if (isFinishing || isDestroyed) return@launch
+                    if (window.decorView.isAttachedToWindow && !internetBottomSheet.isShowing) {
                         internetBottomSheet.show()
                     }
+                    hasInternet = false
                 }
-                hasInternet = false
             }
         }
         connectivityManager.requestNetwork(networkRequest, networkCallback)
@@ -257,15 +278,9 @@ class MainActivity : AppCompatActivity() {
     private var bottomSetUp = false
     private var bottomNavShown = true
 
-    fun initCurrentUser() { // Not used currently
-        UserRepository.observeCurrentUser {
-
-        }
-    }
-
     private val decelerateInterpolator = DecelerateInterpolator(1.5f)
     fun showBottomSheet(show: Boolean, animate: Boolean) {
-        if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return // Avoid redundant animations
+        if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return
         bottomNavShown = show
         binding.bottomNavView.apply {
             if (!bottomSetUp && show) {
@@ -279,7 +294,7 @@ class MainActivity : AppCompatActivity() {
             val targetY = if (show) 0f else measuredHeight.toFloat()
             if (animate) {
                 if (show) translationY =
-                    measuredHeight.toFloat() // Set initial position for slide in
+                    measuredHeight.toFloat()
 
                 animate().setDuration(180).setInterpolator(decelerateInterpolator)
                     .translationY(targetY).withEndAction {

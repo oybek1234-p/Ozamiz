@@ -39,7 +39,7 @@ class LoginGmailFragment : BaseFragment<LoginGmailFragmentBinding>() {
 
     override fun onResume() {
         super.onResume()
-        binding?.gmailView?.editText?.showKeyboard()
+        binding.gmailView.editText?.showKeyboard()
     }
 
     private fun signInUser(email: String, password: String) {
@@ -67,7 +67,7 @@ class LoginGmailFragment : BaseFragment<LoginGmailFragmentBinding>() {
 
                 else -> {
                     showToast(appContext.getString(R.string.biz_bilan_bog_lanish))
-                    binding?.boglanishButton?.isVisible = true
+                    binding.boglanishButton.isVisible = true
                 }
             }
             loading.postVal(false)
@@ -105,7 +105,7 @@ class LoginGmailFragment : BaseFragment<LoginGmailFragmentBinding>() {
 
                 else -> {
                     showToast(appContext.getString(R.string.biz_bilan_bog_lanish))
-                    binding?.boglanishButton?.isVisible = true
+                    binding.boglanishButton.isVisible = true
                 }
             }
         }
@@ -118,7 +118,6 @@ class LoginGmailFragment : BaseFragment<LoginGmailFragmentBinding>() {
             val user = UserRepository.authFirebaseUser()
             loading.postVal(false)
             if (user.valid.not()) return@launch
-            closeFragment()
             mainActivity()?.recreateUi(true)
         }
     }

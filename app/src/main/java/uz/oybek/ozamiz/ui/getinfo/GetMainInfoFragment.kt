@@ -22,6 +22,7 @@ import uz.oybek.ozamiz.data.location.City
 import uz.oybek.ozamiz.databinding.GetInfoMainFragmentBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.showToast
+import java.util.Date
 
 class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
@@ -73,7 +74,8 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             weightInput.editText?.setText(
                 if (user.weight > 0) String.format(
                     "%.1f", user.weight
-                ) else ""
+                ).replace(',', '.') // Vergulni nuqtaga almashtirish
+                else ""
             )
 
             val activityAdapter = ArrayAdapter(
@@ -81,26 +83,19 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
                 R.layout.list_item,
                 ActivityLevel.entries.map { "${it.title} (${it.subtitle})" }
             )
-            harakatView.editText?.apply {
-                (this as AutoCompleteTextView).apply {
-                    setAdapter(activityAdapter)
-
-                    val selected = ActivityLevel.entries.find { it.id == LocalUser.user.activityLevel }
-                    selected?.let {
-                        activityLevelSelected = it.id
-                        setText(it.title, false)
-                    }
-
-                    onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-                        val level = ActivityLevel.entries[position]
-                        activityLevelSelected = level.id
-                    }
+            (harakatView.editText as? AutoCompleteTextView)?.apply {
+                val selected = ActivityLevel.entries.find { it.id == LocalUser.user.activityLevel }
+                selected?.let {
+                    activityLevelSelected = it.id
+                    setText("${it.title} (${it.subtitle})", false)
                 }
+                setAdapter(activityAdapter)
             }
 
-            targetWeightView.editText?.setText(user.targetWeight?.let { String.format("%.1f", it) }
+            targetWeightView.editText?.setText(user.targetWeight?.let { String.format("%.1f", it).replace(',', '.') }
                 ?: "")
 
+            mobilRaqamView.editText?.setText(LocalUser.user.phoneNumber)
             selectedGender = user.gender
             updateGenderSelectionUI(bind)
             calculateAndDisplayIdealWeightIfNeeded(bind)
@@ -109,46 +104,37 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
             selectedProblems.clear()
             user.problems?.let { selectedProblems.addAll(it) }
-            chipGroup.clearCheck()
-            selectedProblems.forEach { problemName ->
-                (chipGroup.findViewWithTag(problemName) as? Chip)?.isChecked = true
+
+            // Clear old chips before adding new ones
+            chipGroup.removeAllViews()
+            Problems.entries.forEach { problem ->
+                val chip = Chip(
+                    requireContext(),
+                    null,
+                    com.google.android.material.R.style.Widget_Material3_Chip_Filter
+                ).apply {
+                    text = problem.text
+                    isCheckable = true
+                    isClickable = true
+                    tag = problem.name // Store enum name as tag
+                    isChecked = selectedProblems.contains(problem.name)
+                }
+                chipGroup.addView(chip)
             }
+
+
             val manzilAdapter =
                 ArrayAdapter(requireContext(), R.layout.list_item, City.asListNames(false))
-            manzilView.editText?.apply {
-                (this as AutoCompleteTextView).apply {
-                    val selectedType = City.entries.find { it.name == LocalUser.user.manzil }
-                    selectedType?.let {
-                        manzilSelected = it.name
-                        setText(getString(it.resId), false)
-                    }
-                    setAdapter(manzilAdapter)
+            (manzilView.editText as? AutoCompleteTextView)?.apply {
+                val currentManzilName = LocalUser.user.manzil
+                val selectedCity = City.entries.find { city -> getString(city.resId) == currentManzilName || city.name == currentManzilName }
+
+                selectedCity?.let {
+                    manzilSelected = getString(it.resId) // Save localized name
+                    setText(getString(it.resId), false)
                 }
-
-                onItemClickListener = AdapterView.OnItemClickListener { _, _, position, id ->
-                    val cityCurrent = City.entries.filter { it.name != City.Hammasi.name }[position]
-                    manzilSelected = cityCurrent.name
-                }
+                setAdapter(manzilAdapter)
             }
-        }
-    }
-
-    private fun setSelectedRadioButton(radioGroup: RadioGroup, valueId: String?) {
-        for (i in 0 until radioGroup.childCount) {
-            val radioButton = radioGroup.getChildAt(i) as? RadioButton
-            if (radioButton?.tag == valueId) {
-                radioButton?.isChecked = true
-                return
-            }
-        }
-    }
-
-    private fun getSelectedRadioButtonTag(radioGroup: RadioGroup): String? {
-        val checkedId = radioGroup.checkedRadioButtonId
-        return if (checkedId != -1) {
-            radioGroup.findViewById<RadioButton>(checkedId)?.tag as? String
-        } else {
-            null
         }
     }
 
@@ -181,36 +167,37 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
                 selectedProblems.clear()
                 group.checkedChipIds.forEach { chipId ->
                     val chip = group.findViewById<Chip>(chipId)
-                    selectedProblems.add(chip.tag.toString()) // Store tag as problem identifier
+                    chip.tag?.toString()?.let { selectedProblems.add(it) }
                 }
             }
-            Problems.entries.forEach { problem ->
-                val chip = Chip(
-                    requireContext(),
-                    null,
-                    com.google.android.material.R.style.Widget_Material3_Chip_Filter
-                ).apply {
-                    text = problem.text
-                    isCheckable = true
-                    isClickable = true
-                    tag = problem.name
-                }
-                chipGroup.addView(chip)
+
+            (harakatView.editText as? AutoCompleteTextView)?.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+                activityLevelSelected = ActivityLevel.entries[position].id
             }
+
+            (manzilView.editText as? AutoCompleteTextView)?.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+                val cityEnumEntry = City.entries.filter { it != City.Hammasi }[position]
+                manzilSelected = getString(cityEnumEntry.resId) // Save localized name
+            }
+
             save.setOnClickListener {
-                viewModel.saveUserInfo(
+                // If it's a new user and registerDate is not set, set it now.
+                if (isNewUser && LocalUser.user.registerDate == null) {
+                    LocalUser.user.registerDate = Date()
+                }
+
+                viewModel.saveUserInfoAndGeneratePlan( // Yangilangan funksiyani chaqirish
                     name = nameView.editText?.text?.toString(),
                     gender = selectedGender,
                     ageStr = ageView.editText?.text?.toString(),
                     heightStr = heightLay.editText?.text?.toString(),
-                    weightStr = weightInput.editText?.text?.toString(),
-                    targetWeightStr = targetWeightView.editText?.text?.toString(),
+                    weightStr = weightInput.editText?.text?.toString()?.replace(',', '.'),
+                    targetWeightStr = targetWeightView.editText?.text?.toString()?.replace(',', '.'),
                     problems = selectedProblems.ifEmpty { null },
-                    manzilSelected,
+                    manzilSelected = manzilSelected,
                     phoneNumber = binding.mobilRaqamView.editText?.text?.toString(),
-                    activityLevelSelected
+                    activityLevel = activityLevelSelected
                 )
-
             }
         }
     }
@@ -222,19 +209,20 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
     }
 
     private fun updateGenderSelectionUI(bind: GetInfoMainFragmentBinding) {
-        val male = selectedGender == Gender.MALE
-        val female = selectedGender == Gender.FEMALE
-        bind.male.strokeWidth = if (male) 3.dpToPx() else 1
-        bind.female.strokeWidth = if (female) 3.dpToPx() else 1
+        val maleSelected = selectedGender == Gender.MALE
+        val femaleSelected = selectedGender == Gender.FEMALE
+        bind.male.strokeWidth = if (maleSelected) 3.dpToPx() else 1.dpToPx()
+        bind.female.strokeWidth = if (femaleSelected) 3.dpToPx() else 1.dpToPx()
     }
+
 
     private fun updateTargetWeightInputVisibility(bind: GetInfoMainFragmentBinding) {
         bind.targetWeightView.isVisible = true
     }
 
     private fun validateTargetWeight(bind: GetInfoMainFragmentBinding) {
-        val currentWeightStr = bind.weightInput.editText?.text?.toString()
-        val targetWeightStr = bind.targetWeightView.editText?.text?.toString()
+        val currentWeightStr = bind.weightInput.editText?.text?.toString()?.replace(',', '.')
+        val targetWeightStr = bind.targetWeightView.editText?.text?.toString()?.replace(',', '.')
         if (currentWeightStr.isNullOrBlank() || targetWeightStr.isNullOrBlank()) {
             bind.targetWeightWarning.isVisible = false
             return
@@ -264,47 +252,43 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         }
     }
 
-
     private fun observeViewModel(bind: GetInfoMainFragmentBinding) {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             bind.progressBar.isVisible = isLoading
             bind.save.isEnabled = !isLoading
-            // Boshqa inputlarni ham disable qilish mumkin
         }
 
         viewModel.idealWeightRangeText.observe(viewLifecycleOwner) { rangeText ->
             if (rangeText != null) {
                 bind.textViewIdealWeightInfo.isVisible = true
+                bind.idealWeightCon.isVisible = true
                 bind.textViewIdealWeightRange.text = rangeText
                 bind.textViewIdealWeightRange.isVisible = true
             } else {
+                bind.idealWeightCon.isVisible = false
                 bind.textViewIdealWeightInfo.isVisible = false
                 bind.textViewIdealWeightRange.isVisible = false
             }
-            validateTargetWeight(bind) // Ideal vazn hisoblangandan keyin maqsadni qayta tekshirish
+            validateTargetWeight(bind)
         }
 
         viewModel.navigationEvent.observe(viewLifecycleOwner) { event ->
             event?.getContentIfNotHandled()?.let { content ->
                 when (content) {
                     is GetInfoNavigationEvent.ShowToast -> showToast(content.message)
-                    is GetInfoNavigationEvent.NavigateToNextScreen -> {
+                    is GetInfoNavigationEvent.NavigateToCongratulation -> { // O'zgartirilgan event
                         if (isAdded && findNavController().currentDestination?.id == R.id.getMainInfo) {
-                            val action =
-                                GetMainInfoFragmentDirections.actionGetMainInfoToSetupRemindersFragment()
-                            findNavController().navigate(action)
+                            navigate(R.id.infoCongratulationFragment)
                         }
                     }
-
                     is GetInfoNavigationEvent.NavigateToHome -> {
                         if (isAdded && findNavController().currentDestination?.id == R.id.getMainInfo) {
-                            mainActivity()?.recreateUi(isNewUser) // isNewUser holatini hisobga olish
+                            mainActivity()?.recreateUi(isNewUser)
                         }
                     }
                 }
             }
         }
     }
-
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
 }

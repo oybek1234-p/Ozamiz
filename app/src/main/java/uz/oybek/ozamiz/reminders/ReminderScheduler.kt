@@ -25,6 +25,7 @@ object ReminderScheduler {
 
     fun scheduleAllActiveReminders(context: Context) {
         val user = LocalUser.user
+
         if (!user.valid || user.reminderSettings == null) {
             cancelAllReminders(context, user.reminderSettings?.keys ?: emptySet())
             return
@@ -74,7 +75,6 @@ object ReminderScheduler {
         return ids
     }
 
-
     private fun scheduleWaterReminderForMeal(context: Context, mealId: String, mealHour: Int, mealMinute: Int) {
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, mealHour)
@@ -85,12 +85,13 @@ object ReminderScheduler {
         val waterMinute = calendar.get(Calendar.MINUTE)
         val waterReminderId = "water_$mealId"
         val mealName = getReminderTitle(context, mealId).lowercase()
-        val waterTitle = "Suv Ichish Vaqti"
-        val waterMessage = "$2 stakan suv ichishni unutmang ${mealName} 20 minut oldin"
+        val waterTitle = "Suv ichishni unutmang"
+        val waterMessage = "2 stakan suv iching"
 
         scheduleDailyAlarm(context, waterReminderId, waterTitle, waterMessage, waterHour, waterMinute)
     }
 
+    
     internal fun scheduleDailyAlarm(
         context: Context,
         reminderIdOriginal: String,
@@ -103,15 +104,11 @@ object ReminderScheduler {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmManager.canScheduleExactAlarms()) {
-                // Optionally, direct user to settings or use inexact alarm
-                // For now, we'll proceed, but it might not be exact.
-                // Consider logging or a less intrusive notification to the user.
                 Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).also {
-                    context.startActivity(it) // This is intrusive
+                    context.startActivity(it)
                 }
             }
         }
-
 
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra(EXTRA_REMINDER_ID_HASH, reminderIdOriginal.hashCode())
@@ -126,7 +123,7 @@ object ReminderScheduler {
             context,
             reminderIdOriginal.hashCode(), // Unique request code for each reminder
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val calendar = Calendar.getInstance().apply {
@@ -174,7 +171,6 @@ object ReminderScheduler {
         }
     }
 
-
     private fun cancelReminder(context: Context, reminderIdHash: Int) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java) // The same intent used for setting
@@ -190,31 +186,30 @@ object ReminderScheduler {
         }
     }
 
-
     private fun getReminderTitle(context: Context, reminderId: String): String {
         return when (reminderId) {
-            MealsType.Breakfast.id -> "Nonushta vaqti bo'ldi"
-            MealsType.Lunch.id -> "Tushlik vaqti bo'ldi"
-            MealsType.Dinner.id -> "Kechki Ovqat bo'ldi"
-            MealsType.Snack.id -> "Tamaddi(Perekus)"
-            // Add exercise titles from ExerciseType
-            else -> uz.oybek.ozamiz.ui.getinfo.ExerciseType.getExerciseTypeById(reminderId).name + ""
+            MealsType.Breakfast.id -> "Ertalabki energiya vaqti"
+            MealsType.Lunch.id -> "Tushlik vaqti – kuch to‘plash"
+            MealsType.Dinner.id -> "Kechki ovqat – yengil tuting"
+            MealsType.Snack.id -> "Yengil tamaddi vaqti"
+            else -> uz.oybek.ozamiz.ui.getinfo.ExerciseType.getExerciseTypeById(reminderId).name
         }
     }
 
     private fun getReminderMessage(context: Context, reminderId: String, hour: Int, minute: Int): String {
         val time = String.format("%02d:%02d", hour, minute)
         return when (reminderId) {
-            MealsType.Breakfast.id -> "Ertalab engil va to‘yimli ovqat tanlang"
-            MealsType.Lunch.id -> "Ovqat miqdorini boshqaring"
-            MealsType.Dinner.id -> "Kechki ovqat eng yengil bo‘lsin"
-            MealsType.Snack.id -> "$time da yengil tamaddi qilib oling!"
-             else -> {
+            MealsType.Breakfast.id -> "Nonushta – kunni sog‘lom boshlang! Mevali yoki oqsilli ovqat tanlang."
+            MealsType.Lunch.id -> "Tushlikda ortiqcha ovqatdan saqlaning. To‘yimli va foydali tanlov qiling."
+            MealsType.Dinner.id -> "Kechki ovqat yengil bo‘lsin. Kechqurun tanani tinchlantiring."
+            MealsType.Snack.id -> "$time da yengil tamaddi qiling. Masalan: meva yoki yong‘oq."
+            else -> {
                 val exerciseName = uz.oybek.ozamiz.ui.getinfo.ExerciseType.getExerciseTypeById(reminderId).name
-                "$time da '$exerciseName' mashqini bajarish vaqti!"
+                "$time da '$exerciseName' mashqi – sog‘lig‘ingiz uchun kichik qadam!"
             }
         }
     }
+
 
     private fun isMealReminder(reminderId: String): Boolean {
         return MealsType.mealTypes.any { it.id == reminderId }

@@ -23,6 +23,7 @@ sealed class AdminWorkoutNavigation {
     data class ShowToast(val message: String) : AdminWorkoutNavigation()
     object NavigateBack : AdminWorkoutNavigation()
     object ShowExerciseSelectionDialog : AdminWorkoutNavigation()
+    data class NavigateToEditExercise(val exerciseJson: String) : AdminWorkoutNavigation() // YANGI EVENT
 }
 
 class AddEditWorkoutViewModel : ViewModel() {
@@ -37,33 +38,31 @@ class AddEditWorkoutViewModel : ViewModel() {
     private val _navigationEvent = MutableLiveData<Event<AdminWorkoutNavigation>>()
     val navigationEvent: LiveData<Event<AdminWorkoutNavigation>> = _navigationEvent
 
-    // Holds the workout data being actively modified by user input
     private var currentWorkoutData = Workout()
-    private var initialWorkoutState: Workout? = null // To compare for changes
+    private var initialWorkoutState: Workout? = null
 
-    var selectedImageUri: Uri? = null // Only for NEWLY selected image
+    var selectedImageUri: Uri? = null
 
     private var loadDataJob: Job? = null
 
     fun initialize(workoutJson: String?) {
-        loadDataJob?.cancel() // Cancel any previous loading
+        loadDataJob?.cancel()
 
         if (workoutJson != null) {
-            // --- EDITING MODE ---
             try {
                 initialWorkoutState = gson.fromJson(workoutJson, Workout::class.java)
-                currentWorkoutData = initialWorkoutState!!.copy() // Start editing from a copy
+                currentWorkoutData = initialWorkoutState!!.copy()
 
                 _uiState.update {
                     it.copy(
-                        isLoading = true, // Start loading categories/exercises
-                        workoutToEdit = initialWorkoutState, // Keep original for reference
+                        isLoading = true,
+                        workoutToEdit = initialWorkoutState,
                         selectedCategoryIds = currentWorkoutData.categoryIds ?: emptyList(),
                         selectedExerciseIds = currentWorkoutData.exerciseIds,
                         title = "Workoutni Tahrirlash",
                         canDelete = true,
                         imageUriToDisplay = currentWorkoutData.imageUrl?.let { Uri.parse(it) },
-                        saveSuccess = false, // Reset flags
+                        saveSuccess = false,
                         deleteSuccess = false,
                         isSaving = false,
                         errorMessage = null
@@ -75,52 +74,61 @@ class AddEditWorkoutViewModel : ViewModel() {
                 return
             }
         } else {
-            // --- ADDING MODE ---
-            initialWorkoutState = null // No initial state to compare against initially
-            currentWorkoutData = Workout() // Start with a blank workout
+            initialWorkoutState = null
+            currentWorkoutData = Workout()
             _uiState.update {
-                AddEditWorkoutUiState(isLoading = true) // Reset to default loading state
+                AddEditWorkoutUiState(isLoading = true)
             }
         }
-        selectedImageUri = null // Reset image selection on init
-        loadAuxiliaryData() // Load categories and exercises
+        selectedImageUri = null
+        loadAuxiliaryData()
     }
 
-    private fun loadAuxiliaryData() {
-        _uiState.update { it.copy(isLoading = true) } // Ensure loading is true
+    private fun loadAuxiliaryData(forceRefreshExercises: Boolean = false) {
+        _uiState.update { it.copy(isLoading = true) }
         loadDataJob = viewModelScope.launch {
-            // Use async/awaitAll for parallel loading
-            val categoriesDeferred = async { repository.getWorkoutCategoriesFlow().first { it !is DataWrapper.Loading } } // Get first result (cache or network)
-            val exercisesDeferred = async { repository.getAllExercises() }
+            val categoriesDeferred = async { repository.getWorkoutCategoriesFlow().first { it !is DataWrapper.Loading } }
+            // Agar mashqlar ro'yxati allaqachon yuklangan bo'lsa va forceRefresh false bo'lsa, qayta yuklamaymiz
+            val exercisesDeferred = if (_uiState.value.allExercises.isNotEmpty() && !forceRefreshExercises) {
+                async { DataWrapper.Success(_uiState.value.allExercises) } // Mavjudini ishlatamiz
+            } else {
+                async { repository.getAllExercises() }
+            }
+
 
             val categoriesResult = categoriesDeferred.await()
             val exercisesResult = exercisesDeferred.await()
 
             var categoriesData: List<WorkoutCategory> = emptyList()
-            var exercisesData: List<Exercise> = emptyList()
+            var exercisesDataList: List<Exercise> = emptyList()
             var combinedError: String? = null
 
             when(categoriesResult) {
                 is DataWrapper.Success -> categoriesData = categoriesResult.data
                 is DataWrapper.Error -> combinedError = "Kategoriya xatosi: ${categoriesResult.error}"
-                else -> {} // Should not happen with .first{}
+                else -> {}
             }
             when(exercisesResult) {
-                is DataWrapper.Success -> exercisesData = exercisesResult.data
+                is DataWrapper.Success -> exercisesDataList = exercisesResult.data
                 is DataWrapper.Error -> combinedError = "${combinedError ?: ""}\nMashq xatosi: ${exercisesResult.error}".trim()
                 else -> {}
             }
 
             _uiState.update {
                 it.copy(
-                    isLoading = false, // Finish loading
+                    isLoading = false,
                     allCategories = categoriesData,
-                    allExercises = exercisesData,
-                    errorMessage = combinedError ?: it.errorMessage // Append errors or keep existing
+                    allExercises = exercisesDataList.sortedBy { ex -> ex.name }, // Ensure consistent order
+                    errorMessage = combinedError ?: it.errorMessage
                 )
             }
         }
     }
+
+    fun refreshExercisesAfterModification() {
+        loadAuxiliaryData(forceRefreshExercises = true)
+    }
+
 
     fun updateName(name: String) { currentWorkoutData = currentWorkoutData.copy(name = name.trim()) }
     fun updateDescription(desc: String) { currentWorkoutData = currentWorkoutData.copy(description = desc.trim().ifBlank { null }) }
@@ -133,54 +141,50 @@ class AddEditWorkoutViewModel : ViewModel() {
     fun updateTargetAreas(areas: List<String>) { currentWorkoutData = currentWorkoutData.copy(targetArea = areas.map { it.trim() }.filter { it.isNotEmpty() }.ifEmpty { null }) }
     fun updateTags(tags: List<String>) { currentWorkoutData = currentWorkoutData.copy(tags = tags.map { it.trim() }.filter { it.isNotEmpty() }.ifEmpty { null }) }
 
-    // These update both 'currentWorkoutData' and the UI state for immediate feedback
     fun updateSelectedCategories(ids: List<String>) {
         currentWorkoutData = currentWorkoutData.copy(categoryIds = ids.ifEmpty { null })
         _uiState.update { it.copy(selectedCategoryIds = ids) }
     }
 
     fun updateSelectedExercises(ids: List<String>) {
-        currentWorkoutData = currentWorkoutData.copy(exerciseIds = ids)
-        _uiState.update { it.copy(selectedExerciseIds = ids) }
+        // Order of selected exercises should match the order in allExercises for consistency
+        val orderedSelectedIds = _uiState.value.allExercises
+            .filter { ids.contains(it.id) }
+            .map { it.id }
+        currentWorkoutData = currentWorkoutData.copy(exerciseIds = orderedSelectedIds)
+        _uiState.update { it.copy(selectedExerciseIds = orderedSelectedIds) }
     }
 
-    // Call this when an image is selected or removed in the fragment
     fun updateSelectedImageUri(uri: Uri?) {
         selectedImageUri = uri
         _uiState.update { it.copy(imageUriToDisplay = uri ?: initialWorkoutState?.imageUrl?.let { Uri.parse(it) }) }
     }
 
-
     fun saveWorkout() {
-        // Validation using currentWorkoutData
         if (currentWorkoutData.name.isBlank()) {
-            _navigationEvent.postValue(Event(AdminWorkoutNavigation.ShowToast("Workout nomini kiriting")))
+            _navigationEvent.value = Event(AdminWorkoutNavigation.ShowToast("Workout nomini kiriting"))
             return
         }
         if (currentWorkoutData.exerciseIds.isEmpty()) {
-            _navigationEvent.postValue(Event(AdminWorkoutNavigation.ShowToast("Kamida bitta mashq tanlang")))
+            _navigationEvent.value = Event(AdminWorkoutNavigation.ShowToast("Kamida bitta mashq tanlang"))
             return
         }
         if (currentWorkoutData.categoryIds.isNullOrEmpty()) {
-            _navigationEvent.postValue(Event(AdminWorkoutNavigation.ShowToast("Kamida bitta kategoriya tanlang")))
+            _navigationEvent.value = Event(AdminWorkoutNavigation.ShowToast("Kamida bitta kategoriya tanlang"))
             return
         }
-        // Check if an image exists (either newly selected or from the original workout)
         if (selectedImageUri == null && currentWorkoutData.imageUrl.isNullOrEmpty()) {
-            _navigationEvent.postValue(Event(AdminWorkoutNavigation.ShowToast("Workout rasmini tanlang")))
+            _navigationEvent.value = Event(AdminWorkoutNavigation.ShowToast("Workout rasmini tanlang"))
             return
         }
 
         _uiState.update { it.copy(isSaving = true, errorMessage = null) }
 
         viewModelScope.launch {
-            // Determine if adding or updating based on currentWorkoutData's ID
             val isUpdating = currentWorkoutData.id.isNotBlank()
             val result: DataWrapper<*> = if (!isUpdating) {
-                // Add new workout
                 repository.addWorkout(currentWorkoutData, selectedImageUri)
             } else {
-                // Update existing workout
                 repository.updateWorkout(currentWorkoutData, selectedImageUri)
             }
 
@@ -195,7 +199,6 @@ class AddEditWorkoutViewModel : ViewModel() {
                 }
                 is DataWrapper.Loading -> {}
             }
-            // Ensure saving state is reset even if navigation doesn't happen immediately
             if (_uiState.value.isSaving) {
                 _uiState.update { it.copy(isSaving = false)}
             }
@@ -203,7 +206,7 @@ class AddEditWorkoutViewModel : ViewModel() {
     }
 
     fun deleteWorkout() {
-        val workoutIdToDelete = currentWorkoutData.id // Use ID from the data being edited
+        val workoutIdToDelete = currentWorkoutData.id
         if (workoutIdToDelete.isBlank()) {
             _uiState.update { it.copy(errorMessage = "O'chirish uchun Workout topilmadi") }
             return
@@ -232,6 +235,35 @@ class AddEditWorkoutViewModel : ViewModel() {
             return
         }
         _navigationEvent.value = Event(AdminWorkoutNavigation.ShowExerciseSelectionDialog)
+    }
+
+    fun onEditExerciseClicked(exercise: Exercise) {
+        _navigationEvent.value = Event(AdminWorkoutNavigation.NavigateToEditExercise(gson.toJson(exercise)))
+    }
+
+    fun onDeleteExerciseConfirmed(exerciseToDelete: Exercise) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSaving = true) } // Indicate processing
+            when (val deleteResult = repository.deleteExercise(exerciseToDelete.id)) {
+                is DataWrapper.Success -> {
+                    val updatedAllExercises = _uiState.value.allExercises.filterNot { it.id == exerciseToDelete.id }.sortedBy { it.name }
+                    val updatedSelectedIds = _uiState.value.selectedExerciseIds.filterNot { it == exerciseToDelete.id }
+                    currentWorkoutData = currentWorkoutData.copy(exerciseIds = updatedSelectedIds) // Update workout data
+                    _uiState.update {
+                        it.copy(
+                            isSaving = false,
+                            allExercises = updatedAllExercises,
+                            selectedExerciseIds = updatedSelectedIds
+                        )
+                    }
+                    _navigationEvent.postValue(Event(AdminWorkoutNavigation.ShowToast("'${exerciseToDelete.name}' o'chirildi")))
+                }
+                is DataWrapper.Error -> {
+                    _uiState.update { it.copy(isSaving = false, errorMessage = "Mashqni o'chirishda xatolik: ${deleteResult.error}") }
+                }
+                is DataWrapper.Loading -> {}
+            }
+        }
     }
 
     fun hasChanges(): Boolean {

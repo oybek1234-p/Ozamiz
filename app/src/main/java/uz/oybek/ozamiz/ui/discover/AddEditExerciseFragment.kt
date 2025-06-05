@@ -6,8 +6,10 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -20,12 +22,11 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.workouts.Exercise
 import uz.oybek.ozamiz.databinding.FragmentAddEditExerciseBinding
+import uz.oybek.ozamiz.databinding.IncludeFilePickerBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.getinfo.Event
 import uz.oybek.ozamiz.ui.hideSoftInput
-import uz.oybek.ozamiz.ui.loadPhoto
 import uz.oybek.ozamiz.ui.showToast
-import uz.oybek.ozamiz.databinding.IncludeFilePickerBinding
 
 class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
 
@@ -69,12 +70,9 @@ class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
 
     private fun setupViewsAndListeners(bind: FragmentAddEditExerciseBinding) {
         bind.includeMediaPickerExercise.textViewAddImagePlaceholder.text = getString(R.string.add_gif_or_image)
-
-        // Media Picker
         bind.includeMediaPickerExercise.buttonRemoveImage.setOnClickListener { viewModel.clearMedia() }
-        bind.includeMediaPickerExercise.cardImagePicker.setOnClickListener { pickMediaLauncher.launch("image/*") } // Allows GIF
+        bind.includeMediaPickerExercise.cardImagePicker.setOnClickListener { pickMediaLauncher.launch("image/*") }
 
-        // Name Audio Picker
         bind.includeNameAudioPicker.textViewFilePickerTitle.text = "Mashq nomi audiosi (ixtiyoriy)"
         bind.includeNameAudioPicker.cardFilePicker.setOnClickListener { pickNameAudioLauncher.launch("audio/*") }
         bind.includeNameAudioPicker.buttonRemoveFile.setOnClickListener { viewModel.clearNameAudio() }
@@ -87,18 +85,13 @@ class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
         bind.editTextExerciseDescription.doAfterTextChanged { viewModel.updateExerciseField { copy(description = it.toString().trim().ifBlank { null }) } }
         bind.editTextExerciseDuration.doAfterTextChanged { viewModel.updateExerciseField { copy(durationSeconds = it.toString().toIntOrNull()) } }
         bind.editTextExerciseRepetitions.doAfterTextChanged { viewModel.updateExerciseField { copy(repetitions = it.toString().toIntOrNull()) } }
-        // Remove listener for deprecated voiceUrl
-        // bind.editTextExerciseVoiceUrl.doAfterTextChanged { viewModel.updateExerciseField { copy(voiceUrl = it.toString().trim().ifBlank { null }) } }
-
 
         bind.buttonSaveExercise.setOnClickListener {
-            // Pass only required fields, ViewModel uses its internal state for others
             viewModel.saveExercise(
                 name = bind.editTextExerciseName.text.toString(),
                 description = bind.editTextExerciseDescription.text.toString(),
                 durationStr = bind.editTextExerciseDuration.text.toString(),
                 repetitionsStr = bind.editTextExerciseRepetitions.text.toString()
-                // Audio URIs are already in the ViewModel
             )
             hideSoftInput(requireActivity())
         }
@@ -118,41 +111,31 @@ class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
                         val deleteMenuItem = bind.toolbarAddEditExercise.menu.findItem(R.id.action_delete_item)
                         deleteMenuItem?.isVisible = state.canDelete
 
-                        // Populate fields only once when editing starts
                         if (!state.isLoading && state.exerciseToEdit != null && bind.editTextExerciseName.text.isNullOrEmpty()) {
                             populateFieldsForEditing(bind, state.exerciseToEdit)
                         }
-
-                        // Update Media Picker UI based on state
                         updateMediaPickerState(bind, state.mediaUriToDisplay, state.exerciseToEdit?.mediaUrl)
+                        updateAudioPickerState(bind.includeNameAudioPicker, viewModel.selectedNameAudioUri, state.exerciseToEdit?.exerciseNameAudioUrl)
+                        updateAudioPickerState(bind.includeAboutAudioPicker, viewModel.selectedAboutAudioUri, state.exerciseToEdit?.exerciseAboutAudioUrl)
 
-                        // Update Audio Pickers UI
-                        updateAudioPickerState(
-                            bind.includeNameAudioPicker,
-                            viewModel.selectedNameAudioUri,
-                            state.exerciseToEdit?.exerciseNameAudioUrl
-                        )
-                        updateAudioPickerState(
-                            bind.includeAboutAudioPicker,
-                            viewModel.selectedAboutAudioUri,
-                            state.exerciseToEdit?.exerciseAboutAudioUrl
-                        )
                         state.errorMessage?.let {
                             showToast(it)
                             viewModel.clearError()
                         }
-                    }
-                }
-                viewModel.navigationEvent.observe(viewLifecycleOwner) { event: Event<AdminExerciseNavigation>? ->
-                    event?.getContentIfNotHandled()?.let { navEvent ->
-                        if (!isAdded || findNavController().currentDestination?.id != R.id.addEditExerciseFragment) return@let
 
-                        when (navEvent) {
-                            is AdminExerciseNavigation.ShowToast -> showToast(navEvent.message)
-                            is AdminExerciseNavigation.NavigateBack -> findNavController().popBackStack()
+                        if (state.saveSuccess || state.deleteSuccess) {
+                            // FragmentResult yuborish AddEditWorkoutFragment'ga
+                            val resultBundle = bundleOf(
+                                AddEditExerciseViewModel.RESULT_MODIFIED_EXERCISE_ID to (state.exerciseToEdit?.id ?: viewModel.uiState.value.exerciseToEdit?.id ?: ""), // Yoki yangi ID
+                                AddEditExerciseViewModel.RESULT_WAS_DELETED to state.deleteSuccess,
+                                "toastMessage" to if(state.saveSuccess) (if(state.exerciseToEdit == null || state.exerciseToEdit.id.isBlank()) "Mashq qo'shildi" else "Mashq yangilandi") else "Mashq o'chirildi"
+                            )
+                            setFragmentResult(AddEditExerciseViewModel.REQUEST_KEY_EXERCISE_MODIFIED, resultBundle)
+                            if (isAdded) findNavController().popBackStack()
                         }
                     }
                 }
+                // operationResultEvent kuzatuvi kerak emas, chunki bu fragment o'zi natijani yuboradi
             }
         }
     }
@@ -176,7 +159,7 @@ class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
             bind.includeMediaPickerExercise.layoutAddImagePlaceholder.isVisible = false
             bind.includeMediaPickerExercise.buttonRemoveImage.isVisible = true
         } else {
-            bind.includeMediaPickerExercise.imageViewPicked.setImageResource(0) // Clear image
+            bind.includeMediaPickerExercise.imageViewPicked.setImageResource(0)
             bind.includeMediaPickerExercise.layoutAddImagePlaceholder.isVisible = true
             bind.includeMediaPickerExercise.buttonRemoveImage.isVisible = false
         }
@@ -186,16 +169,17 @@ class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
         val hasSelection = selectedUri != null
         val hasExisting = !existingUrl.isNullOrEmpty()
 
-        pickerBinding.buttonRemoveFile.isVisible = hasSelection
-        pickerBinding.textViewFilePickerStatus.isVisible = true
+        pickerBinding.buttonRemoveFile.isVisible = hasSelection || (hasExisting && selectedUri == null) // O'chirish tugmasini ko'rsatish
 
         if (hasSelection) {
             val fileName = selectedUri?.lastPathSegment ?: "Fayl tanlandi"
             pickerBinding.textViewFilePickerStatus.text = fileName
             pickerBinding.textViewFilePickerStatus.setTextColor(getThemeColor(com.google.android.material.R.attr.colorPrimary))
         } else if (hasExisting) {
-            pickerBinding.textViewFilePickerStatus.text = "Audio yuklangan"
-            pickerBinding.textViewFilePickerStatus.setTextColor(getThemeColor(com.google.android.material.R.attr.colorPrimary))
+            if (existingUrl != null) {
+                pickerBinding.textViewFilePickerStatus.text = "Audio yuklangan (${existingUrl.substringAfterLast('/')})"
+            }
+            pickerBinding.textViewFilePickerStatus.setTextColor(getThemeColor(com.google.android.material.R.attr.colorOnSurfaceVariant))
         } else {
             pickerBinding.textViewFilePickerStatus.text = "Audio fayl tanlang"
             pickerBinding.textViewFilePickerStatus.setTextColor(getThemeColor(com.google.android.material.R.attr.colorOnSurfaceVariant))
@@ -229,7 +213,7 @@ class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
-    
+
     private fun handleBackPress() {
         if (viewModel.hasChanges()) {
             if (!isAdded) return

@@ -32,13 +32,20 @@ fun getTodayDate(): String {
 }
 
 fun ImageView.openImageViewer(urls: List<String>, startPos: Int = 0, show: Boolean = true) {
-    if (windowToken == null) return
+    if (windowToken == null && !isAttachedToWindow) return // More robust check
     if (isVisible.not()) return
-    if (isAttachedToWindow.not()) return
+
     StfalconImageViewer.Builder(context, urls) { view, image ->
-        view.loadPhoto(image, show.not())
-    }.withTransitionFrom(this).withStartPosition(startPos).withHiddenStatusBar(false).show()
+        view.loadPhoto(image, show.not()) // Pass show.not() for blur if needed, though usually not for full-screen
+    }
+        .withTransitionFrom(this)
+        .withStartPosition(startPos)
+        .withHiddenStatusBar(false) // Usually true for full screen, but can be false
+        .allowZooming(true)
+        .allowSwipeToDismiss(true)
+        .show()
 }
+
 
 var gson: Gson? = null
     get() {
@@ -48,15 +55,9 @@ var gson: Gson? = null
         return field
     }
 
-//fun AdView.loadAd() {
-//    isVisible = true
-//    val adRequest = AdRequest.Builder().build()
-//    loadAd(adRequest)
-//}
-
 fun openPhoneCall(activity: Activity, phone: String) {
     val intent = Intent(Intent.ACTION_DIAL)
-    intent.data = Uri.parse("tel:$phone") // Create a URI with the phone number
+    intent.data = Uri.parse("tel:$phone")
     activity.startActivity(intent)
 }
 

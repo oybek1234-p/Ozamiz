@@ -35,8 +35,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="Media (GIF/Rasm)"/>
-            <!-- GIF/Rasm tanlash uchun include -->
+
             <include
+                android:layout_height="200dp"
+                android:layout_width="match_parent"
                 android:id="@+id/include_media_picker_exercise"
                 layout="@layout/include_image_picker" />
 

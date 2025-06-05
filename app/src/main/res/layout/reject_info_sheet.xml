@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:padding="@dimen/dimen_24"
+        android:background="@color/white"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sizning fikringiz biz uchun muhim"
+            android:drawableStart="@drawable/edit"
+            android:drawablePadding="@dimen/dimen_8"
+            style="@style/Title2_20"
+            />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_8"
+            app:hintEnabled="false"
+            >
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Ilovaning qaysi joyi qiyinchilik tug'diryapti? Ilova qanday bulishini hohlardingiz?"
+                android:gravity="top"
+                android:minLines="5"
+                android:id="@+id/edit_text" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:id="@+id/send"
+            android:text="Junatish" />
+
+    </LinearLayout>
+</layout>

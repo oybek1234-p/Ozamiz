@@ -15,6 +15,12 @@
         android:icon="@drawable/sport_ic"
         />
 
+    <item android:id="@+id/lessonsFragment"
+        android:title="Dars"
+        android:icon="@drawable/study_ic"
+        android:visible="false"
+        />
+
     <item android:icon="@drawable/profile_ic"
         android:title="Profil"
         android:id="@+id/profileFragment"

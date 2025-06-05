@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurface">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_photo_info"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="@drawable/arrow_back"
+        app:title="Rasm yuklash" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@id/button_confirm_photo_info"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_photo_info">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                style="@style/Title2_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="Tanangizni to'liq tushirgan surat yuklang"
+                android:textColor="?colorPrimary" />
+
+            <TextView
+                style="@style/Text2_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_horizontal"
+                android:lineSpacingMultiplier="1.2"
+                android:text="Ilova to'g'ri ishlashi uchun sizning har haftalik tana o'zgarishignizni ko'rishimiz kerak. Iltimos, quyidagi ko'rsatmalarga rioya qiling."
+                android:textColor="?colorOnSurfaceVariant" />
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/upload_info_photo"
+                android:contentDescription="Rasmga tushish qoidalari illustratsiyasi"
+                android:scaleType="fitCenter" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/PhotoGuidelineItem">
+
+                    <ImageView
+                        style="@style/PhotoGuidelineIcon"
+                        android:src="@drawable/camera_ic" />
+
+                    <TextView
+                        style="@style/PhotoGuidelineText"
+                        android:text="Suratda butun tanangiz ko'rinsin" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/PhotoGuidelineItem">
+
+                    <ImageView
+                        style="@style/PhotoGuidelineIcon"
+                        android:src="@drawable/apparel_24px" /> <!-- ic_tshirt ni yaratish kerak -->
+                    <TextView
+                        style="@style/PhotoGuidelineText"
+                        android:text="Yengil kiyimda bo'ling" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/PhotoGuidelineItem">
+
+                    <ImageView
+                        style="@style/PhotoGuidelineIcon"
+                        android:src="@drawable/block_24px" /> <!-- ic_mirror ni yaratish kerak -->
+                    <TextView
+                        style="@style/PhotoGuidelineText"
+                        android:text="Oyna qarshisida yoki kimdir tushirib bersa yaxshi" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/PhotoGuidelineItem">
+
+                    <ImageView
+                        style="@style/PhotoGuidelineIcon"
+                        android:src="@drawable/light_mode_24px" /> <!-- ic_sun ni yaratish kerak -->
+                    <TextView
+                        style="@style/PhotoGuidelineText"
+                        android:text="Yorug' joyda, to'g'ri holatda turing" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_confirm_photo_info"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="Tushundim"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

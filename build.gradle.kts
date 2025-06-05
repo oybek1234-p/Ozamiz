@@ -1,6 +1,7 @@
 buildscript {
     dependencies {
         classpath(libs.google.services)
+        classpath("com.google.firebase:firebase-crashlytics-gradle:3.0.3")
     }
     repositories {
         mavenCentral()
@@ -15,10 +16,11 @@ plugins {
     id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
     kotlin("jvm") version "1.9.20"
     kotlin("plugin.serialization") version "1.9.20" apply true
-    id("com.google.firebase.crashlytics") version "3.0.2" apply false
     id("com.google.firebase.firebase-perf") version "1.4.2" apply false
     id("androidx.navigation.safeargs.kotlin") version "2.7.7" apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
+    id ("com.google.firebase.crashlytics") version "3.0.3" apply false
+
 }
 
 allprojects {

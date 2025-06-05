@@ -60,7 +60,7 @@ class FoodCategoryRepository {
         var finalImageUrl: String? = null
         var uploadedImageForRollback: String? = null
 
-        category.id = System.currentTimeMillis().toString()
+        category.id = category.name.lowercase()
         return try {
             if (imageUri != null) {
                 when (val uploadResult = ImageUploader.uploadImage(imageUri)) {

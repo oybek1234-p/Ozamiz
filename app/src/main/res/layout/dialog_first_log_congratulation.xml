@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="24dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="?colorSurfaceContainerLowest">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:id="@+id/image_congrats_icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/fire_ic"
+            app:tint="#FFC107"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/text_congrats_title"
+            style="@style/Title2_20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tabriklaymiz!"
+            android:textColor="?colorOnSurface"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/text_congrats_message"
+            style="@style/Text1_16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="?colorOnSurface"
+            android:gravity="center"
+            android:text="Siz bugungi birinchi ovqatingizni kiritdingiz.\nOzishga birinchi qadam tashladingiz!\nShunday davom eting!" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_congrats_ok"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Ajoyib !" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
