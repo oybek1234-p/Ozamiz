@@ -224,7 +224,7 @@
     <string name="error_calories_required">Kaloriyani kiriting</string>
     <string name="error_saving_log">Log saqlashda xatolik</string>
     <string name="log_saved_successfully">Muvaffaqiyatli saqlandi</string>
-    <string name="upload_meal_photo">Ovqat rasmini yuklang (Ixtiyoriy)</string>
+    <string name="upload_meal_photo">Ovqat rasmi (Ixtiyoriy)</string>
     <string name="tap_to_add_photo">Rasm qo\'shish</string>
     <string name="describe_your_meal">Bugun nima yedingiz?</string>
     <string name="food_description_hint">Misol: 1 kosa sho‘rva, 1 bo‘lak non, 1 piyola choy, 1 dona bodring</string>
@@ -235,7 +235,18 @@
     <string name="saving">Saqlanmoqda…</string>
     <string name="save_changes">O\'zgarishlarni saqlash</string>
     <string name="analysis_result_title">AI Taxmin Natijasi</string>
-    <string name="estimated_calories_format">%d kal</string>
+    <string name="estimated_calories_format">%d kkal</string>
+    <string name="gallery">Galereya</string> <!-- Bu endi ishlatilmaydi, lekin o'chirmaymiz -->
+    <string name="camera">Kamera</string>
+    <string name="add_image_placeholder_text">Rasm yuklang</string>
+    <string name="take_photo_placeholder">Kamerani ochish (Bosing)</string>
+    <string name="voice_input">Ovozli kiritish</string>
+    <string name="speech_prompt">Ovqat tavsifini ayting...</string>
+    <string name="speech_not_supported">Ovozli kiritish ushbu qurilmada qo\'llab-quvvatlanmaydi</string>
+    <string name="error_opening_camera">Kamerani ochishda xatolik</string>
+    <string name="permission_denied_camera">Rasmga olish uchun kamera ruxsati kerak.</string>
+    <string name="permission_denied_audio">Ovoz yozish uchun mikrofon ruxsati kerak.</string>
+    <string name="selected_meal_image_preview">Tanlangan ovqat rasmi</string>
     <string name="protein_short">Oqsil</string>
     <string name="fat_short">Yog\'</string>
     <string name="carbs_short">Uglevod</string>
@@ -245,7 +256,7 @@
     <string name="pfc_estimation_disclaimer">Bu AI tomonidan berilgan taxminiy ozuqaviy qiymatlar.</string>
     <string name="got_it">Tushunarli</string>
     <string name="estimated_macros">Makronutrientlar</string>
-    <string name="recognized_ingredients">Ko\'ringan Masalliqlar</string>
+    <string name="recognized_ingredients">Tarkibi</string>
     <string name="retry_or_cancel">Qayta kiritish</string>
     <string name="save_to_log">Saqlash</string>
     <string name="recommendations_warnings">Tavsiya</string>
@@ -370,7 +381,6 @@
     <string name="all_rights_reserved">© 2024 Ozamiz. Barcha huquqlar himoyalangan.</string>
     <string name="app_logo_description">Ilova logotipi</string>
 
-    <!-- Asosiy menyu uchun (agar o'zgargan bo'lsa) -->
     <string name="home">Asosiy</string>
     <string name="foods">Ovqatlar</string>
     <string name="bog_lanish">Bog\'lanish</string>
@@ -395,13 +405,13 @@
     <string name="hammasi">Hammasi</string>
 
     <string name="meal_calories_target_not_set">Maqsad belgilanmagan</string>
-    <string name="meal_calories_target_only_format">%d kal</string> <!-- Masalan: "415 kal" -->
+    <string name="meal_calories_target_only_format">%d kal</string>
     <string name="meal_calories_remaining_format">%d kal qoldi</string>
     <string name="meal_calories_slightly_exceeded_format">Yetarli</string>
-    <string name="meal_calories_greatly_exceeded_format">Ko\'proq yeyildi</string>
+    <string name="meal_calories_greatly_exceeded_format">✔ Yetadi. %d kal oshdi</string>
 
     <string name="unit_kcal_eaten">%d kal yeyildi</string>
-    <string name="unit_ml_drunk">%d stakan ichildi</string>
+    <string name="unit_ml_drunk">%d ml ichildi</string>
     <string name="unit_kcal_burned_exercise">%d kal yoqildi</string>
 
     <string name="error_user_not_found">Foydalanuvchi topilmadi.</string>
@@ -409,7 +419,7 @@
     <string name="weight_history_title">Vazn Tarixi</string>
     <string name="weight_photo_log_button">Vazn va Surat Tarixi</string>
     <string name="yetarli">✔ Yetarli</string>
-    <string name="bugunga_yetarli">✔ Bugunga yetarli</string>
+    <string name="bugunga_yetarli">✔ Yetarli</string>
     <string name="premium">Premium</string>
     <string name="yuborish">Yuborish</string>
     <string name="ovqatlar_bo_yicha_cheksiz_maslahatlar">Ovqatlar bo‘yicha cheksiz maslahatlar</string>
@@ -443,6 +453,6 @@
     <string name="go_to_premium">Premiumga O\'tish</string>
     <string name="admin_premium_verifications">Premium Tekshiruv</string> <!-- ProfileFragmentdagi button uchun -->
     <string name="image_load_error_placeholder_text">Rasmni yuklab bo\'lmadi</string>
-    <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida yozing (Ixtiyoriy)</string>
+    <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida (Ixtiyoriy)</string>
 
 </resources>

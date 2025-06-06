@@ -14,7 +14,6 @@
         android:background="?attr/colorSurface"
         app:elevation="0dp">
 
-        <!-- Toolbar can be added here if needed, or use the one from MainActivity -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_profile_fragment"
             android:layout_width="match_parent"
@@ -38,8 +37,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-            <!-- Header Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,6 +63,85 @@
                     tools:text="Oybek" />
             </LinearLayout>
 
+            <!-- Gamification Section -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/gamification_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="18dp"
+                android:layout_marginTop="@dimen/dimen_12"
+                android:visibility="gone"
+                tools:visibility="visible"
+                app:cardBackgroundColor="?colorSurfaceContainer"
+                app:cardCornerRadius="@dimen/dimen_12"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:id="@+id/imageView_current_badge"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginEnd="12dp"
+                            android:visibility="gone"
+                            tools:visibility="visible"/>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/textView_user_score"
+                                style="@style/Title3_17"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?colorPrimary"
+                                tools:text="1250 ball" />
+
+                            <TextView
+                                android:id="@+id/textView_user_level"
+                                style="@style/TextBodyMedium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="?colorOnSurfaceVariant"
+                                tools:text="Ozamiz Ustasi" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/textView_points_to_next_level"
+                        style="@style/TextBodySmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="?colorOnSurfaceVariant"
+                        tools:text="Keyingi nishongacha 250 ball qoldi!" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressBar_next_level"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        app:indicatorColor="?colorPrimary"
+                        app:trackColor="?colorSurfaceContainerHighest"
+                        app:trackCornerRadius="4dp"
+                        tools:progress="75" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+            <!-- End Gamification Section -->
+
             <LinearLayout
                 android:id="@+id/premium_active_c"
                 android:layout_width="match_parent"
@@ -80,7 +156,6 @@
                 android:padding="@dimen/dimen_12"
                 android:visibility="gone"
                 tools:visibility="visible">
-
                 <TextView
                     style="@style/Headline3_15"
                     android:layout_width="wrap_content"
@@ -90,7 +165,6 @@
                     android:text="@string/premium"
                     android:textColor="?colorOnPrimary"
                     app:drawableEndCompat="@drawable/star_ic" />
-
                 <TextView
                     android:id="@+id/premiumExpireDate"
                     style="@style/Subtitle1_14"
@@ -114,15 +188,12 @@
                 android:orientation="vertical"
                 android:padding="@dimen/dimen_12"
                 tools:visibility="gone">
-
                 <TextView
                     style="@style/Title3_17"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Premiumda ko'proq"
                     android:textColor="?colorOnSurface" />
-
-
                 <TextView
                     style="@style/Headline3_15"
                     android:layout_width="wrap_content"
@@ -133,14 +204,13 @@
                     android:text="Sun'iy intellekt bilan ovqat tahlili"
                     android:textColor="?colorPrimary"
                     app:drawableTint="@color/green" />
-
-
                 <TextView
                     style="@style/Subtitle3_13"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawablePadding="8dp"
                     android:paddingEnd="@dimen/dimen_12"
+                    tools:ignore="RtlSymmetry"
                     android:text="Har kuni foydali maslahatlar, tavsiyalar va ogoxlantirishlar"
                     android:layout_marginTop="@dimen/dimen_4"
                     android:textColor="?colorOnSurfaceVariant" />
@@ -154,7 +224,6 @@
                     android:textColor="?colorPrimary"
                     app:drawableStartCompat="@drawable/check_ic"
                     app:drawableTint="@color/green" />
-
                 <TextView
                     style="@style/Headline3_15"
                     android:layout_width="wrap_content"
@@ -165,7 +234,6 @@
                     android:textColor="?colorPrimary"
                     app:drawableStartCompat="@drawable/check_ic"
                     app:drawableTint="@color/green" />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/premium_button"
                     style="@style/Widget.Material3.Button"
@@ -175,8 +243,8 @@
                     android:text="@string/premiumga_o_tish"
                     app:icon="@drawable/star_ic"
                     app:iconGravity="textStart" />
-
             </LinearLayout>
+
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -193,14 +261,14 @@
             <include
                 android:id="@+id/section_reminders"
                 layout="@layout/item_profile_section" />
-
-            <!-- Admin Section (conditionally visible) -->
+            <include
+                android:id="@+id/section_my_badges"
+                layout="@layout/item_profile_section" />
             <include
                 android:id="@+id/section_admin_premium_users"
                 layout="@layout/item_profile_section"
                 android:visibility="gone"
                 tools:visibility="visible"/>
-
             <include
                 android:id="@+id/section_support"
                 layout="@layout/item_profile_section" />
@@ -230,7 +298,6 @@
                 android:textColor="?colorError"
                 app:iconTint="?colorError"
                 app:iconGravity="textStart"/>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

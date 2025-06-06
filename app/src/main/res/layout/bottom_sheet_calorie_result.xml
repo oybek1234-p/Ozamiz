@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\res\layout\bottom_sheet_calorie_result.xml -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="?colorSurfaceContainerLowest"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <ImageView
@@ -21,7 +22,10 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="100dp">
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -30,13 +34,12 @@
             android:orientation="vertical"
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
-            android:paddingBottom="100dp">
-
+            >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="64dp"
+                android:layout_marginTop="56dp"
                 >
 
                 <com.google.android.material.imageview.ShapeableImageView
@@ -45,20 +48,20 @@
                     android:layout_height="80dp"
                     android:layout_gravity="center_horizontal"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/breakfast_ic"
+                    android:src="@drawable/food_icon"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:shapeAppearanceOverlay="@style/RadiusImageView12" />
 
                 <TextView
                     android:id="@+id/food_name"
-                    style="@style/Title3_17"
+                    style="@style/Text1_16"
                     android:layout_width="0dp"
+                    android:layout_marginTop="@dimen/dimen_12"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="@dimen/dimen_12"
                     android:ellipsize="end"
-                    android:lines="2"
                     android:maxLines="2"
                     android:text="2 sih shashlik va oq non"
                     android:textColor="?colorOnSurfaceVariant"
@@ -68,70 +71,130 @@
 
                 <TextView
                     android:id="@+id/textView_estimatedCalories"
-                    style="@style/TextAppearance.Material3.TitleLarge"
+                    style="@style/Title3_17"
+                    android:layout_marginTop="@dimen/dimen_8"
+                    android:background="@drawable/round_lay"
+                    android:backgroundTint="#FFEAD5"
                     android:layout_width="wrap_content"
+                    android:paddingHorizontal="@dimen/dimen_12"
+                    android:paddingVertical="@dimen/dimen_4"
                     android:layout_height="wrap_content"
+                    android:drawableTint="#FF9800"
+                    android:drawablePadding="@dimen/dimen_8"
                     android:layout_gravity="center_horizontal"
-                    android:textColor="?colorPrimary"
                     android:layout_marginStart="@dimen/dimen_12"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:textColor="#FF9800"
+                    app:drawableStartCompat="@drawable/fire_ic"
                     app:layout_constraintStart_toEndOf="@+id/imageView_illustration"
-                    tools:text="~ 480 kkal" />
+                    app:layout_constraintTop_toBottomOf="@+id/food_name"
+                    tools:text="480 kkal" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_health_feedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+
+                android:layout_marginTop="16dp"
+                android:padding="12dp"
+                android:background="@drawable/round_lay"
+                android:backgroundTint="@color/green"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/icon_health_feedback"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_marginEnd="12dp"
+                    app:tint="@color/white"
+                    tools:src="@drawable/check_circle_ic"
+                    tools:tint="@color/white"/>
+
+                <TextView
+                    android:id="@+id/textView_health_feedback"
+                    style="@style/Headline3_15"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    tools:text="Ajoyib! Bu ozish uchun foydali."/>
+            </LinearLayout>
+
 
             <TextView
                 android:id="@+id/textView_calorieInsights"
                 style="@style/Text1_16"
+                android:lineSpacingExtra="1.4dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
                 android:lineSpacingMultiplier="1.2"
                 android:textColor="?colorOnSurface"
-                tools:text="Yog'li bo'lishi mumkin.\nSabzavotlar foydali." />
+                tools:text="✅ Bu ovqat oqsilga boy, uzoq vaqt to'q tutadi.\n⚠️ Non miqdorini kamaytiring, ayniqsa kechki payt.\n💡 Non o'rniga ko'proq sabzavot qo'shing." />
 
             <LinearLayout
                 android:id="@+id/layout_warnings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:elevation="2dp"
                 android:background="@drawable/warning_background"
                 android:orientation="vertical"
                 android:padding="12dp"
+                android:backgroundTint="#FFFCE9"
                 android:visibility="gone"
                 tools:visibility="visible">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    >
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/warning_24px"
-                        app:tint="?colorError" />
-
-                    <TextView
-                        style="@style/Headline3_15"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/recommendations_warnings"
-                        android:textColor="?colorError" />
+                        android:src="@drawable/warning_24px"
+                        app:tint="@color/yellow"
+                        />
+                    <TextView
+                        style="@style/Subtitle2_14"
+                        android:textColor="@color/yellow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="Diqqat"
+                        />
                 </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/layout_warnings_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/dimen_12"
                     android:orientation="vertical" />
             </LinearLayout>
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/label_recognized_ingredients"
+                style="@style/Subtitle2_14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:text="@string/recognized_ingredients"
+                android:textColor="?colorOnSurface" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroup_ingredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:visibility="gone"
+                app:chipSpacingHorizontal="6dp"
+                app:chipSpacingVertical="4dp"
+                tools:visibility="visible"/>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
@@ -139,67 +202,40 @@
                 android:orientation="horizontal">
 
                 <LinearLayout style="@style/MacroItemLayout">
-
                     <TextView
                         style="@style/MacroItemLabel"
                         android:text="@string/protein_short" />
-
                     <TextView
                         android:id="@+id/textView_estimatedProtein"
                         style="@style/MacroItemValue"
                         tools:text="~ 25.5 g" />
                 </LinearLayout>
-
                 <LinearLayout style="@style/MacroItemLayout">
-
                     <TextView
                         style="@style/MacroItemLabel"
                         android:text="@string/fat_short" />
-
                     <TextView
                         android:id="@+id/textView_estimatedFat"
                         style="@style/MacroItemValue"
                         tools:text="~ 15.2 g" />
                 </LinearLayout>
-
                 <LinearLayout style="@style/MacroItemLayout">
-
-
                     <TextView
                         style="@style/MacroItemLabel"
                         android:text="@string/carbs_short" />
-
                     <TextView
                         android:id="@+id/textView_estimatedCarbs"
                         style="@style/MacroItemValue"
                         tools:text="~ 55.0 g" />
                 </LinearLayout>
             </LinearLayout>
-
-            <TextView
-                style="@style/Text1_14"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/recognized_ingredients"
-                android:textColor="?colorOnSurfaceVariant" />
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroup_ingredients"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:visibility="gone"
-                app:chipSpacingHorizontal="6dp"
-                app:chipSpacingVertical="4dp" />
-
             <TextView
                 android:id="@+id/textView_calorieDisclaimer"
                 style="@style/Caption2_12"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:visibility="gone"
+                android:layout_marginTop="16dp"
                 android:gravity="center_horizontal"
                 android:text="@string/pfc_estimation_disclaimer"
                 android:textColor="#979797" />
@@ -248,10 +284,10 @@
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:progressTint="?colorPrimary"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:indeterminateTint="?colorPrimary"
             app:indicatorColor="?colorPrimary"
             app:indicatorSize="24dp" />
-
     </FrameLayout>
-
 </FrameLayout>

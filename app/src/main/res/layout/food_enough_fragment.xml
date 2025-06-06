@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -18,19 +17,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lottie_view" />
 
-    <com.airbnb.lottie.LottieAnimationView
+    <ImageView
         android:id="@+id/lottie_view"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         android:layout_marginTop="@dimen/dimen_48"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:lottie_autoPlay="true"
-        app:lottie_rawRes="@raw/done_anim"
-        app:lottie_repeatCount="100"
-        app:lottie_repeatMode="restart" />
+        android:src="@drawable/check_ic"
+        app:tint="@color/green" />
 
     <TextView
         android:id="@+id/mini_info_text"
@@ -47,12 +44,38 @@
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
     <TextView
+        android:id="@+id/exeed_limit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginHorizontal="@dimen/dimen_24"
+        android:layout_marginTop="@dimen/dimen_24"
+        android:text="Nonushta limiti - 350 kal, siz 450 yedingiz. 150 kaloriya ortiqcha. Keyingiz ovqat mahal limitingizdan ayrilib tashlanadi!"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textColor="?colorOnSurface"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mini_info_text" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dimen_24"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/dimen_12"
+        android:text="Ortiqcha kaloriya ovqat yeyish semirishga olib keladi."
+        android:textColor="?colorOnSurface"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/exeed_limit" />
+
+    <TextView
         android:id="@+id/advice_meal_title"
         style="@style/Title3_17"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_18"
-        android:text="Tushlikgacha yesangiz bo'ladi"
+        android:visibility="gone"
+        android:text="Tushlikgacha yesangiz bo'ladi(Tamaddi)"
         android:textColor="?colorPrimary"
         app:layout_constraintStart_toStartOf="@+id/mini_info_text"
         app:layout_constraintTop_toBottomOf="@+id/mini_info_text" />

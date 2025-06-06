@@ -1,118 +1,144 @@
 package uz.oybek.ozamiz.ui.log
 
+import LogFoodUiState
+import LogFoodViewModel
+import android.app.Dialog
+import android.os.Build
 import android.os.Bundle
-import android.os.Parcel
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ai.GeminiAnalysisResult
 import uz.oybek.ozamiz.data.info.MealsType
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemWarningTextBinding
-import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.dialogs.BadgeUnlockedDialog
 import uz.oybek.ozamiz.ui.dialogs.FirstLogCongratulationDialog
 import uz.oybek.ozamiz.ui.loadPhoto
 import uz.oybek.ozamiz.ui.showToast
 import java.util.Locale
 
-data class MealWarning(val message: String, val isSerious: Boolean = false) : Parcelable {
-    constructor(parcel: Parcel) : this(
-        parcel.readString().toString(), parcel.readByte() != 0.toByte()
-    ) {
-    }
+@Parcelize
+data class MealWarning(val message: String, val isSerious: Boolean = false) : Parcelable
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(message)
-        parcel.writeByte(if (isSerious) 1 else 0)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<MealWarning> {
-        override fun createFromParcel(parcel: Parcel): MealWarning {
-            return MealWarning(parcel)
-        }
-
-        override fun newArray(size: Int): Array<MealWarning?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
-
-class CalorieResultBottomSheet : BaseFragment<BottomSheetCalorieResultBinding>() { // Change parent class
+class CalorieResultBottomSheet : BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetCalorieResultBinding? = null
+    private val binding get() = _binding!!
 
-    private var calories: Int = 0
-    private var protein: Double? = null;
-    private var fat: Double? = null;
-    private var carbs: Double? = null
-    private var ingredients: List<String> = emptyList()
-    private var insights: String = ""
-    private var warnings: List<MealWarning> = emptyList()
-    private var photoUrl: String? = null
-    private var about: String = ""
-    private var mealType: String = ""
+    private lateinit var analysisResultFromArgs: GeminiAnalysisResult
+    private lateinit var healthAssessmentTextFromArgs: String
+    private var isHealthyAssessmentFromArgs: Boolean? = null
+    private lateinit var photoUrlFromArgs: String
+    private lateinit var aboutFromArgs: String
+    private lateinit var mealTypeFromArgs: String
 
     private val viewModel: LogFoodViewModel by activityViewModels()
 
     companion object {
-        const val TAG = "CalorieResultBottomSheet";
-        const val REQUEST_KEY = "CalorieResultRequestKey" // Key for sending result back
-        const val RESULT_ACTION = "ResultAction"          // Key for the action taken
+        const val TAG = "CalorieResultBottomSheet"
+        const val REQUEST_KEY = "CalorieResultRequestKey"
+        const val RESULT_ACTION = "ResultAction"
 
-        const val ARG_CALORIES = "arg_calories";
-        const val ARG_PROTEIN = "arg_protein";
-        const val ARG_FAT = "arg_fat";
-        const val ARG_CARBS = "arg_carbs";
-        const val ARG_PHOTO = "arg_photo";
-        const val ARG_ABOUT = "arg_about"
-        const val ARG_INGREDIENTS = "arg_ingredients";
-        const val ARG_INSIGHTS = "arg_insights";
-        const val ARG_WARNINGS = "arg_warnings"
-        const val ARG_MEAL_TYPE = "mealType" // Add mealType argument
+        const val ARG_ANALYSIS_RESULT = "arg_analysis_result_parcelable"
+        const val ARG_PHOTO_URL_STRING = "arg_photo_url_string"
+        const val ARG_ABOUT_TEXT = "arg_about_text"
+        const val ARG_MEAL_TYPE_ID = "arg_meal_type_id"
+
+        fun newInstance(
+            analysisResult: GeminiAnalysisResultParcelable,
+            photoUrl: String,
+            about: String,
+            mealTypeId: String
+        ): CalorieResultBottomSheet {
+            return CalorieResultBottomSheet().apply {
+                arguments = bundleOf(
+                    ARG_ANALYSIS_RESULT to analysisResult,
+                    ARG_PHOTO_URL_STRING to photoUrl,
+                    ARG_ABOUT_TEXT to about,
+                    ARG_MEAL_TYPE_ID to mealTypeId
+                )
+            }
+        }
     }
 
-    override fun viewCreated(bind: BottomSheetCalorieResultBinding) {
-
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog.setOnShowListener { dialogInterface ->
+            val bottomSheetDialog = dialogInterface as BottomSheetDialog
+            val parentLayout =
+                bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            parentLayout?.let {
+                val behaviour = BottomSheetBehavior.from(it)
+                setupFullHeight(it)
+                behaviour.state = BottomSheetBehavior.STATE_EXPANDED
+                behaviour.skipCollapsed = true
+                behaviour.isFitToContents = true
+            }
+        }
+        return dialog
     }
 
-    override fun inflateBinding(
+    private fun setupFullHeight(bottomSheet: View) {
+        val layoutParams = bottomSheet.layoutParams
+        layoutParams.height = WindowManager.LayoutParams.MATCH_PARENT
+        bottomSheet.layoutParams = layoutParams
+    }
+
+    override fun onCreateView(
         inflater: LayoutInflater,
-        container: ViewGroup?
-    ): BottomSheetCalorieResultBinding {
-        return BottomSheetCalorieResultBinding.inflate(inflater, container, false)
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = BottomSheetCalorieResultBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Optional: Set style for rounded corners if needed
         arguments?.let {
-            calories = it.getInt(ARG_CALORIES, 0)
-            protein = it.getDouble(ARG_PROTEIN, -1.0).takeIf { d -> d >= 0 }
-            fat = it.getDouble(ARG_FAT, -1.0).takeIf { d -> d >= 0 }
-            carbs = it.getDouble(ARG_CARBS, -1.0).takeIf { d -> d >= 0 }
-            ingredients = it.getStringArrayList(ARG_INGREDIENTS) ?: emptyList()
-            insights = it.getString(ARG_INSIGHTS, "")
-            warnings = it.getParcelableArrayList<MealWarning>(ARG_WARNINGS)?.toList() ?: emptyList()
-            photoUrl = it.getString(ARG_PHOTO)
-            about = it.getString(ARG_ABOUT, "")
-            mealType = it.getString(ARG_MEAL_TYPE, "")
+            val parcelableResult: GeminiAnalysisResultParcelable? =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    it.getParcelable(
+                        ARG_ANALYSIS_RESULT,
+                        GeminiAnalysisResultParcelable::class.java
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    it.getParcelable(ARG_ANALYSIS_RESULT)
+                }
+            parcelableResult?.let { pr ->
+                analysisResultFromArgs = pr.toGeminiAnalysisResult()
+                healthAssessmentTextFromArgs = analysisResultFromArgs.healthFeedbackShort ?: ""
+                isHealthyAssessmentFromArgs = analysisResultFromArgs.isHealthyForWeightLoss
+            } ?: kotlin.run {
+                showToast("Natija ma'lumotlari topilmadi.")
+                dismissAllowingStateLoss()
+                return
+            }
+
+            photoUrlFromArgs = it.getString(ARG_PHOTO_URL_STRING, "")
+            aboutFromArgs = it.getString(ARG_ABOUT_TEXT, "")
+            mealTypeFromArgs = it.getString(ARG_MEAL_TYPE_ID, "")
         }
     }
 
@@ -125,111 +151,201 @@ class CalorieResultBottomSheet : BaseFragment<BottomSheetCalorieResultBinding>()
 
     private fun displayResults() {
         binding.textViewEstimatedCalories.text =
-            getString(R.string.estimated_calories_format, calories)
-        val meal = MealsType.fromId(mealType)!!
-        binding.imageViewIllustration.loadPhoto(meal.iconRes)
-        binding.foodName.text = about
-        binding.textViewEstimatedProtein.text = formatMacro(protein)
-        binding.textViewEstimatedFat.text = formatMacro(fat)
-        binding.textViewEstimatedCarbs.text = formatMacro(carbs)
+            getString(R.string.estimated_calories_format, analysisResultFromArgs.estimatedCalories) // Bu string resursdan edi, shunday qoladi
+        val meal = MealsType.fromId(mealTypeFromArgs)
+        binding.imageViewIllustration.loadPhoto(meal?.iconRes ?: R.drawable.food_ic)
+        binding.foodName.text = aboutFromArgs.ifBlank { meal?.name ?: "Ovqat" } // Original "Ovqat" stringi qaytarildi
 
-        if (photoUrl.isNullOrEmpty().not()) {
-            binding.imageViewIllustration.loadPhoto(photoUrl)
+        binding.textViewEstimatedProtein.text = formatMacro(analysisResultFromArgs.estimatedProtein)
+        binding.textViewEstimatedFat.text = formatMacro(analysisResultFromArgs.estimatedFat)
+        binding.textViewEstimatedCarbs.text = formatMacro(analysisResultFromArgs.estimatedCarbs)
+
+        if (photoUrlFromArgs.isNotEmpty()) {
+            binding.imageViewIllustration.loadPhoto(photoUrlFromArgs)
         }
+        binding.textViewHealthFeedback.text = healthAssessmentTextFromArgs
+        val iconRes = when (isHealthyAssessmentFromArgs) {
+            true -> R.drawable.check_circle_ic
+            false -> R.drawable.cancel_ic
+            null -> R.drawable.info_ic
+        }
+        val iconTint = when (isHealthyAssessmentFromArgs) {
+            true -> ContextCompat.getColor(requireContext(), R.color.green)
+            false -> ContextCompat.getColor(requireContext(), R.color.rejected)
+            null -> ContextCompat.getColor(requireContext(), R.color.yellow)
+        }
+        binding.iconHealthFeedback.setImageResource(iconRes)
+        binding.iconHealthFeedback.setColorFilter(iconTint)
 
         binding.chipGroupIngredients.removeAllViews()
-        if (ingredients.isNotEmpty()) {
-            ingredients.forEach {
+        if (analysisResultFromArgs.recognizedIngredients.isNotEmpty()) {
+            analysisResultFromArgs.recognizedIngredients.forEach {
                 val chip = Chip(requireContext()).apply {
+                    typeface = ResourcesCompat.getFont(requireContext(), R.font.roboto_regular)
                     text = it; isClickable = false; isCheckable =
                     false; setChipBackgroundColorResource(R.color.chip_background_color); setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.chip_text_color)
                 )
                 }
                 binding.chipGroupIngredients.addView(chip)
-            }; binding.chipGroupIngredients.isVisible = true
+            }
+            binding.chipGroupIngredients.isVisible = true
+            binding.labelRecognizedIngredients.isVisible = true
         } else {
             binding.chipGroupIngredients.isVisible = false
+            binding.labelRecognizedIngredients.isVisible = false
         }
 
         binding.textViewCalorieInsights.text =
-            insights.ifBlank { getString(R.string.no_insights_available) }
+            analysisResultFromArgs.insights.ifBlank { getString(R.string.no_insights_available) } // Bu string resursdan edi
+        binding.textViewCalorieInsights.isVisible = analysisResultFromArgs.insights.isNotBlank()
 
         binding.layoutWarningsContent.removeAllViews()
-        if (warnings.isNotEmpty()) {
-            warnings.forEach { warning ->
-                val warningBinding = ItemWarningTextBinding.inflate(
-                    layoutInflater, binding.layoutWarningsContent, false
-                )
-                warningBinding.textViewWarning.text = warning.message
-                warningBinding.iconWarning.setColorFilter(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        if (warning.isSerious) R.color.rejected else R.color.colorWarning
+        if (!analysisResultFromArgs.warningsText.isNullOrBlank()) {
+            analysisResultFromArgs.warningsText!!.lines().forEach { warningLine ->
+                if (warningLine.trim().startsWith("⚠️")) {
+                    val warningBinding = ItemWarningTextBinding.inflate(
+                        layoutInflater,
+                        binding.layoutWarningsContent,
+                        false
                     )
-                )
-                binding.layoutWarningsContent.addView(warningBinding.root)
+                    warningBinding.textViewWarning.text =
+                        warningLine.trim().substringAfter("⚠️").trim()
+                    binding.layoutWarningsContent.addView(warningBinding.root)
+                }
             }
-            binding.layoutWarnings.isVisible = true
+            binding.layoutWarnings.isVisible = binding.layoutWarningsContent.childCount > 0
         } else {
             binding.layoutWarnings.isVisible = false
         }
-        binding.textViewCalorieDisclaimer.text = getString(R.string.pfc_estimation_disclaimer)
+        binding.textViewCalorieDisclaimer.text = getString(R.string.pfc_estimation_disclaimer) // Bu string resursdan edi
+    }
+
+    private fun closeSheet() {
+        setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to "dismiss"))
+        viewModel.cancelAnalysisOrResetState()
+        findNavController().popBackStack()
     }
 
     private fun setupActionButtons() {
-        binding.buttonSaveToLog.setOnClickListener {
-            viewModel.confirmAndSaveLog()
-        }
+        binding.buttonSaveToLog.setOnClickListener { viewModel.confirmAndSaveLog() }
         binding.backView.setOnClickListener {
-            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to "dismiss")) // Notify dismiss
-            closeFragment()
+            closeSheet()
         }
         binding.buttonRetryAnalysis.setOnClickListener {
-            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to "retry")) // Notify retry
-            closeFragment()
+            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to "retry"))
+            viewModel.cancelAnalysisOrResetState()
+            findNavController().popBackStack()
         }
     }
 
     private fun observeViewModel() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.uiState.collectLatest { state ->
+                if (!isAdded) return@collectLatest
+
                 val isSaving = state is LogFoodUiState.Saving
-                binding.progressBarSave.isVisible = isSaving // Show/hide progress bar
+                binding.progressBarSave.isVisible = isSaving
                 binding.buttonSaveToLog.isVisible = !isSaving
                 binding.backView.isEnabled = !isSaving
-                binding.buttonSaveToLog.text = if(isSaving) "" else getString(R.string.save_to_log)
+                binding.buttonRetryAnalysis.isEnabled = !isSaving
+                binding.buttonSaveToLog.text = if (isSaving) "" else getString(R.string.save_to_log) // Bu string resursdan edi
 
-                when(state) {
+                if (dialog?.isShowing != true && findNavController().currentDestination?.id != R.id.calorieResultBottomSheet) {
+                    if (state is LogFoodUiState.Success && findNavController().currentDestination?.id == R.id.logFoodFragment) {
+                        // Bu holatda LogFoodFragment o'zi yopiladi
+                    }
+                    if (state !is LogFoodUiState.Success) return@collectLatest
+                }
+
+                when (state) {
+                    is LogFoodUiState.ShowPointsEarned -> {
+                    }
+
                     is LogFoodUiState.ShowFirstLogCongratulation -> {
-                        if (isAdded && findNavController().currentDestination?.id == R.id.calorieResultBottomSheet) {
-                            FirstLogCongratulationDialog.newInstance().show(parentFragmentManager, FirstLogCongratulationDialog.TAG)
+                        setFragmentResultListener("logCongra") { key, bundle ->
+                            closeSheet()
                         }
-                        viewModel.stateHandled()
-                        closeFragment()
-                        closeFragment()
+                        FirstLogCongratulationDialog.newInstance()
+                            .show(parentFragmentManager, FirstLogCongratulationDialog.TAG)
                     }
+
+                    is LogFoodUiState.ShowStreakContinued -> {
+                        showToast("Ajoyib! Siz ${state.currentStreak} kundan beri rejimdasiz!") // Original string
+                    }
+
+                    is LogFoodUiState.ShowMealGoalReached -> {
+                        if (findNavController().currentDestination?.id == R.id.calorieResultBottomSheet) {
+                            val action =
+                                CalorieResultBottomSheetDirections.actionCalorieResultBottomSheetToFoodEnoughFragment(
+                                    mealType = state.mealType,
+                                    snacks = state.recommendedSnacks.toTypedArray()
+                                )
+                            findNavController().navigate(action)
+                        }
+                    }
+
                     is LogFoodUiState.Success -> {
-                        closeFragment()
-                        closeFragment()
-                        viewModel.stateHandled()
+                        if (dialog?.isShowing == true) {
+                            dismissAllowingStateLoss()
+                        }
+                        closeSheet()
                     }
+
                     is LogFoodUiState.Error -> {
                         showToast(state.message)
                         viewModel.stateHandled()
                     }
+
                     else -> {}
                 }
             }
         }
     }
 
+    private fun formatMacro(value: Double?): String =
+        value?.let { String.format(Locale.US, "%.1f g", it) }
+            ?: getString(R.string.not_available_short) // Bu string resursdan edi
+}
 
-    private fun formatMacro(v: Double?): String =
-        v?.let { String.format(Locale.US, "%.1f g", it) } ?: getString(R.string.not_available_short)
+@Parcelize
+data class GeminiAnalysisResultParcelable(
+    val estimatedCalories: Int,
+    val estimatedProtein: Double?,
+    val estimatedFat: Double?,
+    val estimatedCarbs: Double?,
+    val recognizedIngredients: List<String>,
+    val insights: String,
+    val alternativeFoodSuggestions: String,
+    val isHealthyForWeightLoss: Boolean?,
+    val healthFeedbackShort: String?,
+    val warningsText: String?
+) : Parcelable {
+    constructor(original: GeminiAnalysisResult) : this(
+        original.estimatedCalories,
+        original.estimatedProtein,
+        original.estimatedFat,
+        original.estimatedCarbs,
+        original.recognizedIngredients,
+        original.insights,
+        original.alternativeFoodSuggestions,
+        original.isHealthyForWeightLoss,
+        original.healthFeedbackShort,
+        original.warningsText
+    )
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    fun toGeminiAnalysisResult(): GeminiAnalysisResult {
+        return GeminiAnalysisResult(
+            estimatedCalories,
+            estimatedProtein,
+            estimatedFat,
+            estimatedCarbs,
+            recognizedIngredients,
+            insights,
+            alternativeFoodSuggestions,
+            isHealthyForWeightLoss,
+            healthFeedbackShort,
+            warningsText
+        )
     }
 }

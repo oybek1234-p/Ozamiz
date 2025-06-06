@@ -45,13 +45,10 @@
                 android:textColor="?colorPrimary" />
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_imagePicker_log"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="start"
+                android:id="@+id/card_image_container_log"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
                 android:layout_marginTop="@dimen/dimen_8"
-                android:clickable="true"
-                android:focusable="true"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeColor="?colorOutlineVariant"
@@ -65,35 +62,55 @@
                         android:id="@+id/imageView_selectedLogImage"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:alpha="0.5"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        tools:src="@drawable/placeholder_food"
+                        tools:visibility="visible"
+                        android:contentDescription="@string/selected_meal_image_preview" />
 
                     <LinearLayout
                         android:id="@+id/layout_addImagePlaceholder_log"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="?android:attr/selectableItemBackground"
+                        android:background="?colorSurfaceContainerLow"
                         android:gravity="center"
-                        android:orientation="vertical">
+
+                        android:orientation="vertical"
+                        android:visibility="visible">
 
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
                             android:src="@drawable/camera_ic"
-                            app:tint="?colorOnSurface" />
+                            app:tint="?colorPrimary"
+                            android:contentDescription="@null" />
 
                         <TextView
-                            style="@style/Caption1_13"
-                            android:layout_width="match_parent"
+                            style="@style/Subtitle2_14"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/dimen_12"
                             android:layout_marginTop="8dp"
-                            android:gravity="center"
-                            android:text="Rasm olish"
+                            android:text="@string/take_photo_placeholder"
                             android:textColor="?colorOnSurface" />
+
                     </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/button_remove_image_log"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/close_ic"
+                        app:tint="@color/white"
+                        android:background="@drawable/oval_background_with_opacity"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="8dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        android:contentDescription="@string/remove_image"/>
+
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
+
 
             <TextView
                 style="@style/Title3_17"
@@ -101,18 +118,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
                 android:paddingEnd="@dimen/dimen_24"
+                tools:ignore="RtlSymmetry"
                 android:text="@string/ovqat_haqida_yozing_ixtiyoriy"
                 android:textColor="?colorPrimary" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:visibility="gone"
-                android:fontFamily="@font/roboto_regular"
-                android:text="Ovqat nomi va miqdorini yozing: kosa, tarelka, bo'lak, stakan, piyola, gram"
-                android:textColor="?colorOnSurfaceVariant"
-                android:textSize="15sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_foodDescription_log"
@@ -138,18 +146,6 @@
                     android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:padding="@dimen/dimen_12"
-                android:visibility="gone"
-                android:background="@drawable/round_lay"
-                android:layout_marginTop="@dimen/dimen_18"
-                android:backgroundTint="?colorSurfaceContainer"
-                android:text="Har bir yegan ovqatingizni ilovaga kiritib boring, sizga tavsiyalar, ogohlantirishlar beramiz, bu siz uchun juda muhim!"
-                android:textColor="?colorPrimary"
-                android:textSize="16sp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

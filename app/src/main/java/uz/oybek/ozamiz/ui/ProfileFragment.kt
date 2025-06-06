@@ -1,3 +1,4 @@
+// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\ui\profile\ProfileFragment.kt
 package uz.oybek.ozamiz.ui.profile
 
 import android.content.ActivityNotFoundException
@@ -22,6 +23,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.MainActivity
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.LocalUser
+import uz.oybek.ozamiz.data.gamification.GamificationManager
 import uz.oybek.ozamiz.databinding.FragmentProfileBinding
 import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
 import uz.oybek.ozamiz.ui.ProfileNavigationEvent
@@ -33,6 +35,7 @@ import uz.oybek.ozamiz.ui.showToast
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
     private val viewModel: ProfileViewModel by viewModels()
+    private val gamificationManager = GamificationManager()
 
     init {
         showBottomSheet = true
@@ -63,6 +66,12 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 findNavController().navigate(action)
             }
         }
+
+        setupSection(bind.sectionMyBadges, R.drawable.badge_ic, "Nishonlarim") {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                findNavController().navigate(R.id.badgesFragment)
+            }
+        }
         setupSection(bind.sectionSupport, R.drawable.help_ic, getString(R.string.help_and_support)) {
             (activity as? MainActivity)?.showSupportSheet()
         }
@@ -75,13 +84,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             }
         }
 
-        // Admin Section: Premium foydalanuvchilar
         setupSection(bind.sectionAdminPremiumUsers, R.drawable.admin_ic, "Premium Tekshiruv") {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
-               navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
+                navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
             }
         }
-
 
         bind.buttonLogout.setOnClickListener {
             showLogoutConfirmationDialog()
@@ -105,7 +112,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     private fun observeViewModel(bind: FragmentProfileBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userState.collect { user -> // StateFlow dan foydalanish
+                viewModel.userState.collect { user ->
                     if (user.valid) {
                         bind.textViewUserName.text = user.name.ifEmpty { getString(R.string.default_user_name) }
                         Glide.with(this@ProfileFragment)
@@ -134,16 +141,41 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                                 bind.premiumView.isVisible = true
                             }
                         }
-                        // Admin "Premiumchilar" button
                         bind.sectionAdminPremiumUsers.root.isVisible = user.isAdmin
+
+                        val (currentBadge, pointsToNext, nextBadge) = gamificationManager.getCurrentLevelInfo(user.scorePoints, user.unlockedBadgeIds)
+
+                        bind.textViewUserScore.text = "${user.scorePoints} ball"
+
+                        if (currentBadge != null) {
+                            bind.textViewUserLevel.text = "${currentBadge.name} (${currentBadge.requiredPoints} ball)"
+                            bind.imageViewCurrentBadge.setImageResource(currentBadge.iconResId)
+                            bind.imageViewCurrentBadge.isVisible = true
+                        } else {
+                            bind.textViewUserLevel.text = "Boshlang'ich"
+                            bind.imageViewCurrentBadge.isVisible = false
+                        }
+
+                        if (nextBadge != null) {
+                            bind.textViewPointsToNextLevel.text = "Keyingi nishongacha ${pointsToNext} ball qoldi!"
+                            bind.progressBarNextLevel.max = nextBadge.requiredPoints - (currentBadge?.requiredPoints ?: 0)
+                            bind.progressBarNextLevel.progress = bind.progressBarNextLevel.max - pointsToNext
+                            bind.textViewPointsToNextLevel.isVisible = true
+                            bind.progressBarNextLevel.isVisible = true
+                        } else {
+                            bind.textViewPointsToNextLevel.text = "Barcha nishonlar ochilgan!"
+                            bind.progressBarNextLevel.isVisible = false
+                        }
+
 
                     } else {
                         bind.textViewUserName.text = getString(R.string.default_user_name)
                         bind.imageViewUserAvatar.setImageResource(R.drawable.ic_profile)
                         bind.buttonLogout.isVisible = false
                         bind.premiumActiveC.isVisible = false
-                        bind.premiumView.isVisible = true // Show premium purchase option
+                        bind.premiumView.isVisible = true
                         bind.sectionAdminPremiumUsers.root.isVisible = false
+                        bind.gamificationSection.isVisible = false // Foydalanuvchi yo'q bo'lsa yashirish
                     }
                 }
             }

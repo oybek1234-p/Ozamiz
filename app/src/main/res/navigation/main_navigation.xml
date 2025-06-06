@@ -6,6 +6,11 @@
     app:startDestination="@id/splashFragment">
 
     <fragment
+        android:id="@+id/badgesFragment"
+        android:name="uz.oybek.ozamiz.ui.profile.BadgesFragment"
+        android:label="Nishonlarim"
+        tools:layout="@layout/fragment_badges" />
+    <fragment
         android:id="@+id/profileFragment"
         android:name="uz.oybek.ozamiz.ui.profile.ProfileFragment"
         android:label="@string/profile_title"
@@ -425,12 +430,26 @@
             app:argType="string"
             app:nullable="true" />
     </dialog>
-
+    <fragment
+        android:id="@+id/foodEnoughFragment"
+        android:name="uz.oybek.ozamiz.ui.log.FoodEnoughFragment"
+        android:label="FoodEnoughFragment"
+        tools:layout="@layout/fragment_food_enough">
+        <argument
+            android:name="mealType"
+            app:argType="string" />
+        <argument
+            android:name="snacks"
+            app:argType="uz.oybek.ozamiz.data.gamification.GamificationConstants$RecommendedSnackFood[]" />
+    </fragment>
     <fragment
         android:id="@+id/logFoodFragment"
         android:name="uz.oybek.ozamiz.ui.log.LogFoodFragment"
         android:label="LogFoodFragment"
         tools:layout="@layout/fragment_log_food">
+        <action
+            android:id="@+id/action_logFoodFragment_to_foodEnoughFragment"
+            app:destination="@id/foodEnoughFragment" />
         <argument
             android:name="mealType"
             app:argType="string" />
@@ -448,8 +467,11 @@
         android:id="@+id/calorieResultBottomSheet"
         android:name="uz.oybek.ozamiz.ui.log.CalorieResultBottomSheet"
         android:label="CalorieResultBottomSheet"
-        tools:layout="@layout/bottom_sheet_calorie_result"></fragment>
-
+        tools:layout="@layout/bottom_sheet_calorie_result">
+        <action
+            android:id="@+id/action_calorieResultBottomSheet_to_foodEnoughFragment"
+            app:destination="@id/foodEnoughFragment" />
+    </fragment>
     <fragment
         android:id="@+id/logExerciseFragment"
         android:name="uz.oybek.ozamiz.ui.log.LogExerciseFragment"

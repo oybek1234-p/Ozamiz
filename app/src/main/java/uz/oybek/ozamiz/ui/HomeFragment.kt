@@ -43,6 +43,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.math.absoluteValue
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
@@ -104,11 +105,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
         val lastLogTime = user.lastWeightLogTimestamp
         if (lastLogTime == 0L && user.name.isNotEmpty()) {
-            return true
+            return (LocalUser.user.streakInfo?.currentStreak ?: 0) > 3
         }
         val currentTime = System.currentTimeMillis()
         val daysSinceLastLog = TimeUnit.MILLISECONDS.toDays(currentTime - lastLogTime)
-        return (daysSinceLastLog >= MainActivity.getWeightLogIntervalDays()) && (LocalUser.user.streakInfo?.currentStreak ?: 0) > 2
+        return (daysSinceLastLog >= MainActivity.getWeightLogIntervalDays()) && (LocalUser.user.streakInfo?.currentStreak
+            ?: 0) > 3
     }
 
     private fun checkAndNavigateForWeightLog() {
@@ -260,7 +262,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                             putString("preselectedExerciseId", reminder.id)
                         }
                         if (findNavController().currentDestination?.id == R.id.home) {
-                            findNavController().navigate(R.id.logExerciseFragment, bundle)
+                            navigate(R.id.logExerciseFragment, bundle)
                         }
                     }
                     reminderBinding.buttonStartReminder.isVisible = true
@@ -359,12 +361,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 indicator.setIndicatorColor(ContextCompat.getColor(requireContext(), R.color.green))
             }
 
-            exceededBy > 100 -> { // Significantly over
-                textView.text = "Bugun ko'proq ovqat yedingiz"
+            exceededBy > 100 -> {
+                textView.text =
+                    "Bugun ${exceededBy} kal ortiqcha yedingiz. Ertaga ovqatlanish va harakatga e'tibor bering."
                 textView.setTextColor(
-                    getThemeColor(
-                        requireContext(), com.google.android.material.R.attr.colorError
-                    )
+                    requireContext().getColor(R.color.yellow)
                 )
                 indicator.setIndicatorColor(
                     getThemeColor(
@@ -384,18 +385,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun updateUiWithState(bind: FragmentHomeBinding, state: HomeUiState) {
-
-        setMainProgress(
-            bind.textConsumedCalories,
-            bind.progressCalories,
-            state.consumedCalories,
-            state.targetCalories
-        )
-        bind.textConsumed.text =
-            getString(R.string.meal_calories_format, state.consumedCalories, state.targetCalories)
+        bind.targetCalorie.text = getString(R.string.calories_format, state.targetCalories)
+        bind.consumedCalories.text = getString(R.string.calories_format, state.consumedCalories)
+        val exceed = (state.consumedCalories - state.targetCalories) > 100
+        if (exceed) {
+            bind.leftTitle.text = "Meyordan oshdi"
+            bind.leftCalories.text = getString(R.string.calories_format, (state.targetCalories - state.consumedCalories).absoluteValue)
+            bind.leftCalories.setTextColor(requireContext().getColor(R.color.rejected))
+        } else {
+            bind.leftTitle.text = "Yeyish mumkin"
+            bind.leftCalories.text = getString(R.string.calories_format, state.targetCalories - state.consumedCalories)
+            bind.leftCalories.setTextColor(requireContext().getColor(R.color.green))
+        }
 
         bind.textTargetWater.text =
-            "${state.targetWaterMl / 1000f} litr = ${state.targetWaterMl / 250} stakan = ${state.targetWaterMl / 180} piyola suv iching"
+            "${state.targetWaterMl / 1000f} litr suv ichishingiz kerak"
 
         updateSingleMealTime(bind.layoutBreakfast, state.mealReminderTimes["breakfast"])
         updateSingleMealTime(bind.layoutLunch, state.mealReminderTimes["lunch"])
@@ -500,11 +504,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     ) {
         val progressPercent = if (target > 0) (consumed * 100 / target).coerceIn(0, 150) else 0
         indicator.setProgressCompat(progressPercent.coerceAtMost(100), true)
-        if (unitStringResource == R.string.unit_ml_drunk) {
-            textView.text = getString(unitStringResource, consumed / 250)
-        } else {
-            textView.text = getString(unitStringResource, consumed)
-        }
+        textView.text = getString(unitStringResource, consumed)
 
         val colorAttr: Int
         val colorRes: Int?
@@ -591,16 +591,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
 
             exceededBy in 1..100 -> {
-                textView.text = getString(R.string.bugunga_yetarli)
+                textView.text = getString(R.string.yetarli)
                 textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
             }
 
             exceededBy > 100 -> {
-                textView.text = getString(R.string.meal_calories_greatly_exceeded_format)
+                textView.text =
+                    getString(R.string.meal_calories_greatly_exceeded_format, exceededBy)
                 textView.setTextColor(
-                    getThemeColor(
-                        requireContext(), com.google.android.material.R.attr.colorError
-                    )
+                    requireContext().getColor(R.color.yellow)
                 )
             }
 
@@ -745,7 +744,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
         }
         if (findNavController().currentDestination?.id == R.id.home) {
-            findNavController().navigate(R.id.logFoodFragment, bundle)
+            navigate(R.id.logFoodFragment, bundle)
         }
     }
 
@@ -780,7 +779,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                         putString("logToEditJson", Gson().toJson(logData))
                     }
                     if (findNavController().currentDestination?.id == R.id.home) {
-                        findNavController().navigate(R.id.logExerciseFragment, bundle)
+                        navigate(R.id.logExerciseFragment, bundle)
                     }
                 }
             }

@@ -71,7 +71,7 @@
             android:layout_height="40dp"
             android:paddingVertical="@dimen/dimen_2"
             android:src="@drawable/add_ic"
-            android:text="Ovqat yedim"
+            android:text="Ovqat"
             android:textSize="13sp"
             app:icon="@drawable/add_ic"
             app:layout_constraintBottom_toBottomOf="parent"

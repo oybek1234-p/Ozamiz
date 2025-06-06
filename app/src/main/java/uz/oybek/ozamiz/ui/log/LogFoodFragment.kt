@@ -1,12 +1,25 @@
+// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\ui\log\LogFoodFragment.kt
 package uz.oybek.ozamiz.ui.log
 
+import LogFoodUiState
+import LogFoodViewModel
 import MiniInfo
+import android.Manifest
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.speech.RecognizerIntent
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
@@ -15,34 +28,113 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ai.GeminiAnalysisResult
 import uz.oybek.ozamiz.data.info.FoodLog
+import uz.oybek.ozamiz.data.info.MealsType
 import uz.oybek.ozamiz.databinding.FoodAnalyzingLoaderBinding
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
+import uz.oybek.ozamiz.handleException
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.dialogs.FirstLogCongratulationDialog
 import uz.oybek.ozamiz.ui.hideSoftInput
-import uz.oybek.ozamiz.ui.premium.PremiumBottomSheetDialog // Import premium bottom sheet
-import uz.oybek.ozamiz.ui.showKeyboard
+import uz.oybek.ozamiz.ui.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.showToast
+import java.io.File
+import java.util.Locale
 
 class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private val viewModel: LogFoodViewModel by activityViewModels()
+    private var tempImageUri: Uri? = null // Kamera uchun vaqtinchalik URI
+
+    private lateinit var requestCameraPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var requestAudioPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
+    private lateinit var speechToTextLauncher: ActivityResultLauncher<Intent>
+
 
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 viewModel.selectedImageUri = it
-                binding.layoutAddImagePlaceholderLog.isVisible = false
-                Glide.with(this).load(it).into(binding.imageViewSelectedLogImage)
-                binding.imageViewSelectedLogImage.alpha = 1.0f
+                updateSelectedImageView(it)
             }
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.loadArguments(arguments)
+        initializePermissionLaunchers()
+        initializeActivityLaunchers()
+    }
+
+    private fun initializePermissionLaunchers() {
+        requestCameraPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    launchCamera()
+                } else {
+                    showToast(getString(R.string.permission_denied_camera))
+                }
+            }
+        requestAudioPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    launchSpeechToText()
+                } else {
+                    showToast(getString(R.string.permission_denied_audio))
+                }
+            }
+    }
+
+    private fun initializeActivityLaunchers() {
+        takePictureLauncher =
+            registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+                if (success) {
+                    tempImageUri?.let {
+                        viewModel.selectedImageUri = it
+                        updateSelectedImageView(it)
+                    }
+                } else {
+                    tempImageUri = null // Reset if capture failed or was cancelled
+                }
+            }
+
+        speechToTextLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val data: Intent? = result.data
+                    val spokenText: ArrayList<String>? =
+                        data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    if (!spokenText.isNullOrEmpty()) {
+                        val currentText = binding.editTextFoodDescriptionLog.text.toString()
+                        binding.editTextFoodDescriptionLog.setText(
+                            if (currentText.isBlank()) spokenText[0] else "$currentText ${spokenText[0]}"
+                        )
+                        binding.editTextFoodDescriptionLog.setSelection(binding.editTextFoodDescriptionLog.text!!.length)
+                    }
+                }
+            }
+    }
+
+
+    private fun updateSelectedImageView(uri: Uri?) {
+        if (uri != null) {
+            binding.layoutAddImagePlaceholderLog.isVisible = false
+            binding.imageViewSelectedLogImage.isVisible = true
+            Glide.with(this).load(uri).placeholder(R.drawable.placeholder_food)
+                .into(binding.imageViewSelectedLogImage)
+            binding.buttonRemoveImageLog.isVisible = true
+        } else {
+            binding.layoutAddImagePlaceholderLog.isVisible = true
+            binding.imageViewSelectedLogImage.isVisible = false
+            binding.imageViewSelectedLogImage.setImageDrawable(null)
+            binding.buttonRemoveImageLog.isVisible = false
+        }
+    }
+
 
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
@@ -50,52 +142,148 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         return FragmentLogFoodBinding.inflate(inflater, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.loadArguments(arguments)
-    }
 
     override fun viewCreated(bind: FragmentLogFoodBinding) {
         setupToolbar(bind)
         setupClickListeners(bind)
         observeUiState(bind)
         setupBottomSheetResultListener()
+        updateSelectedImageView(viewModel.selectedImageUri) // Restore image if re-created
     }
 
     private fun setupToolbar(bind: FragmentLogFoodBinding) {
         bind.toolbarLogFood.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
-    private var description: String = ""
+    private var currentDescriptionFromInput: String = ""
 
     private fun setupClickListeners(bind: FragmentLogFoodBinding) {
-        bind.cardImagePickerLog.setOnClickListener { pickImageLauncher.launch("image/*") }
+        // Placeholder'dagi tugmalar
+        bind.layoutAddImagePlaceholderLog.setOnClickListener {
+            checkCameraPermissionAndLaunch()
+        }
+        bind.buttonRemoveImageLog.setOnClickListener {
+            viewModel.selectedImageUri = null
+            tempImageUri = null
+            updateSelectedImageView(null)
+        }
+
+        bind.textInputLayoutFoodDescriptionLog.setEndIconOnClickListener {
+            checkAudioPermissionAndLaunchSpeechToText()
+        }
+
         bind.buttonAnalyzeAndSave.setOnClickListener {
-            val description = bind.editTextFoodDescriptionLog.text.toString()
-            this.description = description
+            currentDescriptionFromInput = bind.editTextFoodDescriptionLog.text.toString()
+            val imageUriToAnalyze = viewModel.selectedImageUri ?: tempImageUri
+            viewModel.selectedImageUri = imageUriToAnalyze // Ensure ViewModel has the latest URI
+
             if (viewModel.logToEdit != null) {
-                viewModel.saveEditedLog(description)
+                viewModel.saveEditedLog(currentDescriptionFromInput)
             } else {
-                viewModel.analyzeAndPrepareLog(description, viewModel.mealType)
+                viewModel.analyzeAndPrepareLog(currentDescriptionFromInput, viewModel.mealType)
             }
             hideSoftInput(requireActivity())
         }
     }
+
+    private fun checkCameraPermissionAndLaunch() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                launchCamera()
+            }
+
+            shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
+                showToast(getString(R.string.permission_denied_camera))
+                // Optionally show a dialog explaining why permission is needed
+                requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+
+            else -> {
+                requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+
+    private fun launchCamera() {
+        try {
+            val photoFile: File? = try {
+                File.createTempFile(
+                    "JPEG_${System.currentTimeMillis()}_", ".jpg", requireContext().externalCacheDir
+                )
+            } catch (ex: Exception) {
+                handleException(ex, "CreateTempFileError")
+                null
+            }
+            photoFile?.also {
+                tempImageUri = FileProvider.getUriForFile(
+                    requireContext(), "${requireContext().packageName}.provider", it
+                )
+                takePictureLauncher.launch(tempImageUri)
+            }
+        } catch (e: Exception) {
+            handleException(e, "LaunchCameraError")
+            showToast(getString(R.string.error_opening_camera))
+        }
+    }
+
+    private fun checkAudioPermissionAndLaunchSpeechToText() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                launchSpeechToText()
+            }
+
+            shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) -> {
+                showToast(getString(R.string.permission_denied_audio))
+                // Optionally show a dialog explaining why permission is needed
+                requestAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+
+            else -> {
+                requestAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
+        }
+    }
+
+    private fun launchSpeechToText() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+            )
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("uz-UZ")) // Set Uzbek language
+            putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt))
+        }
+        try {
+            speechToTextLauncher.launch(intent)
+        } catch (e: ActivityNotFoundException) {
+            showToast(getString(R.string.speech_not_supported))
+        }
+    }
+
 
     private val bottomSheet: BottomSheetDialog by lazy {
         BottomSheetDialog(requireContext())
     }
 
     private fun closeAnalyzeSheet() {
-        bottomSheet.dismiss()
+        if (bottomSheet.isShowing) {
+            bottomSheet.dismiss()
+        }
     }
 
     private fun showAnalyzeSheet() {
+        if (bottomSheet.isShowing) return
+
         bottomSheet.setOnDismissListener {
-            viewModel.cancelAnalysisOrResetState()
+            if (viewModel.uiState.value is LogFoodUiState.Analyzing) {
+                viewModel.cancelAnalysisOrResetState()
+            }
         }
-        val binding = FoodAnalyzingLoaderBinding.inflate(layoutInflater)
-        binding.apply {
+        val dialogBinding = FoodAnalyzingLoaderBinding.inflate(layoutInflater)
+        dialogBinding.apply {
             miniInfoText.text = MiniInfo.list.random().text
             backView.setOnClickListener {
                 bottomSheet.dismiss()
@@ -103,21 +291,28 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         }
         bottomSheet.setOnShowListener { dialog ->
             val d = dialog as BottomSheetDialog
-            val bottomSheetInternal = d.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
-
+            val bottomSheetInternal =
+                d.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
             bottomSheetInternal?.let {
                 val behavior = BottomSheetBehavior.from(it)
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
                 behavior.skipCollapsed = true
                 behavior.isFitToContents = false
-
                 val layoutParams = it.layoutParams
                 layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
                 it.layoutParams = layoutParams
             }
         }
-        bottomSheet.setContentView(binding.root)
+        bottomSheet.setContentView(dialogBinding.root)
         bottomSheet.show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (dismiss) {
+            closeFragment()
+            dismiss = false
+        }
     }
 
     private fun observeUiState(bind: FragmentLogFoodBinding) {
@@ -127,55 +322,57 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     state is LogFoodUiState.Saving || state is LogFoodUiState.Analyzing || state is LogFoodUiState.Loading
                 bind.progressAnalyze.isVisible = isLoading
                 bind.buttonAnalyzeAndSave.isEnabled = !isLoading
+                bind.editTextFoodDescriptionLog.isEnabled = !isLoading
 
-                bind.buttonAnalyzeAndSave.text = if (isLoading) "" else {
-                    when (state) {
-                        is LogFoodUiState.Editing -> getString(R.string.save_changes)
-                        else -> getString(R.string.analyze_and_save)
+                bind.buttonAnalyzeAndSave.text =
+                    if (isLoading && state !is LogFoodUiState.Analyzing) "" else {
+                        when (state) {
+                            is LogFoodUiState.Editing -> getString(R.string.save_changes)
+                            is LogFoodUiState.Analyzing -> getString(R.string.analyzing)
+                            is LogFoodUiState.Saving -> getString(R.string.saving)
+                            else -> getString(R.string.analyze_and_save)
+                        }
                     }
-                }
+                bind.buttonAnalyzeAndSave.setIconResource(
+                    if (state is LogFoodUiState.Analyzing || state is LogFoodUiState.Saving) 0
+                    else if (state is LogFoodUiState.Editing) R.drawable.check_ic
+                    else R.drawable.search_ic
+                )
 
                 when (state) {
-                    is LogFoodUiState.Loading -> {
-                        bind.progressAnalyze.isVisible = true
-                    }
+                    is LogFoodUiState.Loading -> {}
                     is LogFoodUiState.Inputting -> {
                         bind.toolbarLogFood.title = getString(
                             R.string.log_food_title_format, getMealTypeName(state.mealType)
                         )
-                        bind.buttonAnalyzeAndSave.setIconResource(R.drawable.search_ic)
                     }
+
                     is LogFoodUiState.Editing -> {
                         bind.toolbarLogFood.title = getString(
                             R.string.edit_log_food_title_format, getMealTypeName(state.log.mealType)
                         )
                         populateFieldsForEditing(bind, state.log)
-                        bind.buttonAnalyzeAndSave.setIconResource(R.drawable.check_ic)
                     }
+
                     is LogFoodUiState.Analyzing -> {
-                        bind.buttonAnalyzeAndSave.text = getString(R.string.analyzing)
-                        bind.buttonAnalyzeAndSave.setIconResource(0)
-                        showAnalyzeSheet()
+                        if (!bottomSheet.isShowing) showAnalyzeSheet()
                     }
+
                     is LogFoodUiState.ShowResult -> {
                         viewModel.stateHandled()
                         closeAnalyzeSheet()
-                        showCalorieResultSheet(state.result, state.warnings)
+                        showCalorieResultSheet(state.analysisResult)
                     }
-                    is LogFoodUiState.Saving -> {
-                        bind.buttonAnalyzeAndSave.text = getString(R.string.saving)
-                        bind.buttonAnalyzeAndSave.setIconResource(0)
+
+                    is LogFoodUiState.Saving -> {}
+                    is LogFoodUiState.ShowFirstLogCongratulation, is LogFoodUiState.ShowStreakContinued, is LogFoodUiState.ShowPointsEarned, is LogFoodUiState.ShowNewBadgeUnlocked -> {
+                        // Handled by CalorieResultBottomSheet
                     }
-                    is LogFoodUiState.ShowFirstLogCongratulation -> {
-                        if (isAdded && findNavController().currentDestination?.id == R.id.logFoodFragment) {
-                            FirstLogCongratulationDialog.newInstance().show(parentFragmentManager, FirstLogCongratulationDialog.TAG)
-                        }
-                        viewModel.stateHandled() // Important to transition state
+
+                    is LogFoodUiState.ShowMealGoalReached -> {
+                        // Handled by CalorieResultBottomSheet
                     }
-                    is LogFoodUiState.ShowStreakContinued -> {
-                        showToast("Ajoyib! Siz ${state.currentStreak} kundan beri rejimdasiz!")
-                        viewModel.stateHandled() // Important to transition state
-                    }
+
                     is LogFoodUiState.Success -> {
                         if (findNavController().currentDestination?.id == R.id.logFoodFragment) {
                             showToast(getString(R.string.log_saved_successfully))
@@ -183,99 +380,100 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         }
                         viewModel.stateHandled()
                     }
+
                     is LogFoodUiState.Error -> {
-                        bind.progressAnalyze.isVisible = false
+                        closeAnalyzeSheet()
                         showToast(state.message)
                         viewModel.stateHandled()
                     }
+
                     is LogFoodUiState.ShowPremiumPrompt -> {
+                        closeAnalyzeSheet()
                         if (isAdded && findNavController().currentDestination?.id == R.id.logFoodFragment) {
-                            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+                            PremiumBottomSheetDialog().show(
+                                parentFragmentManager, PremiumBottomSheetDialog.TAG
+                            )
                         }
-                        // Don't call stateHandled() here immediately.
-                        // The user needs to interact with the premium dialog.
-                        // The state will be reset if the dialog is dismissed or an action is taken.
                     }
+
+                    else -> {}
                 }
             }
         }
     }
 
-
     private fun populateFieldsForEditing(bind: FragmentLogFoodBinding, log: FoodLog) {
         bind.editTextFoodDescriptionLog.setText(log.description)
-        viewModel.selectedImageUri = null
+        viewModel.selectedImageUri = null // Reset selected URI
+        tempImageUri = null
         if (!log.photoUrl.isNullOrEmpty()) {
-            bind.layoutAddImagePlaceholderLog.isVisible = false
-            Glide.with(this).load(log.photoUrl).placeholder(R.drawable.placeholder_food)
-                .error(R.drawable.placeholder_food).into(bind.imageViewSelectedLogImage)
-            bind.imageViewSelectedLogImage.alpha = 1.0f
+            updateSelectedImageView(Uri.parse(log.photoUrl))
         } else {
-            bind.layoutAddImagePlaceholderLog.isVisible = true
-            bind.imageViewSelectedLogImage.setImageDrawable(null)
-            bind.imageViewSelectedLogImage.alpha = 0.5f
+            updateSelectedImageView(null)
         }
     }
 
-    private fun showCalorieResultSheet(result: GeminiAnalysisResult, warnings: List<MealWarning>) {
+    private fun showCalorieResultSheet(analysisResult: GeminiAnalysisResult) {
+        val imageUriToShow = viewModel.selectedImageUri ?: tempImageUri
         val bundle = Bundle().apply {
-            putInt(CalorieResultBottomSheet.ARG_CALORIES, result.estimatedCalories)
-            putDouble(CalorieResultBottomSheet.ARG_PROTEIN, result.estimatedProtein ?: -1.0)
-            putDouble(CalorieResultBottomSheet.ARG_FAT, result.estimatedFat ?: -1.0)
-            putDouble(CalorieResultBottomSheet.ARG_CARBS, result.estimatedCarbs ?: -1.0)
-            putString(CalorieResultBottomSheet.ARG_PHOTO, viewModel.selectedImageUri?.toString())
-            putString(CalorieResultBottomSheet.ARG_ABOUT, description)
-            putString("mealType", viewModel.mealType)
-            putStringArrayList(
-                CalorieResultBottomSheet.ARG_INGREDIENTS, ArrayList(result.recognizedIngredients)
+            putParcelable(
+                CalorieResultBottomSheet.ARG_ANALYSIS_RESULT,
+                GeminiAnalysisResultParcelable(analysisResult)
             )
-            putString(CalorieResultBottomSheet.ARG_INSIGHTS, result.insights)
-            putParcelableArrayList(CalorieResultBottomSheet.ARG_WARNINGS, ArrayList(warnings))
+            putString(CalorieResultBottomSheet.ARG_PHOTO_URL_STRING, imageUriToShow?.toString())
+            putString(CalorieResultBottomSheet.ARG_ABOUT_TEXT, currentDescriptionFromInput)
+            putString(CalorieResultBottomSheet.ARG_MEAL_TYPE_ID, viewModel.mealType)
         }
         try {
             if (findNavController().currentDestination?.id == R.id.logFoodFragment) {
-                findNavController().navigate(
-                    R.id.action_logFoodFragment_to_calorieResultBottomSheet, // Corrected action ID
-                    bundle
+                navigate(
+                    R.id.action_logFoodFragment_to_calorieResultBottomSheet, bundle
                 )
             }
         } catch (e: Exception) {
-            showToast("Error showing results: ${e.message}")
+            showToast("Natijalarni ko'rsatishda xatolik: ${e.message}")
             viewModel.cancelAnalysisOrResetState()
         }
     }
 
+
     private fun getMealTypeName(mealTypeId: String): String {
-        return when (mealTypeId) {
-            "breakfast" -> getString(R.string.breakfast); "lunch" -> getString(R.string.lunch)
-            "dinner" -> getString(R.string.dinner); "snack" -> getString(R.string.snack)
-            else -> mealTypeId
-        }
+        return MealsType.fromId(mealTypeId)?.name ?: mealTypeId
     }
 
     override fun onPause() {
-        super.onPause();
+        super.onPause()
         hideSoftInput(requireActivity())
     }
+
+    private var dismiss = false
 
     private fun setupBottomSheetResultListener() {
         setFragmentResultListener(CalorieResultBottomSheet.REQUEST_KEY) { _, bundle ->
             val action = bundle.getString(CalorieResultBottomSheet.RESULT_ACTION)
             when (action) {
-                "save" -> viewModel.confirmAndSaveLog()
-                "retry" -> viewModel.cancelAnalysisOrResetState() // Or trigger retry logic
-                "dismiss" -> viewModel.cancelAnalysisOrResetState()
+                "save" -> {
+
+                }
+
+                "retry" -> {
+                    viewModel.stateHandled()
+                }
+
+                "dismiss" -> {
+                    dismiss = true
+                }
             }
         }
-        // Listener for PremiumBottomSheetDialog
-        parentFragmentManager.setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY, viewLifecycleOwner) { _, bundle ->
+        parentFragmentManager.setFragmentResultListener(
+            PremiumBottomSheetDialog.REQUEST_KEY, viewLifecycleOwner
+        ) { _, bundle ->
             val action = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
             if (action == "go_to_payment") {
                 if (findNavController().currentDestination?.id == R.id.logFoodFragment) {
                     navigate(R.id.paymentGetCheckFragment)
                 }
             }
-            // After premium dialog interaction, reset LogFoodViewModel state
             viewModel.stateHandled()
         }
     }

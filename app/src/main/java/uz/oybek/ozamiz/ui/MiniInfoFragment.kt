@@ -24,7 +24,7 @@ class MiniInfoFragment : BaseFragment<MiniInfoFragmentBinding>() {
             }
             val text = MiniInfo.list.random().text
             infoText.text = text
-            animator = ValueAnimator.ofInt(0, 100).setDuration(10000).apply {
+            animator = ValueAnimator.ofInt(0, 100).setDuration(15000).apply {
                 addUpdateListener {
                     progressBar.setProgress((it.animatedValue as Int).toInt(),true)
                     if (it.animatedValue == 100) {

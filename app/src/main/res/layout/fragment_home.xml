@@ -17,12 +17,11 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="@string/home_title"
+            app:title="Bugun - Juma"
             app:titleCentered="true"
             app:titleTextAppearance="@style/Title2_20"
             app:titleTextColor="?attr/colorOnSurface">
 
-            <!-- Streak Display Elements -->
             <LinearLayout
                 android:id="@+id/streak_display_layout"
                 android:layout_width="wrap_content"
@@ -116,42 +115,108 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:paddingTop="@dimen/dimen_18"
                             android:orientation="horizontal"
                             >
                             <TextView
                                 android:id="@+id/text_target_calories"
-                                style="@style/Text1_16"
+                                style="@style/Headline3_15"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="18dp"
                                 android:layout_marginEnd="16dp"
                                 android:textColor="?attr/colorOnSurface"
-                                android:textSize="18sp"
-                                android:text="Ovqat nazorati"
+                                android:text="Bugungi maqsad"
                                 />
 
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/info_ic"
+                                app:tint="?colorOnSurfaceVariant" />
                             <TextView
-                                android:id="@+id/text_consumed"
+                                android:id="@+id/target_calorie"
                                 style="@style/Headline2_16"
                                 android:layout_width="0dp"
                                 android:layout_weight="1"
                                 android:gravity="end"
+                                android:textColor="?colorOnSurface"
                                 android:layout_gravity="bottom|end"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="16dp"
-                                tools:text="850 / 1750 kkal" />
+                                tools:text="1750 kkal" />
 
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/text_consumed_calories"
-                            style="@style/Headline2_16"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="16dp"
-                            android:layout_marginTop="4dp"
-                            tools:text="850 / 1750 kkal" />
+                            android:orientation="horizontal"
+                            android:layout_marginTop="@dimen/dimen_12"
+                            >
+                            <TextView
+                                style="@style/Headline3_15"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                android:textColor="?attr/colorOnSurface"
+                                android:text="Yeyildi"
+                                />
 
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/info_ic"
+                                app:tint="?colorOnSurfaceVariant" />
+
+                            <TextView
+                                style="@style/Headline2_16"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:id="@+id/consumed_calories"
+                                android:gravity="end"
+                                android:textColor="?colorOnSurface"
+                                android:layout_gravity="bottom|end"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                tools:text="2100 kkal" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="@dimen/dimen_12"
+                            >
+                            <TextView
+                                android:id="@+id/left_title"
+                                style="@style/Headline3_15"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                android:textColor="?attr/colorOnSurface"
+                                android:text="Qoldi"
+                                />
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/info_ic"
+                                app:tint="?colorOnSurfaceVariant" />
+
+                            <TextView
+                                android:id="@+id/left_calories"
+                                style="@style/Headline2_16"
+                                android:layout_width="0dp"
+                                android:layout_weight="1"
+                                android:gravity="end"
+                                android:textColor="?colorOnSurface"
+                                android:layout_gravity="bottom|end"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                tools:text="2100 kkal" />
+
+                        </LinearLayout>
 
                         <com.google.android.material.progressindicator.LinearProgressIndicator
                             android:id="@+id/progress_calories"
@@ -263,7 +328,7 @@
                                 android:contentDescription="@string/add"
                                 android:paddingVertical="0dp"
                                 android:paddingEnd="@dimen/dimen_18"
-                                android:text="Suv ichdim"
+                                android:text="Qo'shish"
                                 android:textSize="14sp"
                                 app:icon="@drawable/add_ic"
                                 app:iconGravity="textStart"
@@ -304,17 +369,7 @@
                             app:trackStopIndicatorSize="0dp"
                             app:trackThickness="12dp"
                             tools:progress="40" />
-
-                        <TextView
-                            style="@style/Caption1_13"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:text="Suv ichish tanani tozalaydi, ishtahani kamaytiradi va vazn tashlashni osonlashtiradi."
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                      />
+]
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -373,7 +428,7 @@
                                 android:layout_height="40dp"
                                 android:paddingVertical="0dp"
                                 android:paddingEnd="@dimen/dimen_18"
-                                android:text="Mashq qildim"
+                                android:text="Qo'shish"
                                 android:textSize="14sp"
                                 app:icon="@drawable/add_ic"
                                 app:iconGravity="textStart"
@@ -441,16 +496,6 @@
                             android:visibility="gone"
                             tools:visibility="visible" />
 
-                        <TextView
-                            style="@style/Caption1_13"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:text="Harakat yog‘ni eritab, ozishga va sog‘lom bo‘lishga yordam beradi."
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                  />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

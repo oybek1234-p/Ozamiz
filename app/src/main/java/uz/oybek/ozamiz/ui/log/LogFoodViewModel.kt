@@ -1,10 +1,6 @@
-// uz.oybek.ozamiz.ui.log.LogFoodViewModel.kt
-package uz.oybek.ozamiz.ui.log
-
 import android.app.Application
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.database.ServerValue
@@ -12,17 +8,23 @@ import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.ImageUploader
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.DataWrapper
 import uz.oybek.ozamiz.data.LocalUser
+import uz.oybek.ozamiz.data.User
 import uz.oybek.ozamiz.data.UserRepository
 import uz.oybek.ozamiz.data.ai.GeminiAnalysisResult
 import uz.oybek.ozamiz.data.ai.GeminiFoodAnalyzer
+import uz.oybek.ozamiz.data.gamification.Badge
+import uz.oybek.ozamiz.data.gamification.GamificationConstants
+import uz.oybek.ozamiz.data.gamification.GamificationManager
 import uz.oybek.ozamiz.data.info.FoodLog
+import uz.oybek.ozamiz.data.info.MealsType
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
+import uz.oybek.ozamiz.data.utils.NutritionCalculator
 import uz.oybek.ozamiz.util.StreakManager
 import java.util.concurrent.TimeUnit
 
@@ -31,125 +33,122 @@ sealed class LogFoodUiState {
     data class Inputting(val mealType: String) : LogFoodUiState()
     data class Editing(val log: FoodLog) : LogFoodUiState()
     data object Analyzing : LogFoodUiState()
-    data class ShowResult(val result: GeminiAnalysisResult, val warnings: List<MealWarning>) :
-        LogFoodUiState()
+    data class ShowResult(
+        val analysisResult: GeminiAnalysisResult,
+        val healthAssessmentText: String?,
+        val isHealthyAssessment: Boolean?
+    ) : LogFoodUiState()
 
     data object Saving : LogFoodUiState()
     data object Success : LogFoodUiState()
     data class Error(val message: String) : LogFoodUiState()
     data object ShowFirstLogCongratulation : LogFoodUiState()
     data class ShowStreakContinued(val currentStreak: Int) : LogFoodUiState()
-    data object ShowPremiumPrompt : LogFoodUiState() // New state for premium prompt
+    data object ShowPremiumPrompt : LogFoodUiState()
+
+    data class ShowPointsEarned(val points: Int, val mealTypeName: String, val isHealthy: Boolean) : LogFoodUiState()
+    data class ShowNewBadgeUnlocked(val badge: Badge) : LogFoodUiState()
+    data class ShowMealGoalReached(val mealType: String, val recommendedSnacks: List<GamificationConstants.RecommendedSnackFood>) : LogFoodUiState()
 }
+
 
 class LogFoodViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dailyLogRepository = DailyLogRepository()
     private val imageUploader = ImageUploader
     private val foodAnalyzer = GeminiFoodAnalyzer
+    private val gamificationManager = GamificationManager()
     private val TAG = "LogFoodViewModel"
 
     private val _uiState = MutableStateFlow<LogFoodUiState>(LogFoodUiState.Loading)
     val uiState: StateFlow<LogFoodUiState> = _uiState.asStateFlow()
 
-    private var pendingLogData: FoodLog? = null
-    private var analysisResultForSheet: GeminiAnalysisResult? = null
-    private var generatedWarnings: List<MealWarning> = emptyList()
+    private var currentPendingLogData: FoodLog? = null
+    private var currentAnalysisResult: GeminiAnalysisResult? = null
+    private var currentUploadedUrlDuringAnalysis: String? = null
+
 
     var logToEdit: FoodLog? = null
     var mealType: String = ""
-    var selectedImageUri: Uri? = null
+    var selectedImageUri: Uri? = null // Bu Fragment tomonidan to'g'ridan-to'g'ri yangilanadi
     private var originalPhotoUrl: String? = null
-    private var uploadedUrlDuringAnalysis: String? = null
+
 
     fun loadArguments(arguments: Bundle?) {
-        val defaultMealType = arguments?.getString("mealType") ?: "snack"
+        val defaultMealTypeFromArgs = arguments?.getString("mealType") ?: MealsType.Snack.id
         val logJson = arguments?.getString("logToEditJson")
-        mealType = defaultMealType
-        Log.d(TAG, "loadArguments: mealType=$mealType, logJson=$logJson")
+        mealType = defaultMealTypeFromArgs
 
         if (logJson != null) {
             try {
                 logToEdit = Gson().fromJson(logJson, FoodLog::class.java)
                 originalPhotoUrl = logToEdit?.photoUrl
+                mealType = logToEdit?.mealType ?: defaultMealTypeFromArgs
                 _uiState.value = LogFoodUiState.Editing(logToEdit!!)
-                Log.d(TAG, "loadArguments: Editing log - ${logToEdit?.description}")
             } catch (e: Exception) {
                 _uiState.value = LogFoodUiState.Error("Log ma'lumotini o'qishda xatolik")
-                Log.e(TAG, "loadArguments: Error parsing logJson", e)
             }
         } else {
-            logToEdit = null; originalPhotoUrl = null
+            logToEdit = null
+            originalPhotoUrl = null
             _uiState.value = LogFoodUiState.Inputting(mealType)
-            Log.d(TAG, "loadArguments: Inputting new log for mealType=$mealType")
         }
-        selectedImageUri = null; pendingLogData = null; analysisResultForSheet =
-            null; generatedWarnings = emptyList(); uploadedUrlDuringAnalysis = null
+        // selectedImageUri bu yerda reset qilinmaydi, chunki fragment qayta yaratilganda saqlanishi kerak
+        currentPendingLogData = null
+        currentAnalysisResult = null
+        currentUploadedUrlDuringAnalysis = null
     }
 
     fun saveEditedLog(description: String) {
-        Log.d(TAG, "saveEditedLog: description=$description")
         if (logToEdit == null) return
         if (description.isBlank()) {
-            _uiState.value =
-                LogFoodUiState.Error(getApplication<Application>().getString(R.string.error_description_required)); stateHandled(); return
+            _uiState.value = LogFoodUiState.Error(getApplication<Application>().getString(R.string.error_description_required))
+            stateHandled()
+            return
         }
         _uiState.value = LogFoodUiState.Saving
         viewModelScope.launch {
-            var newPhotoUrl = originalPhotoUrl;
+            var newPhotoUrl = originalPhotoUrl
             var deleteOldImage = false
-            if (selectedImageUri != null) {
-                Log.d(TAG, "saveEditedLog: Uploading new image for edit.")
+            if (selectedImageUri != null) { // Only upload if a new image is selected
                 when (val uploadResult = imageUploader.uploadImage(selectedImageUri!!)) {
                     is DataWrapper.Success -> {
-                        newPhotoUrl =
-                            uploadResult.data; if (!originalPhotoUrl.isNullOrEmpty() && originalPhotoUrl != newPhotoUrl) {
+                        newPhotoUrl = uploadResult.data
+                        if (!originalPhotoUrl.isNullOrEmpty() && originalPhotoUrl != newPhotoUrl) {
                             deleteOldImage = true
                         }
-                        Log.d(
-                            TAG,
-                            "saveEditedLog: New image uploaded: $newPhotoUrl, old to delete: $originalPhotoUrl ($deleteOldImage)"
-                        )
                     }
-
                     is DataWrapper.Error -> {
-                        _uiState.value =
-                            LogFoodUiState.Error("Rasm yuklashda xato: ${uploadResult.error}"); return@launch
+                        _uiState.value = LogFoodUiState.Error("Rasm yuklashda xato: ${uploadResult.error}")
+                        return@launch
                     }
-
                     else -> {}
                 }
             }
-            val updatedLog =
-                logToEdit!!.copy(description = description.trim(), photoUrl = newPhotoUrl)
-            Log.d(TAG, "saveEditedLog: Updating log in repository: ${updatedLog.logId}")
+            val updatedLog = logToEdit!!.copy(description = description.trim(), photoUrl = newPhotoUrl)
             when (val result = dailyLogRepository.updateFoodLog(logToEdit!!.logId, updatedLog)) {
                 is DataWrapper.Success -> {
                     if (deleteOldImage) {
-                        Log.d(TAG, "saveEditedLog: Deleting old image: $originalPhotoUrl")
                         imageUploader.deleteImage(originalPhotoUrl)
                     }
                     _uiState.value = LogFoodUiState.Success
-                    Log.d(TAG, "saveEditedLog: Successfully updated.")
                 }
-
                 is DataWrapper.Error -> {
                     if (selectedImageUri != null && newPhotoUrl != originalPhotoUrl) {
                         newPhotoUrl?.let { imageUploader.deleteImage(it) }
-                    }; _uiState.value = LogFoodUiState.Error("Log saqlashda xato: ${result.error}")
-                    Log.e(TAG, "saveEditedLog: Error updating log: ${result.error}")
+                    }
+                    _uiState.value = LogFoodUiState.Error("Log saqlashda xato: ${result.error}")
                 }
-
                 else -> {}
             }
         }
     }
-
-    fun analyzeAndPrepareLog(description: String, type: String) {
+    fun analyzeAndPrepareLog(description: String, currentMealTypeArg: String) {
+        this.mealType = currentMealTypeArg
         val user = LocalUser.user
         val daysSinceRegistration = user.registerDate?.let {
             TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - it.time)
-        } ?: 0L // Default to 0 if registerDate is null
+        } ?: 0L
         val currentStreak = user.streakInfo?.currentStreak ?: 0
 
         if (!user.premium && daysSinceRegistration > 3 && currentStreak > 3) {
@@ -157,169 +156,168 @@ class LogFoodViewModel(application: Application) : AndroidViewModel(application)
             return
         }
 
-        val imageUriForAnalysis = selectedImageUri ?: originalPhotoUrl?.let { Uri.parse(it) }
+        // Use the ViewModel's selectedImageUri which is updated by the fragment
+        val imageUriForAnalysis = selectedImageUri
 
-        if (description.isBlank() && selectedImageUri == null) {
-            _uiState.value =
-                LogFoodUiState.Error(getApplication<Application>().getString(R.string.error_description_required)); stateHandled(); return
+        if (description.isBlank() && imageUriForAnalysis == null) {
+            _uiState.value = LogFoodUiState.Error(getApplication<Application>().getString(R.string.error_description_required))
+            stateHandled()
+            return
         }
         _uiState.value = LogFoodUiState.Analyzing
         viewModelScope.launch {
-            uploadedUrlDuringAnalysis = null
-            if (selectedImageUri != null) {
-                when (val uploadResult = imageUploader.uploadImage(selectedImageUri!!)) {
-                    is DataWrapper.Success -> {
-                        uploadedUrlDuringAnalysis = uploadResult.data
-                    }
-
+            currentUploadedUrlDuringAnalysis = null
+            if (imageUriForAnalysis != null) { // Check if Fragment has set a URI (gallery or camera)
+                when (val uploadResult = imageUploader.uploadImage(imageUriForAnalysis)) {
+                    is DataWrapper.Success -> currentUploadedUrlDuringAnalysis = uploadResult.data
                     is DataWrapper.Error -> {
-                        _uiState.value =
-                            LogFoodUiState.Error("Rasm yuklashda xato: ${uploadResult.error}"); return@launch
+                        _uiState.value = LogFoodUiState.Error("Rasm yuklashda xato: ${uploadResult.error}")
+                        return@launch
                     }
-
                     else -> {}
                 }
             }
 
-            Log.d(TAG, "analyzeAndPrepareLog: Sending to foodAnalyzer.")
-            when (val analysisDataWrapper =
-                foodAnalyzer.analyzeFood(imageUriForAnalysis, description.trim(), type)) {
+            when (val analysisDataWrapper = foodAnalyzer.analyzeFood(imageUriForAnalysis, description.trim(), mealType)) {
                 is DataWrapper.Success -> {
                     val analysisData = analysisDataWrapper.data
-                    analysisResultForSheet = analysisData
-                    pendingLogData = FoodLog(
+                    currentAnalysisResult = analysisData
+                    currentPendingLogData = FoodLog(
                         description = description.trim(),
                         calories = analysisData.estimatedCalories,
                         protein = analysisData.estimatedProtein,
                         fat = analysisData.estimatedFat,
                         carbs = analysisData.estimatedCarbs,
                         mealType = mealType,
-                        photoUrl = uploadedUrlDuringAnalysis ?: originalPhotoUrl,
-                        analysisInsights = analysisData.insights,
+                        photoUrl = currentUploadedUrlDuringAnalysis, // This will be null if no image was provided or upload failed
+                        analysisInsights = analysisData.insights + "\n" + (analysisData.warningsText ?: ""),
                         estimatedByAI = true,
                         timestamp = ServerValue.TIMESTAMP
                     )
-                    generatedWarnings = generateMealWarnings(analysisData)
-                    _uiState.value = LogFoodUiState.ShowResult(analysisData, generatedWarnings)
-                    Log.d(TAG, "analyzeAndPrepareLog: Analysis success, showing result.")
+                    _uiState.value = LogFoodUiState.ShowResult(
+                        analysisData,
+                        analysisData.healthFeedbackShort,
+                        analysisData.isHealthyForWeightLoss
+                    )
                 }
-
                 is DataWrapper.Error -> {
-                    uploadedUrlDuringAnalysis?.let { imageUploader.deleteImage(it) }
+                    currentUploadedUrlDuringAnalysis?.let { imageUploader.deleteImage(it) }
                     _uiState.value = LogFoodUiState.Error(analysisDataWrapper.error)
-                    Log.e(TAG, "analyzeAndPrepareLog: Analysis error: ${analysisDataWrapper.error}")
                 }
-
-                is DataWrapper.Loading -> {}
+                else -> {}
             }
         }
     }
 
-    private fun generateMealWarnings(result: GeminiAnalysisResult): List<MealWarning> {
-        val warnings = mutableListOf<MealWarning>()
-        if (result.estimatedFat != null && result.estimatedFat > 25.0) {
-            warnings.add(
-                MealWarning(
-                    "Yog'li ovqatlarni yeyishni kamaytiring)", isSerious = true
-                )
-            )
-        }
-        if (result.recognizedIngredients.any {
-                it.contains("non", ignoreCase = true) || it.contains(
-                    "bread", ignoreCase = true
-                )
-            }) {
-            warnings.add(
-                MealWarning("Oq noni iloji bo'lsa butunlay cheklang!")
-            )
-            warnings.add(
-                MealWarning("Qora non kuniga 1-2 bo'lak yeyish mumkin")
-            )
-        }
-        return warnings
-    }
 
     fun confirmAndSaveLog() {
-        if (pendingLogData == null) {
-            _uiState.value =
-                if (logToEdit != null) LogFoodUiState.Editing(logToEdit!!) else LogFoodUiState.Inputting(
-                    mealType
-                )
-            _uiState.update { LogFoodUiState.Error("Saqlash uchun ma'lumot yo'q.") }
-            Log.w(TAG, "confirmAndSaveLog: pendingLogData is null.")
+        val logDataToSave = currentPendingLogData
+
+        if (logDataToSave == null) {
+            _uiState.value = LogFoodUiState.Error("Saqlash uchun ma'lumot yo'q.")
             return
         }
         _uiState.value = LogFoodUiState.Saving
         viewModelScope.launch {
-            when (val result = dailyLogRepository.addFoodLog(pendingLogData!!)) {
+            when (val result = dailyLogRepository.addFoodLog(logDataToSave)) {
                 is DataWrapper.Success -> {
-                    handleStreakAfterLogSave()
+                    onLogSaved()
                 }
-
                 is DataWrapper.Error -> {
-                    uploadedUrlDuringAnalysis?.let { imageUploader.deleteImage(it) }
+                    currentUploadedUrlDuringAnalysis?.let { imageUploader.deleteImage(it) }
                     _uiState.value = LogFoodUiState.Error("Log saqlashda xatolik: ${result.error}")
                 }
-
                 else -> {}
             }
-            pendingLogData = null; analysisResultForSheet = null; generatedWarnings =
-            emptyList(); uploadedUrlDuringAnalysis = null
         }
     }
 
-    private fun handleStreakAfterLogSave() {
+    fun onLogSaved() {
         viewModelScope.launch {
             val currentUser = LocalUser.user
             val streakUpdateResult = StreakManager.updateUserStreakOnAction(currentUser)
 
             if (streakUpdateResult.updatedUser.streakInfo != currentUser.streakInfo) {
-                UserRepository.updateUser { user ->
-                    user.streakInfo = streakUpdateResult.updatedUser.streakInfo
-                }
-                LocalUser.user = streakUpdateResult.updatedUser
+                val userWithUpdatedStreak = streakUpdateResult.updatedUser
+                LocalUser.user = userWithUpdatedStreak
                 LocalUser.saveUser()
+                UserRepository.updateUser { dbUser ->
+                    dbUser.streakInfo = userWithUpdatedStreak.streakInfo
+                }
             }
 
             if (StreakManager.shouldShowFirstLogCongratulation(streakUpdateResult)) {
                 _uiState.value = LogFoodUiState.ShowFirstLogCongratulation
-            } else if (streakUpdateResult.streakContinued && (streakUpdateResult.updatedUser.streakInfo?.currentStreak
-                    ?: 0) > 1
-            ) {
-                _uiState.value =
-                    LogFoodUiState.ShowStreakContinued(streakUpdateResult.updatedUser.streakInfo!!.currentStreak)
+            } else if (streakUpdateResult.streakContinued && (streakUpdateResult.updatedUser.streakInfo?.currentStreak ?: 0) > 1) {
+                _uiState.value = LogFoodUiState.ShowStreakContinued(streakUpdateResult.updatedUser.streakInfo!!.currentStreak)
+            } else {
+                checkMealGoalReachedAndFinalize()
+            }
+        }
+    }
+    private fun checkMealGoalReachedAndFinalize() {
+        val typeForGoalCheck = currentPendingLogData?.mealType ?: mealType
+        checkMealGoalReached(LocalUser.user, typeForGoalCheck) { reached, snacks ->
+            if (reached) {
+                _uiState.value = LogFoodUiState.ShowMealGoalReached(typeForGoalCheck, snacks)
             } else {
                 _uiState.value = LogFoodUiState.Success
+            }
+            clearTemporaryAnalysisData()
+        }
+    }
+
+    private fun checkMealGoalReached(user: User, mealTypeToCheck: String, onResult: (Boolean, List<GamificationConstants.RecommendedSnackFood>) -> Unit) {
+        val mealTargetCalories = NutritionCalculator.distributeCaloriesForMeals(user.targetCalories)[mealTypeToCheck] ?: 0
+        if (mealTargetCalories <= 0) {
+            onResult(false, emptyList())
+            return
+        }
+        viewModelScope.launch {
+            val todayLogsWrapper = dailyLogRepository.observeTodayLogs().firstOrNull { it is DataWrapper.Success || it is DataWrapper.Error }
+            if (todayLogsWrapper is DataWrapper.Success) {
+                val consumedForMeal = todayLogsWrapper.data.foodLogs?.values
+                    ?.filter { it.mealType == mealTypeToCheck }
+                    ?.sumOf { it.calories } ?: 0
+                if (consumedForMeal >= mealTargetCalories) {
+                    val snacks = GamificationConstants.getSnackRecommendationsForMeal(mealTypeToCheck)
+                    onResult(true, snacks)
+                } else {
+                    onResult(false, emptyList())
+                }
+            } else {
+                onResult(false, emptyList())
             }
         }
     }
 
-
     fun cancelAnalysisOrResetState() {
-        Log.d(TAG, "cancelAnalysisOrResetState called.")
         viewModelScope.launch {
-            uploadedUrlDuringAnalysis?.let {
-                Log.d(TAG, "Deleting uploaded image during analysis cancellation: $it")
+            currentUploadedUrlDuringAnalysis?.let {
                 imageUploader.deleteImage(it)
             }
-            pendingLogData = null; analysisResultForSheet = null; generatedWarnings =
-            emptyList(); uploadedUrlDuringAnalysis = null
+            clearTemporaryAnalysisData()
             stateHandled()
         }
     }
 
+    private fun clearTemporaryAnalysisData() {
+        currentPendingLogData = null
+        currentAnalysisResult = null
+        currentUploadedUrlDuringAnalysis = null
+        // selectedImageUri ni bu yerda null qilmaymiz, chunki fragment qayta yaratilsa,
+        // foydalanuvchi tanlagan rasm yo'qolib qolmasligi kerak.
+        // U faqat log muvaffaqiyatli saqlanganda yoki fragment to'liq yopilganda (onDestroy) tozalanishi mumkin.
+    }
+
     fun stateHandled() {
-        Log.d(TAG, "stateHandled called. Current state: ${_uiState.value}")
         val currentState = _uiState.value
-        // Reset to inputting or editing state after certain terminal/intermediate states.
-        if (currentState is LogFoodUiState.ShowResult || currentState is LogFoodUiState.Error || currentState is LogFoodUiState.Success || currentState is LogFoodUiState.Saving || currentState is LogFoodUiState.ShowFirstLogCongratulation || currentState is LogFoodUiState.ShowStreakContinued || currentState is LogFoodUiState.ShowPremiumPrompt || // Also reset after premium prompt
-            currentState is LogFoodUiState.Analyzing
-        ) { // Reset if analysis was interrupted somehow
+        if (currentState !is LogFoodUiState.Inputting &&
+            currentState !is LogFoodUiState.Editing &&
+            currentState !is LogFoodUiState.Analyzing) {
             _uiState.value = if (logToEdit != null) {
-                Log.d(TAG, "stateHandled: Resetting to Editing state.")
                 LogFoodUiState.Editing(logToEdit!!)
             } else {
-                Log.d(TAG, "stateHandled: Resetting to Inputting state for mealType=$mealType.")
                 LogFoodUiState.Inputting(mealType)
             }
         }

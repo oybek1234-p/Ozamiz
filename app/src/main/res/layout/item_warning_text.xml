@@ -9,14 +9,6 @@
     android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
-    <ImageView
-        android:id="@+id/icon_warning"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/info_ic"
-        app:tint="@color/colorWarning" />
-
     <TextView
         android:id="@+id/textView_warning"
         style="@style/Text2_15"

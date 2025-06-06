@@ -167,7 +167,7 @@ class HomeViewModel : ViewModel() {
 
         // Weight Goal Section Logic
         var showGoalSection = false
-        var currentWeightDisp = user.weight
+        val currentWeightDisp = user.weight
         var initialWeightGoalDisp = effectiveStartWeight ?: user.weight // Use effectiveStartWeight
         var targetWeightDisp = 0.0
         var weightLostDisp = 0.0
@@ -252,7 +252,6 @@ class HomeViewModel : ViewModel() {
             activeDays = activeDaysFromStreak
         )
     }
-
 
     private fun processReminders(user: User?): Pair<List<ReminderItem>, Map<String, String>> {
         if (user?.reminderSettings == null) {

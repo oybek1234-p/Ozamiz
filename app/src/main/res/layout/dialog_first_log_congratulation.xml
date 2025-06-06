@@ -4,25 +4,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginHorizontal="24dp"
+    android:layout_height="match_parent"
     app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
-    app:cardBackgroundColor="?colorSurfaceContainerLowest">
+    app:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
+        android:background="?colorSurface"
         android:padding="24dp"
-        android:gravity="center_horizontal">
+        android:layout_gravity="center"
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/image_congrats_icon"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/fire_ic"
-            app:tint="#FFC107"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/congratulation_woman"
+            app:lottie_autoPlay="true"
             android:layout_marginBottom="16dp"/>
 
         <TextView
@@ -30,27 +30,27 @@
             style="@style/Title2_20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tabriklaymiz!"
+            android:text="Birinchi ovqatni kiritdingiz!"
             android:textColor="?colorOnSurface"
             android:gravity="center"/>
 
         <TextView
             android:id="@+id/text_congrats_message"
-            style="@style/Text1_16"
+            style="@style/Text2_15"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textColor="?colorOnSurface"
             android:gravity="center"
-            android:text="Siz bugungi birinchi ovqatingizni kiritdingiz.\nOzishga birinchi qadam tashladingiz!\nShunday davom eting!" />
+            android:text="Ozishga birinchi qadam tashladingiz!\nShunday davom eting!" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_congrats_ok"
             style="@style/Widget.Material3.Button"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Ajoyib !" />
+            android:text="Davom etish" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -1,3 +1,4 @@
+// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\data\LocalUser.kt
 package uz.oybek.ozamiz.data
 
 import android.content.Context
@@ -19,26 +20,20 @@ object LocalUser {
     var user = User()
         set(value) {
             val oldSettings = field.reminderSettings
-            val oldStreakInfo = field.streakInfo
-            val oldAvatarUrl = field.avatarUrl
-            val oldLastWeightLogTimestamp = field.lastWeightLogTimestamp
-            val oldRegisterDate = field.registerDate
-            val oldStartWeight = field.startWeight
-            val oldPaymentChecking = field.paymentChecking // Save old paymentChecking
-            val oldIsAdmin = field.isAdmin // Save old isAdmin
+            // Gamification maydonlarini ham tekshirish mumkin, agar UI darhol yangilanishi kerak bo'lsa
+            val oldScorePoints = field.scorePoints
+            val oldUnlockedBadgeIds = field.unlockedBadgeIds
 
             field = value
-            userLive.postVal(value)
+            userLive.postVal(value) // LiveData orqali UI ni xabardor qilish
+
             if (oldSettings != value.reminderSettings) {
                 ReminderScheduler.scheduleAllActiveReminders(appContext)
             }
-            if (oldAvatarUrl != value.avatarUrl ||
-                oldLastWeightLogTimestamp != value.lastWeightLogTimestamp ||
-                oldRegisterDate != value.registerDate ||
-                oldStartWeight != value.startWeight ||
-                oldPaymentChecking != value.paymentChecking || // Check paymentChecking
-                oldIsAdmin != value.isAdmin) { // Check isAdmin
-                // Trigger UI updates or other logic if needed
+
+            // Agar ballar yoki nishonlar o'zgarsa, qo'shimcha logikani ishga tushirish mumkin
+            if (oldScorePoints != value.scorePoints || oldUnlockedBadgeIds != value.unlockedBadgeIds) {
+                // Masalan, profil ekranini yangilash uchun signal yuborish
             }
         }
 
@@ -107,9 +102,29 @@ object LocalUser {
                 val regDateMillis = getLong("registerDateMillis", 0L)
                 registerDate = if (regDateMillis > 0) Date(regDateMillis) else null
 
-                paymentChecking = getBoolean("paymentChecking", false) // Load paymentChecking
-                paymentCheckPhotoUrl = getString("paymentCheckPhotoUrl", null) // Load paymentCheckPhotoUrl
-                isAdmin = getBoolean("isAdmin", false) // Load isAdmin
+                paymentChecking = getBoolean("paymentChecking", false)
+                paymentCheckPhotoUrl = getString("paymentCheckPhotoUrl", null)
+                isAdmin = getBoolean("isAdmin", false)
+
+                // Darslar uchun
+                experiencePoints = getInt("experiencePoints", 0)
+                lessonLives = getInt("lessonLives", 5)
+                lastLifeRefillTimestamp = getLong("lastLifeRefillTimestamp", 0L)
+
+                // Gamification
+                scorePoints = getInt("scorePoints", 0)
+                val unlockedBadgesJson = getString("unlockedBadgeIdsJson", null)
+                if (!unlockedBadgesJson.isNullOrEmpty()) {
+                    try {
+                        val type = object : TypeToken<List<String>>() {}.type
+                        unlockedBadgeIds = gson.fromJson(unlockedBadgesJson, type) ?: emptyList()
+                    } catch (e: Exception) {
+                        Log.e("LocalUser", "Error parsing unlockedBadgeIds JSON", e)
+                        unlockedBadgeIds = emptyList()
+                    }
+                } else {
+                    unlockedBadgeIds = emptyList()
+                }
             }
         }
         user = loadedUser
@@ -175,19 +190,34 @@ object LocalUser {
                 putBoolean("hasSeenWeightPhotoInfo", hasSeenWeightPhotoInfo)
                 putLong("registerDateMillis", registerDate?.time ?: 0L)
 
-                putBoolean("paymentChecking", paymentChecking) // Save paymentChecking
-                putString("paymentCheckPhotoUrl", paymentCheckPhotoUrl) // Save paymentCheckPhotoUrl
-                putBoolean("isAdmin", isAdmin) // Save isAdmin
+                putBoolean("paymentChecking", paymentChecking)
+                putString("paymentCheckPhotoUrl", paymentCheckPhotoUrl)
+                putBoolean("isAdmin", isAdmin)
+
+                // Darslar uchun
+                putInt("experiencePoints", experiencePoints)
+                putInt("lessonLives", lessonLives)
+                putLong("lastLifeRefillTimestamp", lastLifeRefillTimestamp)
+
+                // Gamification
+                putInt("scorePoints", scorePoints)
+                try {
+                    val badgesJson = gson.toJson(unlockedBadgeIds)
+                    putString("unlockedBadgeIdsJson", badgesJson)
+                } catch (e: Exception) {
+                    Log.e("LocalUser", "Error saving unlockedBadgeIds JSON", e)
+                    remove("unlockedBadgeIdsJson")
+                }
             }
             apply()
         }
-        userLive.postVal(user.copy())
+        userLive.postVal(user.copy()) // Ensure LiveData is updated with a new instance
     }
 
     fun clearUser() {
         val prefEditor = preference(appContext).edit()
         prefEditor.clear()
         prefEditor.apply()
-        user = User()
+        user = User() // Reset to default User object
     }
 }

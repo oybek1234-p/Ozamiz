@@ -127,13 +127,13 @@
 
     </style>
 
-    <style name="MacroItemLabel" parent="Headline3_15">
+    <style name="MacroItemLabel" parent="Subtitle3_13">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">?colorOnSurface</item>
     </style>
 
-    <style name="MacroItemValue" parent="Text1_14">
+    <style name="MacroItemValue" parent="Text2_15">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">?colorOnSurfaceVariant</item>

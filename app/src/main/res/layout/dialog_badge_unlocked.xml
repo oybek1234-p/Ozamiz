@@ -1,0 +1,75 @@
+<!-- C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\res\layout\dialog_badge_unlocked.xml -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="24dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="?colorSurfaceContainerLowest">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_animation_badge"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            app:lottie_fileName="done_anim.json"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="false"/>
+
+        <TextView
+            android:id="@+id/textView_badge_unlocked_title"
+            style="@style/Title2_20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            tools:text="Tabriklaymiz!"
+            android:textColor="?colorOnSurface"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textView_badge_name_unlocked"
+            style="@style/Headline2_16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textColor="?colorPrimary"
+            tools:text="Siz Ovqat Ustasi nishonini oldingiz!"/>
+
+        <ImageView
+            android:id="@+id/imageView_unlocked_badge"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="12dp"
+            tools:src="@drawable/badge_plate_placeholder"
+            android:contentDescription="Yangi nishon"/>
+
+        <TextView
+            android:id="@+id/textView_badge_description_unlocked"
+            style="@style/TextBodyMedium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="?colorOnSurfaceVariant"
+            android:gravity="center"
+            tools:text="Sog'lom ovqat tanlashda ustasiz!"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_badge_ok"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Ajoyib!" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
