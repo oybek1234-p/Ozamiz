@@ -11,7 +11,7 @@ import uz.oybek.ozamiz.R
 class MyToolBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet?,
-    defS: Int = com.google.android.material.R.attr.toolbarStyle
+    defS: Int = com.google.android.material.R.attr.toolbarSurfaceStyle
 ) : MaterialToolbar(
     context,
     attrs,

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:paddingBottom="@dimen/dimen_24"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/dimen_24"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/dimen_18">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ozamiz_logo"
+                app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="@dimen/dimen_18"
+                android:text="Ozamiz ilovasini baxolang"
+                android:textColor="?colorOnSurface" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatRatingBar
+            android:id="@+id/rate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dimen_24"
+            android:numStars="5"
+            android:stepSize="0.1" />
+
+    </LinearLayout>
+</layout>

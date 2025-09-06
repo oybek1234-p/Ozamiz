@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/answer_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="12dp"
+    app:cardElevation="1dp"
+    app:strokeWidth="1dp"
+    app:cardCornerRadius="@dimen/dimen_12"
+    app:strokeColor="?colorOutlineVariant">
+
+    <TextView
+        android:id="@+id/answer_text"
+        style="@style/Title3_17"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:fontFamily="@font/roboto_medium"
+        android:textColor="?colorOnSurface"
+        tools:text="Javob varianti matni" />
+
+</com.google.android.material.card.MaterialCardView>

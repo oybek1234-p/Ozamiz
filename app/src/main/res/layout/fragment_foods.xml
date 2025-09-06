@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest"
+    android:background="?colorSurfaceContainerLow"
     tools:context=".ui.foods.FoodsFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -18,12 +17,21 @@
             android:id="@+id/toolbar_foods"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:visibility="gone"
-            app:menu="@menu/recipe_feed_menu"
             app:title="@string/foods_title"
             app:titleCentered="true"
             app:titleTextAppearance="@style/Title2_20"
             app:titleTextColor="?colorOnSurface" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMode="scrollable"
+            app:tabGravity="fill"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorColor="?colorPrimary"
+            app:tabSelectedTextColor="?colorPrimary"
+            app:tabTextColor="?colorOnSurfaceVariant" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -33,333 +41,193 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/scrollViewContent"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingBottom="88dp">
+            android:layout_height="match_parent">
 
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/scrollViewContent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToOutline="false"
+                android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:orientation="vertical"
-                android:padding="@dimen/dimen_18">
+                android:paddingBottom="88dp">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:id="@+id/dayCount"
-                        style="@style/Title2_20"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bugun 1-kun"
-                        android:visibility="gone"
-                        android:textColor="?colorOnSurface"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/heavyFoodsButton"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    android:layout_marginTop="@dimen/dimen_12"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardElevation="@dimen/dimen_2"
-                    app:contentPadding="@dimen/dimen_12">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/imageView3"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:src="@drawable/plov_icon"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:shapeAppearance="@style/CircleImageView" />
-
-                        <TextView
-                            android:id="@+id/textView9"
-                            style="@style/Headline2_16"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dimen_12"
-                            android:drawableEnd="@drawable/arrow_right"
-                            android:text="Semirtiradigan ovqatlar"
-                            android:textColor="?colorOnSurface"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@+id/imageView3"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <TextView
-                            style="@style/Text2_15"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:text="Kaloriyasi yuqori ovqatlar buyicha tavisiyalar"
-                            android:textColor="?colorOnSurfaceVariant"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="@+id/textView9"
-                            app:layout_constraintTop_toBottomOf="@+id/textView9" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:id="@+id/textView_categories_title"
-                    style="@style/Title3_17"
-                    android:layout_marginTop="@dimen/dimen_12"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Kategoriyalar"
-                    android:textColor="?colorOnSurface" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView_food_categories"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:clipToPadding="false"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="5"
-                    tools:listitem="@layout/item_food_category" />
+                    android:orientation="vertical"
+                    android:paddingTop="8dp">
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                    <!-- Meal Plan Section -->
+                    <FrameLayout
+                        android:id="@+id/frameLayout_meal_plan_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="300dp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recyclerView_meal_plan"
+                            android:layout_width="match_parent"
+                            android:clipToPadding="false"
+                            android:paddingHorizontal="@dimen/dimen_12"
+                            android:paddingVertical="8dp"
+                            android:layout_height="wrap_content"
+                            android:nestedScrollingEnabled="false"
+                            android:visibility="gone"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="4"
+                            tools:listitem="@layout/item_planned_meal"
+                            tools:visibility="visible" />
+
+                        <LinearLayout
+                            android:id="@+id/layout_plan_loader"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+                            <ProgressBar
+                                android:id="@+id/progressBar_plan"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:indeterminate="true"/>
+                            <TextView
+                                android:id="@+id/textView_plan_loader_text"
+                                style="@style/TextBodyMedium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:textColor="?colorOnSurfaceVariant"
+                                android:text="Reja tuzilmoqda..."/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layout_premium_prompt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/lock_ic"
+                                app:tint="?colorPrimary"/>
+                            <TextView
+                                style="@style/Headline3_15"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                android:gravity="center"
+                                android:text="Ushbu kun rejasini ko'rish uchun\nPremiumga o'ting"/>
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/button_go_to_premium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="12dp"
+                                app:icon="@drawable/star_ic"
+                                android:text="Premiumga O'tish"/>
+                        </LinearLayout>
+                    </FrameLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_replace_all_meals"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:text="Rejani to'liq almashtirish"
+                        app:icon="@drawable/replace_ic"
+                       />
 
                     <TextView
-                        android:id="@+id/textView_popular_recipes_title"
+                        android:id="@+id/textView_categories_title"
                         style="@style/Title3_17"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
-                        android:text="Foydali retseptlar"
+                        android:paddingHorizontal="16dp"
+                        android:text="Kategoriyalar"
                         android:textColor="?colorOnSurface" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_see_all_recipes"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerView_food_categories"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end|center_vertical"
                         android:layout_marginTop="8dp"
-                        android:text="Barchasi"
-                        app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd" />
-                </FrameLayout>
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="5"
+                        tools:listitem="@layout/item_food_category" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView_popular_recipes"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:clipToPadding="false"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_recipe_horizontal" />
-
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    >
-
-                    <TextView
-                        android:id="@+id/textView_breakfast_ideas_title"
-                        style="@style/Title3_17"
-                        android:layout_width="wrap_content"
+                    <FrameLayout
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/button_see_all_breakfast"
-                        android:text="@string/breakfast"
-                        android:textColor="?colorOnSurface" />
+                        android:layout_marginTop="24dp"
+                        android:paddingHorizontal="16dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_see_all_breakfast"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/textView_popular_recipes_title"
+                            style="@style/Title3_17"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start|center_vertical"
+                            android:text="Foydali retseptlar"
+                            android:textColor="?colorOnSurface" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_see_all_recipes"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end|center_vertical"
+                            android:text="@string/see_all"
+                            app:icon="@drawable/arrow_right"
+                            app:iconGravity="textEnd" />
+                    </FrameLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerView_popular_recipes"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:text="Barchasi"
-                        app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd"
-                        tools:visibility="visible" />
-                </RelativeLayout>
+                        android:layout_marginTop="8dp"
+                        android:clipToPadding="false"
+                        android:visibility="gone"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_recipe_horizontal" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView_breakfast_ideas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_simple_meal_idea" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                >
-
-                    <TextView
-                        android:id="@+id/textView_lunch_ideas_title"
-                        style="@style/Title3_17"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/button_see_all_lunch"
-                        android:text="@string/lunch"
-                        android:textColor="?colorOnSurface" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_see_all_lunch"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:text="Barchasi"
-                        app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd"
-                        tools:visibility="visible" />
-                </RelativeLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView_lunch_ideas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_simple_meal_idea" />
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                   >
-
-                    <TextView
-                        android:id="@+id/textView_dinner_ideas_title"
-                        style="@style/Title3_17"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/button_see_all_dinner"
-                        android:text="@string/dinner"
-                        android:textColor="?colorOnSurface" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_see_all_dinner"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:text="Barchasi"
-                        app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd"
-                        tools:visibility="visible" />
-                </RelativeLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView_dinner_ideas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_simple_meal_idea" />
-
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-               >
-
-                    <TextView
-                        android:id="@+id/textView_snack_ideas_title"
-                        style="@style/Text2_15"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentStart="true"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/button_see_all_snack"
-                        android:text="@string/snack"
-                        android:textColor="?colorOnSurface" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/button_see_all_snack"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:text="Barchasi"
-                        app:icon="@drawable/arrow_right"
-                        app:iconGravity="textEnd"
-                        tools:visibility="visible" />
-                </RelativeLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView_snack_ideas"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/item_simple_meal_idea" />
-
-            </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+            <ProgressBar
+                android:id="@+id/progressBar_foods_overall"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+        </FrameLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar_foods_overall"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_food_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginHorizontal="@dimen/dimen_48"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="100dp"
         android:contentDescription="@string/add_workout_or_category"
         android:src="@drawable/add_ic"

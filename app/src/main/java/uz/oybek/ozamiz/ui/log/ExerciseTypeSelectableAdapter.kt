@@ -76,7 +76,7 @@ class ExerciseTypeSelectableAdapter(
             val context = itemView.context
 
             // Resolve theme attributes for colors
-            val strokeColorAttr = if (isSelected) com.google.android.material.R.attr.colorPrimary else com.google.android.material.R.attr.colorOutlineVariant
+            val strokeColorAttr = if (isSelected) com.google.android.material.R.attr.colorPrimarySurface else com.google.android.material.R.attr.colorOutlineVariant
             val backgroundColorAttr = if (isSelected) com.google.android.material.R.attr.colorPrimaryContainer else android.R.attr.colorBackground // Use standard background for non-selected
 
             val resolvedStrokeColor = getThemeColor(context, strokeColorAttr)

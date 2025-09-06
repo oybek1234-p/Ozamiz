@@ -9,7 +9,7 @@ import java.util.UUID
 
 object AudioUploader {
 
-    private const val AUDIO_PATH = "exercise_audio"
+    private const val AUDIO_PATH = "audios"
 
     private fun getStorageRef(): StorageReference {
         return storage.reference.child(AUDIO_PATH)
@@ -17,7 +17,6 @@ object AudioUploader {
 
     suspend fun uploadAudio(uri: Uri): DataWrapper<String> {
         return try {
-            // Extract file extension or default to mp3/m4a?
             val fileExtension = appContext.contentResolver.getType(uri)?.substringAfterLast('/') ?: "m4a"
             val fileName = "${UUID.randomUUID()}.$fileExtension"
             val audioRef = getStorageRef().child(fileName)

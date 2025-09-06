@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?backgroundColor">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <uz.oybek.ozamiz.ui.base.MyToolBar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="Darslik">
+
+            <LinearLayout
+                android:id="@+id/test_progress_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/test_progress_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    app:indicatorTrackGapSize="0dp"
+                    app:trackCornerRadius="@dimen/dimen_4"
+                    app:trackStopIndicatorSize="0dp"
+                    app:trackThickness="@dimen/dimen_10"
+                    tools:progress="50" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/like_ic"
+                    app:tint="@color/likeColor" />
+
+                <TextView
+                    android:id="@+id/lives_count_text"
+                    style="@style/Headline2_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="16dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="@color/likeColor"
+                    tools:text="5" />
+            </LinearLayout>
+
+        </uz.oybek.ozamiz.ui.base.MyToolBar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ScrollView
+            android:id="@+id/course_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/course_title"
+                    style="@style/Text1.Text1_22_Bold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Nega semiramiz?" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    app:shapeAppearanceOverlay="@style/RadiusImageView12"
+                    android:id="@+id/course_image"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="centerCrop"
+                    tools:src="@drawable/placeholder_food" />
+
+                <!-- New Audio Player Include -->
+                <include
+                    android:id="@+id/audio_player_view"
+                    layout="@layout/include_audio_player"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/course_about"
+                    style="@style/Title3_17"
+                    android:fontFamily="@font/roboto_regular"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    android:layout_marginTop="24dp"
+                    android:lineSpacingMultiplier="1.2"
+                    tools:text="Juda ko'p ovqat (o'ylamasdan, televizor qarshisida)" />
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:id="@+id/test_container"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/test_question"
+                    style="@style/Title4_24"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    tools:text="Tana ortiqcha ovqatni nima qiladi?" />
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/test_image"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="centerCrop"
+
+                    android:visibility="gone"
+                    app:shapeAppearanceOverlay="@style/RadiusImageView12"
+                    tools:src="@drawable/placeholder_food"
+                    tools:visibility="visible" />
+
+                <LinearLayout
+                    android:id="@+id/answers_container_linear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical" />
+
+                <GridLayout
+                    android:id="@+id/answers_container_grid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:columnCount="2"
+                    android:useDefaultMargins="true" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_check_answer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_margin="16dp"
+        android:text="Tekshirish"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

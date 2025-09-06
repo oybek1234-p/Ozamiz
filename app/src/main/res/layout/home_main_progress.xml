@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/dimen_12"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="0.4">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurfaceContainerLowest"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ovqat meyori"
+            android:textColor="?colorOnSurface"
+            style="@style/Text1_16"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewCalories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2139 qoldi"
+            android:textColor="?colorOnSurface"
+            style="@style/Headline2_16"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/consumed_cal"
+            style="@style/Text1_14"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:text="500 yeyildi"
+            android:textColor="?colorOnSurfaceVariant"
+            app:layout_constraintEnd_toEndOf="@+id/progressIndicatorCalories"
+            app:layout_constraintTop_toBottomOf="@+id/progressIndicatorCalories" />
+
+        <TextView
+            android:id="@+id/remaining_cal"
+            style="@style/Headline3_15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"
+            android:text="2200 meyor"
+            android:textColor="?colorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/progressIndicatorCalories"
+            app:layout_constraintTop_toBottomOf="@+id/progressIndicatorCalories" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressIndicatorCalories"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:indicatorColor="#4CAF50"
+            app:indicatorTrackGapSize="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewTitle"
+            app:trackColor="#E0E0E0"
+            app:trackCornerRadius="4dp"
+            app:trackStopIndicatorSize="0dp"
+            app:trackThickness="8dp" />
+
+
+        <TextView
+            android:id="@+id/textViewCarbsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_18"
+            android:text="Uglevod"
+            android:textColor="?colorOnSurfaceVariant"
+            style="@style/Caption2_12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/consumed_cal" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressIndicatorCarbs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
+            app:indicatorTrackGapSize="0dp"
+            android:progress="20"
+            app:indicatorColor="#FFEB3B"
+            app:layout_constraintEnd_toStartOf="@id/guideline_vertical_33"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewCarbsLabel"
+            app:trackColor="#E0E0E0"
+            app:trackCornerRadius="4dp"
+            app:trackStopIndicatorSize="0dp"
+            app:trackThickness="8dp" />
+
+        <TextView
+            android:id="@+id/textViewCarbsValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="133 / 267 g"
+            android:textColor="?colorOnSurfaceVariant"
+            style="@style/Caption2_12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/progressIndicatorCarbs" />
+
+        <TextView
+            android:id="@+id/textViewProteinLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Oqsil"
+            android:textColor="?colorOnSurfaceVariant"
+            style="@style/Caption2_12"
+            app:layout_constraintStart_toStartOf="@id/guideline_vertical_33"
+            app:layout_constraintTop_toTopOf="@+id/textViewCarbsLabel" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressIndicatorProtein"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:progress="50"
+            android:layout_marginEnd="12dp"
+            app:indicatorColor="#8BC34A"
+            app:indicatorTrackGapSize="0dp"
+            app:layout_constraintEnd_toStartOf="@id/guideline_vertical_66"
+            app:layout_constraintStart_toStartOf="@id/guideline_vertical_33"
+            app:layout_constraintTop_toBottomOf="@id/textViewProteinLabel"
+            app:trackColor="#E0E0E0"
+            app:trackCornerRadius="4dp"
+            app:trackStopIndicatorSize="0dp"
+            app:trackThickness="8dp" />
+
+        <TextView
+            android:id="@+id/textViewProteinValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="53 / 107 g"
+            android:textColor="?colorOnSurfaceVariant"
+            style="@style/Caption2_12"
+            app:layout_constraintStart_toStartOf="@id/guideline_vertical_33"
+            app:layout_constraintTop_toBottomOf="@id/progressIndicatorProtein" />
+
+        <TextView
+            android:id="@+id/textViewFatsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Yog'"
+            android:textColor="?colorOnSurfaceVariant"
+            style="@style/Caption2_12"
+            app:layout_constraintStart_toStartOf="@id/guideline_vertical_66"
+            app:layout_constraintTop_toTopOf="@+id/textViewProteinLabel" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressIndicatorFats"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:indicatorColor="#FF9800"
+            android:progress="50"
+            app:indicatorTrackGapSize="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/guideline_vertical_66"
+            app:layout_constraintTop_toBottomOf="@id/textViewFatsLabel"
+            app:trackColor="#E0E0E0"
+            app:trackCornerRadius="4dp"
+            app:trackStopIndicatorSize="0dp"
+            app:trackThickness="8dp" />
+
+        <TextView
+            android:id="@+id/textViewFatsValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="36 / 71 g"
+            android:textColor="?colorOnSurfaceVariant"
+            style="@style/Caption2_12"
+            app:layout_constraintStart_toStartOf="@id/guideline_vertical_66"
+            app:layout_constraintTop_toBottomOf="@id/progressIndicatorFats" />
+
+        <!-- Vertikal yo'naltiruvchi chiziqlar -->
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_vertical_33"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.33" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_vertical_66"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.66" />
+
+        <TextView
+            android:id="@+id/textView13"
+            style="@style/Headline3_15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_14"
+            android:drawablePadding="@dimen/dimen_8"
+            android:drawableTint="?colorPrimary"
+            android:gravity="center_vertical|start"
+            android:text="Batafsil o'rganish"
+            android:visibility="gone"
+            android:textColor="?colorPrimary"
+            app:drawableStartCompat="@drawable/info_ic"
+            app:layout_constraintTop_toBottomOf="@+id/textViewCarbsValue"
+            tools:layout_editor_absoluteX="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/textView13"
+            tools:layout_editor_absoluteX="21dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_8"
+                android:text="Hamma ovqatlarni quvvati bor, osh, non, chips, kola, \nMeyordan ko'p quvvat yedingiz = semirasiz"
+                android:textColor="#757575"
+                android:textSize="15sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

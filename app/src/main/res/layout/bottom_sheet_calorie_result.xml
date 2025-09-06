@@ -44,8 +44,9 @@
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/imageView_illustration"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:visibility="gone"
                     android:layout_gravity="center_horizontal"
                     android:scaleType="centerCrop"
                     android:src="@drawable/food_icon"
@@ -56,27 +57,24 @@
                 <TextView
                     android:id="@+id/food_name"
                     style="@style/Text1_16"
+                    android:textSize="17sp"
                     android:layout_width="0dp"
-                    android:layout_marginTop="@dimen/dimen_12"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:layout_marginStart="@dimen/dimen_12"
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:text="2 sih shashlik va oq non"
-                    android:textColor="?colorOnSurfaceVariant"
+                    android:textColor="?colorOnSurface"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageView_illustration"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/textView_estimatedCalories"
-                    style="@style/Title3_17"
-                    android:layout_marginTop="@dimen/dimen_8"
-                    android:background="@drawable/round_lay"
-                    android:backgroundTint="#FFEAD5"
+                    style="@style/Title2_20"
+                    android:fontFamily="@font/roboto_bold"
                     android:layout_width="wrap_content"
-                    android:paddingHorizontal="@dimen/dimen_12"
                     android:paddingVertical="@dimen/dimen_4"
                     android:layout_height="wrap_content"
                     android:drawableTint="#FF9800"
@@ -127,6 +125,10 @@
                 android:id="@+id/textView_calorieInsights"
                 style="@style/Text1_16"
                 android:lineSpacingExtra="1.4dp"
+                android:padding="@dimen/dimen_18"
+                android:backgroundTint="?colorSurfaceContainer"
+                android:background="@drawable/round_lay"
+                android:elevation="@dimen/dimen_4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
@@ -198,6 +200,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
+                android:clipToPadding="false"
+                android:paddingVertical="@dimen/dimen_8"
                 android:baselineAligned="false"
                 android:orientation="horizontal">
 

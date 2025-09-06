@@ -1,4 +1,3 @@
-// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\data\ai\GeminiFoodAnalyzer.kt
 package uz.oybek.ozamiz.data.ai
 
 import android.content.Context
@@ -7,186 +6,130 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.content
-import com.google.ai.client.generativeai.type.generationConfig
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.content
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.DataWrapper
 import uz.oybek.ozamiz.data.LocalUser
-import uz.oybek.ozamiz.handleException
-import java.io.IOException
 
 object GeminiFoodAnalyzer {
 
-    private const val API_KEY = "AIzaSyC0wvLIiXMkIx-LosviSlXSJKLrbpXdgfI"
-    private const val TAG = "GeminiFoodAnalyzer"
-
-    private val generativeModel: GenerativeModel? by lazy {
-        if (API_KEY.isBlank()) {
-            return@lazy null
-        }
-        try {
-            val config = generationConfig {
-                temperature = 0.6f
-                maxOutputTokens = 500
-            }
-            GenerativeModel(
-                modelName = "gemini-2.0-flash", // Hozircha shu modelda qolamiz
-                apiKey = API_KEY,
-                generationConfig = config
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Error initializing GenerativeModel (Gemini)", e)
-            null
-        }
+    private val foodAnalysisModel by lazy {
+        Firebase.ai.generativeModel("gemini-2.0-flash")
     }
 
     private fun uriToBitmap(context: Context, imageUri: Uri): Bitmap? {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, imageUri))
+                ImageDecoder.decodeBitmap(
+                    ImageDecoder.createSource(context.contentResolver, imageUri)
+                )
             } else {
-                @Suppress("DEPRECATION")
-                MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
+                @Suppress("DEPRECATION") MediaStore.Images.Media.getBitmap(
+                    context.contentResolver, imageUri
+                )
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error converting URI to Bitmap", e)
             null
         }
     }
 
     suspend fun analyzeFood(
-        imageUri: Uri?,
-        description: String,
-        mealTime: String
+        imageUri: Uri?, description: String, mealTime: String
     ): DataWrapper<GeminiAnalysisResult> {
-        val model = generativeModel ?: return DataWrapper.Error("Gemini API sozlanmagan.")
-
         if (description.isBlank() && imageUri == null) {
             return DataWrapper.Error("Iltimos, ovqatni tavsiflang yoki rasm yuklang.")
         }
 
-        val userAge = LocalUser.user.age
-        val userWeight = LocalUser.user.weight
-        val userGender = if (LocalUser.user.gender == 0) "Erkak" else "Ayol"
-
+        val user = LocalUser.user
         val prompt = """
-        Sen ozishga yordam beruvchi do'stona va amaliy oziq-ovqat tahlilchisiz.
-        Foydalanuvchining maqsadi ozish va u ovqatlanish bilmaydi, hattoki protein, oqsil , yog nimaligini ham bilmaydi. Lox foydalanuvchi. 
-        Javobingiz foydalanuvchini xursand qilishi, motivatsiya berishi va aniq, qisqa yo'l-yo'riq berishi kerak - shunga etibor ber!
-        Ozingni huddi usha lox ozmoqchi odamdek tasavur qil birinchi va keyin javob chiqar.
-        Javobing userni hursand qilishi va yul kursatishi shart, va ogoxlantirishi kerak.
-        O'rniga nima ovqat yeyish mumkin ligi ayt. 4-5 ta misol bilan.
-        Hamma javoblar user ovqatiga aloqador bulsin, sizlab yoz
-        Bazi bir ovqatlarni qancha muddatda bir yeyishni ham aytib o't: Masalan: osh 2 haftada bir marta yeyish mumkin
-        Foydalanuvchining yoshi: $userAge, vazni: $userWeight kg, jinsi: $userGender.
-        Ovqatlanish vaqti: $mealTime
-        Ovqat: "$description" ${if (imageUri != null) "(rasmda ko'rsatilgan)" else ""}
+    Siz vaznni nazorat qilishga yordam beruvchi professional dietolog-analitiksiz.
+    Foydalanuvchi ma'lumotlarini hisobga olib, quyidagi ovqat(lar)ni prompt yoki image,yoki ikallasini analiz qiling.
+    MUHIM: Agar bir nechta ovqat nomi berilgan bo'lsa, ularning barchasini YAGONA TAOM SIFATIDA ko'rib chiqing va ozuqaviy qiymatlarni (kaloriya, oqsil va hokazo) UMUMIY YIG'INDISINI hisoblang.
+    Javobni FAQAT KO'RSATILGAN BO'LIMLAR BO'YICHA, o'zbek tilida va hech qanday ortiqcha matnsiz qaytaring.
 
-        Javobingiz O'TA QISQA, oddiy, amaliy va motivatsion bo'lsin.
-        Natijani FAQAT quyidagi QAT'IY FORMATDA yozing. Har bir bo'lim yangi qatordan boshlansin:
-
-        BENEFITS_ADVICE:
-        ✅ [Ozishga ijobiy tomoni (1-2 jumla). Agar yo'q bo'lsa, bu qismni yozmang.]
-        💡 [1 ta amaliy TAVSIYA (1-2 jumla). Agar yo'q bo'lsa, bu qismni yozmang.]
-        WARNINGS_ONLY:
-        ⚠️ [1 ta OGOHLANTIRISH (1-2 jumla). Har doim "⚠️" belgisini qo'ying. Agar yo'q bo'lsa, bu qismni yozmang(Juda qattiq bulma)]
-        NUTRITION_INFO:
-        Oqsil: [taxminiy son]g
-        Yog': [taxminiy son]g
-        Uglevod: [taxminiy son]g
-        INGREDIENTS:
-        Ko‘ringan Masalliqlar: [Icon(If available) Masalliq - taxminiy kal, Icon(If available)Masalliq - taxminiy kal, ...] (Noma'lum bo'lsa "-")
-        ALTERNATIVES:
-        Alternativ takliflar: [Ozish uchun mosroq boshqa ovqat (1 ta). Agar hozirgisi zo'r bo'lsa, "-".]
-        """.trimIndent()
+    Foydalanuvchi ma'lumotlari:
+    Yoshi: ${user.age}
+    Vazni: ${user.weight} kg
+    Jinsi: ${if (user.gender == 0) "Erkak" else "Ayol"}
+    Tahlil qilinadigan taom(lar): "$description"
+    
+    Javob formati:
+    NUTRITION_INFO: [UMUMIY ozuqaviy qiymatni ANIQ SHU FORMATDA yozing ":" dan keyin faqat raqam mumkin : Kaloriya: 0, Oqsil: 0.0, Yog': 0.0, Uglevodlar: 0.0]
+    INGREDIENTS: [Barcha taomlardagi asosiy masalliqlar, vergul bilan ajratib]
+    ALTERNATIVES: [Ushbu taomlar majmuasiga sog'lomroq alternativ takliflar]
+    IS_HEALTHY_FOR_WEIGHT_LOSS: [Ushbu taomlar majmuasi vazn tashlash uchun foydalimi? Faqat "Ha" yoki "Yo'q" deb javob bering]
+    HEALTH_FEEDBACK_SHORT: [Nima uchun vazn tashlash uchun foydali yoki emasligi haqida qisqa gap, yoki tavsiya]
+    """.trimIndent()
 
         return try {
-            val bitmap: Bitmap? = imageUri?.let {
+            val imageBitmap = imageUri?.let {
                 withContext(Dispatchers.IO) { uriToBitmap(appContext, it) }
             }
 
             val inputContent = content {
-                if (bitmap != null) {
-                    image(bitmap)
-                    if (description.isNotBlank()) text("Rasm va quyidagi tavsif asosida tahlil qiling:")
-                } else {
-                    text("Quyidagi tavsif asosida tahlil qiling:")
+                imageBitmap?.let { image(it) }
+                if (prompt.isNotEmpty()) {
+                    text(prompt)
                 }
-                text(prompt)
             }
 
-            val response = withContext(Dispatchers.IO) { model.generateContent(inputContent) }
+            val response = withContext(Dispatchers.IO) {
+                foodAnalysisModel.generateContent(inputContent)
+            }
+
             val responseText = response.text?.trim()
 
             if (responseText.isNullOrBlank()) {
-                return DataWrapper.Error("AI dan bo'sh javob olindi. Qayta urinib ko'ring.")
+                return DataWrapper.Error("AI dan bo'sh javob olindi.")
             }
 
-            val lines = responseText.lines().map { it.trim() }
+            // --- PARSING MANTIG'I O'ZGARISHSIZ QOLADI ---
+            fun extractSection(key: String, text: String): String {
+                val keys = listOf(
+                    "NUTRITION_INFO:", "INGREDIENTS:",
+                    "ALTERNATIVES:", "IS_HEALTHY_FOR_WEIGHT_LOSS:", "HEALTH_FEEDBACK_SHORT:"
+                )
+                val startIndex = text.indexOf(key)
+                if (startIndex == -1) return ""
 
-            val healthAssessmentStr = lines.firstOrNull { it.startsWith("HEALTH_ASSESSMENT:") }?.substringAfter(":")?.trim()
-            val isHealthy = when (healthAssessmentStr?.uppercase()) {
-                "YES" -> true
-                "NO" -> false
-                else -> null
-            }
-            val healthFeedbackShort = lines.firstOrNull { it.startsWith("HEALTH_FEEDBACK_SHORT:") }?.substringAfter(":")?.trim()
+                val contentStart = startIndex + key.length
+                var endIndex = text.length
 
-            val benefitsStartIndex = lines.indexOfFirst { it.startsWith("BENEFITS_ADVICE:") } + 1
-            val warningsStartIndex = lines.indexOfFirst { it.startsWith("WARNINGS_ONLY:") }
-            val nutritionInfoStartIndex = lines.indexOfFirst { it.startsWith("NUTRITION_INFO:") }
+                val nextKeyIndex = keys.map { text.indexOf(it, contentStart) }
+                    .filter { it != -1 }
+                    .minOrNull()
 
-            // benefitsAndAdviceLines, warningLines ni to'g'ri ajratishga e'tibor berish kerak
-            val generalInsightsText = if (benefitsStartIndex > 0 && warningsStartIndex > benefitsStartIndex) {
-                lines.subList(benefitsStartIndex, warningsStartIndex).joinToString("\n").trim()
-            } else if (benefitsStartIndex > 0 && nutritionInfoStartIndex > benefitsStartIndex && warningsStartIndex == -1) {
-                lines.subList(benefitsStartIndex, nutritionInfoStartIndex).joinToString("\n").trim()
-            } else ""
-
-            val onlyWarningsText = if (warningsStartIndex > 0 && nutritionInfoStartIndex > warningsStartIndex) {
-                lines.subList(warningsStartIndex + 1, nutritionInfoStartIndex).joinToString("\n").trim()
-            } else ""
-
-
-            fun parseMacroValue(linePrefix: String): Double? {
-                return lines.firstOrNull { it.startsWith(linePrefix) }
-                    ?.substringAfter(":")?.substringBefore("g")?.trim()
-                    ?.filter { it.isDigit() || it == '.' }?.toDoubleOrNull()
-            }
-
-            val protein = parseMacroValue("Oqsil:")
-            val fat = parseMacroValue("Yog':")
-            val carbs = parseMacroValue("Uglevod:")
-
-            val ingredientsLineText = lines.firstOrNull { it.startsWith("Ko‘ringan Masalliqlar:") }?.substringAfter(":")?.trim() ?: "-"
-            val recognizedIngredients = if (ingredientsLineText == "-" || ingredientsLineText.isBlank()) {
-                emptyList()
-            } else {
-                ingredientsLineText.split(",").map { it.trim() }.filter { it.isNotEmpty() }
-            }
-
-            var finalEstimatedCalories = 0
-            val caloriesRegex = Regex("""(\d+)\s*kal""")
-            val match = caloriesRegex.find(healthFeedbackShort ?: "")
-            if (match != null) {
-                finalEstimatedCalories = match.groupValues[1].toIntOrNull() ?: 0
-            } else {
-                val caloriesFromMacros = ((protein ?: 0.0) * 4 + (carbs ?: 0.0) * 4 + (fat ?: 0.0) * 9).toInt()
-                val totalCaloriesFromIngredients = recognizedIngredients.sumOf { item ->
-                    Regex("""\((\d+)\s*kal\)""").find(item)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+                if (nextKeyIndex != null) {
+                    endIndex = nextKeyIndex
                 }
-                finalEstimatedCalories = when {
-                    totalCaloriesFromIngredients > 0 -> totalCaloriesFromIngredients
-                    caloriesFromMacros > 0 -> caloriesFromMacros
-                    else -> 0
-                }
+                return text.substring(contentStart, endIndex).trim()
             }
 
-            val alternatives = lines.firstOrNull { it.startsWith("Alternativ takliflar:") }?.substringAfter(":")?.trim() ?: ""
+            val nutritionInfoText = extractSection("NUTRITION_INFO:", responseText)
+            val ingredientsText = extractSection("INGREDIENTS:", responseText)
+            val alternatives = extractSection("ALTERNATIVES:", responseText)
+            val isHealthyText = extractSection("IS_HEALTHY_FOR_WEIGHT_LOSS:", responseText)
+            val healthFeedbackShort = extractSection("HEALTH_FEEDBACK_SHORT:", responseText)
+
+            fun parseNutritionValue(key: String, text: String): String? {
+                return Regex("""$key:\s*([\d.]+)""").find(text)?.groupValues?.get(1)
+            }
+
+            val finalEstimatedCalories =
+                parseNutritionValue("Kaloriya", nutritionInfoText)?.toIntOrNull() ?: 0
+            val protein = parseNutritionValue("Oqsil", nutritionInfoText)?.toDoubleOrNull()
+            val fat = parseNutritionValue("Yog'", nutritionInfoText)?.toDoubleOrNull()
+            val carbs = parseNutritionValue("Uglevodlar", nutritionInfoText)?.toDoubleOrNull()
+
+            val recognizedIngredients = ingredientsText.split(",")
+                .map { it.trim().removePrefix("*").trim() }
+                .filter { it.isNotEmpty() }
+
+            val isHealthyForWeightLoss = isHealthyText.equals("Ha", ignoreCase = true)
 
             DataWrapper.Success(
                 GeminiAnalysisResult(
@@ -195,16 +138,13 @@ object GeminiFoodAnalyzer {
                     estimatedFat = fat,
                     estimatedCarbs = carbs,
                     recognizedIngredients = recognizedIngredients,
-                    insights = generalInsightsText,
                     alternativeFoodSuggestions = alternatives,
-                    isHealthyForWeightLoss = isHealthy,
-                    healthFeedbackShort = healthFeedbackShort,
-                    warningsText = onlyWarningsText
+                    isHealthyForWeightLoss = isHealthyForWeightLoss,
+                    healthFeedbackShort = healthFeedbackShort.ifBlank { null }
                 )
             )
         } catch (e: Exception) {
-            handleException(e, "GeminiAnalyzeFoodError")
-            DataWrapper.Error("AI tahlilida kutilmagan xatolik: ${e.message}")
+            DataWrapper.Error("AI tahlilida xatolik: ${e.message}")
         }
     }
 }

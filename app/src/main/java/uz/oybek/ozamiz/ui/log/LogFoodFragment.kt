@@ -1,4 +1,3 @@
-// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\ui\log\LogFoodFragment.kt
 package uz.oybek.ozamiz.ui.log
 
 import LogFoodUiState
@@ -20,14 +19,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
@@ -47,21 +49,12 @@ import java.util.Locale
 class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private val viewModel: LogFoodViewModel by activityViewModels()
-    private var tempImageUri: Uri? = null // Kamera uchun vaqtinchalik URI
+    private var tempImageUri: Uri? = null
 
     private lateinit var requestCameraPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestAudioPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var speechToTextLauncher: ActivityResultLauncher<Intent>
-
-
-    private val pickImageLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                viewModel.selectedImageUri = it
-                updateSelectedImageView(it)
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,7 +91,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         updateSelectedImageView(it)
                     }
                 } else {
-                    tempImageUri = null // Reset if capture failed or was cancelled
+                    tempImageUri = null
                 }
             }
 
@@ -119,7 +112,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             }
     }
 
-
     private fun updateSelectedImageView(uri: Uri?) {
         if (uri != null) {
             binding.layoutAddImagePlaceholderLog.isVisible = false
@@ -135,30 +127,48 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         }
     }
 
-
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentLogFoodBinding {
         return FragmentLogFoodBinding.inflate(inflater, container, false)
     }
 
-
     override fun viewCreated(bind: FragmentLogFoodBinding) {
         setupToolbar(bind)
+        setupMealTypeChips(bind)
         setupClickListeners(bind)
         observeUiState(bind)
         setupBottomSheetResultListener()
-        updateSelectedImageView(viewModel.selectedImageUri) // Restore image if re-created
+        updateSelectedImageView(viewModel.selectedImageUri)
     }
 
     private fun setupToolbar(bind: FragmentLogFoodBinding) {
         bind.toolbarLogFood.setNavigationOnClickListener { findNavController().popBackStack() }
     }
 
+    private fun setupMealTypeChips(bind: FragmentLogFoodBinding) {
+        MealsType.mealTypes.forEach { mealType ->
+            val chip = layoutInflater.inflate(R.layout.item_meal_type_selectable, bind.chipGroupMealType, false) as Chip
+            chip.text = mealType.name
+            chip.tag = mealType.id
+            chip.id = View.generateViewId()
+            chip.isCheckable = true
+            bind.chipGroupMealType.addView(chip)
+        }
+
+        bind.chipGroupMealType.setOnCheckedChangeListener { group, checkedId ->
+            if (checkedId != View.NO_ID) {
+                val chip = group.findViewById<Chip>(checkedId)
+                viewModel.mealType = chip.tag as String
+                bind.toolbarLogFood.title = getString(R.string.log_food_title_format, chip.text)
+            }
+        }
+    }
+
+
     private var currentDescriptionFromInput: String = ""
 
     private fun setupClickListeners(bind: FragmentLogFoodBinding) {
-        // Placeholder'dagi tugmalar
         bind.layoutAddImagePlaceholderLog.setOnClickListener {
             checkCameraPermissionAndLaunch()
         }
@@ -175,12 +185,12 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         bind.buttonAnalyzeAndSave.setOnClickListener {
             currentDescriptionFromInput = bind.editTextFoodDescriptionLog.text.toString()
             val imageUriToAnalyze = viewModel.selectedImageUri ?: tempImageUri
-            viewModel.selectedImageUri = imageUriToAnalyze // Ensure ViewModel has the latest URI
+            viewModel.selectedImageUri = imageUriToAnalyze
 
             if (viewModel.logToEdit != null) {
                 viewModel.saveEditedLog(currentDescriptionFromInput)
             } else {
-                viewModel.analyzeAndPrepareLog(currentDescriptionFromInput, viewModel.mealType)
+                viewModel.analyzeAndPrepareLog(currentDescriptionFromInput, "")
             }
             hideSoftInput(requireActivity())
         }
@@ -196,7 +206,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
             shouldShowRequestPermissionRationale(Manifest.permission.CAMERA) -> {
                 showToast(getString(R.string.permission_denied_camera))
-                // Optionally show a dialog explaining why permission is needed
                 requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
 
@@ -238,7 +247,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
             shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) -> {
                 showToast(getString(R.string.permission_denied_audio))
-                // Optionally show a dialog explaining why permission is needed
                 requestAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
 
@@ -253,7 +261,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("uz-UZ")) // Set Uzbek language
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale("uz-UZ"))
             putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.speech_prompt))
         }
         try {
@@ -262,7 +270,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             showToast(getString(R.string.speech_not_supported))
         }
     }
-
 
     private val bottomSheet: BottomSheetDialog by lazy {
         BottomSheetDialog(requireContext())
@@ -340,18 +347,21 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 )
 
                 when (state) {
-                    is LogFoodUiState.Loading -> {}
                     is LogFoodUiState.Inputting -> {
-                        bind.toolbarLogFood.title = getString(
-                            R.string.log_food_title_format, getMealTypeName(state.mealType)
-                        )
+                        val chipToSelect = bind.chipGroupMealType.findViewWithTag<Chip>(state.mealType)
+                        if (chipToSelect != null && !chipToSelect.isChecked) {
+                            chipToSelect.isChecked = true
+                        } else if (chipToSelect == null && bind.chipGroupMealType.checkedChipId == View.NO_ID) {
+                            (bind.chipGroupMealType.getChildAt(0) as? Chip)?.isChecked = true
+                        }
                     }
 
                     is LogFoodUiState.Editing -> {
-                        bind.toolbarLogFood.title = getString(
-                            R.string.edit_log_food_title_format, getMealTypeName(state.log.mealType)
-                        )
                         populateFieldsForEditing(bind, state.log)
+                        val chipToSelect = bind.chipGroupMealType.findViewWithTag<Chip>(state.log.mealType)
+                        if(chipToSelect != null && !chipToSelect.isChecked) {
+                            chipToSelect.isChecked = true
+                        }
                     }
 
                     is LogFoodUiState.Analyzing -> {
@@ -362,15 +372,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         viewModel.stateHandled()
                         closeAnalyzeSheet()
                         showCalorieResultSheet(state.analysisResult)
-                    }
-
-                    is LogFoodUiState.Saving -> {}
-                    is LogFoodUiState.ShowFirstLogCongratulation, is LogFoodUiState.ShowStreakContinued, is LogFoodUiState.ShowPointsEarned, is LogFoodUiState.ShowNewBadgeUnlocked -> {
-                        // Handled by CalorieResultBottomSheet
-                    }
-
-                    is LogFoodUiState.ShowMealGoalReached -> {
-                        // Handled by CalorieResultBottomSheet
                     }
 
                     is LogFoodUiState.Success -> {
@@ -404,7 +405,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private fun populateFieldsForEditing(bind: FragmentLogFoodBinding, log: FoodLog) {
         bind.editTextFoodDescriptionLog.setText(log.description)
-        viewModel.selectedImageUri = null // Reset selected URI
+        viewModel.selectedImageUri = null
         tempImageUri = null
         if (!log.photoUrl.isNullOrEmpty()) {
             updateSelectedImageView(Uri.parse(log.photoUrl))
@@ -436,7 +437,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         }
     }
 
-
     private fun getMealTypeName(mealTypeId: String): String {
         return MealsType.fromId(mealTypeId)?.name ?: mealTypeId
     }
@@ -452,14 +452,9 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         setFragmentResultListener(CalorieResultBottomSheet.REQUEST_KEY) { _, bundle ->
             val action = bundle.getString(CalorieResultBottomSheet.RESULT_ACTION)
             when (action) {
-                "save" -> {
-
-                }
-
                 "retry" -> {
                     viewModel.stateHandled()
                 }
-
                 "dismiss" -> {
                     dismiss = true
                 }

@@ -2,6 +2,72 @@
 <resources>
     //Title
 
+    <style name="InputEditTextColumn">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="Text1_16_Bold">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+    </style>
+
+    <!-- Asosiy Text1 (Medium) -->
+    <style name="Text1">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="Text1.Text1_22_Bold">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text1.Text1_18_Bold">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Text1.Text1_16_Bold">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+
+    <!-- Asosiy Text2 (oddiy matn) -->
+    <style name="Text2">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Text2.Text2_16">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="Text2.Text2_15">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="Text2.Text2_14">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <!-- Toolbar sarlavhasi -->
+    <style name="ToolbarTitleAppearance" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+
+    <!-- Test javoblari uchun Card -->
+    <style name="TestAnswerCard" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardElevation">2dp</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="strokeColor">?attr/colorOutlineVariant</item>
+    </style>
+
+
     <style name="Title2_20">
         <item name="android:textSize">20sp</item>
         <item name="android:fontFamily">@font/roboto_medium</item>
@@ -15,7 +81,7 @@
 
 
     <style name="Title3_17">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:fontFamily">@font/roboto_medium</item>
     </style>
 
@@ -69,8 +135,6 @@
         <item name="android:textSize">13sp</item>
         <item name="android:fontFamily">@font/roboto_regular</item>
     </style>
-
-    //Caption
 
     <style name="Caption1_13">
         <item name="android:textSize">13sp</item>

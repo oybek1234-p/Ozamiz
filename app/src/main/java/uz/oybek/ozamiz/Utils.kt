@@ -6,7 +6,6 @@ import android.net.Uri
 import android.widget.ImageView
 import androidx.core.view.isVisible
 import com.google.gson.Gson
-import com.stfalcon.imageviewer.StfalconImageViewer
 import uz.oybek.ozamiz.ui.loadPhoto
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -35,15 +34,15 @@ fun ImageView.openImageViewer(urls: List<String>, startPos: Int = 0, show: Boole
     if (windowToken == null && !isAttachedToWindow) return // More robust check
     if (isVisible.not()) return
 
-    StfalconImageViewer.Builder(context, urls) { view, image ->
-        view.loadPhoto(image, show.not()) // Pass show.not() for blur if needed, though usually not for full-screen
-    }
-        .withTransitionFrom(this)
-        .withStartPosition(startPos)
-        .withHiddenStatusBar(false) // Usually true for full screen, but can be false
-        .allowZooming(true)
-        .allowSwipeToDismiss(true)
-        .show()
+//    StfalconImageViewer.Builder(context, urls) { view, image ->
+//        view.loadPhoto(image, show.not()) // Pass show.not() for blur if needed, though usually not for full-screen
+//    }
+//        .withTransitionFrom(this)
+//        .withStartPosition(startPos)
+//        .withHiddenStatusBar(false) // Usually true for full screen, but can be false
+//        .allowZooming(true)
+//        .allowSwipeToDismiss(true)
+//        .show()
 }
 
 

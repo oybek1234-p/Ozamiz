@@ -1,10 +1,9 @@
-// uz/oybek/ozamiz/data/foods/FoodCategoryRepository.kt
 package uz.oybek.ozamiz.data.foods
 
 import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

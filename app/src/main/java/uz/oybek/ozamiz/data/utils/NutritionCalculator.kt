@@ -13,12 +13,9 @@ object NutritionCalculator {
         return pair
     }
 
-    /**
-     * Mifflin-St Jeor formulasidan foydalanib Bazal Metabolizm Tezligini (BMR) hisoblaydi.
-     */
     fun calculateBMR(user: User): Double {
         if (GenderEnum.fromValue(user.gender) == GenderEnum.UNKNOWN || user.age <= 0 || user.height <= 0 || user.weight <= 0) {
-            return 0.0 // Ma'lumotlar yetarli emas yoki noto'g'ri
+            return 0.0
         }
 
         return if (GenderEnum.fromValue(user.gender) == GenderEnum.MALE) {
@@ -28,9 +25,6 @@ object NutritionCalculator {
         }
     }
 
-    /**
-     * Umumiy Kunlik Energiya Sarfini (TDEE) hisoblaydi.
-     */
     fun calculateTDEE(user: User): Double {
         val bmr = calculateBMR(user)
         if (bmr <= 0) return 0.0
@@ -52,6 +46,30 @@ object NutritionCalculator {
         if (weightKg <= 0) return 2500 // Default
         val waterMl = weightKg * 35
         return (waterMl / 100).roundToInt() * 100
+    }
+
+    fun calculateMacrosByPercent(
+        totalCalories: Int,
+        proteinPercent: Double = 0.30, // 30%
+        fatPercent: Double = 0.25,     // 25%
+        carbPercent: Double = 0.45     // 45%
+    ): Map<String, Int> {
+        if (totalCalories <= 0) return emptyMap()
+
+        val proteinCalories = totalCalories * proteinPercent
+        val fatCalories = totalCalories * fatPercent
+        val carbCalories = totalCalories * carbPercent
+
+        val proteinGr = (proteinCalories / 4).roundToInt()
+        val fatGr = (fatCalories / 9).roundToInt()
+        val carbsGr = (carbCalories / 4).roundToInt()
+
+        return mapOf(
+            "calories" to totalCalories,
+            "protein" to proteinGr,
+            "fat" to fatGr,
+            "carbs" to carbsGr
+        )
     }
 
     fun distributeCaloriesForMeals(totalTargetCalories: Int): Map<String, Int> {

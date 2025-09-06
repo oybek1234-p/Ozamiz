@@ -10,13 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.info.ExerciseLog
 import uz.oybek.ozamiz.databinding.FragmentLogExerciseBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.getinfo.ExerciseType
 import uz.oybek.ozamiz.ui.hideSoftInput
 import uz.oybek.ozamiz.ui.showToast
 
@@ -35,7 +32,9 @@ class LogExerciseFragment : BaseFragment<FragmentLogExerciseBinding>() {
         super.onCreate(savedInstanceState)
         val logJson = arguments?.getString("logToEditJson")
         val preselectedId = arguments?.getString("preselectedExerciseId")
-        viewModel.loadInitialData(logJson, preselectedId)
+        // Tanlangan sanani argumentlardan olish
+        val timestamp = arguments?.getLong("selectedDateTimestamp", System.currentTimeMillis()) ?: System.currentTimeMillis()
+        viewModel.loadInitialData(logJson, preselectedId, timestamp)
     }
 
     override fun viewCreated(bind: FragmentLogExerciseBinding) {
@@ -58,7 +57,7 @@ class LogExerciseFragment : BaseFragment<FragmentLogExerciseBinding>() {
         bind.recyclerViewExerciseTypes.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = exerciseAdapter
-            itemAnimator = null // Optional: disable animation
+            itemAnimator = null
         }
     }
 
@@ -79,43 +78,29 @@ class LogExerciseFragment : BaseFragment<FragmentLogExerciseBinding>() {
                     bind.buttonSaveExerciseLog.isEnabled = !isLoading
                     bind.buttonSaveExerciseLog.text = if (isLoading) "" else getString(R.string.save)
                     bind.editTextDuration.isEnabled = !isLoading
-                    bind.recyclerViewExerciseTypes.isEnabled = !isLoading // Consider disabling RV
 
                     when (state) {
-                        is LogExerciseUiState.Loading -> {
-                            // Handled above
-                        }
                         is LogExerciseUiState.Input -> {
                             bind.toolbarLogExercise.title = getString(R.string.log_exercise_title)
                             exerciseAdapter.submitList(state.availableTypes)
-                            bind.editTextDuration.setText("") // Clear duration on initial input
-                            // Pre-select if needed
-                             state.preselectedTypeId?.let { id ->
-                                 val position = state.availableTypes.indexOfFirst { it.id == id }
-                                 if (position != -1) {
-                                     exerciseAdapter.setSelectedPosition(position)
-                                     viewModel.setSelectedExerciseType(state.availableTypes[position]) // Inform ViewModel
-                                 }
-                             }
+                            bind.editTextDuration.setText("")
+                            state.preselectedTypeId?.let { id ->
+                                val position = state.availableTypes.indexOfFirst { it.id == id }
+                                if (position != -1) {
+                                    exerciseAdapter.setSelectedPosition(position)
+                                    viewModel.setSelectedExerciseType(state.availableTypes[position])
+                                }
+                            }
                         }
                         is LogExerciseUiState.Editing -> {
-                             bind.toolbarLogExercise.title = getString(R.string.edit_exercise_log_title)
-                             exerciseAdapter.submitList(state.availableTypes) // Submit all types
-                             bind.editTextDuration.setText(state.log.durationMin.toString())
-
-                             // Find and select the existing type
-                             val position = state.availableTypes.indexOfFirst { it.id == state.log.activityType }
-                             if (position != -1) {
-                                 exerciseAdapter.setSelectedPosition(position)
-                                 viewModel.setSelectedExerciseType(state.availableTypes[position]) // Ensure ViewModel knows
-                             } else {
-                                 // Handle case where logged activity type is no longer in default list?
-                                 showToast("Original activity type not found, please re-select.")
-                             }
-                        }
-
-                        is LogExerciseUiState.Saving -> {
-                            // Handled above
+                            bind.toolbarLogExercise.title = getString(R.string.edit_exercise_log_title)
+                            exerciseAdapter.submitList(state.availableTypes)
+                            bind.editTextDuration.setText(state.log.durationMin.toString())
+                            val position = state.availableTypes.indexOfFirst { it.id == state.log.activityType }
+                            if (position != -1) {
+                                exerciseAdapter.setSelectedPosition(position)
+                                viewModel.setSelectedExerciseType(state.availableTypes[position])
+                            }
                         }
                         is LogExerciseUiState.Success -> {
                             showToast(getString(R.string.exercise_log_saved_success))
@@ -125,7 +110,9 @@ class LogExerciseFragment : BaseFragment<FragmentLogExerciseBinding>() {
                         }
                         is LogExerciseUiState.Error -> {
                             showToast(state.message)
-                             // Optionally reset state or keep fields as they are
+                        }
+                        else -> {
+                            // Loading and Saving states are handled by visibility toggles
                         }
                     }
                 }

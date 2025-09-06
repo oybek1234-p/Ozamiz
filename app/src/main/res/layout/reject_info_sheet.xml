@@ -30,7 +30,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ilovaning qaysi joyi qiyinchilik tug'diryapti? Ilova qanday bulishini hohlardingiz?"
+                android:hint="Firkingizni yozing..."
                 android:gravity="top"
                 android:minLines="5"
                 android:id="@+id/edit_text" />

@@ -1,13 +1,10 @@
-// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\ui\profile\ProfileFragment.kt
-package uz.oybek.ozamiz.ui.profile
+package uz.oybek.ozamiz.ui
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
-import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -22,15 +19,11 @@ import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.MainActivity
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.LocalUser
 import uz.oybek.ozamiz.data.gamification.GamificationManager
 import uz.oybek.ozamiz.databinding.FragmentProfileBinding
 import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
-import uz.oybek.ozamiz.ui.ProfileNavigationEvent
-import uz.oybek.ozamiz.ui.ProfileViewModel
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.premium.getPremiumExpireDate
-import uz.oybek.ozamiz.ui.showToast
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
@@ -138,7 +131,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                             }
                             else -> {
                                 bind.premiumActiveC.isVisible = false
-                                bind.premiumView.isVisible = true
                             }
                         }
                         bind.sectionAdminPremiumUsers.root.isVisible = user.isAdmin
@@ -173,7 +165,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         bind.imageViewUserAvatar.setImageResource(R.drawable.ic_profile)
                         bind.buttonLogout.isVisible = false
                         bind.premiumActiveC.isVisible = false
-                        bind.premiumView.isVisible = true
+                        bind.premiumView.isVisible = false
                         bind.sectionAdminPremiumUsers.root.isVisible = false
                         bind.gamificationSection.isVisible = false // Foydalanuvchi yo'q bo'lsa yashirish
                     }

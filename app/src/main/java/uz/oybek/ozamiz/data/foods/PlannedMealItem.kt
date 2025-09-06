@@ -12,7 +12,7 @@ data class PlannedMealItem(
     var fat: Double? = null,
     var carbs: Double? = null,
     var ingredients: List<String> = emptyList(),
-    var preparationSteps: List<String>? = null,
+    var preparationSteps: String? = null,
     var healthBenefits: String? = null,
     var mealTypeTag: String = "" // masalan, "breakfast", "lunch"
 ) : Parcelable {

@@ -174,7 +174,7 @@ class AddEditExerciseFragment : BaseFragment<FragmentAddEditExerciseBinding>() {
         if (hasSelection) {
             val fileName = selectedUri?.lastPathSegment ?: "Fayl tanlandi"
             pickerBinding.textViewFilePickerStatus.text = fileName
-            pickerBinding.textViewFilePickerStatus.setTextColor(getThemeColor(com.google.android.material.R.attr.colorPrimary))
+            pickerBinding.textViewFilePickerStatus.setTextColor(getThemeColor(com.google.android.material.R.attr.colorPrimaryFixed))
         } else if (hasExisting) {
             if (existingUrl != null) {
                 pickerBinding.textViewFilePickerStatus.text = "Audio yuklangan (${existingUrl.substringAfterLast('/')})"

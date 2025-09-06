@@ -15,6 +15,9 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -93,9 +96,17 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initUser() // Bu yerda LocalUser yuklanadi va LivesManager chaqiriladi
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         binding.apply {
             navHost = (supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment)
@@ -128,19 +139,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initUser() {
-        LocalUser.getUser() // Birinchi navbatda lokal foydalanuvchini yuklash
-        // Foydalanuvchi ma'lumotlari yuklangandan keyin jonlarni tekshirish
+        LocalUser.getUser()
         if (LocalUser.user.valid) {
-            lifecycleScope.launch(Dispatchers.IO) { // Orqa fonda bajarish
+            lifecycleScope.launch(Dispatchers.IO) {
                 LivesManager.checkAndRefillLives()
             }
         }
-        // Firebase'dan foydalanuvchi o'zgarishlarini kuzatish
         UserRepository.observeCurrentUser {
             it?.let { currentUser ->
-                if (currentUser.valid) { // Agar valid foydalanuvchi kelsa
-                    // Bu yerda ham jonlarni tekshirish mumkin, agar kerak bo'lsa
-                    // lifecycleScope.launch(Dispatchers.IO) { LivesManager.checkAndRefillLives() }
+                if (currentUser.valid) {
                     ReminderScheduler.scheduleAllActiveReminders(this)
                 }
             }

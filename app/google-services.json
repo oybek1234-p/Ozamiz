@@ -23,6 +23,22 @@
           }
         },
         {
+          "client_id": "730315334265-s4o55tndetqabs0t7assats6kvub173h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uz.oybek.ozamiz",
+            "certificate_hash": "6ed8a8a233d1df1874d022f87811af92c1bf6221"
+          }
+        },
+        {
+          "client_id": "730315334265-tdda3818b55bv1k1vsordrohh41d9vei.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uz.oybek.ozamiz",
+            "certificate_hash": "9a0c222a22eb4d7ab5c3f32f1de86e0cbd4f4902"
+          }
+        },
+        {
           "client_id": "730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com",
           "client_type": 3
         }

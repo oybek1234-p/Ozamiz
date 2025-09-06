@@ -4,10 +4,11 @@
         <item name="backgroundColor">?colorSurface</item>
         <item name="android:windowBackground">?backgroundColor</item>
         <item name="android:statusBarColor">?colorSurfaceContainerLowest</item>
-        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightStatusBar">false</item>
 
         <item name="colorPrimary">#6750A4</item>
         <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryVariant">#613D88</item>
         <item name="colorPrimaryContainer">#EADDFF</item>
         <item name="colorOnPrimaryContainer">#21005D</item>
         <item name="colorSecondary">#625B71</item>
@@ -23,7 +24,7 @@
         <item name="colorErrorContainer">#FFDAD6</item>
         <item name="colorOnErrorContainer">#410002</item>
 
-        <item name="colorPrimaryFixed">#EADDFF</item>
+        <item name="colorPrimaryFixed">#6750A4</item>
         <item name="colorPrimaryFixedDim">#D0BCFF</item>
         <item name="colorOnPrimaryFixed">#21005D</item>
         <item name="colorOnPrimaryFixedVariant">#6750A4</item>
@@ -50,7 +51,7 @@
         <item name="colorSurfaceContainerHigh">#E6E0EC</item>
         <item name="colorSurfaceContainerHighest">#DED8E1</item>
         <item name="colorOnSurface">#1D1B20</item>
-        <item name="colorOnSurfaceVariant">#6C6C6C</item>
+        <item name="colorOnSurfaceVariant">#535353</item>
 
         <item name="colorSurfaceInverse">#322F35</item>
         <item name="colorOnSurfaceInverse">#F5EFF7</item>

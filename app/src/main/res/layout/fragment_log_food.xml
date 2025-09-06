@@ -38,17 +38,34 @@
             android:padding="16dp">
 
             <TextView
-                style="@style/Title3_17"
+                style="@style/Headline3_15"
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/upload_meal_photo"
-                android:textColor="?colorPrimary" />
+                android:text="Qachon"
+                android:textColor="?colorOnSurfaceVariant" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroup_meal_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:selectionRequired="true"
+                    app:chipSpacingHorizontal="8dp"/>
+            </HorizontalScrollView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_image_container_log"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="@dimen/dimen_8"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_18"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="2dp"
                 app:strokeColor="?colorOutlineVariant"
@@ -56,49 +73,52 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content">
 
                     <ImageView
                         android:id="@+id/imageView_selectedLogImage"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
                         android:scaleType="centerCrop"
                         android:visibility="gone"
+                        android:maxHeight="150dp"
                         tools:src="@drawable/placeholder_food"
-                        tools:visibility="visible"
+                        tools:visibility="gone"
                         android:contentDescription="@string/selected_meal_image_preview" />
 
                     <LinearLayout
                         android:id="@+id/layout_addImagePlaceholder_log"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="?colorSurfaceContainerLow"
-                        android:gravity="center"
-
-                        android:orientation="vertical"
+                        android:layout_height="wrap_content"
+                        android:background="?colorPrimaryVariant"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/dimen_18"
+                        android:paddingVertical="@dimen/dimen_12"
                         android:visibility="visible">
 
                         <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:contentDescription="@null"
                             android:src="@drawable/camera_ic"
-                            app:tint="?colorPrimary"
-                            android:contentDescription="@null" />
+                            app:tint="?colorOnPrimary" />
 
                         <TextView
                             style="@style/Subtitle2_14"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/take_photo_placeholder"
-                            android:textColor="?colorOnSurface" />
+                            android:layout_marginStart="@dimen/dimen_12"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="Ovqatni rasmga olish"
+                            android:textColor="?colorOnPrimary" />
 
                     </LinearLayout>
 
                     <ImageButton
                         android:id="@+id/button_remove_image_log"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/dimen_24"
+                        android:layout_height="@dimen/dimen_24"
                         android:src="@drawable/close_ic"
                         app:tint="@color/white"
                         android:background="@drawable/oval_background_with_opacity"
@@ -113,20 +133,20 @@
 
 
             <TextView
-                style="@style/Title3_17"
+                style="@style/Headline3_15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_24"
+                android:layout_marginTop="@dimen/dimen_28"
                 android:paddingEnd="@dimen/dimen_24"
                 tools:ignore="RtlSymmetry"
                 android:text="@string/ovqat_haqida_yozing_ixtiyoriy"
-                android:textColor="?colorPrimary" />
+                android:textColor="?colorOnSurfaceVariant" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayout_foodDescription_log"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_18"
+                android:layout_marginTop="@dimen/dimen_12"
                 app:helperTextEnabled="true"
                 app:hintEnabled="false">
 
@@ -135,7 +155,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ellipsize="none"
-                    android:textColorHint="?colorOnSurfaceVariant"
                     android:gravity="top"
                     android:hint="@string/food_description_hint"
                     android:imeOptions="actionDone"
@@ -145,6 +164,18 @@
                     android:background="@drawable/round_lay_stroke"
                     android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_analyze_and_save"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="56dp"
+                android:paddingEnd="56dp"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:text="Tahlil qilish"
+                app:icon="@drawable/search_ic"
+                app:iconGravity="textStart" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -161,16 +192,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_analyze_and_save"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="56dp"
-                android:paddingEnd="56dp"
-                android:text="Tahlil qilish"
-                app:icon="@drawable/search_ic"
-                app:iconGravity="textStart" />
 
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progress_analyze"
@@ -183,6 +204,7 @@
                 app:trackColor="?colorSurfaceContainerLowest"
                 app:indicatorSize="24dp" />
         </FrameLayout>
+
 
     </LinearLayout>
 

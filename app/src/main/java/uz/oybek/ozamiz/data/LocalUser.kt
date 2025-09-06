@@ -12,7 +12,6 @@ import uz.oybek.ozamiz.data.info.ActivityLevel
 import uz.oybek.ozamiz.data.model.StreakInfo
 import uz.oybek.ozamiz.reminders.ReminderScheduler
 import uz.oybek.ozamiz.ui.postVal
-import uz.oybek.ozamiz.ui.showToast
 import java.util.Date
 
 object LocalUser {
@@ -110,6 +109,27 @@ object LocalUser {
                 experiencePoints = getInt("experiencePoints", 0)
                 lessonLives = getInt("lessonLives", 5)
                 lastLifeRefillTimestamp = getLong("lastLifeRefillTimestamp", 0L)
+                val completedLessonsJson = getString("completedLessonIdsJson", null)
+                if (!completedLessonsJson.isNullOrEmpty()) {
+                    try {
+                        val type = object : TypeToken<List<String>>() {}.type
+                        completedLessonIds = gson.fromJson(completedLessonsJson, type) ?: emptyList()
+                    } catch (e: Exception) {
+                        Log.e("LocalUser", "Error parsing completedLessonIds JSON", e)
+                        completedLessonIds = emptyList()
+                    }
+                }
+                val unlockedLessonsJson = getString("unlockedLessonIdsJson", null)
+                if (!unlockedLessonsJson.isNullOrEmpty()) {
+                    try {
+                        val type = object : TypeToken<List<String>>() {}.type
+                        unlockedLessonIds = gson.fromJson(unlockedLessonsJson, type) ?: emptyList()
+                    } catch (e: Exception) {
+                        Log.e("LocalUser", "Error parsing unlockedLessonIds JSON", e)
+                        unlockedLessonIds = emptyList()
+                    }
+                }
+
 
                 // Gamification
                 scorePoints = getInt("scorePoints", 0)
@@ -198,6 +218,21 @@ object LocalUser {
                 putInt("experiencePoints", experiencePoints)
                 putInt("lessonLives", lessonLives)
                 putLong("lastLifeRefillTimestamp", lastLifeRefillTimestamp)
+                try {
+                    val completedLessonsJson = gson.toJson(completedLessonIds)
+                    putString("completedLessonIdsJson", completedLessonsJson)
+                } catch (e: Exception) {
+                    Log.e("LocalUser", "Error saving completedLessonIds JSON", e)
+                    remove("completedLessonIdsJson")
+                }
+                try {
+                    val unlockedLessonsJson = gson.toJson(unlockedLessonIds)
+                    putString("unlockedLessonIdsJson", unlockedLessonsJson)
+                } catch (e: Exception) {
+                    Log.e("LocalUser", "Error saving unlockedLessonIds JSON", e)
+                    remove("unlockedLessonIdsJson")
+                }
+
 
                 // Gamification
                 putInt("scorePoints", scorePoints)

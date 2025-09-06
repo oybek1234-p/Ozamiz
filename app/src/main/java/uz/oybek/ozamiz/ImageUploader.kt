@@ -14,8 +14,11 @@ import java.util.UUID
 
 object ImageUploader {
 
-    private const val DEFAULT_IMAGE_PATH = "food_images" // Default path
-    private const val MAX_IMAGE_SIZE_KB = 200 // Maximum allowed image size in KB
+    const val OZAMIZ_PATH = "ozamiz"
+    const val USER_PATH = "users_private"
+
+    private const val DEFAULT_IMAGE_PATH = "food_images"
+    private const val MAX_IMAGE_SIZE_KB = 200
 
     private fun getStorageRef(path: String = DEFAULT_IMAGE_PATH): StorageReference {
         return storage.reference.child(path)
@@ -28,11 +31,13 @@ object ImageUploader {
 
             val byteArray = (compressedData as DataWrapper.Success).data
 
-            val fileExtension = appContext.contentResolver.getType(uri)?.substringAfterLast('/') ?: "jpg"
+            val fileExtension =
+                appContext.contentResolver.getType(uri)?.substringAfterLast('/') ?: "jpg"
             val fileName = "${UUID.randomUUID()}.$fileExtension"
             val imageRef = getStorageRef(path).child(fileName)
 
-            val uploadTask = imageRef.putBytes(byteArray).await() // Changed from putFile to putBytes
+            val uploadTask =
+                imageRef.putBytes(byteArray).await() // Changed from putFile to putBytes
             val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
 
             DataWrapper.Success(downloadUrl)
@@ -42,35 +47,39 @@ object ImageUploader {
         }
     }
 
-    private suspend fun compressImage(uri: Uri, maxSizeKb: Int): DataWrapper<ByteArray> = withContext(Dispatchers.IO) {
-        return@withContext try {
-            val bitmap = BitmapFactory.decodeStream(appContext.contentResolver.openInputStream(uri))
-                ?: return@withContext DataWrapper.Error("Rasmni yuklashda xatolik: Bitmapga o'tkazib bo'lmadi")
+    private suspend fun compressImage(uri: Uri, maxSizeKb: Int): DataWrapper<ByteArray> =
+        withContext(Dispatchers.IO) {
+            return@withContext try {
+                val bitmap =
+                    BitmapFactory.decodeStream(appContext.contentResolver.openInputStream(uri))
+                        ?: return@withContext DataWrapper.Error("Rasmni yuklashda xatolik: Bitmapga o'tkazib bo'lmadi")
 
-            var quality = 100
-            var byteArray: ByteArray
-            val baos = ByteArrayOutputStream()
+                var quality = 100
+                var byteArray: ByteArray
+                val baos = ByteArrayOutputStream()
 
-            do {
-                baos.reset()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
-                byteArray = baos.toByteArray()
-                quality -= 5 // Reduce quality by 5 each time
+                do {
+                    baos.reset()
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
+                    byteArray = baos.toByteArray()
+                    quality -= 5 // Reduce quality by 5 each time
 
-                if (quality < 0) {
-                    return@withContext DataWrapper.Error("Rasmni siqishda xatolik: Qayta ishlash mumkin bo'lmagan rasm.")
-                }
-            } while (byteArray.size > maxSizeKb * 1024) // Check if image size exceeds limit
+                    if (quality < 0) {
+                        return@withContext DataWrapper.Error("Rasmni siqishda xatolik: Qayta ishlash mumkin bo'lmagan rasm.")
+                    }
+                } while (byteArray.size > maxSizeKb * 1024) // Check if image size exceeds limit
 
-            bitmap.recycle() // Free memory
-            DataWrapper.Success(byteArray)
-        } catch (e: Exception) {
-            handleException(e, "ImageCompressionError")
-            DataWrapper.Error(e.localizedMessage ?: "Rasmni siqishda noma'lum xatolik")
+                bitmap.recycle() // Free memory
+                DataWrapper.Success(byteArray)
+            } catch (e: Exception) {
+                handleException(e, "ImageCompressionError")
+                DataWrapper.Error(e.localizedMessage ?: "Rasmni siqishda noma'lum xatolik")
+            }
         }
-    }
 
-    suspend fun deleteImage(imageUrl: String?, path: String = DEFAULT_IMAGE_PATH): DataWrapper<Unit> {
+    suspend fun deleteImage(
+        imageUrl: String?, path: String = DEFAULT_IMAGE_PATH
+    ): DataWrapper<Unit> {
         if (imageUrl.isNullOrEmpty()) {
             return DataWrapper.Success(Unit) // URL bo'sh bo'lsa, hech narsa qilmaymiz
         }
@@ -94,3 +103,5 @@ object ImageUploader {
         }
     }
 }
+
+const val firebasePrefix = "https://firebasestorage"

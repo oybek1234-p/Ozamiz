@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurfaceContainerLowest"
-    tools:context=".ui.profile.ProfileFragment">
+    tools:context=".ui.ProfileFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout_profile"
@@ -186,6 +186,7 @@
                 android:backgroundTint="?colorSurfaceContainerLowest"
                 android:elevation="2dp"
                 android:orientation="vertical"
+                android:visibility="gone"
                 android:padding="@dimen/dimen_12"
                 tools:visibility="gone">
                 <TextView

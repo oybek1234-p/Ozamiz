@@ -6,9 +6,7 @@ data class GeminiAnalysisResult(
     val estimatedFat: Double?,
     val estimatedCarbs: Double?,
     val recognizedIngredients: List<String>,
-    val insights: String,
     val alternativeFoodSuggestions: String,
     val isHealthyForWeightLoss: Boolean?,
     val healthFeedbackShort: String?,
-    val warningsText: String?
 )

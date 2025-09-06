@@ -43,7 +43,7 @@ class AdminPaymentVerificationDetailFragment :
         bind.imageViewPaymentCheckAdmin.setOnClickListener {
             viewModel.uiState.value.user?.paymentCheckPhotoUrl?.let { url ->
                 if (url.isNotEmpty()) {
-                    bind.imageViewPaymentCheckAdmin.openImageViewer(listOf(url))
+                //    bind.imageViewPaymentCheckAdmin.openImageViewer(listOf(url))
                 }
             }
         }

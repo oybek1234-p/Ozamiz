@@ -68,10 +68,10 @@ class FilterCategoryAdapter(
             val isSelected = category.id == selectedCategoryId
             val context = itemView.context
 
-            val textColorAttr = if (isSelected) com.google.android.material.R.attr.colorPrimary else com.google.android.material.R.attr.colorOnSurfaceVariant
+            val textColorAttr = if (isSelected) com.google.android.material.R.attr.colorPrimaryFixed else com.google.android.material.R.attr.colorOnSurfaceVariant
             binding.textViewFilterCategoryName.setTextColor(MaterialColors.getColor(context, textColorAttr, ContextCompat.getColor(context, R.color.grey)))
 
-            val strokeColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimary, 0)
+            val strokeColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimarySurface, 0)
             val transparentColor = ContextCompat.getColor(context, android.R.color.transparent)
 
             binding.cardFilterCategory.strokeColor = if (isSelected) strokeColor else transparentColor

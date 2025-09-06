@@ -96,17 +96,6 @@ class RecipeDetailViewModel : ViewModel() {
                 analysisInsights = null,
                 estimatedByAI = false
             )
-
-            when(val result = dailyLogRepository.addFoodLog(foodLog)) {
-                is DataWrapper.Success -> {
-                    _uiState.postValue(_uiState.value?.copy(isLoggingMeal = false, logSuccessMessage = "'${currentRecipe.name}' muvaffaqiyatli qo'shildi!"))
-                }
-                is DataWrapper.Error -> {
-                    handleException(Exception(result.error), "LogMealFromRecipe")
-                    _uiState.postValue(_uiState.value?.copy(isLoggingMeal = false, logErrorMessage = "Log qo'shishda xatolik: ${result.error}"))
-                }
-                is DataWrapper.Loading -> {}
-            }
         }
     }
 

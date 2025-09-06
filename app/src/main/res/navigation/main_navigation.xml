@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_badges" />
     <fragment
         android:id="@+id/profileFragment"
-        android:name="uz.oybek.ozamiz.ui.profile.ProfileFragment"
+        android:name="uz.oybek.ozamiz.ui.ProfileFragment"
         android:label="@string/profile_title"
         tools:layout="@layout/fragment_profile">
 
@@ -862,4 +862,48 @@
         android:id="@+id/miniInfoFragment"
         android:name="uz.oybek.ozamiz.ui.MiniInfoFragment"
         android:label="MiniInfoFragment" />
+    <fragment
+        android:id="@+id/lessonsFragment"
+        android:name="uz.oybek.ozamiz.ui.study.lessons.LessonsFragment"
+        android:label="LessonsFragment" />
+    <fragment
+        android:id="@+id/fragmentAddLesson"
+        android:name="uz.oybek.ozamiz.ui.study.lessons.FragmentAddLesson"
+        android:label="FragmentAddLesson" />
+    <fragment
+        android:id="@+id/addEditCourseFragment"
+        android:name="uz.oybek.ozamiz.ui.study.courses.AddEditCourseFragment"
+        android:label="AddEditCourseFragment" />
+    <fragment
+        android:id="@+id/lessonCoursesFragment"
+        android:name="uz.oybek.ozamiz.ui.study.courses.LessonCoursesFragment"
+        android:label="LessonCoursesFragment" />
+    <dialog
+        android:id="@+id/badgeUnlockedDialog"
+        android:name="uz.oybek.ozamiz.ui.dialogs.BadgeUnlockedDialog"
+        android:label="BadgeUnlockedDialog" />
+    <fragment
+        android:id="@+id/lessonContentFragment"
+        android:name="uz.oybek.ozamiz.ui.study.content.LessonContentFragment"
+        android:label="LessonContentFragment" />
+    <fragment
+        android:id="@+id/lessonTestsFragment"
+        android:name="uz.oybek.ozamiz.ui.study.tests.LessonTestsFragment"
+        android:label="LessonTestsFragment" />
+
+    <fragment
+        android:id="@+id/addEditTestFragment"
+        android:name="uz.oybek.ozamiz.ui.study.tests.AddEditTestFragment"
+        android:label="fragment_add_edit_test"
+        tools:layout="@layout/fragment_add_edit_test" />
+
+    <fragment
+        android:id="@+id/lessonResultFragment"
+        android:name="uz.oybek.ozamiz.ui.study.content.LessonResultFragment"
+        android:label="fragment_lesson_result"
+        tools:layout="@layout/fragment_lesson_result" />
+    <fragment
+        android:id="@+id/natijaFragment2"
+        android:name="uz.oybek.ozamiz.ui.natija.NatijaFragment"
+        android:label="NatijaFragment" />
 </navigation>

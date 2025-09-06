@@ -2,6 +2,7 @@
 package uz.oybek.ozamiz.data
 
 import androidx.annotation.Keep
+import com.google.firebase.database.PropertyName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Transient
 import uz.oybek.ozamiz.data.info.ActivityLevel
@@ -43,13 +44,13 @@ data class User(
     var registerDate: Date? = null,
     var paymentChecking: Boolean = false,
     var paymentCheckPhotoUrl: String? = null,
-    @SerialName("isAdmin")
     var isAdmin: Boolean = false,
-
-    // Darslar uchun yangi maydonlar
     var experiencePoints: Int = 0,
     var lessonLives: Int = 5, // Default 5 jon
     var lastLifeRefillTimestamp: Long = 0L, // Oxirgi jon to'ldirilgan vaqt (millis)
+    var completedLessonIds: List<String> = emptyList(), // Tugatilgan darslar IDlari
+    var unlockedLessonIds: List<String> = emptyList(), // Ochilgan (lekin hali tugatilmagan) darslar IDlari
+
 
     // Gamification uchun yangi maydonlar
     var scorePoints: Int = 0, // Umumiy ballar
@@ -89,6 +90,8 @@ data class User(
         experiencePoints = 0,
         lessonLives = 5,
         lastLifeRefillTimestamp = 0L,
+        completedLessonIds = emptyList(),
+        unlockedLessonIds = emptyList(),
         scorePoints = 0, // Default ball 0
         unlockedBadgeIds = emptyList() // Boshida nishonlar yo'q
     )

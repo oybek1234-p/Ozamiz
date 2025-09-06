@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_date"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:layout_marginHorizontal="4dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="?colorSurfaceContainerLow"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <LinearLayout
+        android:id="@+id/date_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingVertical="4dp">
+
+        <TextView
+            android:id="@+id/textView_day_of_week"
+            style="@style/Caption3_11"
+            android:textColor="?colorOnSurface"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            tools:text="Sesh" />
+
+        <TextView
+            android:id="@+id/textView_day_of_month"
+            style="@style/Text1_14"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="26" />
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

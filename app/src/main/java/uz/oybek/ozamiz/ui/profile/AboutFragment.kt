@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.airbnb.lottie.BuildConfig
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAboutBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment

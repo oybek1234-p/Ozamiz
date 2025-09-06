@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?colorOnSurfaceVariant"
-                tools:text="Mashq nomi audiosi (ixtiyoriy)" />
+                tools:text="Ovoz" />
 
             <TextView
                 android:id="@+id/textView_file_picker_status"

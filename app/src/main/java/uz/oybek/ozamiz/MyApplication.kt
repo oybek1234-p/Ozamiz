@@ -5,19 +5,17 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import com.google.firebase.BuildConfig
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.persistentCacheSettings
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.LocalUser
-import uz.oybek.ozamiz.util.LivesManager // LivesManager importi
 
 lateinit var appContext: Context
 
@@ -33,17 +31,17 @@ class MyApplication : Application() {
         super.onCreate()
         appContext = this
 
-        LocalUser.getUser() // Foydalanuvchi ma'lumotlarini yuklash
+        LocalUser.getUser()
+        initFirebase()
 
-        // Jonlarni tekshirish va kerak bo'lsa to'ldirish
-        // Bu GlobalScope.launch ichida bo'lishi shart emas, chunki SharedPreferences bilan ishlaydi
-        // Lekin Firebase'ga yozish uchun IO thread'da bo'lishi mumkin.
-        // Eng yaxshisi, MainActivity yoki birinchi ochiladigan ekranda chaqirish.
-        // Hozircha shu yerda qoldiramiz, lekin MainActivity.onCreate da chaqirishni o'ylab ko'ring.
-        GlobalScope.launch(Dispatchers.IO) {
-            LivesManager.checkAndRefillLives()
-            initFirebase()
-        }
+        val releaseAppCheck = PlayIntegrityAppCheckProviderFactory.getInstance()
+        val debugAppCheck = DebugAppCheckProviderFactory.getInstance()
+        //Install provider appcheck
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        firebaseAppCheck.installAppCheckProviderFactory(
+            debugAppCheck
+        )
+
         createNotificationChannels()
     }
 
@@ -54,11 +52,8 @@ class MyApplication : Application() {
         val settings = firestoreSettings {
             setLocalCacheSettings(persistentCacheSettings {})
         }
-        FirebaseFirestore.getInstance().firestoreSettings = settings
 
-        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance()
-        )
+        FirebaseFirestore.getInstance().firestoreSettings = settings
     }
 
     private fun createNotificationChannels() {

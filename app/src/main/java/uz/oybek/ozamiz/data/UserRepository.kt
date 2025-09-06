@@ -2,7 +2,6 @@
 package uz.oybek.ozamiz.data
 
 import android.net.Uri
-import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -17,13 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.ImageUploader
-import uz.oybek.ozamiz.MainActivity
 import uz.oybek.ozamiz.data.firebase.FirebaseInstances
 import uz.oybek.ozamiz.data.model.StreakInfo
 import uz.oybek.ozamiz.data.utils.FirebaseUtils.getValueSafe
 import uz.oybek.ozamiz.handleException
-import uz.oybek.ozamiz.ui.showToast
-import java.util.Calendar
 import java.util.Date
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -84,40 +80,53 @@ object UserRepository {
     private fun saveUserNetwork() {
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid
         if (user.valid && user.uid == currentUid) {
-            val userMap = mapOf(
-                "uid" to user.uid,
-                "name" to user.name,
-                "admin" to user.isAdmin,
-                "phoneNumber" to user.phoneNumber,
-                "gmail" to user.gmail,
-                "lastSeenTime" to user.lastSeenTime,
-                "age" to user.age,
-                "height" to user.height,
-                "weight" to user.weight,
-                "targetWeight" to user.targetWeight,
-                "startWeight" to user.startWeight,
-                "activityLevel" to user.activityLevel,
-                "targetCalories" to user.targetCalories,
-                "targetWaterMl" to user.targetWaterMl,
-                "targetCaloriesBurned" to user.targetCaloriesBurned,
-                "problems" to user.problems,
-                "reminderSettings" to user.reminderSettings,
-                "streakInfo" to user.streakInfo,
-                "lastWeightLogTimestamp" to user.lastWeightLogTimestamp,
-                "avatarUrl" to user.avatarUrl,
-                "hasSeenWeightPhotoInfo" to user.hasSeenWeightPhotoInfo,
-                "registerDate" to user.registerDate,
-                "premium" to user.premium,
-                "premiumDate" to user.premiumDate,
-                "paymentChecking" to user.paymentChecking,
-                "paymentCheckPhotoUrl" to user.paymentCheckPhotoUrl,
-                "gender" to user.gender,
-                "manzil" to user.manzil,
-                "pushToken" to user.pushToken
-            )
+            val userMap = user.toMap() // User obyektini Mapga o'tkazish
             usersReference.child(user.uid).setValue(userMap)
                 .addOnSuccessListener {}
         }
+    }
+
+    // User modelini Mapga o'tkazuvchi extension funksiya
+    private fun User.toMap(): Map<String, Any?> {
+        return mapOf(
+            "uid" to uid,
+            "name" to name,
+            "phoneNumber" to phoneNumber,
+            "gmail" to gmail,
+            "lastSeenTime" to lastSeenTime,
+            "unreadMessages" to unreadMessages,
+            "premium" to premium,
+            "premiumDate" to premiumDate,
+            "pushToken" to pushToken,
+            "gender" to gender,
+            "manzil" to manzil,
+            "age" to age,
+            "height" to height,
+            "weight" to weight,
+            "targetWeight" to targetWeight,
+            "startWeight" to startWeight,
+            "activityLevel" to activityLevel,
+            "targetCalories" to targetCalories,
+            "targetWaterMl" to targetWaterMl,
+            "targetCaloriesBurned" to targetCaloriesBurned,
+            "problems" to problems,
+            "reminderSettings" to reminderSettings,
+            "streakInfo" to streakInfo,
+            "lastWeightLogTimestamp" to lastWeightLogTimestamp,
+            "avatarUrl" to avatarUrl,
+            "hasSeenWeightPhotoInfo" to hasSeenWeightPhotoInfo,
+            "registerDate" to registerDate,
+            "paymentChecking" to paymentChecking,
+            "paymentCheckPhotoUrl" to paymentCheckPhotoUrl,
+            "isAdmin" to isAdmin,
+            "experiencePoints" to experiencePoints,
+            "lessonLives" to lessonLives,
+            "lastLifeRefillTimestamp" to lastLifeRefillTimestamp,
+            "completedLessonIds" to completedLessonIds,
+            "unlockedLessonIds" to unlockedLessonIds,
+            "scorePoints" to scorePoints,
+            "unlockedBadgeIds" to unlockedBadgeIds
+        )
     }
 
 

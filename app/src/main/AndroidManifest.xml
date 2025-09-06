@@ -41,7 +41,7 @@
             android:exported="true"
             android:showForAllUsers="true"
             android:showOnLockScreen="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -90,7 +90,6 @@
 
     </application>
 
-    <!-- Kamera bilan ishlash uchun intentlarni aniqlashga ruxsat -->
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />

@@ -1,4 +1,3 @@
-<!-- res/layout/item_planned_meal.xml -->
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -6,14 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/dimen_12"
-    app:cardBackgroundColor="?colorSurfaceContainer"
+    app:cardBackgroundColor="?colorSurfaceContainerLow"
     app:cardCornerRadius="@dimen/dimen_12"
-    app:cardElevation="1dp">
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="?colorSurfaceContainerLowest"
         android:padding="@dimen/dimen_12">
 
         <LinearLayout
@@ -22,12 +22,12 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageView_meal_type_icon_plan"
                 android:layout_width="32dp"
+                app:shapeAppearance="@style/CircleImageView"
                 android:layout_height="32dp"
                 android:layout_marginEnd="12dp"
-                app:tint="?colorPrimary"
                 tools:src="@drawable/breakfast_ic"/>
 
             <TextView
@@ -39,41 +39,126 @@
                 android:textColor="?colorOnSurface"
                 tools:text="Nonushta" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_replace_meal_plan"
-                style="@style/Widget.Material3.Button.TextButton.Icon"
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Almashtirish"
-                android:textSize="13sp"
-                app:icon="@drawable/ic_replace_meal"
-                app:iconSize="18dp"
-                app:iconGravity="textStart"
-                app:iconTint="?colorPrimary"
-                android:visibility="gone"
-                tools:visibility="visible"/>
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_replace_meal_plan"
+                    style="@style/Widget.Material3.Button.TextButton.Icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Almashtirish"
+                    android:textSize="13sp"
+                    app:icon="@drawable/replace_ic"
+                    app:iconSize="18dp"
+                    app:iconGravity="textStart"
+                    app:iconTint="?colorPrimary"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/progress_replace_meal"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:indeterminateTint="?colorPrimary"
+                    tools:visibility="visible" />
+
+            </FrameLayout>
+
         </LinearLayout>
 
         <TextView
             android:id="@+id/textView_meal_name_plan"
-            style="@style/Headline2_16"
+            style="@style/Headline3_15"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/dimen_8"
+            android:drawableTint="?colorOnSurfaceVariant"
             android:layout_marginTop="@dimen/dimen_8"
             android:textColor="?colorOnSurface"
             tools:text="Suli yormasi (banan va yong'oqlar bilan)" />
 
         <!-- Nutrients Horizontal Layout -->
+        <!-- Ingredients Section (Expandable) -->
+        <TextView
+            android:id="@+id/textView_ingredients_title_plan"
+            style="@style/Subtitle2_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Masalliqlar"
+            app:drawableTint="?colorOnSurfaceVariant"
+            android:textColor="?colorOnSurface"/>
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/dimen_8"
+            android:id="@+id/layout_ingredients_plan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:visibility="visible">
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView_preparation_title_plan"
+            style="@style/Subtitle2_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Tayyorlanishi"
+            app:drawableTint="?colorOnSurfaceVariant"
+            android:textColor="?colorOnSurface"/>
+
+        <LinearLayout
+            android:id="@+id/layout_preparation_plan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_8"
+            android:orientation="vertical"
+            tools:visibility="visible">
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView_health_benefits_title_plan"
+            style="@style/Subtitle2_14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Foydali jihatlari"
+            app:drawableTint="?colorOnSurfaceVariant"
+            android:textColor="?colorOnSurface"/>
+
+        <TextView
+            android:id="@+id/textView_health_benefits_plan"
+            style="@style/Text2_15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingMultiplier="1.1"
+            android:textColor="?colorOnSurface"
+            android:layout_marginTop="@dimen/dimen_8"
+            tools:visibility="visible"
+            tools:text="Bu ovqat kletchatkaga boy va uzoq vaqt to'q tutadi."/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="18dp"
             android:orientation="horizontal"
             android:baselineAligned="false">
 
             <LinearLayout style="@style/MacroItemLayout">
-                <TextView style="@style/MacroItemLabel" android:text="Kaloriya"/>
-                <TextView android:id="@+id/textView_calories_plan" style="@style/MacroItemValue" tools:text="300 kkal"/>
+                <TextView style="@style/MacroItemLabel"
+                    android:text="Kaloriya"/>
+                <TextView
+                    android:id="@+id/textView_calories_plan"
+                    style="@style/MacroItemValue"
+                    android:textColor="?colorOnSurface"
+                    android:fontFamily="@font/roboto_medium"
+                    tools:text="300 kkal"/>
             </LinearLayout>
             <LinearLayout style="@style/MacroItemLayout">
                 <TextView style="@style/MacroItemLabel" android:text="@string/protein_short"/>
@@ -88,88 +173,6 @@
                 <TextView android:id="@+id/textView_carbs_plan" style="@style/MacroItemValue" tools:text="50 g"/>
             </LinearLayout>
         </LinearLayout>
-
-        <!-- Ingredients Section (Expandable) -->
-        <TextView
-            android:id="@+id/textView_ingredients_title_plan"
-            style="@style/Headline3_15"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Masalliqlar"
-            android:drawableEnd="@drawable/ic_expand_more"
-            app:drawableTint="?colorOnSurfaceVariant"
-            android:textColor="?colorOnSurfaceVariant"/>
-
-        <LinearLayout
-            android:id="@+id/layout_ingredients_plan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
-            <!-- Ingredients will be added programmatically or via RecyclerView -->
-            <TextView style="@style/Text1_14" android:layout_marginTop="4dp" android:textColor="?colorOnSurfaceVariant" tools:text="- 50g suli yormasi"/>
-            <TextView style="@style/Text1_14" android:layout_marginTop="2dp" android:textColor="?colorOnSurfaceVariant" tools:text="- 250ml suv"/>
-            <TextView style="@style/Text1_14" android:layout_marginTop="2dp" android:textColor="?colorOnSurfaceVariant" tools:text="- 10g yong'oq"/>
-        </LinearLayout>
-
-        <!-- Preparation Steps Section (Expandable) -->
-        <TextView
-            android:id="@+id/textView_preparation_title_plan"
-            style="@style/Headline3_15"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Tayyorlanishi"
-            android:drawableEnd="@drawable/ic_expand_more"
-            app:drawableTint="?colorOnSurfaceVariant"
-            android:textColor="?colorOnSurfaceVariant"/>
-
-        <LinearLayout
-            android:id="@+id/layout_preparation_plan"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
-            <!-- Preparation steps will be added programmatically or via RecyclerView -->
-            <TextView style="@style/Text1_14" android:layout_marginTop="4dp" android:textColor="?colorOnSurfaceVariant" tools:text="1. Suli yormasini suvda quyuqlashguncha pishiring."/>
-        </LinearLayout>
-
-        <!-- Health Benefits Section (Expandable) -->
-        <TextView
-            android:id="@+id/textView_health_benefits_title_plan"
-            style="@style/Headline3_15"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Foydali jihatlari"
-            android:drawableEnd="@drawable/ic_expand_more"
-            app:drawableTint="?colorOnSurfaceVariant"
-            android:textColor="?colorOnSurfaceVariant"/>
-
-        <TextView
-            android:id="@+id/textView_health_benefits_plan"
-            style="@style/Text1_14"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:lineSpacingMultiplier="1.1"
-            android:textColor="?colorOnSurfaceVariant"
-            android:visibility="gone"
-            tools:visibility="visible"
-            tools:text="Bu ovqat kletchatkaga boy va uzoq vaqt to'q tutadi."/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_log_food_plan"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Logga qo'shish"
-            app:icon="@drawable/add_circle_ic"
-            app:iconGravity="textStart"/>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

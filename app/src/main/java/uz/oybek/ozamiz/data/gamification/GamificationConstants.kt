@@ -1,14 +1,14 @@
-// C:\Users\User\AndroidStudioProjects\Ozamiz\app\src\main\java\uz\oybek\ozamiz\data\gamification\GamificationConstants.kt
 package uz.oybek.ozamiz.data.gamification
 
 import android.os.Parcelable
 import androidx.annotation.DrawableRes
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 import uz.oybek.ozamiz.R // R drawable uchun
 
+@Keep
 object GamificationConstants {
 
-    // Ballarni hisoblash qoidalari
     const val POINTS_HEALTHY_MEAL = 10
     const val POINTS_HEALTHY_SNACK = 5
     const val POINTS_DAILY_GOAL_ALL_HEALTHY = 15 // Agar kunlik barcha ovqatlar sog'lom bo'lsa

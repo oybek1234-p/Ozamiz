@@ -2,7 +2,6 @@ package uz.oybek.ozamiz.data.utils
 
 import android.annotation.SuppressLint
 import com.google.firebase.Timestamp
-import okhttp3.internal.toLongOrDefault
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
 import java.text.SimpleDateFormat
@@ -35,10 +34,6 @@ object DateUtils {
         when (any) {
             is Timestamp -> {
                 return any.toDate().time
-            }
-
-            is String -> {
-                return any.toLongOrDefault(0)
             }
 
             is Long -> {
