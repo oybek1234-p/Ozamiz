@@ -32,7 +32,7 @@ class AdminPaymentVerificationDetailFragment :
     ): FragmentAdminPaymentVerificationDetailBinding {
         return FragmentAdminPaymentVerificationDetailBinding.inflate(inflater, container, false)
     }
-
+    
     override fun viewCreated(bind: FragmentAdminPaymentVerificationDetailBinding) {
         viewModel.loadUserDetails(args.userId)
 

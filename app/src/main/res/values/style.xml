@@ -119,7 +119,7 @@
         <item name="android:background">@drawable/round_lay</item>
         <item name="elevation">2dp</item>
         <item name="android:elevation">2dp</item>
-        <item name="android:layout_marginStart">@dimen/dimen_12</item>
+        <item name="android:layout_marginStart">@dimen/dimen_8</item>
         <item name="android:layout_weight">1</item>
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center</item>
@@ -141,13 +141,13 @@
 
     </style>
 
-    <style name="MacroItemLabel" parent="Subtitle2_14">
+    <style name="MacroItemLabel" parent="Subtitle3_13">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">?colorPrimary</item>
     </style>
 
-    <style name="MacroItemValue" parent="Headline2_16">
+    <style name="MacroItemValue" parent="Text1_14">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginTop">4dp</item>
@@ -164,7 +164,7 @@
             <item name="android:foreground">?attr/selectableItemBackground</item>
             <item name="cardBackgroundColor">?colorSurfaceContainer</item>
             <item name="strokeWidth">2dp</item>
-            <item name="strokeColor">?colorPrimary</item>
+            <item name="strokeColor">@color/blue</item>
         </style>
 
         <style name="WaterPresetLayout">
@@ -172,6 +172,7 @@
             <item name="android:layout_height">wrap_content</item>
             <item name="android:orientation">vertical</item>
             <item name="android:padding">12dp</item>
+            <item name="android:background">#F0FAFD</item>
             <item name="android:gravity">center</item>
         </style>
 
@@ -183,10 +184,10 @@
             <item name="android:visibility">gone</item>
         </style>
 
-        <style name="WaterPresetLabel" parent="Text1_16">
+        <style name="WaterPresetLabel" parent="Headline3_15">
             <item name="android:layout_width">wrap_content</item>
             <item name="android:layout_height">wrap_content</item>
-            <item name="android:textColor">?colorOnSurfaceVariant</item>
+            <item name="android:textColor">@color/blue</item>
             <item name="android:layout_marginTop">@dimen/dimen_12</item>
         </style>
 

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?colorSurfaceContainerLowest"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar_food_detail"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/close_ic"
+            app:title="Ovqat ma'lumoti"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/Title3_17" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:clipToPadding="false"
+                android:paddingBottom="24dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageView_food_detail"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="center_horizontal"
+                    app:shapeAppearanceOverlay="@style/RadiusImageView12"
+
+                    tools:src="@drawable/placeholder_food"
+                    />
+
+                <TextView
+                    android:id="@+id/textView_food_description_detail"
+                    style="@style/Title2_20"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/dimen_12"
+                    tools:text="Tovuqli salat"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:paddingVertical="4dp"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="1dp"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <LinearLayout style="@style/MacroItemLayout">
+                        <TextView style="@style/MacroItemLabel"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textSize="15sp"
+                            android:textColor="@color/yellow"
+                            android:text="Kaloriya"/>
+                        <TextView android:id="@+id/textView_detail_calories" style="@style/MacroItemValue" tools:text="350 kkal"/>
+                    </LinearLayout>
+                    <LinearLayout style="@style/MacroItemLayout">
+                        <TextView style="@style/MacroItemLabel" android:text="@string/protein_short"/>
+                        <TextView android:id="@+id/textView_detail_protein" style="@style/MacroItemValue" tools:text="25.5 g"/>
+                    </LinearLayout>
+                    <LinearLayout style="@style/MacroItemLayout">
+                        <TextView style="@style/MacroItemLabel" android:text="@string/fat_short"/>
+                        <TextView android:id="@+id/textView_detail_fat" style="@style/MacroItemValue" tools:text="15.2 g"/>
+                    </LinearLayout>
+                    <LinearLayout style="@style/MacroItemLayout">
+                        <TextView style="@style/MacroItemLabel" android:text="@string/carbs_short"/>
+                        <TextView android:id="@+id/textView_detail_carbs" style="@style/MacroItemValue" tools:text="10.0 g"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardView_ai_insights"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:elevation="2dp"
+                    app:cardBackgroundColor="#F2F2F2"
+                    app:cardElevation="1dp"
+                    app:strokeWidth="1dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:padding="18dp">
+
+                        <TextView
+                            android:id="@+id/textView_ai_insights"
+                            style="@style/Text1_16"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:lineSpacingMultiplier="1.1"
+                            android:textColor="?colorOnSurface"
+                            tools:text="AI: Bu ovqat oqsilga boy, uzoq vaqt to'q tutadi. Non miqdorini kamaytiring."/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_delete_log"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/delete"
+                    android:drawableTint="?colorError"
+                    app:icon="@drawable/delete_ic"
+                    app:iconTint="?colorError"
+                    app:iconGravity="textStart"
+                    app:strokeColor="?colorError"
+                    android:textColor="?colorError"/>
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/close"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Ortga"
+                    app:icon="@drawable/arrow_back"
+                    android:drawableTint="?colorError"
+                    app:iconGravity="textStart"
+                    android:textColor="?colorOnSurface"/>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

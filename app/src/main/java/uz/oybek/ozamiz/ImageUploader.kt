@@ -18,7 +18,7 @@ object ImageUploader {
     const val USER_PATH = "users_private"
 
     private const val DEFAULT_IMAGE_PATH = "food_images"
-    private const val MAX_IMAGE_SIZE_KB = 200
+    private const val MAX_IMAGE_SIZE_KB = 100
 
     private fun getStorageRef(path: String = DEFAULT_IMAGE_PATH): StorageReference {
         return storage.reference.child(path)

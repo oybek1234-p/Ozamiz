@@ -2,12 +2,18 @@ import android.app.Application
 import android.net.Uri
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.google.firebase.database.ServerValue
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.ImageUploader
@@ -24,6 +30,7 @@ import uz.oybek.ozamiz.data.info.FoodLog
 import uz.oybek.ozamiz.data.info.MealsType
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.utils.NutritionCalculator
+import uz.oybek.ozamiz.ui.getinfo.Event
 import uz.oybek.ozamiz.util.StreakManager
 import java.util.Date
 
@@ -44,6 +51,11 @@ sealed class LogFoodUiState {
     data object ShowPremiumPrompt : LogFoodUiState()
 }
 
+sealed class LogFoodNavigationEvent {
+    data class ShowToast(val message: String) : LogFoodNavigationEvent()
+    object RefreshList : LogFoodNavigationEvent()
+}
+
 class LogFoodViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dailyLogRepository = DailyLogRepository()
@@ -54,6 +66,12 @@ class LogFoodViewModel(application: Application) : AndroidViewModel(application)
     private val _uiState = MutableStateFlow<LogFoodUiState>(LogFoodUiState.Loading)
     val uiState: StateFlow<LogFoodUiState> = _uiState.asStateFlow()
 
+    private val _navigationEvent = MutableLiveData<Event<LogFoodNavigationEvent>>()
+    val navigationEvent: LiveData<Event<LogFoodNavigationEvent>> = _navigationEvent
+
+    var todaysFoodLogs: Flow<PagingData<FoodLog>> = emptyFlow()
+        private set
+
     private var currentPendingLogData: FoodLog? = null
     private var currentAnalysisResult: GeminiAnalysisResult? = null
     private var currentUploadedUrlDuringAnalysis: String? = null
@@ -62,13 +80,13 @@ class LogFoodViewModel(application: Application) : AndroidViewModel(application)
     var mealType: String = ""
     var selectedImageUri: Uri? = null
     private var originalPhotoUrl: String? = null
-    private var selectedDate: Date = Date() // Sana saqlash uchun
+    private var selectedDate: Date = Date()
 
     fun loadArguments(arguments: Bundle?) {
         val defaultMealTypeFromArgs = arguments?.getString("mealType") ?: MealsType.Snack.id
         val logJson = arguments?.getString("logToEditJson")
         val timestamp = arguments?.getLong("selectedDateTimestamp", System.currentTimeMillis())
-        selectedDate = Date(timestamp ?: System.currentTimeMillis()) // Argumentdan sanani o'qish
+        selectedDate = Date(timestamp ?: System.currentTimeMillis())
         mealType = defaultMealTypeFromArgs
 
         if (logJson != null) {
@@ -85,6 +103,9 @@ class LogFoodViewModel(application: Application) : AndroidViewModel(application)
             originalPhotoUrl = null
             _uiState.value = LogFoodUiState.Inputting(mealType)
         }
+
+        todaysFoodLogs = dailyLogRepository.getTodaysFoodLogsPaginated(selectedDate).cachedIn(viewModelScope)
+
         currentPendingLogData = null
         currentAnalysisResult = null
         currentUploadedUrlDuringAnalysis = null
@@ -222,6 +243,24 @@ class LogFoodViewModel(application: Application) : AndroidViewModel(application)
                     _uiState.value = LogFoodUiState.Error("Log saqlashda xatolik: ${result.error}")
                 }
 
+                else -> {}
+            }
+        }
+    }
+
+    fun deleteFoodLog(foodLog: FoodLog) {
+        _uiState.value = LogFoodUiState.Saving
+        viewModelScope.launch {
+            when (dailyLogRepository.deleteFoodLog(foodLog.logId, selectedDate)) {
+                is DataWrapper.Success -> {
+                    foodLog.photoUrl?.let { imageUploader.deleteImage(it) }
+                    _navigationEvent.postValue(Event(LogFoodNavigationEvent.ShowToast("Ovqat o'chirildi")))
+                    _navigationEvent.postValue(Event(LogFoodNavigationEvent.RefreshList))
+                    stateHandled()
+                }
+                is DataWrapper.Error -> {
+                    _uiState.value = LogFoodUiState.Error("O'chirishda xatolik yuz berdi")
+                }
                 else -> {}
             }
         }

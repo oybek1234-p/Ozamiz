@@ -54,7 +54,6 @@
             </LinearLayout>
         </com.google.android.material.appbar.MaterialToolbar>
 
-        <!-- YANGI QO'SHILGAN SANA SKROLLERI -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/date_scroller_recycler_view"
             android:layout_width="match_parent"
@@ -62,6 +61,7 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             android:paddingHorizontal="12dp"
+            android:background="?colorSurfaceContainerLowest"
             android:paddingVertical="4dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="10"
@@ -88,7 +88,7 @@
                 android:clipToPadding="false"
                 android:orientation="vertical"
                 android:paddingTop="16dp"
-                android:paddingBottom="16dp">
+                android:paddingBottom="200dp">
 
                 <include
                     android:id="@+id/main_progress"
@@ -121,7 +121,7 @@
                             android:padding="@dimen/dimen_4"
                             android:src="@drawable/add_ic"
                             app:tint="?colorOnPrimary" />
-                        
+
                         <TextView
                             style="@style/Subtitle2_14"
                             android:layout_width="wrap_content"
@@ -158,7 +158,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?colorSurfaceContainerLowest"
+                        android:background="#F0F8FF"
                         android:orientation="vertical"
                         android:paddingBottom="@dimen/dimen_18">
 
@@ -255,7 +255,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?colorSurfaceContainerLowest"
+                        android:background="#FFFAF3"
                         android:orientation="vertical">
 
                         <androidx.constraintlayout.widget.ConstraintLayout

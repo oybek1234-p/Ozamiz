@@ -227,10 +227,10 @@
     <string name="upload_meal_photo">Kaloriyasini hisoblaymiz</string>
     <string name="tap_to_add_photo">Rasm qo\'shish</string>
     <string name="describe_your_meal">Bugun nima yedingiz?</string>
-    <string name="food_description_hint">Kosa sho‘rva, 2 bo‘lak , non ,stakan kola</string>
+    <string name="food_description_hint">Kosa sho‘rva, 2 bo‘lak non, piyola choy \nOvqat haqida batafsil yozing...</string>
     <string name="analyze_and_save">Taxlil qilish</string>
     <string name="error_photo_required">Iltimos, ovqat rasmini yuklang</string>
-    <string name="error_description_required">Iltimos, ovqatni tavsiflang</string>
+    <string name="error_description_required">Ovqat haqida ma\'lumot kiriting</string>
     <string name="analyzing">Taxlil qilinmoqda…</string>
     <string name="saving">Saqlanmoqda…</string>
     <string name="save_changes">O\'zgarishlarni saqlash</string>
@@ -453,7 +453,7 @@
     <string name="go_to_premium">Premiumga O\'tish</string>
     <string name="admin_premium_verifications">Premium Tekshiruv</string> <!-- ProfileFragmentdagi button uchun -->
     <string name="image_load_error_placeholder_text">Rasmni yuklab bo\'lmadi</string>
-    <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida (Ixtiyoriy)</string>
+    <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida yozing (Ixtiyoriy)</string>
     <string name="dars_nomi">Dars nomi</string>
     <string name="dars_haqida">Dars haqida</string>
 

@@ -12,11 +12,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
@@ -26,6 +30,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -40,6 +45,7 @@ import uz.oybek.ozamiz.databinding.FoodAnalyzingLoaderBinding
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
 import uz.oybek.ozamiz.handleException
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.getinfo.Event
 import uz.oybek.ozamiz.ui.hideSoftInput
 import uz.oybek.ozamiz.ui.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.showToast
@@ -55,6 +61,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     private lateinit var requestAudioPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
     private lateinit var speechToTextLauncher: ActivityResultLauncher<Intent>
+    private lateinit var todaysFoodAdapter: TodaysFoodAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,10 +141,18 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     override fun viewCreated(bind: FragmentLogFoodBinding) {
+       // bind.toolbarLogFood.inflateMenu(R.menu.add_log_save_menu)
+        bind.editTextFoodDescriptionLog.requestFocus()
+        bind.toolbarLogFood.setOnMenuItemClickListener {
+            analyze()
+            return@setOnMenuItemClickListener true
+        }
         setupToolbar(bind)
         setupMealTypeChips(bind)
+        setupTodaysFoodList(bind)
         setupClickListeners(bind)
         observeUiState(bind)
+        observeNavigationEvents()
         setupBottomSheetResultListener()
         updateSelectedImageView(viewModel.selectedImageUri)
     }
@@ -155,16 +170,16 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             chip.isCheckable = true
             bind.chipGroupMealType.addView(chip)
         }
-
-        bind.chipGroupMealType.setOnCheckedChangeListener { group, checkedId ->
-            if (checkedId != View.NO_ID) {
-                val chip = group.findViewById<Chip>(checkedId)
-                viewModel.mealType = chip.tag as String
-                bind.toolbarLogFood.title = getString(R.string.log_food_title_format, chip.text)
-            }
-        }
     }
 
+    private fun setupTodaysFoodList(bind: FragmentLogFoodBinding) {
+        todaysFoodAdapter = TodaysFoodAdapter { foodLog ->
+            val bottomSheet = TodaysFoodDetailBottomSheet.newInstance(foodLog)
+            bottomSheet.show(parentFragmentManager, TodaysFoodDetailBottomSheet.TAG)
+        }
+        bind.recyclerViewTodaysFood.layoutManager = LinearLayoutManager(requireContext())
+        bind.recyclerViewTodaysFood.adapter = todaysFoodAdapter
+    }
 
     private var currentDescriptionFromInput: String = ""
 
@@ -183,17 +198,21 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         }
 
         bind.buttonAnalyzeAndSave.setOnClickListener {
-            currentDescriptionFromInput = bind.editTextFoodDescriptionLog.text.toString()
-            val imageUriToAnalyze = viewModel.selectedImageUri ?: tempImageUri
-            viewModel.selectedImageUri = imageUriToAnalyze
-
-            if (viewModel.logToEdit != null) {
-                viewModel.saveEditedLog(currentDescriptionFromInput)
-            } else {
-                viewModel.analyzeAndPrepareLog(currentDescriptionFromInput, "")
-            }
-            hideSoftInput(requireActivity())
+            analyze()
         }
+    }
+
+    private fun analyze() {
+        currentDescriptionFromInput = binding.editTextFoodDescriptionLog.text.toString()
+        val imageUriToAnalyze = viewModel.selectedImageUri ?: tempImageUri
+        viewModel.selectedImageUri = imageUriToAnalyze
+
+        if (viewModel.logToEdit != null) {
+            viewModel.saveEditedLog(currentDescriptionFromInput)
+        } else {
+            viewModel.analyzeAndPrepareLog(currentDescriptionFromInput, "")
+        }
+        hideSoftInput(requireActivity())
     }
 
     private fun checkCameraPermissionAndLaunch() {
@@ -398,6 +417,27 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     }
 
                     else -> {}
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.todaysFoodLogs.collectLatest { pagingData ->
+                todaysFoodAdapter.submitData(pagingData)
+            }
+        }
+    }
+
+    private fun observeNavigationEvents() {
+        viewModel.navigationEvent.observe(viewLifecycleOwner) { event ->
+            event?.getContentIfNotHandled()?.let { navEvent ->
+                when (navEvent) {
+                    is LogFoodNavigationEvent.RefreshList -> {
+                        todaysFoodAdapter.refresh()
+                    }
+                    is LogFoodNavigationEvent.ShowToast -> {
+                        showToast(navEvent.message)
+                    }
                 }
             }
         }

@@ -23,6 +23,7 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -166,7 +167,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
                 // Asosiy UI state'ni kuzatish (progress barlar, textlar va h.k.)
                 launch {
-                    viewModel.uiState.collect { state ->
+                    viewModel.uiState.collectLatest { state ->
                         bind.progressBarOverall.isVisible = state.isLoading && state.dailyLogData == null
                         bind.contentScrollView.isVisible = !state.isLoading || state.dailyLogData != null
                         bind.swipeRefreshLayout.isRefreshing = state.isLoading && state.dailyLogData != null
@@ -179,9 +180,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     }
                 }
 
-                // Sanalar ro'yxatini FAQAT bir marta, o'zgarganda adapterga yuborish
                 launch {
-                    viewModel.uiState.map { it.datesForScroller }.distinctUntilChanged().collect { dates ->
+                    viewModel.uiState.map { it.datesForScroller }.distinctUntilChanged().collectLatest { dates ->
                         if (dates.isNotEmpty()) {
                             dateAdapter.submitList(dates)
                         }
@@ -190,7 +190,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
                 // Tanlangan sana o'zgarganda adapter va toolbar'ni yangilash
                 launch {
-                    viewModel.uiState.map { it.selectedDate }.distinctUntilChanged().collect { selectedDate ->
+                    viewModel.uiState.map { it.selectedDate }.distinctUntilChanged().collectLatest { selectedDate ->
                         dateAdapter.setSelectedDate(selectedDate)
 
                         val today = Calendar.getInstance().time
@@ -200,9 +200,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                             SimpleDateFormat("d MMMM", Locale("uz", "UZ")).format(selectedDate)
                         }
 
-                        val selectedIndex = viewModel.uiState.value.datesForScroller.indexOfFirst { DateUtils.isSameDay(it.time, selectedDate.time) }
-                        if (selectedIndex != -1) {
-                            (bind.dateScrollerRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(selectedIndex, bind.root.width / 2 - 32.dpToPx())
+                        bind.dateScrollerRecyclerView.post {
+                            val selectedIndex = viewModel.uiState.value.datesForScroller.indexOfFirst { DateUtils.isSameDay(it.time, selectedDate.time) }
+                            if (selectedIndex != -1) {
+                                (bind.dateScrollerRecyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(selectedIndex, bind.root.width / 2 - 32.dpToPx())
+                            }
                         }
                     }
                 }

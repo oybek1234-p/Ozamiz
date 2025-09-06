@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.data.logs
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -33,6 +36,18 @@ class DailyLogRepository {
     private fun getFormattedDateString(date: Date): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return dateFormat.format(date)
+    }
+
+    fun getTodaysFoodLogsPaginated(date: Date): Flow<PagingData<FoodLog>> {
+        val userId = getCurrentUserId() ?: return kotlinx.coroutines.flow.emptyFlow()
+        val dateString = getFormattedDateString(date)
+        val query = logsRootRef.child(userId).child(dateString).child("foodLogs")
+            .orderByChild("timestamp") // Firebase vaqti bo'yicha saralash
+
+        return Pager(
+            config = PagingConfig(pageSize = 8, enablePlaceholders = false),
+            pagingSourceFactory = { FirebasePagingSource(query, FoodLog::class.java) }
+        ).flow
     }
 
     fun observeLogsForDate(date: Date): Flow<DataWrapper<DailyLogData>> = callbackFlow {
@@ -128,7 +143,11 @@ class DailyLogRepository {
         }
     }
 
-    suspend fun updateFoodLog(logId: String, updatedFoodLog: FoodLog, date: Date): DataWrapper<Unit> {
+    suspend fun updateFoodLog(
+        logId: String,
+        updatedFoodLog: FoodLog,
+        date: Date
+    ): DataWrapper<Unit> {
         val userId = getCurrentUserId() ?: return DataWrapper.Error("Foydalanuvchi topilmadi")
         val dateString = getFormattedDateString(date)
         if (logId.isEmpty()) return DataWrapper.Error("Log ID bo'sh")

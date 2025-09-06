@@ -72,13 +72,13 @@ class DateScrollerAdapter(
                 isSelected -> {
                     // Tanlangan kun
                     binding.cardDate.strokeWidth = 0
-                    binding.dateContainer.setBackgroundColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryFixed, 0))
+                    binding.dateContainer.setBackgroundColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondary, 0))
                     binding.textViewDayOfWeek.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0))
                     binding.textViewDayOfMonth.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0))
                 }
                 isToday -> {
                     // Bugungi kun (lekin tanlanmagan)
-                    binding.cardDate.strokeWidth = (1.5f * context.resources.displayMetrics.density).toInt()
+                    binding.cardDate.strokeWidth = (2f * context.resources.displayMetrics.density).toInt()
                     binding.cardDate.strokeColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryFixed, 0)
                     binding.dateContainer.background = null
                     binding.textViewDayOfWeek.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorPrimaryFixed, 0))

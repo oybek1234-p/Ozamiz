@@ -34,13 +34,13 @@ class MyApplication : Application() {
         LocalUser.getUser()
         initFirebase()
 
-        val releaseAppCheck = PlayIntegrityAppCheckProviderFactory.getInstance()
-        val debugAppCheck = DebugAppCheckProviderFactory.getInstance()
-        //Install provider appcheck
-        val firebaseAppCheck = FirebaseAppCheck.getInstance()
-        firebaseAppCheck.installAppCheckProviderFactory(
-            debugAppCheck
-        )
+//        val releaseAppCheck = PlayIntegrityAppCheckProviderFactory.getInstance()
+//        val debugAppCheck = DebugAppCheckProviderFactory.getInstance()
+//        //Install provider appcheck
+//        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+//        firebaseAppCheck.installAppCheckProviderFactory(
+//            debugAppCheck
+//        )
 
         createNotificationChannels()
     }

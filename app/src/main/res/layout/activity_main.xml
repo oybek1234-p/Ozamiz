@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         app:backgroundTint="?colorSurfaceContainerLowest"
-        app:elevation="2dp"
+        app:elevation="4dp"
         app:itemBackground="?colorSurfaceContainer"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"

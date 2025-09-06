@@ -17,11 +17,12 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_logFood"
             android:layout_width="match_parent"
+            app:title="Kaloriya hisoblash"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/arrow_back"
             app:navigationIconTint="?colorOnSurface"
             app:titleTextColor="?colorOnSurface"
-            tools:title="Nonushta Qo'shish" />
+            />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,7 +36,8 @@
             android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingBottom="200dp"
+            android:paddingHorizontal="16dp">
 
             <TextView
                 style="@style/Headline3_15"
@@ -90,8 +92,9 @@
                         android:id="@+id/layout_addImagePlaceholder_log"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?colorPrimaryVariant"
+                        android:background="?colorSurfaceContainer"
                         android:gravity="center_vertical"
+                        android:elevation="@dimen/dimen_2"
                         android:orientation="horizontal"
                         android:paddingHorizontal="@dimen/dimen_18"
                         android:paddingVertical="@dimen/dimen_12"
@@ -102,7 +105,7 @@
                             android:layout_height="24dp"
                             android:contentDescription="@null"
                             android:src="@drawable/camera_ic"
-                            app:tint="?colorOnPrimary" />
+                            app:tint="?colorPrimary" />
 
                         <TextView
                             style="@style/Subtitle2_14"
@@ -111,7 +114,7 @@
                             android:layout_marginStart="@dimen/dimen_12"
                             android:fontFamily="@font/roboto_medium"
                             android:text="Ovqatni rasmga olish"
-                            android:textColor="?colorOnPrimary" />
+                            android:textColor="?colorPrimary" />
 
                     </LinearLayout>
 
@@ -131,13 +134,14 @@
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-
             <TextView
                 style="@style/Headline3_15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_28"
+                android:drawablePadding="@dimen/dimen_8"
                 android:paddingEnd="@dimen/dimen_24"
+                app:drawableStartCompat="@drawable/edit"
                 tools:ignore="RtlSymmetry"
                 android:text="@string/ovqat_haqida_yozing_ixtiyoriy"
                 android:textColor="?colorOnSurfaceVariant" />
@@ -156,12 +160,14 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="none"
                     android:gravity="top"
+                    android:lineSpacingMultiplier="1.2"
                     android:hint="@string/food_description_hint"
-                    android:imeOptions="actionDone"
                     android:inputType="textMultiLine|textCapSentences"
                     android:minLines="3"
+                    android:textColorHint="#808080"
                     android:padding="@dimen/dimen_18"
                     android:background="@drawable/round_lay_stroke"
+                    android:backgroundTint="#F4F4F4"
                     android:textSize="15sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -171,11 +177,29 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="56dp"
+                android:layout_marginTop="@dimen/dimen_12"
                 android:paddingEnd="56dp"
-                android:layout_marginTop="@dimen/dimen_24"
                 android:text="Tahlil qilish"
                 app:icon="@drawable/search_ic"
                 app:iconGravity="textStart" />
+
+            <TextView
+                android:id="@+id/todays_food_title"
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Oxirgi qo'shilganlar"
+                android:textColor="?colorOnSurface" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView_todays_food"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_todays_food" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -192,7 +216,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progress_analyze"
                 android:layout_width="wrap_content"
@@ -207,5 +230,4 @@
 
 
     </LinearLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
