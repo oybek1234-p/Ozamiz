@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurface"
+    android:background="?colorSurfaceContainerLowest"
     tools:context=".ui.log.LogFoodFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,7 +16,8 @@
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar_logFood"
             android:layout_width="match_parent"
-            app:title="Kaloriya hisoblash"
+            app:title="Qanday ovqat yedingiz?"
+            android:background="@color/white"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="@drawable/arrow_back"
             app:navigationIconTint="?colorOnSurface"
@@ -63,15 +63,66 @@
                     app:chipSpacingHorizontal="8dp"/>
             </HorizontalScrollView>
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout_foodDescription_log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxCornerRadiusBottomEnd="@dimen/dimen_12"
+                app:boxCornerRadiusBottomStart="@dimen/dimen_12"
+                app:boxCornerRadiusTopEnd="@dimen/dimen_12"
+                app:boxStrokeWidth="0.5dp"
+                app:boxBackgroundColor="?colorSurfaceContainerLowest"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                app:boxCornerRadiusTopStart="@dimen/dimen_12"
+                android:layout_marginTop="@dimen/dimen_12"
+                app:helperTextEnabled="true"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_foodDescription_log"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="none"
+                    android:gravity="top"
+                    android:textSize="15sp"
+                    android:lineSpacingMultiplier="1.2"
+                    android:hint="@string/food_description_hint"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:minLines="1"
+                    android:padding="@dimen/dimen_18" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end"
+                android:layout_marginTop="@dimen/dimen_8">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_voice_input"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="0dp"
+                    app:iconGravity="textStart"
+                    android:layout_weight="1"
+                    app:iconPadding="@dimen/dimen_8"
+                    android:layout_height="wrap_content"
+                    android:text="Ovoz"
+                    app:icon="@drawable/mic_ic" />
+
+
+            </LinearLayout>
+
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_image_container_log"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_18"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
+                android:layout_marginTop="@dimen/dimen_8"
+                app:cardElevation="0dp"
                 app:strokeColor="?colorOutlineVariant"
-                app:strokeWidth="1dp">
+                app:strokeWidth="0dp">
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -88,35 +139,15 @@
                         tools:visibility="gone"
                         android:contentDescription="@string/selected_meal_image_preview" />
 
-                    <LinearLayout
-                        android:id="@+id/layout_addImagePlaceholder_log"
+                    <com.google.android.material.button.MaterialButton
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?colorSurfaceContainer"
-                        android:gravity="center_vertical"
-                        android:elevation="@dimen/dimen_2"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="@dimen/dimen_18"
-                        android:paddingVertical="@dimen/dimen_12"
-                        android:visibility="visible">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:contentDescription="@null"
-                            android:src="@drawable/camera_ic"
-                            app:tint="?colorPrimary" />
-
-                        <TextView
-                            style="@style/Subtitle2_14"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/dimen_12"
-                            android:fontFamily="@font/roboto_medium"
-                            android:text="Ovqatni rasmga olish"
-                            android:textColor="?colorPrimary" />
-
-                    </LinearLayout>
+                        style="@style/Widget.Material3.Button.ElevatedButton"
+                        android:id="@+id/layout_addImagePlaceholder_log"
+                        android:text="Ovqat rasmi"
+                        app:iconGravity="textStart"
+                        app:iconPadding="@dimen/dimen_8"
+                        app:icon="@drawable/camera_ic" />
 
                     <ImageButton
                         android:id="@+id/button_remove_image_log"
@@ -125,56 +156,19 @@
                         android:src="@drawable/close_ic"
                         app:tint="@color/white"
                         android:background="@drawable/oval_background_with_opacity"
-                        android:layout_gravity="top|end"
+                        android:layout_gravity="top|start"
                         android:layout_margin="8dp"
                         android:visibility="gone"
-                        tools:visibility="visible"
                         android:contentDescription="@string/remove_image"/>
-
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <TextView
-                style="@style/Headline3_15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_28"
-                android:drawablePadding="@dimen/dimen_8"
-                android:paddingEnd="@dimen/dimen_24"
-                app:drawableStartCompat="@drawable/edit"
-                tools:ignore="RtlSymmetry"
-                android:text="@string/ovqat_haqida_yozing_ixtiyoriy"
-                android:textColor="?colorOnSurfaceVariant" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout_foodDescription_log"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_12"
-                app:helperTextEnabled="true"
-                app:hintEnabled="false">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editText_foodDescription_log"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="none"
-                    android:gravity="top"
-                    android:lineSpacingMultiplier="1.2"
-                    android:hint="@string/food_description_hint"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:minLines="3"
-                    android:textColorHint="#808080"
-                    android:padding="@dimen/dimen_18"
-                    android:background="@drawable/round_lay_stroke"
-                    android:backgroundTint="#F4F4F4"
-                    android:textSize="15sp" />
-            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_analyze_and_save"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
+                android:layout_gravity="end"
                 android:layout_height="wrap_content"
                 android:paddingStart="56dp"
                 android:layout_marginTop="@dimen/dimen_12"
@@ -185,18 +179,18 @@
 
             <TextView
                 android:id="@+id/todays_food_title"
-                style="@style/Title3_17"
+                style="@style/Subtitle2_14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="Oxirgi qo'shilganlar"
+                android:layout_marginTop="48dp"
+                android:text="Oxirgilar"
                 android:textColor="?colorOnSurface" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_todays_food"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="@dimen/dimen_12"
                 android:nestedScrollingEnabled="false"
                 tools:itemCount="3"
                 tools:listitem="@layout/item_todays_food" />
@@ -227,7 +221,6 @@
                 app:trackColor="?colorSurfaceContainerLowest"
                 app:indicatorSize="24dp" />
         </FrameLayout>
-
 
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

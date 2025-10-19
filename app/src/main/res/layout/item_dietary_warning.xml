@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_warning"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dimen_8"
+    app:cardBackgroundColor="?colorSurfaceContainerLowest"
+    app:cardCornerRadius="16dp"
+    app:strokeColor="@color/grey"
+    app:cardElevation="1dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="@dimen/dimen_12">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textView_warning_title"
+                    style="@style/Text2_15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorOnSurface"
+                    tools:text="Uglevodlar me'yordan oshdi!" />
+
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/icon_warning"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/warning_24px"
+                app:tint="@color/rejected" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView_warning_message"
+            style="@style/Text1_14"
+            android:layout_width="match_parent"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="?colorOnSurfaceVariant"
+            tools:text="Non va xamirli ovqatlar ko'p yeyildi." />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.data
 
 import androidx.annotation.Keep
 import com.google.firebase.database.PropertyName
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Transient
 import uz.oybek.ozamiz.data.info.ActivityLevel
 import uz.oybek.ozamiz.data.info.MealsType
@@ -44,16 +43,13 @@ data class User(
     var registerDate: Date? = null,
     var paymentChecking: Boolean = false,
     var paymentCheckPhotoUrl: String? = null,
-    var isAdmin: Boolean = false,
+    var admin: Boolean = false,
     var experiencePoints: Int = 0,
-    var lessonLives: Int = 5, // Default 5 jon
-    var lastLifeRefillTimestamp: Long = 0L, // Oxirgi jon to'ldirilgan vaqt (millis)
+    var lessonLives: Int = 5,
+    var lastLifeRefillTimestamp: Long = 0L,
     var completedLessonIds: List<String> = emptyList(), // Tugatilgan darslar IDlari
     var unlockedLessonIds: List<String> = emptyList(), // Ochilgan (lekin hali tugatilmagan) darslar IDlari
-
-
-    // Gamification uchun yangi maydonlar
-    var scorePoints: Int = 0, // Umumiy ballar
+    var scorePoints: Int = 0,
     var unlockedBadgeIds: List<String> = emptyList() // Ochilgan nishonlarning IDlari
 ) {
     constructor() : this(
@@ -86,7 +82,7 @@ data class User(
         registerDate = Calendar.getInstance().time,
         paymentChecking = false,
         paymentCheckPhotoUrl = null,
-        isAdmin = false,
+        admin = false,
         experiencePoints = 0,
         lessonLives = 5,
         lastLifeRefillTimestamp = 0L,
@@ -135,4 +131,4 @@ fun User.upcomingMeal(): String {
 
 const val weightGoalModifier = -750
 
-fun User.admin() = this.isAdmin
+fun User.admin() = this.admin

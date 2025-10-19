@@ -103,16 +103,10 @@ class WorkoutListFragment : BaseFragment<FragmentWorkoutListBinding>() {
 
                         when (navEvent) {
                             is WorkoutListNavigationEvent.NavigateToWorkoutDetail -> {
-                                val action =
-                                    WorkoutListFragmentDirections.actionWorkoutListFragmentToWorkoutDetailFragment(
-                                        navEvent.workoutId
-                                    )
-                                findNavController().navigate(action)
+
                             }
 
                             is WorkoutListNavigationEvent.NavigateToAddWorkout -> {
-                                // Yangi workout qo'shish ekraniga o'tish
-                                // Agar kategoriya ID si bo'lsa, uni ham o'tkazish mumkin
                                 val action =
                                     WorkoutListFragmentDirections.actionWorkoutListFragmentToAddEditWorkoutFragment(
                                         null

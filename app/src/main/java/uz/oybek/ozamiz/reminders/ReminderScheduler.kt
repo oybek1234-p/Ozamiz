@@ -24,6 +24,7 @@ object ReminderScheduler {
     const val EXTRA_REMINDER_MINUTE = "reminder_minute"
 
     fun scheduleAllActiveReminders(context: Context) {
+        return
         val user = LocalUser.user
 
         if (!user.valid || user.reminderSettings == null) {
@@ -76,6 +77,7 @@ object ReminderScheduler {
     }
 
     private fun scheduleWaterReminderForMeal(context: Context, mealId: String, mealHour: Int, mealMinute: Int) {
+        return
         val calendar = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, mealHour)
             set(Calendar.MINUTE, mealMinute)
@@ -100,6 +102,7 @@ object ReminderScheduler {
         hour: Int,
         minute: Int
     ) {
+        return
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

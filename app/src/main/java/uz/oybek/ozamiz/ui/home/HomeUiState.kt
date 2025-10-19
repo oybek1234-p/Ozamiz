@@ -3,6 +3,7 @@ package uz.oybek.ozamiz.ui.home
 import uz.oybek.ozamiz.data.User
 import uz.oybek.ozamiz.data.info.DailyLogData
 import uz.oybek.ozamiz.data.model.StreakInfo
+import uz.oybek.ozamiz.logic.DietaryWarning
 import java.util.Date
 
 data class HomeUiState(
@@ -20,7 +21,7 @@ data class HomeUiState(
     val fat: Double = 0.0,
     val carbs: Double = 0.0,
     val protein: Double = 0.0,
-    // Yangi maydonlar
     val selectedDate: Date = Date(),
-    val datesForScroller: List<Date> = emptyList()
+    val datesForScroller: List<Date> = emptyList(),
+    val warnings: List<DietaryWarning> = emptyList()
 )

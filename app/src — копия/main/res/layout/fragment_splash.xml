@@ -14,6 +14,7 @@
             android:id="@+id/photo"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:src="@drawable/splash_photo"
             android:scaleType="centerCrop"
             android:layout_marginBottom="@dimen/dimen_12"
             app:layout_constraintBottom_toTopOf="@+id/title_view"

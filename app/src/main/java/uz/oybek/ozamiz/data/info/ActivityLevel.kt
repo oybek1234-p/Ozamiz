@@ -28,7 +28,5 @@ enum class ActivityLevel(val id: String, val title: String, val subtitle: String
 
     companion object {
         fun fromId(id: String?) = entries.find { it.id == id } ?: SEDENTARY
-        fun getAllDisplayOptions(): List<Pair<String, String>> =
-            entries.map { it.title to it.subtitle }
     }
 }

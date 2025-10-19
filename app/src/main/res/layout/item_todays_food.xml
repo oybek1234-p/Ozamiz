@@ -4,66 +4,84 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="4dp"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="@dimen/dimen_4"
     app:cardElevation="0dp"
-    app:strokeWidth="1dp"
     app:strokeColor="#E4E4E4"
+    app:strokeWidth="0dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/white">
+    app:cardBackgroundColor="?colorSurfaceContainerLowest">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:elevation="0.1dp"
+        android:background="#E2E2E2"
+        />
     <LinearLayout
-        android:background="@color/white"
+        android:background="?colorSurfaceContainerLowest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="8dp">
+        android:paddingVertical="@dimen/dimen_14">
+
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imageView_food"
             android:layout_width="40dp"
+            android:layout_marginEnd="@dimen/dimen_18"
             android:layout_height="40dp"
+            android:visibility="gone"
             android:scaleType="centerCrop"
             app:shapeAppearanceOverlay="@style/RadiusImageView12"
-            android:visibility="gone"
             tools:src="@drawable/placeholder_food"
-            tools:visibility="visible"/>
+            />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="12dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/textView_food_name"
                 style="@style/Text1_14"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="2"
+                android:layout_marginEnd="@dimen/dimen_48"
+                android:maxLines="1"
                 android:ellipsize="end"
-                android:textColor="?colorOnSurface"
+                android:textColor="?colorOnSurfaceVariant"
                 tools:text="Tovuqli salat va grechka nonushta uchun" />
 
             <TextView
                 android:id="@+id/textView_food_calories"
-                style="@style/Subtitle3_13"
+                style="@style/Text1_14"
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="?colorOnSurfaceVariant"
+                android:textColor="#777777"
                 tools:text="350 kal" />
         </LinearLayout>
+
+        <View
+            android:id="@+id/healthiness_dot"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/oval_back"
+            android:visibility="gone"
+            tools:backgroundTint="@color/green"
+            tools:visibility="visible" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/arrow_right"
-            app:tint="?colorSurfaceContainerHighest"/>
+            android:src="@drawable/more_vert"
+            app:tint="#757575"/>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

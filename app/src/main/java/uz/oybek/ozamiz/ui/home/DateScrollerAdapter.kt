@@ -70,7 +70,6 @@ class DateScrollerAdapter(
 
             when {
                 isSelected -> {
-                    // Tanlangan kun
                     binding.cardDate.strokeWidth = 0
                     binding.dateContainer.setBackgroundColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondary, 0))
                     binding.textViewDayOfWeek.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0))

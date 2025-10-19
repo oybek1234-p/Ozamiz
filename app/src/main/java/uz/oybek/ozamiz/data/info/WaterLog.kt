@@ -9,6 +9,5 @@ data class WaterLog(
     var amountMl: Int = 0, // Ichilgan suv miqdori (ml)
     var timestamp: Any = ServerValue.TIMESTAMP
 ) {
-    // Firebase RealtimeDB uchun kerakli no-argument konstruktor
     constructor() : this("", 0, 0L)
 }

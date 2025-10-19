@@ -144,15 +144,30 @@
     <style name="MacroItemLabel" parent="Subtitle3_13">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">?colorPrimary</item>
+        <item name="android:textColor">?colorOnSurfaceVariant</item>
     </style>
 
-    <style name="MacroItemValue" parent="Text1_14">
+    <style name="MacroItemValue" parent="Subtitle2_14">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginTop">8dp</item>
         <item name="android:textColor">?colorOnSurface</item>
     </style>
+
+        <style name="FormSectionHeaderSimple" parent="TextLabelMedium">
+            <item name="android:layout_width">match_parent</item>
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:layout_marginTop">24dp</item>
+            <item name="android:layout_marginBottom">8dp</item>
+            <item name="android:textColor">?colorPrimary</item>
+        </style>
+
+        <style name="FormDivider">
+            <item name="android:layout_width">match_parent</item>
+            <item name="android:layout_height">wrap_content</item>
+            <item name="android:layout_marginTop">16dp</item>
+        </style>
+
 
         <style name="WaterPresetCard" parent="Widget.Material3.CardView.Filled">
             <item name="android:layout_width">0dp</item>

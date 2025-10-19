@@ -1,6 +1,5 @@
 package uz.oybek.ozamiz.data.info
 
-import androidx.annotation.DrawableRes
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.ui.getinfo.ReminderItem
 import uz.oybek.ozamiz.ui.getinfo.ReminderType
@@ -8,7 +7,7 @@ import uz.oybek.ozamiz.ui.getinfo.ReminderType
 sealed class MealsType(
     val id: String,
     val name: String,
-    @DrawableRes val iconRes: Int,
+    val iconRes: Int,
     val description: String,
     val defaultImageUrl: String? = null
 ) {
@@ -41,7 +40,7 @@ sealed class MealsType(
         description = ""
     )
 
-    fun toReminder() : ReminderItem {
+    fun toReminder(): ReminderItem {
         return ReminderItem(
             id = id,
             name = name,

@@ -1,4 +1,3 @@
-// uz/oybek/ozamiz/data/foods/FoodItem.kt
 package uz.oybek.ozamiz.data.foods
 
 import androidx.annotation.Keep

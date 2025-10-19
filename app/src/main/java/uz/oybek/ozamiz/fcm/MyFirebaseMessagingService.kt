@@ -44,7 +44,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendNotification(messageTitle: String?, messageBody: String?, data: Map<String, String>) {
-        val intent = Intent(this, MainActivity::class.java) // Xabarnoma bosilganda ochiladigan Activity
+        val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
         val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -64,19 +64,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             .setAutoCancel(true)
             .setSound(defaultSoundUri)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // Muhim xabarlar uchun
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // Android Oreo (API 26) va undan yuqori versiyalar uchun notification channel kerak.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(channelId,
-                "Umumiy Xabarnomalar", // Kanal nomi (foydalanuvchiga ko'rinadi)
-                NotificationManager.IMPORTANCE_HIGH) // Muhimlik darajasi
+                "Umumiy Xabarnomalar",
+                NotificationManager.IMPORTANCE_HIGH)
             notificationManager.createNotificationChannel(channel)
         }
 
-        val notificationId = System.currentTimeMillis().toInt() // Har bir xabarnoma uchun unikal ID
+        val notificationId = System.currentTimeMillis().toInt()
         notificationManager.notify(notificationId, notificationBuilder.build())
     }
 }

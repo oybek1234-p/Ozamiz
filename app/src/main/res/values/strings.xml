@@ -1,5 +1,21 @@
 <resources>
     <!-- Existing strings -->
+
+        <!-- Mavjud stringlarga qo'shimcha -->
+
+        <string name="describe_meal_with_voice">Ovqatni ovozda tariflang</string>
+        <string name="press_to_record">Yozish uchun bosing</string>
+        <string name="stop_recording">To\'xtatish</string>
+        <string name="recording_in_progress">Yozilmoqda...</string>
+        <string name="analyze_voice">Tekshirish</string>
+        <string name="error_recording_failed">Ovoz yozishda xatolik yuz berdi.</string>
+        <string name="error_transcribing_audio">Ovozni matnga o\'girishda xatolik.</string>
+        <string name="audio_transcription_in_progress">Tekshiryapman ...</string>
+        <string name="input_via_voice_hint">Ovoz orqali</string>
+
+    <string name="bugungi_tavsiyalar">Bugungi tavsiyalar</string>
+    <string name="stop_and_analyze">To\'xtatish</string>
+    <string name="recording_speak_now">Gapiring...</string>
     <string name="app_name">Ozamiz</string>
     <string name="daqiqa_oldin">daqiqa oldin</string>
     <string name="sohat_oldin">soat oldin</string>
@@ -216,6 +232,13 @@
     <string name="log_add_success_ai">AI taklifi logga qo\'shildi</string>
     <string name="log_add_error_ai">AI taklifini logga qo\'shishda xato</string>
 
+    <string name="healthiness_good">Yaxshi tanlov</string>
+    <string name="healthiness_moderate">Me\'yorda yeng</string>
+    <string name="healthiness_poor">Ehtiyot bo\'ling</string>
+    <string name="macro_protein">💪 Kuch (Oqsil)</string>
+    <string name="macro_carbs">⚡️ Energiya (Uglevod)</string>
+    <string name="macro_fat">🛡️ Himoya (Yog\')</string>
+
     <string name="carbs_hint">Uglevod</string>
     <string name="log_food_title_format">%s</string>
     <string name="log_food_subtitle_format">Bugun %sga nima ovqat yedingiz ?</string>
@@ -227,7 +250,7 @@
     <string name="upload_meal_photo">Kaloriyasini hisoblaymiz</string>
     <string name="tap_to_add_photo">Rasm qo\'shish</string>
     <string name="describe_your_meal">Bugun nima yedingiz?</string>
-    <string name="food_description_hint">Kosa sho‘rva, 2 bo‘lak non, piyola choy \nOvqat haqida batafsil yozing...</string>
+    <string name="food_description_hint">Misol: Bir kosa go\'shtli sho‘rva, 2 bo‘lak oq non, stakan kola</string>
     <string name="analyze_and_save">Taxlil qilish</string>
     <string name="error_photo_required">Iltimos, ovqat rasmini yuklang</string>
     <string name="error_description_required">Ovqat haqida ma\'lumot kiriting</string>
@@ -235,9 +258,13 @@
     <string name="saving">Saqlanmoqda…</string>
     <string name="save_changes">O\'zgarishlarni saqlash</string>
     <string name="analysis_result_title">AI Taxmin Natijasi</string>
-    <string name="estimated_calories_format">%d quvvat</string>
+    <string name="estimated_calories_format">%d kaloriya</string>
     <string name="gallery">Galereya</string> <!-- Bu endi ishlatilmaydi, lekin o'chirmaymiz -->
     <string name="camera">Kamera</string>
+    <string name="calories_remaining">%d kaloriya qoldi</string>
+    <string name="calories_sufficient">Bugunga yetarli yedingiz</string>
+    <string name="calories_exceeded_slightly">%d kal oshdi</string>
+    <string name="calories_exceeded_warning">%d kal oshdi️</string>
     <string name="add_image_placeholder_text">Rasm yuklang</string>
     <string name="take_photo_placeholder">Kamerani ochish (Bosing)</string>
     <string name="voice_input">Ovozli kiritish</string>
@@ -453,7 +480,7 @@
     <string name="go_to_premium">Premiumga O\'tish</string>
     <string name="admin_premium_verifications">Premium Tekshiruv</string> <!-- ProfileFragmentdagi button uchun -->
     <string name="image_load_error_placeholder_text">Rasmni yuklab bo\'lmadi</string>
-    <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida yozing (Ixtiyoriy)</string>
+    <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida</string>
     <string name="dars_nomi">Dars nomi</string>
     <string name="dars_haqida">Dars haqida</string>
 

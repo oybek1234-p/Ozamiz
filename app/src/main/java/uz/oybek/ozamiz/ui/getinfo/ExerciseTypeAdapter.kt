@@ -15,7 +15,6 @@ class ExerciseTypeAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseAdapter.ViewHolder<ItemExerciseTypeBinding> {
         val binding = ItemExerciseTypeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         val holder = BaseAdapter.ViewHolder(binding)
-        // Click listenerni ViewHolder yaratilganda o'rnatish
         holder.itemView.setOnClickListener {
             if (holder.adapterPosition != androidx.recyclerview.widget.RecyclerView.NO_POSITION) {
                 listener(getItem(holder.adapterPosition))

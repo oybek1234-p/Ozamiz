@@ -27,36 +27,4 @@ object GamificationConstants {
         Badge("inspiration_bulb", "Ilhom manbai", "Yangi g'oyalar va kuch manbaisiz!", R.drawable.apple_ic, 1500),
         Badge("ozamiz_master", "Ozamiz ustasi", "Ozish va sog'lom bo'lishda haqiqiy ustasiz!", R.drawable.apple_ic, 2000)
     )
-
-    @Parcelize
-    data class RecommendedSnackFood(
-        val name: String,
-        @DrawableRes val iconRes: Int,
-        val mealType: String
-    ) : Parcelable
-
-    val FRUITS_FOR_SNACK: List<RecommendedSnackFood> = listOf(
-        RecommendedSnackFood("Olma", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Banan", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Nok", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Qatiq", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Kefir", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Tvorog", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Kivi", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Qaynatilgan tuxum", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Yong'oq", R.drawable.apple_ic, "breakfast_done"),
-        RecommendedSnackFood("Xurmo", R.drawable.apple_ic, "breakfast_done"),
-    )
-
-    val NUTS_AND_DAIRY_FOR_SNACK: List<RecommendedSnackFood> = listOf(
-        RecommendedSnackFood("Olma", R.drawable.apple_ic, "breakfast_done"),
-    )
-
-    fun getSnackRecommendationsForMeal(mealTypeJustFinished: String): List<RecommendedSnackFood> {
-        return when (mealTypeJustFinished.lowercase()) {
-            "breakfast" -> FRUITS_FOR_SNACK
-            "lunch" -> NUTS_AND_DAIRY_FOR_SNACK
-            else -> emptyList() // Dinner or other snacks, no specific recommendations for now
-        }
-    }
 }

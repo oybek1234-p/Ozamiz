@@ -13,6 +13,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
@@ -44,6 +45,8 @@ import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.visibleOrGone
 import uz.oybek.ozamiz.util.LivesManager // LivesManager importi
 import java.util.Calendar
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.atomics.AtomicInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -281,7 +284,7 @@ class MainActivity : AppCompatActivity() {
             setCanceledOnTouchOutside(false)
         }
     }
-
+    
     private var bottomSetUp = false
     private var bottomNavShown = true
 

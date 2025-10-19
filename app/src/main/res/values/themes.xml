@@ -1,11 +1,13 @@
- <resources>
+<resources>
     <style name="Base.Ozamiz" parent="Theme.Material3.Light.NoActionBar">
 
         <item name="backgroundColor">?colorSurface</item>
         <item name="android:windowBackground">?backgroundColor</item>
         <item name="android:statusBarColor">?colorSurfaceContainerLowest</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <!-- YAXSHILANDI: Oq fonda status bar ikonkalari qora bo'lishi uchun "true" qilib o'zgartirildi -->
+        <item name="android:windowLightStatusBar">true</item>
 
+        <!-- Asosiy ranglar (o'zgarishsiz) -->
         <item name="colorPrimary">#6750A4</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorPrimaryVariant">#613D88</item>
@@ -24,6 +26,7 @@
         <item name="colorErrorContainer">#FFDAD6</item>
         <item name="colorOnErrorContainer">#410002</item>
 
+        <!-- Belgilangan ranglar (o'zgarishsiz) -->
         <item name="colorPrimaryFixed">#6750A4</item>
         <item name="colorPrimaryFixedDim">#D0BCFF</item>
         <item name="colorOnPrimaryFixed">#21005D</item>
@@ -32,26 +35,28 @@
         <item name="colorSecondaryFixedDim">#CCC2DC</item>
         <item name="colorOnSecondaryFixed">#1D192B</item>
         <item name="colorOnSecondaryFixedVariant">#4A4458</item>
-
         <item name="colorTertiaryFixed">#FFD8E4</item>
         <item name="colorTertiaryFixedDim">#EFB8C8</item>
         <item name="colorOnTertiaryFixed">#31111D</item>
         <item name="colorOnTertiaryFixedVariant">#7D5260</item>
 
-        <item name="colorOutline">#979797</item>
-        <item name="colorOutlineVariant">#FDF4F4F4</item>
+        <!-- Chiziq ranglari -->
+        <item name="colorOutline">#79747E</item>
+        <!-- YAXSHILANDI: Chiziqlar ko'rinishi uchun rang o'zgartirildi -->
+        <item name="colorOutlineVariant">#CAC4D0</item>
 
+        <!-- YUZALAR (SURFACES) - Professional ko'rinish uchun neytral ranglar bilan yangilandi -->
         <item name="colorSurfaceDim">#DED8E1</item>
-        <item name="colorSurface">#FFFFFF</item>
-        <item name="colorSurfaceBright">#FEF7FF</item>
+        <item name="colorSurface">#FEFBFF</item> <!-- Asosiy fon biroz o'zgardi -->
+        <item name="colorSurfaceBright">#FEFBFF</item>
 
         <item name="colorSurfaceContainerLowest">#FFFFFF</item>
         <item name="colorSurfaceContainerLow">#F7F2FA</item>
         <item name="colorSurfaceContainer">#F3EDF7</item>
-        <item name="colorSurfaceContainerHigh">#E6E0EC</item>
-        <item name="colorSurfaceContainerHighest">#DED8E1</item>
+        <item name="colorSurfaceContainerHigh">#EBE6EF</item>
+        <item name="colorSurfaceContainerHighest">#E6E0E9</item>
         <item name="colorOnSurface">#1D1B20</item>
-        <item name="colorOnSurfaceVariant">#535353</item>
+        <item name="colorOnSurfaceVariant">#49454F</item>
 
         <item name="colorSurfaceInverse">#322F35</item>
         <item name="colorOnSurfaceInverse">#F5EFF7</item>
@@ -62,13 +67,10 @@
 
     <style name="Theme.Ozamiz" parent="Base.Ozamiz" />
 
-     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-         <item name="backgroundColor">?colorSurface</item>
-         <item name="android:windowBackground">?backgroundColor</item>
-         <item name="android:statusBarColor">?colorSurfaceContainerLowest</item>
-         <item name="android:windowLightStatusBar">true</item>
-         <item name="windowSplashScreenBackground">@color/white</item>
-         <item name="postSplashScreenTheme">@style/Theme.Ozamiz</item>
-     </style>
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="postSplashScreenTheme">@style/Theme.Ozamiz</item>
+        <!-- YAXSHILANDI: Bu yerdagi sozlamalar Base.Ozamiz dan meros qilib olinadi -->
+    </style>
 
 </resources>

@@ -10,36 +10,31 @@ import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.data.DataWrapper
 import uz.oybek.ozamiz.data.LocalUser
 import uz.oybek.ozamiz.data.User
-import uz.oybek.ozamiz.data.UserRepository
 import uz.oybek.ozamiz.data.info.DailyLogData
 import uz.oybek.ozamiz.data.info.ExerciseLog
 import uz.oybek.ozamiz.data.info.FoodLog
 import uz.oybek.ozamiz.data.info.WaterLog
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.model.StreakInfo
-import uz.oybek.ozamiz.data.utils.NutritionCalculator
+import uz.oybek.ozamiz.logic.FoodAdviser
 import uz.oybek.ozamiz.reminders.ReminderScheduler
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class HomeViewModel : ViewModel() {
 
     private val dailyLogRepository = DailyLogRepository()
 
-    // Holds the currently selected date, defaults to today.
     private val _selectedDate = MutableStateFlow(getMidnight(Date()))
 
     private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
-        // Initial setup
         viewModelScope.launch(Dispatchers.Default) {
             val initialUser = LocalUser.user
             _uiState.update {
                 it.copy(
                     user = initialUser.takeIf { u -> u.valid },
-                    // Sanalar ro'yxati faqat bir marta shu yerda yaratiladi
                     datesForScroller = generateDatesForScroller(),
                     selectedDate = _selectedDate.value
                 )
@@ -72,10 +67,10 @@ class HomeViewModel : ViewModel() {
     private fun observeDateAndLogs() {
         viewModelScope.launch {
             _selectedDate.collectLatest { date ->
-                _uiState.update { it.copy(isLoading = true) } // Sana o'zgarganda yuklanishni ko'rsatish
+                _uiState.update { it.copy(isLoading = true) }
                 dailyLogRepository.observeLogsForDate(date).collectLatest { result ->
                     when (result) {
-                        is DataWrapper.Loading -> { /* isLoading allaqachon true */ }
+                        is DataWrapper.Loading -> { }
                         is DataWrapper.Success -> {
                             val logs = result.data
                             _uiState.update { currentState ->
@@ -85,7 +80,7 @@ class HomeViewModel : ViewModel() {
                                 processed.copy(isLoading = false, errorMessage = null, selectedDate = date)
                             }
                         }
-                        is DataWrapper.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = result.error, dailyLogData = DailyLogData()) }
+                        is DataWrapper.Error -> _uiState.update { it.copy(isLoading = false, errorMessage = result.error, dailyLogData = DailyLogData(), warnings = emptyList()) }
                     }
                 }
             }
@@ -108,6 +103,8 @@ class HomeViewModel : ViewModel() {
         val consumedCarbs = foodLogs.sumOf { it.carbs ?: 0.0 }
         val consumedProtein = foodLogs.sumOf { it.protein ?: 0.0 }
 
+        val newWarnings = FoodAdviser.analyzeDailyIntake(user, foodLogs)
+
         return _uiState.value.copy(
             user = user,
             dailyLogData = logs,
@@ -120,7 +117,8 @@ class HomeViewModel : ViewModel() {
             streakInfo = user.streakInfo ?: StreakInfo(),
             fat = consumedFat,
             carbs = consumedCarbs,
-            protein = consumedProtein
+            protein = consumedProtein,
+            warnings = newWarnings
         )
     }
 
@@ -137,15 +135,12 @@ class HomeViewModel : ViewModel() {
     private fun generateDatesForScroller(): List<Date> {
         val calendar = Calendar.getInstance()
         val dates = mutableListOf<Date>()
-        // 7 kun orqaga
         for (i in 7 downTo 1) {
             calendar.time = Date()
             calendar.add(Calendar.DAY_OF_YEAR, -i)
             dates.add(getMidnight(calendar.time))
         }
-        // Bugun
         dates.add(getMidnight(Date()))
-        // 7 kun oldinga
         for (i in 1..7) {
             calendar.time = Date()
             calendar.add(Calendar.DAY_OF_YEAR, i)

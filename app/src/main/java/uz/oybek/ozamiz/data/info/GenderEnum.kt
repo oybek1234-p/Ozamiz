@@ -7,6 +7,5 @@ enum class GenderEnum(val value: Int, val description: String) {
 
     companion object {
         fun fromValue(value: Int) = entries.find { it.value == value } ?: UNKNOWN
-        fun getAllDescriptions() = entries.filter { it != UNKNOWN }.map { it.description }
     }
 }

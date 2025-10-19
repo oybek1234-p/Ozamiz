@@ -17,8 +17,8 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 35
-        versionCode = 25
-        versionName = "1.7"
+        versionCode = 37
+        versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -37,6 +37,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

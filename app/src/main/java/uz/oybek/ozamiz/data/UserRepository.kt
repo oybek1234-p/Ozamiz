@@ -118,7 +118,7 @@ object UserRepository {
             "registerDate" to registerDate,
             "paymentChecking" to paymentChecking,
             "paymentCheckPhotoUrl" to paymentCheckPhotoUrl,
-            "isAdmin" to isAdmin,
+            "admin" to admin,
             "experiencePoints" to experiencePoints,
             "lessonLives" to lessonLives,
             "lastLifeRefillTimestamp" to lastLifeRefillTimestamp,
@@ -321,7 +321,7 @@ object UserRepository {
                 startWeight = null,
                 paymentChecking = false,
                 paymentCheckPhotoUrl = null,
-                isAdmin = false
+                admin = false
             )
             createNewUserAndSet(newUser)
             newUser
@@ -334,7 +334,7 @@ object UserRepository {
                 paymentCheckPhotoUrl = networkUser.paymentCheckPhotoUrl,
                 premium = networkUser.premium,
                 premiumDate = networkUser.premiumDate,
-                isAdmin = networkUser.isAdmin || id == "r7o2q6Ttd1XVY9w6M4gW1lqKqB52" // TODO: Replace with actual admin check logic
+                admin = networkUser.admin || id == "r7o2q6Ttd1XVY9w6M4gW1lqKqB52" // TODO: Replace with actual admin check logic
             )
             LocalUser.user = userWithIntegrity
             LocalUser.saveUser()
@@ -360,7 +360,7 @@ object UserRepository {
                 paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
                 premium = loadedUser.premium,
                 premiumDate = loadedUser.premiumDate,
-                isAdmin = loadedUser.isAdmin
+                admin = loadedUser.admin
             )
             sus.resume(userWithIntegrity)
         }.addOnFailureListener {
@@ -390,7 +390,7 @@ object UserRepository {
                     paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
                     premium = loadedUser.premium,
                     premiumDate = loadedUser.premiumDate,
-                    isAdmin = loadedUser.isAdmin
+                    admin = loadedUser.admin
                 )
                 if (userWithIntegrity.valid) {
                     LocalUser.user = userWithIntegrity

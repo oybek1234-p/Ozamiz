@@ -278,7 +278,7 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
                     is GetInfoNavigationEvent.ShowToast -> showToast(content.message)
                     is GetInfoNavigationEvent.NavigateToCongratulation -> { // O'zgartirilgan event
                         if (isAdded && findNavController().currentDestination?.id == R.id.getMainInfo) {
-                            navigate(R.id.infoCongratulationFragment)
+                            mainActivity()?.recreateUi(isNewUser)
                         }
                     }
                     is GetInfoNavigationEvent.NavigateToHome -> {

@@ -3,6 +3,7 @@ package uz.oybek.ozamiz.ui.log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -50,7 +51,7 @@ class TodaysFoodAdapter(
 
             binding.textViewFoodCalories.text =
                 itemView.context.getString(R.string.calories_format, foodLog.calories)
-            binding.textViewFoodCalories.visibility = if (foodLog.calories > 0) View.VISIBLE else View.GONE
+            binding.textViewFoodCalories.visibility = if (foodLog.calories > 0 && foodLog.description.isEmpty()) View.VISIBLE else View.GONE
 
             if (!foodLog.photoUrl.isNullOrEmpty()) {
                 binding.imageViewFood.visibility = View.VISIBLE
@@ -60,6 +61,21 @@ class TodaysFoodAdapter(
                     .into(binding.imageViewFood)
             } else {
                 binding.imageViewFood.visibility = View.GONE
+            }
+
+            // Healthiness Dot Logic
+            val healthinessColor = when (foodLog.healthinessLevel) {
+                "GOOD" -> R.color.green
+                "MODERATE" -> R.color.yellow
+                "POOR" -> R.color.rejected
+                else -> 0
+            }
+
+            if (healthinessColor != 0) {
+                binding.healthinessDot.background.setTint(ContextCompat.getColor(itemView.context, healthinessColor))
+                binding.healthinessDot.visibility = View.VISIBLE
+            } else {
+                binding.healthinessDot.visibility = View.GONE
             }
         }
     }

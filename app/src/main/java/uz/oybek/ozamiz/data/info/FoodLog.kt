@@ -15,7 +15,9 @@ data class FoodLog(
     var photoUrl: String? = null,
     var analysisInsights: String? = null,
     var estimatedByAI: Boolean = true,
-    var timestamp: Any = ServerValue.TIMESTAMP
+    var healthinessLevel: String? = null,
+    var timestamp: Any = ServerValue.TIMESTAMP,
+    var tags: List<String>? = null
 ) {
-    constructor() : this("", "", 0, null, null, null, "", null, null, true, 0L)
+    constructor() : this("", "", 0, null, null, null, "", null, null, true, null, 0L, null)
 }

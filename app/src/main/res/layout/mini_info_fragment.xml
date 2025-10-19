@@ -25,7 +25,6 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="200dp"
-        android:src="@drawable/info_woman_photo"
         app:shapeAppearance="@style/RadiusImageView12"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

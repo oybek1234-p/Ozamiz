@@ -3,6 +3,7 @@ package uz.oybek.ozamiz
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -15,7 +16,6 @@ import java.util.UUID
 object ImageUploader {
 
     const val OZAMIZ_PATH = "ozamiz"
-    const val USER_PATH = "users_private"
 
     private const val DEFAULT_IMAGE_PATH = "food_images"
     private const val MAX_IMAGE_SIZE_KB = 100
@@ -40,6 +40,7 @@ object ImageUploader {
                 imageRef.putBytes(byteArray).await() // Changed from putFile to putBytes
             val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
 
+            Log.d("ImageUploader", "Image uploaded successfully. URL: $downloadUrl")
             DataWrapper.Success(downloadUrl)
         } catch (e: Exception) {
             handleException(e, "ImageUploadError - Path: $path")
@@ -62,7 +63,7 @@ object ImageUploader {
                     baos.reset()
                     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
                     byteArray = baos.toByteArray()
-                    quality -= 5 // Reduce quality by 5 each time
+                    quality -= 5
 
                     if (quality < 0) {
                         return@withContext DataWrapper.Error("Rasmni siqishda xatolik: Qayta ishlash mumkin bo'lmagan rasm.")
@@ -81,25 +82,18 @@ object ImageUploader {
         imageUrl: String?, path: String = DEFAULT_IMAGE_PATH
     ): DataWrapper<Unit> {
         if (imageUrl.isNullOrEmpty()) {
-            return DataWrapper.Success(Unit) // URL bo'sh bo'lsa, hech narsa qilmaymiz
+            return DataWrapper.Success(Unit)
         }
-        // Basic check for Firebase Storage URLs
         if (!imageUrl.startsWith("gs://") && !imageUrl.startsWith("https://firebasestorage.googleapis.com/")) {
-            return DataWrapper.Success(Unit) // Not a Firebase URL, nothing to delete here
+            return DataWrapper.Success(Unit)
         }
         return try {
-            // Attempt to get reference from URL (path parameter is not strictly needed for deletion if full URL is given)
-            // However, if only a file name was stored and path is needed to reconstruct, then use path.
-            // For simplicity, assuming full URL is always passed for deletion.
             val imageRef = storage.getReferenceFromUrl(imageUrl)
             imageRef.delete().await()
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
             handleException(e, "ImageDeleteError - Path: $path, URL: $imageUrl")
-            // It's often okay to return Success even if deletion failed,
-            // as the main operation (e.g., updating Firestore) might have succeeded.
-            // Or return Error if deletion is critical.
-            DataWrapper.Success(Unit) // For now, treat as success to not block other operations
+            DataWrapper.Success(Unit)
         }
     }
 }

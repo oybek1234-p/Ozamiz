@@ -30,17 +30,17 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = this
-
+        
         LocalUser.getUser()
         initFirebase()
 
-//        val releaseAppCheck = PlayIntegrityAppCheckProviderFactory.getInstance()
-//        val debugAppCheck = DebugAppCheckProviderFactory.getInstance()
-//        //Install provider appcheck
-//        val firebaseAppCheck = FirebaseAppCheck.getInstance()
-//        firebaseAppCheck.installAppCheckProviderFactory(
-//            debugAppCheck
-//        )
+        val releaseAppCheck = PlayIntegrityAppCheckProviderFactory.getInstance()
+        val debugAppCheck = DebugAppCheckProviderFactory.getInstance()
+
+        val firebaseAppCheck = FirebaseAppCheck.getInstance()
+        firebaseAppCheck.installAppCheckProviderFactory(
+            releaseAppCheck
+        )
 
         createNotificationChannels()
     }
@@ -57,30 +57,28 @@ class MyApplication : Application() {
     }
 
     private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val reminderChannel = NotificationChannel(
-                REMINDER_CHANNEL_ID, "Eslatmalar",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Ovqatlanish, suv ichish va mashqlar uchun eslatmalar"
-                enableLights(true)
-                enableVibration(true)
-            }
+//        val reminderChannel = NotificationChannel(
+//            REMINDER_CHANNEL_ID, "Eslatmalar",
+//            NotificationManager.IMPORTANCE_HIGH
+//        ).apply {
+//            description = "Ovqatlanish, suv ichish va mashqlar uchun eslatmalar"
+//            enableLights(true)
+//            enableVibration(true)
+//        }
 
-            val fcmGeneralChannel = NotificationChannel(
-                FCM_GENERAL_CHANNEL_ID,
-                "Umumiy Xabarnomalar",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Ilovadan umumiy xabarlar va yangiliklar"
-                enableLights(true)
-                enableVibration(true)
-            }
-
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(reminderChannel)
-            notificationManager.createNotificationChannel(fcmGeneralChannel)
+        val fcmGeneralChannel = NotificationChannel(
+            FCM_GENERAL_CHANNEL_ID,
+            "Umumiy Xabarnomalar",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Ilovadan umumiy xabarlar va yangiliklar"
+            enableLights(true)
+            enableVibration(true)
         }
+
+        val notificationManager: NotificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        //notificationManager.createNotificationChannel(reminderChannel)
+        notificationManager.createNotificationChannel(fcmGeneralChannel)
     }
 }

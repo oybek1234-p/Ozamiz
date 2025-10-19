@@ -1,8 +1,9 @@
-package uz.oybek.ozamiz
+package uz.oybek.ozamiz.util
 
 import android.widget.EditText
 import com.github.vacxe.phonemask.PhoneMaskManager
-
+import uz.oybek.ozamiz.ExceptionHandler
+import java.lang.Exception
 
 object PhoneUtils {
 
@@ -16,7 +17,7 @@ object PhoneUtils {
                 .substringAfter(":")
                 .substringBefore(".")
                 .trim()
-        } catch (e: java.lang.Exception) {
+        } catch (e: Exception) {
             ExceptionHandler.handle(e)
         }
         return ""

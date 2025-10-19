@@ -24,6 +24,9 @@ sealed class ProfileNavigationEvent {
 
 class ProfileViewModel : ViewModel() {
 
+    init {
+        viewModelScope
+    }
     // LocalUser.userLive (MutableLiveData<User?>) dan StateFlow<User> yaratish
     val userState: StateFlow<User> = LocalUser.userLive.asFlow() // LiveData'ni Flow'ga aylantiramiz
         .map { user -> user ?: User() } // Agar user null bo'lsa, bo'sh User() obyekti qaytaramiz

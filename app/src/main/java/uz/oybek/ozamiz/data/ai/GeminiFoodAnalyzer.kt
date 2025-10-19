@@ -6,6 +6,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.content
@@ -14,6 +15,7 @@ import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.DataWrapper
 import uz.oybek.ozamiz.data.LocalUser
+import java.util.regex.Pattern
 
 object GeminiFoodAnalyzer {
 
@@ -43,27 +45,37 @@ object GeminiFoodAnalyzer {
         if (description.isBlank() && imageUri == null) {
             return DataWrapper.Error("Iltimos, ovqatni tavsiflang yoki rasm yuklang.")
         }
+        val userName = LocalUser.user.name
+        val userAge = LocalUser.user.age
+        val userHeight = LocalUser.user.height
+        val currentWeight = LocalUser.user.weight
+        val gender = LocalUser.user.gender
+        val targetCalorie = LocalUser.user.targetCalories
+        val activityLevel = LocalUser.user.activityLevel
 
-        val user = LocalUser.user
-        val prompt = """
-    Siz vaznni nazorat qilishga yordam beruvchi professional dietolog-analitiksiz.
-    Foydalanuvchi ma'lumotlarini hisobga olib, quyidagi ovqat(lar)ni prompt yoki image,yoki ikallasini analiz qiling.
-    MUHIM: Agar bir nechta ovqat nomi berilgan bo'lsa, ularning barchasini YAGONA TAOM SIFATIDA ko'rib chiqing va ozuqaviy qiymatlarni (kaloriya, oqsil va hokazo) UMUMIY YIG'INDISINI hisoblang.
-    Javobni FAQAT KO'RSATILGAN BO'LIMLAR BO'YICHA, o'zbek tilida va hech qanday ortiqcha matnsiz qaytaring.
-
-    Foydalanuvchi ma'lumotlari:
-    Yoshi: ${user.age}
-    Vazni: ${user.weight} kg
-    Jinsi: ${if (user.gender == 0) "Erkak" else "Ayol"}
-    Tahlil qilinadigan taom(lar): "$description"
+        val prompt = ("""
+    USER INFO:
+    - Maqsad: Ozish
+    - Joylashuv: O'zbekiston
     
-    Javob formati:
-    NUTRITION_INFO: [UMUMIY ozuqaviy qiymatni ANIQ SHU FORMATDA yozing ":" dan keyin faqat raqam mumkin : Kaloriya: 0, Oqsil: 0.0, Yog': 0.0, Uglevodlar: 0.0]
-    INGREDIENTS: [Barcha taomlardagi asosiy masalliqlar, vergul bilan ajratib]
-    ALTERNATIVES: [Ushbu taomlar majmuasiga sog'lomroq alternativ takliflar]
-    IS_HEALTHY_FOR_WEIGHT_LOSS: [Ushbu taomlar majmuasi vazn tashlash uchun foydalimi? Faqat "Ha" yoki "Yo'q" deb javob bering]
-    HEALTH_FEEDBACK_SHORT: [Nima uchun vazn tashlash uchun foydali yoki emasligi haqida qisqa gap, yoki tavsiya]
-    """.trimIndent()
+    VAZIFA:
+    Sen O'zbekistondagi ozish uchun mo'ljallangan ilovada ekspert nutritionist assistantsan. Taqdim etilgan ovqat tavsifi va/yoki rasmini tahlil qil. O'zbek tilida qisqa, foydali va madaniyatga mos tahlil ber.
+
+    Ovqat Tavsifi/So'rov: "$description"
+
+    QO'LLANMA:
+    1.  **Yagona Ovqat Tahlili**: Barcha aytilgan oziq-ovqat mahsulotlarini bitta ovqat deb hisobla. JAMI ozuqaviy qiymatlarni hisobla.
+    2.  **Chiqish Formati**: FAQAT quyida ko'rsatilgan formatda javob ber. Hech qanday qo'shimcha matn, tushuntirish yoki salomlashish qo'shma. Javobda "[]" qavslar bo'lmasin.
+    
+    Bir nechta ovqat bulsa, hammasini umumiy qilib hisobla kaloriya va etc. 
+    JAVOB FORMATI:
+    NUTRITION_INFO: Kaloriya: INTEGER, Oqsil: DOUBLE, Yog': DOUBLE, Uglevodlar: DOUBLE
+    INGREDIENTS: Asosiy masalliqlar ro'yxati, vergul bilan ajratilgan, "Emoji Nomi (Kaloriya)" formatida. Masalan: 🍗 Tovuq filesi (150), 🥒 Bodring (15), 🍅 Pomidor (20), etc.
+    HEALTH_ADVICE: Yagona, qisqa, aniq harakatga undovchi maslahat ber, uning oldiga hissiy darajani (GREEN, YELLOW, yoki RED) qo'y. Bu ENG MUHIM qism. Maslahat aniq, raqamli va o'rinbosar taklif qiladigan bo'lsin.
+        - GREEN: Sog'lom ovqat uchun. Maslahat ijobiy bo'lishi kerak. Masalan: "GREEN: Vitaminga boy, ozish uchun ajoyib tanlov! Be'malol yeyishingiz mumkin."
+        - YELLOW: O'rtacha sog'lom ovqat uchun. Maslahat me'yorni yoki sog'lomroq tayyorlashni taklif qilishi kerak. Masalan: "YELLOW: Me'yorida yesa bo'ladi. Keyingi safar yog'siz pishiring yoki yarim porsiya yeng."
+        - RED: Nosog'lom ovqat uchun. Maslahat aniq iste'mol chegarasini (masalan, haftasiga necha marta) yoki aniq sog'lomroq alternativani (masalan, "Cola Zero") berishi SHART. Masalan: "RED: Haftasiga 1 martadan oshirmang, yoki 'Cola Zero' iching.", "RED: Keyingi safar yarim porsiya yeng.""
+    """).trimIndent()
 
         return try {
             val imageBitmap = imageUri?.let {
@@ -87,11 +99,9 @@ object GeminiFoodAnalyzer {
                 return DataWrapper.Error("AI dan bo'sh javob olindi.")
             }
 
-            // --- PARSING MANTIG'I O'ZGARISHSIZ QOLADI ---
             fun extractSection(key: String, text: String): String {
                 val keys = listOf(
-                    "NUTRITION_INFO:", "INGREDIENTS:",
-                    "ALTERNATIVES:", "IS_HEALTHY_FOR_WEIGHT_LOSS:", "HEALTH_FEEDBACK_SHORT:"
+                    "NUTRITION_INFO:", "INGREDIENTS:", "HEALTH_ADVICE:"
                 )
                 val startIndex = text.indexOf(key)
                 if (startIndex == -1) return ""
@@ -106,17 +116,38 @@ object GeminiFoodAnalyzer {
                 if (nextKeyIndex != null) {
                     endIndex = nextKeyIndex
                 }
-                return text.substring(contentStart, endIndex).trim()
+                return text.substring(contentStart, endIndex).trim().removeSurrounding("[", "]")
+                    .trim()
             }
 
             val nutritionInfoText = extractSection("NUTRITION_INFO:", responseText)
             val ingredientsText = extractSection("INGREDIENTS:", responseText)
-            val alternatives = extractSection("ALTERNATIVES:", responseText)
-            val isHealthyText = extractSection("IS_HEALTHY_FOR_WEIGHT_LOSS:", responseText)
-            val healthFeedbackShort = extractSection("HEALTH_FEEDBACK_SHORT:", responseText)
+            val healthAdviceText = extractSection("HEALTH_ADVICE:", responseText)
+
 
             fun parseNutritionValue(key: String, text: String): String? {
                 return Regex("""$key:\s*([\d.]+)""").find(text)?.groupValues?.get(1)
+            }
+
+            fun parseIngredients(text: String): List<AnalyzedIngredient> {
+                val ingredientPattern = Pattern.compile("([^,(]+)(?:\\s*\\((\\d+)\\))?")
+                val matcher = ingredientPattern.matcher(text)
+                val ingredients = mutableListOf<AnalyzedIngredient>()
+                while (matcher.find()) {
+                    val name = matcher.group(1)?.trim() ?: continue
+                    val calories = matcher.group(2)?.toIntOrNull()
+                    ingredients.add(AnalyzedIngredient(name, calories))
+                }
+                return ingredients
+            }
+
+            fun parseHealthAdvice(text: String): Pair<String?, String?> {
+                return when {
+                    text.startsWith("GREEN:") -> "GOOD" to text.removePrefix("GREEN:").trim()
+                    text.startsWith("YELLOW:") -> "MODERATE" to text.removePrefix("YELLOW:").trim()
+                    text.startsWith("RED:") -> "POOR" to text.removePrefix("RED:").trim()
+                    else -> null to text
+                }
             }
 
             val finalEstimatedCalories =
@@ -125,11 +156,8 @@ object GeminiFoodAnalyzer {
             val fat = parseNutritionValue("Yog'", nutritionInfoText)?.toDoubleOrNull()
             val carbs = parseNutritionValue("Uglevodlar", nutritionInfoText)?.toDoubleOrNull()
 
-            val recognizedIngredients = ingredientsText.split(",")
-                .map { it.trim().removePrefix("*").trim() }
-                .filter { it.isNotEmpty() }
-
-            val isHealthyForWeightLoss = isHealthyText.equals("Ha", ignoreCase = true)
+            val recognizedIngredients = parseIngredients(ingredientsText)
+            val (healthLevel, healthAdvice) = parseHealthAdvice(healthAdviceText)
 
             DataWrapper.Success(
                 GeminiAnalysisResult(
@@ -138,9 +166,9 @@ object GeminiFoodAnalyzer {
                     estimatedFat = fat,
                     estimatedCarbs = carbs,
                     recognizedIngredients = recognizedIngredients,
-                    alternativeFoodSuggestions = alternatives,
-                    isHealthyForWeightLoss = isHealthyForWeightLoss,
-                    healthFeedbackShort = healthFeedbackShort.ifBlank { null }
+                    alternativeFoodSuggestions = "",
+                    isHealthyForWeightLoss = healthLevel,
+                    healthFeedbackShort = healthAdvice
                 )
             )
         } catch (e: Exception) {

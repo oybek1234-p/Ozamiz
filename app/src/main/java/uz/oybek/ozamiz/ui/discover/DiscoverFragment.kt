@@ -222,8 +222,7 @@ class DiscoverFragment : BaseFragment<FragmentDiscoverBinding>() {
                 if (findNavController().currentDestination?.id != R.id.discoverFragment) return@let
                 when (navEvent) {
                     is DiscoverNavigationEvent.NavigateToWorkoutDetail -> {
-                        val action = DiscoverFragmentDirections.actionDiscoverFragmentToWorkoutDetailFragment(navEvent.workoutId)
-                        findNavController().navigate(action)
+
                     }
                     is DiscoverNavigationEvent.NavigateToVideoDetail -> {
                         val action = DiscoverFragmentDirections.actionDiscoverFragmentToVideoDetailFragment(videoJson = Gson().toJson(navEvent.video))

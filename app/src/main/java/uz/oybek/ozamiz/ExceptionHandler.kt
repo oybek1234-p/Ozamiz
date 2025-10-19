@@ -22,7 +22,4 @@ fun handleException(
     exception: java.lang.Exception?, name: String? = null, needThrow: Boolean = false
 ) {
     ExceptionHandler.handle(exception, name, needThrow)
-    if (BuildConfig.DEBUG) {
-        throw exception!!
-    }
 }

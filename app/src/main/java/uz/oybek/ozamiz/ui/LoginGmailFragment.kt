@@ -135,7 +135,7 @@ class LoginGmailFragment : BaseFragment<LoginGmailFragmentBinding>() {
             boglanishButton.setOnClickListener {
                 mainActivity()?.showSupportSheet()
             }
-            binding?.boglanishButton?.isVisible = false
+            binding.boglanishButton?.isVisible = false
             continueButton.setOnClickListener {
                 val email = gmailView.editText?.text?.toString()
                 val password = passwordView.editText?.text?.toString()
