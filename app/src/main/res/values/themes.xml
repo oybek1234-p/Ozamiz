@@ -4,50 +4,49 @@
         <item name="backgroundColor">?colorSurface</item>
         <item name="android:windowBackground">?backgroundColor</item>
         <item name="android:statusBarColor">?colorSurfaceContainerLowest</item>
-        <!-- YAXSHILANDI: Oq fonda status bar ikonkalari qora bo'lishi uchun "true" qilib o'zgartirildi -->
         <item name="android:windowLightStatusBar">true</item>
 
-        <!-- Asosiy ranglar (o'zgarishsiz) -->
         <item name="colorPrimary">#6750A4</item>
         <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorPrimaryVariant">#613D88</item>
         <item name="colorPrimaryContainer">#EADDFF</item>
         <item name="colorOnPrimaryContainer">#21005D</item>
+
         <item name="colorSecondary">#625B71</item>
         <item name="colorOnSecondary">#FFFFFF</item>
         <item name="colorSecondaryContainer">#E8DEF8</item>
         <item name="colorOnSecondaryContainer">#1D192B</item>
+
         <item name="colorTertiary">#7D5260</item>
         <item name="colorOnTertiary">#FFFFFF</item>
         <item name="colorTertiaryContainer">#FFD8E4</item>
         <item name="colorOnTertiaryContainer">#31111D</item>
+
         <item name="colorError">#B3261E</item>
         <item name="colorOnError">#FFFFFF</item>
-        <item name="colorErrorContainer">#FFDAD6</item>
+        <item name="colorErrorContainer">#FCEEEE</item>
         <item name="colorOnErrorContainer">#410002</item>
 
-        <!-- Belgilangan ranglar (o'zgarishsiz) -->
-        <item name="colorPrimaryFixed">#6750A4</item>
+        <!-- Belgilangan ranglar -->
+        <item name="colorPrimaryFixed">#EADDFF</item>
         <item name="colorPrimaryFixedDim">#D0BCFF</item>
         <item name="colorOnPrimaryFixed">#21005D</item>
-        <item name="colorOnPrimaryFixedVariant">#6750A4</item>
+        <item name="colorOnPrimaryFixedVariant">#4F378B</item>
+
         <item name="colorSecondaryFixed">#E8DEF8</item>
         <item name="colorSecondaryFixedDim">#CCC2DC</item>
         <item name="colorOnSecondaryFixed">#1D192B</item>
         <item name="colorOnSecondaryFixedVariant">#4A4458</item>
+
         <item name="colorTertiaryFixed">#FFD8E4</item>
         <item name="colorTertiaryFixedDim">#EFB8C8</item>
         <item name="colorOnTertiaryFixed">#31111D</item>
-        <item name="colorOnTertiaryFixedVariant">#7D5260</item>
+        <item name="colorOnTertiaryFixedVariant">#633B48</item>
 
-        <!-- Chiziq ranglari -->
         <item name="colorOutline">#79747E</item>
-        <!-- YAXSHILANDI: Chiziqlar ko'rinishi uchun rang o'zgartirildi -->
         <item name="colorOutlineVariant">#CAC4D0</item>
 
-        <!-- YUZALAR (SURFACES) - Professional ko'rinish uchun neytral ranglar bilan yangilandi -->
         <item name="colorSurfaceDim">#DED8E1</item>
-        <item name="colorSurface">#FEFBFF</item> <!-- Asosiy fon biroz o'zgardi -->
+        <item name="colorSurface">#FEFBFF</item>
         <item name="colorSurfaceBright">#FEFBFF</item>
 
         <item name="colorSurfaceContainerLowest">#FFFFFF</item>
@@ -55,11 +54,12 @@
         <item name="colorSurfaceContainer">#F3EDF7</item>
         <item name="colorSurfaceContainerHigh">#EBE6EF</item>
         <item name="colorSurfaceContainerHighest">#E6E0E9</item>
-        <item name="colorOnSurface">#1D1B20</item>
+
+        <item name="colorOnSurface">#1C1B1F</item>
         <item name="colorOnSurfaceVariant">#49454F</item>
 
-        <item name="colorSurfaceInverse">#322F35</item>
-        <item name="colorOnSurfaceInverse">#F5EFF7</item>
+        <item name="colorSurfaceInverse">#313033</item>
+        <item name="colorOnSurfaceInverse">#F4EFF4</item>
 
         <item name="contentScrim">#000000</item>
         <item name="android:shadowColor">#000000</item>
@@ -70,7 +70,6 @@
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/white</item>
         <item name="postSplashScreenTheme">@style/Theme.Ozamiz</item>
-        <!-- YAXSHILANDI: Bu yerdagi sozlamalar Base.Ozamiz dan meros qilib olinadi -->
     </style>
 
 </resources>

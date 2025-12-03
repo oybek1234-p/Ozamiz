@@ -1,9 +1,9 @@
 package uz.oybek.ozamiz.ui.base
 
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.DiffUtil
+import androidx.viewbinding.ViewBinding
 
-abstract class SelectableAdapter<Model, B : ViewDataBinding>(
+abstract class SelectableAdapter<Model, B : ViewBinding>(
     val multiple: Boolean, itemResId: Int, diffUtil: DiffUtil.ItemCallback<Model>
 ) : BaseAdapter<Model, B>(itemResId, diffUtil) {
 

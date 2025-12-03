@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import uz.oybek.ozamiz.R
+import androidx.core.graphics.drawable.toDrawable
 
 class MyToolBar @JvmOverloads constructor(
     context: Context,
@@ -37,7 +38,7 @@ class MyToolBar @JvmOverloads constructor(
     init {
         showArrowBack = true
         setTitleTextAppearance(context, R.style.ToolbarTitleApearence)
-        background = ColorDrawable(resources.getColor(R.color.white))
+        background = resources.getColor(R.color.white).toDrawable()
     }
 
 }

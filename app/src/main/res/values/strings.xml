@@ -1,18 +1,14 @@
 <resources>
-    <!-- Existing strings -->
 
-        <!-- Mavjud stringlarga qo'shimcha -->
-
-        <string name="describe_meal_with_voice">Ovqatni ovozda tariflang</string>
-        <string name="press_to_record">Yozish uchun bosing</string>
-        <string name="stop_recording">To\'xtatish</string>
-        <string name="recording_in_progress">Yozilmoqda...</string>
-        <string name="analyze_voice">Tekshirish</string>
-        <string name="error_recording_failed">Ovoz yozishda xatolik yuz berdi.</string>
-        <string name="error_transcribing_audio">Ovozni matnga o\'girishda xatolik.</string>
-        <string name="audio_transcription_in_progress">Tekshiryapman ...</string>
-        <string name="input_via_voice_hint">Ovoz orqali</string>
-
+    <string name="describe_meal_with_voice">Ovqatni ovozda tariflang</string>
+    <string name="press_to_record">Yozish uchun bosing</string>
+    <string name="stop_recording">To\'xtatish</string>
+    <string name="recording_in_progress">Yozilmoqda...</string>
+    <string name="analyze_voice">Tekshirish</string>
+    <string name="error_recording_failed">Ovoz yozishda xatolik yuz berdi.</string>
+    <string name="error_transcribing_audio">Ovozni matnga o\'girishda xatolik.</string>
+    <string name="audio_transcription_in_progress">Tekshiryapman ...</string>
+    <string name="input_via_voice_hint">Ovoz orqali</string>
     <string name="bugungi_tavsiyalar">Bugungi tavsiyalar</string>
     <string name="stop_and_analyze">To\'xtatish</string>
     <string name="recording_speak_now">Gapiring...</string>
@@ -122,7 +118,7 @@
 
     <string name="error_loading_detail">Ma\'lumot yuklashda xatolik</string>
     <string name="calories_format">%d kal</string>
-    <string name="add_food_title">Ovqat qo\'shish</string>
+    <string name="add_food_title">Ovqat yedim</string>
     <string name="edit_food_title">Ovqatni tahrirlash</string>
     <string name="add_image">Rasm qo\'shish</string>
     <string name="food_name_hint">Nomi</string>
@@ -359,7 +355,6 @@
     <string name="get_info_title_edit">Ma\'lumotlarni tahrirlash</string>
     <string name="get_info_welcome_message">Ozish safaringizni biz bilan boshlayotganingizdan xursandmiz! Keling, avval siz haqingizda va maqsadlaringizni aniqlab olaylik.</string>
     <string name="name_hint_asterisk">Ismingiz*</string>
-    <string name="select_gender_asterisk">Jinsingizni belgilang*</string>
     <string name="gender_male">Erkak</string>
     <string name="gender_female">Ayol</string>
     <string name="age_hint_asterisk">Yoshingiz*</string>
@@ -483,5 +478,66 @@
     <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida</string>
     <string name="dars_nomi">Dars nomi</string>
     <string name="dars_haqida">Dars haqida</string>
+    <string name="qandli_diabet">Qandli diabet</string>
+    <string name="emizikli_ayol">Emizikli ayol</string>
+    <string name="homilador_ayol">Homilador ayol</string>
+    <string name="infarkt">Yurak qon tomir kasalligi(Infarkt)</string>
+    <string name="erkak">Erkak</string>
+    <string name="ayol">Ayol</string>
+    <string name="splash_text">Ideal qomat — sizga yarashadi!</string>
+    <string name="email_orqali">Email orqali</string>
+    <string name="what_gender">Jinsingiz nima?</string>
+    <string name="what_gender_subtitle">Har bir odam uchun ozish maqsadi belgishashimiz uchun jinsingiz muhim</string>
+    <string name="what_name">Ismingiz kiriting</string>
+    <string name="start_stable_loss">Samarali va sog\'lom ozishni boshlang!</string>
+    <string name="diagram_text_1">🙌 Ozamiz bilan nima xohlasangiz, shuni yeng. Sevimli taomlardan tiyilish va qiyin "qoidalar" endi yo‘q!</string>
+    <string name="diagram_text_2">🍏 Biz sizga kundalik hayotingizga mos tushadigan, eng muhimi — qayta semirmaslikka olib keladigan sog‘lom ozish yo‘lini o‘rgatamiz.</string>
+    <string name="ismingiz">Ismingiz...</string>
+    <string name="calorie_info_title">Bu juda oson</string>
+    <string name="calorie_info_subtitle">Ozish siri — sarflagandan kamroq kaloriya yeyish, lekin me’yorni saqlashdir. Sog‘lom ozishingizda biz yordam beramiz!</string>
+    <string name="what_age">Necha yoshsiz?</string>
+    <string name="yoshingiz">Yoshingiz</string>
+    <string name="age_error">Yoshingizni to\'g\'ri kiriting</string>
+    <string name="what_height">Bo\'yingizni kiriting</string>
+    <string name="buyingiz">Bo\'yingiz</string>
+    <string name="how_active">Siz qanchalik faolsiz?</string>
+    <string name="how_active_info">Kundalik faollik darajangizni bilish bizga kaloriya ehtiyojingizni aniqroq hisoblashda yordam beradi.</string>
+    <string name="what_current_weight">Hozirgi vazningiz qancha?</string>
+    <string name="vazningiz_kg">Vazningiz (kg)</string>
+    <string name="what_target_weight">Keling, siz erishmoqchi bo‘lgan maqsadni belgilaymiz!</string>
+    <string name="see_effect_title">Tez orada sog‘lig‘ingiz va umumiy holatingizda ijobiy o‘zgarishlarni ko‘rasiz.</string>
+    <string name="s_effect_1">🩸 Qandli diabet xavfi kamayadi</string>
+    <string name="s_effect_2">📉 Qon bosimi pasayadi</string>
+    <string name="s_effect_3">💪 Xolesterin darajasi yaxshilanadi</string>
+    <string name="people_belivus">Minglab insonlar Ozamiz bilan maqsadiga yetdi. Navbat sizniki — bugunoq boshlang!</string>
+    <string name="review_1">Eng qulay ilova! Och qolmasdan, to‘g‘ri ovqatlanib qorin yo‘qotish mumkinligiga ishonmasdim</string>
+    <string name="aziz_28_yosh">Aziz, 28 yosh</string>
+    <string name="review_2">Ozamiz menga o‘zimni qo‘lga olishga yordam berdi. Kaloriya sanash juda oson va retseptlar bizning oshxonaga mos. 8 kg vazn tashladim!</string>
+    <string name="madina_24_yosh">Madina, 24 yosh</string>
+    <string name="communtity_join">Bizning safimizga qo‘shiling!</string>
+    <string name="today">Bugun</string>
+    <string name="plan_estimated_title">Siz %1$s sanasigacha %2$skg vaznga erisha olasiz!</string>
 
+    <string name="benefits_title">Shaxsiy reja afzalliklari</string>
+    <string name="benefit_1">✨  Oson va tushunarli</string>
+    <string name="benefit_2">🎯  Maqsadga moslangan</string>
+    <string name="benefit_3">📅  Kun tartibiga mos</string>
+    <string name="benefit_4">🥗  Didga mos taomlar</string>
+    <string name="benefit_5">😌  Qattiq cheklovsiz</string>
+    <string name="benefit_6">👨‍⚕️  Mutaxassislar tuzgan</string>
+
+    <string name="how_we_help_title">Biz qanday yordam beramiz?</string>
+
+    <string name="card_eat_love_title">Sevimli taomlarni yeng</string>
+    <string name="card_eat_love_desc">Mazali ovqatlanib, maqsadingizga erishing.</string>
+
+    <string name="card_ratings_title">Ovqatlar reytingi</string>
+    <string name="card_ratings_desc">Qaysi ovqat foydali ekanini bilib oling.</string>
+
+    <string name="card_tracking_title">Kaloriya hisobi</string>
+    <string name="card_tracking_desc">Yegan ovqatingizni kiritib, kunlik me’yorni kuzating.</string>
+    <string name="love_it">Ajoyib</string>
+    <string name="error_height">Bo\'yingizni to\'g\'ri kiriting</string>
+    <string name="error_weight">Vazn notog\'ri</string>
+    <string name="name_error">Ismingizni kiriting</string>
 </resources>

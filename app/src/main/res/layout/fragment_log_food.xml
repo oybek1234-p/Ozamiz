@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurfaceContainerLowest"
-    tools:context=".ui.log.LogFoodFragment">
+    tools:context=".ui.log.food.LogFoodFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout_logFood"

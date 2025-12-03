@@ -2,6 +2,7 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="grey">#808080</color>
 
     <color name="iconColor">#6D6D6D</color>
     <color name="likeColor">#E91E63</color>
@@ -10,27 +11,11 @@
     <color name="green">#0F9063</color>
     <color name="rejected">#C12317</color>
 
-    //Blue
-    <color name="blue">#03A9F4</color>
-    <color name="green_alpha_10">#1A0F9063</color> <!-- Green with 10% alpha -->
-    <color name="red_alpha_10">#1AC12317</color>   <!-- Red with 10% alpha -->
-    <color name="grey_alpha_50">#80888888</color> <!-- Grey with 50% alpha -->
-
-    <color name="blue_alpha_10">#1A03A9F4</color>
-
-    <color name="yellow_alpha_10">#4DFFDBA7</color> <!-- Yellow with 10% alpha -->
-    <color name="chip_background_color">#FFFFFF</color> <!-- Lighter gray for chips -->
-    <color name="chip_text_color">#333333</color> <!-- Darker text for chips -->
-    <color name="warning_background_color">#FFF8E1</color> <!-- Very light yellow/orange -->
-    <color name="warning_stroke_color">#FFE0B2</color> <!-- Light orange -->
-    <color name="colorWarning">#FFB74D</color> <!-- Standard warning orange -->
-
-    <color name="colorPrimary">?colorPrimary</color>
-    <color name="colorOutlineVariant">?colorOutlineVariant</color>
-    <color name="colorSecondary">?colorSecondary</color>
-    <color name="colorTertiary">?colorTertiary</color>
-    <color name="colorPrimaryContainerApha">#1FEADDFF</color> <!-- Example: PrimaryContainer with ~12% alpha -->
-    <color name="grey">#888888</color>
-
+    <color name="grey_alpha_50">#808080</color>
+    <color name="green_alpha_10">#E0F2F1</color>
+    <color name="yellow_alpha_10">#FFF3E0</color>
+    <color name="red_alpha_10">#FFE0E0</color>
+    <color name="white_alpha_50">#80FFFFFF</color>
+    <color name="white_alpha_10">#1AFFFFFF</color>
 
 </resources>

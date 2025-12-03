@@ -1,10 +1,12 @@
 package uz.oybek.ozamiz.data.premium
 
-import uz.oybek.ozamiz.data.firebase.FirebaseInstances
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 
 object PaymentInfo {
 
-    private val reference = FirebaseInstances.database.getReference("paymentCard")
+    private val reference =
+        Firebase.database.getReference("paymentCard")
 
     fun loadPaymentCard(result: (card: String) -> Unit) {
         reference.get().addOnSuccessListener {

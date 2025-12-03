@@ -7,9 +7,12 @@ import android.net.Uri
 open class SocialMedia {
 
     companion object {
-        private const val TELEGRAM_SUFFIX = "https://t.me/"
+        private const val TELEGRAM_SUFFIX = ""
 
-        fun openLink(activity: Activity, link: String) {
+        fun openLink(
+            activity: Activity,
+            link: String
+        ) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(parseTelegramLink(link)))
             activity.startActivity(intent)
         }

@@ -12,10 +12,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
-import uz.oybek.ozamiz.MainActivity
+import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.handleException
-import uz.oybek.ozamiz.ui.hideSoftInput
+import uz.oybek.ozamiz.util.handleException
+import uz.oybek.ozamiz.ui.utils.hideSoftInput
 
 abstract class BaseFragment<T : ViewBinding> : Fragment() {
 

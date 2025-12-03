@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface"
-    tools:context=".ui.profile.AboutFragment">
+    tools:context=".ui.feature.profile.AboutFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_about"
@@ -61,31 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?colorOnSurface"
-            tools:text="Ishlab chiquvchi: Oybek Khamroev" />
-
-        <TextView
-            android:id="@+id/textView_contact_info"
-            style="@style/TextBodyMedium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="?colorOnSurfaceVariant"
-            android:autoLink="web|email"
-            tools:text="Bog'lanish: oybek.dev@example.com" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <TextView
-            style="@style/Caption1_13"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/all_rights_reserved"
-            android:textColor="?colorOnSurfaceVariant"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"/>
+            tools:text="Ishlab chiquvchi: Oybek Qodirov" />
 
     </LinearLayout>
 

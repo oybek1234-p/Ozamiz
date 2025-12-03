@@ -21,7 +21,7 @@
 
 
     <application
-        android:name=".MyApplication"
+        android:name=".Application"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -35,7 +35,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
             android:showForAllUsers="true"
             android:showOnLockScreen="true"
@@ -45,9 +45,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+
         <service
-            android:name=".fcm.MyFirebaseMessagingService"
+            android:name=".notification.AppMessagingService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -57,18 +59,18 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ozamiz_logo" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />
 
         <receiver
-            android:name=".reminders.AlarmReceiver"
+            android:name=".notification.reminders.AlarmReceiver"
             android:enabled="true"
-            android:exported="true"
-            android:permission="" />
+            android:exported="true" />
 
         <receiver
-            android:name=".reminders.BootCompletedReceiver"
+            android:name=".notification.reminders.BootCompletedReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

@@ -59,10 +59,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
+            android:paddingBottom="@dimen/dimen_12"
             android:orientation="horizontal"
             android:paddingHorizontal="12dp"
             android:background="?colorSurfaceContainerLowest"
-            android:paddingVertical="4dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="10"
             tools:listitem="@layout/item_date_scroller" />
@@ -93,35 +93,6 @@
                 <include
                     android:id="@+id/main_progress"
                     layout="@layout/home_main_progress" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/add_food"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dimen_12"
-                    android:layout_marginHorizontal="@dimen/dimen_12"
-                    android:text="@string/add_food_title"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="24dp"
-                    app:icon="@drawable/add_ic"
-                    app:iconGravity="textStart"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:strokeColor="?colorSurfaceContainerHigh" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView_warnings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:clipChildren="false"
-                    android:paddingVertical="@dimen/dimen_2"
-                    android:nestedScrollingEnabled="false"
-                    android:clipToPadding="false"
-                    android:paddingHorizontal="12dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_dietary_warning"
-                    tools:itemCount="2"/>
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -171,13 +142,13 @@
                             <ImageView
                                 android:id="@+id/button_add_water"
                                 style="@style/Widget.Material3.Button.IconButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:padding="@dimen/dimen_18"
+                                android:layout_width="@dimen/dimen_48"
+                                android:layout_height="48dp"
                                 android:src="@drawable/add_ic"
                                 android:textSize="14sp"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:tint="?colorPrimary" />
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 

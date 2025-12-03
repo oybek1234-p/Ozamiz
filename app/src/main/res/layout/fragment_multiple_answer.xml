@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurfaceContainerLowest"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/question_text"
+        style="@style/Title4_28"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_marginHorizontal="@dimen/dimen_24"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_24"
+        android:textColor="?colorOnSurface"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Nima uchun ozmoqchisiz?"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="@dimen/dimen_12"
+        tools:listitem="@layout/onboard_multiple_anwer_item"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/question_text" />
+</androidx.constraintlayout.widget.ConstraintLayout>

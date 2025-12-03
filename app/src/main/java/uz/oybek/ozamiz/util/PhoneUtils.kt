@@ -1,9 +1,8 @@
 package uz.oybek.ozamiz.util
 
-import android.widget.EditText
-import com.github.vacxe.phonemask.PhoneMaskManager
-import uz.oybek.ozamiz.ExceptionHandler
-import java.lang.Exception
+import android.content.Intent
+import androidx.core.net.toUri
+import uz.oybek.ozamiz.appContext
 
 object PhoneUtils {
 
@@ -11,26 +10,16 @@ object PhoneUtils {
     private const val code = "998"
     private const val MASK = "(##) ###-##-##"
 
-    fun getCodeFromSms(message: String): String {
+    fun openPhoneCall(phone: String) {
         try {
-            return message
-                .substringAfter(":")
-                .substringBefore(".")
-                .trim()
-        } catch (e: Exception) {
-            ExceptionHandler.handle(e)
+            val intent = Intent(Intent.ACTION_DIAL)
+            intent.data = "tel:$phone".toUri()
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            appContext.startActivity(intent)
+        } catch (_: Exception) {
         }
-        return ""
     }
 
-    fun phoneMask(editText: EditText?): PhoneMaskManager? {
-        if (editText == null) return null
-        return PhoneMaskManager().withMask(MASK)
-            .withRegion("$plus$code")
-            .bindTo(editText)
-    }
-
-    //Formats phone
     fun formatPhoneNumber(phone: String): String {
         var exactPhone = phone.replaceFirst(plus, "")
         if (exactPhone.length > 9) {

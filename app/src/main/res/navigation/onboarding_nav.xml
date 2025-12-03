@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/onboarding_nav"
+    app:startDestination="@id/genderFragment">
+
+    <fragment
+        android:id="@+id/genderFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.GenderFragment"
+        android:label="GenderFragment" />
+    <fragment
+        android:id="@+id/nameFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.NameFragment"
+        android:label="NameFragment" />
+    <fragment
+        android:id="@+id/multipleAnswerFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.MultipleAnswerFragment"
+        android:label="MultipleAnswerFragment" />
+    <fragment
+        android:id="@+id/diagramFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.DiagramFragment"
+        android:label="DiagramFragment" />
+    <fragment
+        android:id="@+id/onBoardingFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingFragment"
+        android:label="OnBoardingFragment" />
+    <fragment
+        android:id="@+id/calorieInfoFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.CalorieInfoFragment"
+        android:label="CalorieInfoFragment" />
+    <fragment
+        android:id="@+id/ageFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.AgeFragment"
+        android:label="AgeFragment" />
+    <fragment
+        android:id="@+id/heightFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.HeightFragment"
+        android:label="HeightFragment" />
+    <fragment
+        android:id="@+id/activityLevelFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.ActivityLevelFragment"
+        android:label="ActivityLevelFragment" />
+    <fragment
+        android:id="@+id/targetWeightFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.TargetWeightFragment"
+        android:label="TargetWeightFragment" />
+    <fragment
+        android:id="@+id/weightFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.WeightFragment"
+        android:label="WeightFragment" />
+    <fragment
+        android:id="@+id/seeEffectFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.SeeEffectFragment"
+        android:label="SeeEffectFragment" />
+    <fragment
+        android:id="@+id/photosOnboardFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.PhotosOnboardFragment"
+        android:label="PhotosOnboardFragment" />
+    <fragment
+        android:id="@+id/planFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.plan.PlanFragment"
+        android:label="PlanFragment" />
+</navigation>

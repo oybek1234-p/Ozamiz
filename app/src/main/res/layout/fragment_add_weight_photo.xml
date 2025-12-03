@@ -37,7 +37,6 @@
                 android:text="Hozirgi suratingizni yuklang"
                 android:textColor="?colorOnSurface" />
 
-
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_image_picker_weight_log"
                 style="@style/ImagePickerCardStyle"
@@ -45,9 +44,6 @@
                 android:layout_height="400dp"
                 android:layout_marginTop="8dp">
 
-                <include
-                    android:id="@+id/include_image_picker_weight_log"
-                    layout="@layout/include_image_picker" />
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.textfield.TextInputLayout
