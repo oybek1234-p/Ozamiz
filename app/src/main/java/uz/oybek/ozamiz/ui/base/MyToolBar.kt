@@ -1,13 +1,13 @@
 package uz.oybek.ozamiz.ui.base
 
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.util.AttributeSet
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.color.MaterialColors
 import uz.oybek.ozamiz.R
-import androidx.core.graphics.drawable.toDrawable
 
 class MyToolBar @JvmOverloads constructor(
     context: Context,
@@ -38,7 +38,10 @@ class MyToolBar @JvmOverloads constructor(
     init {
         showArrowBack = true
         setTitleTextAppearance(context, R.style.ToolbarTitleApearence)
-        background = resources.getColor(R.color.white).toDrawable()
+        background = MaterialColors.getColor(
+            this,
+            com.google.android.material.R.attr.colorSurfaceContainer
+        ).toDrawable()
     }
 
 }

@@ -4,112 +4,267 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/round_lay"
-    android:backgroundTint="?colorSurfaceContainerLowest"
+    android:backgroundTint="?attr/colorSurfaceContainer"
     android:orientation="vertical"
-    android:paddingHorizontal="@dimen/dimen_24"
-    android:paddingBottom="64dp"
-    android:paddingTop="24dp">
+    android:paddingHorizontal="20dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="20dp">
 
+    <!-- Drag handle -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/round_lay"
+        android:backgroundTint="?colorOutlineVariant" />
 
+    <!-- Title with water emoji -->
     <TextView
-        style="@style/Title3_17"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_marginBottom="20dp"
-        android:text="@string/log_water_title"
+        android:layout_gravity="center"
+        android:layout_marginBottom="6dp"
+        style="@style/TextAppearance.Material3.TitleLarge"
+        android:fontFamily="@font/roboto_bold"
+        android:text="💧 Suv qo'shish"
         android:textColor="?colorOnSurface" />
 
     <TextView
-        style="@style/Text1_16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:visibility="gone"
-        android:drawablePadding="@dimen/dimen_8"
-        android:text="Suvni ovqatdan 20 minut olding iching"
-        android:textColor="#AC5F00"
-        android:drawableTint="@color/yellow"
-        app:drawableStartCompat="@drawable/info_ic" />
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:text="Qancha suv ichdingiz?"
+        android:textColor="?colorOnSurfaceVariant" />
 
+    <!-- Row 1 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_12"
-        android:baselineAligned="false"
         android:orientation="horizontal">
 
+        <!-- Piyola 100ml -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_glass"
-            style="@style/WaterPresetCard">
+            android:id="@+id/card_cup_100"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?selectableItemBackground"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant">
 
             <LinearLayout
-                android:background="#F0FAFD"
-                style="@style/WaterPresetLayout">
-
-                <ImageView
-                    style="@style/WaterPresetIcon"
-                    android:src="@drawable/water_full_24px" />
-
-                <TextView
-                    style="@style/WaterPresetLabel"
-                    android:text="@string/water_preset_glass" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="8dp">
 
                 <TextView
-                    style="@style/WaterPresetAmount"
-                    android:text="@string/water_amount_glass" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="☕"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    style="@style/TextAppearance.Material3.TitleMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="Piyola"
+                    android:textColor="?colorOnSurface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="100 ml"
+                    android:textColor="@color/blue" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Stakan 250ml -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_small_bottle"
-            style="@style/WaterPresetCard"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp">
+            android:id="@+id/card_glass_250"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?selectableItemBackground"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant">
 
             <LinearLayout
-                style="@style/WaterPresetLayout"
-                android:background="#F0FAFD"
-                >
-
-                <ImageView
-                    style="@style/WaterPresetIcon"
-                    android:src="@drawable/bottle_mini" />
-
-                <TextView
-                    style="@style/WaterPresetLabel"
-                    android:gravity="center"
-                    android:text="0.5 litr" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="8dp">
 
                 <TextView
-                    style="@style/WaterPresetAmount"
-                    android:text="@string/water_amount_small_bottle" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🥛"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    style="@style/TextAppearance.Material3.TitleMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="Stakan"
+                    android:textColor="?colorOnSurface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="250 ml"
+                    android:textColor="@color/blue" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_large_bottle"
-            style="@style/WaterPresetCard">
-
-            <LinearLayout
-                android:background="#F0FAFD"
-                style="@style/WaterPresetLayout">
-
-                <ImageView
-                    style="@style/WaterPresetIcon"
-                    android:src="@drawable/water_bottle_24px" />
-
-                <TextView
-                    style="@style/WaterPresetLabel"
-                    android:text="1 litr" />
-
-                <TextView
-                    style="@style/WaterPresetAmount"
-                    android:text="@string/water_amount_large_bottle" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
     </LinearLayout>
 
+    <!-- Row 2 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <!-- Kichik butilka 500ml -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_bottle_500"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?selectableItemBackground"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🧴"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    style="@style/TextAppearance.Material3.TitleMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="Kichik butilka"
+                    android:textColor="?colorOnSurface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="0.5 L"
+                    android:textColor="@color/blue" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Katta butilka 1L -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_bottle_1000"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?selectableItemBackground"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💧"
+                    android:textSize="32sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    style="@style/TextAppearance.Material3.TitleMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="Katta butilka"
+                    android:textColor="?colorOnSurface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    style="@style/TextAppearance.Material3.BodyMedium"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="1.0 L"
+                    android:textColor="@color/blue" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <!-- Close button -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_close"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:minHeight="48dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="Yopish"
+        android:textColor="?colorOnSurfaceVariant" />
 
 </LinearLayout>

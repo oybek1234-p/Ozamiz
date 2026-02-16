@@ -1,106 +1,135 @@
 package uz.oybek.ozamiz.data.food.analyzer
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
+import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerationConfig
 import com.google.firebase.ai.type.content
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzerConfig.MODEL_VERSION
-import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzerConfig.foodAnalysisResultSchema
+import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
+import uz.oybek.ozamiz.data.user.local.user
 
+/**
+ * Firebase Gemini orqali ovqatni tahlil qiladi
+ */
 object FoodAnalyzer {
 
-    private val foodAnalysisModel by lazy {
+    private val gson = Gson()
+    private val cache = mutableMapOf<Int, FoodAnalysis>()
+    private val conversationCache = mutableMapOf<Int, List<com.google.firebase.ai.type.Content>>()
+
+    private val model by lazy {
         Firebase.ai.generativeModel(
-            modelName = MODEL_VERSION,
-            generationConfig = GenerationConfig.builder()
-                .setResponseMimeType("application/json")
-                .setResponseSchema(foodAnalysisResultSchema)
-                .build()
+            modelName = FoodAnalyzerConfig.MODEL_NAME,
+            systemInstruction = content { text(FoodAnalyzerConfig.FOOD_INSTRUCTION) }
         )
     }
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        explicitNulls = true
+    fun getLastAnalyzed(id: Int) = cache[id]
+    fun getHistory(id: Int) = conversationCache[id] ?: emptyList()
+
+    suspend fun analyze(
+        history: List<com.google.firebase.ai.type.Content>
+    ): FoodAnalysis? = withContext(Dispatchers.IO) {
+        if (history.isEmpty()) {
+            Log.e("FoodAnalyzer", "❌ History is empty, cannot analyze")
+            return@withContext null
+        }
+
+        Log.d("FoodAnalyzer", "🔍 Starting analysis with history size: ${history.size}")
+        
+        runCatching {
+            // Using generateContent with history is manually managing chat
+            // Essentially we pass the whole conversation as input or use startChat if we want stateful
+            // But since we want to be stateless in repository, simple generation with context is often sufficient
+            // However, Gemini API 'generateContent' takes a single Content.
+            // For chat, we should use model.startChat(history).sendMessage(lastMessage)
+            
+            // Let's assume the last message is the new input, and previous are history.
+            val correctHistory = history.dropLast(1)
+            val lastMessage = history.last()
+            
+            Log.d("FoodAnalyzer", "📝 History messages: ${correctHistory.size}, Last message role: ${lastMessage.role}")
+            
+            val chat = model.startChat(correctHistory)
+            Log.d("FoodAnalyzer", "💬 Chat started, sending message...")
+            
+            val response = chat.sendMessage(lastMessage)
+            Log.d("FoodAnalyzer", "✅ Response received: ${response.text?.take(100)}...")
+            
+            response.text?.parseResult()?.let { result ->
+                Log.d("FoodAnalyzer", "✅ Parsed result: calories=${result.calories}, isAmbiguous=${result.isAmbiguous}")
+                // Make sure to preserve ID if possible, or just generate new hash
+                FoodAnalysis(
+                    id = result.hashCode(),
+                    photoUrl = "", // Set by ViewModel
+                    result = result,
+                    mealType = "" // Set by ViewModel
+                ).also { 
+                    cache[it.id] = it
+                    // Append the model response to history and save
+                    // We need to reconstruct the model content because 'response' is a GenerateContentResponse
+                    // But for the next turn, we need the model's reply in the history.
+                    // The easiest way is to add the generated text as a model part.
+                    val modelContent = com.google.firebase.ai.type.content(role = "model") {
+                        text(response.text ?: "")
+                    }
+                    conversationCache[it.id] = history + modelContent
+                    Log.d("FoodAnalyzer", "💾 Cached result with id: ${it.id}")
+                }
+            } ?: run {
+                Log.e("FoodAnalyzer", "❌ Failed to parse response text: ${response.text}")
+                null
+            }
+        }.onFailure { 
+            Log.e("FoodAnalyzer", "❌ Analysis error: ${it.message}", it)
+            Log.e("FoodAnalyzer", "❌ Error type: ${it.javaClass.simpleName}")
+            Log.e("FoodAnalyzer", "❌ Stack trace: ${it.stackTraceToString()}")
+        }
+            .getOrNull()
     }
 
-    private suspend fun uriToBitmap(
-        context: Context, imageUri: Uri
-    ): Bitmap? {
-        return withContext(Dispatchers.IO) {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    ImageDecoder.decodeBitmap(
-                        ImageDecoder.createSource(
-                            context.contentResolver,
-                            imageUri
-                        )
-                    )
-                } else {
-                    MediaStore.Images.Media.getBitmap(
-                        context.contentResolver,
-                        imageUri
-                    )
-                }
-            } catch (e: Exception) {
-                return@withContext null
-            }
+    suspend fun createInitialContent(
+       imageUrl: Uri?,
+       description: String,
+       meal: String
+    ): com.google.firebase.ai.type.Content = withContext(Dispatchers.IO) {
+        val prompt = FoodAnalyzerConfig.buildFoodPrompt(description, meal, user.gender)
+        content {
+            imageUrl?.toBytes()?.let { inlineData(it, "image/jpeg") }
+            text(prompt)
         }
     }
 
-    suspend fun analyzeFood(
-        imageUri: Uri?,
-        description: String
-    ): DataWrapper<FoodAnalysisResult> {
-        if (
-            description.isBlank() &&
-            imageUri == null
-        ) {
-            return DataWrapper.Error("")
-        }
-        val prompt = FoodAnalyzerConfig
-            .foodAnalyzePrompt(description)
-        return try {
-            val imageBitmap = imageUri?.let {
-                uriToBitmap(appContext, it)
-            }
-            val inputContent = content {
-                if (imageBitmap != null) {
-                    image(imageBitmap)
-                }
-                if (prompt.isNotEmpty()) {
-                    text(prompt)
-                }
-            }
-            val response = withContext(Dispatchers.IO) {
-                foodAnalysisModel.generateContent(
-                    prompt = inputContent
-                )
-            }
-            val responseJson = response.text
-            if (responseJson.isNullOrBlank()) {
-                return DataWrapper.Error(Errors.EMPTY_RESULT)
-            }
-            val result = json.decodeFromString<FoodAnalysisResult>(responseJson)
-            DataWrapper.Success(result)
-        } catch (e: Exception) {
-            DataWrapper.Error("")
-        }
-    }
+    private fun Uri.toBytes(): ByteArray? = runCatching {
+        appContext.contentResolver.openInputStream(this)?.readBytes()
+    }.getOrNull()
 
-    object Errors {
-        const val EMPTY_RESULT = "empty"
-    }
+    private fun String.parseResult(): FoodAnalysisResult? = runCatching {
+        val cleaned = this.trim()
+        
+        val jsonString = when {
+            cleaned.contains("```json") -> {
+                cleaned.substringAfter("```json")
+                    .substringBeforeLast("```")
+                    .trim()
+            }
+            cleaned.startsWith("```") && cleaned.endsWith("```") -> {
+                cleaned.removePrefix("```")
+                    .removeSuffix("```")
+                    .trim()
+            }
+            cleaned.startsWith("{") -> cleaned
+            else -> {
+                Log.e("FoodAnalyzer", "❌ Unexpected response format: ${cleaned.take(100)}")
+                cleaned
+            }
+        }
+        Log.d("FoodAnalyzer", "🔍 Extracted JSON: ${jsonString.take(200)}")
+        gson.fromJson(jsonString, FoodAnalysisResult::class.java)
+    }.getOrNull()
 }

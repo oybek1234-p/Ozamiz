@@ -1,331 +1,318 @@
-<!-- ✅ YAKUNIY, YAXSHILANGAN VERSIYA -->
-<!-- C:...\res\layout\bottom_sheet_calorie_result.xml -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainer"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    android:background="?colorSurfaceContainer">
 
-    <!-- Orqaga qaytish tugmasi -->
-    <ImageView
-        android:id="@+id/back_view"
-        android:layout_width="wrap_content"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:elevation="2dp"
-        android:padding="12dp"
-        android:src="@drawable/arrow_back"
-        app:tint="?colorOnSurface" />
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
 
-    <ScrollView
+        <uz.oybek.ozamiz.ui.base.MyToolBar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/arrow_back"
+            app:titleCentered="true"
+            app:titleTextAppearance="@style/Title3_17" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="100dp">
+        android:paddingBottom="100dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
             android:orientation="vertical"
-            android:layout_gravity="center_vertical"
-            android:paddingStart="24dp"
-            android:paddingTop="64dp"
-            android:paddingEnd="24dp">
+            android:paddingHorizontal="16dp"
+            android:clipToPadding="false"
+            android:paddingTop="16dp">
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imageView_illustration"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center"
+                android:id="@+id/imageView_food_photo"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center_horizontal"
                 android:scaleType="centerCrop"
-                android:visibility="gone"
-                app:shapeAppearanceOverlay="@style/RadiusImageView12"
+                app:shapeAppearance="@style/RadiusImageView12"
                 tools:src="@drawable/placeholder_food" />
 
             <TextView
-                android:id="@+id/textView_estimatedCalories"
+                android:id="@+id/textView_timestamp"
+                style="@style/Caption2_12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="12dp"
-                android:drawablePadding="4dp"
-                android:fontFamily="@font/roboto_bold"
-                android:textColor="?colorPrimary"
-                android:textSize="45sp"
-                app:drawableTint="?colorPrimary"
-                tools:text="480" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:fontFamily="@font/roboto_regular"
-
-                android:text="kaloriya (Energiya)"
-                android:textColor="?colorPrimary"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/food_name"
-                style="@style/Text2_15"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/round_lay"
-                android:backgroundTint="?colorSurfaceContainerLowest"
-                android:ellipsize="end"
-                android:fontFamily="@font/roboto_regular"
+                android:layout_marginTop="24dp"
+                android:drawablePadding="6dp"
                 android:gravity="center"
-                android:maxLines="2"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="8dp"
+                android:text="6:21 PM"
                 android:textColor="?colorOnSurfaceVariant"
-                app:drawableTint="#939393"
-                tools:text="2 sih shashlik va oq non" />
+                android:visibility="gone"
+                app:drawableStartCompat="@drawable/date_ic"
+                app:drawableTint="?colorOnSurfaceVariant" />
 
-
-            <!-- Sog'lomlik Darajasi Bloki -->
             <LinearLayout
-                android:id="@+id/layout_health_feedback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/round_lay"
-                android:backgroundTint="@color/white"
-                android:orientation="vertical"
-                android:padding="16dp">
+                android:layout_marginTop="18dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView_food_name"
+                    style="@style/Title4_24"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:textColor="?colorOnSurface"
+                    tools:text="Caesar Salad" />
+
+                <ImageView
+                    android:id="@+id/btn_edit_name"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    android:src="@drawable/edit"
+                    app:tint="?colorOnSurfaceVariant" />
+
+            </LinearLayout>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_calorie_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?colorOutlineVariant"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/dimen_18"
+                    android:paddingVertical="@dimen/dimen_12">
 
                     <ImageView
-                        android:id="@+id/icon_health_feedback"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
-                        android:layout_marginEnd="12dp"
-                        tools:src="@drawable/check_ic"
-                        tools:tint="@color/green" />
+                        android:src="@drawable/fire_ic"
+                        app:tint="?colorOnSurface" />
 
-                    <TextView
-                        android:id="@+id/level_text"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:fontFamily="@font/roboto_medium"
-                        android:textSize="15sp"
-                        tools:text="Yaxshi tanlov"
-                        tools:textColor="@color/green" />
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
+                        <TextView
+                            style="@style/Caption2_12"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Calories"
+                            android:textColor="?colorOnSurfaceVariant" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/textView_calories"
+                                style="@style/Title4_28"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:textColor="?colorOnSurface"
+                                tools:text="330" />
+
+                            <ImageView
+                                android:id="@+id/btn_edit_calories"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginStart="8dp"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:padding="2dp"
+                                android:src="@drawable/edit"
+                                app:tint="?colorOnSurfaceVariant" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/textView_health_feedback"
-                    android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/layout_macros"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_12"
+                android:baselineAligned="false"
+                android:padding="1dp"
+                android:clipToPadding="false"
+                android:orientation="horizontal">
+
+                <include
+                    android:id="@+id/layout_protein"
+                    layout="@layout/item_macro_display"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:lineSpacingMultiplier="1.2"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="16sp"
-                    tools:text="Haftasiga 1 martadan oshirmang, yoki 'Cola Zero' iching." />
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1" />
+
+                <include
+                    android:id="@+id/layout_carbs"
+                    layout="@layout/item_macro_display"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1" />
+
+                <include
+                    android:id="@+id/layout_fats"
+                    layout="@layout/item_macro_display"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
             </LinearLayout>
 
-            <!-- Makronutrientlar -->
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_ai_health"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:baselineAligned="false"
-                android:clipToPadding="false"
-                android:orientation="horizontal"
-                android:padding="2dp">
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp">
 
-                <!-- Protein -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardBackgroundColor="?colorSurfaceContainerLowest"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:src="@drawable/protein_ic"
-                                android:layout_gravity="center" />
-                            <ImageView
-                                android:id="@+id/info_protein"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:src="@drawable/info_ic"
-                                android:layout_gravity="top|end"
-                                app:tint="@color/grey" />
-                        </FrameLayout>
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
                         <TextView
-                            style="@style/MacroItemLabel"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/protein_short" />
+                            style="@style/Title3_17"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/smart_toy_24px"
+                            android:text="Sog'liq bahosi"
+                            android:textColor="?colorOnSurface" />
+
                         <TextView
-                            android:id="@+id/textView_estimatedProtein"
-                            style="@style/MacroItemValue"
-                            tools:text="25.5 g" />
+                            android:id="@+id/textView_health_score"
+                            style="@style/Headline2_16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/dimen_12"
+                            android:fontFamily="@font/roboto_bold"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="4dp"
+                            android:textColor="?attr/colorPrimary"
+                            tools:text="8.5/10" />
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
 
-                <!-- Carbs -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp"
-                    app:cardBackgroundColor="?colorSurfaceContainerLowest"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp">
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/textView_ai_insight"
+                        style="@style/Text1_16"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-                            <ImageView
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                style="@style/MacroItemIcon"
-                                android:layout_gravity="center"
-                                android:src="@drawable/carbs_ic"
-                               />
-                            <ImageView
-                                android:id="@+id/info_carbs"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:src="@drawable/info_ic"
-                                android:layout_gravity="top|end"
-                                app:tint="@color/grey" />
-                        </FrameLayout>
-                        <TextView
-                            style="@style/MacroItemLabel"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/carbs_short" />
-                        <TextView
-                            android:id="@+id/textView_estimatedCarbs"
-                            style="@style/MacroItemValue"
-                            tools:text="55.0 g" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                        android:layout_marginTop="8dp"
+                        android:lineSpacingMultiplier="1.2"
+                        android:textColor="?colorOnSurface"
+                        tools:text="Bu taom oqsilga boy va uglevodlari me'yorda. Tushlik uchun ajoyib tanlov." />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <!-- Fat -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    app:cardBackgroundColor="?colorSurfaceContainerLowest"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-                        <FrameLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-                            <ImageView
-                                style="@style/MacroItemIcon"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/fat_ic"
-                               />
-                            <ImageView
-                                android:id="@+id/info_fat"
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:src="@drawable/info_ic"
-                                android:layout_gravity="top|end"
-                                app:tint="@color/grey" />
-                        </FrameLayout>
-                        <TextView
-                            style="@style/MacroItemLabel"
-                            android:layout_marginTop="8dp"
-                            android:text="@string/fat_short" />
-                        <TextView
-                            android:id="@+id/textView_estimatedFat"
-                            style="@style/MacroItemValue"
-                            tools:text="15.2 g" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- Harakat tugmalari -->
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?colorSurfaceContainerLowest"
-        android:elevation="4dp"
+        android:background="?colorSurfaceContainer"
+        android:elevation="16dp"
+        android:orientation="horizontal"
         android:padding="16dp">
-        <LinearLayout
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_delete"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/delete"
+            android:textColor="?colorError"
+            android:visibility="gone"
+            app:iconGravity="textStart"
+            app:icon="@drawable/delete_ic"
+            app:iconTint="?colorError"
+            app:strokeColor="?colorError" />
+
+
+        <FrameLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_retry_analysis"
-                style="@style/Widget.Material3.Button.ElevatedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="@string/retry_or_cancel" />
+            android:layout_marginStart="8dp"
+            android:layout_weight="1">
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_save_to_log"
                 style="@style/Widget.Material3.Button"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="@string/save_to_log"
-                app:icon="@drawable/check_ic"
-                app:iconGravity="textStart" />
-        </LinearLayout>
-        <ProgressBar
-            android:id="@+id/progressBar_save"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:indeterminateTint="?colorPrimary"
-            android:visibility="gone"
-            tools:visibility="visible" />
-    </FrameLayout>
-</FrameLayout>
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:backgroundTint="?colorPrimary"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/save"
+                android:textColor="?colorSurface" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:elevation="4dp"
+                android:indeterminateTint="?colorSurface"
+                android:visibility="gone" />
+
+        </FrameLayout>
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:elevation="20dp"
+        android:visibility="gone" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

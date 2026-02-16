@@ -7,35 +7,52 @@ object FirebasePaths {
 
     private val root: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    const val USERS = "users"
-    const val WEIGHT_PHOTOS = "weightPhoto"
-    const val LOGS = "logs"
+    object Database {
+        const val PATH_USERS = "users"
+        const val PATH_LOGS = "logs"
+        const val FOOD_LOGS = "foodLogs"
+        const val WATER_LOGS = "waterLogs"
+        const val EXERCISE_LOGS = "exerciseLogs"
+        const val WEIGHT_LOGS = "weightLogs"
+    }
 
-    const val FOOD_LOGS = "foodLogs"
-    const val WATER_LOGS = "waterLogs"
-    const val EXERCISE_LOGS = "exerciseLogs"
+    object Firestore {
+        const val WEIGHT_PHOTOS = "weightPhoto"
+    }
 
-    private fun DatabaseReference.childPath(vararg segments: String): DatabaseReference =
-        segments.fold(this) { ref, segment ->
-            ref.child(segment)
-        }
+    object Storage {
+        const val WEIGHT_PHOTOS = "weightLog"
+        const val FOOD_PHOTOS = "loggedFood"
+    }
 
-    fun userRoot(userId: String) = root.childPath(USERS, userId)
+    fun userReference(userId: String) =
+        root.child(Database.PATH_USERS).child(userId)
 
-    fun userLogsRoot(userId: String) = root.childPath(LOGS, userId)
+    fun userLogsReference(userId: String) =
+        root.child(Database.PATH_LOGS).child(userId)
 
-    fun dailyLogsRoot(userId: String, dateKey: String) =
-        userLogsRoot(userId).childPath(dateKey)
+    fun foodLogsReference(userId: String, date: String) =
+        userLogsReference(userId)
+            .child(date)
+            .child(Database.FOOD_LOGS)
 
-    fun foodLogsRef(userId: String, dateKey: String) =
-        dailyLogsRoot(userId, dateKey).childPath(FOOD_LOGS)
+    fun exerciseLogsReference(userId: String, date: String) =
+        userLogsReference(userId)
+            .child(date)
+            .child(Database.EXERCISE_LOGS)
 
-    fun waterLogsRef(userId: String, dateKey: String) =
-        dailyLogsRoot(userId, dateKey).childPath(WATER_LOGS)
+    fun waterLogsReference(userId: String, date: String) =
+        userLogsReference(userId)
+            .child(date)
+            .child(Database.WATER_LOGS)
 
-    fun exerciseLogsRef(userId: String, dateKey: String) =
-        dailyLogsRoot(userId, dateKey).childPath(EXERCISE_LOGS)
+    fun weightLogsReference(userId: String, date: String) =
+        userLogsReference(userId).child(date).child(Database.WEIGHT_LOGS)
 
-    fun weightPhotosRef(userId: String) =
-        userRoot(userId).childPath(WEIGHT_PHOTOS)
+    fun userDailySummariesReference(userId: String) =
+        root.child("daily_summaries").child(userId)
+
+    fun dailySummaryReference(userId: String, date: String) =
+        userDailySummariesReference(userId).child(date)
+
 }

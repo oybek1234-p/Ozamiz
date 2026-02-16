@@ -3,6 +3,8 @@ package uz.oybek.ozamiz.ui.feature.onboarding.screens
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.food.DietController
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.databinding.FragmentTargetWeightBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
@@ -20,7 +22,14 @@ class TargetWeightFragment
                     ?.toString()
                     ?.toIntOrNull()
                 if (inputTarget != null && inputTarget > 40) {
-                    LocalUser.update { targetWeight = inputTarget.toDouble() }
+                    LocalUser.update {
+                        targetWeight = inputTarget.toDouble()
+                    }
+                    LocalUser.update {
+                        targetCalories = DietController.calculateTargetCalories(this)
+                        targetWaterMl = DietController.calculateTargetWaterMl(this.weight)
+                    }
+                    UserRepository.updateUser {}
                     moveToNextScreen()
                 } else {
                     textInput.error = getString(R.string.error_weight)

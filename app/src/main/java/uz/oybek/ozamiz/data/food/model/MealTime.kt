@@ -4,37 +4,37 @@ import uz.oybek.ozamiz.R
 
 sealed class MealTime(
     val id: String,
-    val name: String,
+    val nameRes: Int,
     val iconRes: Int
 ) {
 
     data object Breakfast : MealTime(
         id = "breakfast",
-        name = "Nonushta",
+        nameRes = R.string.breakfast,
         iconRes = R.drawable.breakfast_ic
     )
 
     data object Lunch : MealTime(
         id = "lunch",
-        name = "Tushlik",
+        nameRes = R.string.lunch,
         iconRes = R.drawable.lunch_ic
     )
 
     data object Dinner : MealTime(
         id = "dinner",
-        name = "Kechki ovqat",
+        nameRes = R.string.dinner,
         iconRes = R.drawable.dinner_ic
     )
 
     data object Snack : MealTime(
         id = "snack",
-        name = "Tamaddi",
+        nameRes = R.string.snack,
         iconRes = R.drawable.snack_ic
     )
 
     companion object {
-        val mealTypes =
-            listOf(Breakfast, Lunch, Dinner, Snack)
+        val mealTypes: List<MealTime>
+            get() = listOf(Breakfast, Lunch, Dinner, Snack)
 
         fun fromId(id: String): MealTime? {
             return mealTypes.find { it.id == id }

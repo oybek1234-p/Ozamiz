@@ -1,34 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurfaceContainer"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
     tools:context=".ui.feature.profile.ProfileFragment">
-
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:paddingBottom="32dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp">
 
-            <!-- Foydalanuvchi ma'lumotlari kartasi -->
-            <com.google.android.material.card.MaterialCardView
+            <!-- HEADER: Avatar + Ism -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="48dp"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingTop="24dp"
+                android:paddingBottom="20dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageView_user_avatar"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                    tools:src="@drawable/user_photo_placeholder" />
+
+                <TextView
+                    android:id="@+id/textView_user_name"
+                    style="@style/TextAppearance.Material3.TitleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:textColor="?colorOnSurface"
+                    tools:text="Ali Valiyev" />
+
+            </LinearLayout>
+
+            <!-- Premium Status (agar kerak bo'lsa) -->
+            <LinearLayout
+                android:id="@+id/premium_active_c"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="16dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/premiumExpireDate"
+                    style="@style/TextAppearance.Material3.LabelLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?colorPrimary"
+                    tools:text="Premium 25.02.2026 gacha" />
+
+            </LinearLayout>
+
+            <!-- Premium Banner (hidden by default) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/premium_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="?colorPrimaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -37,174 +90,153 @@
                     android:orientation="horizontal"
                     android:padding="16dp">
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/imageView_user_avatar"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:scaleType="centerCrop"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                        tools:src="@drawable/user_photo_placeholder" />
-
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/textView_user_name"
-                            style="@style/Title2_20"
+                            style="@style/TextAppearance.Material3.TitleSmall"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="?colorOnSurface"
-                            tools:text="Ali Valiyev" />
+                            android:textColor="?colorOnPrimaryContainer"
+                            android:text="Premium a'zolik" />
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.BodySmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="?colorOnPrimaryContainer"
+                            android:alpha="0.8"
+                            android:text="Barcha imkoniyatlar" />
 
                     </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <LinearLayout
-                android:id="@+id/premium_active_c"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="18dp"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:layout_marginBottom="2dp"
-                android:background="@drawable/round_lay"
-                android:backgroundTint="?colorSurfaceContainerLowest"
-                android:elevation="2dp"
-                android:orientation="vertical"
-                android:padding="@dimen/dimen_12"
-                android:visibility="gone"
-                tools:visibility="visible">
-                <TextView
-                    style="@style/Headline3_15"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="@dimen/dimen_8"
-                    android:drawableTint="?colorOnSurface"
-                    android:text="@string/premium"
-                    android:textColor="?colorOnSurface"
-                    app:drawableEndCompat="@drawable/star_ic" />
-                <TextView
-                    android:id="@+id/premiumExpireDate"
-                    style="@style/Subtitle1_14"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dimen_8"
-                    android:textColor="?colorOnSurface"
-                    tools:text="Premium 24.08.2024 gacha amal qiladi"/>
-            </LinearLayout>
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/premium_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                app:cardBackgroundColor="@color/yellow_alpha_10"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/yellowDark"
-                app:strokeWidth="1dp"
-                android:visibility="gone"
-                tools:visibility="visible">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <TextView
-                        style="@style/Title3_17"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/yellowDark"
-                        android:text="Premiumda ko'proq imkoniyatlar" />
-                    <TextView
-                        style="@style/TextBodyMedium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="?colorOnSurface"
-                        android:text="Sun'iy intellekt yordamida ovqat tahlili, shaxsiy tavsiyalar va reklamasiz foydalanish." />
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/premium_button"
                         style="@style/Widget.Material3.Button.TonalButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/premiumga_o_tish"
-                        app:icon="@drawable/star_ic" />
+                        android:layout_height="40dp"
+                        android:text="Faollashtirish"
+                        android:textSize="13sp" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- MENU BO'LIMI 1: Asosiy -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-                    <include android:id="@+id/section_my_info" layout="@layout/item_profile_section" />
-                    <com.google.android.material.divider.MaterialDivider android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp"/>
-                    <include android:id="@+id/section_weight_history" layout="@layout/item_profile_section" />
-                    <com.google.android.material.divider.MaterialDivider android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp"/>
+
+                    <include
+                        android:id="@+id/section_my_info"
+                        layout="@layout/item_profile_section" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="52dp"
+                        android:background="?colorSurfaceContainerHighest" />
+
+                    <include
+                        android:id="@+id/section_weight_history"
+                        layout="@layout/item_profile_section" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- MENU BO'LIMI 2: Yordam -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="8dp"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp">
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-                    <include android:id="@+id/section_support" layout="@layout/item_profile_section" />
-                    <com.google.android.material.divider.MaterialDivider android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp"/>
-                    <include android:id="@+id/section_rate_app" layout="@layout/item_profile_section" />
-                    <com.google.android.material.divider.MaterialDivider android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp"/>
+
+                    <include
+                        android:id="@+id/section_support"
+                        layout="@layout/item_profile_section" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="52dp"
+                        android:background="?colorSurfaceContainerHighest" />
+
+                    <include
+                        android:id="@+id/section_rate_app"
+                        layout="@layout/item_profile_section" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Admin Section -->
+            <!-- MENU BO'LIMI 3: Darsliklar -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <include
+                    android:id="@+id/section_admin_lessons"
+                    layout="@layout/item_profile_section" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Admin bo'limi (Hidden) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/section_admin_premium_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp"
                 android:visibility="gone"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest"
-                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
+                app:strokeWidth="0dp"
                 tools:visibility="visible">
+
                 <include
                     android:id="@+id/section_admin_premium_users_content"
-                    layout="@layout/item_profile_section"/>
+                    layout="@layout/item_profile_section" />
+
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Chiqish tugmasi -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_logout"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="88dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="32dp"
                 android:text="@string/logout"
                 android:textColor="?colorError"
                 android:visibility="gone"
                 tools:visibility="visible" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>

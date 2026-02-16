@@ -3,139 +3,134 @@ package uz.oybek.ozamiz.data.logs
 import android.net.Uri
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.firestore
-import com.google.firebase.firestore.toObject
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.firebase.generateKey
 import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
+import uz.oybek.ozamiz.data.logs.local.LocalLogs
 import uz.oybek.ozamiz.data.logs.model.WeightLog
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
-import java.util.Date
-import java.util.UUID
+import uz.oybek.ozamiz.util.handleException
 import java.util.concurrent.TimeUnit
 
-class WeightLogRepository {
+object WeightLogRepository {
 
-    private val firestore = Firebase.firestore
+    private const val INTERVAL_DAYS = 7
+    private const val COLLECTION_USERS = "users"
+    private const val COLLECTION_WEIGHT_LOGS = "weightLogs"
 
-    private fun weightLogsCollection(userId: String) =
-        firestore
-            .collection(FirebaseCollections.USERS)
-            .document(userId)
-            .collection(FirebaseCollections.WEIGHT_PHOTOS)
-
-    suspend fun addLog(
+    suspend fun add(
+        userId: String,
         weightKg: Double,
         photoUri: Uri
     ): DataWrapper<WeightLog> {
-        var uploadedImageUrl: String? = null
-        return try {
-            when (val uploadResult =
-                ImageUploader.uploadImage(photoUri, ImagePaths.weightLog)) {
-                is DataWrapper.Success -> uploadedImageUrl = uploadResult.data
-                is DataWrapper.Error -> {
-                    return DataWrapper.Error()
-                }
-            }
-            val newLog = WeightLog(
-                id = UUID.randomUUID().toString(),
-                userId = LocalUser.user.uid,
-                weightKg = weightKg,
-                photoUrl = uploadedImageUrl,
-                timestamp = null
-            )
+        val uploadedUrl =
+            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog)
 
-            weightLogsCollection(LocalUser.user.uid)
-                .document(newLog.id)
-                .set(newLog, SetOptions.merge()).await()
-            LocalUser.user = LocalUser.user.copy(
-                weight = newLog.weightKg,
-                lastWeightLogTimestamp = System.currentTimeMillis(),
-                avatarUrl = newLog.photoUrl
-            )
-            LocalUser.saveUser()
-            UserRepository.updateUser {
-                it.weight = newLog.weightKg
-                it.lastWeightLogTimestamp = LocalUser.user.lastWeightLogTimestamp
-                it.avatarUrl = LocalUser.user.avatarUrl
-            }
-            DataWrapper.Success(newLog.copy(timestamp = Date()))
-        } catch (_: Exception) {
-            uploadedImageUrl?.let { ImageUploader.deleteImage(it) }
-            DataWrapper.Error()
+        val logId = generateKey()
+
+        val newLog = WeightLog(
+            logId = logId,
+            userId = userId,
+            weightKg = weightKg,
+            photoUrl = uploadedUrl.toString()
+        )
+
+        return try {
+            Firebase.firestore.collection(COLLECTION_USERS)
+                .document(userId)
+                .collection(COLLECTION_WEIGHT_LOGS)
+                .document(logId)
+                .set(newLog)
+                .await()
+            DataWrapper.Success(newLog)
+        } catch (e: Exception) {
+            handleException(e)
+            DataWrapper.Error(e.localizedMessage)
         }
     }
 
-    fun getLogsFlow(userId: String): Flow<DataWrapper<List<WeightLog>>> =
-        callbackFlow {
-            val listenerRegistration = weightLogsCollection(userId)
-                .orderBy(timestamp, Query.Direction.DESCENDING)
+    fun getLogsFlow(userId: String): Flow<DataWrapper<List<WeightLog>>> = flow {
+        val localLogs = LocalLogs.getLogs()
+        if (localLogs.isNotEmpty()) {
+            emit(DataWrapper.Success(localLogs))
+        }
+
+        emitAll(callbackFlow {
+            val registration = Firebase.firestore.collection(COLLECTION_USERS)
+                .document(userId)
+                .collection(COLLECTION_WEIGHT_LOGS)
+                .orderBy("timestampLong", Query.Direction.DESCENDING)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
-                        trySend(DataWrapper.Error())
-                        close(error)
+                        trySend(DataWrapper.Error(error.message))
                         return@addSnapshotListener
                     }
+
                     if (snapshot != null) {
-                        val logs = snapshot.documents.mapNotNull {
-                            it.toObject<WeightLog>()
-                        }
+                        val logs = snapshot.toObjects(WeightLog::class.java)
+                        LocalLogs.saveLogs(logs)
                         trySend(DataWrapper.Success(logs))
                     } else {
                         trySend(DataWrapper.Success(emptyList()))
                     }
                 }
-            awaitClose { listenerRegistration.remove() }
-        }
 
-    suspend fun getLatestLog(userId: String): WeightLog? {
-        return try {
-            val snapshot = weightLogsCollection(userId)
-                .orderBy(timestamp, Query.Direction.DESCENDING)
-                .limit(1)
-                .get()
-                .await()
-            val log = snapshot.documents
-                .firstOrNull()
-                ?.toObject<WeightLog>()
-            return log
-        } catch (_: Exception) {
-            null
-        }
+            awaitClose { registration.remove() }
+        })
     }
 
-    suspend fun hasAnyLog(userId: String): DataWrapper<Boolean> {
+    suspend fun hasAny(userId: String): Boolean {
         return try {
-            val snapshot = weightLogsCollection(userId)
+            val snapshot = Firebase.firestore.collection(COLLECTION_USERS)
+                .document(userId)
+                .collection(COLLECTION_WEIGHT_LOGS)
                 .limit(1)
                 .get()
                 .await()
-            DataWrapper.Success(!snapshot.isEmpty)
+            !snapshot.isEmpty
         } catch (e: Exception) {
-            DataWrapper.Error(e.message.toString())
+            handleException(e)
+            false
         }
     }
 
-    companion object {
-        private val timestamp = "timestamp"
-        private const val INTERVAL_DAYS = 7
+    fun timeToWeightLog(): Boolean {
+        val user = LocalUser.user
+        val lastLogTime = user.lastWeightLogTimestamp
+        val daysSince = if (lastLogTime > 0) {
+            TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastLogTime)
+        } else {
+            (INTERVAL_DAYS + 1).toLong()
+        }
+        return daysSince >= INTERVAL_DAYS
+    }
 
-        fun timeToWeightLog(): Boolean {
-            val user = LocalUser.user
-            val lastLogTime = user.lastWeightLogTimestamp
-            val daysSinceLastLog = if (lastLogTime > 0) {
-                TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - lastLogTime)
-            } else {
-                (INTERVAL_DAYS + 1).toLong()
+    suspend fun deleteLog(log: WeightLog): DataWrapper<Unit> {
+        return try {
+            Firebase.firestore.collection(COLLECTION_USERS)
+                .document(log.userId)
+                .collection(COLLECTION_WEIGHT_LOGS)
+                .document(log.logId)
+                .delete()
+                .await()
+            
+            val photoUrl = log.photoUrl
+             if (photoUrl.isNotEmpty()) {
+                ImageUploader.deleteImage(photoUrl)
             }
-            return daysSinceLastLog >= INTERVAL_DAYS
+            
+            DataWrapper.Success(Unit)
+        } catch (e: Exception) {
+            handleException(e)
+            DataWrapper.Error(e.localizedMessage)
         }
     }
-
 }

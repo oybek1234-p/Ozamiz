@@ -22,7 +22,11 @@ class WeightPhotoHistoryFragment : BaseFragment<FragmentWeightPhotoHistoryBindin
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentWeightPhotoHistoryBinding {
-        return FragmentWeightPhotoHistoryBinding.inflate(inflater, container, false)
+        return FragmentWeightPhotoHistoryBinding.inflate(
+            inflater,
+            container,
+            false
+        )
     }
 
     override fun viewCreated(bind: FragmentWeightPhotoHistoryBinding) {
@@ -39,9 +43,7 @@ class WeightPhotoHistoryFragment : BaseFragment<FragmentWeightPhotoHistoryBindin
 
     private fun setupRecyclerView(bind: FragmentWeightPhotoHistoryBinding) {
         adapter = WeightPhotoLogAdapter { log ->
-            // Handle item click - e.g., open full screen image viewer
-            // For now, just log or show a toast
-            // showToast("Clicked on log from: ${log.timestamp}")
+
         }
         bind.recyclerViewWeightHistory.layoutManager = LinearLayoutManager(requireContext())
         bind.recyclerViewWeightHistory.adapter = adapter
@@ -52,18 +54,19 @@ class WeightPhotoHistoryFragment : BaseFragment<FragmentWeightPhotoHistoryBindin
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     bind.progressBarWeightHistory.isVisible = state.isLoading
-                    bind.textViewNoHistory.isVisible = !state.isLoading && state.logs.isEmpty() && state.error == null
-                    bind.recyclerViewWeightHistory.isVisible = !state.isLoading && state.logs.isNotEmpty()
+                    bind.textViewNoHistory.isVisible =
+                        !state.isLoading && state.logs.isEmpty() && state.error == null
+                    bind.recyclerViewWeightHistory.isVisible =
+                        !state.isLoading && state.logs.isNotEmpty()
 
                     if (!state.isLoading) {
                         adapter.submitList(state.logs)
                     }
 
                     state.error?.let {
-                        bind.textViewNoHistory.text = it // Show error in the empty state view
+                        bind.textViewNoHistory.text = it
                         bind.textViewNoHistory.isVisible = true
                         bind.recyclerViewWeightHistory.isVisible = false
-                        // showToast(it) // Or show as toast
                         viewModel.clearError()
                     }
                 }
@@ -72,7 +75,7 @@ class WeightPhotoHistoryFragment : BaseFragment<FragmentWeightPhotoHistoryBindin
     }
 
     override fun onDestroyView() {
-        binding.recyclerViewWeightHistory.adapter = null // Clear adapter
+        binding.recyclerViewWeightHistory.adapter = null
         super.onDestroyView()
     }
 }

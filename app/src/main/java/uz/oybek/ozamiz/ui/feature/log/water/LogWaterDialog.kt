@@ -38,16 +38,14 @@ class LogWaterDialog : BottomSheetDialogFragment() {
     }
 
     private fun setupClickListeners() {
-        binding.cardGlass.setOnClickListener { addWater(glassAmount) }
-        binding.cardSmallBottle.setOnClickListener { addWater(smallBottleAmount) }
-        binding.cardLargeBottle.setOnClickListener { addWater(largeBottleAmount) }
+
     }
 
     private fun addWater(amountMl: Int) {
-        hideSoftInput(requireActivity())
-        homeViewModel.addWaterLog(amountMl) // ViewModel o'zi sanani biladi
-        showToast(getString(uz.oybek.ozamiz.R.string.water_logged_successfully)) // Optimistic UI
-        dismiss()
+//        hideSoftInput(requireActivity())
+//        homeViewModel.addWaterLog(amountMl) // ViewModel o'zi sanani biladi
+//        showToast(getString(uz.oybek.ozamiz.R.string.water_logged_successfully)) // Optimistic UI
+//        dismiss()
     }
 
     override fun onDestroyView() {

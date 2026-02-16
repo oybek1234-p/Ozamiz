@@ -2,14 +2,19 @@ package uz.oybek.ozamiz.ui.feature.home
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.R
 import com.google.android.material.color.MaterialColors
+import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.logs.model.DailySummary
+import uz.oybek.ozamiz.data.utils.dateApiFormat
 import uz.oybek.ozamiz.databinding.ItemDateScrollerBinding
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class DateScrollerAdapter(
     private val onDateSelected: (Date) -> Unit
@@ -18,6 +23,39 @@ class DateScrollerAdapter(
     private var selectedDate: Date = getMidnight(Date())
     private val dayFormat = SimpleDateFormat("E", Locale("uz", "UZ"))
     private val dateFormat = SimpleDateFormat("d", Locale.getDefault())
+    
+    var dailySummaries: Map<String, DailySummary> = emptyMap()
+    var targetCalories: Int = 2000
+
+    companion object {
+        private const val PAYLOAD_PROGRESS = "PAYLOAD_PROGRESS"
+    }
+
+    fun updateData(summaries: Map<String, DailySummary>, target: Int) {
+        val oldSummaries = this.dailySummaries
+        val oldTarget = this.targetCalories
+
+        this.dailySummaries = summaries
+        this.targetCalories = target
+
+        if (oldTarget != target) {
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_PROGRESS)
+            return
+        }
+
+        for (i in 0 until itemCount) {
+            val date = getItem(i)
+            val dateKey = date.dateApiFormat()
+            val oldSum = oldSummaries[dateKey]
+            val newSum = summaries[dateKey]
+
+            // We only care if the consumed calories or target changed effectively
+            // But since target check is above, just check summary equality or specific field
+            if (oldSum != newSum) {
+                notifyItemChanged(i, PAYLOAD_PROGRESS)
+            }
+        }
+    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup, viewType: Int
@@ -33,6 +71,14 @@ class DateScrollerAdapter(
 
     override fun onBindViewHolder(holder: DateViewHolder, position: Int) {
         holder.bind(getItem(position))
+    }
+
+    override fun onBindViewHolder(holder: DateViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.contains(PAYLOAD_PROGRESS)) {
+            holder.updateProgress(getItem(position))
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     fun setSelectedDate(date: Date) {
@@ -63,91 +109,65 @@ class DateScrollerAdapter(
     inner class DateViewHolder(private val binding: ItemDateScrollerBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.root.setOnClickListener {
+            binding.cardDate.setOnClickListener {
                 if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
                     onDateSelected(getItem(bindingAdapterPosition))
                 }
             }
         }
 
+        private val context = binding.root.context
+        private val primaryColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, 0)
+        private val onPrimary = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0)
+        private val surfaceLow = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow, 0)
+        private val onSurface = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0)
+        private val outlineVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, 0)
+        
+        private val greenColor = ContextCompat.getColor(context, R.color.green)
+        private val redColor = ContextCompat.getColor(context, R.color.red)
+
         fun bind(date: Date) {
             val isSelected = isSameDay(date, selectedDate)
             val isToday = isSameDay(date, Date())
-            val context = binding.root.context
 
             binding.textViewDayOfWeek.text =
                 dayFormat.format(date).replaceFirstChar { it.uppercase() }
             binding.textViewDayOfMonth.text = dateFormat.format(date)
 
-            when {
-                isSelected -> {
+            updateProgress(date)
+            
+            // Selection Logic
+            if (isSelected) {
+                binding.cardDate.setCardBackgroundColor(primaryColor)
+                binding.textViewDayOfWeek.setTextColor(primaryColor)
+                binding.textViewDayOfMonth.setTextColor(onPrimary)
+                binding.cardDate.strokeWidth = 0
+            } else {
+                binding.cardDate.setCardBackgroundColor(surfaceLow)
+                binding.textViewDayOfWeek.setTextColor(onSurface)
+                binding.textViewDayOfMonth.setTextColor(onSurface)
+                // If today, maybe a border? Or just the progress ring is enough distinction
+                if (isToday) {
+                    binding.cardDate.strokeWidth = 2
+                    binding.cardDate.strokeColor = primaryColor
+                } else {
                     binding.cardDate.strokeWidth = 0
-                    binding.dateContainer.setBackgroundColor(
-                        MaterialColors.getColor(
-                            context,
-                            R.attr.colorSecondary,
-                            0
-                        )
-                    )
-                    binding.textViewDayOfWeek.setTextColor(
-                        MaterialColors.getColor(
-                            context,
-                            R.attr.colorOnPrimary,
-                            0
-                        )
-                    )
-                    binding.textViewDayOfMonth.setTextColor(
-                        MaterialColors.getColor(
-                            context,
-                            R.attr.colorOnPrimary,
-                            0
-                        )
-                    )
-                }
-
-                isToday -> {
-                    // Bugungi kun (lekin tanlanmagan)
-                    binding.cardDate.strokeWidth =
-                        (2f * context.resources.displayMetrics.density).toInt()
-                    binding.cardDate.strokeColor =
-                        MaterialColors.getColor(context, R.attr.colorPrimaryFixed, 0)
-                    binding.dateContainer.background = null
-                    binding.textViewDayOfWeek.setTextColor(
-                        MaterialColors.getColor(
-                            context,
-                            R.attr.colorPrimaryFixed,
-                            0
-                        )
-                    )
-                    binding.textViewDayOfMonth.setTextColor(
-                        MaterialColors.getColor(
-                            context,
-                            R.attr.colorPrimaryFixed,
-                            0
-                        )
-                    )
-                }
-
-                else -> {
-                    // Boshqa kunlar
-                    binding.cardDate.strokeWidth = 0
-                    binding.dateContainer.background = null
-                    binding.textViewDayOfWeek.setTextColor(
-                        MaterialColors.getColor(
-                            context,
-                            R.attr.colorOnSurfaceVariant,
-                            0
-                        )
-                    )
-                    binding.textViewDayOfMonth.setTextColor(
-                        MaterialColors.getColor(
-                            context,
-                            R.attr.colorOnSurface,
-                            0
-                        )
-                    )
                 }
             }
+        }
+
+        fun updateProgress(date: Date) {
+            val dateKey = date.dateApiFormat()
+            val summary = dailySummaries[dateKey]
+            val consumed = summary?.consumedCalories ?: 0
+            val max = if (targetCalories > 0) targetCalories else 1
+            val progress = (consumed.toFloat() / max * 100).toInt()
+            val isExceeded = consumed > targetCalories
+
+            binding.progressRing.max = 100
+            // Animate progress change
+            binding.progressRing.setProgressCompat(if (isExceeded) 100 else progress, true)
+            binding.progressRing.setIndicatorColor(if (isExceeded) redColor else greenColor)
         }
     }
 

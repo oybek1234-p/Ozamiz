@@ -1,22 +1,16 @@
 package uz.oybek.ozamiz.data.firebase
 
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.DataSnapshot
 
-val currentUserId: String?
-    get() = FirebaseAuth.getInstance().currentUser?.uid
-
-val currentUserLogsRoot: DatabaseReference?
-    get() = currentUserId?.let {
-        FirebaseDatabase.getInstance().reference
-            .child("logs")
-            .child(it)
+fun <T> DataSnapshot.getValueSafe(type: Class<T>, default: T? = null): T? {
+    return try {
+        getValue(type)
+    } catch (_: Exception) {
+        return default
     }
+}
 
-val currentUserRoot: DatabaseReference?
-    get() = currentUserId?.let {
-        FirebaseDatabase.getInstance().reference
-            .child("users")
-            .child(it)
-    }
+val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
+fun generateKey() = System.currentTimeMillis().toString()

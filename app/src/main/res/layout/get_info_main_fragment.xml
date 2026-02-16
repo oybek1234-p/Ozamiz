@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest">
+    android:background="?colorSurfaceContainer"
+    android:focusableInTouchMode="true">
 
     <uz.oybek.ozamiz.ui.base.MyToolBar
         android:id="@+id/toolbar"
@@ -13,30 +14,31 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:title="Profil ma'lumotlari" />
+        app:title="Ma'lumotlarim" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView_main_info"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@+id/save_button_container"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
             android:orientation="vertical"
-            android:paddingHorizontal="@dimen/dimen_18"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
             android:paddingBottom="24dp">
 
+            <!-- Ism -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/name_view"
-                android:layout_marginTop="@dimen/dimen_24"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ismingiz*">
+                android:hint="Ismingiz">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -44,24 +46,26 @@
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Jins -->
             <TextView
-                style="@style/TextLabelMedium"
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Jinsingizni belgilang*" />
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:text="Jinsingiz"
+                android:textColor="?colorOnSurfaceVariant" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/male"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:text="Erkak"
@@ -72,7 +76,7 @@
                     android:id="@+id/female"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="52dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:text="Ayol"
@@ -80,13 +84,14 @@
                     app:iconGravity="textStart" />
             </LinearLayout>
 
+            <!-- Yosh -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/age_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Yoshingiz*">
+                android:layout_marginTop="20dp"
+                android:hint="Yoshingiz">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -95,78 +100,95 @@
                     android:maxLength="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.divider.MaterialDivider style="@style/FormDivider" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/height_lay"
-                android:layout_marginTop="@dimen/dimen_12"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Bo'yingiz (sm)*"
-                app:suffixText="sm">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:maxLength="3" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/weight_input"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Vazningiz (kg)*"
-                app:suffixText="kg">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:maxLength="5" />
-            </com.google.android.material.textfield.TextInputLayout>
-
+            <!-- Bo'y va Vazn -->
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/height_lay"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:hint="Bo'y"
+                    app:suffixText="sm">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:maxLength="3" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/weight_input"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:hint="Vazn"
+                    app:suffixText="kg">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        android:maxLength="5" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+
+            <!-- Ideal vazn info -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/idealWeight_con"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:gravity="center"
-                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
                 android:visibility="gone"
+                app:cardBackgroundColor="?colorSurfaceContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
                 tools:visibility="visible">
 
-                <TextView
-                    android:id="@+id/textView_ideal_weight_info"
-                    style="@style/Title3_17"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ideal vazn:"
-                    android:textColor="?colorOnSurface" />
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                <TextView
-                    android:id="@+id/textView_ideal_weight_range"
-                    style="@style/Headline2_16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?colorPrimary"
-                    tools:text="60.5 kg - 75.2 kg" />
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/textView_ideal_weight_info"
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ideal vazn oralig'i"
+                        android:textColor="?colorOnSurfaceVariant" />
 
-            <com.google.android.material.divider.MaterialDivider style="@style/FormDivider" />
+                    <TextView
+                        android:id="@+id/textView_ideal_weight_range"
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="?colorPrimary"
+                        android:textStyle="bold"
+                        tools:text="60.5 - 75.2 kg" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
+            <!-- Maqsad vazn -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/target_weight_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_marginTop="@dimen/dimen_18"
                 android:layout_height="wrap_content"
-                android:hint="Siz istagan vazn (kg)"
+                android:layout_marginTop="20dp"
+                android:hint="Maqsad vazn"
                 app:suffixText="kg">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -178,93 +200,74 @@
 
             <TextView
                 android:id="@+id/target_weight_warning"
-                style="@style/Caption2_12"
+                style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:paddingStart="12dp"
+                android:paddingStart="4dp"
                 android:textColor="?colorError"
                 android:visibility="gone"
-                tools:text="Bu maqsad juda keskin." />
+                tools:text="Bu maqsad juda keskin"
+                tools:visibility="visible" />
 
+            <!-- Kundalik harakat -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/harakat_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Harakatingizni belgilang*">
+                android:layout_marginTop="20dp"
+                android:hint="Kundalik harakat">
 
                 <AutoCompleteTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.divider.MaterialDivider style="@style/FormDivider" />
-
-            <TextView
-                style="@style/TextLabelMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Qaysi biri sizga aloqador? (ixtiyoriy)"
-                android:visibility="gone" />
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_marginTop="8dp"
-                app:chipSpacingHorizontal="8dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/manzil_view"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="@string/yashaydi">
+                android:visibility="gone" />
 
-                <AutoCompleteTextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="none" />
-            </com.google.android.material.textfield.TextInputLayout>
-
+            <!-- Telefon -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/mobil_raqam_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:hint="Telefon raqam">
+                android:layout_marginTop="20dp"
+                android:hint="Telefon raqam"
+                app:startIconDrawable="@drawable/call_ic">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
+    <!-- SAQLASH TUGMASI -->
     <FrameLayout
         android:id="@+id/save_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurfaceContainerLow"
-        android:padding="16dp"
+        android:background="?colorSurfaceContainerLowest"
+        android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/save"
-            style="@style/FilledButton"
+            style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/davom_etish"
-            app:icon="@drawable/arrow_right"
-            app:iconGravity="textEnd"
-            app:iconPadding="@dimen/dimen_8" />
+            android:layout_height="56dp"
+            android:text="@string/save"
+            android:textSize="16sp"
+            app:cornerRadius="12dp" />
 
         <ProgressBar
             android:id="@+id/progress_bar"

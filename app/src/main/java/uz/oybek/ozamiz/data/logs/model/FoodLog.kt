@@ -2,10 +2,11 @@ package uz.oybek.ozamiz.data.logs.model
 
 import androidx.annotation.Keep
 import com.google.firebase.database.ServerValue
+import uz.oybek.ozamiz.data.logs.base.LogItem
 
 @Keep
 data class FoodLog(
-    var logId: String = "",
+    override var logId: String = "",
     var description: String = "",
     var calories: Int = 0,
     var protein: Double? = null,
@@ -15,9 +16,9 @@ data class FoodLog(
     var photoUrl: String? = null,
     var aiInsights: String? = null,
     var aiGenerated: Boolean = true,
-    var healthLevel: String? = null,
+    var healthLevel: Int? = null,
     var timestamp: Any = ServerValue.TIMESTAMP
-) {
+) : LogItem {
     constructor() : this(
         "",
         "",

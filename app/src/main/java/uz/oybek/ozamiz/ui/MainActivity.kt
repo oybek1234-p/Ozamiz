@@ -10,6 +10,7 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -77,23 +78,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initUser()
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
-            )
-            insets
-        }
 
         binding.apply {
             navHost =
@@ -112,7 +102,6 @@ class MainActivity : AppCompatActivity() {
             checkRegisterDate()
             if (user.name.isEmpty()) {
                 graph.setStartDestination(R.id.onboarding)
-            } else {
                 graph.setStartDestination(R.id.home)
             }
         } else {
@@ -122,6 +111,10 @@ class MainActivity : AppCompatActivity() {
 
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
+        
+        lifecycleScope.launch {
+            uz.oybek.ozamiz.data.lessons.LessonSeeder.seedData()
+        }
     }
 
     private fun checkRegisterDate() {

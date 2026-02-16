@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    
+
+
+
     <item android:id="@+id/home"
-        android:title="Asosiy"
-        android:icon="@drawable/home_ic"
+        android:title="Sanash"
+        android:icon="@drawable/calculate_ic"
         />
 
-    <item android:id="@+id/foods"
-        android:visible="false"
-        android:title="Ovqat"
-        android:icon="@drawable/food_ic"
+
+    <item android:id="@+id/aiChatFragment"
+        android:title="Dietolog"
+        android:icon="@drawable/chat_ic"
         />
 
     <item android:id="@+id/natijaFragment2"
-        android:title="Natija"
-        android:visible="false"
+        android:title="@string/natija_title"
+        android:visible="true"
         android:icon="@drawable/progress_ic"
         />
 

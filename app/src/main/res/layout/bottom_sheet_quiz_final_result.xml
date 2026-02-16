@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_bg"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <ImageView
+        android:id="@+id/imgResultIcon"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/check_circle_ic"
+        app:tint="@color/green" />
+
+    <TextView
+        android:id="@+id/textResultTitle"
+        style="@style/TextAppearance.Material3.HeadlineMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Tabriklaymiz!"
+        android:textAlignment="center"
+        android:textColor="?colorOnSurface"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textResultScore"
+        style="@style/TextAppearance.Material3.BodyLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:text="Siz 10 tadan 8 tasini to'g'ri topdingiz"
+        android:textAlignment="center"
+        android:textColor="?colorOnSurfaceVariant" />
+        
+    <TextView
+        android:id="@+id/textResultPercentage"
+        style="@style/TextAppearance.Material3.TitleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="32dp"
+        android:text="80%"
+        android:textColor="?colorPrimary"
+        android:textStyle="bold" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnExit"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Darsliklar bo'limiga qaytish"
+        android:textColor="@color/white"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="16sp"
+        app:backgroundTint="?colorPrimary"
+        app:cornerRadius="16dp" />
+
+</LinearLayout>

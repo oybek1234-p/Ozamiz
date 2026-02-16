@@ -1,0 +1,8 @@
+@echo off
+set OUTPUT_FILE=all_code.txt
+del %OUTPUT_FILE%
+for R %%f in (.java .kt .xml) do (
+    echo --------- %%f ---------  %OUTPUT_FILE%
+    type %%f  %OUTPUT_FILE%
+    echo.  %OUTPUT_FILE%
+)

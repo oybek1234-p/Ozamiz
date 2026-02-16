@@ -71,7 +71,7 @@
         <!-- Chip stili -->
         <style name="Widget.App.Chip" parent="Widget.Material3.Chip.Assist">
             <!-- Assist chip ko'rinishidan meros oladi -->
-            <item name="chipBackgroundColor">#316750A4</item>
+            <item name="chipBackgroundColor">?colorPrimaryContainer</item>
             <item name="android:textColor">@color/colorPrimary</item>
             <item name="chipCornerRadius">8dp</item>
             <item name="closeIconVisible">false</item> <!-- O'chirish ikonasini yashirish -->
@@ -122,13 +122,15 @@
         <item name="android:layout_weight">1</item>
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center</item>
-    </style>c
+    </style>
 
     <style name="WidgetAppChipChoice" parent="Widget.Material3.Chip.Filter">
         <item name="chipBackgroundColor">@color/chip_meal_type_background</item>
         <item name="android:textColor">@color/chip_meal_type_text</item>
-        <item name="chipStrokeWidth">0dp</item>
-        <item name="chipCornerRadius">8dp</item>
+        <item name="chipStrokeWidth">0.5dp</item>
+        <item name="chipCornerRadius">18dp</item>
+        <item name="fontFamily">@font/roboto_regular</item>
+        <item name="android:textSize">15sp</item>
         <item name="checkedIconVisible">false</item>
         <item name="closeIconVisible">false</item>
     </style>
@@ -185,7 +187,7 @@
             <item name="android:layout_height">wrap_content</item>
             <item name="android:orientation">vertical</item>
             <item name="android:padding">12dp</item>
-            <item name="android:background">#F0FAFD</item>
+            <item name="android:background">?colorSurfaceContainerLow</item>
             <item name="android:gravity">center</item>
         </style>
 

@@ -1,46 +1,144 @@
 package uz.oybek.ozamiz.data.firebase.uploader
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
+import androidx.core.net.toUri
+import id.zelory.compressor.Compressor
+import id.zelory.compressor.constraint.format
+import id.zelory.compressor.constraint.quality
+import id.zelory.compressor.constraint.resolution
+import id.zelory.compressor.constraint.size
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.util.handleException
-import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 object ImageCompressor {
 
+    suspend fun compressImageFile(
+        uri: Uri,
+        maxSizeKb: Int = 20
+    ): File? = withContext(Dispatchers.IO) {
+        try {
+            val file = fromUri(uri) ?: return@withContext null
+
+            val compressedFile = Compressor.compress(appContext, file) {
+                resolution(200, 200)
+                quality(60)
+                format(Bitmap.CompressFormat.WEBP)
+                size(maxSizeKb * 1024L)
+            }
+
+            launch {
+                if (file.exists()) file.delete()
+            }
+            compressedFile
+        } catch (e: Exception) {
+            handleException(e)
+            null
+        }
+    }
+
     suspend fun compressImage(
         uri: Uri,
-        maxSizeKb: Int
-    ): DataWrapper<ByteArray> =
-        withContext(Dispatchers.IO) {
-            return@withContext try {
-                val bitmap = BitmapFactory.decodeStream(
-                    appContext.contentResolver.openInputStream(uri)
-                ) ?: return@withContext DataWrapper.Error()
+        maxSizeKb: Int = 30
+    ): DataWrapper<ByteArray> = withContext(Dispatchers.IO) {
+        try {
+            val file = fromUri(uri) ?: return@withContext DataWrapper.Error()
 
-                var quality = 100
-                var byteArray: ByteArray
-                val baos = ByteArrayOutputStream()
-
-                do {
-                    baos.reset()
-                    bitmap.compress(Bitmap.CompressFormat.WEBP, quality, baos)
-                    byteArray = baos.toByteArray()
-                    quality -= 5
-
-                    if (quality < 0) {
-                        return@withContext DataWrapper.Error()
-                    }
-                } while (byteArray.size > maxSizeKb * 1024)
-                bitmap.recycle()
-                DataWrapper.Success(byteArray)
-            } catch (e: Exception) {
-                handleException(e)
-                DataWrapper.Error()
+            val compressedFile = Compressor.compress(appContext, file) {
+                resolution(200, 200)
+                quality(60)
+                format(Bitmap.CompressFormat.WEBP)
+                size(maxSizeKb * 1024L)
             }
+
+            val byteArray = compressedFile.readBytes()
+
+            launch {
+                if (file.exists()) file.delete()
+                if (compressedFile.exists() && compressedFile != file) compressedFile.delete()
+            }
+            DataWrapper.Success(byteArray)
+        } catch (e: Exception) {
+            handleException(e)
+            DataWrapper.Error()
         }
+    }
+
+    suspend fun compressImageToUri(
+        uri: Uri,
+        maxWidth: Int = 1024,
+        maxHeight: Int = 1024,
+        quality: Int = 80,
+        maxSizeKb: Int = 50
+    ): Uri? = withContext(Dispatchers.IO) {
+        val originalFile = fromUri(uri) ?: return@withContext null
+
+        try {
+            val compressedFile = Compressor.compress(appContext, originalFile) {
+                resolution(maxWidth, maxHeight)
+                quality(quality)
+                format(Bitmap.CompressFormat.WEBP)
+                size(maxSizeKb * 1024L)
+            }
+
+            launch {
+                if (originalFile.exists()) originalFile.delete()
+            }
+            compressedFile.toUri()
+        } catch (e: Exception) {
+            handleException(e)
+            null
+        }
+    }
+
+    suspend fun compressImageToFile(
+        uri: Uri,
+        maxWidth: Int = 1024,
+        maxHeight: Int = 1024,
+        quality: Int = 80,
+        maxSizeKb: Int = 50
+    ): File? = withContext(Dispatchers.IO) {
+        val originalFile = fromUri(uri) ?: return@withContext null
+
+        try {
+            val compressedFile = Compressor.compress(appContext, originalFile) {
+                resolution(maxWidth, maxHeight)
+                quality(quality)
+                format(Bitmap.CompressFormat.WEBP)
+                size(maxSizeKb * 1024L)
+            }
+
+            launch {
+                if (originalFile.exists()) originalFile.delete()
+            }
+            compressedFile
+        } catch (e: Exception) {
+            handleException(e)
+            null
+        }
+    }
+
+    private fun fromUri(uri: Uri): File? {
+        return try {
+            val inputStream = appContext.contentResolver.openInputStream(uri)
+                ?: return null
+            val file = File(
+                appContext.cacheDir,
+                "temp_image_${System.currentTimeMillis()}.webp"
+            )
+            val outputStream = FileOutputStream(file)
+            inputStream.copyTo(outputStream)
+            inputStream.close()
+            outputStream.close()
+            file
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

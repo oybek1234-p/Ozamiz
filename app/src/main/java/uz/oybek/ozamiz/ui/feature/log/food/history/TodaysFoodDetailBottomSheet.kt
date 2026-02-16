@@ -1,7 +1,5 @@
 package uz.oybek.ozamiz.ui.feature.log.food.history
 
-import LogFoodViewModel
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +15,10 @@ import com.google.gson.Gson
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.BottomSheetTodaysFoodDetailBinding
+import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
+import uz.oybek.ozamiz.ui.feature.log.food.LogFoodViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class TodaysFoodDetailBottomSheet : BottomSheetDialogFragment() {
@@ -41,6 +43,7 @@ class TodaysFoodDetailBottomSheet : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.BottomSheetStyle)
         arguments?.getString(ARG_FOOD_LOG)?.let {
             foodLog = Gson().fromJson(it, FoodLog::class.java)
         } ?: dismiss()
@@ -60,52 +63,38 @@ class TodaysFoodDetailBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun displayFoodLog() {
-        binding.imageViewFoodDetail.isVisible = !foodLog.photoUrl.isNullOrEmpty()
+        // Rasm
         if (!foodLog.photoUrl.isNullOrEmpty()) {
-            Glide.with(this).load(foodLog.photoUrl).placeholder(R.drawable.placeholder_food)
-                .error(R.drawable.placeholder_food).into(binding.imageViewFoodDetail)
+            Glide.with(this).load(foodLog.photoUrl).placeholder(R.drawable.placeholder_food).into(binding.imageViewFoodDetail)
         }
 
-        binding.textViewFoodDescriptionDetail.text = foodLog.description
-        binding.textViewDetailCalories.text = getString(R.string.calories_format, foodLog.calories)
-        binding.textViewEstimatedProtein.text = formatMacro(foodLog.protein)
-        binding.textViewEstimatedFat.text = formatMacro(foodLog.fat)
-        binding.textViewEstimatedCarbs.text = formatMacro(foodLog.carbs)
+        // Vaqt
+        val timestamp = foodLog.timestamp as? Long
+        if (timestamp != null) {
+            val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+            binding.textViewTimestampDetail.text = dateFormat.format(Date(timestamp))
+        }
 
-        setupHealthinessIndicator(foodLog.healthLevel, foodLog.aiInsights)
+        // Asosiy ma'lumotlar
+        binding.textViewFoodDescriptionDetail.text = foodLog.description
+        binding.textViewDetailCalories.text = foodLog.calories.toString()
+
+        // Makrolar
+        bindMacro(binding.layoutProteinDetail, "Protein", foodLog.protein, R.color.green)
+        bindMacro(binding.layoutCarbsDetail, "Carbs", foodLog.carbs, R.color.yellow)
+        bindMacro(binding.layoutFatDetail, "Fats", foodLog.fat, R.color.rejected)
+
+        // AI Insight
+        if (!foodLog.aiInsights.isNullOrBlank()) {
+            binding.cardAiHealthDetail.isVisible = true
+            binding.textViewHealthFeedbackDetail.text = foodLog.aiInsights
+        }
     }
 
-    private fun setupHealthinessIndicator(level: String?, advice: String?) {
-        binding.layoutHealthFeedbackDetail.isVisible = !advice.isNullOrBlank()
-        if (advice.isNullOrBlank()) return
-
-        val (colorRes, iconRes, textColorRes) = when (level) {
-            "GOOD" -> Triple(R.color.green_alpha_10, R.drawable.check_circle_ic, R.color.green)
-            "MODERATE" -> Triple(
-                R.color.yellow_alpha_10, R.drawable.warning_24px, R.color.yellowDark
-            )
-
-            "POOR" -> Triple(R.color.red_alpha_10, R.drawable.cancel_ic, R.color.rejected)
-            else -> Triple(R.color.grey_alpha_50, R.drawable.info_ic, R.color.black)
-        }
-
-        binding.layoutHealthFeedbackDetail.backgroundTintList = ColorStateList.valueOf(
-            ContextCompat.getColor(
-                requireContext(), colorRes
-            )
-        )
-        binding.iconHealthFeedbackDetail.setImageResource(iconRes)
-        binding.iconHealthFeedbackDetail.setColorFilter(
-            ContextCompat.getColor(
-                requireContext(), textColorRes
-            )
-        )
-        binding.textViewHealthFeedbackDetail.text = advice
-        binding.textViewHealthFeedbackDetail.setTextColor(
-            ContextCompat.getColor(
-                requireContext(), textColorRes
-            )
-        )
+    private fun bindMacro(layout: ItemMacroDisplayBinding, name: String, value: Double?, colorRes: Int) {
+        layout.textViewMacroName.text = name
+        layout.textViewMacroValue.text = "${value?.toInt() ?: 0}g"
+        layout.textViewMacroValue.setTextColor(ContextCompat.getColor(requireContext(), colorRes))
     }
 
     private fun setupListeners() {
@@ -124,27 +113,22 @@ class TodaysFoodDetailBottomSheet : BottomSheetDialogFragment() {
         dismiss()
         val bundle = Bundle().apply {
             putString("logToEditJson", Gson().toJson(foodLog))
-            putLong(
-                "selectedDateTimestamp", (foodLog.timestamp as? Long) ?: System.currentTimeMillis()
-            )
+            putLong("selectedDateTimestamp", (foodLog.timestamp as? Long) ?: System.currentTimeMillis())
         }
-        findNavController().navigate(R.id.logFoodFragment, bundle)
+
     }
 
     private fun showDeleteConfirmation() {
-        AlertDialog.Builder(requireContext()).setTitle(R.string.confirm_delete_title).setMessage(
-            getString(
-                R.string.confirm_delete_message_generic,
-                foodLog.description.ifBlank { "bu ovqatni" })
-        ).setPositiveButton(R.string.yes_delete) { _, _ ->
-            viewModel.deleteFoodLog(foodLog)
-            dismiss()
-        }.setNegativeButton(R.string.no, null).show()
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.confirm_delete_title)
+            .setMessage(getString(R.string.confirm_delete_message_generic, foodLog.description))
+            .setPositiveButton(R.string.yes_delete) { _, _ ->
+             //   viewModel.deleteFoodLog(foodLog)
+                dismiss()
+            }
+            .setNegativeButton(R.string.no, null)
+            .show()
     }
-
-    private fun formatMacro(value: Double?): String =
-        value?.let { String.Companion.format(Locale.US, "%.1f g", it) }
-            ?: getString(R.string.not_available_short)
 
     override fun onDestroyView() {
         super.onDestroyView()

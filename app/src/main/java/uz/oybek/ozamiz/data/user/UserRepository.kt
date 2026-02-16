@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.user
 
+import uz.oybek.ozamiz.data.streak.StreakInfo
 import android.net.Uri
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -11,18 +12,15 @@ import com.google.firebase.database.OnDisconnect
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
-import com.google.firebase.messaging.messaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.getValueSafe
-import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.notification.AppMessagingService
+
 import uz.oybek.ozamiz.util.handleException
 import java.util.Date
 import kotlin.coroutines.resume
@@ -40,37 +38,35 @@ object UserRepository {
         if (userId.isBlank()) return DataWrapper.Error("Foydalanuvchi ID si bo'sh")
         val userSpecificPaymentPath = "$PAYMENT_CHECK_PHOTOS_PATH/$userId" // <<< YENI YO'L
 
-        return try {
-            val uploadResult = ImageUploader.uploadImage(
-                checkImageUri,
-                userSpecificPaymentPath
-            ) // <<< O'ZGARTIRILDI
-            when (uploadResult) {
-                is DataWrapper.Success -> {
-                    val imageUrl = uploadResult.data
-                    val updates = mapOf(
-                        User::paymentChecking.name to true,
-                        User::paymentCheckPhotoUrl.name to imageUrl,
-                        // User::premiumDate.name to ServerValue.TIMESTAMP // Mark submission time
-                    )
-                    usersReference.child(userId).updateChildren(updates).await()
-                    // Update local user
-                    updateUser {
-                        it.paymentChecking = true
-                        it.paymentCheckPhotoUrl = imageUrl
-                        // it.premiumDate = System.currentTimeMillis() // Approximate, server time is better
-                    }
-                    DataWrapper.Success(Unit)
-                }
-
-                is DataWrapper.Error -> {
-                    DataWrapper.Error("Chek rasmini yuklashda xatolik: ${uploadResult.error}")
-                }
-            }
-        } catch (e: Exception) {
-            handleException(e, "UploadPremiumCheckDataError")
-            DataWrapper.Error(e.localizedMessage ?: "Chek ma'lumotlarini yuklashda xatolik")
-        }
+        return DataWrapper.Error()
+//        return try {
+////            val uploadResult = ImageUploader.uploadImage(
+////                checkImageUri,
+////                userSpecificPaymentPath
+////            ) // <<< O'ZGARTIRILDI
+////            when (uploadResult) {
+////                is DataWrapper.Success -> {
+////                    val imageUrl = uploadResult.data
+////                    val updates = mapOf(
+////                        User::paymentChecking.name to true,
+////                        User::paymentCheckPhotoUrl.name to imageUrl,
+////                        // User::premiumDate.name to ServerValue.TIMESTAMP // Mark submission time
+////                    )
+////                    usersReference.child(userId).updateChildren(updates).await()
+////                    // Update local user
+////                    updateUser {
+////                        it.paymentChecking = true
+////                        it.paymentCheckPhotoUrl = imageUrl
+////                        // it.premiumDate = System.currentTimeMillis() // Approximate, server time is better
+////                    }
+////                    DataWrapper.Success(Unit)
+////                }
+////
+////
+//        } catch (e: Exception) {
+//            handleException(e, "UploadPremiumCheckDataError")
+//            DataWrapper.Error(e.localizedMessage ?: "Chek ma'lumotlarini yuklashda xatolik")
+//        }
     }
 
     private val usersReference: DatabaseReference by lazy {
@@ -99,7 +95,7 @@ object UserRepository {
             "unreadMessages" to unreadMessages,
             "premium" to premium,
             "premiumDate" to premiumDate,
-            "pushToken" to pushToken,
+
             "gender" to gender,
             "region" to region,
             "age" to age,
@@ -111,7 +107,7 @@ object UserRepository {
             "targetCalories" to targetCalories,
             "targetWaterMl" to targetWaterMl,
             "problems" to problems,
-            "reminderSettings" to reminderSettings,
+
             "streakInfo" to streakInfo,
             "lastWeightLogTimestamp" to lastWeightLogTimestamp,
             "avatarUrl" to avatarUrl,
@@ -204,7 +200,7 @@ object UserRepository {
             val users = snapshot.children.mapNotNull { it.getValue(User::class.java) }
             DataWrapper.Success(users)
         } catch (e: Exception) {
-            handleException(e, "GetPendingPremiumUsersError")
+            handleException(e)
             DataWrapper.Error(
                 e.localizedMessage ?: "Tekshiruvdagi foydalanuvchilarni yuklashda xatolik"
             )
@@ -247,7 +243,7 @@ object UserRepository {
     }
 
     fun signOut() {
-        Firebase.messaging.unsubscribeFromTopic(LocalUser.user.uid + "topic")
+
         Firebase.auth.signOut()
         LocalUser.user = User()
         LocalUser.saveUser()
@@ -302,8 +298,6 @@ object UserRepository {
         val isNewUser = (networkUser == null || networkUser.valid.not())
 
         return if (isNewUser) {
-            val pushToken = AppMessagingService.loadToken()
-
             val newUser = User(
                 uid = id,
                 name = "",
@@ -313,7 +307,6 @@ object UserRepository {
                 unreadMessages = 0,
                 premium = false,
                 premiumDate = 0L,
-                pushToken = pushToken ?: "",
                 registerDate = Date(),
                 startWeight = null,
                 paymentChecking = false,
@@ -339,11 +332,7 @@ object UserRepository {
         }
     }
 
-    fun updatePushToken(newPushToken: String) {
-        if (newPushToken.isEmpty()) return
-        if (LocalUser.user.valid.not()) return
-        usersReference.child(LocalUser.user.uid).child(User::pushToken.name).setValue(newPushToken)
-    }
+
 
     private suspend fun loadUser(id: String) = suspendCoroutine { sus ->
         val reference = usersReference.child(id)

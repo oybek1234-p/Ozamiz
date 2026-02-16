@@ -1,0 +1,66 @@
+{
+  "rules": {
+    "users": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('admin').val() === true",
+      ".write": false,
+      ".indexOn": ["paymentChecking", "admin"],
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('admin').val() === true)",
+        ".write": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('admin').val() === true)",
+        "admin": {
+          ".validate": "newData.isBoolean() && (root.child('users').child(auth.uid).child('admin').val() === true || (auth.uid === $uid && (newData.val() === false || newData.val() === data.val())))"
+        },
+        "$other": { ".validate": "data.exists() || newData.exists()" }
+      }
+    },
+    "logs": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('admin').val() === true)",
+        ".write": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('admin').val() === true)",
+        
+        "$date": {
+          ".validate": "$date.matches(/^\\d{4}-\\d{2}-\\d{2}$/)",
+          
+          "$logType": {
+            "$logId": {
+              ".validate": "newData.hasChild('timestamp')"
+            }
+          }
+        }
+      }
+    },
+    "daily_logs": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('admin').val() === true)",
+        ".write": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('admin').val() === true)",
+        
+        "$date": {
+          ".validate": "$date.matches(/^\\d{4}-\\d{2}-\\d{2}$/)",
+          
+          "$logType": {
+            "$logId": {
+              ".validate": "newData.hasChild('timestamp')"
+            }
+          }
+        }
+      }
+    },
+    "daily_summaries": {
+      "$userId": {
+        ".read": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('admin').val() === true)",
+        ".write": "auth != null && (auth.uid === $userId || root.child('users').child(auth.uid).child('admin').val() === true)",
+        "$date": {
+          ".validate": "$date.matches(/^\\d{4}-\\d{2}-\\d{2}$/)"
+        }
+      }
+    },
+    "paymentCard": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('admin').val() === true"
+    },
+    "premiumPrice": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('admin').val() === true"
+    }
+  }
+}

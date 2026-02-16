@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?colorSurfaceContainer"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <TextView
+        style="@style/Title3_17"
+        android:layout_marginVertical="@dimen/dimen_18"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="Nima yedingiz?"
+        android:textColor="?colorOnSurface" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout_description"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="@dimen/dimen_18"
+            android:layout_height="wrap_content"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top"
+                android:hint="1 kosa uy osh, bir bo'lak oq non ..."
+                android:minLines="3"
+                android:textColorHint="?colorOnSurfaceVariant"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_analyze_and_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_12"
+        android:layout_marginHorizontal="16dp"
+        android:text="Foydasini bilish"
+        app:icon="@drawable/arrow_right"
+        app:iconGravity="textEnd" />
+
+</LinearLayout>

@@ -13,6 +13,7 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.utils.DataWrapper
 
 data class AddWeightPhotoUiState(
@@ -24,7 +25,6 @@ data class AddWeightPhotoUiState(
 
 class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = WeightLogRepository()
 
     private val _uiState = MutableStateFlow(AddWeightPhotoUiState())
     val uiState: StateFlow<AddWeightPhotoUiState> = _uiState.asStateFlow()
@@ -52,26 +52,31 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
         }
 
         _uiState.update { it.copy(isLoading = true, error = null) }
-
+//
         viewModelScope.launch {
-            val result = repository.addLog(weightKg, imageUri)
+            val result = WeightLogRepository.add(userId, weightKg, imageUri)
 
             when (result) {
                 is DataWrapper.Success -> {
                     // Muvaffaqiyatli saqlangandan so'ng LocalUserni yangilash
                     val newLog = result.data
-                    LocalUser.user = LocalUser.user.copy(
-                        lastWeightLogTimestamp = newLog.timestamp?.time
-                            ?: System.currentTimeMillis(),
+                    
+                    LocalUser.update {
+                        lastWeightLogTimestamp = System.currentTimeMillis()
                         avatarUrl = newLog.photoUrl // Profil rasmini yangilash
-                    )
-                    LocalUser.saveUser()
+                        weight = weightKg // Update Current Weight!
+                        
+                        if (startWeight == null || startWeight == -1.0) {
+                            startWeight = weightKg // Set Start Weight if not set
+                        }
+                    }
 
-                    // Firebase'da foydalanuvchi ma'lumotlarini yangilash (agar kerak bo'lsa)
-                    // Bu UserRepository orqali amalga oshirilishi mumkin
+                    // Firebase'da foydalanuvchi ma'lumotlarini yangilash
                     UserRepository.updateUser { userToUpdate ->
                         userToUpdate.lastWeightLogTimestamp = LocalUser.user.lastWeightLogTimestamp
                         userToUpdate.avatarUrl = LocalUser.user.avatarUrl
+                        userToUpdate.weight = LocalUser.user.weight
+                        userToUpdate.startWeight = LocalUser.user.startWeight
                     }
                     _uiState.update { it.copy(isLoading = false, logAddedSuccessfully = true) }
                 }

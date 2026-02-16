@@ -4,5 +4,5 @@ object ImagePaths {
 
     const val main = "ozamiz"
     const val weightLog = "weightLog"
-    const val loggedFood = "loggedFood"
+    const val ANALYZE_FOOD = "analyzedFood"
 }

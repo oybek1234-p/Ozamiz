@@ -12,13 +12,20 @@ android {
     namespace = "uz.oybek.ozamiz"
     compileSdk = 36
 
+    packagingOptions {
+        resources {
+            excludes += "META-INF/DEPENDENCIES"
+            excludes += "META-INF/INDEX.LIST"
+        }
+    }
+
     defaultConfig {
 
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 37
-        versionName = "2.0"
+        targetSdk = 36
+        versionCode = 45
+        versionName = "2.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -67,11 +74,12 @@ dependencies {
     implementation(libs.play.services.auth)
     implementation(libs.androidx.paging.common.android)
     implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.common)
 
     val nav_version = "2.8.1"
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
-    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
 
     implementation("com.github.vacxe:phonemask:1.0.5")
     implementation("com.google.firebase:firebase-auth")
@@ -102,11 +110,15 @@ dependencies {
     implementation("com.github.ozcanalasalvar.picker:wheelview:2.0.7")
     implementation("com.github.ozcanalasalvar.picker:datepicker:2.0.7")
 
-    implementation("com.google.firebase:firebase-ai")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.2")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-messaging")
 
-    implementation("com.google.firebase:firebase-analytics") // (Ixtiyoriy, lekin ko'pincha birga ishlatiladi)
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation(libs.google.firebase.ai)
+
 }

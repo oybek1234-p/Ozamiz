@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="?colorSurfaceContainerLowest"
+        android:background="?colorSurfaceContainer"
         android:paddingHorizontal="@dimen/dimen_24"
         android:paddingTop="@dimen/dimen_12"
         android:paddingBottom="@dimen/dimen_24">

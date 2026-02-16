@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="12dp">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/imgHistoryPhoto"
+        android:layout_width="48dp"
+        android:layout_height="60dp"
+
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Small"
+        tools:visibility="visible"
+        tools:src="@color/grey_line" />
+
+    <!-- Date (Day and Month) -->
+    <LinearLayout
+        android:layout_marginStart="@dimen/dimen_18"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:minWidth="60dp">
+        
+        <TextView
+            android:id="@+id/tvHistoryDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            tools:text="15 May" />
+
+        <TextView
+            android:id="@+id/tvHistoryTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="12sp"
+            tools:text="08:30" />
+    </LinearLayout>
+
+    <!-- Photo Thumbnail -->
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <!-- Weight Info -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end"
+        android:layout_marginEnd="16dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+             <TextView
+                android:id="@+id/tvHistoryChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:textSize="13sp"
+                android:letterSpacing="-0.02"
+                android:layout_marginEnd="8dp"
+                tools:text="-0.5"
+                tools:textColor="#4CAF50" />
+
+            <TextView
+                android:id="@+id/tvHistoryWeight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="17sp"
+                tools:text="92.5 kg" />
+        </LinearLayout>
+        
+
+
+    </LinearLayout>
+
+    <!-- Delete Action -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDelete"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        app:icon="@drawable/delete_ic"
+        app:iconTint="?attr/colorError"
+        app:rippleColor="?attr/colorErrorContainer" />
+
+</LinearLayout>

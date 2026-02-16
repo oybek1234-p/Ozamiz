@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.log.photo
 
+import uz.oybek.ozamiz.data.logs.model.WeightLog
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -7,16 +9,17 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.databinding.ItemWeightPhotoLogBinding
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class WeightPhotoLogAdapter(
     private val onItemClick: (WeightLog) -> Unit
 ) : ListAdapter<WeightLog, WeightPhotoLogAdapter.ViewHolder>(WeightPhotoLogDiffCallback()) {
 
-    private val dateFormat = SimpleDateFormat("dd-MMMM, yyyy HH:mm", Locale("uz", "UZ")) // Adjust locale if needed
+    private val dateFormat =
+        SimpleDateFormat("dd-MMMM, yyyy HH:mm", Locale("uz", "UZ")) // Adjust locale if needed
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemWeightPhotoLogBinding.inflate(
@@ -42,7 +45,7 @@ class WeightPhotoLogAdapter(
 
         fun bind(log: WeightLog) {
             binding.textViewLogWeight.text = String.format(Locale.US, "%.1f kg", log.weightKg)
-            binding.textViewLogDate.text = log.timestamp?.let { dateFormat.format(it) } ?: "Noma'lum vaqt"
+            binding.textViewLogDate.text = dateFormat.format(Date(log.timestampLong))
 
             Glide.with(itemView.context)
                 .load(log.photoUrl)
@@ -54,7 +57,7 @@ class WeightPhotoLogAdapter(
 
     class WeightPhotoLogDiffCallback : DiffUtil.ItemCallback<WeightLog>() {
         override fun areItemsTheSame(oldItem: WeightLog, newItem: WeightLog): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.logId == newItem.logId
         }
 
         override fun areContentsTheSame(oldItem: WeightLog, newItem: WeightLog): Boolean {

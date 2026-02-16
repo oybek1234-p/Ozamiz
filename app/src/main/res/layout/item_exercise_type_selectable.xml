@@ -9,53 +9,39 @@
     android:layout_marginBottom="4dp"
     android:clickable="true"
     android:focusable="true"
+    app:cardBackgroundColor="@android:color/transparent"
     app:cardElevation="0dp"
-    app:cardCornerRadius="8dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="?colorOutlineVariant"
-    app:checkedIcon="@drawable/check_ic"
-    app:checkedIconTint="?colorPrimary"
-    app:cardBackgroundColor="@android:color/transparent"> <!-- Make background transparent -->
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout_exercise_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="16dp">
 
-        <ImageView
+        <TextView
             android:id="@+id/iv_exercise_icon_selectable"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginEnd="12dp"
+            android:gravity="center"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:src="@drawable/walking"/>
+            tools:text="🚶" />
 
         <TextView
             android:id="@+id/tv_exercise_name_selectable"
             style="@style/Headline2_16"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
             android:textColor="?colorOnSurface"
+            app:layout_constraintBottom_toBottomOf="@id/iv_exercise_icon_selectable"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_exercise_icon_selectable"
             app:layout_constraintTop_toTopOf="@id/iv_exercise_icon_selectable"
-            app:layout_constraintBottom_toBottomOf="@id/iv_exercise_icon_selectable"
-            app:layout_constraintEnd_toStartOf="@+id/radio_button_selected"
             tools:text="Piyoda yurish" />
-
-        <RadioButton
-            android:id="@+id/radio_button_selected"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

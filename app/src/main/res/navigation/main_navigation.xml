@@ -3,7 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
-    app:startDestination="@id/authFragment">
+    app:startDestination="@id/home">
+
+    <fragment
+        android:id="@+id/tasksFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.tasks.TasksFragment"
+        android:label="Vazifalar"
+        tools:layout="@layout/fragment_tasks" />
 
     <fragment
         android:id="@+id/profileFragment"
@@ -52,6 +58,20 @@
         <action
             android:id="@+id/action_profileFragment_to_weightPhotoHistoryFragment"
             app:destination="@id/weightPhotoHistoryFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_profileFragment_to_adminLessonsFragment"
+            app:destination="@id/adminLessonsFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_profileFragment_to_lessonsHomeFragment"
+            app:destination="@id/lessonsHomeFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
@@ -110,7 +130,7 @@
             app:popExitAnim="@anim/fragment_pop_exit" />
         <action
             android:id="@+id/action_authFragment_to_home"
-            app:destination="@id/home"
+            app:destination="@id/mainFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
@@ -134,7 +154,7 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_loginGmailFragment_to_home"
-            app:destination="@id/home"
+            app:destination="@id/mainFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
@@ -153,36 +173,62 @@
 
     <fragment
         android:id="@+id/home"
-        android:name="uz.oybek.ozamiz.ui.feature.home.HomeFragment"
-        android:label="HomeFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.home.LogFragment"
+        android:label="LogFragment"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_home_to_logFoodFragment"
-            app:destination="@id/logFoodFragment"
+            android:id="@+id/action_home_to_menuListFragment"
+            app:destination="@id/menuListFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
         <action
-            android:id="@+id/action_home_to_logExerciseFragment"
-            app:destination="@id/logExerciseFragment"
+            android:id="@+id/action_home_to_calorieInfoFragment"
+            app:destination="@id/calorieInfoFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
         <action
-            android:id="@+id/action_home_to_logWaterDialog"
-            app:destination="@id/logWaterDialog" />
-        <action
-            android:id="@+id/action_home_to_foods"
-            app:destination="@id/foods"
+            android:id="@+id/action_home_to_macroInfoFragment"
+            app:destination="@id/macroInfoFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
-
     </fragment>
 
+    <fragment
+        android:id="@+id/calorieInfoFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.home.CalorieInfoFragment"
+        android:label="CalorieInfoFragment"
+        tools:layout="@layout/fragment_calorie_info" />
+
+    <fragment
+        android:id="@+id/macroInfoFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.home.MacroInfoFragment"
+        android:label="MacroInfoFragment"
+        tools:layout="@layout/fragment_macro_info">
+        <argument
+            android:name="macro_type"
+            app:argType="string"
+            android:defaultValue="protein" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.main.MainFragment"
+        android:label="MainFragment"
+        tools:layout="@layout/main_fragment">
+        <action
+            android:id="@+id/action_mainFragment_to_menuListFragment"
+            app:destination="@id/menuListFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/logFoodFragment"
@@ -205,6 +251,24 @@
         <action
             android:id="@+id/action_logFoodFragment_to_calorieResultBottomSheet"
             app:destination="@id/calorieResultBottomSheet" />
+        <action
+            android:id="@+id/action_logFoodFragment_to_dailyFoodLogsFragment"
+            app:destination="@id/dailyFoodLogsFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dailyFoodLogsFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.log.food.DailyFoodLogsFragment"
+        android:label="DailyFoodLogsFragment"
+        tools:layout="@layout/fragment_daily_food_logs">
+        <argument
+            android:name="timestamp"
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
 
     <fragment
@@ -212,24 +276,32 @@
         android:name="uz.oybek.ozamiz.ui.feature.log.food.AnalyzeResultFragment"
         android:label="CalorieResultBottomSheet"
         tools:layout="@layout/bottom_sheet_calorie_result">
-
+        <argument
+            android:name="id"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="logId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="timestamp"
+            app:argType="long"
+            android:defaultValue="0L" />
     </fragment>
     <fragment
-        android:id="@+id/logExerciseFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.log.exercise.LogExerciseFragment"
-        android:label="LogExerciseFragment"
-        tools:layout="@layout/fragment_log_exercise">
-        <argument
-            android:name="logToEditJson"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
-            android:name="preselectedExerciseId"
-            android:defaultValue="@null"
-            app:argType="string"
-            app:nullable="true" />
-    </fragment>
+        android:id="@+id/selectExerciseFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.log.exercise.SelectExerciseFragment"
+        android:label="SelectExerciseFragment"
+        tools:layout="@layout/fragment_select_exercise" />
+
+    <fragment
+        android:id="@+id/addExerciseLogFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.log.exercise.AddExerciseLogFragment"
+        android:label="AddExerciseLogFragment"
+        tools:layout="@layout/fragment_add_exercise_log" />
+
 
     <dialog
         android:id="@+id/logWaterDialog"
@@ -250,10 +322,15 @@
         android:label="CustomTimePickerDialogFragment" />
 
 
-    <dialog
-        android:id="@+id/streakInfoBottomSheetDialog"
-        android:name="uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet"
-        android:label="StreakInfoBottomSheetDialog" />
+    <fragment
+        android:id="@+id/streakInfoFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.streak.StreakInfoFragment"
+        android:label="StreakInfoFragment"
+        tools:layout="@layout/fragment_streak_info">
+        <argument
+            android:name="streak_info_arg"
+            app:argType="uz.oybek.ozamiz.data.streak.StreakInfo" />
+    </fragment>
 
     <fragment
         android:id="@+id/addWeightPhotoFragment"
@@ -271,9 +348,166 @@
     <fragment
         android:id="@+id/natijaFragment2"
         android:name="uz.oybek.ozamiz.ui.feature.natija.NatijaFragment"
-        android:label="NatijaFragment" />
+        android:label="NatijaFragment">
+        <action
+            android:id="@+id/action_natijaFragment_to_weightHistoryFragment"
+            app:destination="@id/weightHistoryFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/weightHistoryFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.natija.WeightHistoryFragment"
+        android:label="WeightHistoryFragment"
+        tools:layout="@layout/fragment_weight_history" />
     <dialog
         android:id="@+id/voiceInputBottomSheet"
         android:name="uz.oybek.ozamiz.ui.feature.log.voice.VoiceRecorderBottomSheet"
         android:label="VoiceInputBottomSheet" />
+    <fragment
+        android:id="@+id/getMainInfoFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.exercise.GetMainInfoFragment"
+        android:label="GetMainInfoFragment" />
+    <fragment
+        android:id="@+id/menuListFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.list.MenuListFragment"
+        android:label="MenuListFragment"
+        tools:layout="@layout/fragment_menu_list">
+        <action
+            android:id="@+id/action_menuListFragment_to_addMenuFragment"
+            app:destination="@id/addMenuFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_menuDetailFragment"
+            app:destination="@id/menuDetailFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addMenuFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.add.AddMenuFragment"
+        android:label="AddMenuFragment"
+        tools:layout="@layout/fragment_add_menu">
+        <action
+            android:id="@+id/action_addMenuFragment_to_categoryManagerFragment"
+            app:destination="@id/categoryManagerFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryManagerFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.category.CategoryManagerFragment"
+        android:label="CategoryManagerFragment"
+        tools:layout="@layout/fragment_category_manager" />
+
+    <fragment
+        android:id="@+id/menuDetailFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.detail.MenuDetailFragment"
+        android:label="MenuDetailFragment"
+        tools:layout="@layout/fragment_menu_detail">
+        <argument
+            android:name="menu"
+            app:argType="uz.oybek.ozamiz.data.menu.model.Menu" />
+    </fragment>
+
+    <!-- Admin Lessons -->
+    <fragment
+        android:id="@+id/adminLessonsFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.lessons.admin.AdminLessonsFragment"
+        android:label="AdminLessonsFragment"
+        tools:layout="@layout/fragment_admin_lessons">
+        <action
+            android:id="@+id/action_adminLessonsFragment_to_adminTopicDetailFragment"
+            app:destination="@id/adminTopicDetailFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminTopicDetailFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.lessons.admin.AdminTopicDetailFragment"
+        android:label="AdminTopicDetailFragment"
+        tools:layout="@layout/fragment_admin_topic_detail">
+        <argument
+            android:name="topicId"
+            app:argType="string" />
+        <argument
+            android:name="topicTitle"
+            app:argType="string" />
+    </fragment>
+
+    <!-- User-facing Lessons -->
+    <fragment
+        android:id="@+id/lessonsHomeFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.lessons.LessonsHomeFragment"
+        android:label="LessonsHomeFragment"
+        tools:layout="@layout/fragment_lessons_home">
+        <action
+            android:id="@+id/action_lessonsHomeFragment_to_topicViewerFragment"
+            app:destination="@id/topicViewerFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/topicViewerFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.lessons.TopicViewerFragment"
+        android:label="TopicViewerFragment"
+        tools:layout="@layout/fragment_topic_viewer">
+        <argument
+            android:name="topicId"
+            app:argType="string" />
+        <argument
+            android:name="topicTitle"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_topicViewerFragment_to_quizFragment"
+            app:destination="@id/lessonQuizFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/lessonQuizFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.lessons.QuizFragment"
+        android:label="QuizFragment"
+        tools:layout="@layout/fragment_lesson_quiz">
+        <argument
+            android:name="topicId"
+            app:argType="string" />
+        <argument
+            android:name="topicTitle"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aiChatFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.ai.AiChatFragment"
+        android:label="AI Chat"
+        tools:layout="@layout/fragment_ai_chat">
+        <argument
+            android:name="initialPrompt"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
 </navigation>

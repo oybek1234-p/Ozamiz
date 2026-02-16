@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
@@ -13,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.user.model.info.Cities
+import uz.oybek.ozamiz.data.user.model.info.Gender
 import uz.oybek.ozamiz.data.user.model.info.UserActivityLevel
 import uz.oybek.ozamiz.databinding.GetInfoMainFragmentBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -25,6 +26,8 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
     private var selectedGender: Int = -1
     private val selectedProblems = mutableListOf<String>()
     private var isNewUser: Boolean = true
+    private var activityLevelSelected: String = ""
+    private var manzilSelected: String = "Uzbekistan"
 
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
@@ -47,164 +50,149 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
     private fun setupToolbar(bind: GetInfoMainFragmentBinding) {
         bind.toolbar.apply {
-            title = if (isNewUser) "Profil ma'lumotlari" else "Profilni tahrirlash"
-            if (!isNewUser) {
-                setNavigationIcon(R.drawable.arrow_back)
-                setNavigationOnClickListener { findNavController().popBackStack() }
-            } else {
-                navigationIcon = null
-            }
+            setNavigationIcon(R.drawable.arrow_back)
+            setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
-    var manzilSelected = ""
-    private var activityLevelSelected: String = ""
-
-    private fun loadInitialData(bind: GetInfoMainFragmentBinding) {
+    private fun loadInitialData(bind: GetInfoMainFragmentBinding) = with(bind) {
         val user = LocalUser.user
-        bind.apply {
-            nameView.editText?.setText(user.name)
-            ageView.editText?.setText(if (user.age > 0) user.age.toString() else "")
-            heightLay.editText?.setText(if (user.height > 0) user.height.toString() else "")
-            weightInput.editText?.setText(
-                if (user.weight > 0) String.format(
-                    "%.1f", user.weight
-                ).replace(',', '.') // Vergulni nuqtaga almashtirish
-                else ""
-            )
 
-            val activityAdapter = ArrayAdapter(
-                requireContext(),
-                R.layout.list_item,
-                UserActivityLevel.entries.map { "${it.title} (${it.subtitle})" }
-            )
-//            (harakatView.editText as? AutoCompleteTextView)?.apply {
-//                val selected = UserActivityLevel.entries.find { it.id == LocalUser.user.activityLevel }
-//                selected?.let {
-//                    activityLevelSelected = it.id
-//                    setText("${it.title} (${it.subtitle})", false)
-//                }
-//                setAdapter(activityAdapter)
-//            }
+        nameView.editText?.setText(user.name)
+        ageView.editText?.setText(if (user.age > 0) user.age.toString() else "")
+        mobilRaqamView.editText?.setText(user.phoneNumber)
 
-            targetWeightView.editText?.setText(user.targetWeight?.let {
-                String.format("%.1f", it).replace(',', '.')
+        heightLay.editText?.setText(if (user.height > 0) user.height.toString() else "")
+        weightInput.editText?.setText(
+            if (user.weight > 0) String.format("%.1f", user.weight).replace(',', '.') else ""
+        )
+        targetWeightView.editText?.setText(user.targetWeight?.let {
+            String.format("%.1f", it).replace(',', '.')
+        } ?: "")
+
+        val activityAdapter = ArrayAdapter(
+            requireContext(),
+            R.layout.list_item,
+            UserActivityLevel.entries.map { "${it.title} (${it.subtitle})" }
+        )
+
+        (harakatView.editText as? AutoCompleteTextView)?.apply {
+            setAdapter(activityAdapter)
+            UserActivityLevel.entries.find { it.name == user.activityLevel }?.let {
+                activityLevelSelected = it.name
+                setText("${it.title} (${it.subtitle})", false)
             }
-                ?: "")
+            onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+                activityLevelSelected = UserActivityLevel.entries[position].name
+            }
+        }
 
-            mobilRaqamView.editText?.setText(LocalUser.user.phoneNumber)
-            selectedGender = user.gender
-            updateGenderSelectionUI(bind)
-            calculateAndDisplayIdealWeightIfNeeded(bind)
+        selectedGender = user.gender
+        updateGenderSelectionUI(this)
+        calculateAndDisplayIdealWeightIfNeeded(this)
 
-            updateTargetWeightInputVisibility(bind)
+        selectedProblems.clear()
+        user.problems?.let { selectedProblems.addAll(it) }
+    }
 
+    private fun setupListeners(bind: GetInfoMainFragmentBinding) = with(bind) {
+        male.setOnClickListener {
+            selectedGender = Gender.MALE
+            updateGenderSelectionUI(this)
+            calculateAndDisplayIdealWeightIfNeeded(this)
+        }
+        female.setOnClickListener {
+            selectedGender = Gender.FEMALE
+            updateGenderSelectionUI(this)
+            calculateAndDisplayIdealWeightIfNeeded(this)
+        }
+
+        heightLay.editText?.doAfterTextChanged { calculateAndDisplayIdealWeightIfNeeded(this) }
+        weightInput.editText?.doAfterTextChanged { validateTargetWeight(this) }
+        targetWeightView.editText?.doAfterTextChanged { validateTargetWeight(this) }
+
+        chipGroup.setOnCheckedStateChangeListener { group, _ ->
             selectedProblems.clear()
-            user.problems?.let { selectedProblems.addAll(it) }
-
-            // Clear old chips before adding new ones
-            chipGroup.removeAllViews()
-//            UserDiseases.entries.forEach { problem ->
-//                val chip = Chip(
-//                    requireContext(),
-//                    null,
-//                    com.google.android.material.R.style.Widget_Material3_Chip_Filter
-//                ).apply {
-//                    text = problem.text
-//                    isCheckable = true
-//                    isClickable = true
-//                    tag = problem.name // Store enum name as tag
-//                    isChecked = selectedProblems.contains(problem.name)
-//                }
-//                chipGroup.addView(chip)
-//            }
-
-
-            val manzilAdapter =
-                ArrayAdapter(
-                    requireContext(),
-                    R.layout.list_item,
-                    Cities.Companion.asListNames(false)
-                )
-            (manzilView.editText as? AutoCompleteTextView)?.apply {
-                val currentManzilName = LocalUser.user.region
-                val selectedCity =
-                    Cities.entries.find { city -> getString(city.resId) == currentManzilName || city.name == currentManzilName }
-
-                selectedCity?.let {
-                    manzilSelected = getString(it.resId) // Save localized name
-                    setText(getString(it.resId), false)
-                }
-                setAdapter(manzilAdapter)
+            group.checkedChipIds.forEach { chipId ->
+                val chip = group.findViewById<Chip>(chipId)
+                chip.tag?.toString()?.let { selectedProblems.add(it) }
             }
+        }
+
+        save.setOnClickListener {
+            handleSaveClick(bind)
         }
     }
 
+    private fun handleSaveClick(bind: GetInfoMainFragmentBinding) {
+        val name = bind.nameView.editText?.text?.toString()?.trim()
+        val ageStr = bind.ageView.editText?.text?.toString()
+        val heightStr = bind.heightLay.editText?.text?.toString()
+        val weightStr = bind.weightInput.editText?.text?.toString()?.replace(',', '.')
+        val targetWeightStr = bind.targetWeightView.editText?.text?.toString()?.replace(',', '.')
+        val phone = bind.mobilRaqamView.editText?.text?.toString()?.trim()
 
-    private fun setupListeners(bind: GetInfoMainFragmentBinding) {
-        bind.apply {
-            male.setOnClickListener {
-          //      selectedGender = Gender.MALE_RES.ordinal
-                updateGenderSelectionUI(bind)
-                calculateAndDisplayIdealWeightIfNeeded(bind)
+        if (name.isNullOrEmpty()) {
+            showToast("Iltimos, ismingizni kiriting")
+            return
+        }
+
+        if (selectedGender == -1) {
+            showToast("Iltimos, jinsingizni belgilang")
+            return
+        }
+
+        val age = ageStr?.toIntOrNull()
+        if (age == null || age <= 0 || age > 120) {
+            showToast("Iltimos, yoshingizni to'g'ri kiriting")
+            return
+        }
+
+        val height = heightStr?.toIntOrNull()
+        if (height == null || height < 50 || height > 250) {
+            showToast("Iltimos, bo'yingizni to'g'ri kiriting (sm)")
+            return
+        }
+
+        val weight = weightStr?.toDoubleOrNull()
+        if (weight == null || weight < 20 || weight > 500) {
+            showToast("Iltimos, vazningizni to'g'ri kiriting (kg)")
+            return
+        }
+
+        var targetWeight: Double? = null
+        if (!targetWeightStr.isNullOrEmpty()) {
+            targetWeight = targetWeightStr.toDoubleOrNull()
+            if (targetWeight == null || targetWeight < 20 || targetWeight > 500) {
+                showToast("Maqsad vaznni to'g'ri kiriting")
+                return
             }
-            female.setOnClickListener {
-            //    selectedGender = Gender.FEMALE_RES.value
-                updateGenderSelectionUI(bind)
-                calculateAndDisplayIdealWeightIfNeeded(bind)
-            }
-
-            heightLay.editText?.doAfterTextChanged {
-                calculateAndDisplayIdealWeightIfNeeded(bind)
-            }
-            weightInput.editText?.doAfterTextChanged {
-                validateTargetWeight(bind)
-            }
-            targetWeightView.editText?.doAfterTextChanged {
-                validateTargetWeight(bind)
-            }
-
-
-            chipGroup.setOnCheckedStateChangeListener { group, _ ->
-                selectedProblems.clear()
-                group.checkedChipIds.forEach { chipId ->
-                    val chip = group.findViewById<Chip>(chipId)
-                    chip.tag?.toString()?.let { selectedProblems.add(it) }
-                }
-            }
-
-            (harakatView.editText as? AutoCompleteTextView)?.onItemClickListener =
-                AdapterView.OnItemClickListener { _, _, position, _ ->
-            //        activityLevelSelected = UserActivityLevel.entries[position].id
-                }
-
-            (manzilView.editText as? AutoCompleteTextView)?.onItemClickListener =
-                AdapterView.OnItemClickListener { _, _, position, _ ->
-                    val cityEnumEntry = Cities.entries.filter { it != Cities.Hammasi }[position]
-                    manzilSelected = getString(cityEnumEntry.resId) // Save localized name
-                }
-
-            save.setOnClickListener {
-                // If it's a new user and registerDate is not set, set it now.
-                if (isNewUser && LocalUser.user.registerDate == null) {
-                    LocalUser.user.registerDate = Date()
-                }
-
-                viewModel.saveUserInfoAndGeneratePlan( // Yangilangan funksiyani chaqirish
-                    name = nameView.editText?.text?.toString(),
-                    gender = selectedGender,
-                    ageStr = ageView.editText?.text?.toString(),
-                    heightStr = heightLay.editText?.text?.toString(),
-                    weightStr = weightInput.editText?.text?.toString()?.replace(',', '.'),
-                    targetWeightStr = targetWeightView.editText?.text?.toString()
-                        ?.replace(',', '.'),
-                    problems = selectedProblems.ifEmpty { null },
-                    manzilSelected = manzilSelected,
-                    phoneNumber = binding.mobilRaqamView.editText?.text?.toString(),
-                    activityLevel = activityLevelSelected
-                )
+            if (targetWeight >= weight) {
+                showToast("Ozish uchun maqsad vazn joriy vazndan kichik bo'lishi kerak")
+                return
             }
         }
+
+        if (activityLevelSelected.isEmpty()) {
+            showToast("Iltimos, harakat darajasini tanlang")
+            return
+        }
+        if (isNewUser && LocalUser.user.registerDate == null) {
+            LocalUser.user.registerDate = Date()
+        }
+
+        viewModel.saveUserInfoAndGeneratePlan(
+            name = name,
+            gender = selectedGender,
+            age = age,
+            height = height,
+            weight = weight,
+            targetWeight = targetWeight,
+            problems = selectedProblems.ifEmpty { null },
+            phoneNumber = phone.toString(),
+            activityLevel = activityLevelSelected,
+            manzil = manzilSelected
+        )
     }
 
     private fun calculateAndDisplayIdealWeightIfNeeded(bind: GetInfoMainFragmentBinding) {
@@ -213,48 +201,34 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         viewModel.calculateAndSetIdealWeight(height, selectedGender)
     }
 
-    private fun updateGenderSelectionUI(bind: GetInfoMainFragmentBinding) {
-//        val maleSelected = selectedGender == Gender.MALE_RES.value
-//        val femaleSelected = selectedGender == Gender.FEMALE_RES.value
-//        bind.male.strokeWidth = if (maleSelected) 3.dpToPx() else 1.dpToPx()
-//        bind.female.strokeWidth = if (femaleSelected) 3.dpToPx() else 1.dpToPx()
-    }
-
-
-    private fun updateTargetWeightInputVisibility(bind: GetInfoMainFragmentBinding) {
-        bind.targetWeightView.isVisible = true
-    }
-
     private fun validateTargetWeight(bind: GetInfoMainFragmentBinding) {
-        val currentWeightStr = bind.weightInput.editText?.text?.toString()?.replace(',', '.')
-        val targetWeightStr = bind.targetWeightView.editText?.text?.toString()?.replace(',', '.')
-        if (currentWeightStr.isNullOrBlank() || targetWeightStr.isNullOrBlank()) {
-            bind.targetWeightWarning.isVisible = false
-            return
-        }
-
-        val currentWeight = currentWeightStr.toDoubleOrNull()
-        val targetWeight = targetWeightStr.toDoubleOrNull()
+        val currentWeight =
+            bind.weightInput.editText?.text?.toString()?.replace(',', '.')?.toDoubleOrNull()
+        val targetWeight =
+            bind.targetWeightView.editText?.text?.toString()?.replace(',', '.')?.toDoubleOrNull()
 
         if (currentWeight == null || targetWeight == null) {
             bind.targetWeightWarning.isVisible = false
             return
         }
 
-        var warningMessage: String? = null
+        val warningMessage = when {
+            targetWeight >= currentWeight -> "Ozish uchun maqsad vazn joriy vazndan kichik bo'lishi kerak."
+            (currentWeight - targetWeight) > 30 -> "Bu maqsad juda keskin. Kichikroq qadamlar bilan boshlash tavsiya etiladi."
+            else -> null
+        }
 
-        if (targetWeight >= currentWeight) {
-            warningMessage = "Ozish uchun maqsad vazn joriy vazndan kichik bo'lishi kerak."
-        } else if (currentWeight - targetWeight > 30) {
-            warningMessage =
-                "Bu maqsad juda keskin. Kichikroq qadamlar bilan boshlash tavsiya etiladi."
+        bind.targetWeightWarning.apply {
+            text = warningMessage
+            isVisible = warningMessage != null
         }
-        if (warningMessage != null) {
-            bind.targetWeightWarning.text = warningMessage.trim()
-            bind.targetWeightWarning.isVisible = true
-        } else {
-            bind.targetWeightWarning.isVisible = false
-        }
+    }
+
+    private fun updateGenderSelectionUI(bind: GetInfoMainFragmentBinding) {
+        val maleSelected = selectedGender == Gender.MALE
+        val femaleSelected = selectedGender == Gender.FEMALE
+        bind.male.strokeWidth = if (maleSelected) 3.dpToPx() else 1.dpToPx()
+        bind.female.strokeWidth = if (femaleSelected) 3.dpToPx() else 1.dpToPx()
     }
 
     private fun observeViewModel(bind: GetInfoMainFragmentBinding) {
@@ -264,19 +238,31 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         }
 
         viewModel.idealWeightRangeText.observe(viewLifecycleOwner) { rangeText ->
-            if (rangeText != null) {
-                bind.textViewIdealWeightInfo.isVisible = true
-                bind.idealWeightCon.isVisible = true
+            val hasValue = rangeText != null
+            bind.idealWeightCon.isVisible = hasValue
+            bind.textViewIdealWeightInfo.isVisible = hasValue
+            bind.textViewIdealWeightRange.isVisible = hasValue
+            if (hasValue) {
                 bind.textViewIdealWeightRange.text = rangeText
-                bind.textViewIdealWeightRange.isVisible = true
-            } else {
-                bind.idealWeightCon.isVisible = false
-                bind.textViewIdealWeightInfo.isVisible = false
-                bind.textViewIdealWeightRange.isVisible = false
             }
             validateTargetWeight(bind)
         }
+        viewModel.navigationEvent.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is GetInfoNavigationEvent.ShowToast -> showToast(event.message)
+                is GetInfoNavigationEvent.NavigateToHome -> {
+                    findNavController().popBackStack()
+                }
 
+                is GetInfoNavigationEvent.NavigateToCongratulation -> {
+                    findNavController().popBackStack()
+                }
+            }
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()

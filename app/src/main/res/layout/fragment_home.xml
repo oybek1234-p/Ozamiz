@@ -10,14 +10,14 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurfaceContainerLowest"
+        android:background="?colorSurfaceContainer"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?colorSurfaceContainerLowest"
+            android:background="?colorSurfaceContainer"
             app:title="Bugun"
             app:titleCentered="true"
             app:titleTextAppearance="@style/Title2_20"
@@ -34,6 +34,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="@dimen/dimen_18"
+                android:visibility="gone"
                 tools:visibility="visible">
 
                 <ImageView
@@ -41,15 +42,16 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/fire_ic"
-                    app:tint="?attr/colorOnSurfaceVariant" />
+                    app:tint="@color/yellow" />
 
                 <TextView
                     android:id="@+id/text_streak_count"
                     style="@style/Headline3_15"
+                    android:fontFamily="@font/roboto_bold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="@color/yellow"
                     tools:text="3" />
             </LinearLayout>
         </com.google.android.material.appbar.MaterialToolbar>
@@ -58,11 +60,11 @@
             android:id="@+id/date_scroller_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="?colorSurfaceContainer"
             android:clipToPadding="false"
-            android:paddingBottom="@dimen/dimen_12"
             android:orientation="horizontal"
             android:paddingHorizontal="12dp"
-            android:background="?colorSurfaceContainerLowest"
+            android:paddingBottom="@dimen/dimen_12"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="10"
             tools:listitem="@layout/item_date_scroller" />
@@ -86,202 +88,456 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
+                android:gravity="end"
                 android:orientation="vertical"
                 android:paddingTop="16dp"
-                android:paddingBottom="200dp">
+                android:paddingBottom="100dp">
 
                 <include
                     android:id="@+id/main_progress"
                     layout="@layout/home_main_progress" />
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_add_food_promo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="@dimen/dimen_8"
-                    android:layout_marginEnd="12dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="1dp"
-                    app:strokeWidth="0dp">
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="20dp">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/img_promo_banner"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/food_camera_icon"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:shapeAppearance="@style/RadiusImageView12" />
+
+                        <TextView
+                            android:id="@+id/text_promo_title"
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:includeFontPadding="false"
+                            android:text="Ovqatni foyda va zararini bilib oling"
+                            android:textColor="?attr/colorOnSurface"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toEndOf="@id/img_promo_banner"
+                            app:layout_constraintTop_toTopOf="@id/img_promo_banner" />
+
+                        <TextView
+                            android:id="@+id/text_promo_subtitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Kunlik yegan ovqatingizni miqdorini bilib oling"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="@id/text_promo_title"
+                            app:layout_constraintTop_toBottomOf="@id/text_promo_title" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_promo_add_food"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:paddingHorizontal="16dp"
+                            android:text="Ovqatni qo'shish"
+                            android:textSize="13sp"
+                            app:cornerRadius="12dp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/text_promo_subtitle" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_add_food"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/dimen_48"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="@dimen/dimen_12"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/add_food_title"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    app:cornerRadius="20dp"
+                    app:elevation="2dp"
+                    app:icon="@drawable/add_ic"
+                    app:iconGravity="textStart"
+                    app:iconSize="20dp"
+                    tools:visibility="visible" />
+
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_menus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?selectableItemBackground"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="20dp">
+
+                        <ImageView
+                            android:id="@+id/img_menu_icon"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/round_lay"
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:padding="12dp"
+                            android:src="@drawable/food_ic"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="?attr/colorPrimary" />
+
+                        <TextView
+                            android:id="@+id/text_menu_title"
+                            style="@style/TextAppearance.Material3.TitleLarge"
+                            android:textSize="20sp"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/menus_title"
+                            android:textColor="?attr/colorOnSurface"
+                            app:layout_constraintBottom_toTopOf="@+id/text_menu_subtitle"
+                            app:layout_constraintEnd_toStartOf="@+id/img_arrow"
+                            app:layout_constraintStart_toEndOf="@id/img_menu_icon"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/text_menu_subtitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/menus_subtitle"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="@id/text_menu_title"
+                            app:layout_constraintStart_toStartOf="@id/text_menu_title"
+                            app:layout_constraintTop_toBottomOf="@id/text_menu_title" />
+
+                        <ImageView
+                            android:id="@+id/img_arrow"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/arrow_right"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_water"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:background="?colorSurfaceContainerLowest"
-                        android:paddingBottom="@dimen/dimen_18">
+                        android:padding="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:paddingStart="@dimen/dimen_18">
-
-                            <ImageView
-                                android:id="@+id/icon_water"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/water_full_24px"
-                                app:layout_constraintBottom_toBottomOf="@+id/title_water"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="@id/title_water"
-                                app:tint="@color/blue" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:id="@+id/title_water"
-                                style="@style/Headline2_16"
-                                android:layout_width="0dp"
+                                style="@style/TextAppearance.Material3.TitleLarge"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
-                                android:layout_marginTop="@dimen/dimen_18"
-                                android:text="@string/water_intake_title"
-                                android:textColor="@color/blue"
-                                app:layout_constraintEnd_toStartOf="@id/button_add_water"
-                                app:layout_constraintStart_toEndOf="@id/icon_water"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/water_title"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="20sp" />
 
-                            <ImageView
-                                android:id="@+id/button_add_water"
-                                style="@style/Widget.Material3.Button.IconButton"
-                                android:layout_width="@dimen/dimen_48"
-                                android:layout_height="48dp"
-                                android:src="@drawable/add_ic"
-                                android:textSize="14sp"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:tint="?colorPrimary" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
+                            <TextView
+                                android:id="@+id/text_current_water_liters"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="end"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="18sp"
+                                tools:text="1.2 L ichildi" />
+                        </FrameLayout>
 
                         <TextView
-                            android:id="@+id/text_consumed_water"
-                            style="@style/Text1_14"
+                            android:id="@+id/text_water_goal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/dimen_18"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/roboto_regular"
                             android:textColor="?colorOnSurface"
-                            tools:text="250 ml ichildi" />
+                            android:textSize="16sp"
+                            tools:text="Maqsad: 2.5 L" />
 
                         <com.google.android.material.progressindicator.LinearProgressIndicator
                             android:id="@+id/progress_water"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/dimen_18"
-                            app:indicatorColor="@color/blue"
-                            android:layout_marginTop="@dimen/dimen_12"
+                            android:layout_marginTop="16dp"
+                            app:indicatorColor="?colorTertiary"
+                            app:trackColor="?colorSurfaceContainerHigh"
+                            app:trackCornerRadius="4dp"
                             app:indicatorTrackGapSize="0dp"
-                            app:trackColor="?attr/colorSurfaceContainer"
-                            app:trackCornerRadius="20dp"
                             app:trackStopIndicatorSize="0dp"
-                            app:trackThickness="12dp"
-                            tools:progress="40" />
+                            app:trackStopIndicatorPadding="0dp"
+                            app:trackThickness="10dp"
+                            tools:progress="50" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_open_water_dialog"
+                            style="@style/FilledButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            app:backgroundTint="?colorTertiary"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="Suv qo'shish"
+                            android:textSize="14sp"
+                            app:iconGravity="textStart"
+                            app:cornerRadius="16dp"
+                            app:icon="@drawable/add_ic"
+                           />
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_exercise"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/dimen_12"
-                    android:layout_marginTop="@dimen/dimen_12"
-                    android:layout_marginEnd="12dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="1dp"
-                    app:strokeWidth="0dp">
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?colorSurfaceContainerLowest"
-                        android:orientation="vertical">
+                        android:orientation="vertical"
+                        android:padding="20dp">
 
-                        <androidx.constraintlayout.widget.ConstraintLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
-
-                            <ImageView
-                                android:id="@+id/icon_exercise"
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:layout_marginStart="@dimen/dimen_18"
-                                android:layout_marginTop="@dimen/dimen_18"
-                                android:src="@drawable/fire_ic"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent"
-                                app:tint="@color/yellow" />
-
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <TextView
                                 android:id="@+id/title_exercise"
-                                style="@style/Text1_16"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
-                                android:text="Harakat"
-                                android:textColor="#E99C02"
-                                app:layout_constraintBottom_toBottomOf="@+id/icon_exercise"
-                                app:layout_constraintEnd_toStartOf="@id/button_add_exercise_log"
-                                app:layout_constraintStart_toEndOf="@id/icon_exercise"
-                                app:layout_constraintTop_toTopOf="@+id/icon_exercise" />
-
-                            <ImageView
-                                android:id="@+id/button_add_exercise_log"
-                                style="@style/Widget.Material3.Button.IconButton"
+                                style="@style/TextAppearance.Material3.TitleLarge"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:padding="@dimen/dimen_18"
-                                android:src="@drawable/add_ic"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="Yog' yoqish"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="20sp" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                            <TextView
+                                android:id="@+id/text_exercise_progress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="?colorOnSurfaceVariant"
                                 android:textSize="14sp"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                tools:text="0 / 300 kkal" />
 
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        <TextView
-                            style="@style/Text1_16"
-                            android:visibility="gone"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/dimen_18"
-                            android:text="Tavsiya kamida 300 kaloriya yoqing"
-                            android:textColor="?attr/colorOnSurfaceVariant" />
-
-                        <TextView
-                            android:id="@+id/text_burned_calories"
-                            style="@style/Text1_14"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/dimen_18"
-                            android:layout_marginBottom="@dimen/dimen_12"
-                            android:textColor="?colorOnSurface"
-                            tools:text="50 yoqildi" />
-
+                        </LinearLayout>
 
                         <com.google.android.material.progressindicator.LinearProgressIndicator
                             android:id="@+id/progress_exercise"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="@dimen/dimen_18"
-                            app:indicatorColor="@color/yellow"
-                            android:layout_marginBottom="@dimen/dimen_12"
-                            app:indicatorTrackGapSize="0dp"
-                            app:trackColor="?attr/colorSurfaceContainer"
-                            app:trackCornerRadius="20dp"
+                            android:layout_marginTop="12dp"
+                            app:indicatorColor="?colorTertiary"
+                            app:trackColor="?colorSurfaceContainerHigh"
+                            app:trackStopIndicatorPadding="0dp"
                             app:trackStopIndicatorSize="0dp"
-                            app:trackThickness="12dp"
-                            tools:progress="30" />
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackCornerRadius="4dp"
+                            app:trackThickness="8dp"
+                            tools:progress="50" />
 
                         <LinearLayout
-                            android:id="@+id/layout_exercise_logs"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:orientation="vertical"
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:id="@+id/btn_quick_walk"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_rounded_8"
+                                android:backgroundTint="?attr/colorSurface"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:foreground="?selectableItemBackground"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:paddingVertical="12dp">
+
+                                <TextView
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:text="🚶"
+                                    android:textSize="24sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="Piyoda"
+                                    android:textColor="?colorOnSurface"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+
+                            <Space
+                                android:layout_width="8dp"
+                                android:layout_height="wrap_content" />
+
+                            <LinearLayout
+                                android:id="@+id/btn_quick_run"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_rounded_8"
+                                android:backgroundTint="?attr/colorSurface"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:foreground="?selectableItemBackground"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:paddingVertical="12dp">
+
+                                <TextView
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:text="🏃"
+                                    android:textSize="24sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="Yugurish"
+                                    android:textColor="?colorOnSurface"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+
+                            <Space
+                                android:layout_width="8dp"
+                                android:layout_height="wrap_content" />
+
+                            <LinearLayout
+                                android:id="@+id/btn_quick_other"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:background="@drawable/bg_rounded_8"
+                                android:backgroundTint="?attr/colorSurface"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:foreground="?selectableItemBackground"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:paddingVertical="12dp">
+
+                                <ImageView
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    android:src="@drawable/add_ic"
+                                    android:textSize="24sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="Boshqa"
+                                    android:textColor="?colorOnSurface"
+                                    android:textSize="12sp" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/recycler_exercise_logs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:clipToPadding="false"
+                            android:nestedScrollingEnabled="false"
+                            android:overScrollMode="never"
                             android:visibility="gone"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="3"
+                            tools:listitem="@layout/item_home_exercise_log"
                             tools:visibility="visible" />
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

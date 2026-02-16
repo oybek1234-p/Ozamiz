@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurface">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="?colorSurfaceContainer"
+        android:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/oval_back"
+            android:backgroundTint="?colorSurfaceContainerHigh"
+            android:src="@drawable/arrow_back"
+            android:contentDescription="Back"
+            android:padding="8dp"
+            app:tint="?colorOnSurface"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Taom qo'shish"
+            android:textSize="18sp"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="?colorOnSurface"
+            android:layout_marginEnd="40dp"/>
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintBottom_toTopOf="@id/footerLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:clipToPadding="false">
+            
+            <!-- Image Picker -->
+            <FrameLayout
+                android:id="@+id/cardImagePicker"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/round_lay_stroke"
+                android:padding="24dp">
+                
+                <LinearLayout
+                    android:id="@+id/containerUploadInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/oval_background_with_opacity"
+                        android:backgroundTint="?attr/colorPrimaryContainer"
+                        android:src="@drawable/camera_ic"
+                        app:tint="?attr/colorPrimary"
+                        android:padding="14dp"
+                        android:layout_marginBottom="8dp"/>
+                        
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rasm yuklash"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="16sp"/>
+                        
+                    <TextView
+                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Taomning chiroyli ko'rinishini suratga oling"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="12dp"/>
+                        
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rasm tanlash"
+                        android:textColor="?attr/colorPrimary"
+                        android:background="@drawable/round_lay"
+                        android:backgroundTint="?attr/colorPrimaryContainer"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="8dp"
+                        android:textStyle="bold"
+                        android:textSize="12sp"/>
+                </LinearLayout>
+                
+                <ImageView
+                    android:id="@+id/imagePreview"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone"
+                    android:background="@drawable/round_lay"/>
+            </FrameLayout>
+            
+            <!-- Categories -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+                
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Kategoriyalar"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="14sp"/>
+                    
+                <TextView
+                    android:id="@+id/btnAddCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+ Yangi kategoriya"
+                    android:textColor="?attr/colorPrimary"
+                    android:textStyle="bold"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+            
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:chipSpacing="8dp"
+                app:singleSelection="false"/>
+                
+            <!-- Inputs -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Taom nomi"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="?colorOnSurface"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+                
+            <EditText
+                android:id="@+id/editName"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/round_lay_stroke"
+                android:padding="12dp"
+                android:hint="Masalan: Pishirilgan somsa"
+                android:inputType="textCapSentences"
+                android:layout_marginBottom="16dp"/>
+                
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ingredientlar"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="?colorOnSurface"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/editIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:background="@drawable/round_lay_stroke"
+                android:padding="12dp"
+                android:gravity="top|start"
+                android:hint="Masalan: 200g go'sht, piyoz, un..."
+                android:inputType="textMultiLine"
+                android:layout_marginBottom="16dp"/>
+                
+             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Haqida"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="?colorOnSurface"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/editDescription"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@drawable/round_lay_stroke"
+                android:padding="12dp"
+                android:gravity="top|start"
+                android:hint="Tayyorlanish usuli va foydali tomonlari..."
+                android:inputType="textMultiLine"
+                android:layout_marginBottom="16dp"/>
+                
+            <!-- Macros Grid -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginBottom="16dp">
+                
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="8dp">
+                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kaloriya (kcal)"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
+                    <EditText
+                        android:id="@+id/editCalories"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:padding="12dp"
+                        android:hint="0"
+                        android:inputType="numberDecimal"/>
+                </LinearLayout>
+                
+                 <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="8dp">
+                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Oqsillar (g)"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
+                    <EditText
+                        android:id="@+id/editProtein"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:padding="12dp"
+                        android:hint="0"
+                        android:inputType="numberDecimal"/>
+                </LinearLayout>
+            </LinearLayout>
+            
+             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="8dp">
+                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Yog'lar (g)"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
+                    <EditText
+                        android:id="@+id/editFat"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:padding="12dp"
+                        android:hint="0"
+                        android:inputType="numberDecimal"/>
+                </LinearLayout>
+
+                 <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="8dp">
+                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Uglevod (g)"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
+                    <EditText
+                        android:id="@+id/editCarbs"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:padding="12dp"
+                        android:hint="0"
+                        android:inputType="numberDecimal"/>
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Footer -->
+    <FrameLayout
+        android:id="@+id/footerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurface"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:text="Saqlash"
+            android:textColor="?colorOnPrimary"
+            android:fontFamily="@font/roboto_bold"
+            android:textSize="16sp"
+            app:cornerRadius="16dp"
+            android:textAllCaps="false"/>
+            
+        <ProgressBar
+             android:id="@+id/progressBar"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center"
+             android:visibility="gone"/>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

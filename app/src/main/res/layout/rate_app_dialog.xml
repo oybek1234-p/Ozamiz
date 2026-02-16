@@ -11,13 +11,14 @@
         android:paddingBottom="@dimen/dimen_24"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/dimen_24"
-        android:background="@color/white"
+        android:background="?colorSurfaceContainer"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/dimen_18">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -32,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="@dimen/dimen_18"
-                android:text="Ozamiz ilovasini baxolang"
+                android:text="Ozamiz ilovasini baholang"
                 android:textColor="?colorOnSurface" />
         </LinearLayout>
 
@@ -42,8 +43,41 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/dimen_24"
-            android:numStars="5"
-            android:stepSize="0.1" />
+            android:progressTint="@color/orange"
+            android:secondaryProgressTint="@color/orange"
+            android:stepSize="1" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/input_feedback_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_12"
+            android:hint="Fikringizni qoldiring..."
+            android:visibility="gone"
+            app:boxBackgroundColor="?colorSurfaceContainerHigh"
+            app:boxCornerRadiusBottomEnd="16dp"
+            app:boxCornerRadiusBottomStart="16dp"
+            app:boxCornerRadiusTopEnd="16dp"
+            app:boxCornerRadiusTopStart="16dp"
+            app:boxStrokeWidth="0dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/input_feedback"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:minLines="3" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_action"
+            style="@style/FilledButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_24"
+            android:text="Davom etish"
+            android:visibility="gone" />
 
     </LinearLayout>
 </layout>

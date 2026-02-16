@@ -1,226 +1,341 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest"
-    tools:context=".ui.log.food.LogFoodFragment">
+    android:background="?colorSurfaceContainer">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout_logFood"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?colorSurface"
-        app:elevation="0dp">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar_logFood"
-            android:layout_width="match_parent"
-            app:title="Qanday ovqat yedingiz?"
-            android:background="@color/white"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/arrow_back"
-            app:navigationIconTint="?colorOnSurface"
-            app:titleTextColor="?colorOnSurface"
-            />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.core.widget.NestedScrollView
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/rootCoordinatorLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:fitsSystemWindows="false"
+        tools:context=".ui.feature.log.food.LogFoodFragment">
 
-        <LinearLayout
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:paddingBottom="200dp"
-            android:paddingHorizontal="16dp">
+            app:elevation="0dp">
 
-            <TextView
-                style="@style/Headline3_15"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Qachon"
-                android:textColor="?colorOnSurfaceVariant" />
-
-            <HorizontalScrollView
+            <uz.oybek.ozamiz.ui.base.MyToolBar
+                android:id="@+id/toolbar_log_food"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_marginTop="8dp"
-                android:scrollbars="none">
+                android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@drawable/arrow_back"
+                app:title="" />
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroup_meal_type"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:singleSelection="true"
-                    app:selectionRequired="true"
-                    app:chipSpacingHorizontal="8dp"/>
-            </HorizontalScrollView>
+        </com.google.android.material.appbar.AppBarLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout_foodDescription_log"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:boxCornerRadiusBottomEnd="@dimen/dimen_12"
-                app:boxCornerRadiusBottomStart="@dimen/dimen_12"
-                app:boxCornerRadiusTopEnd="@dimen/dimen_12"
-                app:boxStrokeWidth="0.5dp"
-                app:boxBackgroundColor="?colorSurfaceContainerLowest"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-                app:boxCornerRadiusTopStart="@dimen/dimen_12"
-                android:layout_marginTop="@dimen/dimen_12"
-                app:helperTextEnabled="true"
-                app:hintEnabled="false">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editText_foodDescription_log"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="none"
-                    android:gravity="top"
-                    android:textSize="15sp"
-                    android:lineSpacingMultiplier="1.2"
-                    android:hint="@string/food_description_hint"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:minLines="1"
-                    android:padding="@dimen/dimen_18" />
-            </com.google.android.material.textfield.TextInputLayout>
-
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="end"
-                android:layout_marginTop="@dimen/dimen_8">
+                android:orientation="vertical"
+                android:clipToPadding="false"
+                android:paddingBottom="100dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_voice_input"
-                    style="@style/Widget.Material3.Button.ElevatedButton"
-                    android:layout_width="0dp"
-                    app:iconGravity="textStart"
-                    android:layout_weight="1"
-                    app:iconPadding="@dimen/dimen_8"
-                    android:layout_height="wrap_content"
-                    android:text="Ovoz"
-                    app:icon="@drawable/mic_ic" />
-
-
-            </LinearLayout>
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_image_container_log"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                android:layout_marginTop="@dimen/dimen_8"
-                app:cardElevation="0dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:strokeWidth="0dp">
-
-                <FrameLayout
+                <HorizontalScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:scrollbars="none">
 
-                    <ImageView
-                        android:id="@+id/imageView_selectedLogImage"
-                        android:layout_width="150dp"
-                        android:layout_height="150dp"
-                        android:scaleType="centerCrop"
-                        android:visibility="gone"
-                        android:maxHeight="150dp"
-                        tools:src="@drawable/placeholder_food"
-                        tools:visibility="gone"
-                        android:contentDescription="@string/selected_meal_image_preview" />
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroup_meal_type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="@dimen/dimen_18"
+                        app:chipSpacingHorizontal="8dp"
+                        app:selectionRequired="true"
+                        app:singleLine="true"
+                        app:singleSelection="true" />
+                </HorizontalScrollView>
 
-                    <com.google.android.material.button.MaterialButton
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:gravity="start"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="Nima yedingiz?"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:gravity="start"
+                    android:text="Ovqatingizni tahlil qiling va mutaxassis maslahatini oling"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="24dp"
+                    android:orientation="vertical">
+
+                    <!-- Option 1: Camera -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/uploadImageButton"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        style="@style/Widget.Material3.Button.ElevatedButton"
-                        android:id="@+id/layout_addImagePlaceholder_log"
-                        android:text="Ovqat rasmi"
-                        app:iconGravity="textStart"
-                        app:iconPadding="@dimen/dimen_8"
-                        app:icon="@drawable/camera_ic" />
+                        android:layout_marginBottom="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?selectableItemBackground"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="?attr/colorOutlineVariant"
+                        app:strokeWidth="1dp">
 
-                    <ImageButton
-                        android:id="@+id/button_remove_image_log"
-                        android:layout_width="@dimen/dimen_24"
-                        android:layout_height="@dimen/dimen_24"
-                        android:src="@drawable/close_ic"
-                        app:tint="@color/white"
-                        android:background="@drawable/oval_background_with_opacity"
-                        android:layout_gravity="top|start"
-                        android:layout_margin="8dp"
-                        android:visibility="gone"
-                        android:contentDescription="@string/remove_image"/>
-                </FrameLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
 
+                            <ImageView
+                                android:id="@+id/img_photo_icon"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/round_lay"
+                                android:backgroundTint="?attr/colorPrimaryContainer"
+                                android:padding="12dp"
+                                android:src="@drawable/camera_ic"
+                                app:tint="?attr/colorPrimary" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_analyze_and_save"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_gravity="end"
-                android:layout_height="wrap_content"
-                android:paddingStart="56dp"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:paddingEnd="56dp"
-                android:text="Tahlil qilish"
-                app:icon="@drawable/search_ic"
-                app:iconGravity="textStart" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/todays_food_title"
-                style="@style/Subtitle2_14"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
-                android:text="Oxirgilar"
-                android:textColor="?colorOnSurface" />
+                                <TextView
+                                    android:id="@+id/text_photo_title"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="Ovqatni rasmga olish"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="17sp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_todays_food"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:nestedScrollingEnabled="false"
-                tools:itemCount="3"
-                tools:listitem="@layout/item_todays_food" />
+                                <TextView
+                                    android:id="@+id/text_photo_desc"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:alpha="0.8"
+                                    android:text="Eng oson va tez usul"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:alpha="0.5"
+                                android:src="@drawable/arrow_right"
+                                app:tint="?attr/colorOnSurfaceVariant" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?colorSurface"
-        android:elevation="4dp"
-        android:padding="16dp">
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+                    <!-- Option 2: Voice -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/voiceInputButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?selectableItemBackground"
+                        android:visibility="visible"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="?attr/colorOutlineVariant"
+                        app:strokeWidth="1dp">
 
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progress_analyze"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:indeterminate="true"
-                android:visibility="gone"
-                app:indicatorColor="?colorOnPrimary"
-                app:trackColor="?colorSurfaceContainerLowest"
-                app:indicatorSize="24dp" />
-        </FrameLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
 
-    </LinearLayout>
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+                            <ImageView
+                                android:id="@+id/img_voice_icon"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/round_lay"
+                                android:backgroundTint="?attr/colorPrimaryContainer"
+                                android:padding="12dp"
+                                android:src="@drawable/mic_ic"
+                                app:tint="?attr/colorPrimary" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/text_voice_title"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="Ovozli qo'shish"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="17sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Ovqat haqida gapirib bering"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:alpha="0.5"
+                                android:src="@drawable/arrow_right"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Option 3: Text -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/textInputButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?selectableItemBackground"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="?attr/colorOutlineVariant"
+                        app:strokeWidth="1dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:id="@+id/img_text_icon"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/round_lay"
+                                android:backgroundTint="?attr/colorPrimaryContainer"
+                                android:padding="12dp"
+                                android:src="@drawable/edit"
+                                app:tint="?attr/colorPrimary" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/text_write_title"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="Yozib kiritish"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="17sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="Nima yeganizni yozing"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:alpha="0.5"
+                                android:src="@drawable/arrow_right"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_recent_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/dimen_24">
+
+                    <TextView
+                        style="@style/Headline3_15"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/dimen_18"
+                        android:layout_marginBottom="8dp"
+                        android:text="Oxirgi qo'shilganlar"
+                        android:textColor="?colorOnSurface" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_recent_logs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_todays_food" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/history_button"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
+                        android:text="Barchasini ko'rish"
+                        android:textColor="?attr/colorPrimary" />
+
+                </LinearLayout>
+
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

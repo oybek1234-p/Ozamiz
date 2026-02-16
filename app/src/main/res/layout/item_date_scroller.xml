@@ -1,46 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/card_date"
-    android:layout_width="50dp"
-    android:layout_height="50dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_marginHorizontal="4dp"
-    app:cardCornerRadius="18dp"
-    app:cardElevation="0dp"
-    android:clickable="true"
-    android:focusable="true"
-    app:strokeWidth="1dp"
-    app:strokeColor="?colorOutlineVariant"
-    app:cardBackgroundColor="?colorSurfaceContainerLowest"
-    android:foreground="?android:attr/selectableItemBackground">
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:gravity="center"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/date_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingVertical="4dp">
+    <TextView
+        android:id="@+id/textView_day_of_week"
+        style="@style/TextAppearance.Material3.LabelSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:textAllCaps="true"
+        android:textColor="?colorOnSurface"
+        android:textSize="12sp"
+        tools:text="Sesh" />
 
-        <TextView
-            android:id="@+id/textView_day_of_week"
-            style="@style/Caption3_11"
-            android:textColor="?colorOnSurface"
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_ring"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAllCaps="true"
-            tools:text="Sesh" />
+            android:layout_gravity="center"
+            app:indicatorColor="@color/green"
+            app:indicatorSize="54dp"
+            app:trackColor="?attr/colorSurfaceContainerHigh"
+            app:trackCornerRadius="4dp"
+            app:trackThickness="3dp"
+            tools:progress="60" />
 
-        <TextView
-            android:id="@+id/textView_day_of_month"
-            style="@style/Subtitle3_13"
-            android:fontFamily="@font/roboto_medium"
-            android:layout_width="wrap_content"
-            android:visibility="gone"
-            android:layout_height="wrap_content"
-            tools:text="26" />
-    </LinearLayout>
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_date"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="0dp">
 
-</com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/textView_day_of_month"
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/roboto_medium"
+                android:visibility="visible"
+                tools:text="26" />
+
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
+</LinearLayout>

@@ -1,0 +1,81 @@
+package uz.oybek.ozamiz.data.logs
+
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.firebase.FirebasePaths
+import uz.oybek.ozamiz.data.firebase.currentUserId
+import uz.oybek.ozamiz.data.logs.base.BaseLogRepository
+import uz.oybek.ozamiz.data.logs.model.ExerciseLog
+import uz.oybek.ozamiz.data.utils.dateApiFormat
+import java.util.Date
+
+/**
+ * Repository for exercise log operations.
+ * Extends BaseLogRepository to eliminate code duplication.
+ */
+object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
+
+    override fun getReference(userId: String, date: String): DatabaseReference {
+        return FirebasePaths.exerciseLogsReference(userId, date)
+    }
+
+    override suspend fun add(log: ExerciseLog, date: Date): Boolean {
+        val success = super.add(log, date)
+        if (success) {
+            DailySummaryRepository.updateSummary(
+                date = date,
+                exerciseDelta = log.caloriesBurned
+            )
+        }
+        return success
+    }
+
+    override suspend fun delete(logId: String, date: Date): Boolean {
+        val userId = currentUserId ?: return false
+        val dateStr = date.dateApiFormat()
+        
+        val oldLog = try {
+            getReference(userId, dateStr).child(logId).get().await().getValue(ExerciseLog::class.java)
+        } catch (e: Exception) {
+            null
+        }
+
+        val success = super.delete(logId, date)
+        if (success && oldLog != null) {
+            DailySummaryRepository.updateSummary(
+                date = date,
+                exerciseDelta = -oldLog.caloriesBurned
+            )
+        }
+        return success
+    }
+
+    fun getLogs(date: Date): Flow<List<ExerciseLog>> = callbackFlow {
+        val userId = currentUserId
+        if (userId == null) {
+            close()
+            return@callbackFlow
+        }
+        val dateStr = date.dateApiFormat()
+        val query = getReference(userId, dateStr)
+
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val logs = snapshot.children.mapNotNull { it.getValue(ExerciseLog::class.java) }
+                trySend(logs)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
+        }
+        query.addValueEventListener(listener)
+        awaitClose { query.removeEventListener(listener) }
+    }
+}

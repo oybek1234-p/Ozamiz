@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurface">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorSurfaceContainer"
+        app:elevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
+
+            <!-- Toolbar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/oval_back"
+                    android:backgroundTint="?colorSurfaceContainerHigh"
+                    android:src="@drawable/arrow_back"
+                    android:padding="8dp"
+                    android:contentDescription="Back"
+                    app:tint="?colorOnSurface"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Menyular"
+                    android:textSize="20sp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="?colorOnSurface"
+                    android:layout_marginStart="12dp"/>
+
+                <ImageButton
+                    android:id="@+id/btnAddMenu"
+                    android:layout_width="24dp"
+                    android:layout_height="40dp"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:src="@drawable/add_ic"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Add Menu"
+                    app:tint="?attr/colorPrimary" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="12dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    
+                    <EditText
+                        android:id="@+id/editSearch"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:hint="Taom qidirish..."
+                        android:paddingStart="40dp"
+                        android:paddingEnd="16dp"
+                        android:textSize="14sp"
+                        android:textColor="?colorOnSurface"
+                        android:maxLines="1"
+                        android:inputType="text"/>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/search_ic"
+                        android:layout_gravity="center_vertical|start"
+                        android:layout_marginStart="12dp"
+                        app:tint="?colorOnSurfaceVariant"/>
+                </FrameLayout>            
+            </LinearLayout>
+
+            <!-- Primary Categories -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerPrimaryCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- Secondary Categories -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSecondaryCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"/>
+        </LinearLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerMenus"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"/>
+        
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

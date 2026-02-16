@@ -11,6 +11,9 @@ import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.ItemTodaysFoodBinding
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class TodaysFoodAdapter(
     private val onItemClick: (FoodLog) -> Unit
@@ -26,34 +29,34 @@ class TodaysFoodAdapter(
     }
 
     override fun onBindViewHolder(holder: FoodLogViewHolder, position: Int) {
-        val item = getItem(position)
-        if (item != null) {
-            holder.bind(item)
-        }
+        getItem(position)?.let { holder.bind(it) }
     }
 
     inner class FoodLogViewHolder(private val binding: ItemTodaysFoodBinding) :
         RecyclerView.ViewHolder(binding.root) {
+
+        private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
         init {
             itemView.setOnClickListener {
-                val position = bindingAdapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    getItem(position)?.let { log ->
-                        onItemClick(log)
-                    }
-                }
+                getItem(bindingAdapterPosition)?.let { log -> onItemClick(log) }
             }
         }
 
         fun bind(foodLog: FoodLog) {
             binding.textViewFoodName.text = foodLog.description
-            binding.textViewFoodName.visibility = if (foodLog.description.isNotBlank()) View.VISIBLE else View.GONE
-
             binding.textViewFoodCalories.text =
                 itemView.context.getString(R.string.calories_format, foodLog.calories)
-            binding.textViewFoodCalories.visibility = if (foodLog.calories > 0 && foodLog.description.isEmpty()) View.VISIBLE else View.GONE
 
-            if (!foodLog.photoUrl.isNullOrEmpty()) {
+            val timestamp = foodLog.timestamp as? Long
+            if (timestamp != null) {
+                binding.textViewTimestamp.text = timeFormat.format(Date(timestamp))
+                binding.textViewTimestamp.visibility = View.VISIBLE
+            } else {
+                binding.textViewTimestamp.visibility = View.GONE
+            }
+
+            if (!foodLog.photoUrl.isNullOrEmpty() && foodLog.photoUrl != "null") {
                 binding.imageViewFood.visibility = View.VISIBLE
                 Glide.with(itemView.context)
                     .load(foodLog.photoUrl)
@@ -63,20 +66,10 @@ class TodaysFoodAdapter(
                 binding.imageViewFood.visibility = View.GONE
             }
 
-            // Healthiness Dot Logic
-            val healthinessColor = when (foodLog.healthLevel) {
-                "GOOD" -> R.color.green
-                "MODERATE" -> R.color.yellow
-                "POOR" -> R.color.rejected
-                else -> 0
-            }
-
-            if (healthinessColor != 0) {
-                binding.healthinessDot.background.setTint(ContextCompat.getColor(itemView.context, healthinessColor))
-                binding.healthinessDot.visibility = View.VISIBLE
-            } else {
-                binding.healthinessDot.visibility = View.GONE
-            }
+            // Macros
+            binding.textViewProtein.text = "${foodLog.protein?.toInt() ?: 0}g"
+            binding.textViewCarbs.text = "${foodLog.carbs?.toInt() ?: 0}g"
+            binding.textViewFat.text = "${foodLog.fat?.toInt() ?: 0}g"
         }
     }
 

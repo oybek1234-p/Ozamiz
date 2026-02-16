@@ -17,7 +17,7 @@
             android:layout_width="50dp"
             app:shapeAppearance="@style/CircleImageView"
             android:layout_height="50dp"
-            app:strokeColor="#D2D2D2"
+            app:strokeColor="?attr/colorOutlineVariant"
             app:strokeWidth="2dp"
             android:padding="@dimen/dimen_2"
             android:scaleType="centerCrop"
@@ -27,7 +27,7 @@
 
         <TextView
             android:id="@+id/text_meal_name"
-            style="@style/Subtitle2_14"
+            style="@style/TextAppearance.Material3.TitleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dimen_2"
             android:textColor="?colorOnSurfaceVariant"
-            android:textSize="13sp"
+            style="@style/TextAppearance.Material3.BodyMedium"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/button_add_meal"
             app:layout_constraintStart_toStartOf="@+id/text_meal_name"
@@ -52,7 +52,7 @@
 
         <TextView
             android:id="@+id/text_meal_reminder_time"
-            style="@style/Caption1_13"
+            style="@style/TextAppearance.Material3.LabelSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/dimen_12"

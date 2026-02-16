@@ -1,72 +1,80 @@
 package uz.oybek.ozamiz.data.food.analyzer
 
-import com.google.firebase.ai.type.Schema
-
+/**
+ * AI tahlil uchun universal instruksiya va konfiguratsiya.
+ * Ma'lumot aniqligi 92% dan yuqori bo'lgandagina natija beradi,
+ * aks holda JSON formatida aniqlashtiruvchi savol qaytaradi.
+ */
 object FoodAnalyzerConfig {
 
-    const val MODEL_VERSION = "gemini-2.0-flash"
+    const val MODEL_NAME = "gemini-flash-lite-latest"
 
-    const val AUDIO_INSTRUCTION = """
-                Sen user nima yeganini o'zbek milliy taomlarini aniqlaydigan ekspert assistantsan.
-                Sening asosiy maqsading - audio yozuvdagi oziq-ovqat nomlarini to'g'ri transkripsiya qilish.
-                Muhim taomlar ro'yxati: [Somsa,Gumma, Honim, Osh, Manti, Sho'rva, Lag'mon, Shashlik, Kabob, Chuchvara, Dimlama, Norin, Mastava, Kartoshka].
-                Nima ovqat yegani, qancha, nimalar borligini yoz. Boshqa gaplar kerak emas.
-                1 kosa osh, 0.5 kola, pomidor bodring salat tarelka
-            """
+    const val FOOD_INSTRUCTION = """
+Sen tajribali AI Diyetologsan. Har qanday ovqatni tahlil qilishda quyidagi UNIVERSAL ALGORITM bo'yicha ishlaysan.
+Har doim FAQAT JSON formatida javob ber. 
 
-    const val AUDIO_PROMPT = "" +
-            "Bu audio yozuvni matnga aylantir"
+🔴 QAT'IY TAQIQLAR (TIZIM XATOLIK BERMASLIGI UCHUN):
+1. Hech qachon foydalanuvchi bilan oddiy matn orqali gaplashma (chat qilma)!
+2. "Ma'lumotlar yetarli emas", "Iltimos ayting" kabi gaplarni JSONdan tashqarida aslo yozma!
+3. Javobing har doim '{' belgisi bilan boshlanishi va '}' bilan tugashi shart.
+4. Agar ma'lumot yetishmasa, buni FAQAT JSON ichidagi "question" maydonida so'ra.
 
-    fun foodAnalyzePrompt(
-        description: String
-    ): String {
-        return """
-    USER INFO:
-    - Maqsad: Ozish
-    - Joylashuv: O'zbekiston
-    
-    VAZIFA:
-    Sen O'zbekistondagi ozish uchun mo'ljallangan ilovada ekspert nutritionist assistantsan. Taqdim etilgan ovqat tavsifi va/yoki rasmini tahlil qil. O'zbek tilida qisqa, foydali va madaniyatga mos tahlil ber.
+🟢 ANIQ (CONFIDENT) QAROR QABUL QILISH QOIDASI (92%):
+1. Agar rasm yoki matndan ovqat turi va miqdori 92% aniqlikda ko'rinib turgan bo'lsa (Masalan: Pepsi 0.5L rasmda ko'rinsa yoki "3 ta go'shtli somsa" deb yozilsa), SAVOL BERMA, darhol natija (isAmbiguous: false) chiqar.
+2. Agar aniqlik 98% dan past bo'lsa (Masalan: Pepsi bor, lekin hajmi shubhali bo'lsa, yoki ovqat rasmi pishloq yoki shirinlik ajrata olmasang), "isAmbiguous": true holatini qaytar.
 
-    Ovqat Tavsifi: "$description"
+🟡 UNIVERSAL TOIFALAR (O'lchov birliklari):
+- Suyuq (Sho'rva, Sut...): kosa, piyola, tarelka, litr.
+- Quyuq (Osh, Lag'mon...): porsiya, kosa, tarelka, lagan.
+- Dona (Somsa, Manti, Shashlik, Non...): dona, ta, bo'lak.
+- Fast-food (Lavash, Burger...): kichik, o'rtacha, katta.
+- Ichimlik (Pepsi, Choy...): stakan, piyola, banka, 0.5L, 1L, 1.5L.
 
-    QO'LLANMA:
-    1.  **Yagona Ovqat Tahlili**: Barcha aytilgan oziq-ovqat mahsulotlarini bitta ovqat deb hisobla. JAMI ozuqaviy qiymatlarni hisobla.
-    2.  **Chiqish Formati**: FAQAT quyida ko'rsatilgan formatda javob ber. Hech qanday qo'shimcha matn, tushuntirish yoki salomlashish qo'shma. Json formatda scheme qaytar.
-     
-    Bir nechta ovqat bulsa, hammasini umumiy qilib hisobla kaloriya va etc.
-    """
+🔵 JAVOB FORMATI (FAQAT SHU IKKI HOLAT):
+
+1. AGAR MA'LUMOT NOANIQ BO'LSA, bir vaqtda bitta savol ber (isAmbiguous: true):
+{
+  "isAmbiguous": true,
+  "question": "Qisqa va lo'nda savol?(Faqat bitta mantiqga ega savol)",
+  "options": ["Variant 1", "Variant 2", "Variant 3", "Variant 4"]
+}
+Notogri savol: Nechta va qanday turdagi somsa?
+Togri: Nechta somsa yedingiz? 1ta, 2 ta, 4ta, boshqa.
+
+2. AGAR MA'LUMOT ANIQ BO'LSA (isAmbiguous: false):
+{
+  "isAmbiguous": false,
+  "name": "Ovqat nomi va miqdori (aniq turi bilan)",
+  "calories": 450,
+  "protein": 15.0,
+  "fat": 20.0,
+  "carbs": 55.0,
+  "ingredients": ["Ro'yxat"],
+  "healthScore": 7,
+  "aiInsight": "Foydali maslahat qisqa, 1-2 qisqa ta gap"
+}
+
+MUHIM: O'zbek tilida so'zlashuvchi oddiy odam tushunadigan xalqchil tilni ishlat.
+"""
+
+    private val mealNames = mapOf(
+        "breakfast" to "Nonushta",
+        "lunch" to "Tushlik",
+        "dinner" to "Kechki ovqat",
+        "snack" to  "Gazak"
+    )
+
+    /**
+     * Foydalanuvchi ma'lumotlarini promptga birlashtiradi.
+     */
+    fun buildFoodPrompt(description: String, meal: String, gender: Int): String {
+        val genderText = if (gender == 1) "Erkak kishi" else "Ayol kishi"
+        val mealText = mealNames[meal.lowercase()] ?: meal
+
+        return if (description.isNotBlank()) {
+            "$genderText, $mealText vaqtida: $description. Ma'lumot 92% aniq bo'lsa natija ber, aks holda bitta detalni so'ra."
+        } else {
+            "$genderText, $mealText vaqtida rasm yukladi. Agar hamma narsa (nomi va hajmi) ko'rinib turgan bo'lsa natija ber, aks holda miqdorini so'ra."
+        }
     }
-
-    val analyzedIngredientSchema = Schema.obj(
-        properties = mapOf(
-            "name" to Schema.string(description = "The name of the ingredient."),
-            "calories" to Schema.integer(
-                description = "The calorie count of the ingredient.",
-                nullable = true
-            )
-        )
-    )
-
-    val foodAnalysisResultSchema = Schema.obj(
-        mapOf(
-            "name" to Schema.string("Ovqatga oddiy nom ber, min 1,max 5 words."),
-            "calories" to Schema.integer(description = "Umumiy kaloriya qiymati"),
-            "protein" to Schema.double(description = "Umumiy protein qiymati", nullable = true),
-            "fat" to Schema.double(description = "Umumiy yog' qiymati", nullable = true),
-            "carbs" to Schema.double(description = "Umumiy karbohidrat qiymati", nullable = true),
-            "ingredients" to Schema.array(
-                description = "Asosiy masalliqlar ro'yxati, vergul bilan ajratilgan, \"Emoji Nomi (Kaloriya)\" formatida. Masalan: \uD83C\uDF57 Tovuq filesi (150), \uD83E\uDD52 Bodring (15), \uD83C\uDF45 Pomidor (20), etc.",
-                items = analyzedIngredientSchema
-            ),
-            "isHealthy" to Schema.string(
-                description = "Yagona, qisqa, aniq harakatga undovchi maslahat ber, uning oldiga hissiy darajani (GOOD, MODERATE, yoki POOR) qo'y.",
-                nullable = true
-            ),
-            "feedback" to Schema.string(
-                description = "Ovqatga asoslanib ozish uchun maslahat ber, agar ovqat GOOD bulsa, foydali tomonini ayt, agar moderate/poor bulsa maslahat ber",
-                nullable = true
-            )
-        )
-    )
 }

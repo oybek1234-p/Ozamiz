@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest"
-    tools:context=".ui.log.photo.WeightPhotoHistoryFragment">
+    android:background="?colorSurfaceContainer">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout_weight_history"
@@ -14,12 +13,10 @@
         android:background="?colorSurface"
         app:elevation="0dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
+        <uz.oybek.ozamiz.ui.base.MyToolBar
             android:id="@+id/toolbar_weight_history"
-            style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?colorSurface"
             app:navigationIcon="@drawable/arrow_back"
             app:navigationIconTint="?colorOnSurface"
             app:title="Vazn va Surat Tarixi"
@@ -33,13 +30,13 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_new"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/add_new"
-            android:src="@drawable/add_ic"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/dimen_28"
-            />
+            android:src="@drawable/add_ic" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView_weight_history"
             android:layout_width="match_parent"

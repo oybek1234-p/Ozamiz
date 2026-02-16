@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
+    android:elevation="1dp"
+    android:orientation="vertical"
+    android:paddingVertical="12dp"
+    android:paddingHorizontal="8dp"
+    android:background="@drawable/round_lay"
+    android:backgroundTint="?colorSurfaceContainerLowest">
+
+    <TextView
+        android:id="@+id/textView_macro_name"
+        style="@style/Text2_15"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?colorOnSurfaceVariant"
+        tools:text="Protein" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp">
+
+        <TextView
+            android:id="@+id/textView_macro_value"
+            style="@style/Title3_17"
+            android:fontFamily="@font/roboto_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?colorOnSurface"
+            tools:text="8g" />
+
+        <ImageView
+            android:id="@+id/btn_edit_macro"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/edit"
+            app:tint="?colorOnSurfaceVariant" />
+
+    </LinearLayout>
+
+</LinearLayout>

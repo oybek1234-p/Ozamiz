@@ -1,18 +1,18 @@
 package uz.oybek.ozamiz.ui.feature.log.photo
 
 import androidx.lifecycle.ViewModel
+import uz.oybek.ozamiz.data.logs.model.WeightLog
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.logs.WeightLogRepository
+import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.utils.DataWrapper
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.logs.WeightLogRepository
-import uz.oybek.ozamiz.data.logs.model.WeightLog
-import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.utils.DataWrapper
 
 data class WeightPhotoHistoryUiState(
     val isLoading: Boolean = true,
@@ -21,8 +21,6 @@ data class WeightPhotoHistoryUiState(
 )
 
 class WeightPhotoHistoryViewModel : ViewModel() {
-
-    private val repository = WeightLogRepository()
 
     private val _uiState = MutableStateFlow(WeightPhotoHistoryUiState())
     val uiState: StateFlow<WeightPhotoHistoryUiState> = _uiState.asStateFlow()
@@ -33,10 +31,10 @@ class WeightPhotoHistoryViewModel : ViewModel() {
             _uiState.update { it.copy(isLoading = false, error = "Foydalanuvchi topilmadi.") }
             return
         }
-
+//
         _uiState.update { it.copy(isLoading = true, error = null) }
         viewModelScope.launch {
-            repository.getLogsFlow(userId)
+            WeightLogRepository.getLogsFlow(userId)
                 .catch { e ->
                     _uiState.update {
                         it.copy(

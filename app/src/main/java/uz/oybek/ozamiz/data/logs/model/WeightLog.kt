@@ -2,25 +2,35 @@ package uz.oybek.ozamiz.data.logs.model
 
 import android.os.Parcelable
 import androidx.annotation.Keep
-import com.google.firebase.firestore.ServerTimestamp
+import com.google.firebase.database.ServerValue
+import kotlinx.serialization.Serializable
+import uz.oybek.ozamiz.data.logs.base.LogItem
 import kotlinx.parcelize.Parcelize
-import java.util.Date
+import kotlinx.parcelize.RawValue
 
 @Keep
+@Serializable
 @Parcelize
 data class WeightLog(
-    var id: String = "",
+    override var logId: String = "",
     val userId: String = "",
-    @ServerTimestamp
-    var timestamp: Date? = null,
+    var timestamp: @RawValue @kotlinx.serialization.Contextual Any = ServerValue.TIMESTAMP,
     var weightKg: Double = 0.0,
     var photoUrl: String = ""
-) : Parcelable {
+) : LogItem, Parcelable {
+
+    @kotlinx.serialization.Transient
+    val timestampLong: Long
+        get() = when (val ts = timestamp) {
+            is Long -> ts
+            is Double -> ts.toLong()
+            else -> System.currentTimeMillis()
+        }
 
     constructor() : this(
         "",
         "",
-        null,
+        0L,
         0.0,
         ""
     )

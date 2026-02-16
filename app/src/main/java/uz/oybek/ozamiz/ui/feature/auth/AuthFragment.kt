@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,13 +18,13 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.util.PermissionController
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FragmentAuthBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.postVal
 import uz.oybek.ozamiz.ui.utils.showToast
+import uz.oybek.ozamiz.util.PermissionController
 import uz.oybek.ozamiz.util.handleException
 
 class AuthFragment : BaseFragment<FragmentAuthBinding>() {
@@ -49,25 +50,25 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
                 val data = result.data
                 if (data != null) {
                     try {
-                    val credential = oneTapClient?.getSignInCredentialFromIntent(data)
-                    val idToken = credential?.googleIdToken
-                    if (idToken != null) {
-                        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
+                        val credential = oneTapClient?.getSignInCredentialFromIntent(data)
+                        val idToken = credential?.googleIdToken
+                        if (idToken != null) {
+                            val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
 
-                        if (context != null && activity != null) {
-                            viewModel.sendState.postVal(SendState.Sending)
-                            viewModel.signInGoogle(firebaseCredential) {
-                                if (it) {
-                                    verified()
-                                } else {
-                                    viewModel.sendState.postVal(SendState.Input())
-                                    isSigning = false
+                            if (context != null && activity != null) {
+                                viewModel.sendState.postVal(SendState.Sending)
+                                viewModel.signInGoogle(firebaseCredential) {
+                                    if (it) {
+                                        verified()
+                                    } else {
+                                        viewModel.sendState.postVal(SendState.Input())
+                                        isSigning = false
+                                    }
                                 }
+                            } else {
+                                isSigning = false
                             }
-                        } else {
-                            isSigning = false
                         }
-                    }
                     } catch (e: Exception) {
                         handleException(e)
                         isSigning = false
@@ -183,12 +184,17 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
             viewModel.sendState.observe(viewLifecycleOwner) {
                 when (it) {
                     is SendState.Input -> {
-                        gmailButton.isVisible = true
                         progressBar.isVisible = false
+                        gmailButton.isVisible = true
+                        emailButton.isVisible = true
                     }
+
                     is SendState.Sending -> {
                         progressBar.isVisible = true
+                        gmailButton.visibility = View.INVISIBLE
+                        emailButton.visibility = View.INVISIBLE
                     }
+
                     else -> {}
                 }
             }

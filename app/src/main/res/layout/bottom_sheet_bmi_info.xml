@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="?attr/colorSurfaceContainerLowest">
+
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/round_lay"
+        android:backgroundTint="?attr/colorSurfaceVariant" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BMI Ko'rsatkichi"
+        android:fontFamily="@font/roboto_bold"
+        android:textSize="20sp"
+        android:textColor="?attr/colorOnSurface"
+        android:layout_gravity="center_horizontal"/>
+    
+    <TextView
+        android:id="@+id/tvBmiValueSheet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="19.13"
+        android:fontFamily="@font/roboto_bold"
+        android:textSize="36sp"
+        android:textColor="?attr/colorOnSurface"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/tvBmiStatusSheet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sog'lom"
+        android:background="@drawable/round_lay"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="4dp"
+        android:fontFamily="@font/roboto_medium"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="#4CAF50"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="center_horizontal"/>
+
+    <FrameLayout
+         android:id="@+id/layoutBmiScaleSheet"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="24dp">
+         
+         <View
+             android:layout_width="match_parent"
+             android:layout_height="12dp"
+             android:layout_gravity="center_vertical"
+             android:background="@drawable/bg_bmi_gradient"/>
+         
+         <!-- Marker (Vertical Line) -->
+         <View
+             android:id="@+id/viewBmiMarkerSheet"
+             android:layout_width="4dp"
+             android:layout_height="24dp"
+             android:background="?attr/colorOnSurface"
+             android:layout_gravity="center_vertical|start"/> 
+     </FrameLayout>
+     
+     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical">
+            
+            <ImageView android:layout_width="8dp" android:layout_height="8dp" app:srcCompat="@drawable/circle_shape" app:tint="#2196F3"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Kam vazn" android:textSize="12sp" android:layout_marginStart="4dp" android:textColor="?attr/colorOnSurfaceVariant"/>
+            <Space android:layout_width="0dp" android:layout_weight="1" android:layout_height="0dp"/>
+
+            <ImageView android:layout_width="8dp" android:layout_height="8dp" app:srcCompat="@drawable/circle_shape" app:tint="#4CAF50"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Sog'lom" android:textSize="12sp" android:layout_marginStart="4dp" android:textColor="?attr/colorOnSurfaceVariant"/>
+            <Space android:layout_width="0dp" android:layout_weight="1" android:layout_height="0dp"/>
+
+            <ImageView android:layout_width="8dp" android:layout_height="8dp" app:srcCompat="@drawable/circle_shape" app:tint="#FFC107"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ortiqcha" android:textSize="12sp" android:layout_marginStart="4dp" android:textColor="?attr/colorOnSurfaceVariant"/>
+            <Space android:layout_width="0dp" android:layout_weight="1" android:layout_height="0dp"/>
+
+            <ImageView android:layout_width="8dp" android:layout_height="8dp" app:srcCompat="@drawable/circle_shape" app:tint="#F44336"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Semizlik" android:textSize="12sp" android:layout_marginStart="4dp" android:textColor="?attr/colorOnSurfaceVariant"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Eslatma"
+        android:fontFamily="@font/roboto_bold"
+        android:textSize="16sp"
+        android:layout_marginTop="32dp"
+        android:textColor="?attr/colorOnSurface"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Sog'liqni saqlashning ko'plab o'lchovlari singari, BMI mukammal test emas. Masalan, homiladorlik yoki yuqori mushak massasi natijalarga ta'sir qilishi mumkin. Shuningdek, bolalar yoki qariyalar uchun sog'liqni aniqlashda eng yaxshi o'lchov bo'lmasligi mumkin."
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nima uchun BMI muhim?"
+        android:fontFamily="@font/roboto_bold"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:textColor="?attr/colorOnSurface"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Umuman olganda, BMI qanchalik yuqori bo'lsa, ortiqcha vazn bilan bog'liq qator kasalliklarning rivojlanish xavfi shunchalik yuqori bo'ladi, jumladan:\n• diabet\n• artrit\n• jigar kasalliklari\n• saratonning ayrim turlari\n• yuqori qon bosimi (gipertoniya)\n• yuqori xolesterin\n• uyqu apnesi."
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/tvSource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Manba: O'zbekiston Sog'liqni Saqlash Vazirligi"
+        android:layout_marginTop="24dp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp" />
+
+</LinearLayout>

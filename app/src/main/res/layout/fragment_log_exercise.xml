@@ -4,91 +4,108 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest">
+    android:background="?colorSurfaceContainer"
+    android:animateLayoutChanges="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_log_exercise"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="?colorSurfaceContainer"
+        android:elevation="@dimen/dimen_4"
+        app:titleTextColor="?colorOnSurface"
+        app:titleCentered="true"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/arrow_back"
         tools:title="@string/log_exercise_title" />
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_exercise_types"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_log_exercise"
-        app:layout_constraintBottom_toTopOf="@id/button_save_exercise_log">
+        tools:listitem="@layout/item_exercise_type_selectable" />
 
-        <LinearLayout
+    <!-- Tanlangan mashq tafsilotlari ko'rinishi -->
+    <LinearLayout
+        android:id="@+id/layout_exercise_details"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_log_exercise">
+
+        <TextView
+            android:id="@+id/text_selected_exercise_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="64sp"
+            tools:text="🧘" />
+
+        <TextView
+            android:id="@+id/text_burned_calories"
+            style="@style/Title4_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:textColor="?colorOnSurface"
+            tools:text="57 kal" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout_duration"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_marginTop="24dp"
+            android:hint="@string/duration_hint">
 
-            <TextView
-                style="@style/Headline2_16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/select_activity_type"
-                android:textColor="?colorOnSurface" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView_exercise_types"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editText_duration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:clipToPadding="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:itemCount="4"
-                tools:listitem="@layout/item_exercise_type_selectable" />
+                android:gravity="center"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:maxLength="4"
+                android:textSize="20sp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
+        <FrameLayout
+            android:id="@+id/save_button_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?colorSurfaceContainer"
+            android:layout_marginTop="@dimen/dimen_24"
+            android:visibility="gone"
+            tools:layout_editor_absoluteY="811dp"
+            tools:visibility="visible">
 
-            <TextView
-                style="@style/Headline2_16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/enter_duration_minutes"
-                android:textColor="?colorOnSurface" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout_duration"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_save_exercise_log"
+                style="@style/FilledButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:hint="@string/duration_hint">
+                android:text="@string/save" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editText_duration"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:maxLength="4"
-                    android:imeOptions="actionDone" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <ProgressBar
+                android:id="@+id/progressBar_exercise"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="?colorOnPrimary"
+                android:visibility="gone" />
+        </FrameLayout>
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_save_exercise_log"
-        style="@style/FilledButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/save"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <ProgressBar
-        android:id="@+id/progressBar_exercise"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/button_save_exercise_log"
-        app:layout_constraintBottom_toBottomOf="@id/button_save_exercise_log"
-        app:layout_constraintStart_toStartOf="@id/button_save_exercise_log"
-        app:layout_constraintEnd_toEndOf="@id/button_save_exercise_log" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

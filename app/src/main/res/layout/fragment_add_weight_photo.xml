@@ -4,89 +4,242 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurface">
+    android:background="?colorSurfaceContainer"
+    android:animateLayoutChanges="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_add_weight_photo"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:background="?colorSurfaceContainer"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/arrow_back" />
+        app:navigationIcon="@drawable/arrow_back"
+        app:title="Vazn qo'shish"
+        app:titleTextAppearance="@style/Title2_20" />
 
     <androidx.core.widget.NestedScrollView
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
         android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@+id/save_button_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:paddingBottom="100dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_add_weight_photo">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp">
 
-            <TextView
-                style="@style/Title2_20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="Hozirgi suratingizni yuklang"
-                android:textColor="?colorOnSurface" />
-
+            <!-- Photo Upload Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_image_picker_weight_log"
-                style="@style/ImagePickerCardStyle"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
-                android:layout_marginTop="8dp">
+                android:layout_height="280dp"
+                android:layout_marginBottom="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                android:backgroundTint="?attr/colorSurfaceContainerLowest">
+
+                <FrameLayout
+                    android:id="@+id/layout_add_image_placeholder"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="?attr/colorSurfaceContainerLowest">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="24dp">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:minHeight="180dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorOutlineVariant"
+                            app:strokeWidth="2dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:padding="24dp">
+
+                                <ImageView
+                                    android:layout_width="48dp"
+                                    android:layout_height="48dp"
+                                    android:src="@drawable/camera_ic"
+                                    app:tint="?attr/colorPrimary" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="16dp"
+                                    android:text="Fotosurat yuklash"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textSize="17sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:text="Bosib suratingizni yuklang"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:text="(Ixtiyoriy)"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="14sp"
+                                    android:alpha="0.6" />
+
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </LinearLayout>
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/imageView_picked"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_remove_image"
+                    style="@style/Widget.Material3.Button.IconButton.Filled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="12dp"
+                    android:visibility="gone"
+                    app:icon="@drawable/close_ic"
+                    app:iconTint="@color/white" />
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout_weight"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <!-- Weight Input Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:hint="Vazningiz"
-                app:suffixText="kg">
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                android:backgroundTint="?attr/colorSurfaceContainerLowest">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editText_weight"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    android:maxLength="6" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Bugungi vazningiz"
+                        android:textColor="?colorOnSurface"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textSize="18sp" />
+
+                    <!-- Prominent Weight Input -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="bottom"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editText_weight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@null"
+                            android:gravity="center"
+                            android:hint="00.0"
+                            android:inputType="numberDecimal"
+                            android:maxLength="5"
+                            android:minWidth="100dp"
+                            android:padding="0dp"
+                            android:textColor="?attr/colorPrimary"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textSize="48sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginStart="6dp"
+                            android:text="kg"
+                            android:textColor="?attr/colorPrimary"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="120dp"
+                        android:layout_height="3dp"
+                        android:layout_marginTop="8dp"
+                        android:background="?attr/colorPrimaryContainer"
+                        android:alpha="0.5" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <FrameLayout
+    <!-- Bottom Button -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/save_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
+        android:backgroundTint="?colorSurfaceContainerLowest"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:padding="16dp"
-        android:background="?colorSurfaceContainerLowest">
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_save_weight_photo"
-            style="@style/Widget.Material3.Button"
+        app:strokeWidth="0dp">
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/save" />
-        <ProgressBar
-            android:id="@+id/progressBar_save_weight_photo"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            tools:visibility="visible"/>
-    </FrameLayout>
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_save_weight_photo"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Saqlash"
+                android:textSize="16sp"
+                android:fontFamily="@font/roboto_bold"
+                app:cornerRadius="16dp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar_save_weight_photo"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

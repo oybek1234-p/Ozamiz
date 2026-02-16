@@ -1,32 +1,25 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
-import LogFoodUiState
-import LogFoodViewModel
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.food.analyzer.model.AnalyzedIngredient
+import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
-import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
-import uz.oybek.ozamiz.ui.utils.loadPhoto
-import uz.oybek.ozamiz.ui.utils.showToast
+import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
+import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class AnalyzeResultFragment : BottomSheetDialogFragment() {
@@ -34,53 +27,23 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
     private var _binding: BottomSheetCalorieResultBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var analysisResultFromArgs: FoodAnalysisResult
-    private lateinit var photoUrlFromArgs: String
-    private lateinit var aboutFromArgs: String
-    private lateinit var mealTypeFromArgs: String
-
-    private val viewModel: LogFoodViewModel by activityViewModels()
-
-    private data class HealthIndicatorUI(
-        val backgroundColorRes: Int, val iconRes: Int, val textColorRes: Int, val levelText: String
-    )
-
-    companion object {
-        private const val LEVEL_GOOD = "GOOD"
-        private const val LEVEL_MODERATE = "MODERATE"
-        private const val LEVEL_POOR = "POOR"
-
-        const val TAG = "AnalyzeResultFragment"
-        const val REQUEST_KEY = "CalorieResultRequestKey"
-        const val RESULT_ACTION = "ResultAction"
-
-        const val ARG_ANALYSIS_RESULT = "arg_analysis_result_parcelable"
-        const val ARG_PHOTO_URL_STRING = "arg_photo_url_string"
-        const val ARG_ABOUT_TEXT = "arg_about_text"
-        const val ARG_MEAL_TYPE_ID = "arg_meal_type_id"
-    }
+    private val viewModel: AnalyzeResultViewModel by viewModels()
+    private lateinit var ingredientsAdapter: IngredientsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requireArguments().let {
-            val parcelableResult: GeminiAnalysisResultParcelable? =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    it.getParcelable(
-                        ARG_ANALYSIS_RESULT, GeminiAnalysisResultParcelable::class.java
-                    )
-                } else {
-                    @Suppress("DEPRECATION") it.getParcelable(ARG_ANALYSIS_RESULT)
+        setStyle(STYLE_NORMAL, R.style.BottomSheetStyle)
+        arguments?.let {
+            val logId = it.getString("logId")
+            if (logId != null) {
+                val timestamp = it.getLong("timestamp")
+                viewModel.loadLog(logId, Date(timestamp))
+            } else {
+                val id = it.getInt("id", -1)
+                if (id != -1) {
+                    viewModel.setResult(FoodAnalyzer.getLastAnalyzed(id))
                 }
-
-            analysisResultFromArgs = parcelableResult?.toGeminiAnalysisResult() ?: run {
-                showToast("Natija ma'lumotlari topilmadi.")
-                dismissAllowingStateLoss()
-                return
             }
-
-            photoUrlFromArgs = it.getString(ARG_PHOTO_URL_STRING, "")
-            aboutFromArgs = it.getString(ARG_ABOUT_TEXT, "")
-            mealTypeFromArgs = it.getString(ARG_MEAL_TYPE_ID, "")
         }
     }
 
@@ -93,197 +56,229 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        displayResults()
-        setupActionButtons()
-        setupInfoIconListeners()
-        observeViewModel()
+        setupUI()
+        setupListeners()
+        if (arguments?.getString("logId") != null) {
+            binding.buttonSaveToLog.isVisible = false
+            binding.buttonDelete.isVisible = true
+        }
     }
 
-    private fun observeViewModel() {
+    private fun showLoading(show: Boolean) {
+        binding.progressBarSave.isVisible = show
+        binding.buttonSaveToLog.isEnabled = !show
+        binding.buttonDelete.isEnabled = !show
+        binding.nestedScrollView.alpha = if (show) 0.5f else 1.0f
+    }
+
+    private fun setupUI() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.uiState.collectLatest { state ->
-                if (!isAdded) return@collectLatest
+            viewModel.resultLive.collect { state ->
+                state?.run {
+                    showLoading(isLoading)
+                    val analysisResult = result?.result ?: return@run
+                    
+                    if (analysisResult.isAmbiguous && analysisResult.question != null) {
+                        val existingSheet = parentFragmentManager.findFragmentByTag("clarification_sheet")
+                        if (existingSheet == null && !isLoading) {
+                            ClarificationBottomSheet(
+                                question = analysisResult.question,
+                                options = analysisResult.options ?: emptyList()
+                            ) { selectedOption ->
+                                viewModel.submitAnswer(selectedOption)
+                            }.show(parentFragmentManager, "clarification_sheet")
+                        }
+                    }
 
-                val isProcessing = state is LogFoodUiState.Saving
-                binding.progressBarSave.isVisible = isProcessing
-                binding.buttonSaveToLog.isVisible = !isProcessing
-                binding.backView.isEnabled = !isProcessing
-                binding.buttonRetryAnalysis.isEnabled = !isProcessing
-                binding.buttonSaveToLog.text =
-                    if (isProcessing) "" else getString(R.string.save_to_log)
+                    updateMacrosAndCalorie(analysisResult)
+                    val photoUrl = result.photoUrl
+                    if (photoUrl.isNotEmpty() && (photoUrl == "null").not()) {
+                        Glide
+                            .with(this@AnalyzeResultFragment)
+                            .load(photoUrl)
+                            .placeholder(R.drawable.placeholder_food)
+                            .into(binding.imageViewFoodPhoto)
+                    } else {
+                        binding.imageViewFoodPhoto.isVisible = false
+                    }
+                    binding.textViewFoodName.text = analysisResult.name
+                    val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
+                    binding.textViewTimestamp.text =
+                        dateFormat.format(Date(analysisResult.timestamp))
 
-                if (state is LogFoodUiState.Success) {
-                    closeSheet("success")
-                } else if (state is LogFoodUiState.Error) {
-                    showToast(state.message)
-                    viewModel.stateHandled()
+                    ingredientsAdapter =
+                        IngredientsAdapter(
+                            ingredients = analysisResult.ingredients ?: emptyList()
+                        )
+                    val score = analysisResult.healthScore ?: 0
+                    binding.textViewHealthScore.text = "$score/10"
+                    binding.textViewHealthScore.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            if (score >= 8) R.color.green
+                            else if (score >= 5) R.color.yellow
+                            else R.color.rejected
+                        )
+                    )
+                    binding.textViewAiInsight.text = analysisResult.aiInsight
+                    binding.cardAiHealth.isVisible = analysisResult.aiInsight.isNullOrBlank().not()
                 }
             }
         }
     }
 
-    private fun setupActionButtons() {
-        binding.buttonSaveToLog.setOnClickListener {
-            viewModel.confirmAndSaveLog()
-        }
-        binding.backView.setOnClickListener {
-            closeSheet("dismiss")
-        }
-        binding.buttonRetryAnalysis.setOnClickListener {
-            closeSheet("retry")
-        }
+    private fun updateMacrosAndCalorie(result: FoodAnalysisResult) {
+        val totalCalories = result.calories
+        binding.textViewCalories.text = totalCalories.toString()
+
+        bindMacro(
+            binding.layoutProtein,
+            getString(R.string.protein),
+            result.protein
+        )
+        bindMacro(
+            binding.layoutCarbs,
+            getString(R.string.carbs_hint),
+            result.carbs
+        )
+        bindMacro(
+            binding.layoutFats,
+            getString(R.string.fat_hint),
+            result.fat
+        )
     }
 
-    private fun closeSheet(action: String) {
-        if (isAdded && findNavController().currentDestination?.id == R.id.calorieResultBottomSheet) {
-            viewModel.cancelAnalysisOrResetState()
-            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to action))
+
+    private fun bindMacro(
+        layout: ItemMacroDisplayBinding,
+        name: String,
+        value: Double?
+    ) {
+        layout.textViewMacroName.text = name
+        val totalValue = (value ?: 0.0)
+        layout.textViewMacroValue.text = "${totalValue.toInt()}gr"
+    }
+
+    private fun setupListeners() {
+        binding.buttonSaveToLog.setOnClickListener {
+            viewModel.saveLog()
+            findNavController().popBackStack()
             findNavController().popBackStack()
         }
+
+        binding.buttonDelete.setOnClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("O'chirish")
+                .setMessage("Haqiqatan ham bu yozuvni o'chirmoqchimisiz?")
+                .setPositiveButton("Ha") { _, _ ->
+                    viewModel.deleteLog {
+                        findNavController().popBackStack()
+                    }
+                }
+                .setNegativeButton("Yo'q", null)
+                .show()
+        }
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        val nameEditListener = View.OnClickListener {
+            val currentName = binding.textViewFoodName.text.toString()
+            showEditNameDialog(currentName)
+        }
+        binding.btnEditName.setOnClickListener(nameEditListener)
+        binding.textViewFoodName.setOnClickListener(nameEditListener)
+
+
+        val editCaloriesListener = View.OnClickListener {
+            val currentCalories = binding.textViewCalories.text.toString().toDoubleOrNull() ?: 0.0
+            showEditNumberDialog("Kaloriyani o'zgartirish", currentCalories) { newValue ->
+                viewModel.updateCalories(newValue)
+            }
+        }
+        binding.cardCalorieBanner.setOnClickListener(editCaloriesListener)
+        binding.textViewCalories.setOnClickListener(editCaloriesListener)
+
+
+        binding.layoutProtein.root.setOnClickListener {
+            val currentVal = viewModel.resultLive.value?.result?.result?.protein ?: 0.0
+            showEditNumberDialog("Oqsilni o'zgartirish (gr)", currentVal) { newValue ->
+                viewModel.updateProtein(newValue)
+            }
+        }
+        binding.layoutCarbs.root.setOnClickListener {
+            val currentVal = viewModel.resultLive.value?.result?.result?.carbs ?: 0.0
+            showEditNumberDialog("Uglevodni o'zgartirish (gr)", currentVal) { newValue ->
+                viewModel.updateCarbs(newValue)
+            }
+        }
+        binding.layoutFats.root.setOnClickListener {
+            val currentVal = viewModel.resultLive.value?.result?.result?.fat ?: 0.0
+            showEditNumberDialog("Yog'ni o'zgartirish (gr)", currentVal) { newValue ->
+                viewModel.updateFat(newValue)
+            }
+        }
     }
 
-    private fun displayResults() {
-        binding.textViewEstimatedCalories.text = analysisResultFromArgs.calories.toString()
-        val meal = MealTime.fromId(mealTypeFromArgs)
-        binding.foodName.text = aboutFromArgs.ifBlank { meal?.name ?: "Ovqat" }
-        binding.textViewEstimatedProtein.text =
-            formatMacroValue(analysisResultFromArgs.protein)
-        binding.textViewEstimatedCarbs.text =
-            formatMacroValue(analysisResultFromArgs.carbs)
-        binding.textViewEstimatedFat.text = formatMacroValue(analysisResultFromArgs.fat)
-        binding.imageViewIllustration.isVisible = photoUrlFromArgs.isNotEmpty()
-        if (photoUrlFromArgs.isNotEmpty()) {
-            binding.imageViewIllustration.loadPhoto(photoUrlFromArgs)
-        }
-        setupHealthinessIndicator(
-            analysisResultFromArgs.isHealthy,
-            analysisResultFromArgs.feedback
+    private fun showEditNameDialog(currentName: String) {
+        val input = android.widget.EditText(requireContext())
+        input.setText(currentName)
+        input.hint = "Ovqat nomi"
+        
+        val container = android.widget.FrameLayout(requireContext())
+        val params = android.widget.FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        params.marginStart = resources.getDimensionPixelSize(R.dimen.dimen_24)
+        params.marginEnd = resources.getDimensionPixelSize(R.dimen.dimen_24)
+        input.layoutParams = params
+        container.addView(input)
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Nomni o'zgartirish")
+            .setView(container)
+            .setPositiveButton("Saqlash") { _, _ ->
+                val newName = input.text.toString()
+                if (newName.isNotBlank() && newName != currentName) {
+                     viewModel.updateLog(newName)
+                }
+            }
+            .setNegativeButton("Bekor qilish", null)
+            .show()
     }
 
-    private fun setupHealthinessIndicator(level: String?, advice: String?) {
-        if (advice.isNullOrBlank()) {
-            binding.layoutHealthFeedback.isVisible = false
-            return
-        }
-        val uiData = when (level) {
-            LEVEL_GOOD -> HealthIndicatorUI(
-                R.color.green_alpha_10,
-                R.drawable.check_ic,
-                R.color.green,
-                getString(R.string.healthiness_good)
-            )
-
-            LEVEL_MODERATE -> HealthIndicatorUI(
-                R.color.yellow_alpha_10, R.drawable.warning_24px, R.color.yellowDark, "Tavsiya"
-            )
-
-            LEVEL_POOR -> HealthIndicatorUI(
-                R.color.red_alpha_10, R.drawable.close_ic, R.color.rejected, "Tavsiya"
-            )
-
-            else -> HealthIndicatorUI(R.color.grey_alpha_50, R.drawable.info_ic, R.color.black, "")
-        }
-
-        binding.layoutHealthFeedback.isVisible = true
-//        binding.layoutHealthFeedback.backgroundTintList =
-//            ContextCompat.getColorStateList(requireContext(), uiData.backgroundColorRes)
-        binding.iconHealthFeedback.setImageResource(uiData.iconRes)
-        binding.iconHealthFeedback.setColorFilter(
-            ContextCompat.getColor(
-                requireContext(), uiData.textColorRes
-            )
+    private fun showEditNumberDialog(title: String, currentValue: Double, onSave: (Double) -> Unit) {
+        val input = android.widget.EditText(requireContext())
+        input.setText(if (currentValue % 1.0 == 0.0) currentValue.toInt().toString() else currentValue.toString())
+        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+        
+        val container = android.widget.FrameLayout(requireContext())
+        val params = android.widget.FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, 
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        binding.levelText.text = uiData.levelText
-        binding.levelText.setTextColor(
-            ContextCompat.getColor(
-                requireContext(), uiData.textColorRes
-            )
-        )
-        binding.textViewHealthFeedback.text = advice
+        params.marginStart = resources.getDimensionPixelSize(R.dimen.dimen_24)
+        params.marginEnd = resources.getDimensionPixelSize(R.dimen.dimen_24)
+        input.layoutParams = params
+        container.addView(input)
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setView(container)
+            .setPositiveButton("Saqlash") { _, _ ->
+                val newValue = input.text.toString().toDoubleOrNull()
+                if (newValue != null) {
+                    onSave(newValue)
+                }
+            }
+            .setNegativeButton("Bekor qilish", null)
+            .show()
     }
 
-    private fun setupInfoIconListeners() {
-        binding.infoProtein.setOnClickListener {
-            showMacroInfoDialog(
-                "Oqsil (Protein) nima?",
-                "Oqsil — tananing qurilish materiali. U mushaklarni tiklaydi, to'q tutadi va soch-tirnoqlar salomatligi uchun zarur. Go'sht, tuxum, sut mahsulotlari va dukkaklilarda ko'p bo'ladi."
-            )
-        }
-        binding.infoCarbs.setOnClickListener {
-            showMacroInfoDialog(
-                "Uglevodlar nima?",
-                "Uglevodlar — tananing asosiy energiya manbai. Ular 'tez' (shirinliklar, oq non) va 'sekin' (donlar, sabzavotlar) turlarga bo'linadi. Ozish uchun 'sekin' uglevodlarni tanlash muhim."
-            )
-        }
-        binding.infoFat.setOnClickListener {
-            showMacroInfoDialog(
-                "Yog'lar nima?",
-                "Yog'lar gormonlar ishlab chiqarish va vitaminlarni o'zlashtirish uchun kerak. 'Foydali' yog'lar (yong'oq, zaytun yog'i, baliq) va 'zararli' yog'lar (margarin, fastfud) mavjud. Foydali yog'larni me'yorida iste'mol qilish kerak."
-            )
-        }
-    }
-
-    private fun showMacroInfoDialog(title: String, message: String) {
-        AlertDialog.Builder(requireContext()).setTitle(title).setMessage(message)
-            .setPositiveButton("Tushunarli") { dialog, _ -> dialog.dismiss() }.show()
-    }
-
-    private fun formatMacroValue(value: Double?): String =
-        value?.let { String.format(Locale.US, "%.1f g", it) }
-            ?: getString(R.string.not_available_short)
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-}
-
-@Parcelize
-data class GeminiAnalysisResultParcelable(
-    val estimatedCalories: Int,
-    val estimatedProtein: Double?,
-    val estimatedFat: Double?,
-    val estimatedCarbs: Double?,
-    val recognizedIngredients: List<AnalyzedIngredientParcelable>,
-    val alternativeFoodSuggestions: String,
-    val isHealthyForWeightLoss: String?,
-    val healthFeedbackShort: String?,
-) : Parcelable {
-    constructor(original: FoodAnalysisResult) : this(
-        original.calories,
-        original.protein,
-        original.fat,
-        original.carbs,
-        original.ingredients.map { AnalyzedIngredientParcelable(it) },
-        "",
-        original.isHealthy,
-        original.feedback
-    )
-
-    fun toGeminiAnalysisResult(): FoodAnalysisResult {
-        return FoodAnalysisResult(
-            estimatedCalories,
-            estimatedProtein,
-            estimatedFat,
-            estimatedCarbs,
-            recognizedIngredients.map { it.toAnalyzedIngredient() },
-            alternativeFoodSuggestions,
-            isHealthyForWeightLoss,
-            healthFeedbackShort
-        )
-    }
-}
-
-@Parcelize
-data class AnalyzedIngredientParcelable(
-    val name: String, val estimatedCalories: Int?
-) : Parcelable {
-    constructor(original: AnalyzedIngredient) : this(
-        original.name, original.calories
-    )
-
-    fun toAnalyzedIngredient(): AnalyzedIngredient {
-        return AnalyzedIngredient(name, estimatedCalories)
     }
 }

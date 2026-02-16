@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp"
+    android:background="?selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textCategoryName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nonushta"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:fontFamily="@font/roboto_medium" />
+
+        <TextView
+            android:id="@+id/textCategoryType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Asosiy"
+            android:textSize="10sp"
+            android:textColor="@color/grey"
+            android:fontFamily="@font/roboto_regular"/>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnEdit"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:src="@drawable/edit"
+        android:tint="@color/grey"
+        android:contentDescription="Edit" />
+
+    <ImageButton
+        android:id="@+id/btnDelete"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:src="@drawable/close_ic"
+        android:tint="@color/grey"
+        android:contentDescription="Delete" />
+
+</LinearLayout>

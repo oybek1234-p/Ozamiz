@@ -26,10 +26,11 @@ object PremiumUtil {
 }
 
 fun User.premiumExpired(): Boolean {
-    val premiumGotDate = premiumDate
-    val currentDate = System.currentTimeMillis()
-    val days = DateUtils.calculateDaysBetween(premiumGotDate, currentDate)
-    return days > 31
+//    val premiumGotDate = premiumDate
+//    val currentDate = System.currentTimeMillis()
+//    val days = DateUtils.getS(premiumGotDate, currentDate)
+//    return days > 31
+    return false
 }
 
 fun User.getPremiumExpireDate(): String {

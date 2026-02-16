@@ -3,6 +3,7 @@ package uz.oybek.ozamiz.ui.feature.onboarding.screens.plan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.databinding.FragmentPlanBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment

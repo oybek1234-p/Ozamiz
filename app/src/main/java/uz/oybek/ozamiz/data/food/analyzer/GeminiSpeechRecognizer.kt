@@ -14,9 +14,9 @@ object GeminiSpeechRecognizer {
 
     private val speechModel by lazy {
         Firebase.ai.generativeModel(
-            FoodAnalyzerConfig.MODEL_VERSION,
+            FoodAnalyzerConfig.MODEL_NAME,
             systemInstruction = content {
-                text(FoodAnalyzerConfig.AUDIO_INSTRUCTION)
+             //   text(FoodAnalyzerConfig.AUDIO_INSTRUCTION)
             })
     }
 
@@ -29,7 +29,7 @@ object GeminiSpeechRecognizer {
                 }
                 val inputContent = content {
                     inlineData(audioBytes, "audio/ogg")
-                    text(FoodAnalyzerConfig.AUDIO_PROMPT)
+                    text(FoodAnalyzerConfig.FOOD_INSTRUCTION)
                 }
                 val response = speechModel.generateContent(inputContent)
                 val transcribedText = response.text?.trim()

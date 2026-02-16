@@ -5,7 +5,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?colorSurface">
+        android:background="?colorSurfaceContainer">
 
         <ImageView
             android:id="@+id/photo"
@@ -141,7 +141,6 @@
             android:elevation="@dimen/dimen_2"
             android:indeterminate="true"
             android:padding="@dimen/dimen_12"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/continue_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

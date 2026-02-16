@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?colorSurfaceContainer">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@drawable/arrow_back"
+            app:title=""
+            app:titleTextAppearance="@style/ToolbarTitleApearence" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:clipToPadding="false"
+            android:paddingBottom="120dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imageScreen"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:shapeAppearance="@style/RadiusImageView12"
+                android:layout_marginTop="8dp"
+                android:scaleType="centerCrop"
+                android:background="@android:color/transparent"
+                tools:src="@drawable/user_photo_placeholder" />
+
+            <TextView
+                android:id="@+id/textScreenTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                style="@style/Title2_20"
+                android:visibility="gone"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="?colorOnSurface"
+                android:lineSpacingMultiplier="1.2"
+                tools:text="To'g'ri ovqatlanish asoslari" />
+
+            <TextView
+                android:id="@+id/textMainContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:lineSpacingMultiplier="1.2"
+                android:textColor="?colorOnSurface"
+                android:textSize="18sp"
+                tools:text="Sog'lom turmush tarzi uchun to'g'ri ovqatlanish juda muhimdir. Har kuni turli xil vitaminlarga boy mahsulotlarni iste'mol qilish tanangizning energiya darajasini oshiradi va immunitetni mustahkamlaydi. Ratsioningizda sabzavotlar, mevalar va oqsillarning muvozanati bo'lishi lozim." />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardKeyInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="?colorSurfaceContainer"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/textKeyInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Headline2_16"
+                        android:lineSpacingMultiplier="1.4"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="17sp"
+                        tools:text="Kun davomida kamida 2 litr toza suv ichishni unutmang. Bu metabolizmni yaxshilaydi va hujayralarni yangilaydi." />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom Navigation -->
+    <LinearLayout
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?colorSurface"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPrevious"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            android:paddingHorizontal="24dp"
+            android:text="Oldingi"
+            android:textColor="?colorOnSurfaceVariant"
+            android:visibility="invisible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNext"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Keyingisi"
+            app:iconGravity="textEnd"
+            app:icon="@drawable/arrow_right"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.02"
+            app:cornerRadius="28dp" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

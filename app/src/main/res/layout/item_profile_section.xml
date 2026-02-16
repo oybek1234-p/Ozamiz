@@ -4,43 +4,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:background="?attr/colorSurfaceContainerLowest"
     android:clickable="true"
     android:focusable="true"
     android:gravity="center_vertical"
+    android:minHeight="56dp"
     android:orientation="horizontal"
     android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp">
+    android:paddingVertical="14dp">
 
-    <FrameLayout
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/round_lay"
-        android:backgroundTint="?colorSurfaceContainer">
+    <!-- Ikon -->
+    <ImageView
+        android:id="@+id/icon_section_profile"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginEnd="14dp"
+        android:contentDescription="@null"
+        app:tint="?attr/colorPrimary"
+        tools:src="@drawable/settings_ic" />
 
-        <ImageView
-            android:id="@+id/icon_section_profile"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_gravity="center"
-            app:tint="?attr/colorOnSurfaceVariant"
-            tools:src="@drawable/settings_ic" />
-    </FrameLayout>
-
+    <!-- Matn -->
     <TextView
         android:id="@+id/text_section_title_profile"
-        style="@style/Text1_16"
+        style="@style/TextAppearance.Material3.BodyLarge"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textColor="?attr/colorOnSurface"
         tools:text="Sozlamalar" />
 
+    <!-- Chevron -->
     <ImageView
         android:id="@+id/icon_chevron_right_profile"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:alpha="0.3"
         android:src="@drawable/arrow_right"
-        app:tint="?attr/colorOnSurfaceVariant" />
+        app:tint="?attr/colorOnSurface" />
+
 </LinearLayout>

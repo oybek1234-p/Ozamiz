@@ -12,6 +12,7 @@
     <string name="bugungi_tavsiyalar">Bugungi tavsiyalar</string>
     <string name="stop_and_analyze">To\'xtatish</string>
     <string name="recording_speak_now">Gapiring...</string>
+    <string name="ai_chat_greeting">Qanday savollaringiz bor?</string>
     <string name="app_name">Ozamiz</string>
     <string name="daqiqa_oldin">daqiqa oldin</string>
     <string name="sohat_oldin">soat oldin</string>
@@ -55,6 +56,7 @@
     <string name="kechki_ovqat">Kechki ovqat</string>
     <string name="tamaddi">Tamaddi</string>
     <string name="nomi">Nomi</string>
+    <string name="natija_title">Natija</string>
     <string name="title_home">Asosiy</string>
     <string name="title_foods">Ovqatlar</string>
     <string name="title_sport">Mashqlar</string>
@@ -116,9 +118,10 @@
     <string name="add_gif_or_image">GIF yoki rasm qo\'shish</string>
     <string name="no_exercises_selected">Mashq tanlanmagan</string>
 
+    <string name="macro_format">%1$d / %2$d g</string>
     <string name="error_loading_detail">Ma\'lumot yuklashda xatolik</string>
     <string name="calories_format">%d kal</string>
-    <string name="add_food_title">Ovqat yedim</string>
+    <string name="add_food_title">Ovqat qo\'shish</string>
     <string name="edit_food_title">Ovqatni tahrirlash</string>
     <string name="add_image">Rasm qo\'shish</string>
     <string name="food_name_hint">Nomi</string>
@@ -144,7 +147,7 @@
     <string name="meals_title">Ovqatlanish</string>
     <string name="add_meal_description">Ovqat qo\'shish uchun + tugmasini bosing</string>
     <string name="food_list_button">Ovqatlar Ro\'yxati</string>
-    <string name="water_intake_title">Suv</string>
+    <string name="water_intake_title">Suv ichish tezroq ozdiradi</string>
     <string name="target_water_format">Ichish kerak: %.1f ml</string>
     <string name="consumed_water_format">%1$d millilitr</string>
     <string name="water_benefits_link">Suv ichish foydalari haqida</string>
@@ -235,6 +238,10 @@
     <string name="macro_carbs">⚡️ Energiya (Uglevod)</string>
     <string name="macro_fat">🛡️ Himoya (Yog\')</string>
 
+    <string name="water_liters_format">%.1f litr ichildi</string>
+    <string name="water_goal_format">Kuniga %.1f litr suv iching</string>
+    <string name="water_consumed_format">%: %.1f litr</string>
+
     <string name="carbs_hint">Uglevod</string>
     <string name="log_food_title_format">%s</string>
     <string name="log_food_subtitle_format">Bugun %sga nima ovqat yedingiz ?</string>
@@ -257,7 +264,7 @@
     <string name="estimated_calories_format">%d kaloriya</string>
     <string name="gallery">Galereya</string> <!-- Bu endi ishlatilmaydi, lekin o'chirmaymiz -->
     <string name="camera">Kamera</string>
-    <string name="calories_remaining">%d kaloriya qoldi</string>
+    <string name="calories_remaining">Kaloriya yeyishingiz mumkin</string>
     <string name="calories_sufficient">Bugunga yetarli yedingiz</string>
     <string name="calories_exceeded_slightly">%d kal oshdi</string>
     <string name="calories_exceeded_warning">%d kal oshdi️</string>
@@ -317,14 +324,12 @@
     <string name="no_upcoming_reminders">Yaqin orada eslatmalar yo\'q</string>
     <string name="unit_kcal">kal</string>
     <string name="unit_ml">ml</string>
-    <string name="unit_kcal_burned">kal</string>
+    <string name="unit_kcal_burned">%d kal</string>
     <string name="unit_water">suv</string>
     <string name="unit_minute">daq</string>
 
     <string name="reminder_started_placeholder">eslatmasi boshlandi (implementatsiya qilinadi)</string> <!-- Placeholder for start button -->
 
-
-    <!-- ... existing strings ... -->
     <string name="all_recipes_title">Barcha Retseptlar</string>
     <string name="search_results_title">Qidiruv: \'%1$s\'</string>
     <string name="error_loading_filters">Filtrlarni yuklashda xatolik: %1$s</string>
@@ -540,4 +545,35 @@
     <string name="error_height">Bo\'yingizni to\'g\'ri kiriting</string>
     <string name="error_weight">Vazn notog\'ri</string>
     <string name="name_error">Ismingizni kiriting</string>
+
+
+    <string name="label_remaining">Remaining</string>
+    <string name="label_eaten">Eaten</string>
+    <string name="label_burned">Burned</string>
+    <string name="label_carbs">Carbs</string>
+    <string name="label_protein">Protein</string>
+    <string name="label_fat">Fat</string>
+    <string name="macro_short_format">%1$d / %2$d g</string>
+    <string name="macro_remaining_format">%1$d qoldi</string>
+    <string name="macro_exceeded_format">%1$d oshdi</string>
+    <string name="protein_desc">Mushak quruvchi</string>
+    <string name="fat_desc">Energiya manbai</string>
+    <string name="carbs_desc">Kuch manbai</string>
+    <string name="water_title">Suv</string>
+    <string name="water_goal_desc">Kunlik me\'yor: %1$s</string>
+    <string name="water_current_format">%1$s litr</string>
+    <string name="add_200ml">+200 ml</string>
+    <string name="add_250ml">+250 ml</string>
+    <string name="menus_title">Menyular</string>
+    <string name="menus_subtitle">Sog\'lom va foydali taomlar</string>
+    <string name="burned">Sarflandi</string>
+    <string name="sun">Suniy intelekt ovqatni ozishga foydasini hisoblaydi</string>
+    <string name="rasmoling">1. Ovqatni rasmga oling.</string>
+    <string name="ilovakalhison">2. Ilova kaloriya miqdorini hisoblaydi.</string>
+    <string name="log_input_empty">Ovqat haqida kiriting</string>
+    <string name="fix">Tog\'irlash</string>
+    <string name="add_plus">+ Qo\'shish</string>
+    <string name="tarkibi">Tarkibi</string>
+    <string name="oshdi">Oshdi</string>
+    <string name="necha_minut_bajardingiz">Necha minut bajardingiz?</string>
 </resources>

@@ -15,13 +15,12 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentProfileBinding
 import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
+import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.getPremiumExpireDate
-import uz.oybek.ozamiz.ui.utils.showToast
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
@@ -30,7 +29,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     init {
         showBottomSheet = true
     }
-
+    
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentProfileBinding {
@@ -40,13 +39,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
     override fun viewCreated(bind: FragmentProfileBinding) {
         setupSection(
-            bind.sectionMyInfo, R.drawable.person_filled, getString(R.string.my_information)
+            bind.sectionMyInfo,
+            R.drawable.person_filled,
+            getString(R.string.my_information)
         ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                val action =
-                    ProfileFragmentDirections.actionProfileFragmentToGetMainInfoFragment(new = false)
-                findNavController().navigate(action)
-            }
+            findNavController().navigate(R.id.getMainInfoFragment)
         }
         setupSection(
             bind.sectionWeightHistory,
@@ -57,12 +54,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 navigate(R.id.weightPhotoHistoryFragment)
             }
         }
-//        setupSection(bind.sectionReminders, R.drawable.notify_ic, getString(R.string.reminders)) {
-//            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-//                val action = ProfileFragmentDirections.actionProfileFragmentToSetupRemindersFragment()
-//                findNavController().navigate(action)
-//            }
-//        }
         setupSection(
             bind.sectionSupport, R.drawable.help_ic, getString(R.string.help_and_support)
         ) {
@@ -78,7 +69,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
             }
         }
-
+        setupSection(
+            bind.sectionAdminLessons, R.drawable.ic_profile, "Admin: Darsliklar"
+        ) {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                navigate(R.id.action_profileFragment_to_adminLessonsFragment)
+            }
+        }
         bind.buttonLogout.setOnClickListener {
             showLogoutConfirmationDialog()
         }
@@ -144,23 +141,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 }
             }
         }
-
-//        viewModel.navigationEvent.observe(viewLifecycleOwner) { event ->
-//            event?.getContentIfNotHandled()?.let { navEvent ->
-//                if (findNavController().currentDestination?.id != R.id.profileFragment && navEvent !is ProfileNavigationEvent.NavigateToAuth) {
-//                    return@let
-//                }
-//                when (navEvent) {
-//                    ProfileNavigationEvent.NavigateToAuth -> {
-//                        (activity as? MainActivity)?.recreateUi(false)
-//                    }
-//
-//                    is ProfileNavigationEvent.ShowToast -> {
-//                        showToast(navEvent.message)
-//                    }
-//                }
-//            }
-//        }
     }
 
     private fun openAppInPlayStore() {
@@ -186,7 +166,10 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         AlertDialog.Builder(requireContext()).setTitle(R.string.logout_confirmation_title)
             .setMessage(R.string.logout_confirmation_message)
             .setPositiveButton(R.string.logout) { _, _ ->
-                viewModel.logout()
-            }.setNegativeButton(R.string.cancel, null).show()
+                MainActivity.signOut?.run()
+            }.setNegativeButton(
+                R.string.cancel,
+                null
+            ).show()
     }
 }

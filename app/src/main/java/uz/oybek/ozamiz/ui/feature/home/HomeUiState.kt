@@ -1,25 +1,31 @@
 package uz.oybek.ozamiz.ui.feature.home
 
-import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.logs.model.ExerciseLog
+import uz.oybek.ozamiz.data.logs.model.UserExercise
 import java.util.Date
 
 data class HomeUiState(
-    val isLoading: Boolean = true,
-    val errorMessage: String? = null,
-    val user: User? = null,
-    val dailyLogData: DailyLogs? = null,
-    val consumedCalories: Int = 0,
-    val consumedWaterMl: Int = 0,
-    val burnedCalories: Int = 0,
-    val targetCalories: Int = 0,
-    val targetWaterMl: Int = 0,
-    val targetCaloriesBurned: Int = 0,
-    val streakInfo: StreakInfo? = null,
-    val fat: Double = 0.0,
-    val carbs: Double = 0.0,
-    val protein: Double = 0.0,
+    val isInitialLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
     val selectedDate: Date = Date(),
-    val datesForScroller: List<Date> = emptyList()
+    val datesForScroller: List<Date> = emptyList(),
+    val dailySummaries: Map<String, uz.oybek.ozamiz.data.logs.model.DailySummary> = emptyMap(),
+    val streakInfo: StreakInfo? = null,
+    val caloriesRemaining: Int = 0,
+    val caloriesConsumed: Int = 0,
+    val caloriesTarget: Int = 0,
+    val waterConsumed: Int = 0,
+    val waterTarget: Int = 0,
+    val waterGlasses: List<WaterGlassState> = emptyList(),
+    val exerciseBurnt: Int = 0,
+    val exerciseTarget: Int = 0,
+    val carbsConsumed: Int = 0,
+    val carbsTarget: Int = 0,
+    val proteinConsumed: Int = 0,
+    val proteinTarget: Int = 0,
+    val fatConsumed: Int = 0,
+    val fatTarget: Int = 0,
+    val exerciseLogs: List<ExerciseLog> = emptyList(),
+    val recommendedExercises: List<UserExercise> = emptyList()
 )

@@ -38,7 +38,7 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             state.premiumPrice?.let {
                 binding.priceView.text = "$it so'm / oyiga"
             }
-            // Handle loading and error states if necessary
+            // Handle isAnalyzing and error states if necessary
         }
 
         binding.button.setOnClickListener {

@@ -93,8 +93,12 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         bindingT = inflateBinding(inflater, container)
-        viewCreated(binding)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewCreated(binding)
     }
 
     override fun onPause() {
