@@ -133,7 +133,7 @@
                                     android:id="@+id/text_photo_title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:fontFamily="@font/roboto_bold"
+                                    android:fontFamily="@font/roboto_medium"
                                     android:text="Ovqatni rasmga olish"
                                     android:textColor="?attr/colorOnSurface"
                                     android:textSize="17sp" />
@@ -168,7 +168,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?selectableItemBackground"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="0dp"
@@ -180,6 +180,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
+
                             android:padding="16dp">
 
                             <ImageView

@@ -12,6 +12,11 @@ import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.utils.showToast
 
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
+
 class LogWaterDialog : BottomSheetDialogFragment() {
 
     private var _binding: DialogLogWaterBinding? = null
@@ -38,14 +43,27 @@ class LogWaterDialog : BottomSheetDialogFragment() {
     }
 
     private fun setupClickListeners() {
-
+        binding.apply {
+            cardCup100.setOnClickListener { addWater(100) }
+            cardGlass250.setOnClickListener { addWater(250) }
+            cardBottle500.setOnClickListener { addWater(500) }
+            cardBottle1000.setOnClickListener { addWater(1000) }
+            btnClose.setOnClickListener { dismiss() }
+        }
+        
+        // Observe ViewModel state
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                homeViewModel.uiState.collect { state ->
+                    binding.tvWaterProgress.text = "${state.waterConsumed} / ${state.waterTarget} ml"
+                }
+            }
+        }
     }
 
     private fun addWater(amountMl: Int) {
-//        hideSoftInput(requireActivity())
-//        homeViewModel.addWaterLog(amountMl) // ViewModel o'zi sanani biladi
-//        showToast(getString(uz.oybek.ozamiz.R.string.water_logged_successfully)) // Optimistic UI
-//        dismiss()
+        homeViewModel.addWater(amountMl)
+        // showToast(getString(uz.oybek.ozamiz.R.string.water_logged_successfully)) // Optional: Feedback for user
     }
 
     override fun onDestroyView() {

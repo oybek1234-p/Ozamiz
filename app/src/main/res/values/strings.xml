@@ -574,6 +574,11 @@
     <string name="fix">Tog\'irlash</string>
     <string name="add_plus">+ Qo\'shish</string>
     <string name="tarkibi">Tarkibi</string>
-    <string name="oshdi">Oshdi</string>
+    <string name="try_not_to_eat_more">Boshqa ovqat yemaslikga harakat qiling</string>
     <string name="necha_minut_bajardingiz">Necha minut bajardingiz?</string>
+    <string name="tushunarli">Tushunarli</string>
+    
+    <string name="limit_exceeded_title">Kunlik me\'yor oshdi</string>
+    <string name="limit_exceeded_message">Siz bugun kunlik kaloriya me\'yoridan oshib ketdingiz.</string>
+    <string name="what_can_i_eat_now">💡 Nima yeyishim mumkin?</string>
 </resources>

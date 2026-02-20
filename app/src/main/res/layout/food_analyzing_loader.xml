@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:backgroundTint="?colorSurfaceContainerLowest"
     android:background="@drawable/round_lay">
-
-    <ProgressBar
-        android:id="@+id/lottie_view"
-        android:layout_width="@dimen/dimen_48"
-        android:layout_height="@dimen/dimen_48"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginVertical="64dp"
-        android:indeterminateTint="?colorPrimary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/back_view"
@@ -28,16 +18,63 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/mini_info_text"
-        style="@style/Text1_16"
+        style="@style/Headline2_16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tekshiryapmiz..."
+        android:textColor="?colorOnSurface"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/dimen_24"
-        android:layout_marginTop="@dimen/dimen_18"
         android:gravity="center"
-        android:text="Kaloriya - bu ovqat energiya qiymati"
-        android:textColor="?colorOnSurface"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:orientation="vertical"
+        android:paddingBottom="48dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/back_view">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/image_request"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+
+        <TextView
+            android:id="@+id/text_request"
+            style="@style/Text1_16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lines="4" />
+
+        <ProgressBar
+            android:id="@+id/lottie_view"
+            android:layout_width="@dimen/dimen_48"
+            android:layout_height="@dimen/dimen_48"
+            android:layout_marginTop="24dp"
+            android:indeterminateTint="?colorPrimary" />
+
+        <TextView
+            android:id="@+id/mini_info_text"
+            style="@style/Text1_16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/dimen_24"
+            android:layout_marginTop="@dimen/dimen_18"
+            android:gravity="center"
+            android:text="Kaloriya - bu ovqat energiya qiymati"
+            android:textColor="?colorOnSurface"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

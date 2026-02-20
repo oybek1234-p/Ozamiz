@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.databinding.PaymentCheckFragmentBinding
@@ -47,7 +48,8 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
                 }
                 state.successMessage?.let {
                     showToast(it)
-                    closeFragment() // Navigate back or to profile
+                    setFragmentResult("payment_check_submitted", androidx.core.os.bundleOf("submitted" to true))
+                    closeFragment()
                     viewModel.clearSuccess()
                 }
             }

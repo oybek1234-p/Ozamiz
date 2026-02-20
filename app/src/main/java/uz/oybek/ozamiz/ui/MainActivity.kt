@@ -86,7 +86,7 @@ class MainActivity : AppCompatActivity() {
         initUser()
 
         binding.apply {
-            navHost =
+                navHost =
                 (supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment)
             navController = navHost.navController
             NavigationUI.setupWithNavController(
@@ -102,7 +102,6 @@ class MainActivity : AppCompatActivity() {
             checkRegisterDate()
             if (user.name.isEmpty()) {
                 graph.setStartDestination(R.id.onboarding)
-                graph.setStartDestination(R.id.home)
             }
         } else {
             graph.setStartDestination(R.id.authFragment)
@@ -115,6 +114,8 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             uz.oybek.ozamiz.data.lessons.LessonSeeder.seedData()
         }
+
+
     }
 
     private fun checkRegisterDate() {

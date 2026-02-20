@@ -15,11 +15,9 @@ class PhotosOnboardFragment
         bind.apply {
             if (LocalUser.user.gender == Gender.MALE) {
                 img1.setImageResource(R.drawable.man_result_photo_1)
-                img2.setImageResource(R.drawable.man_result_photo_2)
                 img3.setImageResource(R.drawable.man_result_photo_3)
             } else {
                 img1.setImageResource(R.drawable.woman_result_photo_1)
-                img2.setImageResource(R.drawable.woman_result_photo_2)
                 img3.setImageResource(R.drawable.woman_result_photo_3)
             }
             button.setOnClickListener {

@@ -26,11 +26,17 @@ object PremiumUtil {
 }
 
 fun User.premiumExpired(): Boolean {
-//    val premiumGotDate = premiumDate
-//    val currentDate = System.currentTimeMillis()
-//    val days = DateUtils.getS(premiumGotDate, currentDate)
-//    return days > 31
-    return false
+    if (!premium) return true
+    val premiumGotDate = premiumDate
+    val currentDate = System.currentTimeMillis()
+    val thirtyDaysInMillis = 30L * 24 * 60 * 60 * 1000 // 30 days
+    return (currentDate - premiumGotDate) > thirtyDaysInMillis
+}
+
+fun User.isPremiumOrTrial(): Boolean {
+    if (premium && !premiumExpired()) return true
+    val streak = streakInfo?.currentStreak ?: 0
+    return streak < 3
 }
 
 fun User.getPremiumExpireDate(): String {

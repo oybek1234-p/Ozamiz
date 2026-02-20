@@ -27,7 +27,6 @@ data class User(
     var targetCalories: Int = 0,
     var targetWaterMl: Int = 2500,
     var problems: List<String>? = null,
-
     var streakInfo: StreakInfo? = null,
     var lastWeightLogTimestamp: Long = 0L,
     var avatarUrl: String? = null,
@@ -48,7 +47,6 @@ data class User(
         unreadMessages = 0,
         premium = false,
         premiumDate = 0L,
-
         gender = -1,
         region = "",
         age = -1,

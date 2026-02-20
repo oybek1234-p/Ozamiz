@@ -23,6 +23,10 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
     private lateinit var secondaryFilterAdapter: MenuFilterAdapter
     private lateinit var menuAdapter: MenuAdapter
 
+    init {
+        showBottomSheet = true
+    }
+
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -59,7 +63,7 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
     }
 
     private fun setupListeners(bind: FragmentMenuListBinding) {
-        bind.btnBack.setOnClickListener { closeFragment() }
+        bind.btnBack.isVisible = false
         bind.btnAddMenu.setOnClickListener { navigate(R.id.addMenuFragment) }
 
 
@@ -68,6 +72,7 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.onSearchQuery(s.toString())
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
     }
@@ -77,13 +82,13 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     bind.progressBar.isVisible = state.isLoading
-                    
+
                     primaryFilterAdapter.submitList(state.primaryCategories)
                     primaryFilterAdapter.setSelectedCategory(state.selectedPrimaryId)
-                    
+
                     secondaryFilterAdapter.submitList(state.secondaryCategories)
                     secondaryFilterAdapter.setSelectedCategory(state.selectedSecondaryId)
-                    
+
                     menuAdapter.submitList(state.menus)
                 }
             }

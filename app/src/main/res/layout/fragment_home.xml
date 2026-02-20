@@ -183,6 +183,52 @@
                     app:iconSize="20dp"
                     tools:visibility="visible" />
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_motivation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="?colorSurfaceContainerLowest"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/text_motivation_message"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="8dp"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@id/btn_close_motivation"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:text="Motivation message here" />
+
+                        <ImageView
+                            android:id="@+id/btn_close_motivation"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:src="@drawable/ic_close_24"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:tint="?attr/colorOnPrimaryContainer" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_menus"

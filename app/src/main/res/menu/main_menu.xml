@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
     <item android:id="@+id/home"
         android:title="Sanash"
         android:icon="@drawable/calculate_ic"
         />
-
 
     <item android:id="@+id/aiChatFragment"
         android:title="Dietolog"
@@ -18,6 +15,11 @@
         android:title="@string/natija_title"
         android:visible="true"
         android:icon="@drawable/progress_ic"
+        />
+
+    <item android:id="@+id/menuListFragment"
+        android:title="Menyular"
+        android:icon="@drawable/food_ic"
         />
 
     <item

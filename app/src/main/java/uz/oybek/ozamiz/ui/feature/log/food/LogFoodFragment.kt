@@ -24,10 +24,13 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FoodAnalyzingLoaderBinding
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.voice.VoiceRecorderBottomSheet
+import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showToast
 import java.io.File
@@ -81,6 +84,31 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         setMeal(meal)
         viewModel.updateMeal(meal)
         initTodayLogs(logDate)
+        viewModel.updateMeal(meal)
+        initTodayLogs(logDate)
+        setupPremiumListener()
+    }
+
+    private fun setupPremiumListener() {
+        setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
+            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
+            if (result == "go_to_payment") {
+                findNavController().navigate(R.id.paymentGetCheckFragment)
+            }
+        }
+        setFragmentResultListener("payment_check_submitted") { _, bundle ->
+            if (bundle.getBoolean("submitted")) {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+            }
+        }
+    }
+
+    private fun checkPremium(action: () -> Unit) {
+        if (UserRepository.user.isPremiumOrTrial()) {
+            action()
+        } else {
+            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+        }
     }
 
     private fun initVoiceRecorder() {
@@ -93,6 +121,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     viewModel.updateDescription(
                         text = "$currentText $it".trim()
                     )
+                    viewModel.analyze()
                 }
         }
     }
@@ -128,13 +157,13 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 }
             }
             textInputButton.setOnClickListener {
-                showTextInputSheet()
+                checkPremium { showTextInputSheet() }
             }
             voiceInputButton.setOnClickListener {
-                findNavController().navigate(R.id.voiceInputBottomSheet)
+                checkPremium { findNavController().navigate(R.id.voiceInputBottomSheet) }
             }
             uploadImageButton.setOnClickListener {
-                checkAndLaunchCamera()
+                checkPremium { checkAndLaunchCamera() }
             }
         }
 
@@ -212,7 +241,8 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     private var loadingShown = false
     private var loadingSheet: BottomSheetDialog? = null
 
-    private fun showLoading(show: Boolean) {
+    private fun showLoading(state: LogFoodState) {
+        val show = state.isAnalyzing
         if (loadingShown == show) return
         loadingShown = show
         if (show.not()) {
@@ -227,6 +257,15 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             backView.setOnClickListener {
                 viewModel.cancelAnalyze()
                 sheet.dismiss()
+            }
+            if (state.image != null) {
+                imageRequest.isVisible = true
+                textRequest.isVisible = false
+                imageRequest.setImageURI(state.image)
+            } else if (state.description.isNotBlank()) {
+                imageRequest.isVisible = false
+                textRequest.isVisible = true
+                textRequest.text = state.description
             }
         }
         loadingSheet = sheet
@@ -248,7 +287,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.state.collectLatest { state ->
-                    showLoading(state.isAnalyzing)
+                    showLoading(state)
                 }
             }
             launch {
@@ -272,7 +311,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                                     question = question,
                                     options = options
                                 ) { selectedOption ->
-                                    showLoading(true)
                                     viewModel.submitAnswer(selectedOption)
                                 }.show(parentFragmentManager, "clarification_sheet")
                             }

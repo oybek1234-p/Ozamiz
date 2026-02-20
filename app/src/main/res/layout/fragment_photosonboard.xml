@@ -39,15 +39,6 @@
                     app:shapeAppearance="@style/RadiusImageView12" />
 
                 <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/img2"
-                    android:elevation="@dimen/dimen_4"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:src="@drawable/man_result_photo_2"
-                    android:layout_marginStart="@dimen/dimen_18"
-                    app:shapeAppearance="@style/RadiusImageView12" />
-
-                <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/img3"
                     android:layout_width="200dp"
                     android:elevation="@dimen/dimen_4"

@@ -63,7 +63,11 @@ class AdminPaymentVerificationDetailViewModel : ViewModel() {
                 it.copy(
                     isProcessing = false,
                     verificationComplete = true,
-                    user = userToVerify.copy(premium = approve, paymentChecking = false, paymentCheckPhotoUrl = if(approve) userToVerify.paymentCheckPhotoUrl else null) // Update local copy for immediate UI change before pop
+                    user = userToVerify.copy(
+                        premium = approve,
+                        paymentChecking = false,
+                        paymentCheckPhotoUrl = if(approve) userToVerify.paymentCheckPhotoUrl else null
+                    )
                 )
             }
         }

@@ -38,35 +38,30 @@ object UserRepository {
         if (userId.isBlank()) return DataWrapper.Error("Foydalanuvchi ID si bo'sh")
         val userSpecificPaymentPath = "$PAYMENT_CHECK_PHOTOS_PATH/$userId" // <<< YENI YO'L
 
-        return DataWrapper.Error()
-//        return try {
-////            val uploadResult = ImageUploader.uploadImage(
-////                checkImageUri,
-////                userSpecificPaymentPath
-////            ) // <<< O'ZGARTIRILDI
-////            when (uploadResult) {
-////                is DataWrapper.Success -> {
-////                    val imageUrl = uploadResult.data
-////                    val updates = mapOf(
-////                        User::paymentChecking.name to true,
-////                        User::paymentCheckPhotoUrl.name to imageUrl,
-////                        // User::premiumDate.name to ServerValue.TIMESTAMP // Mark submission time
-////                    )
-////                    usersReference.child(userId).updateChildren(updates).await()
-////                    // Update local user
-////                    updateUser {
-////                        it.paymentChecking = true
-////                        it.paymentCheckPhotoUrl = imageUrl
-////                        // it.premiumDate = System.currentTimeMillis() // Approximate, server time is better
-////                    }
-////                    DataWrapper.Success(Unit)
-////                }
-////
-////
-//        } catch (e: Exception) {
-//            handleException(e, "UploadPremiumCheckDataError")
-//            DataWrapper.Error(e.localizedMessage ?: "Chek ma'lumotlarini yuklashda xatolik")
-//        }
+        return try {
+            val uploadResult = uz.oybek.ozamiz.data.firebase.uploader.ImageUploader.uploadImage(
+                checkImageUri,
+                userSpecificPaymentPath
+            )
+            if (uploadResult != null) {
+                val imageUrl = uploadResult
+                val updates = mapOf(
+                    User::paymentChecking.name to true,
+                    User::paymentCheckPhotoUrl.name to imageUrl,
+                    User::premiumDate.name to ServerValue.TIMESTAMP
+                )
+                usersReference.child(userId).updateChildren(updates).await()
+                updateUser {
+                    it.paymentChecking = true
+                    it.paymentCheckPhotoUrl = imageUrl
+                }
+                DataWrapper.Success(Unit)
+            } else {
+                DataWrapper.Error("Rasm yuklanmadi")
+            }
+        } catch (e: Exception) {
+            DataWrapper.Error(e.localizedMessage ?: "Chek ma'lumotlarini yuklashda xatolik")
+        }
     }
 
     private val usersReference: DatabaseReference by lazy {
@@ -188,7 +183,7 @@ object UserRepository {
     fun loadAllUsers(scope: CoroutineScope, done: (list: List<User>) -> Unit) {
         usersReference.get().addOnSuccessListener { it ->
             scope.launch(Dispatchers.Default) {
-                done.invoke(it.children.mapNotNull { it.getValue(User::class.java) })
+                done.invoke(it.children.mapNotNull { it.getValueSafe(User::class.java) })
             }
         }
     }
@@ -197,7 +192,7 @@ object UserRepository {
         return try {
             val snapshot =
                 usersReference.orderByChild(User::paymentChecking.name).equalTo(true).get().await()
-            val users = snapshot.children.mapNotNull { it.getValue(User::class.java) }
+            val users = snapshot.children.mapNotNull { it.getValueSafe(User::class.java) }
             DataWrapper.Success(users)
         } catch (e: Exception) {
             handleException(e)
@@ -311,7 +306,8 @@ object UserRepository {
                 startWeight = null,
                 paymentChecking = false,
                 paymentCheckPhotoUrl = null,
-                admin = false
+                admin = false,
+                scorePoints = 0
             )
             createNewUserAndSet(newUser)
             newUser
@@ -367,7 +363,7 @@ object UserRepository {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 userLoading = false
-                val loadedUser = snapshot.getValue(User::class.java) ?: return
+                val loadedUser = snapshot.getValueSafe(User::class.java) ?: return
                 val userWithIntegrity = loadedUser.copy(
                     streakInfo = loadedUser.streakInfo ?: StreakInfo(),
                     registerDate = loadedUser.registerDate ?: Date(),

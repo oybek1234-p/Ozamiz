@@ -75,52 +75,103 @@
                 android:id="@+id/premium_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="24dp"
+                android:visibility="gone"
                 app:cardBackgroundColor="?colorPrimaryContainer"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp"
-                android:visibility="gone"
                 tools:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/star_ic"
+                            app:tint="?colorOnPrimaryContainer" />
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="Premium a'zolik"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?colorOnPrimaryContainer" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.BodyMedium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:alpha="0.8"
+                        android:text="Barcha imkoniyatlardan cheklovsiz foydalaning:"
+                        android:textColor="?colorOnPrimaryContainer" />
+
+                    <!-- Benefits List -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
                         android:orientation="vertical">
 
                         <TextView
-                            style="@style/TextAppearance.Material3.TitleSmall"
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:drawablePadding="12dp"
+                            android:text="Cheklovsiz AI Tahlil"
                             android:textColor="?colorOnPrimaryContainer"
-                            android:text="Premium a'zolik" />
+                            app:drawableStartCompat="@drawable/check_ic"
+                            app:drawableTint="?colorOnPrimaryContainer" />
 
                         <TextView
-                            style="@style/TextAppearance.Material3.BodySmall"
+                            style="@style/TextAppearance.Material3.BodyMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="12dp"
+                            android:text="Shaxsiy AI Dietolog"
                             android:textColor="?colorOnPrimaryContainer"
-                            android:alpha="0.8"
-                            android:text="Barcha imkoniyatlar" />
+                            app:drawableStartCompat="@drawable/check_ic"
+                            app:drawableTint="?colorOnPrimaryContainer" />
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:drawablePadding="12dp"
+                            android:text="Reklamasiz"
+                            android:textColor="?colorOnPrimaryContainer"
+                            app:drawableStartCompat="@drawable/check_ic"
+                            app:drawableTint="?colorOnPrimaryContainer" />
 
                     </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/premium_button"
-                        style="@style/Widget.Material3.Button.TonalButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
+                        style="@style/Widget.Material3.Button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:backgroundTint="?colorOnPrimaryContainer"
                         android:text="Faollashtirish"
-                        android:textSize="13sp" />
+                        android:textColor="?colorPrimaryContainer"
+                        app:cornerRadius="12dp" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -191,13 +242,16 @@
 
             <!-- MENU BO'LIMI 3: Darsliklar -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/container_admin_lessons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
+                android:visibility="gone"
                 app:cardBackgroundColor="?attr/colorSurface"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                app:strokeWidth="0dp"
+                tools:visibility="visible">
 
                 <include
                     android:id="@+id/section_admin_lessons"

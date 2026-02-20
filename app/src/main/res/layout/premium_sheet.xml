@@ -16,12 +16,6 @@
         android:paddingTop="@dimen/dimen_12"
         android:paddingBottom="@dimen/dimen_24">
 
-        <View
-            android:layout_width="40dp"
-            android:layout_height="4dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/dimen_12"
-            android:background="?colorOutlineVariant"/>
 
         <TextView
             android:id="@+id/textView17"
@@ -37,9 +31,12 @@
             app:drawableTint="?colorPrimary" />
 
         <LinearLayout
+            android:id="@+id/layout_benefits"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:layout_marginTop="@dimen/dimen_18" >
 
             <TextView
@@ -48,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/check_ic"
                 android:drawablePadding="8dp"
-                android:text="Sun'iy intellekt bilan ovqat tahlili"
+                android:text="Cheklovsiz AI Tahlil"
                 android:layout_marginTop="@dimen/dimen_12"
                 android:textSize="18sp"
                 android:textColor="?colorOnSurface"
@@ -59,7 +56,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="8dp"
-                android:text="Yegan ovqatingizni rasmga olib, AI yordamida kaloriya va ozuqaviy qiymatini bilib oling."
+                android:layout_marginTop="@dimen/dimen_8"
+                android:text="Ovqatlarni rasmga oling va bir zumda kaloriya hamda makrolarni aniqlang."
                 android:textColor="?colorOnSurfaceVariant" />
 
             <TextView
@@ -68,8 +66,8 @@
                 android:layout_height="wrap_content"
                 android:drawableStart="@drawable/check_ic"
                 android:drawablePadding="8dp"
-                android:text="@string/ovqatlar_bo_yicha_cheksiz_maslahatlar"
-                android:layout_marginTop="@dimen/dimen_12"
+                android:text="Shaxsiy AI Dietolog"
+                android:layout_marginTop="@dimen/dimen_18"
                 android:textSize="18sp"
                 android:textColor="?colorOnSurface"
                 app:drawableTint="@color/green" />
@@ -79,7 +77,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="8dp"
-                android:text="Har kuni foydali maslahatlar, tavsiyalar va ogohlantirishlar."
+                android:layout_marginTop="@dimen/dimen_8"
+                android:text="Sog'lom ovqatlanish, retseptlar va maslahatlar bo'yicha AI bilan cheklovsiz suhbat."
                 android:textColor="?colorOnSurfaceVariant" />
 
 
@@ -88,10 +87,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="8dp"
+                android:drawableStart="@drawable/check_ic"
                 android:text="@string/reklama_yo_q"
-                android:layout_marginTop="@dimen/dimen_12"
+                android:layout_marginTop="@dimen/dimen_18"
+                android:textSize="18sp"
                 android:textColor="?colorOnSurface"
-                app:drawableStartCompat="@drawable/check_ic"
                 app:drawableTint="@color/green" />
 
 
@@ -113,6 +113,66 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_24"
                 android:text="@string/sotib_olish" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_verification_pending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="gone"
+            android:backgroundTint="?colorSurfaceContainerHigh"
+            tools:visibility="visible"
+            android:layout_marginTop="@dimen/dimen_24">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/admin_ic"
+                app:tint="?colorPrimary"
+                android:padding="16dp" />
+
+            <TextView
+                style="@style/Title2_20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:text="To'lov Tekshirilmoqda"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="?colorOnSurface"
+                android:textAlignment="center" />
+
+            <TextView
+                style="@style/Text1_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_12"
+                android:text="Sizning to'lov chekingiz qabul qilindi. Operatorlarimiz uni 24 soat ichida tekshirib chiqadilar."
+                android:textColor="?colorOnSurfaceVariant"
+                android:textAlignment="center"
+                android:lineSpacingMultiplier="1.2" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardBackgroundColor="?colorSecondaryContainer"
+                app:cardCornerRadius="12dp"
+                app:strokeWidth="0dp">
+
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_close"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_24"
+                android:text="@string/tushunarli" />
+
         </LinearLayout>
     </LinearLayout>
 </layout>

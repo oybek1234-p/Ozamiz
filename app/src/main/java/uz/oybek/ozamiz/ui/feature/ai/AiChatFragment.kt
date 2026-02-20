@@ -14,6 +14,11 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAiChatBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
+import uz.oybek.ozamiz.data.user.UserRepository
+import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 
 class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
 
@@ -35,7 +40,41 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         setupListeners(bind)
         setupKeyboardListener(bind)
         observeState(bind)
+        setupRecyclerViews(bind)
+        setupListeners(bind)
+        setupKeyboardListener(bind)
+        observeState(bind)
         handleInitialArguments()
+        setupPremiumListener()
+        checkPremiumOnEntry()
+    }
+
+    private fun setupPremiumListener() {
+        setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
+            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
+            if (result == "go_to_payment") {
+                findNavController().navigate(R.id.paymentGetCheckFragment)
+            }
+        }
+        setFragmentResultListener("payment_check_submitted") { _, bundle ->
+            if (bundle.getBoolean("submitted")) {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+            }
+        }
+    }
+
+    private fun checkPremiumOnEntry() {
+        if (!UserRepository.user.isPremiumOrTrial()) {
+            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+        }
+    }
+
+    private fun checkPremium(action: () -> Unit) {
+        if (UserRepository.user.isPremiumOrTrial()) {
+            action()
+        } else {
+            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+        }
     }
 
     private fun setupKeyboardListener(bind: FragmentAiChatBinding) {
@@ -67,11 +106,10 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         }
 
         questionAdapter = SuggestedQuestionAdapter { question ->
-            viewModel.sendMessage(question)
+            checkPremium { viewModel.sendMessage(question) }
         }
         bind.suggestedQuestionsRecyclerView.adapter = questionAdapter
 
-        // Set greeting title with user name
         bind.greetingTitle.text = getString(R.string.ai_chat_greeting, viewModel.userName)
     }
 
@@ -79,10 +117,12 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         bind.toolbar.setNavigationOnClickListener { closeFragment() }
 
         bind.sendButton.setOnClickListener {
-            val text = bind.messageEditText.text.toString()
-            if (text.isNotBlank()) {
-                viewModel.sendMessage(text)
-                bind.messageEditText.text.clear()
+            checkPremium {
+                val text = bind.messageEditText.text.toString()
+                if (text.isNotBlank()) {
+                    viewModel.sendMessage(text)
+                    bind.messageEditText.text.clear()
+                }
             }
         }
 

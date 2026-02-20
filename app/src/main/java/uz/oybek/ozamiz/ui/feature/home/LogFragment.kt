@@ -3,7 +3,7 @@ package uz.oybek.ozamiz.ui.feature.home
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -33,6 +33,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private var dateAdapter: DateScrollerAdapter? = null
 
     private lateinit var exerciseAdapter: HomeExerciseLogAdapter
+    
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+    }
 
 
     init {
@@ -52,6 +57,19 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             updateUi(lastState!!, false)
         }
         observeUiState(bind)
+        checkNotificationPermission()
+    }
+
+    private fun checkNotificationPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
     }
 
     private var lastState: HomeUiState? = null
@@ -158,7 +176,28 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         bind.btnOpenWaterDialog.setOnClickListener {
-            showAddWaterDialog()
+            uz.oybek.ozamiz.ui.feature.log.water.LogWaterDialog().show(childFragmentManager, "LogWaterDialog")
+        }
+
+        checkMotivationMessage(bind)
+    }
+
+    private fun checkMotivationMessage(bind: FragmentHomeBinding) {
+        val repository = uz.oybek.ozamiz.data.motivation.MotivationRepository
+        if (repository.shouldShowBanner()) {
+            val message = repository.getMessageForCurrentTime()
+            if (message != null) {
+                bind.cardMotivation.isVisible = true
+                bind.textMotivationMessage.text = message
+                bind.btnCloseMotivation.setOnClickListener {
+                    repository.dismissMessage()
+                    bind.cardMotivation.isVisible = false
+                }
+            } else {
+                bind.cardMotivation.isVisible = false
+            }
+        } else {
+            bind.cardMotivation.isVisible = false
         }
     }
 
@@ -268,7 +307,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             progressCaloriesCircular.max = state.caloriesTarget
             val isMoreConsume = state.caloriesRemaining < 0
             textCaloriesRemainingLabel.setText(
-                if (isMoreConsume) R.string.oshdi else R.string.calories_remaining
+                if (isMoreConsume) R.string.try_not_to_eat_more else R.string.calories_remaining
             )
             progressCaloriesCircular.setProgressCompat(
                 state.caloriesConsumed.absoluteValue,
@@ -345,24 +384,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
 
 
-    private fun showAddWaterDialog() {
-        val dialog = BottomSheetDialog(requireContext())
-        val dialogBinding = DialogLogWaterBinding.inflate(layoutInflater)
-        dialog.setContentView(dialogBinding.root)
 
-        fun addWater(amount: Int) {
-            viewModel.addWater(amount)
-            dialog.dismiss()
-        }
-        dialogBinding.cardCup100.setOnClickListener { addWater(100) }
-        dialogBinding.cardGlass250.setOnClickListener { addWater(250) }
-        dialogBinding.cardBottle500.setOnClickListener { addWater(500) }
-        dialogBinding.cardBottle1000.setOnClickListener { addWater(1000) }
-
-        dialogBinding.btnClose.setOnClickListener { dialog.dismiss() }
-
-        dialog.show()
-    }
 
     private fun scrollToSelectedDate(selectedDate: Date) {
         binding.dateScrollerRecyclerView.post {

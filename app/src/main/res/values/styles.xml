@@ -13,6 +13,11 @@
         <item name="android:windowMinWidthMinor">100%</item>
     </style>
 
+    <style name="CustomDialogTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
     <style name="RadiusImageView12Top">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSizeTopLeft">@dimen/dimen_12</item>

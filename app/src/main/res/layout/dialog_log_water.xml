@@ -10,34 +10,35 @@
     android:paddingTop="28dp"
     android:paddingBottom="20dp">
 
-    <!-- Drag handle -->
-    <View
-        android:layout_width="40dp"
-        android:layout_height="4dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/round_lay"
-        android:backgroundTint="?colorOutlineVariant" />
-
-    <!-- Title with water emoji -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginBottom="6dp"
-        style="@style/TextAppearance.Material3.TitleLarge"
+        android:textSize="18sp"
         android:fontFamily="@font/roboto_bold"
-        android:text="💧 Suv qo'shish"
+        android:text="Suv qo'shish"
         android:textColor="?colorOnSurface" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="20dp"
-        style="@style/TextAppearance.Material3.BodyMedium"
+        android:layout_marginBottom="6dp"
+        style="@style/Text1_16"
         android:text="Qancha suv ichdingiz?"
         android:textColor="?colorOnSurfaceVariant" />
+
+    <TextView
+        android:id="@+id/tv_water_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="20dp"
+        style="@style/TextAppearance.Material3.TitleLarge"
+        android:fontFamily="@font/roboto_bold"
+        android:text="0 / 2000 ml"
+        android:textColor="@color/blue" />
 
     <!-- Row 1 -->
     <LinearLayout
@@ -69,11 +70,6 @@
                 android:paddingVertical="16dp"
                 android:paddingHorizontal="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="☕"
-                    android:textSize="32sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -119,11 +115,6 @@
                 android:paddingVertical="16dp"
                 android:paddingHorizontal="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🥛"
-                    android:textSize="32sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -177,11 +168,6 @@
                 android:paddingVertical="16dp"
                 android:paddingHorizontal="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🧴"
-                    android:textSize="32sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -189,7 +175,7 @@
                     android:layout_marginTop="8dp"
                     style="@style/TextAppearance.Material3.TitleMedium"
                     android:fontFamily="@font/roboto_medium"
-                    android:text="Kichik butilka"
+                    android:text="Kichik"
                     android:textColor="?colorOnSurface" />
 
                 <TextView
@@ -198,7 +184,7 @@
                     android:layout_marginTop="2dp"
                     style="@style/TextAppearance.Material3.BodyMedium"
                     android:fontFamily="@font/roboto_medium"
-                    android:text="0.5 L"
+                    android:text="0.5 litr"
                     android:textColor="@color/blue" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -227,11 +213,6 @@
                 android:paddingVertical="16dp"
                 android:paddingHorizontal="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💧"
-                    android:textSize="32sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -239,7 +220,7 @@
                     android:layout_marginTop="8dp"
                     style="@style/TextAppearance.Material3.TitleMedium"
                     android:fontFamily="@font/roboto_medium"
-                    android:text="Katta butilka"
+                    android:text="Katta"
                     android:textColor="?colorOnSurface" />
 
                 <TextView
@@ -248,23 +229,21 @@
                     android:layout_marginTop="2dp"
                     style="@style/TextAppearance.Material3.BodyMedium"
                     android:fontFamily="@font/roboto_medium"
-                    android:text="1.0 L"
+                    android:text="1.0 litr"
                     android:textColor="@color/blue" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 
-    <!-- Close button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_close"
-        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
+        style="@style/ThemeOverlay.Material3.Button.TonalButton"
         android:minHeight="48dp"
         android:fontFamily="@font/roboto_medium"
-        android:text="Yopish"
-        android:textColor="?colorOnSurfaceVariant" />
+        android:text="Yopish" />
 
 </LinearLayout>

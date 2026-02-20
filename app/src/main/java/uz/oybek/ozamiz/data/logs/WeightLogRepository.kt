@@ -13,7 +13,6 @@ import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.generateKey
 import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.logs.local.LocalLogs
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
@@ -58,10 +57,6 @@ object WeightLogRepository {
     }
 
     fun getLogsFlow(userId: String): Flow<DataWrapper<List<WeightLog>>> = flow {
-        val localLogs = LocalLogs.getLogs()
-        if (localLogs.isNotEmpty()) {
-            emit(DataWrapper.Success(localLogs))
-        }
 
         emitAll(callbackFlow {
             val registration = Firebase.firestore.collection(COLLECTION_USERS)
@@ -76,7 +71,6 @@ object WeightLogRepository {
 
                     if (snapshot != null) {
                         val logs = snapshot.toObjects(WeightLog::class.java)
-                        LocalLogs.saveLogs(logs)
                         trySend(DataWrapper.Success(logs))
                     } else {
                         trySend(DataWrapper.Success(emptyList()))
@@ -121,12 +115,12 @@ object WeightLogRepository {
                 .document(log.logId)
                 .delete()
                 .await()
-            
+
             val photoUrl = log.photoUrl
-             if (photoUrl.isNotEmpty()) {
+            if (photoUrl.isNotEmpty()) {
                 ImageUploader.deleteImage(photoUrl)
             }
-            
+
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
             handleException(e)

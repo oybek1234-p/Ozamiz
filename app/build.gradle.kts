@@ -20,12 +20,11 @@ android {
     }
 
     defaultConfig {
-
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 45
-        versionName = "2.4"
+        versionCode = 48
+        versionName = "2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -75,6 +74,7 @@ dependencies {
     implementation(libs.androidx.paging.common.android)
     implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.common)
+    implementation(libs.work.runtime.ktx)
 
     val nav_version = "2.8.1"
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
@@ -119,6 +119,7 @@ dependencies {
     implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
 
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation(libs.google.firebase.ai)
 
 }

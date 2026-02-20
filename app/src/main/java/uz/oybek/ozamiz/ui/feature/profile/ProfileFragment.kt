@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.profile
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -7,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +23,7 @@ import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
 import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.getPremiumExpireDate
+import uz.oybek.ozamiz.ui.feature.premium.premiumExpired
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
@@ -85,7 +88,16 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 findNavController().navigate(R.id.paymentGetCheckFragment)
             }
         }
+        setupPaymentCheckListener()
         observeViewModel(bind)
+    }
+
+    private fun setupPaymentCheckListener() {
+        setFragmentResultListener("payment_check_submitted") { _, bundle ->
+            if (bundle.getBoolean("submitted")) {
+                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(parentFragmentManager, uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG)
+            }
+        }
     }
 
     private fun setupSection(
@@ -97,6 +109,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun observeViewModel(bind: FragmentProfileBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -112,7 +125,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         bind.buttonLogout.isVisible = true
 
                         when {
-                            user.premium -> {
+                            user.premium && !user.premiumExpired() -> {
                                 bind.premiumActiveC.isVisible = true
                                 bind.premiumView.isVisible = false
                                 bind.premiumExpireDate.text =
@@ -127,9 +140,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
                             else -> {
                                 bind.premiumActiveC.isVisible = false
+                                bind.premiumView.isVisible = true
                             }
                         }
                         bind.sectionAdminPremiumUsers.isVisible = user.admin
+                        bind.containerAdminLessons.isVisible = user.admin
                     } else {
                         bind.textViewUserName.text = getString(R.string.default_user_name)
                         bind.imageViewUserAvatar.setImageResource(R.drawable.ic_profile)
@@ -137,6 +152,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         bind.premiumActiveC.isVisible = false
                         bind.premiumView.isVisible = false
                         bind.sectionAdminPremiumUsers.isVisible = false
+                        bind.containerAdminLessons.isVisible = false
                     }
                 }
             }

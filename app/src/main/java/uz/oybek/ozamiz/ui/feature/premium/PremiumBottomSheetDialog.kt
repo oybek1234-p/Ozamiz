@@ -8,6 +8,8 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.PremiumSheetBinding
 
 class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
@@ -34,15 +36,41 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (UserRepository.user.paymentChecking) {
+            binding.layoutBenefits.visibility = View.GONE
+            binding.layoutVerificationPending.visibility = View.VISIBLE
+            binding.textView17.visibility = View.GONE
+        } else {
+            binding.layoutBenefits.visibility = View.VISIBLE
+            binding.layoutVerificationPending.visibility = View.GONE
+            binding.textView17.visibility = View.VISIBLE
+            binding.textView17.text = getString(R.string.premium)
+        }
+
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
+            if (state.isLoading) return@observe
             state.premiumPrice?.let {
                 binding.priceView.text = "$it so'm / oyiga"
             }
-            // Handle isAnalyzing and error states if necessary
+            
+            if (state.paymentChecking) {
+                binding.layoutBenefits.visibility = View.GONE
+                binding.layoutVerificationPending.visibility = View.VISIBLE
+                binding.textView17.visibility = View.GONE
+            } else {
+                binding.layoutBenefits.visibility = View.VISIBLE
+                binding.layoutVerificationPending.visibility = View.GONE
+                binding.textView17.visibility = View.VISIBLE
+                binding.textView17.text = getString(R.string.premium)
+            }
         }
-
         binding.button.setOnClickListener {
-            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to "go_to_payment"))
+            setFragmentResult(REQUEST_KEY,
+                bundleOf(RESULT_ACTION to "go_to_payment"))
+            dismiss()
+        }
+        
+        binding.buttonClose.setOnClickListener {
             dismiss()
         }
     }

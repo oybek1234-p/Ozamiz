@@ -7,7 +7,7 @@ package uz.oybek.ozamiz.data.food.analyzer
  */
 object FoodAnalyzerConfig {
 
-    const val MODEL_NAME = "gemini-flash-lite-latest"
+    const val MODEL_NAME = "gemini-flash-latest"
 
     const val FOOD_INSTRUCTION = """
 Sen tajribali AI Diyetologsan. Har qanday ovqatni tahlil qilishda quyidagi UNIVERSAL ALGORITM bo'yicha ishlaysan.

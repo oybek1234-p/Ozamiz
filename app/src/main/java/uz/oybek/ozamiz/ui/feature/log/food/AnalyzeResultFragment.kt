@@ -125,6 +125,24 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                 }
             }
         }
+        
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.event.collect { event ->
+                when (event) {
+                    is AnalyzeResultEvent.Saved -> {
+                        findNavController().popBackStack()
+                        findNavController().popBackStack()
+                    }
+                    is AnalyzeResultEvent.LimitExceeded -> {
+                        val dialog = LimitExceededDialog.newInstance()
+                        dialog.show(parentFragmentManager, LimitExceededDialog.TAG)
+                        
+                        findNavController().popBackStack()
+                        findNavController().popBackStack()
+                    }
+                }
+            }
+        }
     }
 
     private fun updateMacrosAndCalorie(result: FoodAnalysisResult) {
@@ -162,8 +180,6 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
     private fun setupListeners() {
         binding.buttonSaveToLog.setOnClickListener {
             viewModel.saveLog()
-            findNavController().popBackStack()
-            findNavController().popBackStack()
         }
 
         binding.buttonDelete.setOnClickListener {
