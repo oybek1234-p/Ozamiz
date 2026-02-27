@@ -162,7 +162,7 @@ class DateScrollerAdapter(
             val consumed = summary?.consumedCalories ?: 0
             val max = if (targetCalories > 0) targetCalories else 1
             val progress = (consumed.toFloat() / max * 100).toInt()
-            val isExceeded = consumed > targetCalories
+            val isExceeded = consumed > targetCalories + 200
 
             binding.progressRing.max = 100
             // Animate progress change

@@ -160,7 +160,12 @@ class HomeViewModel : ViewModel() {
                                     .take(4)
                             } else {
                                 emptyList()
-                            }
+                            },
+                        isProteinExceeded = summary.consumedProtein > macros.protein + 20,
+                        isCarbsExceeded = summary.consumedCarbs > macros.carbs + 20,
+                        isFatExceeded = summary.consumedFat > macros.fat + 20,
+                        isCalorieOptimal = summary.consumedCalories >= user.targetCalories && summary.consumedCalories <= user.targetCalories + 200,
+                        isCalorieExceeded = summary.consumedCalories > user.targetCalories + 200
                     )
                 }
                 previousWaterAmount = currentWater

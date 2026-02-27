@@ -1,15 +1,22 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
+import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
+import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.streak.StreakRepository
@@ -21,7 +28,7 @@ data class AnalyzeResultState(
 
 sealed interface AnalyzeResultEvent {
     object Saved : AnalyzeResultEvent
-    object LimitExceeded : AnalyzeResultEvent
+    data class LimitExceeded(val exceededTypes: List<String>) : AnalyzeResultEvent
 }
 
 class AnalyzeResultViewModel : ViewModel() {
@@ -35,12 +42,27 @@ class AnalyzeResultViewModel : ViewModel() {
     private var loadedLogDate: java.util.Date? = null
     private var loadedLogId: String? = null
 
+    private var uploadJob: kotlinx.coroutines.Deferred<String?>? = null
+
+    private fun startUploadIfNeeded(photoUrl: String?) {
+        if (photoUrl != null && !photoUrl.startsWith("http") && uploadJob == null) {
+            uploadJob = CoroutineScope(Dispatchers.IO).async {
+                val url = ImageUploader.uploadImage(
+                    photoUrl.toUri(),
+                    ImagePaths.ANALYZE_FOOD
+                )
+                url
+            }
+        }
+    }
+
     fun setResult(result: FoodAnalysis?) {
         liveResult.update {
             it.copy(
                 result = result
             )
         }
+        startUploadIfNeeded(result?.photoUrl)
     }
 
     fun loadLog(logId: String, date: java.util.Date) {
@@ -52,7 +74,7 @@ class AnalyzeResultViewModel : ViewModel() {
             if (log != null) {
                 val analysis = FoodAnalysis(
                     id = log.logId.hashCode(), // Store hash or just rely on loadedLogId
-                    photoUrl = log.photoUrl ?: "",
+                    photoUrl = log.photoUrl?.takeIf { it.isNotBlank() },
                     result = uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult(
                         name = log.description,
                         calories = log.calories,
@@ -87,33 +109,33 @@ class AnalyzeResultViewModel : ViewModel() {
 
     fun updateLog(newDescription: String) {
         val currentResult = liveResult.value.result ?: return
-        val logId = loadedLogId // Can be null
-        val date = loadedLogDate // Can be null
+        val logId = loadedLogId
+        val date = loadedLogDate
 
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
 
-            // Re-analyze
             val prompt = "$newDescription. (Do not ask questions, provide best possible estimate)"
             val initialContent =
-                uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer.createInitialContent(
-                    null, // Use null for image as we are text-correcting
+                FoodAnalyzer.createInitialContent(
+                    null,
                     prompt,
                     currentResult.mealType
                 )
             val history = listOf(initialContent)
 
-            val analysis = uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer.analyze(history)
+            val analysis = FoodAnalyzer.analyze(history)
 
             if (analysis != null) {
-                // Keep original interactions/photo
                 analysis.photoUrl = currentResult.photoUrl
                 analysis.mealType = currentResult.mealType
+                FoodAnalyzer.updateCachedResult(
+                    analysis.id,
+                    currentResult.photoUrl,
+                    currentResult.mealType
+                )
 
-                // Update local state - This triggers UI update
                 liveResult.update { it.copy(result = analysis, isLoading = false) }
-
-                // If existing log, update remote
                 if (logId != null && date != null) {
                     val updatedLog = analysis.toFoodLog()
                     updatedLog.logId = logId
@@ -129,6 +151,13 @@ class AnalyzeResultViewModel : ViewModel() {
         val result = liveResult.value.result ?: return
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
+
+            val finalUrl = uploadJob?.await() ?: result.photoUrl
+            if (finalUrl != result.photoUrl && finalUrl != null) {
+                result.photoUrl = finalUrl
+                FoodAnalyzer.updateCachedResult(result.id, finalUrl, result.mealType)
+            }
+
             val log = result.toFoodLog()
             val targetDate = loadedLogDate ?: LogFragment.currentDate
 
@@ -154,8 +183,35 @@ class AnalyzeResultViewModel : ViewModel() {
                 val summary =
                     snapshot.getValue(uz.oybek.ozamiz.data.logs.model.DailySummary::class.java)
 
-                if (summary != null && targetCalories > 0 && summary.consumedCalories > targetCalories) {
-                    _event.send(AnalyzeResultEvent.LimitExceeded)
+                val exceededTypes = mutableListOf<String>()
+                if (summary != null && targetCalories > 0) {
+                    // Kaloriya
+                    if (summary.consumedCalories > targetCalories) {
+                        exceededTypes.add(LimitExceededDialog.TYPE_CALORIES)
+                    }
+                    // Makro limitlarni kaloriyadan hisoblash
+                    // Oqsil: 30% (1g = 4 kal), Yog': 25% (1g = 9 kal), Uglevod: 45% (1g = 4 kal)
+                    val targetProtein = (targetCalories * 0.30) / 4.0
+                    val targetFat = (targetCalories * 0.25) / 9.0
+                    val targetCarbs = (targetCalories * 0.45) / 4.0
+
+                    if (summary.consumedProtein > targetProtein) {
+                        exceededTypes.add(LimitExceededDialog.TYPE_PROTEIN)
+                    }
+                    if (summary.consumedFat > targetFat) {
+                        exceededTypes.add(LimitExceededDialog.TYPE_FAT)
+                    }
+                    if (summary.consumedCarbs > targetCarbs) {
+                        exceededTypes.add(LimitExceededDialog.TYPE_CARBS)
+                    }
+                }
+
+                if (exceededTypes.isNotEmpty()) {
+                    uz.oybek.ozamiz.data.motivation.MotivationAlarmScheduler.scheduleNutrientWarning(
+                        uz.oybek.ozamiz.appContext,
+                        exceededTypes
+                    )
+                    _event.send(AnalyzeResultEvent.LimitExceeded(exceededTypes))
                 } else {
                     _event.send(AnalyzeResultEvent.Saved)
                 }
@@ -174,27 +230,25 @@ class AnalyzeResultViewModel : ViewModel() {
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
 
-            // Get history from cache
-            val history = uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer.getHistory(id)
+            val history = FoodAnalyzer.getHistory(id)
             if (history.isEmpty()) {
                 liveResult.update { it.copy(isLoading = false, isError = true) }
                 return@launch
             }
-
-            // Append user answer
             val answerContent = com.google.firebase.ai.type.content(role = "user") {
                 text(answer)
             }
             val newHistory = history + answerContent
 
-            // Re-analyze
-            val newAnalysis = uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer.analyze(newHistory)
-
+            val newAnalysis = FoodAnalyzer.analyze(newHistory)
             if (newAnalysis != null) {
-                // Keep the photoUrl from original since re-analysis might lose it if not careful 
-                // (though FoodAnalyzer analyze sets empty string currently, we should fix that or carry it over)
                 newAnalysis.photoUrl = currentAnalysis.photoUrl
-                newAnalysis.mealType = currentAnalysis.mealType // Carry over meal type
+                newAnalysis.mealType = currentAnalysis.mealType
+                FoodAnalyzer.updateCachedResult(
+                    newAnalysis.id,
+                    currentAnalysis.photoUrl,
+                    currentAnalysis.mealType
+                )
 
                 liveResult.update { it.copy(result = newAnalysis, isLoading = false) }
             } else {

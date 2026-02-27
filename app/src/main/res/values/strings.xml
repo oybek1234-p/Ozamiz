@@ -264,7 +264,7 @@
     <string name="estimated_calories_format">%d kaloriya</string>
     <string name="gallery">Galereya</string> <!-- Bu endi ishlatilmaydi, lekin o'chirmaymiz -->
     <string name="camera">Kamera</string>
-    <string name="calories_remaining">Kaloriya yeyishingiz mumkin</string>
+    <string name="calories_remaining">kaloriya ovqat yeyish mumkin</string>
     <string name="calories_sufficient">Bugunga yetarli yedingiz</string>
     <string name="calories_exceeded_slightly">%d kal oshdi</string>
     <string name="calories_exceeded_warning">%d kal oshdi️</string>

@@ -30,6 +30,12 @@ object FoodAnalyzer {
     }
 
     fun getLastAnalyzed(id: Int) = cache[id]
+    fun updateCachedResult(id: Int, photoUrl: String?, mealType: String) {
+        cache[id]?.let {
+            it.photoUrl = photoUrl
+            it.mealType = mealType
+        }
+    }
     fun getHistory(id: Int) = conversationCache[id] ?: emptyList()
 
     suspend fun analyze(
@@ -66,7 +72,7 @@ object FoodAnalyzer {
                 // Make sure to preserve ID if possible, or just generate new hash
                 FoodAnalysis(
                     id = result.hashCode(),
-                    photoUrl = "", // Set by ViewModel
+                    photoUrl = null, // Set by ViewModel
                     result = result,
                     mealType = "" // Set by ViewModel
                 ).also { 

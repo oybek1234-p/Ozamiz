@@ -59,8 +59,9 @@ class MotivationNotificationManager(private val context: Context) {
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
+        val notificationId = (System.currentTimeMillis() % 100000).toInt()
         with(NotificationManagerCompat.from(context)) {
-            notify(NOTIFICATION_ID, builder.build())
+            notify(notificationId, builder.build())
         }
     }
 }

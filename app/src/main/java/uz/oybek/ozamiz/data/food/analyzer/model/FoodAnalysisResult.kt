@@ -14,7 +14,7 @@ data class AnalyzedIngredient(
 @Keep
 data class FoodAnalysis(
     var mealType: String,
-    var photoUrl: String,
+    var photoUrl: String? = null,
     val id: Int = 0,
     val result: FoodAnalysisResult? = null
 ) {

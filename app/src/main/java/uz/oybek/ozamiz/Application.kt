@@ -3,9 +3,7 @@ package uz.oybek.ozamiz
 import android.app.Application
 
 import android.content.Context
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
+import uz.oybek.ozamiz.data.motivation.MotivationAlarmScheduler
 
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.BuildConfig
@@ -19,7 +17,6 @@ import com.google.firebase.firestore.persistentCacheSettings
 import kotlinx.coroutines.DelicateCoroutinesApi
 import uz.oybek.ozamiz.data.motivation.MotivationNotificationManager
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.workers.MotivationWorker
 
 lateinit var appContext: Context
 
@@ -50,16 +47,6 @@ class Application : Application() {
         FirebaseFirestore.getInstance().firestoreSettings = settings
 
         MotivationNotificationManager(this).createNotificationChannel()
-        val workRequest = PeriodicWorkRequest.Builder(
-            MotivationWorker::class.java,
-            1,
-            java.util.concurrent.TimeUnit.HOURS
-        ).build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "MotivationWorker",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            workRequest
-        )
+        MotivationAlarmScheduler.scheduleAll(this)
     }
 }

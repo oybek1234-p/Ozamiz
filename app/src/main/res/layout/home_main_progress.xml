@@ -22,8 +22,6 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Top row: remaining + how it works -->
-            <!-- Top row: remaining + how it works -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -47,13 +45,14 @@
 
                     <TextView
                         android:id="@+id/text_calories_remaining_label"
-                        style="@style/TextAppearance.Material3.BodyLarge"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        style="@style/Text1_16"
                         android:gravity="center"
-                        android:layout_marginTop="@dimen/dimen_4"
+                        android:layout_marginTop="@dimen/dimen_8"
                         android:text="@string/calories_remaining"
                         android:textColor="?colorOnSurface" />
+
                 </LinearLayout>
 
                 <ImageView
@@ -105,50 +104,45 @@
                         android:id="@+id/text_eaten_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/yeyildi"
+                        android:text="Yeyildi: "
                         android:textColor="?colorOnSurfaceVariant"
                         android:textSize="15sp" />
 
                     <TextView
                         android:id="@+id/text_eaten_count"
-                        style="@style/TextAppearance.Material3.TitleMedium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:fontFamily="@font/roboto_medium"
                         android:textColor="?colorOnSurface"
-                        tools:text="1200" />
-                </LinearLayout>
-
-                <!-- Burned -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end|center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/text_burned_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/burned"
-                        android:textColor="?colorOnSurfaceVariant"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:id="@+id/text_burned_count"
-                        style="@style/TextAppearance.Material3.TitleMedium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:fontFamily="@font/roboto_medium"
-                        android:textColor="?colorOnSurface"
-                        tools:text="350" />
+                        android:textSize="15sp"
+                        tools:text="2600 Maqsad 2600 dan oshirmaslik.OK" />
                 </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_calorie_advice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="?attr/colorSecondaryContainer"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp">
+
+        <TextView
+            android:id="@+id/text_calories_subtitle"
+            style="@style/Text1_16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Boshqa ovqat yemang. Juda och qolsangiz sabzavotlar, ko‘katlar, tuxum oqi, yog‘siz qatiq/yogurt, tvorog, sho‘rva, me’yorida meva mumkin."
+            android:textColor="?colorOnSecondaryContainer" />
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView

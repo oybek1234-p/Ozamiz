@@ -27,5 +27,10 @@ data class HomeUiState(
     val fatConsumed: Int = 0,
     val fatTarget: Int = 0,
     val exerciseLogs: List<ExerciseLog> = emptyList(),
-    val recommendedExercises: List<UserExercise> = emptyList()
+    val recommendedExercises: List<UserExercise> = emptyList(),
+    val isProteinExceeded: Boolean = false,
+    val isCarbsExceeded: Boolean = false,
+    val isFatExceeded: Boolean = false,
+    val isCalorieOptimal: Boolean = false,
+    val isCalorieExceeded: Boolean = false
 )

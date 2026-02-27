@@ -183,6 +183,28 @@
                     app:iconSize="20dp"
                     tools:visibility="visible" />
 
+                <LinearLayout
+                    android:id="@+id/layout_macro_warnings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/warning_protein"
+                        layout="@layout/item_macro_warning_card"
+                        android:visibility="gone" />
+
+                    <include
+                        android:id="@+id/warning_carbs"
+                        layout="@layout/item_macro_warning_card"
+                        android:visibility="gone" />
+
+                    <include
+                        android:id="@+id/warning_fat"
+                        layout="@layout/item_macro_warning_card"
+                        android:visibility="gone" />
+                </LinearLayout>
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_motivation"
                     android:layout_width="match_parent"

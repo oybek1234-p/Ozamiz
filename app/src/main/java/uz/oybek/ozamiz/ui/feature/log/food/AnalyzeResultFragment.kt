@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
@@ -71,15 +71,17 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
         binding.nestedScrollView.alpha = if (show) 0.5f else 1.0f
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setupUI() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.resultLive.collect { state ->
                 state?.run {
                     showLoading(isLoading)
                     val analysisResult = result?.result ?: return@run
-                    
+
                     if (analysisResult.isAmbiguous && analysisResult.question != null) {
-                        val existingSheet = parentFragmentManager.findFragmentByTag("clarification_sheet")
+                        val existingSheet =
+                            parentFragmentManager.findFragmentByTag("clarification_sheet")
                         if (existingSheet == null && !isLoading) {
                             ClarificationBottomSheet(
                                 question = analysisResult.question,
@@ -92,7 +94,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
 
                     updateMacrosAndCalorie(analysisResult)
                     val photoUrl = result.photoUrl
-                    if (photoUrl.isNotEmpty() && (photoUrl == "null").not()) {
+                    if (!photoUrl.isNullOrEmpty() && photoUrl != "null") {
                         Glide
                             .with(this@AnalyzeResultFragment)
                             .load(photoUrl)
@@ -125,7 +127,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                 }
             }
         }
-        
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.event.collect { event ->
                 when (event) {
@@ -133,10 +135,13 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                         findNavController().popBackStack()
                         findNavController().popBackStack()
                     }
+
                     is AnalyzeResultEvent.LimitExceeded -> {
-                        val dialog = LimitExceededDialog.newInstance()
+                        val firstType =
+                            event.exceededTypes.firstOrNull() ?: LimitExceededDialog.TYPE_CALORIES
+                        val dialog = LimitExceededDialog.newInstance(firstType)
                         dialog.show(parentFragmentManager, LimitExceededDialog.TAG)
-                        
+
                         findNavController().popBackStack()
                         findNavController().popBackStack()
                     }
@@ -240,10 +245,10 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
         val input = android.widget.EditText(requireContext())
         input.setText(currentName)
         input.hint = "Ovqat nomi"
-        
+
         val container = android.widget.FrameLayout(requireContext())
         val params = android.widget.FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 
+            ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         params.marginStart = resources.getDimensionPixelSize(R.dimen.dimen_24)
@@ -257,21 +262,29 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
             .setPositiveButton("Saqlash") { _, _ ->
                 val newName = input.text.toString()
                 if (newName.isNotBlank() && newName != currentName) {
-                     viewModel.updateLog(newName)
+                    viewModel.updateLog(newName)
                 }
             }
             .setNegativeButton("Bekor qilish", null)
             .show()
     }
 
-    private fun showEditNumberDialog(title: String, currentValue: Double, onSave: (Double) -> Unit) {
+    private fun showEditNumberDialog(
+        title: String,
+        currentValue: Double,
+        onSave: (Double) -> Unit
+    ) {
         val input = android.widget.EditText(requireContext())
-        input.setText(if (currentValue % 1.0 == 0.0) currentValue.toInt().toString() else currentValue.toString())
-        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-        
+        input.setText(
+            if (currentValue % 1.0 == 0.0) currentValue.toInt()
+                .toString() else currentValue.toString()
+        )
+        input.inputType =
+            android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+
         val container = android.widget.FrameLayout(requireContext())
         val params = android.widget.FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, 
+            ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         params.marginStart = resources.getDimensionPixelSize(R.dimen.dimen_24)

@@ -22,6 +22,7 @@ import uz.oybek.ozamiz.databinding.DialogLogWaterBinding
 import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.exercise.HomeEmptyExerciseAdapter
+import uz.oybek.ozamiz.ui.feature.log.food.LimitExceededDialog
 import uz.oybek.ozamiz.ui.feature.log.food.LogFoodFragment
 import java.util.Calendar
 import java.util.Date
@@ -149,7 +150,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         bind.mainProgress.btnHowItWorks.setOnClickListener {
-            navigate(R.id.action_home_to_calorieInfoFragment)
+            if (viewModel.uiState.value.isCalorieExceeded || viewModel.uiState.value.isCalorieOptimal) {
+                LimitExceededDialog.newInstance(LimitExceededDialog.TYPE_CALORIES).show(childFragmentManager, LimitExceededDialog.TAG)
+            } else {
+                navigate(R.id.action_home_to_calorieInfoFragment)
+            }
         }
 
         // Macro info buttons
@@ -266,13 +271,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         binding.progressWater.max = state.waterTarget
         binding.progressWater.setProgressCompat(state.waterConsumed, animate)
 
-        // Streak UI Binding
         val streakInfo = state.streakInfo
         if (streakInfo != null) {
             binding.streakDisplayLayout.isVisible = true
             binding.textStreakCount.text = streakInfo.currentStreak.toString()
-            
-            // Basic pulse animation if not animated yet (could use flag)
+
             if (binding.streakDisplayLayout.scaleX == 1f) {
                 binding.streakDisplayLayout.animate()
                     .scaleX(1.1f).scaleY(1.1f)
@@ -285,7 +288,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                     }
                     .start()
             }
-            
             binding.streakDisplayLayout.setOnClickListener {
                  uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet
                      .newInstance(streakInfo)
@@ -294,77 +296,113 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         } else {
             binding.streakDisplayLayout.isVisible = false
         }
-        
-        // Goal text is now part of the header or hidden, so we can remove/comment out this line if the view is gone
-        // binding.textWaterGoal.text = "Kunlik me'yor: $goalLiters litr"
-
-
         binding.mainProgress.apply {
             textCaloriesRemainingCount.text = state.caloriesRemaining.absoluteValue.toString()
-            textEatenCount.text = state.caloriesConsumed.toString()
-            textBurnedCount.text = state.exerciseBurnt.toString()
+
+            textEatenCount.text = "${state.caloriesConsumed}    Maqsad: ${state.caloriesTarget} oshirmaslik"
 
             progressCaloriesCircular.max = state.caloriesTarget
             val isMoreConsume = state.caloriesRemaining < 0
-            textCaloriesRemainingLabel.setText(
-                if (isMoreConsume) R.string.try_not_to_eat_more else R.string.calories_remaining
-            )
             progressCaloriesCircular.setProgressCompat(
                 state.caloriesConsumed.absoluteValue,
                 animate
             )
             val primaryColor = com.google.android.material.color.MaterialColors.getColor(requireView(), androidx.appcompat.R.attr.colorPrimary)
             val redColor = ContextCompat.getColor(requireContext(), R.color.red)
-            val trackColor = com.google.android.material.color.MaterialColors.getColor(requireView(), com.google.android.material.R.attr.colorSurfaceContainerHigh)
-            val onSurfaceColor = com.google.android.material.color.MaterialColors.getColor(requireView(), com.google.android.material.R.attr.colorOnSurface)
-
-            progressCaloriesCircular.setIndicatorColor(if (isMoreConsume) redColor else primaryColor)
-            progressCaloriesCircular.trackColor = trackColor
-            textCaloriesRemainingCount.setTextColor(if (isMoreConsume) redColor else onSurfaceColor)
-
             val orangeColor = ContextCompat.getColor(requireContext(), R.color.orange)
             val yellowColor = ContextCompat.getColor(requireContext(), R.color.yellow)
             val greenColor = ContextCompat.getColor(requireContext(), R.color.green)
+            val trackColor = com.google.android.material.color.MaterialColors.getColor(requireView(), com.google.android.material.R.attr.colorSurfaceContainerHigh)
+            val onSurfaceColor = com.google.android.material.color.MaterialColors.getColor(requireView(), com.google.android.material.R.attr.colorOnSurface)
 
-            val proteinExceeded = state.proteinConsumed > state.proteinTarget
+            if (state.isCalorieExceeded) {
+                textCaloriesRemainingLabel.text = "Ozgina meyordan oshdi"
+                textCaloriesRemainingLabel.setTextColor(redColor)
+                textCaloriesRemainingLabel.setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Large)
+                textCaloriesRemainingLabel.textSize = 20f
+                textCaloriesRemainingCount.isVisible = false
+                cardCalorieAdvice.isVisible = true
+                macrosContainer.isVisible = false
+                binding.layoutMacroWarnings.isVisible = false
+            } else if (state.isCalorieOptimal) {
+                textCaloriesRemainingLabel.text = "Meyorida yedingiz"
+                textCaloriesRemainingLabel.setTextColor(greenColor)
+                textCaloriesRemainingLabel.setTextAppearance(androidx.appcompat.R.style.TextAppearance_AppCompat_Large)
+                textCaloriesRemainingLabel.textSize = 20f
+                textCaloriesRemainingCount.isVisible = false
+                cardCalorieAdvice.isVisible = true
+                macrosContainer.isVisible = false
+                binding.layoutMacroWarnings.isVisible = false
+            } else {
+                 textCaloriesRemainingLabel.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge)
+                textCaloriesRemainingLabel.setText(
+                    if (isMoreConsume) R.string.try_not_to_eat_more else R.string.calories_remaining
+                )
+                textCaloriesRemainingLabel.setTextColor(onSurfaceColor)
+                textCaloriesRemainingCount.isVisible = true
+                cardCalorieAdvice.isVisible = false
+                macrosContainer.isVisible = true
+                binding.layoutMacroWarnings.isVisible = true
+            }
+
+            progressCaloriesCircular.setIndicatorColor(if (state.isCalorieExceeded) redColor else if (state.isCalorieOptimal && isMoreConsume) greenColor else primaryColor)
+            progressCaloriesCircular.trackColor = trackColor
+            textCaloriesRemainingCount.setTextColor(if (state.isCalorieExceeded) redColor else if (state.isCalorieOptimal && isMoreConsume) greenColor else onSurfaceColor)
+
+
+
+            val proteinExceeded = state.isProteinExceeded
+            val proteinOptimal = state.proteinConsumed >= state.proteinTarget && !state.isProteinExceeded
+            val proteinTargetReached = state.proteinConsumed >= state.proteinTarget
+            binding.mainProgress.cardProtein.isVisible = !proteinTargetReached
+
             val proteinRemaining = state.proteinTarget - state.proteinConsumed
             progressProtein.max = if (proteinExceeded) state.proteinConsumed else state.proteinTarget
             progressProtein.setProgressCompat(state.proteinConsumed, animate)
-            progressProtein.setIndicatorColor(if (proteinExceeded) redColor else orangeColor)
+            progressProtein.setIndicatorColor(if (proteinExceeded) redColor else if (proteinOptimal) greenColor else orangeColor)
             progressProtein.trackColor = trackColor
-            textProteinValue.setTextColor(if (proteinExceeded) redColor else onSurfaceColor)
+            textProteinValue.setTextColor(if (proteinExceeded) redColor else if (proteinOptimal) greenColor else onSurfaceColor)
             textProteinValue.text = if (proteinExceeded)
                 getString(R.string.macro_exceeded_format, -proteinRemaining)
+            else if (proteinOptimal)
+                "Me'yorida"
             else
                 getString(R.string.macro_remaining_format, proteinRemaining)
 
-            val fatExceeded = state.fatConsumed > state.fatTarget
+            val fatExceeded = state.isFatExceeded
+            val fatOptimal = state.fatConsumed >= state.fatTarget && !state.isFatExceeded
+            val fatTargetReached = state.fatConsumed >= state.fatTarget
+            binding.mainProgress.cardFat.isVisible = !fatTargetReached
+
             val fatRemaining = state.fatTarget - state.fatConsumed
             progressFat.max = if (fatExceeded) state.fatConsumed else state.fatTarget
             progressFat.setProgressCompat(state.fatConsumed, animate)
-            progressFat.setIndicatorColor(if (fatExceeded) redColor else yellowColor)
+            progressFat.setIndicatorColor(if (fatExceeded) redColor else if (fatOptimal) greenColor else yellowColor)
             progressFat.trackColor = trackColor
-            textFatValue.setTextColor(if (fatExceeded) redColor else onSurfaceColor)
+            textFatValue.setTextColor(if (fatExceeded) redColor else if (fatOptimal) greenColor else onSurfaceColor)
             textFatValue.text = if (fatExceeded)
                 getString(R.string.macro_exceeded_format, -fatRemaining)
-            else
-                getString(R.string.macro_remaining_format, fatRemaining)
-
-            textFatValue.text = if (fatExceeded)
-                getString(R.string.macro_exceeded_format, -fatRemaining)
+            else if (fatOptimal)
+                "Me'yorida"
             else
                 getString(R.string.macro_remaining_format, fatRemaining)
 
             // Carbs
-            val carbsExceeded = state.carbsConsumed > state.carbsTarget
+            val carbsExceeded = state.isCarbsExceeded
+            val carbsOptimal = state.carbsConsumed >= state.carbsTarget && !state.isCarbsExceeded
+            val carbsTargetReached = state.carbsConsumed >= state.carbsTarget
+            binding.mainProgress.cardCarbs.isVisible = !carbsTargetReached
+
             val carbsRemaining = state.carbsTarget - state.carbsConsumed
             progressCarbs.max = if (carbsExceeded) state.carbsConsumed else state.carbsTarget
             progressCarbs.setProgressCompat(state.carbsConsumed, animate)
-            progressCarbs.setIndicatorColor(if (carbsExceeded) redColor else greenColor)
+            progressCarbs.setIndicatorColor(if (carbsExceeded) redColor else if (carbsOptimal) greenColor else greenColor)
             progressCarbs.trackColor = trackColor
-            textCarbsValue.setTextColor(if (carbsExceeded) redColor else onSurfaceColor)
+            textCarbsValue.setTextColor(if (carbsExceeded) redColor else if (carbsOptimal) greenColor else onSurfaceColor)
             textCarbsValue.text = if (carbsExceeded)
                 getString(R.string.macro_exceeded_format, -carbsRemaining)
+            else if (carbsOptimal)
+                "Me'yorida"
             else
                 getString(R.string.macro_remaining_format, carbsRemaining)
         }
@@ -380,6 +418,35 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             exerciseAdapter.submitList(state.exerciseLogs)
         }
         binding.recyclerExerciseLogs.scrollToPosition(0)
+
+
+
+        binding.warningProtein.root.isVisible = state.isProteinExceeded
+        if (state.isProteinExceeded) {
+            binding.warningProtein.textWarningTitle.text = "Oqsil oshdi!"
+            binding.warningProtein.textWarningSubtitle.text = "Cheklang: Go'sht, tuxum, tovuq, baliq, tvorog, mosh, protein."
+            binding.warningProtein.root.setOnClickListener {
+                LimitExceededDialog.newInstance(LimitExceededDialog.TYPE_PROTEIN).show(childFragmentManager, LimitExceededDialog.TAG)
+            }
+        }
+
+        binding.warningCarbs.root.isVisible = state.isCarbsExceeded
+        if (state.isCarbsExceeded) {
+            binding.warningCarbs.textWarningTitle.text = "Uglevod oshdi!"
+            binding.warningCarbs.textWarningSubtitle.text = "Cheklang: Non, guruch, makaron, kartoshka, shirinliklar, pishiriqlar, banan, uzum."
+            binding.warningCarbs.root.setOnClickListener {
+                LimitExceededDialog.newInstance(LimitExceededDialog.TYPE_CARBS).show(childFragmentManager, LimitExceededDialog.TAG)
+            }
+        }
+
+        binding.warningFat.root.isVisible = state.isFatExceeded
+        if (state.isFatExceeded) {
+            binding.warningFat.textWarningTitle.text = "Yog' oshdi!"
+            binding.warningFat.textWarningSubtitle.text = "Cheklang: Qovurilgan ovqat, yog'li go'sht, sariyog', mayonez, pishloq, yong'oq, fast-fud."
+            binding.warningFat.root.setOnClickListener {
+                LimitExceededDialog.newInstance(LimitExceededDialog.TYPE_FAT).show(childFragmentManager, LimitExceededDialog.TAG)
+            }
+        }
     }
 
 

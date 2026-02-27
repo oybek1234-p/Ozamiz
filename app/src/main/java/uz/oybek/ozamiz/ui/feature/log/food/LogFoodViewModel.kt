@@ -115,6 +115,7 @@ class LogFoodViewModel() : ViewModel() {
             if (result != null) {
                 result.photoUrl = currentAnalysis.photoUrl
                 result.mealType = currentAnalysis.mealType
+                FoodAnalyzer.updateCachedResult(result.id, currentAnalysis.photoUrl, currentAnalysis.mealType)
 
                 android.util.Log.d(
                     "LogFoodViewModel",
@@ -153,17 +154,13 @@ class LogFoodViewModel() : ViewModel() {
 
             _state.update { it.copy(isAnalyzing = true) }
 
-            val uploadDeferred = async {
-                state.image?.let {
-                    ImageUploader.uploadImage(it, ImagePaths.ANALYZE_FOOD)
-                }
-            }
-
             val compressor = state.image?.let {
                 ImageCompressor.compressImageFile(
                     it
                 )
             }
+            
+            android.util.Log.d("LogFoodViewModel", "AI Analyze: Image compressed, creating initial content to send to FoodAnalyzer...")
 
             val initialContent = FoodAnalyzer.createInitialContent(
                 compressor?.toUri(),
@@ -174,8 +171,9 @@ class LogFoodViewModel() : ViewModel() {
             // Initial history contains just the user's prompt
             val history = listOf(initialContent)
 
+            android.util.Log.d("LogFoodViewModel", "AI Analyze: Sending request to Gemini...")
             val result = FoodAnalyzer.analyze(history)
-            val uploadedUrl = uploadDeferred.await()
+            android.util.Log.d("LogFoodViewModel", "AI Analyze: Request complete. Result success=${result != null}")
 
             _state.update {
                 it.copy(
@@ -185,8 +183,9 @@ class LogFoodViewModel() : ViewModel() {
             }
             if (result != null) {
                 // Set the local image path for later upload and meal type
-                result.photoUrl = uploadedUrl ?: ""
+                result.photoUrl = state.image?.toString()
                 result.mealType = state.meal
+                FoodAnalyzer.updateCachedResult(result.id, state.image?.toString(), state.meal)
                 
                 if (result.result?.isAmbiguous == true) {
                     _event.send(LogEvent.ClarificationNeeded(result))
