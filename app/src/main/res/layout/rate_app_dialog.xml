@@ -2,82 +2,85 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <data>
-
-    </data>
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:paddingBottom="@dimen/dimen_24"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/dimen_24"
-        android:background="?colorSurfaceContainer"
+        android:background="@drawable/bg_bottom_sheet_premium"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/dimen_18">
+        android:paddingHorizontal="24dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="32dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ozamiz_logo"
+            app:shapeAppearanceOverlay="@style/CircleImageView" />
+
+        <TextView
+            style="@style/Title2_20"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:text="Ozamiz ilovasi yoqdimi?"
+            android:textColor="?colorOnSurface" />
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ozamiz_logo"
-                app:shapeAppearanceOverlay="@style/CircleImageView" />
+        <TextView
+            style="@style/Text2_15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:text="Fikringiz biz uchun juda muhim"
+            android:textColor="?colorOnSurfaceVariant" />
 
-            <TextView
-                style="@style/Title3_17"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/dimen_18"
-                android:text="Ozamiz ilovasini baholang"
-                android:textColor="?colorOnSurface" />
-        </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatRatingBar
             android:id="@+id/rate_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/dimen_24"
+            android:layout_marginTop="24dp"
+            android:numStars="5"
             android:progressTint="@color/orange"
             android:secondaryProgressTint="@color/orange"
             android:stepSize="1" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/input_feedback_layout"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/text_rating_feedback"
+            style="@style/Title3_17"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dimen_12"
-            android:hint="Fikringizni qoldiring..."
-            android:visibility="gone"
-            app:boxBackgroundColor="?colorSurfaceContainerHigh"
-            app:boxCornerRadiusBottomEnd="16dp"
-            app:boxCornerRadiusBottomStart="16dp"
-            app:boxCornerRadiusTopEnd="16dp"
-            app:boxCornerRadiusTopStart="16dp"
-            app:boxStrokeWidth="0dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_feedback"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="top|start"
-                android:inputType="textMultiLine"
-                android:minLines="3" />
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:text=""
+            android:textColor="@color/orange"
+            android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_action"
             style="@style/FilledButton"
             android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:text="Baholash"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            app:cornerRadius="16dp" />
+
+        <TextView
+            android:id="@+id/btn_later"
+            style="@style/Text2_15"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dimen_24"
-            android:text="Davom etish"
-            android:visibility="gone" />
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:text="Keyinroq"
+            android:textColor="?colorOnSurfaceVariant" />
+
 
     </LinearLayout>
-</layout>
+</layout>

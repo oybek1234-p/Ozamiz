@@ -121,16 +121,20 @@ class MainActivity : AppCompatActivity() {
     private fun checkRegisterDate() {
         if (LocalUser.user.registerDate == null) {
             UserRepository.updateUser {
-                it.registerDate = Calendar.getInstance()
-                    .apply {
-                        add(Calendar.YEAR, -1)
-                    }.time
+                it.registerDate = Calendar.getInstance().time
             }
         }
     }
 
     private fun initUser() {
         LocalUser.getUser()
+        if (LocalUser.user.valid) {
+            UserRepository.updateLastSeen()
+            UserRepository.observeCurrentUser { }
+            lifecycleScope.launch(Dispatchers.IO) {
+                UserRepository.refreshUser()
+            }
+        }
     }
 
     fun showSupportSheet() {

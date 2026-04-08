@@ -38,7 +38,8 @@ class WeightPhotoHistoryFragment : BaseFragment<FragmentWeightPhotoHistoryBindin
         }
         setupRecyclerView(bind)
         observeViewModel(bind)
-        viewModel.loadHistory()
+        val argUserId = arguments?.getString("userId")
+        viewModel.loadHistory(argUserId)
     }
 
     private fun setupRecyclerView(bind: FragmentWeightPhotoHistoryBinding) {

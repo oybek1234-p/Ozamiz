@@ -51,7 +51,11 @@
 
         <!-- Misc -->
         <item name="contentScrim">#000000</item>
-        <item name="android:shadowColor">#000000</item>
+        <item name="android:shadowColor">#006D42</item>
+
+        <!-- Custom Theme Colors -->
+        <item name="customGreen">#006D42</item>
+        <item name="customYellow">#FFB116</item>
     </style>
 
     <style name="Theme.Ozamiz" parent="Base.Ozamiz" />

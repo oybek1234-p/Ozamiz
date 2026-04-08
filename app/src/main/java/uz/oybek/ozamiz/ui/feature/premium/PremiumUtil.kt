@@ -36,7 +36,7 @@ fun User.premiumExpired(): Boolean {
 fun User.isPremiumOrTrial(): Boolean {
     if (premium && !premiumExpired()) return true
     val streak = streakInfo?.currentStreak ?: 0
-    return streak < 3
+    return streak < 2
 }
 
 fun User.getPremiumExpireDate(): String {

@@ -44,9 +44,6 @@ class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
         )
         bind.recyclerCategories.adapter = adapter
         bind.recyclerCategories.layoutManager = LinearLayoutManager(requireContext())
-        bind.recyclerCategories.addItemDecoration(
-            DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL)
-        )
     }
 
     private fun setupListeners(bind: FragmentCategoryManagerBinding) {

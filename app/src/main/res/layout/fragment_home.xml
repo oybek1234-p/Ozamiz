@@ -18,42 +18,105 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?colorSurfaceContainer"
-            app:title="Bugun"
-            app:titleCentered="true"
-            app:titleTextAppearance="@style/Title2_20"
-            app:titleTextColor="?attr/colorOnSurface">
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp">
 
-            <LinearLayout
-                android:id="@+id/streak_display_layout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="end"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="@dimen/dimen_18"
-                android:visibility="gone"
-                tools:visibility="visible">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-                <ImageView
-                    android:id="@+id/image_streak_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/fire_ic"
-                    app:tint="@color/yellow" />
+                <LinearLayout
+                    android:id="@+id/coin_display_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="4dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottie_coin"
+                        android:layout_width="@dimen/dimen_48"
+                        android:layout_height="@dimen/dimen_48"
+                        android:scaleType="centerCrop"
+                        app:lottie_rawRes="@raw/coin_anim"
+                        app:lottie_autoPlay="false"
+                        app:lottie_loop="false" />
+
+                    <TextView
+                        android:id="@+id/text_points_count"
+                        style="@style/Headline2_16"
+                        android:fontFamily="@font/roboto_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?colorOnSurface"
+                        tools:text="0" />
+
+                    <TextView
+                        android:id="@+id/text_points_delta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textSize="20sp"
+                        android:visibility="gone"
+                        tools:text="+5"
+                        tools:textColor="@color/green" />
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/text_streak_count"
-                    style="@style/Headline3_15"
-                    android:fontFamily="@font/roboto_bold"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/toolbar_title"
+                    style="@style/Title2_20"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:textColor="@color/yellow"
-                    tools:text="3" />
-            </LinearLayout>
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:gravity="center"
+                    android:textColor="?attr/colorOnSurface"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/streak_display_layout"
+                    app:layout_constraintStart_toEndOf="@id/coin_display_layout"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Bugun" />
+
+                <LinearLayout
+                    android:id="@+id/streak_display_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/dimen_18"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:id="@+id/image_streak_icon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/fire_ic"
+                        app:tint="@color/yellow" />
+
+                    <TextView
+                        android:id="@+id/text_streak_count"
+                        style="@style/Headline2_16"
+                        android:fontFamily="@font/roboto_bold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:textColor="?colorOnSurface"
+                        tools:text="3" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.appbar.MaterialToolbar>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -97,91 +160,61 @@
                     android:id="@+id/main_progress"
                     layout="@layout/home_main_progress" />
 
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_add_food_promo"
+                <LinearLayout
+                    android:id="@+id/layout_meal_cards"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="?attr/colorOutlineVariant">
+                    android:orientation="vertical">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <include
+                        android:id="@+id/card_breakfast"
+                        layout="@layout/item_home_meal_card" />
+
+                    <include
+                        android:id="@+id/card_lunch"
+                        layout="@layout/item_home_meal_card" />
+
+                    <include
+                        android:id="@+id/card_dinner"
+                        layout="@layout/item_home_meal_card" />
+
+                    <include
+                        android:id="@+id/card_snack"
+                        layout="@layout/item_home_meal_card" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_recommendations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/text_recommendation_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textSize="20sp"
+                        android:textColor="?attr/colorOnSurface"
+                        tools:text="Keyingi ovqat uchun tavsiya: Tushlik" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_food_recommendations"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="20dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/img_promo_banner"
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/food_camera_icon"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:shapeAppearance="@style/RadiusImageView12" />
-
-                        <TextView
-                            android:id="@+id/text_promo_title"
-                            style="@style/TextAppearance.Material3.TitleMedium"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:fontFamily="@font/roboto_bold"
-                            android:includeFontPadding="false"
-                            android:text="Ovqatni foyda va zararini bilib oling"
-                            android:textColor="?attr/colorOnSurface"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toEndOf="@id/img_promo_banner"
-                            app:layout_constraintTop_toTopOf="@id/img_promo_banner" />
-
-                        <TextView
-                            android:id="@+id/text_promo_subtitle"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:text="Kunlik yegan ovqatingizni miqdorini bilib oling"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="12sp"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="@id/text_promo_title"
-                            app:layout_constraintTop_toBottomOf="@id/text_promo_title" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_promo_add_food"
-                            style="@style/Widget.Material3.Button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:paddingHorizontal="16dp"
-                            android:text="Ovqatni qo'shish"
-                            android:textSize="13sp"
-                            app:cornerRadius="12dp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/text_promo_subtitle" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_add_food"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/dimen_48"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="@dimen/dimen_12"
-                    android:fontFamily="@font/roboto_bold"
-                    android:text="@string/add_food_title"
-                    android:textSize="16sp"
-                    android:visibility="gone"
-                    app:cornerRadius="20dp"
-                    app:elevation="2dp"
-                    app:icon="@drawable/add_ic"
-                    app:iconGravity="textStart"
-                    app:iconSize="20dp"
-                    tools:visibility="visible" />
+                        android:layout_marginTop="4dp"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="12dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_home_recommended_food" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/layout_macro_warnings"
@@ -206,46 +239,90 @@
                 </LinearLayout>
 
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_motivation"
+                    android:id="@+id/card_daily_tip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="24dp"
                     app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
+                    app:strokeWidth="1dp"
+                    app:strokeColor="?attr/colorOutlineVariant">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="?colorSurfaceContainerLowest"
-                        android:padding="16dp">
+                        android:paddingTop="@dimen/dimen_18"
+                        android:paddingHorizontal="@dimen/dimen_18">
 
                         <TextView
-                            android:id="@+id/text_motivation_message"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:fontFamily="@font/roboto_medium"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="16sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toStartOf="@id/btn_close_motivation"
+                            android:id="@+id/text_tip_emoji"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:background="@drawable/round_lay"
+                            android:backgroundTint="?attr/colorSurfaceContainer"
+                            android:gravity="center"
+                            android:textSize="24sp"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            tools:text="Motivation message here" />
+                            tools:text="💧" />
+
+                        <TextView
+                            android:id="@+id/text_tip_title"
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            app:layout_constraintEnd_toStartOf="@id/btn_close_tip"
+                            app:layout_constraintStart_toEndOf="@id/text_tip_emoji"
+                            app:layout_constraintTop_toTopOf="@id/text_tip_emoji"
+                            app:layout_constraintBottom_toBottomOf="@id/text_tip_emoji"
+                            tools:text="Suv ichish tartibi" />
 
                         <ImageView
-                            android:id="@+id/btn_close_motivation"
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
+                            android:id="@+id/btn_close_tip"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
                             android:focusable="true"
+                            android:padding="4dp"
                             android:src="@drawable/ic_close_24"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"
-                            app:tint="?attr/colorOnPrimaryContainer" />
+                            app:tint="?attr/colorOnSurfaceVariant" />
+
+                        <TextView
+                            android:id="@+id/text_tip_description"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:lineSpacingMultiplier="1.2"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/text_tip_emoji"
+                            tools:text="Har kuni kamida 2 litr suv ichish moddalar almashinuvini yaxshilaydi." />
+
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_tip_details"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="Batafsil"
+                            android:textColor="?attr/colorPrimary"
+                            app:icon="@drawable/arrow_right"
+                            app:iconGravity="textEnd"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/text_tip_description" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -604,6 +681,86 @@
                             tools:visibility="visible" />
 
                     </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_dietolog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?selectableItemBackground"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="20dp">
+
+                        <ImageView
+                            android:id="@+id/img_dietolog_icon"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:background="@drawable/round_lay"
+                            android:backgroundTint="?attr/colorPrimary"
+                            android:padding="12dp"
+                            android:src="@drawable/chat_ic"
+                            app:tint="?attr/colorOnPrimary"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                        <TextView
+                            android:id="@+id/text_dietolog_title"
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="Dietolog savol berish"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:textSize="17sp"
+                            app:layout_constraintEnd_toStartOf="@+id/img_dietolog_arrow"
+                            app:layout_constraintStart_toEndOf="@id/img_dietolog_icon"
+                            app:layout_constraintTop_toTopOf="@id/img_dietolog_icon"
+                            app:layout_constraintBottom_toTopOf="@+id/text_dietolog_subtitle"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <TextView
+                            android:id="@+id/text_dietolog_subtitle"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="8dp"
+                            android:layout_marginTop="2dp"
+                            android:text="AI dietolog bilan suhbat"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            android:alpha="0.7"
+                            android:textSize="13sp"
+                            app:layout_constraintEnd_toStartOf="@+id/img_dietolog_arrow"
+                            app:layout_constraintStart_toEndOf="@id/img_dietolog_icon"
+                            app:layout_constraintTop_toBottomOf="@id/text_dietolog_title"
+                            app:layout_constraintBottom_toBottomOf="@id/img_dietolog_icon" />
+
+                        <ImageView
+                            android:id="@+id/img_dietolog_arrow"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/arrow_right"
+                            app:tint="?attr/colorOnPrimaryContainer"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>

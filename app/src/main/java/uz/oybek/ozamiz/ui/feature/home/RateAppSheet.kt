@@ -48,36 +48,33 @@ class RateAppSheet : BottomSheetDialogFragment() {
     private fun setupListeners() {
         binding.rateButton.onRatingBarChangeListener =
             RatingBar.OnRatingBarChangeListener { _, rating, _ ->
-                if (rating >= 4) {
-                    binding.inputFeedbackLayout.isVisible = false
-                    binding.btnAction.text = "Baholash"
-                    binding.btnAction.isVisible = true
-                    
-                } else if (rating > 0) {
-                    binding.inputFeedbackLayout.isVisible = true
-                    binding.btnAction.text = "Yuborish"
-                    binding.btnAction.isVisible = true
-                } else {
-                    binding.inputFeedbackLayout.isVisible = false
-                    binding.btnAction.isVisible = false
+                val feedbackText = when (rating) {
+                    1f -> "Yomon 😟"
+                    2f -> "Yaxshi emas 😕"
+                    3f -> "Yaxshi 😊"
+                    4f -> "Judayam yaxshi! 😍"
+                    5f -> "Ajoyib, zo'r! 🤩"
+                    else -> ""
                 }
+                binding.textRatingFeedback.text = feedbackText
+                binding.textRatingFeedback.isVisible = feedbackText.isNotEmpty()
+                binding.btnAction.text = if (rating >= 4) "Baholash" else "Yuborish va baholash"
             }
 
         binding.btnAction.setOnClickListener {
             val rating = binding.rateButton.rating
-            if (rating >= 4) {
-                openPlayStore()
-                dismiss()
-            } else {
-                val feedback = binding.inputFeedback.text.toString()
-                if (feedback.isBlank()) {
-                    Toast.makeText(context, "Iltimos, fikringizni yozing", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                saveFeedback(rating, feedback)
-                Toast.makeText(context, "Rahmat! Fikringiz inobatga olinadi.", Toast.LENGTH_SHORT).show()
-                dismiss()
+            if (rating == 0f) {
+                Toast.makeText(context, "Iltimos, yulduzchalarni belgilang", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+            
+            saveFeedback(rating, "")
+            openPlayStore()
+            dismiss()
+        }
+
+        binding.btnLater.setOnClickListener {
+            dismiss()
         }
     }
 
@@ -127,3 +124,4 @@ class RateAppSheet : BottomSheetDialogFragment() {
         fun newInstance() = RateAppSheet()
     }
 }
+

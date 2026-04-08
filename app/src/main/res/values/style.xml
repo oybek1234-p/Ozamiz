@@ -111,6 +111,14 @@
             <item name="cornerSizeBottomRight">0dp</item>
         </style>
 
+        <style name="ShapeAppearance.App.MediumComponent.Top" parent="ShapeAppearance.Material3.Corner.Medium">
+            <item name="cornerFamily">rounded</item>
+            <item name="cornerSizeTopLeft">12dp</item>
+            <item name="cornerSizeTopRight">12dp</item>
+            <item name="cornerSizeBottomLeft">0dp</item>
+            <item name="cornerSizeBottomRight">0dp</item>
+        </style>
+
     <style name="MacroItemLayout">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>

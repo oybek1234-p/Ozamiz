@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
 
@@ -17,6 +19,12 @@ sealed class ProfileNavigationEvent {
 
 class ProfileViewModel : ViewModel() {
 
+    init {
+        viewModelScope.launch {
+            UserRepository.refreshUser()
+            UserRepository.observeCurrentUser { }
+        }
+    }
     val userState: StateFlow<User> = LocalUser.userLive.asFlow()
         .map { user -> user ?: User() }
         .stateIn(

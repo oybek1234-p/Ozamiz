@@ -6,9 +6,6 @@ package uz.oybek.ozamiz
  */
 object AppConstants {
 
-    /**
-     * Water tracking constants
-     */
     object Water {
         const val GLASS_VOLUME_ML = 250
         const val DEFAULT_GLASSES_COUNT = 8

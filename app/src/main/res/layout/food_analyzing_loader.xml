@@ -63,17 +63,6 @@
             android:layout_marginTop="24dp"
             android:indeterminateTint="?colorPrimary" />
 
-        <TextView
-            android:id="@+id/mini_info_text"
-            style="@style/Text1_16"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/dimen_24"
-            android:layout_marginTop="@dimen/dimen_18"
-            android:gravity="center"
-            android:text="Kaloriya - bu ovqat energiya qiymati"
-            android:textColor="?colorOnSurface"
-            android:visibility="gone" />
 
     </LinearLayout>
 

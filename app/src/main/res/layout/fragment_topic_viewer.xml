@@ -138,7 +138,7 @@
             android:text="Keyingisi"
             app:iconGravity="textEnd"
             app:icon="@drawable/arrow_right"
-            android:textColor="@android:color/white"
+            android:textColor="?attr/colorOnPrimary"
             android:textSize="15sp"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.02"

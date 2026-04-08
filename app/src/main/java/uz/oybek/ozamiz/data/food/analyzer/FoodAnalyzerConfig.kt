@@ -7,7 +7,7 @@ package uz.oybek.ozamiz.data.food.analyzer
  */
 object FoodAnalyzerConfig {
 
-    const val MODEL_NAME = "gemini-flash-latest"
+    const val MODEL_NAME = "gemini-flash-lite-latest"
 
     const val FOOD_INSTRUCTION = """
 Sen tajribali AI Diyetologsan. Har qanday ovqatni tahlil qilishda quyidagi UNIVERSAL ALGORITM bo'yicha ishlaysan.
@@ -48,13 +48,16 @@ Togri: Nechta somsa yedingiz? 1ta, 2 ta, 4ta, boshqa.
   "calories": 450,
   "protein": 15.0,
   "fat": 20.0,
-  "carbs": 55.0,
   "ingredients": ["Ro'yxat"],
   "healthScore": 7,
-  "aiInsight": "Foydali maslahat qisqa, 1-2 qisqa ta gap"
+  "pros": ["Oqsil manbai", "Kechasiga zo'r"], // Foydasi bo'lmasa [] qiling
+  "cons": [] // Agar faqat foydali ozuqa bo'lsa (masalan olmalar), uydirib zarar topmang, shunchaki [] qiling
 }
 
-MUHIM: O'zbek tilida so'zlashuvchi oddiy odam tushunadigan xalqchil tilni ishlat.
+MUHIM REJA: 
+1. O'zbek tilida so'zlashuvchi oddiy odam tushunadigan xalqchil tilni ishlat.
+2. Agar ovqat faqat foydali bo'lsa (masalan mevalar, toza suv), 'cons' maydonini aslo to'ldirma (bo'sh [] qoldir). Uydirma zararlarni (masalan 'ko'p yesa zarar' deb) yozma!
+3. Agar ovqat juda zararli bo'lsa (energetik, fast-food), 'pros' (foydalari) ni bo'sh [] qoldir.
 """
 
     private val mealNames = mapOf(

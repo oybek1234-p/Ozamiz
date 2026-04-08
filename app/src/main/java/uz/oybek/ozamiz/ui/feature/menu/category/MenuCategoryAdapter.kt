@@ -1,10 +1,12 @@
 package uz.oybek.ozamiz.ui.feature.menu.category
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
 import uz.oybek.ozamiz.data.menu.model.MenuCategory
 import uz.oybek.ozamiz.databinding.ItemMenuCategoryBinding
 
@@ -29,7 +31,20 @@ class MenuCategoryAdapter(
 
         fun bind(item: MenuCategory) {
             binding.textCategoryName.text = item.name
-            binding.textCategoryType.text = if (item.isSecondary) "Ikkilamchi" else "Asosiy"
+            
+            // Apply dynamic colors based on category type
+            val containerAttr = if (item.isSecondary) com.google.android.material.R.attr.colorSecondaryContainer else com.google.android.material.R.attr.colorPrimaryContainer
+            val onContainerAttr = if (item.isSecondary) com.google.android.material.R.attr.colorOnSecondaryContainer else com.google.android.material.R.attr.colorOnPrimaryContainer
+            
+            val containerColor = MaterialColors.getColor(binding.root, containerAttr)
+            val onContainerColor = MaterialColors.getColor(binding.root, onContainerAttr)
+
+            binding.iconContainer.backgroundTintList = ColorStateList.valueOf(containerColor)
+            binding.imgCategoryIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
+            
+            binding.textCategoryType.text = if (item.isSecondary) "Qo'shimcha" else "Asosiy"
+            binding.textCategoryType.backgroundTintList = ColorStateList.valueOf(containerColor)
+            binding.textCategoryType.setTextColor(onContainerColor)
             
             binding.btnEdit.setOnClickListener { onEditClick(item) }
             binding.btnDelete.setOnClickListener { onDeleteClick(item) }

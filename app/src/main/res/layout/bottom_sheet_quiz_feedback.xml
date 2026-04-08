@@ -21,7 +21,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:src="@drawable/check_circle_ic"
-            app:tint="@color/green" />
+            app:tint="?attr/colorPrimary" />
 
         <TextView
             android:id="@+id/textResultTitle"
@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:textStyle="bold"
-            android:textColor="@color/green"
+            android:textColor="?attr/colorPrimary"
             tools:text="Ajoyib! To'g'ri topdingiz." />
     </LinearLayout>
 
@@ -50,7 +50,7 @@
         style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:backgroundTint="@color/green"
+        android:backgroundTint="?attr/colorPrimary"
         android:text="DAVOM ETISH"
         android:textColor="?colorOnPrimary"
         android:fontFamily="sans-serif-black"

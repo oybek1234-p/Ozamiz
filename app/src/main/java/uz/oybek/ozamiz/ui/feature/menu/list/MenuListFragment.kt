@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentMenuListBinding
@@ -58,7 +58,7 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
                 putParcelable("menu", menu)
             })
         }
-        bind.recyclerMenus.layoutManager = LinearLayoutManager(requireContext())
+        bind.recyclerMenus.layoutManager = GridLayoutManager(requireContext(), 2)
         bind.recyclerMenus.adapter = menuAdapter
     }
 

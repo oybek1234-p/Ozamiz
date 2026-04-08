@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
@@ -35,9 +36,10 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
         setStyle(STYLE_NORMAL, R.style.BottomSheetStyle)
         arguments?.let {
             val logId = it.getString("logId")
+            val userId = it.getString("userId")
             if (logId != null) {
                 val timestamp = it.getLong("timestamp")
-                viewModel.loadLog(logId, Date(timestamp))
+                viewModel.loadLog(logId, Date(timestamp), userId)
             } else {
                 val id = it.getInt("id", -1)
                 if (id != -1) {
@@ -100,10 +102,21 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                             .load(photoUrl)
                             .placeholder(R.drawable.placeholder_food)
                             .into(binding.imageViewFoodPhoto)
+                            
+                        binding.imageViewFoodPhoto.setOnClickListener {
+                            uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(photoUrl)
+                                .show(parentFragmentManager, "full_image")
+                        }
                     } else {
                         binding.imageViewFoodPhoto.isVisible = false
                     }
                     binding.textViewFoodName.text = analysisResult.name
+                    if (state.currentStreak >= 2) {
+                        binding.textViewStreakMotivation.isVisible = true
+                        binding.textViewStreakMotivation.text = "Siz ${state.currentStreak} kundan beri aktivsiz! 🔥"
+                    } else {
+                        binding.textViewStreakMotivation.isVisible = false
+                    }
                     val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
                     binding.textViewTimestamp.text =
                         dateFormat.format(Date(analysisResult.timestamp))
@@ -113,17 +126,72 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                             ingredients = analysisResult.ingredients ?: emptyList()
                         )
                     val score = analysisResult.healthScore ?: 0
-                    binding.textViewHealthScore.text = "$score/10"
-                    binding.textViewHealthScore.setTextColor(
+                    binding.textViewHealthScore.isVisible = false
+                    
+                    val pointsDelta = when {
+                        score >= 8 -> 10
+                        score == 7 -> 5
+                        score == 6 -> 0
+                        score in 4..5 -> -5
+                        else -> -10
+                    }
+                    
+                    binding.cardHealthScore.isVisible = score > 0
+                    binding.textViewPointsDelta.isVisible = score > 0
+                    binding.textViewPointsDelta.text = if (pointsDelta >= 0) "+$pointsDelta ball" else "$pointsDelta ball"
+                    binding.textViewPointsDelta.setTextColor(
                         ContextCompat.getColor(
                             requireContext(),
-                            if (score >= 8) R.color.green
-                            else if (score >= 5) R.color.yellow
-                            else R.color.rejected
+                            if (pointsDelta > 0) R.color.green else if (pointsDelta < 0) R.color.rejected else R.color.grey
                         )
                     )
-                    binding.textViewAiInsight.text = analysisResult.aiInsight
-                    binding.cardAiHealth.isVisible = analysisResult.aiInsight.isNullOrBlank().not()
+                    binding.textViewPointsDelta.setTextAppearance(R.style.Headline2_16)
+
+                    val pros = analysisResult.pros
+                    if (!pros.isNullOrEmpty()) {
+                        binding.layoutPros.isVisible = true
+                        binding.containerPros.removeAllViews()
+                        pros.forEach { pro ->
+                            val tv = android.widget.TextView(requireContext()).apply {
+                                text = "• $pro"
+                                setTextAppearance(R.style.Headline2_16)
+                                setTextColor(com.google.android.material.color.MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorOnSurface))
+                                layoutParams = android.widget.LinearLayout.LayoutParams(
+                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                                ).apply {
+                                    topMargin = 16
+                                }
+                            }
+                            binding.containerPros.addView(tv)
+                        }
+                    } else {
+                        binding.layoutPros.isVisible = false
+                    }
+
+                    val cons = analysisResult.cons
+                    if (!cons.isNullOrEmpty()) {
+                        binding.layoutCons.isVisible = true
+                        binding.containerCons.removeAllViews()
+                        cons.forEach { con ->
+                            val tv = android.widget.TextView(requireContext()).apply {
+                                text = "• $con"
+                                setTextAppearance(R.style.Headline2_16)
+                                setTextColor(com.google.android.material.color.MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorOnSurface))
+                                layoutParams = android.widget.LinearLayout.LayoutParams(
+                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                                ).apply {
+                                    topMargin = 16
+                                }
+                            }
+                            binding.containerCons.addView(tv)
+                        }
+                    } else {
+                        binding.layoutCons.isVisible = false
+                    }
+                    val hasInsight = !analysisResult.aiInsight.isNullOrBlank()
+                    binding.cardAiHealth.isVisible = hasInsight || !pros.isNullOrEmpty() || !cons.isNullOrEmpty()
                 }
             }
         }
@@ -135,15 +203,26 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                         findNavController().popBackStack()
                         findNavController().popBackStack()
                     }
+                    
+                    is AnalyzeResultEvent.PromptShare -> {
+                        val bottomSheet = uz.oybek.ozamiz.ui.feature.community.SharePostBottomSheet(
+                            foodName = event.name,
+                            photoUrl = event.photoUrl,
+                            calories = event.calories,
+                            onShare = {
+                                viewModel.saveFood(shouldShare = true)
+                            },
+                            onCancel = {
+                                viewModel.saveFood(shouldShare = false)
+                            }
+                        )
+                        bottomSheet.show(parentFragmentManager, "SharePostBottomSheet")
+                    }
 
                     is AnalyzeResultEvent.LimitExceeded -> {
-                        val firstType =
-                            event.exceededTypes.firstOrNull() ?: LimitExceededDialog.TYPE_CALORIES
-                        val dialog = LimitExceededDialog.newInstance(firstType)
-                        dialog.show(parentFragmentManager, LimitExceededDialog.TAG)
-
-                        findNavController().popBackStack()
-                        findNavController().popBackStack()
+                        val act = requireActivity()
+                        findNavController().popBackStack(R.id.home, false)
+                        DailyLimitFragment().show(act.supportFragmentManager, "daily_limit")
                     }
                 }
             }
@@ -184,7 +263,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
 
     private fun setupListeners() {
         binding.buttonSaveToLog.setOnClickListener {
-            viewModel.saveLog()
+            viewModel.onSaveClick()
         }
 
         binding.buttonDelete.setOnClickListener {

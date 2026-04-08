@@ -11,11 +11,7 @@ class MotivationWorker(context: Context, params: WorkerParameters) : Worker(cont
     override fun doWork(): Result {
         val repository = MotivationRepository
         val message = repository.getMessageForCurrentTime()
-        
-        // Check if we should actually notify.
-        // User logic: "User ilovani ochdi... user ilovani yopdi... notification notification boradi"
-        // Basically if we are in the time slot.
-        
+
         if (message != null) {
              val notificationManager = MotivationNotificationManager(applicationContext)
              notificationManager.showMotivationNotification(message)

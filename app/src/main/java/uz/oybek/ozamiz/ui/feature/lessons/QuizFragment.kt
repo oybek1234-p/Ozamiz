@@ -177,7 +177,14 @@ class QuizFragment : BaseFragment<FragmentLessonQuizBinding>() {
         countText.layoutParams = textParams
         countText.text = lives.toString()
         countText.textSize = 18f
-        countText.setTextColor(requireContext().getColor(R.color.black))
+        
+        val colorOnSurfaceAttr = com.google.android.material.R.attr.colorOnSurface
+        val textColor = requireContext().obtainStyledAttributes(intArrayOf(colorOnSurfaceAttr)).run {
+            val c = getColor(0, android.graphics.Color.BLACK)
+            recycle()
+            c
+        }
+        countText.setTextColor(textColor)
         countText.setTypeface(android.graphics.Typeface.DEFAULT_BOLD)
         
         bind.heartsContainer.addView(countText)
@@ -206,28 +213,62 @@ class QuizFragment : BaseFragment<FragmentLessonQuizBinding>() {
             val imageRadio = optionView.findViewById<android.widget.ImageView>(R.id.imageRadio)
             val isSelected = i == selectedIndex
             
+            val colorPrimaryAttr = androidx.appcompat.R.attr.colorPrimary
+            val colorErrorAttr = androidx.appcompat.R.attr.colorError
+            val colorOutlineAttr = com.google.android.material.R.attr.colorOutlineVariant
+            val colorSurfaceAttr = com.google.android.material.R.attr.colorSurfaceContainerLowest
+
+            val colorPrimary = requireContext().obtainStyledAttributes(intArrayOf(colorPrimaryAttr)).run {
+                val c = getColor(0, android.graphics.Color.GREEN)
+                recycle()
+                c
+            }
+            val colorError = requireContext().obtainStyledAttributes(intArrayOf(colorErrorAttr)).run {
+                val c = getColor(0, android.graphics.Color.RED)
+                recycle()
+                c
+            }
+            val colorOutline = requireContext().obtainStyledAttributes(intArrayOf(colorOutlineAttr)).run {
+                val c = getColor(0, android.graphics.Color.LTGRAY)
+                recycle()
+                c
+            }
+            val colorSurface = requireContext().obtainStyledAttributes(intArrayOf(colorSurfaceAttr)).run {
+                val c = getColor(0, android.graphics.Color.WHITE)
+                recycle()
+                c
+            }
+
             if (isSelected) {
                 if (isCorrect == false) {
-                    // INCORRECT selection -> Red
-                    optionView.strokeColor = requireContext().getColor(R.color.red)
+                    // INCORRECT selection -> Error Color with 10% alpha
+                    optionView.strokeColor = colorError
                     optionView.strokeWidth = 2.dpToPx()
-                    imageRadio.setImageResource(R.drawable.close_ic) // Or keep radio checked but red
-                    imageRadio.setColorFilter(requireContext().getColor(R.color.red))
-                    optionView.setCardBackgroundColor(requireContext().getColor(R.color.red_alpha_10)) // Needs color or use faint red
+                    imageRadio.setImageResource(R.drawable.close_ic) 
+                    imageRadio.setColorFilter(colorError)
+                    
+                    val red = android.graphics.Color.red(colorError)
+                    val green = android.graphics.Color.green(colorError)
+                    val blue = android.graphics.Color.blue(colorError)
+                    optionView.setCardBackgroundColor(android.graphics.Color.argb(26, red, green, blue)) 
                 } else {
-                    // Correct or just selected (defaulting to green/positive)
-                    optionView.strokeColor = requireContext().getColor(R.color.green)
+                    // Correct or just selected -> Primary Color with 10% alpha
+                    optionView.strokeColor = colorPrimary
                     optionView.strokeWidth = 2.dpToPx()
                     imageRadio.setImageResource(R.drawable.radio_checked)
-                    imageRadio.setColorFilter(requireContext().getColor(R.color.green))
-                    optionView.setCardBackgroundColor(requireContext().getColor(R.color.green_alpha_10))
+                    imageRadio.setColorFilter(colorPrimary)
+                    
+                    val red = android.graphics.Color.red(colorPrimary)
+                    val green = android.graphics.Color.green(colorPrimary)
+                    val blue = android.graphics.Color.blue(colorPrimary)
+                    optionView.setCardBackgroundColor(android.graphics.Color.argb(26, red, green, blue)) 
                 }
             } else {
-                optionView.strokeColor = requireContext().getColor(R.color.grey_line)
+                optionView.strokeColor = colorOutline
                 optionView.strokeWidth = 1.dpToPx()
                 imageRadio.setImageResource(R.drawable.radio_unchecked)
                 imageRadio.clearColorFilter()
-                optionView.setCardBackgroundColor(requireContext().getColor(R.color.white))
+                optionView.setCardBackgroundColor(colorSurface)
             }
         }
     }
@@ -243,18 +284,29 @@ class QuizFragment : BaseFragment<FragmentLessonQuizBinding>() {
         val textResultLabel = view.findViewById<android.widget.TextView>(R.id.textResultLabel)
         val btnContinue = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnContinue)
         
-        val colorGreen = requireContext().getColor(R.color.green)
-        val colorError = requireContext().getColor(R.color.red)
+        val colorPrimaryAttr = androidx.appcompat.R.attr.colorPrimary
+        val colorErrorAttr = androidx.appcompat.R.attr.colorError
+
+        val colorPrimary = requireContext().obtainStyledAttributes(intArrayOf(colorPrimaryAttr)).run {
+            val c = getColor(0, android.graphics.Color.GREEN)
+            recycle()
+            c
+        }
+        val colorError = requireContext().obtainStyledAttributes(intArrayOf(colorErrorAttr)).run {
+            val c = getColor(0, android.graphics.Color.RED)
+            recycle()
+            c
+        }
         
         if (isCorrect) {
             iconResult.setImageResource(R.drawable.check_circle_ic)
-            iconResult.setColorFilter(colorGreen)
+            iconResult.setColorFilter(colorPrimary)
             textResultTitle.text = "Ajoyib! To'g'ri topdingiz."
-            textResultTitle.setTextColor(colorGreen)
+            textResultTitle.setTextColor(colorPrimary)
             
             textResultLabel.isVisible = false
             btnContinue.setText("DAVOM ETISH")
-            btnContinue.backgroundTintList = android.content.res.ColorStateList.valueOf(colorGreen)
+            btnContinue.backgroundTintList = android.content.res.ColorStateList.valueOf(colorPrimary)
         } else {
             iconResult.setImageResource(R.drawable.close_ic)
             iconResult.setColorFilter(colorError)
@@ -269,9 +321,23 @@ class QuizFragment : BaseFragment<FragmentLessonQuizBinding>() {
             val fullText = "$prefix $correctOption"
             val spannable = android.text.SpannableStringBuilder(fullText)
             
+            val colorOnSurfaceVariantAttr = com.google.android.material.R.attr.colorOnSurfaceVariant
+            val colorOnSurfaceAttr = com.google.android.material.R.attr.colorOnSurface
+
             // "To'g'ri javob: " -> Gray (lighter)
+            val colorOnSurfaceVariant = requireContext().obtainStyledAttributes(intArrayOf(colorOnSurfaceVariantAttr)).run {
+                val c = getColor(0, android.graphics.Color.GRAY)
+                recycle()
+                c
+            }
+            val colorOnSurface = requireContext().obtainStyledAttributes(intArrayOf(colorOnSurfaceAttr)).run {
+                val c = getColor(0, android.graphics.Color.BLACK)
+                recycle()
+                c
+            }
+
             spannable.setSpan(
-                android.text.style.ForegroundColorSpan(requireContext().getColor(R.color.grey)),
+                android.text.style.ForegroundColorSpan(colorOnSurfaceVariant),
                 0,
                 prefix.length,
                 android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -285,7 +351,7 @@ class QuizFragment : BaseFragment<FragmentLessonQuizBinding>() {
                 android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             spannable.setSpan(
-                 android.text.style.ForegroundColorSpan(requireContext().getColor(R.color.black)), // Make sure it's dark
+                 android.text.style.ForegroundColorSpan(colorOnSurface), 
                 prefix.length,
                 fullText.length,
                 android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -327,8 +393,19 @@ class QuizFragment : BaseFragment<FragmentLessonQuizBinding>() {
         val textResultPercentage = view.findViewById<android.widget.TextView>(R.id.textResultPercentage)
         val btnExit = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnExit)
         
-        val colorGreen = requireContext().getColor(R.color.green)
-        val colorRed = requireContext().getColor(R.color.red)
+        val colorPrimaryAttr = androidx.appcompat.R.attr.colorPrimary
+        val colorErrorAttr = androidx.appcompat.R.attr.colorError
+
+        val colorPrimary = requireContext().obtainStyledAttributes(intArrayOf(colorPrimaryAttr)).run {
+            val c = getColor(0, android.graphics.Color.GREEN)
+            recycle()
+            c
+        }
+        val colorError = requireContext().obtainStyledAttributes(intArrayOf(colorErrorAttr)).run {
+            val c = getColor(0, android.graphics.Color.RED)
+            recycle()
+            c
+        }
         
         val isPassed = state.isPassed
         val percentage = state.scorePercentage
@@ -337,16 +414,16 @@ class QuizFragment : BaseFragment<FragmentLessonQuizBinding>() {
         
         if (isPassed) {
             imgResultIcon.setImageResource(R.drawable.check_circle_ic)
-            imgResultIcon.setColorFilter(colorGreen)
+            imgResultIcon.setColorFilter(colorPrimary)
             textResultTitle.text = "Tabriklaymiz!"
-            textResultTitle.setTextColor(colorGreen)
-            textResultPercentage.setTextColor(colorGreen)
+            textResultTitle.setTextColor(colorPrimary)
+            textResultPercentage.setTextColor(colorPrimary)
         } else {
             imgResultIcon.setImageResource(R.drawable.close_ic)
-            imgResultIcon.setColorFilter(colorRed)
+            imgResultIcon.setColorFilter(colorError)
             textResultTitle.text = "Afsuski, o'ta olmadingiz"
-            textResultTitle.setTextColor(colorRed)
-            textResultPercentage.setTextColor(colorRed)
+            textResultTitle.setTextColor(colorError)
+            textResultPercentage.setTextColor(colorError)
         }
         
         textResultScore.text = "Siz $totalCount tadan $correctCount tasini to'g'ri topdingiz"

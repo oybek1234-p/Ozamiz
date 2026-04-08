@@ -235,13 +235,12 @@
                                 android:layout_marginTop="@dimen/dimen_8"
                                 android:fontFamily="@font/roboto_bold"
                                 android:text="-- kg"
-                                android:textColor="#4CAF50"
+                                android:textColor="?attr/colorPrimary"
                                 android:textSize="20sp"
                                 tools:text="-6.5 kg" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Remaining -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -647,11 +646,11 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
                                 android:background="@drawable/round_lay"
-                                android:backgroundTint="#4CAF50"
+                                android:backgroundTint="?attr/colorPrimary"
                                 android:fontFamily="@font/roboto_medium"
                                 android:paddingHorizontal="12dp"
                                 android:paddingVertical="4dp"
-                                android:textColor="@android:color/white"
+                                android:textColor="?attr/colorOnPrimary"
                                 android:textSize="13sp"
                                 tools:text="Sog'lom" />
 

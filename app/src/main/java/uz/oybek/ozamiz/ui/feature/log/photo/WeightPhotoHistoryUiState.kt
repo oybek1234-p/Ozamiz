@@ -25,8 +25,8 @@ class WeightPhotoHistoryViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(WeightPhotoHistoryUiState())
     val uiState: StateFlow<WeightPhotoHistoryUiState> = _uiState.asStateFlow()
 
-    fun loadHistory() {
-        val userId = LocalUser.user.uid
+    fun loadHistory(uid: String? = null) {
+        val userId = uid ?: LocalUser.user.uid
         if (userId.isBlank()) {
             _uiState.update { it.copy(isLoading = false, error = "Foydalanuvchi topilmadi.") }
             return

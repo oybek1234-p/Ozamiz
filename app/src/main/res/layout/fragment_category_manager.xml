@@ -53,65 +53,84 @@
             android:paddingBottom="80dp">
 
             <!-- Add New -->
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp"
-                android:background="?colorSurface">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="YANGI KATEGORIYA QO'SHISH"
-                    android:textSize="12sp"
-                    android:textColor="?colorOnSurfaceVariant"
-                    android:fontFamily="@font/roboto_medium"
-                    android:layout_marginBottom="8dp"/>
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/editNewCategory"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:background="@drawable/round_lay_stroke"
-                        android:hint="Kategoriya nomini kiriting..."
-                        android:paddingStart="16dp"
-                        android:paddingEnd="50dp"
-                        android:textSize="16sp"
-                        android:inputType="textCapSentences"/>
-
-                    <ImageButton
-                        android:id="@+id/btnAdd"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_gravity="end|center_vertical"
-                        android:layout_marginEnd="6dp"
-                        android:background="@drawable/round_lay"
-                        android:backgroundTint="?attr/colorPrimary"
-                        android:src="@drawable/add_ic"
-                        app:tint="?colorOnPrimary"
-                        android:padding="8dp"/>
-                </FrameLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="8dp">
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                    <CheckBox
-                        android:id="@+id/checkIsSecondary"
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ikkilamchi kategoriya (Oson, Oqsilga boy...)"
-                        android:textSize="12sp"
-                        android:textColor="?colorOnSurface"/>
+                        android:text="Yangi kategoriya yaratish"
+                        android:textSize="18sp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/roboto_bold"
+                        android:layout_marginBottom="16dp"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Kategoriya nomi"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:boxBackgroundColor="?attr/colorSurfaceContainerLowest"
+                        android:layout_marginBottom="12dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editNewCategory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textCapSentences"
+                            android:textSize="16sp"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Type selection -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Kategoriya turi"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginTop="4dp"/>
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/checkIsSecondary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Qo'shimcha (Oson, Oqsilga boy...)"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="14sp"
+                        android:buttonTint="?attr/colorPrimary"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAdd"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginTop="16dp"
+                        android:text="QO'SHISH"
+                        android:textColor="?attr/colorOnPrimary"
+                        app:cornerRadius="12dp"
+                        app:icon="@drawable/add_ic"
+                        app:iconTint="?attr/colorOnPrimary"
+                        app:iconGravity="textStart"/>
                 </LinearLayout>
-            </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- List Header -->
             <LinearLayout

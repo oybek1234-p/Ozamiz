@@ -99,8 +99,33 @@ object FoodLogRepository {
         awaitClose { query.removeEventListener(listener) }
     }
 
-    suspend fun getFoodLog(logId: String, date: Date): FoodLog? {
-        val userId = currentUserId ?: return null
+    fun getAllLogs(date: Date): Flow<List<FoodLog>> = callbackFlow {
+        val userId = currentUserId
+        if (userId == null) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+        val dateStr = date.dateApiFormat()
+        val query = FirebasePaths
+            .foodLogsReference(userId, dateStr)
+            
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val logs = snapshot.children.mapNotNull { it.getValue(FoodLog::class.java) }
+                trySend(logs)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
+            }
+        }
+        query.addValueEventListener(listener)
+        awaitClose { query.removeEventListener(listener) }
+    }
+
+    suspend fun getFoodLog(logId: String, date: Date, uid: String? = null): FoodLog? {
+        val userId = uid ?: currentUserId ?: return null
         val dateStr = date.dateApiFormat()
         return try {
             FirebasePaths.foodLogsReference(userId, dateStr)

@@ -2,7 +2,6 @@ package uz.oybek.ozamiz.ui.feature.menu.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -48,11 +47,11 @@ class MenuFilterAdapter(
             if (isSelected) {
                 binding.root.setBackgroundResource(R.drawable.round_lay)
                 binding.root.background.setTint(selectedColor)
-                binding.textName.setTextColor(ContextCompat.getColor(context, R.color.white))
+                binding.textName.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0))
             } else {
                 binding.root.setBackgroundResource(R.drawable.round_lay)
                 binding.root.background.setTint(primaryContainerColor)
-                binding.textName.setTextColor(ContextCompat.getColor(context, R.color.black))
+                binding.textName.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0))
             }
 
             binding.root.setOnClickListener { onCategoryClick(item) }

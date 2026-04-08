@@ -76,6 +76,55 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
+            
+        <action
+            android:id="@+id/action_profileFragment_to_adminUsersListFragment"
+            app:destination="@id/adminUsersListFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminUsersListFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.admin.users.AdminUsersListFragment"
+        android:label="AdminUsersListFragment"
+        tools:layout="@layout/fragment_admin_users_list">
+        <action
+            android:id="@+id/action_adminUsersListFragment_to_adminUserDetailsFragment"
+            app:destination="@id/adminUserDetailsFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminUserDetailsFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.admin.users.AdminUserDetailsFragment"
+        android:label="AdminUserDetailsFragment"
+        tools:layout="@layout/fragment_admin_user_details">
+        <argument
+            android:name="userId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_adminUserDetailsFragment_to_adminFoodLogsFragment"
+            app:destination="@id/adminFoodLogsFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/adminFoodLogsFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.admin.users.AdminFoodLogsFragment"
+        android:label="AdminFoodLogsFragment"
+        tools:layout="@layout/fragment_admin_food_logs">
+        <argument
+            android:name="userId"
+            app:argType="string" />
     </fragment>
 
     <fragment
@@ -130,7 +179,7 @@
             app:popExitAnim="@anim/fragment_pop_exit" />
         <action
             android:id="@+id/action_authFragment_to_home"
-            app:destination="@id/mainFragment"
+            app:destination="@id/home"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
@@ -154,7 +203,7 @@
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_loginGmailFragment_to_home"
-            app:destination="@id/mainFragment"
+            app:destination="@id/home"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
@@ -197,6 +246,13 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_home_to_levelFragment"
+            app:destination="@id/levelFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
     </fragment>
 
     <fragment
@@ -216,19 +272,7 @@
             android:defaultValue="protein" />
     </fragment>
 
-    <fragment
-        android:id="@+id/mainFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.main.MainFragment"
-        android:label="MainFragment"
-        tools:layout="@layout/main_fragment">
-        <action
-            android:id="@+id/action_mainFragment_to_menuListFragment"
-            app:destination="@id/menuListFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
-    </fragment>
+
 
     <fragment
         android:id="@+id/logFoodFragment"
@@ -499,6 +543,33 @@
     </fragment>
 
     <fragment
+        android:id="@+id/communityFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.community.CommunityFragment"
+        android:label="Hamjamiyat"
+        tools:layout="@layout/fragment_community">
+        <action
+            android:id="@+id/action_communityFragment_to_communityProfileFragment"
+            app:destination="@id/communityProfileFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/communityProfileFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.community.CommunityProfileFragment"
+        android:label="Profil"
+        tools:layout="@layout/fragment_community_profile">
+        <argument
+            android:name="userId"
+            app:argType="string" />
+        <argument
+            android:name="userName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
         android:id="@+id/aiChatFragment"
         android:name="uz.oybek.ozamiz.ui.feature.ai.AiChatFragment"
         android:label="AI Chat"
@@ -509,5 +580,17 @@
             app:nullable="true"
             android:defaultValue="@null" />
     </fragment>
+
+    <fragment
+        android:id="@+id/levelFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.level.LevelFragment"
+        android:label="LevelFragment"
+        tools:layout="@layout/fragment_level" />
+
+    <dialog
+        android:id="@+id/dailyLimitFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.log.food.DailyLimitFragment"
+        android:label="DailyLimitFragment"
+        tools:layout="@layout/fragment_daily_limit" />
 
 </navigation>

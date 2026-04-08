@@ -26,10 +26,6 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     private lateinit var chatAdapter: AiChatAdapter
     private lateinit var questionAdapter: SuggestedQuestionAdapter
 
-    init {
-        showBottomSheet = true
-    }
-
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -79,6 +75,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
 
     private fun setupKeyboardListener(bind: FragmentAiChatBinding) {
         val root = bind.root
+
         root.viewTreeObserver.addOnGlobalLayoutListener {
             val rect = android.graphics.Rect()
             root.getWindowVisibleDisplayFrame(rect)

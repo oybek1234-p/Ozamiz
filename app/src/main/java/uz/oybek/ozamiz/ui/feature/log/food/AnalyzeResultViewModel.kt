@@ -23,12 +23,16 @@ import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
 
 data class AnalyzeResultState(
-    val result: FoodAnalysis? = null, val isLoading: Boolean = false, val isError: Boolean = false
+    val result: FoodAnalysis? = null, 
+    val isLoading: Boolean = false, 
+    val isError: Boolean = false,
+    val currentStreak: Int = 0
 )
 
 sealed interface AnalyzeResultEvent {
     object Saved : AnalyzeResultEvent
     data class LimitExceeded(val exceededTypes: List<String>) : AnalyzeResultEvent
+    data class PromptShare(val name: String, val photoUrl: String, val calories: Int, val exceededTypes: List<String>? = null) : AnalyzeResultEvent
 }
 
 class AnalyzeResultViewModel : ViewModel() {
@@ -57,23 +61,26 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun setResult(result: FoodAnalysis?) {
+        val streak = uz.oybek.ozamiz.data.user.UserRepository.user?.streakInfo?.currentStreak ?: 0
         liveResult.update {
             it.copy(
-                result = result
+                result = result,
+                currentStreak = streak
             )
         }
         startUploadIfNeeded(result?.photoUrl)
     }
 
-    fun loadLog(logId: String, date: java.util.Date) {
+    fun loadLog(logId: String, date: java.util.Date, userId: String? = null) {
         loadedLogDate = date
         loadedLogId = logId
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
-            val log = FoodLogRepository.getFoodLog(logId, date)
+            val streak = uz.oybek.ozamiz.data.user.UserRepository.user?.streakInfo?.currentStreak ?: 0
+            val log = FoodLogRepository.getFoodLog(logId, date, userId)
             if (log != null) {
                 val analysis = FoodAnalysis(
-                    id = log.logId.hashCode(), // Store hash or just rely on loadedLogId
+                    id = log.logId.hashCode(),
                     photoUrl = log.photoUrl?.takeIf { it.isNotBlank() },
                     result = uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult(
                         name = log.description,
@@ -89,7 +96,7 @@ class AnalyzeResultViewModel : ViewModel() {
                     ),
                     mealType = log.mealType
                 )
-                liveResult.update { it.copy(result = analysis, isLoading = false) }
+                liveResult.update { it.copy(result = analysis, isLoading = false, currentStreak = streak) }
             } else {
                 liveResult.update { it.copy(isError = true, isLoading = false) }
             }
@@ -147,11 +154,18 @@ class AnalyzeResultViewModel : ViewModel() {
         }
     }
 
-    fun saveLog() {
+    fun onSaveClick() {
         val result = liveResult.value.result ?: return
-        viewModelScope.launch {
-            liveResult.update { it.copy(isLoading = true) }
+        val photoUrl = result.photoUrl
+        val score = result.result?.healthScore ?: 0
+        val shouldShare = !photoUrl.isNullOrBlank() && photoUrl != "null" && score >= 8
+        saveFood(shouldShare = shouldShare)
+    }
 
+    fun saveFood(shouldShare: Boolean) {
+        val result = liveResult.value.result ?: return
+        CoroutineScope(Dispatchers.IO).launch {
+            // 1. Upload image if needed
             val finalUrl = uploadJob?.await() ?: result.photoUrl
             if (finalUrl != result.photoUrl && finalUrl != null) {
                 result.photoUrl = finalUrl
@@ -161,13 +175,47 @@ class AnalyzeResultViewModel : ViewModel() {
             val log = result.toFoodLog()
             val targetDate = loadedLogDate ?: LogFragment.currentDate
 
-            FoodLogRepository.add(
-                result.photoUrl,
-                log,
-                targetDate
-            )
-            StreakRepository.updateStreak()
+            // 2. Prepare concurrent jobs
+            val saveJob = async {
+                FoodLogRepository.add(result.photoUrl, log, targetDate)
+                StreakRepository.updateStreak()
+                val score = result.result?.healthScore ?: 0
+                val pointsDelta = when {
+                    score >= 8 -> 10
+                    score == 7 -> 5
+                    score == 6 -> 0
+                    score in 4..5 -> -5
+                    else -> -10
+                }
+                if (pointsDelta != 0) {
+                    uz.oybek.ozamiz.data.user.UserRepository.addPoints(pointsDelta)
+                }
+            }
 
+            val shareJob = if (shouldShare) {
+                async {
+                    val user = uz.oybek.ozamiz.data.user.UserRepository.user
+                    val userId = Firebase.auth.currentUser?.uid
+                    if (user != null && userId != null) {
+                        val post = uz.oybek.ozamiz.data.community.model.CommunityPost(
+                            userId = userId,
+                            userName = user.name.ifBlank { "Foydalanuvchi" },
+                            photoUrl = result.photoUrl!!,
+                            foodName = result.result!!.name,
+                            calories = result.result!!.calories,
+                            healthScore = result.result!!.healthScore ?: 0,
+                            userScore = user.scorePoints
+                        )
+                        uz.oybek.ozamiz.data.community.CommunityPostRepository.addPost(post)
+                    }
+                }
+            } else null
+
+            // 3. Wait for both
+            saveJob.await()
+            shareJob?.await()
+
+            // 4. Check limits and trigger notification
             val uid = Firebase.auth.currentUser?.uid
             if (uid != null) {
                 val user = uz.oybek.ozamiz.data.user.UserRepository.user
@@ -185,16 +233,13 @@ class AnalyzeResultViewModel : ViewModel() {
 
                 val exceededTypes = mutableListOf<String>()
                 if (summary != null && targetCalories > 0) {
-                    // Kaloriya
-                    if (summary.consumedCalories > targetCalories) {
-                        exceededTypes.add(LimitExceededDialog.TYPE_CALORIES)
-                    }
-                    // Makro limitlarni kaloriyadan hisoblash
-                    // Oqsil: 30% (1g = 4 kal), Yog': 25% (1g = 9 kal), Uglevod: 45% (1g = 4 kal)
                     val targetProtein = (targetCalories * 0.30) / 4.0
                     val targetFat = (targetCalories * 0.25) / 9.0
                     val targetCarbs = (targetCalories * 0.45) / 4.0
 
+                    if (summary.consumedCalories > targetCalories) {
+                        exceededTypes.add(LimitExceededDialog.TYPE_CALORIES)
+                    }
                     if (summary.consumedProtein > targetProtein) {
                         exceededTypes.add(LimitExceededDialog.TYPE_PROTEIN)
                     }
@@ -218,8 +263,6 @@ class AnalyzeResultViewModel : ViewModel() {
             } else {
                 _event.send(AnalyzeResultEvent.Saved)
             }
-
-            liveResult.update { it.copy(isLoading = false) }
         }
     }
 

@@ -21,33 +21,96 @@
             android:orientation="vertical"
             android:paddingHorizontal="20dp">
 
-            <!-- HEADER: Avatar + Ism -->
-            <LinearLayout
+            <!-- HEADER: Avatar + Ism + Level -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:paddingTop="24dp"
-                android:paddingBottom="20dp">
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/imageView_user_avatar"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                    tools:src="@drawable/user_photo_placeholder" />
-
-                <TextView
-                    android:id="@+id/textView_user_name"
-                    style="@style/TextAppearance.Material3.TitleLarge"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:textColor="?colorOnSurface"
-                    tools:text="Ali Valiyev" />
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="24dp">
 
-            </LinearLayout>
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imageView_user_avatar"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:scaleType="centerCrop"
+                            android:padding="4dp"
+                            app:strokeWidth="2dp"
+                            app:strokeColor="?attr/colorPrimary"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                            tools:src="@drawable/user_photo_placeholder" />
+
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/textView_user_name"
+                        style="@style/TextAppearance.Material3.TitleLarge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurface"
+                        tools:text="Ali Valiyev" />
+
+                    <!-- Level Badge -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_user_level"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="?attr/colorOutlineVariant"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?selectableItemBackground">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp">
+
+                            <TextView
+                                android:id="@+id/text_profile_level_emoji"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                tools:text="🔥" />
+
+                            <TextView
+                                android:id="@+id/text_profile_level_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="14sp"
+                                tools:text="Iroda" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Premium Status (agar kerak bo'lsa) -->
             <LinearLayout
@@ -272,9 +335,26 @@
                 app:strokeWidth="0dp"
                 tools:visibility="visible">
 
-                <include
-                    android:id="@+id/section_admin_premium_users_content"
-                    layout="@layout/item_profile_section" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/section_admin_premium_users_content"
+                        layout="@layout/item_profile_section" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="52dp"
+                        android:background="?colorSurfaceContainerHighest" />
+
+                    <include
+                        android:id="@+id/section_admin_all_users"
+                        layout="@layout/item_profile_section" />
+
+                </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 

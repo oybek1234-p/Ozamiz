@@ -30,7 +30,6 @@ class MenuAdapter(
 
         fun bind(item: Menu) {
             binding.textName.text = item.name
-            binding.textDescription.text = item.description
             binding.textCalories.text =
                 binding.root.context.getString(R.string.calories_format, item.calories)
 

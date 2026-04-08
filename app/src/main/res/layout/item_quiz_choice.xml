@@ -11,7 +11,7 @@
     app:cardBackgroundColor="?colorSurfaceContainerLowest"
     app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
-    app:strokeColor="#E5E7EB"
+    app:strokeColor="?attr/colorOutlineVariant"
     app:strokeWidth="1dp">
 
     <LinearLayout
@@ -39,7 +39,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@drawable/radio_unchecked"
-            app:tint="#D1D5DB" />
+            app:tint="?attr/colorOnSurfaceVariant" />
 
     </LinearLayout>
 

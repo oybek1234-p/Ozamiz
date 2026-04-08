@@ -6,9 +6,9 @@
         android:icon="@drawable/calculate_ic"
         />
 
-    <item android:id="@+id/aiChatFragment"
-        android:title="Dietolog"
-        android:icon="@drawable/chat_ic"
+    <item android:id="@+id/lessonsHomeFragment"
+        android:title="Darslar"
+        android:icon="@drawable/study_ic"
         />
 
     <item android:id="@+id/natijaFragment2"
@@ -20,6 +20,11 @@
     <item android:id="@+id/menuListFragment"
         android:title="Menyular"
         android:icon="@drawable/food_ic"
+        />
+
+    <item android:id="@+id/communityFragment"
+        android:title="Boshqalar"
+        android:icon="@drawable/people_ic"
         />
 
     <item

@@ -96,7 +96,11 @@ class LessonsAdapter(
                     // Reset padding to avoid extra space on left if needed, or set specific padding
                     binding.btnStatus.setPadding(0, 0, 0, 0)
                     
-                    val color = context.getColor(R.color.grey)
+                    val color = context.obtainStyledAttributes(intArrayOf(com.google.android.material.R.attr.colorOnSurfaceVariant)).run {
+                        val c = getColor(0, android.graphics.Color.GRAY)
+                        recycle()
+                        c
+                    }
                     binding.btnStatus.setTextColor(color)
                     binding.btnStatus.iconTint = android.content.res.ColorStateList.valueOf(color)
                     binding.btnStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
@@ -113,14 +117,17 @@ class LessonsAdapter(
                     // Reset padding to design values
                     binding.btnStatus.setPadding(16.dpToPx(context), 0, 12.dpToPx(context), 0)
                     
-                    val colorPrimary = context.getTheme().run {
-                        val arr = obtainStyledAttributes(intArrayOf(androidx.appcompat.R.attr.colorPrimary))
-                        val color = arr.getColor(0, 0)
-                        arr.recycle()
+                    val colorPrimaryAttr = androidx.appcompat.R.attr.colorPrimary
+                    val colorPrimary = context.obtainStyledAttributes(intArrayOf(colorPrimaryAttr)).run {
+                        val color = getColor(0, android.graphics.Color.GREEN)
+                        recycle()
                         color
                     }
-                    val colorOnPrimary = context.getColor(android.R.color.white) 
-                    
+                    val colorOnPrimary = context.obtainStyledAttributes(intArrayOf(com.google.android.material.R.attr.colorOnPrimary)).run {
+                        val color = getColor(0, android.graphics.Color.WHITE)
+                        recycle()
+                        color
+                    }                    
                     binding.btnStatus.setTextColor(colorOnPrimary)
                     binding.btnStatus.iconTint = android.content.res.ColorStateList.valueOf(colorOnPrimary)
                     binding.btnStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(colorPrimary)

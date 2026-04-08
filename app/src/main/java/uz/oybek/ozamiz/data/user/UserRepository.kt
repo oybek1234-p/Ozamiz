@@ -69,14 +69,14 @@ object UserRepository {
     }
 
     val user: User get() = LocalUser.user
-    private var userLoading = false
+    private var isObserving = false
+    private var userListener: ValueEventListener? = null
 
     private fun saveUserNetwork() {
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid
         if (user.valid && user.uid == currentUid) {
             val userMap = user.toMap()
-            usersReference.child(user.uid).setValue(userMap)
-                .addOnSuccessListener {}
+            usersReference.child(user.uid).updateChildren(userMap)
         }
     }
 
@@ -238,7 +238,11 @@ object UserRepository {
     }
 
     fun signOut() {
-
+        if (isObserving) {
+            userListener?.let { usersReference.child(user.uid).removeEventListener(it) }
+            isObserving = false
+            userListener = null
+        }
         Firebase.auth.signOut()
         LocalUser.user = User()
         LocalUser.saveUser()
@@ -265,21 +269,11 @@ object UserRepository {
         }
     }
 
-    private const val ONLINE = 0L
-
-    private var onlineListener: OnDisconnect? = null
-
-    fun setOnline() {
+    fun updateLastSeen() {
         if (user.valid) {
-            onlineListener?.cancel()
-            LocalUser.user.lastSeenTime = ONLINE
-            usersReference.child(user.uid).child(User::lastSeenTime.name).setValue(ONLINE)
+            LocalUser.user.lastSeenTime = System.currentTimeMillis()
+            usersReference.child(user.uid).child(User::lastSeenTime.name).setValue(ServerValue.TIMESTAMP)
             LocalUser.saveUser()
-            val lastSeen = ServerValue.TIMESTAMP
-            usersReference.child(user.uid).child(User::lastSeenTime.name).onDisconnect().apply {
-                onlineListener = this
-                setValue(lastSeen)
-            }
         }
     }
 
@@ -329,6 +323,17 @@ object UserRepository {
     }
 
 
+    suspend fun refreshUser() {
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUid != null) {
+            val networkUser = loadUser(currentUid)
+            if (networkUser != null && networkUser.valid) {
+                LocalUser.user = networkUser
+                LocalUser.saveUser()
+            }
+        }
+    }
+
 
     private suspend fun loadUser(id: String) = suspendCoroutine { sus ->
         val reference = usersReference.child(id)
@@ -350,19 +355,27 @@ object UserRepository {
         }
     }
 
+    private val userListeners = mutableListOf<(user: User?) -> Unit>()
+
     fun observeCurrentUser(result: (user: User?) -> Unit) {
-        if (userLoading || user.valid.not()) {
+        userListeners.add(result)
+        if (isObserving) {
+            // Already observing Firebase, but call the new listener immediately with current data
+            if (user.valid) {
+                result.invoke(user)
+            }
             return
         }
-        userLoading = true
+        if (user.valid.not()) return
+
+        isObserving = true
         val reference = usersReference.child(user.uid)
-        reference.addValueEventListener(object : ValueEventListener {
+        userListener = object : ValueEventListener {
             override fun onCancelled(error: DatabaseError) {
-                result.invoke(null)
+                isObserving = false
             }
 
             override fun onDataChange(snapshot: DataSnapshot) {
-                userLoading = false
                 val loadedUser = snapshot.getValueSafe(User::class.java) ?: return
                 val userWithIntegrity = loadedUser.copy(
                     streakInfo = loadedUser.streakInfo ?: StreakInfo(),
@@ -378,7 +391,28 @@ object UserRepository {
                     LocalUser.user = userWithIntegrity
                     LocalUser.saveUser()
                 }
-                result.invoke(userWithIntegrity)
+                userListeners.forEach { it.invoke(userWithIntegrity) }
+            }
+        }
+        reference.addValueEventListener(userListener!!)
+    }
+
+
+    fun addPoints(amount: Int) {
+        if (user.valid.not() || amount == 0) return
+        val ref = usersReference.child(user.uid).child(User::scorePoints.name)
+        ref.runTransaction(object : com.google.firebase.database.Transaction.Handler {
+            override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
+                val current = currentData.getValue(Int::class.java) ?: 0
+                currentData.value = maxOf(0, current + amount)
+                return com.google.firebase.database.Transaction.success(currentData)
+            }
+            override fun onComplete(error: com.google.firebase.database.DatabaseError?, committed: Boolean, snapshot: com.google.firebase.database.DataSnapshot?) {
+                if (committed && error == null) {
+                    val newTotal = snapshot?.getValue(Int::class.java) ?: maxOf(0, LocalUser.user.scorePoints + amount)
+                    LocalUser.user.scorePoints = newTotal
+                    LocalUser.saveUser()
+                }
             }
         })
     }

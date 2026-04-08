@@ -11,7 +11,7 @@ plugins {
 android {
     namespace = "uz.oybek.ozamiz"
     compileSdk = 36
-    
+
     packagingOptions {
         resources {
             excludes += "META-INF/DEPENDENCIES"
@@ -23,8 +23,8 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 49
-        versionName = "2.7"
+        versionCode = 55
+        versionName = "3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -45,8 +45,24 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
 
     private fun setupViews(bind: FragmentMenuDetailBinding, menu: Menu) {
         bind.textName.text = menu.name
-        bind.textIngredients.text = menu.ingredients
-        bind.textDescription.text = menu.description
+
+        if (menu.ingredients.isNullOrBlank()) {
+            bind.labelIngredients.visibility = android.view.View.GONE
+            bind.cardIngredients.visibility = android.view.View.GONE
+        } else {
+            bind.textIngredients.text = menu.ingredients
+            bind.labelIngredients.visibility = android.view.View.VISIBLE
+            bind.cardIngredients.visibility = android.view.View.VISIBLE
+        }
+
+        if (menu.description.isNullOrBlank()) {
+            bind.labelDescription.visibility = android.view.View.GONE
+            bind.cardDescription.visibility = android.view.View.GONE
+        } else {
+            bind.textDescription.text = menu.description
+            bind.labelDescription.visibility = android.view.View.VISIBLE
+            bind.cardDescription.visibility = android.view.View.VISIBLE
+        }
 
         bind.textCalories.text = getString(R.string.calories_format, menu.calories)
         bind.textProtein.text = "${menu.protein} g"

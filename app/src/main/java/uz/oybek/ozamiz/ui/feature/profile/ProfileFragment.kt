@@ -24,6 +24,7 @@ import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.getPremiumExpireDate
 import uz.oybek.ozamiz.ui.feature.premium.premiumExpired
+import uz.oybek.ozamiz.data.level.LevelManager
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
@@ -79,6 +80,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 navigate(R.id.action_profileFragment_to_adminLessonsFragment)
             }
         }
+        setupSection(
+            bind.sectionAdminAllUsers, R.drawable.group_ic, "Admin: Foydalanuvchilar"
+        ) {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                navigate(R.id.action_profileFragment_to_adminUsersListFragment)
+            }
+        }
         bind.buttonLogout.setOnClickListener {
             showLogoutConfirmationDialog()
         }
@@ -86,6 +94,12 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         bind.premiumButton.setOnClickListener {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
                 findNavController().navigate(R.id.paymentGetCheckFragment)
+            }
+        }
+
+        bind.cardUserLevel.setOnClickListener {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                navigate(R.id.levelFragment)
             }
         }
         setupPaymentCheckListener()
@@ -122,6 +136,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                             .placeholder(R.drawable.user_photo_placeholder)
                             .apply(RequestOptions.circleCropTransform())
                             .into(bind.imageViewUserAvatar)
+                        
+                        val level = LevelManager.getCurrentLevel(user.scorePoints)
+                        bind.textProfileLevelEmoji.text = level.emoji
+                        bind.textProfileLevelName.text = level.name
+                        
                         bind.buttonLogout.isVisible = true
 
                         when {

@@ -71,8 +71,10 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
                 durationMin = duration,
                 caloriesBurned = caloriesBurned
             )
+            val points = (caloriesBurned / 10).coerceAtLeast(1)
             ExerciseLogRepository.add(exerciseLog, selectedDate)
             uz.oybek.ozamiz.data.streak.StreakRepository.updateStreak()
+            uz.oybek.ozamiz.data.user.UserRepository.addPoints(points)
         }
     }
 }

@@ -18,6 +18,7 @@ object FirebasePaths {
 
     object Firestore {
         const val WEIGHT_PHOTOS = "weightPhoto"
+        const val COMMUNITY_POSTS = "communityPosts"
     }
 
     object Storage {

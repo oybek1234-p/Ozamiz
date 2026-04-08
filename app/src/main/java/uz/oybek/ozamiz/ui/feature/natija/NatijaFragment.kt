@@ -94,6 +94,13 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                                 .load(state.photoBefore)
                                 .placeholder(R.color.grey_line)
                                 .into(bind.imgPhotoBefore)
+                                
+                            bind.imgPhotoBefore.setOnClickListener {
+                                state.photoBefore?.let { url ->
+                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(url)
+                                        .show(parentFragmentManager, "full_image")
+                                }
+                            }
                         } else {
                             bind.layoutPhotoBefore.isVisible = false
                         }
@@ -105,6 +112,13 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                                 .load(state.photoAfter)
                                 .placeholder(R.color.grey_line)
                                 .into(bind.imgPhotoAfter)
+                                
+                            bind.imgPhotoAfter.setOnClickListener {
+                                state.photoAfter?.let { url ->
+                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(url)
+                                        .show(parentFragmentManager, "full_image")
+                                }
+                            }
                         } else {
                             bind.layoutPhotoAfter.isVisible = false
                         }
