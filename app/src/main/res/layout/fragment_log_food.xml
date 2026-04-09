@@ -35,8 +35,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:clipToPadding="false"
+                android:orientation="vertical"
                 android:paddingBottom="100dp">
 
                 <HorizontalScrollView
@@ -56,32 +56,17 @@
                         app:singleSelection="true" />
                 </HorizontalScrollView>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:orientation="vertical">
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
                     android:layout_marginHorizontal="24dp"
-                    android:gravity="start"
+                    android:layout_marginTop="24dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="Qanday ovqat yedingiz?"
+                    android:text="Nima yedingiz?"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="24sp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginHorizontal="24dp"
-                    android:gravity="start"
-                    android:text="Har bir ovqatingizni hisoblang, va kunlik meyordan oshmang"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="14sp" />
+
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -90,20 +75,16 @@
                     android:layout_marginTop="24dp"
                     android:orientation="vertical">
 
-                    <!-- Option 1: Camera -->
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/uploadImageButton"
+                        android:id="@+id/button_quick_camera"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?selectableItemBackground"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="?attr/colorOutlineVariant"
-                        app:strokeWidth="1dp">
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -113,135 +94,67 @@
                             android:padding="16dp">
 
                             <ImageView
-                                android:id="@+id/img_photo_icon"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:background="@drawable/round_lay"
-                                android:backgroundTint="?attr/colorPrimaryContainer"
-                                android:padding="12dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:src="@drawable/camera_ic"
                                 app:tint="?attr/colorPrimary" />
 
-                            <LinearLayout
-                                android:layout_width="0dp"
+                            <TextView
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="16dp"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/text_photo_title"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/roboto_medium"
-                                    android:text="Ovqatni rasmga olish"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="17sp" />
-
-                                <TextView
-                                    android:id="@+id/text_photo_desc"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:alpha="0.8"
-                                    android:text="Eng oson va tez usul"
-                                    android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="14sp" />
-                            </LinearLayout>
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:alpha="0.5"
-                                android:src="@drawable/arrow_right"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Kamera orqali"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="16sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Option 2: Voice -->
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/voiceInputButton"
+                        android:id="@+id/button_quick_voice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?selectableItemBackground"
-                        android:visibility="gone"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="?attr/colorOutlineVariant"
-                        app:strokeWidth="1dp">
+                        app:cardBackgroundColor="?attr/colorSurface"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:orientation="horizontal"
-
                             android:padding="16dp">
 
                             <ImageView
-                                android:id="@+id/img_voice_icon"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:background="@drawable/round_lay"
-                                android:backgroundTint="?attr/colorPrimaryContainer"
-                                android:padding="12dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:src="@drawable/mic_ic"
                                 app:tint="?attr/colorPrimary" />
 
-                            <LinearLayout
-                                android:layout_width="0dp"
+                            <TextView
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="16dp"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/text_voice_title"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/roboto_medium"
-                                    android:text="Ovozli qo'shish"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="17sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:text="Ovqat haqida gapirib bering"
-                                    android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="14sp" />
-                            </LinearLayout>
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:alpha="0.5"
-                                android:src="@drawable/arrow_right"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Ovozli kiritish"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="16sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Option 3: Text -->
                     <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/textInputButton"
+                        android:id="@+id/button_show_text_input"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:foreground="?selectableItemBackground"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="?attr/colorOutlineVariant"
-                        app:strokeWidth="1dp">
+                        app:cardBackgroundColor="?attr/colorSurface"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -251,59 +164,70 @@
                             android:padding="16dp">
 
                             <ImageView
-                                android:id="@+id/img_text_icon"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:background="@drawable/round_lay"
-                                android:backgroundTint="?attr/colorPrimaryContainer"
-                                android:padding="12dp"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
                                 android:src="@drawable/edit"
                                 app:tint="?attr/colorPrimary" />
 
-                            <LinearLayout
-                                android:layout_width="0dp"
+                            <TextView
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="16dp"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:id="@+id/text_write_title"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/roboto_medium"
-                                    android:text="Yozib kiritish"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="17sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:text="Nima yeganizni yozing"
-                                    android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="14sp" />
-                            </LinearLayout>
-
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:alpha="0.5"
-                                android:src="@drawable/arrow_right"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Yozib kiritish"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="16sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
-
                 </LinearLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_text_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurface"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <EditText
+                            android:id="@+id/input_quick_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/roboto_regular"
+                            android:hint="Nima yedingiz? Masalan: 1 kosa palov"
+                            android:imeOptions="actionDone"
+                            android:inputType="textCapSentences"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/button_analyze_and_save"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Tahlil va saqlash"
+                            app:cornerRadius="12dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:id="@+id/layout_recent_history"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
                     android:orientation="vertical"
-                    android:visibility="gone"
-                    android:layout_marginTop="@dimen/dimen_24">
+                    android:visibility="gone">
 
                     <TextView
                         style="@style/Headline3_15"
@@ -334,7 +258,6 @@
 
                 </LinearLayout>
 
-                </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 

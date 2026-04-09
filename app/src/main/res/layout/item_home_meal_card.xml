@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?selectableItemBackground"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeColor="?attr/colorOutlineVariant"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/img_meal_icon"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@drawable/round_lay"
+            android:backgroundTint="?attr/colorPrimaryContainer"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="@style/CircleImageView"
+            tools:src="@drawable/food_ic" />
+
+        <TextView
+            android:id="@+id/text_meal_name"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="17sp"
+            app:layout_constraintBottom_toTopOf="@+id/layout_calories"
+            app:layout_constraintEnd_toStartOf="@+id/btn_add_meal"
+            app:layout_constraintStart_toEndOf="@id/img_meal_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Ertalabki" />
+
+        <LinearLayout
+            android:id="@+id/layout_calories"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/text_meal_name"
+            app:layout_constraintStart_toStartOf="@id/text_meal_name"
+            app:layout_constraintTop_toBottomOf="@id/text_meal_name">
+
+            <TextView
+                android:id="@+id/text_meal_calories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
+                tools:text="450 kkal yeyildi" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress_meal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:indicatorTrackGapSize="0dp"
+                app:trackColor="?attr/colorSurfaceContainerHigh"
+                app:trackCornerRadius="3dp"
+                app:trackStopIndicatorPadding="0dp"
+                app:trackStopIndicatorSize="0dp"
+                app:trackThickness="6dp"
+                tools:progress="60" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btn_add_meal"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/round_lay"
+            android:backgroundTint="?attr/colorSurfaceContainerHighest"
+            android:padding="6dp"
+            android:src="@drawable/add_ic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorOnSurface" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

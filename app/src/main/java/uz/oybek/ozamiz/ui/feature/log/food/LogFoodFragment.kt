@@ -184,35 +184,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     imm.showSoftInput(inputQuickDescription, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
                 }
             }
-            setupSuggestions(bind)
         }
-
-    private fun setupSuggestions(bind: FragmentLogFoodBinding) {
-        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-        val suggestions = when {
-            hour in 5..10 -> listOf("2 ta tuxum", "Sutli kasha", "Non va pishloq", "Kofe", "Shirin choy", "Meva")
-            hour in 11..16 -> listOf("Bir kosa palov", "Sho'rva", "Somsa", "Manti", "Shashlik", "Salat")
-            hour in 17..22 -> listOf("Qovurma", "Meva", "Kefir", "Engil salat", "Grechka", "Choy")
-            else -> listOf("Meva", "Suv", "Yong'oq", "Yogurt")
-        }
-        
-        bind.chipGroupSuggestions.removeAllViews()
-        suggestions.forEach { suggestion ->
-            val chip = (layoutInflater.inflate(
-                R.layout.item_meal_type_selectable,
-                bind.chipGroupSuggestions,
-                false
-            ) as Chip).apply {
-                text = suggestion
-                setOnClickListener {
-                    bind.inputQuickDescription.setText(suggestion)
-                    viewModel.updateDescription(suggestion)
-                    viewModel.analyze()
-                }
-            }
-            bind.chipGroupSuggestions.addView(chip)
-        }
-    }
 
     private fun initTodayLogs(date: Date) {
         val adapter = uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter { foodLog ->
