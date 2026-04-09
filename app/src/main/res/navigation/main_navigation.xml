@@ -302,6 +302,26 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_logFoodFragment_to_searchFoodFragment"
+            app:destination="@id/searchFoodFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchFoodFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.log.food.SearchFoodFragment"
+        android:label="SearchFoodFragment"
+        tools:layout="@layout/fragment_search_food">
+        <argument
+            android:name="mealType"
+            app:argType="string" />
+        <argument
+                android:name="timestamp"
+                app:argType="long" />
     </fragment>
 
     <fragment

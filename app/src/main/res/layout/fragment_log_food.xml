@@ -59,12 +59,48 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="24dp"
+                    android:layout_marginHorizontal="24dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="Nima yedingiz?"
+                    android:text="Qanday ovqat yedingiz?"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="24sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:text="Har bir ovqatingizni hisoblang, va kunlik meyordan oshmang"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginHorizontal="24dp"
+                    android:text="Tezkor qo'shish"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:alpha="0.7" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="18dp"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroup_suggestions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipSpacingHorizontal="8dp"
+                        app:singleLine="true" />
+                </HorizontalScrollView>
 
 
 

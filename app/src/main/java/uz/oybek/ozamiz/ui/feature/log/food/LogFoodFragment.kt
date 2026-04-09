@@ -84,8 +84,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         setMeal(meal)
         viewModel.updateMeal(meal)
         initTodayLogs(logDate)
-        viewModel.updateMeal(meal)
-        initTodayLogs(logDate)
         setupPremiumListener()
     }
 
@@ -183,6 +181,24 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
                     imm.showSoftInput(inputQuickDescription, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
                 }
+            }
+            
+            (layoutInflater.inflate(
+                R.layout.item_meal_type_selectable,
+                chipGroupSuggestions,
+                false
+            ) as Chip).apply {
+                text = "🔍 Qidiruv"
+                setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_logFoodFragment_to_searchFoodFragment,
+                        Bundle().apply {
+                            putString("mealType", viewModel.state.value.meal)
+                            putLong("timestamp", logDate.time)
+                        }
+                    )
+                }
+                chipGroupSuggestions.addView(this)
             }
         }
 
