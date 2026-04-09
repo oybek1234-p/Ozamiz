@@ -64,6 +64,7 @@ class HomeViewModel : ViewModel() {
             )
         }
         initDailyTip()
+        initYesterdayAnalysis()
         viewModelScope.launch {
             try {
                 StreakRepository.updateStreak()
@@ -192,11 +193,13 @@ class HomeViewModel : ViewModel() {
                 val sortedExerciseLogs = exerciseLogs
                     .sortedByDescending { it.timestamp as? Long ?: 0L }
 
-                val currentExerciseBurnt = summary.burnedCalories
-                val exerciseJustAddedEvent =
-                    if (isFirstLoadCompleted && currentExerciseBurnt > _uiState.value.exerciseBurnt) {
-                        sortedExerciseLogs.firstOrNull()?.exerciseType
-                    } else null
+                val forecastFatLoss = if ((user.targetCalories - summary.consumedCalories) + summary.burnedCalories > 0) 
+                    (((user.targetCalories - summary.consumedCalories) + summary.burnedCalories) / 7.7).roundToInt() else 0
+
+                val analysisPrefs = appContext.getSharedPreferences("analysis_dismiss_prefs", android.content.Context.MODE_PRIVATE)
+                val todayStr = Date().dateApiFormat()
+                val yesterdayDismissed = analysisPrefs.getString("yesterday_dismiss_date", "") == todayStr
+                val todayDismissed = analysisPrefs.getString("today_dismiss_date", "") == todayStr
 
                 _uiState.update {
                     it.copy(
@@ -212,7 +215,7 @@ class HomeViewModel : ViewModel() {
                         waterGlasses = calculateGlasses(currentWater, previousWaterAmount),
                         waterJustAdded = it.waterJustAdded || waterJustAddedEvent,
                         foodJustAdded = it.foodJustAdded || foodJustAddedEvent,
-                        exerciseJustAddedType = it.exerciseJustAddedType ?: exerciseJustAddedEvent,
+                        exerciseJustAddedType = it.exerciseJustAddedType,
                         exerciseBurnt = summary.burnedCalories,
                         exerciseTarget = AppConstants.Exercise.DEFAULT_TARGET_CALORIES,
                         carbsConsumed = summary.consumedCarbs.roundToInt(),
@@ -234,7 +237,10 @@ class HomeViewModel : ViewModel() {
                         isCarbsExceeded = summary.consumedCarbs > macros.carbs + 20,
                         isFatExceeded = summary.consumedFat > macros.fat + 20,
                         isCalorieOptimal = summary.consumedCalories >= user.targetCalories && summary.consumedCalories <= user.targetCalories + 200,
-                        isCalorieExceeded = summary.consumedCalories > user.targetCalories + 200
+                        isCalorieExceeded = summary.consumedCalories > user.targetCalories + 200,
+                        todayForecastFatGram = forecastFatLoss,
+                        isYesterdayCardDismissed = yesterdayDismissed,
+                        isTodayForecastDismissed = todayDismissed
                     )
                 }
                 previousWaterAmount = currentWater
@@ -457,5 +463,82 @@ class HomeViewModel : ViewModel() {
         prefs.edit().putInt("current_tip_index", nextIndex).apply()
         val tip = uz.oybek.ozamiz.ui.utils.DailyTipUtil.getTip(nextIndex)
         _uiState.update { it.copy(dailyTip = tip) }
+    }
+
+    private fun initYesterdayAnalysis() {
+        viewModelScope.launch {
+            val prefs = appContext.getSharedPreferences("yesterday_analysis_prefs", android.content.Context.MODE_PRIVATE)
+            val lastShownDate = prefs.getString("last_shown_date", "")
+            val today = Date().dateApiFormat()
+
+            val calendar = java.util.Calendar.getInstance()
+            calendar.add(java.util.Calendar.DAY_OF_YEAR, -1)
+            val yesterday = calendar.time
+
+            DailyLogRepository.observeDailySummary(yesterday).collect { wrapper ->
+                if (wrapper is DataWrapper.Success) {
+                    val summary = wrapper.data
+                    val user = user
+                    
+                    // "Juda kam degani qoshmagan bulishi mumkin" - We check if consumed calories are suspiciously low
+                    // For example, if it's less than 40% of their target.
+                    val isSuspicouslyLow = if (user != null) summary.consumedCalories < user.targetCalories * 0.4 else true
+
+                    if (user != null && user.valid && summary.consumedCalories > 0 && !isSuspicouslyLow) {
+                        val caloriesTarget = user.targetCalories
+                        val consumed = summary.consumedCalories
+                        val burnedFromExercise = summary.burnedCalories
+                        
+                        // "Ancha oshib ketsa" - We'll use 200 kcal as a buffer for success
+                        val isSuccess = consumed <= caloriesTarget + 200
+                        
+                        val deficit = (caloriesTarget - consumed) + burnedFromExercise
+                        val fatBurnedGram = if (deficit > 0) (deficit / 7.7).toInt() else 0
+                        val monthlyPredictionGram = (fatBurnedGram * 30.0) / 1000.0
+
+                        val shouldShowSheet = lastShownDate != today
+
+                        _uiState.update {
+                            it.copy(
+                                yesterdayAnalysis = YesterdayAnalysis(
+                                    isAvailable = true,
+                                    consumedCalories = consumed,
+                                    targetCalories = caloriesTarget,
+                                    fatBurnedGram = fatBurnedGram,
+                                    monthlyPredictionGram = monthlyPredictionGram,
+                                    isSuccess = isSuccess,
+                                    showSheet = shouldShowSheet
+                                )
+                            )
+                        }
+                    } else {
+                        // If no food or too little food, we don't show the analysis
+                        _uiState.update {
+                            it.copy(yesterdayAnalysis = YesterdayAnalysis(isAvailable = false))
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onYesterdayAnalysisShown() {
+        val prefs = appContext.getSharedPreferences("yesterday_analysis_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit().putString("last_shown_date", Date().dateApiFormat()).apply()
+        _uiState.update {
+            it.copy(yesterdayAnalysis = it.yesterdayAnalysis.copy(showSheet = false))
+        }
+    }
+
+    fun onYesterdayCardDismissed() {
+        val prefs = appContext.getSharedPreferences("analysis_dismiss_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit().putString("yesterday_dismiss_date", Date().dateApiFormat()).apply()
+        _uiState.update { it.copy(isYesterdayCardDismissed = true) }
+    }
+
+    fun onTodayForecastDismissed() {
+        val prefs = appContext.getSharedPreferences("analysis_dismiss_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit().putString("today_dismiss_date", Date().dateApiFormat()).apply()
+        _uiState.update { it.copy(isTodayForecastDismissed = true) }
     }
 }

@@ -192,6 +192,15 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                     }
                     val hasInsight = !analysisResult.aiInsight.isNullOrBlank()
                     binding.cardAiHealth.isVisible = hasInsight || !pros.isNullOrEmpty() || !cons.isNullOrEmpty()
+
+                    if (state.totalFatBurnedGram > 0) {
+                        binding.cardJourneyProgress.root.isVisible = true
+                        binding.cardJourneyProgress.textTitle.text = "Sizning natijangiz! 🌟"
+                        binding.cardJourneyProgress.textDescription.text = "Oxirgi ${state.totalDaysTracked} kun ichida ${state.totalFatBurnedGram} gramm yog' yoqdingiz!"
+                        val monthly = (state.totalFatBurnedGram.toDouble() / state.totalDaysTracked) * 30 / 1000.0
+                    } else {
+                        binding.cardJourneyProgress.root.isVisible = false
+                    }
                 }
             }
         }
@@ -222,7 +231,8 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                     is AnalyzeResultEvent.LimitExceeded -> {
                         val act = requireActivity()
                         findNavController().popBackStack(R.id.home, false)
-                        DailyLimitFragment().show(act.supportFragmentManager, "daily_limit")
+                        DailyLimitFragment.newInstance(event.exceededTypes.firstOrNull() ?: DailyLimitFragment.TYPE_CALORIES)
+                            .show(act.supportFragmentManager, DailyLimitFragment.TAG)
                     }
                 }
             }

@@ -7,6 +7,16 @@ import java.util.Date
 import uz.oybek.ozamiz.data.course.model.CourseLevel
 import uz.oybek.ozamiz.data.course.model.CourseLesson
 
+data class YesterdayAnalysis(
+    val isAvailable: Boolean = false,
+    val consumedCalories: Int = 0,
+    val targetCalories: Int = 0,
+    val fatBurnedGram: Int = 0,
+    val monthlyPredictionGram: Double = 0.0,
+    val isSuccess: Boolean = false,
+    val showSheet: Boolean = false
+)
+
 data class HomeUiState(
     val isInitialLoading: Boolean = true,
     val isRefreshing: Boolean = false,
@@ -46,5 +56,9 @@ data class HomeUiState(
     val recommendedFoods: List<uz.oybek.ozamiz.data.menu.model.Menu> = emptyList(),
     val recommendingForMeal: String? = null,
     val dailyTip: uz.oybek.ozamiz.ui.utils.DailyTipUtil.Tip? = null,
-    val isTipVisible: Boolean = true
+    val isTipVisible: Boolean = true,
+    val yesterdayAnalysis: YesterdayAnalysis = YesterdayAnalysis(),
+    val todayForecastFatGram: Int = 0,
+    val isYesterdayCardDismissed: Boolean = false,
+    val isTodayForecastDismissed: Boolean = false
 )

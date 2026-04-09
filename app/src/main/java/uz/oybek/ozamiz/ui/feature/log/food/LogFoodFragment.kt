@@ -156,56 +156,62 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     chipGroupMealType.addView(this)
                 }
             }
-            textInputButton.setOnClickListener {
-                checkPremium { showTextInputSheet() }
+            inputQuickDescription.setOnEditorActionListener { _, actionId, _ ->
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                    hideSoftInput(requireActivity())
+                    viewModel.analyze()
+                    true
+                } else false
             }
-            voiceInputButton.setOnClickListener {
+            inputQuickDescription.addTextChangedListener {
+                viewModel.updateDescription(text = it.toString())
+            }
+            buttonAnalyzeAndSave.setOnClickListener {
+                hideSoftInput(requireActivity())
+                viewModel.analyze()
+            }
+            buttonQuickVoice.setOnClickListener {
                 checkPremium { findNavController().navigate(R.id.voiceInputBottomSheet) }
             }
-            uploadImageButton.setOnClickListener {
+            buttonQuickCamera.setOnClickListener {
                 checkPremium { checkAndLaunchCamera() }
             }
-        }
-
-    private var textInputSheet: BottomSheetDialog? = null
-    private fun showTextInputSheet() {
-        val sheet = BottomSheetDialog(requireContext())
-        val sheetBinding =
-            uz.oybek.ozamiz.databinding.BottomSheetLogFoodTextInputBinding.inflate(layoutInflater)
-
-        sheet.setContentView(sheetBinding.root)
-
-        sheetBinding.inputDescription.setText(viewModel.state.value.description)
-        sheetBinding.inputDescription.addTextChangedListener {
-            viewModel.updateDescription(text = it.toString())
-        }
-        sheetBinding.buttonAnalyzeAndSave.setOnClickListener {
-            hideSoftInput(requireActivity())
-            viewModel.analyze()
-            sheet.dismiss()
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.state.collectLatest {
-                if (sheetBinding.inputDescription.text.toString() != it.description) {
-                    sheetBinding.inputDescription.setText(it.description)
+            buttonShowTextInput.setOnClickListener {
+                cardTextInput.isVisible = !cardTextInput.isVisible
+                if (cardTextInput.isVisible) {
+                    inputQuickDescription.requestFocus()
+                    val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+                    imm.showSoftInput(inputQuickDescription, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
                 }
             }
+            setupSuggestions(bind)
         }
 
-        sheet.show()
-        sheetBinding.inputDescription.requestFocus()
-        // Wait for dialog to show before showing keyboard
-        sheetBinding.inputDescription.postDelayed({
-            val imm =
-                requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-            imm.showSoftInput(
-                sheetBinding.inputDescription,
-                android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-            )
-        }, 200)
-
-        textInputSheet = sheet
+    private fun setupSuggestions(bind: FragmentLogFoodBinding) {
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val suggestions = when {
+            hour in 5..10 -> listOf("2 ta tuxum", "Sutli kasha", "Non va pishloq", "Kofe", "Shirin choy", "Meva")
+            hour in 11..16 -> listOf("Bir kosa palov", "Sho'rva", "Somsa", "Manti", "Shashlik", "Salat")
+            hour in 17..22 -> listOf("Qovurma", "Meva", "Kefir", "Engil salat", "Grechka", "Choy")
+            else -> listOf("Meva", "Suv", "Yong'oq", "Yogurt")
+        }
+        
+        bind.chipGroupSuggestions.removeAllViews()
+        suggestions.forEach { suggestion ->
+            val chip = (layoutInflater.inflate(
+                R.layout.item_meal_type_selectable,
+                bind.chipGroupSuggestions,
+                false
+            ) as Chip).apply {
+                text = suggestion
+                setOnClickListener {
+                    bind.inputQuickDescription.setText(suggestion)
+                    viewModel.updateDescription(suggestion)
+                    viewModel.analyze()
+                }
+            }
+            bind.chipGroupSuggestions.addView(chip)
+        }
     }
 
     private fun initTodayLogs(date: Date) {
@@ -287,6 +293,9 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.state.collectLatest { state ->
+                    if (state.description != bind.inputQuickDescription.text.toString()) {
+                        bind.inputQuickDescription.setText(state.description)
+                    }
                     showLoading(state)
                 }
             }
@@ -294,18 +303,14 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 viewModel.event.collectLatest {
                     when (it) {
                         LogEvent.Error.AnalyzeError -> {
-
                         }
-
                         LogEvent.Error.EmptyInput -> {
                             showToast(getString(R.string.log_input_empty))
                         }
-
                         is LogEvent.ClarificationNeeded -> {
                             val analysis = it.data
                             val question = analysis.result?.question
                             val options = analysis.result?.options ?: emptyList()
-                            
                             if (question != null) {
                                 ClarificationBottomSheet(
                                     question = question,
@@ -315,7 +320,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                                 }.show(parentFragmentManager, "clarification_sheet")
                             }
                         }
-
                         is LogEvent.Analyzed -> {
                             navigateToResult(it.data)
                         }

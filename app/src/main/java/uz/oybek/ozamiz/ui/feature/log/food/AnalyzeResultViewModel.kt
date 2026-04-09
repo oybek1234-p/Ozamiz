@@ -23,10 +23,12 @@ import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
 
 data class AnalyzeResultState(
-    val result: FoodAnalysis? = null, 
-    val isLoading: Boolean = false, 
+    val result: FoodAnalysis? = null,
+    val isLoading: Boolean = false,
     val isError: Boolean = false,
-    val currentStreak: Int = 0
+    val currentStreak: Int = 0,
+    val totalFatBurnedGram: Int = 0,
+    val totalDaysTracked: Int = 0
 )
 
 sealed interface AnalyzeResultEvent {
@@ -69,6 +71,7 @@ class AnalyzeResultViewModel : ViewModel() {
             )
         }
         startUploadIfNeeded(result?.photoUrl)
+        loadJourneyProgress()
     }
 
     fun loadLog(logId: String, date: java.util.Date, userId: String? = null) {
@@ -100,6 +103,7 @@ class AnalyzeResultViewModel : ViewModel() {
             } else {
                 liveResult.update { it.copy(isError = true, isLoading = false) }
             }
+            loadJourneyProgress()
         }
     }
 
@@ -238,16 +242,16 @@ class AnalyzeResultViewModel : ViewModel() {
                     val targetCarbs = (targetCalories * 0.45) / 4.0
 
                     if (summary.consumedCalories > targetCalories) {
-                        exceededTypes.add(LimitExceededDialog.TYPE_CALORIES)
+                        exceededTypes.add(DailyLimitFragment.TYPE_CALORIES)
                     }
                     if (summary.consumedProtein > targetProtein) {
-                        exceededTypes.add(LimitExceededDialog.TYPE_PROTEIN)
+                        exceededTypes.add(DailyLimitFragment.TYPE_PROTEIN)
                     }
                     if (summary.consumedFat > targetFat) {
-                        exceededTypes.add(LimitExceededDialog.TYPE_FAT)
+                        exceededTypes.add(DailyLimitFragment.TYPE_FAT)
                     }
                     if (summary.consumedCarbs > targetCarbs) {
-                        exceededTypes.add(LimitExceededDialog.TYPE_CARBS)
+                        exceededTypes.add(DailyLimitFragment.TYPE_CARBS)
                     }
                 }
 
@@ -347,4 +351,51 @@ class AnalyzeResultViewModel : ViewModel() {
             )
         }
     }
-}
+
+    private fun loadJourneyProgress() {
+        viewModelScope.launch {
+            try {
+                val uid = com.google.firebase.Firebase.auth.currentUser?.uid ?: return@launch
+                val user = uz.oybek.ozamiz.data.user.UserRepository.user ?: return@launch
+                val targetCalories = user.targetCalories
+                if (targetCalories <= 0) return@launch
+
+                var totalFatBurned = 0
+                var daysTracked = 0
+
+                val calendar = java.util.Calendar.getInstance()
+                for (i in 1..7) {
+                    calendar.time = java.util.Date()
+                    calendar.add(java.util.Calendar.DAY_OF_YEAR, -i)
+                    val dateStr = uz.oybek.ozamiz.data.utils.DateUtils.getFormattedDateString(
+                        calendar.time,
+                        "yyyy-MM-dd"
+                    )
+
+                    val summaryRef =
+                        uz.oybek.ozamiz.data.firebase.FirebasePaths.dailySummaryReference(uid, dateStr)
+                    val snapshot = summaryRef.get().await()
+                    val summary =
+                        snapshot.getValue(uz.oybek.ozamiz.data.logs.model.DailySummary::class.java)
+
+                    if (summary != null && summary.consumedCalories > 0) {
+                        val deficit = targetCalories - summary.consumedCalories
+                        if (deficit > 0) {
+                            totalFatBurned += (deficit / 7.7).toInt()
+                        }
+                        daysTracked++
+                    }
+                }
+
+                liveResult.update {
+                    it.copy(
+                        totalFatBurnedGram = totalFatBurned,
+                        totalDaysTracked = daysTracked
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+}

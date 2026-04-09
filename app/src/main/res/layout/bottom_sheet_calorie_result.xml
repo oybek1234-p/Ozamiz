@@ -313,7 +313,6 @@
                         style="@style/Title3_17"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
                         android:layout_weight="1"
                         android:text="Baho"
                         android:textColor="?colorOnSurface" />
@@ -353,6 +352,15 @@
                 android:fontFamily="@font/roboto_regular"
                 android:visibility="gone"
                 tools:text="Siz 3 kundan beri bandsiz! 🔥"
+                tools:visibility="visible" />
+
+            <include
+                android:id="@+id/card_journey_progress"
+                layout="@layout/item_yesterday_analysis_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
                 tools:visibility="visible" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

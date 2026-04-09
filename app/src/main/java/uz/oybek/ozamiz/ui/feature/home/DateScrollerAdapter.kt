@@ -167,7 +167,7 @@ class DateScrollerAdapter(
             binding.progressRing.max = 100
             // Animate progress change
             binding.progressRing.setProgressCompat(if (isExceeded) 100 else progress, true)
-            binding.progressRing.setIndicatorColor(if (isExceeded) redColor else greenColor)
+            binding.progressRing.setIndicatorColor(if (isExceeded) greenColor else greenColor)
         }
     }
 

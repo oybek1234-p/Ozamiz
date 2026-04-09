@@ -113,15 +113,15 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Limit Reached / Optimal State -->
             <LinearLayout
                 android:id="@+id/layout_limit_state"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:visibility="gone"
                 android:padding="24dp"
                 android:gravity="center"
-                android:visibility="gone">
+              >
                 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="80dp"
@@ -152,7 +152,7 @@
 
                 <TextView
                     android:id="@+id/text_limit_subtitle"
-                    style="@style/TextAppearance.Material3.BodyMedium"
+                    style="@style/Text1_16"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -167,7 +167,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginTop="24dp"
-                    android:text="Batafsil ma'lumot"
+                    android:text="Nima yeyman?"
                     app:cornerRadius="16dp"
                     android:textSize="16sp" />
             </LinearLayout>

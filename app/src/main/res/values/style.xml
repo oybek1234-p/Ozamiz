@@ -65,7 +65,7 @@
 
     <style name="SheetAppearance" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/dimen_12</item>
+        <item name="cornerSize">@dimen/dimen_28</item>
     </style>
 
         <!-- Chip stili -->
