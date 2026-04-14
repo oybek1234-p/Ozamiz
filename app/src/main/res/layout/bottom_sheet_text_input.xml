@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_bg"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Nima yedingiz?"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/input_quick_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="?attr/colorPrimary"
+        android:fontFamily="@font/roboto_regular"
+        android:hint="Masalan: 1 kosa palov, 2 ta choy"
+        android:imeOptions="actionDone"
+        android:inputType="textCapSentences"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="18sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_analyze_and_save"
+        style="@style/FilledButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Tahlil qilish"
+        app:cornerRadius="12dp" />
+
+</LinearLayout>
