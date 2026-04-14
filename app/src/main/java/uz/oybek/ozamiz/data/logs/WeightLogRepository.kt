@@ -28,10 +28,13 @@ object WeightLogRepository {
     suspend fun add(
         userId: String,
         weightKg: Double,
-        photoUri: Uri
+        photoUri: Uri?
     ): DataWrapper<WeightLog> {
-        val uploadedUrl =
-            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog)
+        val uploadedUrl = if (photoUri != null) {
+            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog).toString()
+        } else {
+            ""
+        }
 
         val logId = generateKey()
 
@@ -39,7 +42,7 @@ object WeightLogRepository {
             logId = logId,
             userId = userId,
             weightKg = weightKg,
-            photoUrl = uploadedUrl.toString()
+            photoUrl = uploadedUrl
         )
 
         return try {
@@ -57,7 +60,7 @@ object WeightLogRepository {
     }
 
     fun getLogsFlow(userId: String): Flow<DataWrapper<List<WeightLog>>> = flow {
-
+        if (userId.isEmpty()) return@flow
         emitAll(callbackFlow {
             val registration = Firebase.firestore.collection(COLLECTION_USERS)
                 .document(userId)

@@ -12,6 +12,9 @@
     <string name="bugungi_tavsiyalar">Bugungi tavsiyalar</string>
     <string name="stop_and_analyze">To\'xtatish</string>
     <string name="recording_speak_now">Gapiring...</string>
+    <string name="voice_listening">Eshityapman</string>
+    <string name="voice_analyze">Tahlil qilish</string>
+    <string name="voice_checking">Tekshiryapmiz</string>
     <string name="ai_chat_greeting">Qanday savollaringiz bor?</string>
     <string name="app_name">Ozamiz</string>
     <string name="daqiqa_oldin">daqiqa oldin</string>
@@ -255,7 +258,7 @@
     <string name="describe_your_meal">Bugun nima yedingiz?</string>
     <string name="food_description_hint">Misol: Bir kosa go\'shtli sho‘rva, 2 bo‘lak oq non, stakan kola</string>
     <string name="analyze_and_save">Taxlil qilish</string>
-    <string name="error_photo_required">Iltimos, ovqat rasmini yuklang</string>
+    <string name="error_photo_required">Iltimos, rasm yuklang</string>
     <string name="error_description_required">Ovqat haqida ma\'lumot kiriting</string>
     <string name="analyzing">Taxlil qilinmoqda…</string>
     <string name="saving">Saqlanmoqda…</string>
@@ -265,9 +268,9 @@
     <string name="gallery">Galereya</string> <!-- Bu endi ishlatilmaydi, lekin o'chirmaymiz -->
     <string name="camera">Kamera</string>
     <string name="calories_remaining">kaloriya ovqat yeyish mumkin</string>
-    <string name="calories_sufficient">Bugunga yetarli yedingiz</string>
-    <string name="calories_exceeded_slightly">%d kal oshdi</string>
-    <string name="calories_exceeded_warning">%d kal oshdi️</string>
+    <string name="calories_sufficient">Bugunga yetarli</string>
+    <string name="calories_exceeded_slightly">Bugunga yetarli</string>
+    <string name="calories_exceeded_warning">Me\'yor to\'ldi</string>
     <string name="add_image_placeholder_text">Rasm yuklang</string>
     <string name="take_photo_placeholder">Kamerani ochish (Bosing)</string>
     <string name="voice_input">Ovozli kiritish</string>
@@ -435,7 +438,7 @@
     <string name="meal_calories_target_only_format">%d kal</string>
     <string name="meal_calories_remaining_format">%d kal qoldi</string>
     <string name="meal_calories_slightly_exceeded_format">Yetarli</string>
-    <string name="meal_calories_greatly_exceeded_format">✔ Yetadi. %d kal oshdi</string>
+    <string name="meal_calories_greatly_exceeded_format">✔ Yetadi</string>
 
     <string name="unit_kcal_eaten">%d kal yeyildi</string>
     <string name="unit_ml_drunk">%d ml ichildi</string>
@@ -555,7 +558,7 @@
     <string name="label_fat">Fat</string>
     <string name="macro_short_format">%1$d / %2$d g</string>
     <string name="macro_remaining_format">%1$d qoldi</string>
-    <string name="macro_exceeded_format">%1$d oshdi</string>
+    <string name="macro_exceeded_format">Yetarli</string>
     <string name="protein_desc">Mushak quruvchi</string>
     <string name="fat_desc">Energiya manbai</string>
     <string name="carbs_desc">Kuch manbai</string>
@@ -578,7 +581,7 @@
     <string name="necha_minut_bajardingiz">Necha minut bajardingiz?</string>
     <string name="tushunarli">Tushunarli</string>
     
-    <string name="limit_exceeded_title">Kunlik me\'yor oshdi</string>
-    <string name="limit_exceeded_message">Siz bugun kunlik kaloriya me\'yoridan oshib ketdingiz.</string>
+    <string name="limit_exceeded_title">Kunlik me\'yor to\'ldi</string>
+    <string name="limit_exceeded_message">Siz bugun kunlik kaloriya me\'yoriga yetdingiz.</string>
     <string name="what_can_i_eat_now">💡 Nima yeyishim mumkin?</string>
 </resources>

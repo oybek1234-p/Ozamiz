@@ -11,6 +11,7 @@ import uz.oybek.ozamiz.databinding.DialogLogWaterBinding
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.utils.showToast
+import androidx.fragment.app.setFragmentResult
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -61,12 +62,19 @@ class LogWaterDialog : BottomSheetDialogFragment() {
         }
     }
 
+    private var waterAdded = false
+
     private fun addWater(amountMl: Int) {
         homeViewModel.addWater(amountMl)
-        // showToast(getString(uz.oybek.ozamiz.R.string.water_logged_successfully)) // Optional: Feedback for user
+        waterAdded = true
     }
 
     override fun onDestroyView() {
+        if (waterAdded) {
+            setFragmentResult("water_added_request", android.os.Bundle().apply {
+                putBoolean("added", true)
+            })
+        }
         super.onDestroyView()
         _binding = null
     }

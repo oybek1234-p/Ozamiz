@@ -10,6 +10,8 @@ import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.data.logs.DailySummaryRepository
+import java.util.Date
 
 data class NatijaUiState(
     val isLoading: Boolean = false,
@@ -23,6 +25,7 @@ data class NatijaUiState(
     val photoAfter: String? = null,
     val showTopBanner: Boolean = false,
     val showBottomBanner: Boolean = false,
+
     val estimatedGoalDate: Long? = null,
     val error: String? = null,
     val bmi: Double? = null,
@@ -43,6 +46,8 @@ class NatijaViewModel : ViewModel() {
         if (!user.valid) return
 
         _uiState.update { it.copy(isLoading = true, error = null) }
+        
+
 
         viewModelScope.launch {
             WeightLogRepository.getLogsFlow(user.uid).collect { result ->
@@ -83,8 +88,16 @@ class NatijaViewModel : ViewModel() {
                 ?: 0.0) > 0
         ) user.startWeight else validLogs.firstOrNull()?.weightKg
 
-        // Calculate diff (overall progress)
-        val diff = if (currentW != null && startW != null) currentW - startW else 0.0
+        // Calculate diff (comparison with previous log)
+        val diff = if (validLogs.size >= 2) {
+            val last = validLogs.last().weightKg
+            val prev = validLogs[validLogs.size - 2].weightKg
+            last - prev
+        } else if (validLogs.size == 1 && startW != null && startW > 0 && startW != validLogs.last().weightKg) {
+            validLogs.last().weightKg - startW
+        } else {
+            0.0
+        }
 
         val targetWeight = user.targetWeight
 
@@ -174,6 +187,8 @@ class NatijaViewModel : ViewModel() {
             )
         }
     }
+
+
 
     private fun calculateBmi(weight: Double, heightCm: Int): Pair<Double, BmiCategory> {
         if (weight <= 0 || heightCm <= 0) return 0.0 to BmiCategory.NONE

@@ -14,6 +14,7 @@ object FirebasePaths {
         const val WATER_LOGS = "waterLogs"
         const val EXERCISE_LOGS = "exerciseLogs"
         const val WEIGHT_LOGS = "weightLogs"
+        const val SAVED_FOODS = "savedFoods"
     }
 
     object Firestore {
@@ -49,6 +50,9 @@ object FirebasePaths {
 
     fun weightLogsReference(userId: String, date: String) =
         userLogsReference(userId).child(date).child(Database.WEIGHT_LOGS)
+
+    fun savedFoodsReference(userId: String) =
+        userReference(userId).child(Database.SAVED_FOODS)
 
     fun userDailySummariesReference(userId: String) =
         root.child("daily_summaries").child(userId)

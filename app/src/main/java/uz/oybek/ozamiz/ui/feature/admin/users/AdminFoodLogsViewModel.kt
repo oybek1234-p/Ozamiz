@@ -30,87 +30,74 @@ class AdminFoodLogsViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private var logsListener: com.google.firebase.database.ValueEventListener? = null
+    private var currentPath: com.google.firebase.database.DatabaseReference? = null
+
     fun loadLatestFoodLogs(userId: String) {
+        currentPath?.removeEventListener(logsListener ?: return)
+        
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                val userLogsRef = FirebasePaths.userLogsReference(userId)
-                val snapshot = userLogsRef.orderByKey().limitToLast(14).get().await()
-                
-                val allLogs = mutableListOf<AdminGenericLog>()
+            val userLogsRef = FirebasePaths.userLogsReference(userId)
+            currentPath = userLogsRef
 
-                if (snapshot.exists()) {
-                    for (dateSnapshot in snapshot.children) {
-                        
-                        // Parse Food Logs
-                        dateSnapshot.child("foodLogs").children.forEach { foodSnap ->
-                            val food = foodSnap.getValue(FoodLog::class.java)
-                            if (food != null) {
-                                val ts = (food.timestamp as? Long) ?: ((food.timestamp as? Double)?.toLong()) ?: 0L
-                                allLogs.add(
-                                    AdminGenericLog(
-                                        id = food.logId.ifEmpty { foodSnap.key ?: "" },
-                                        title = food.description,
-                                        subtitle = "${food.calories} kkal",
-                                        extraInfo = "Oqsil: ${food.protein ?: 0}g • Yog': ${food.fat ?: 0}g • Uglevod: ${food.carbs ?: 0}g",
-                                        photoUrl = food.photoUrl,
-                                        timestamp = ts,
-                                        type = "food"
+            logsListener = object : com.google.firebase.database.ValueEventListener {
+                override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                    val allLogs = mutableListOf<AdminGenericLog>()
+                    if (snapshot.exists()) {
+                        for (dateSnapshot in snapshot.children) {
+                            // Parse Food Logs
+                            dateSnapshot.child("foodLogs").children.forEach { foodSnap ->
+                                val food = foodSnap.getValue(FoodLog::class.java)
+                                if (food != null) {
+                                    val ts = (food.timestamp as? Long) ?: ((food.timestamp as? Double)?.toLong()) ?: 0L
+                                    allLogs.add(
+                                        AdminGenericLog(
+                                            id = food.logId.ifEmpty { foodSnap.key ?: "" },
+                                            title = food.description,
+                                            subtitle = "${food.calories} kkal",
+                                            extraInfo = "Oqsil: ${food.protein ?: 0}g • Yog': ${food.fat ?: 0}g • Uglevod: ${food.carbs ?: 0}g",
+                                            photoUrl = food.photoUrl,
+                                            timestamp = ts,
+                                            type = "food"
+                                        )
                                     )
-                                )
+                                }
+                            }
+                            // ... Water and Exercise parsing ...
+                            dateSnapshot.child("waterLogs").children.forEach { waterSnap ->
+                                val water = waterSnap.getValue(WaterLog::class.java)
+                                if (water != null) {
+                                    val ts = (water.timestamp as? Long) ?: ((water.timestamp as? Double)?.toLong()) ?: 0L
+                                    allLogs.add(AdminGenericLog(water.logId.ifEmpty { waterSnap.key ?: "" }, "Suv", "${water.amountMl} ml", "", null, ts, "water"))
+                                }
+                            }
+                            dateSnapshot.child("exerciseLogs").children.forEach { exSnap ->
+                                val ex = exSnap.getValue(ExerciseLog::class.java)
+                                if (ex != null) {
+                                    val ts = (ex.timestamp as? Long) ?: ((ex.timestamp as? Double)?.toLong()) ?: 0L
+                                    allLogs.add(AdminGenericLog(ex.logId.ifEmpty { exSnap.key ?: "" }, ex.exerciseType.ifEmpty { "Mashg'ulot" }, "${ex.caloriesBurned} kkal yoqildi", "${ex.durationMin} daqiqa", null, ts, "exercise"))
+                                }
                             }
                         }
-                        
-                        // Parse Water Logs
-                        dateSnapshot.child("waterLogs").children.forEach { waterSnap ->
-                            val water = waterSnap.getValue(WaterLog::class.java)
-                            if (water != null) {
-                                val ts = (water.timestamp as? Long) ?: ((water.timestamp as? Double)?.toLong()) ?: 0L
-                                allLogs.add(
-                                    AdminGenericLog(
-                                        id = water.logId.ifEmpty { waterSnap.key ?: "" },
-                                        title = "Suv",
-                                        subtitle = "${water.amountMl} ml",
-                                        extraInfo = "",
-                                        photoUrl = null,
-                                        timestamp = ts,
-                                        type = "water"
-                                    )
-                                )
-                            }
-                        }
-                        
-                        // Parse Exercise Logs
-                        dateSnapshot.child("exerciseLogs").children.forEach { exSnap ->
-                            val ex = exSnap.getValue(ExerciseLog::class.java)
-                            if (ex != null) {
-                                val ts = (ex.timestamp as? Long) ?: ((ex.timestamp as? Double)?.toLong()) ?: 0L
-                                allLogs.add(
-                                    AdminGenericLog(
-                                        id = ex.logId.ifEmpty { exSnap.key ?: "" },
-                                        title = ex.exerciseType.ifEmpty { "Mashg'ulot" },
-                                        subtitle = "${ex.caloriesBurned} kkal yoqildi",
-                                        extraInfo = "${ex.durationMin} daqiqa",
-                                        photoUrl = null,
-                                        timestamp = ts,
-                                        type = "exercise"
-                                    )
-                                )
-                            }
-                        }
+                        allLogs.sortByDescending { it.timestamp }
+                        _foodLogs.value = allLogs
+                    } else {
+                        _foodLogs.value = emptyList()
                     }
-                    
-                    // Sort descending by timestamp
-                    allLogs.sortByDescending { it.timestamp }
-                    _foodLogs.value = allLogs
-                } else {
-                    _foodLogs.value = emptyList()
+                    _isLoading.value = false
                 }
-            } catch (e: Exception) {
-                // error
-            } finally {
-                _isLoading.value = false
+
+                override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                    _isLoading.value = false
+                }
             }
+            userLogsRef.orderByKey().limitToLast(14).addValueEventListener(logsListener!!)
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        currentPath?.removeEventListener(logsListener ?: return)
     }
 }

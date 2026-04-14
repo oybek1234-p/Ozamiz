@@ -33,9 +33,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
-            android:clipToPadding="false"
             android:paddingTop="16dp">
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="?colorOutlineVariant"
@@ -168,9 +168,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_12"
                 android:baselineAligned="false"
-                android:padding="1dp"
                 android:clipToPadding="false"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="1dp">
 
                 <include
                     android:id="@+id/layout_protein"
@@ -202,7 +202,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="?colorOutlineVariant"
@@ -252,41 +252,28 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/layout_cons"
+                        android:id="@+id/layout_advice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
                         android:orientation="vertical"
                         android:visibility="gone"
                         tools:visibility="visible">
 
-                        <LinearLayout
+                        <TextView
+                            style="@style/Title3_17"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Maslahat"
+                            android:textColor="?colorPrimary" />
+
+                        <TextView
+                            android:id="@+id/textView_advice"
+                            style="@style/Headline2_16"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/warning_24px"
-                                app:tint="?colorError" />
-
-                            <TextView
-                                style="@style/Title3_17"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Zararlari"
-                                android:textColor="?colorError" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/container_cons"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:orientation="vertical" />
+                            android:layout_marginTop="8dp"
+                            android:textColor="?colorOnSurface"
+                            tools:text="Bu ovqatni kamroq miqdorda va kechqurun yemaslik maslahat beriladi." />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -296,7 +283,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_12"
-                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="?colorOutlineVariant"
@@ -341,27 +328,60 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-            <TextView
-                android:id="@+id/textView_streak_motivation"
-                style="@style/Text1_14"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_streak_milestone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_24"
-                android:gravity="center"
-                android:textColor="?colorOnSurface"
-                android:fontFamily="@font/roboto_regular"
+                android:layout_marginTop="@dimen/dimen_18"
                 android:visibility="gone"
-                tools:text="Siz 3 kundan beri bandsiz! 🔥"
-                tools:visibility="visible" />
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                app:cardCornerRadius="16dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?colorOutlineVariant"
+                tools:visibility="visible">
 
-            <include
-                android:id="@+id/card_journey_progress"
-                layout="@layout/item_yesterday_analysis_card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:background="?attr/colorSurfaceContainerLowest"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/textView_streak_emoji"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="32sp"
+                        tools:text="🔥" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/textView_streak_title"
+                            style="@style/Title3_17"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="?attr/colorPrimary"
+                            tools:text="Ajoyib!" />
+
+                        <TextView
+                            android:id="@+id/textView_streak_subtitle"
+                            style="@style/Caption1_13"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="?attr/colorOnPrimaryContainer"
+                            tools:text="Siz 7 kundan beri aktivsiz" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -371,7 +391,7 @@
         android:layout_gravity="bottom"
         android:background="?colorSurfaceContainer"
         android:elevation="16dp"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="16dp">
 
         <com.google.android.material.button.MaterialButton
@@ -379,23 +399,32 @@
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
+            android:layout_marginBottom="12dp"
             android:fontFamily="@font/roboto_medium"
             android:text="@string/delete"
             android:textColor="?colorError"
             android:visibility="gone"
-            app:iconGravity="textStart"
             app:icon="@drawable/delete_ic"
+            app:iconGravity="textStart"
             app:iconTint="?colorError"
-            app:strokeColor="?colorError" />
-
+            app:strokeColor="?colorError"
+            tools:visibility="gone" />
 
         <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_weight="1">
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_re_log"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:fontFamily="@font/roboto_medium"
+                android:text="Qayta qo'shish"
+                android:visibility="gone"
+                app:icon="@drawable/add_ic"
+                app:iconGravity="textStart"
+                tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_save_to_log"
@@ -418,13 +447,5 @@
 
         </FrameLayout>
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:elevation="20dp"
-        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

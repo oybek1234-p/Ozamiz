@@ -64,6 +64,7 @@ object DailySummaryRepository {
      */
     fun updateSummary(
         date: Date,
+        targetUid: String? = null,
         caloriesDelta: Int = 0,
         waterDelta: Int = 0,
         exerciseDelta: Int = 0,
@@ -71,7 +72,7 @@ object DailySummaryRepository {
         carbsDelta: Double = 0.0,
         fatDelta: Double = 0.0
     ) {
-        val userId = currentUserId ?: return
+        val userId = targetUid ?: currentUserId ?: return
         val dateStr = date.dateApiFormat()
         val ref = FirebasePaths.dailySummaryReference(userId, dateStr)
 

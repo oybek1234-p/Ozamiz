@@ -10,6 +10,8 @@ import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.ItemLessonSectionBinding
 import uz.oybek.ozamiz.databinding.ItemLessonTopicBinding
+import jp.wasabeef.glide.transformations.BlurTransformation
+import com.bumptech.glide.request.RequestOptions
 
 /**
  * Multi-viewtype adapter for user-facing Lessons list
@@ -67,14 +69,21 @@ class LessonsAdapter(
             
             // Load image
             if (item.topic.imageUrl.isNotEmpty()) {
-                Glide.with(binding.imageTopic)
+                var glideRequest = Glide.with(binding.imageTopic)
                     .load(item.topic.imageUrl)
                     .placeholder(R.drawable.user_photo_placeholder)
                     .centerCrop()
-                    .into(binding.imageTopic)
+                
+                if (item.isPremiumRequired) {
+                    glideRequest = glideRequest.apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
+                }
+                
+                glideRequest.into(binding.imageTopic)
             } else {
                 binding.imageTopic.setImageResource(R.drawable.user_photo_placeholder)
             }
+
+            binding.premiumOverlay.isVisible = item.isPremiumRequired
             
             // Status styling
             val context = binding.root.context

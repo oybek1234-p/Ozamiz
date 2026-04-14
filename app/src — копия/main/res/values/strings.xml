@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Ozamiz</string>
+
+    <string name="facebook_app_id">1852595262260195</string>
+
     <string name="daqiqa_oldin">daqiqa oldin</string>
     <string name="sohat_oldin">soat oldin</string>
     <string name="kun_oldin">kun oldin</string>

@@ -12,13 +12,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
+import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
+import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,18 +59,39 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupUI()
         setupListeners()
-        if (arguments?.getString("logId") != null) {
-            binding.buttonSaveToLog.isVisible = false
-            binding.buttonDelete.isVisible = true
+        setupUI()
+        if (arguments?.getBoolean("isFromFavorite") == true) {
+            val args = requireArguments()
+            val analysis = FoodAnalysis(
+                id = args.getString("description").hashCode(),
+                photoUrl = args.getString("photoUrl")?.takeIf { it != "null" },
+                result = FoodAnalysisResult(
+                    name = args.getString("description") ?: "",
+                    calories = args.getDouble("calories").toInt(),
+                    protein = args.getDouble("protein"),
+                    fat = args.getDouble("fat"),
+                    carbs = args.getDouble("carbs"),
+                    healthScore = 0,
+                    aiInsight = ""
+                ),
+                mealType = args.getString("mealType") ?: ""
+            )
+            viewModel.setRecallResult(analysis)
         }
     }
 
     private fun showLoading(show: Boolean) {
-        binding.progressBarSave.isVisible = show
+        binding.progressBarButton.isVisible = show
         binding.buttonSaveToLog.isEnabled = !show
+        binding.buttonReLog.isEnabled = !show
         binding.buttonDelete.isEnabled = !show
+
+        binding.buttonSaveToLog.text = if (show) "" else getString(R.string.save)
+        binding.buttonReLog.text = if (show) "" else "Qayta qo'shish"
+        binding.buttonReLog.icon =
+            if (show) null else ContextCompat.getDrawable(requireContext(), R.drawable.add_ic)
+
         binding.nestedScrollView.alpha = if (show) 0.5f else 1.0f
     }
 
@@ -102,20 +124,68 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                             .load(photoUrl)
                             .placeholder(R.drawable.placeholder_food)
                             .into(binding.imageViewFoodPhoto)
-                            
+
                         binding.imageViewFoodPhoto.setOnClickListener {
-                            uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(photoUrl)
+                            uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
+                                photoUrl
+                            )
                                 .show(parentFragmentManager, "full_image")
                         }
                     } else {
                         binding.imageViewFoodPhoto.isVisible = false
                     }
                     binding.textViewFoodName.text = analysisResult.name
-                    if (state.currentStreak >= 2) {
-                        binding.textViewStreakMotivation.isVisible = true
-                        binding.textViewStreakMotivation.text = "Siz ${state.currentStreak} kundan beri aktivsiz! 🔥"
+                    val streak = state.currentStreak
+                    val milestones = listOf(3, 7, 14, 18, 30, 60, 100, 150, 200, 365)
+                    val isMilestone = milestones.contains(streak)
+
+                    if (streak >= 2) {
+                        binding.cardStreakMilestone.isVisible = true
+                        binding.textViewStreakEmoji.text = when {
+                            streak >= 30 -> "👑"
+                            streak >= 7 -> "🔥"
+                            else -> "⚡"
+                        }
+                        binding.textViewStreakTitle.text = when (streak) {
+                            3 -> "Ajoyib boshlanish!"
+                            7 -> "Bir hafta!"
+                            14 -> "Ikki hafta!"
+                            18 -> "Ajoyib natija!"
+                            30 -> "Bir oylik g'alaba!"
+                            else -> "Davom eting!"
+                        }
+                        binding.textViewStreakSubtitle.text =
+                            "Siz ketma-ket $streak kundan beri aktivsiz!"
+
+                        if (isMilestone) {
+                            binding.cardStreakMilestone.setCardBackgroundColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.green_alpha_10
+                                )
+                            )
+                            binding.textViewStreakTitle.setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.green
+                                )
+                            )
+                        } else {
+                            binding.cardStreakMilestone.setCardBackgroundColor(
+                                com.google.android.material.color.MaterialColors.getColor(
+                                    binding.root,
+                                    com.google.android.material.R.attr.colorSurfaceContainer
+                                )
+                            )
+                            binding.textViewStreakTitle.setTextColor(
+                                com.google.android.material.color.MaterialColors.getColor(
+                                    binding.root,
+                                    com.google.android.material.R.attr.colorOnSurface
+                                )
+                            )
+                        }
                     } else {
-                        binding.textViewStreakMotivation.isVisible = false
+                        binding.cardStreakMilestone.isVisible = false
                     }
                     val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
                     binding.textViewTimestamp.text =
@@ -127,7 +197,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                         )
                     val score = analysisResult.healthScore ?: 0
                     binding.textViewHealthScore.isVisible = false
-                    
+
                     val pointsDelta = when {
                         score >= 8 -> 10
                         score == 7 -> 5
@@ -135,14 +205,14 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                         score in 4..5 -> -5
                         else -> -10
                     }
-                    
-                    binding.cardHealthScore.isVisible = score > 0
-                    binding.textViewPointsDelta.isVisible = score > 0
-                    binding.textViewPointsDelta.text = if (pointsDelta >= 0) "+$pointsDelta ball" else "$pointsDelta ball"
+
+                    binding.cardHealthScore.isVisible = score > 0 && pointsDelta > 0
+                    binding.textViewPointsDelta.isVisible = pointsDelta > 0
+                    binding.textViewPointsDelta.text = "+$pointsDelta ball"
                     binding.textViewPointsDelta.setTextColor(
                         ContextCompat.getColor(
                             requireContext(),
-                            if (pointsDelta > 0) R.color.green else if (pointsDelta < 0) R.color.rejected else R.color.grey
+                            R.color.green
                         )
                     )
                     binding.textViewPointsDelta.setTextAppearance(R.style.Headline2_16)
@@ -155,7 +225,12 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                             val tv = android.widget.TextView(requireContext()).apply {
                                 text = "• $pro"
                                 setTextAppearance(R.style.Headline2_16)
-                                setTextColor(com.google.android.material.color.MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorOnSurface))
+                                setTextColor(
+                                    com.google.android.material.color.MaterialColors.getColor(
+                                        binding.root,
+                                        com.google.android.material.R.attr.colorOnSurface
+                                    )
+                                )
                                 layoutParams = android.widget.LinearLayout.LayoutParams(
                                     android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
                                     android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
@@ -169,38 +244,29 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                         binding.layoutPros.isVisible = false
                     }
 
-                    val cons = analysisResult.cons
-                    if (!cons.isNullOrEmpty()) {
-                        binding.layoutCons.isVisible = true
-                        binding.containerCons.removeAllViews()
-                        cons.forEach { con ->
-                            val tv = android.widget.TextView(requireContext()).apply {
-                                text = "• $con"
-                                setTextAppearance(R.style.Headline2_16)
-                                setTextColor(com.google.android.material.color.MaterialColors.getColor(binding.root, com.google.android.material.R.attr.colorOnSurface))
-                                layoutParams = android.widget.LinearLayout.LayoutParams(
-                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                                ).apply {
-                                    topMargin = 16
-                                }
-                            }
-                            binding.containerCons.addView(tv)
-                        }
-                    } else {
-                        binding.layoutCons.isVisible = false
-                    }
-                    val hasInsight = !analysisResult.aiInsight.isNullOrBlank()
-                    binding.cardAiHealth.isVisible = hasInsight || !pros.isNullOrEmpty() || !cons.isNullOrEmpty()
+                    binding.layoutAdvice.isVisible = false
 
-                    if (state.totalFatBurnedGram > 0) {
-                        binding.cardJourneyProgress.root.isVisible = true
-                        binding.cardJourneyProgress.textTitle.text = "Sizning natijangiz! 🌟"
-                        binding.cardJourneyProgress.textDescription.text = "Oxirgi ${state.totalDaysTracked} kun ichida ${state.totalFatBurnedGram} gramm yog' yoqdingiz!"
-                        val monthly = (state.totalFatBurnedGram.toDouble() / state.totalDaysTracked) * 30 / 1000.0
-                    } else {
-                        binding.cardJourneyProgress.root.isVisible = false
-                    }
+                    binding.cardAiHealth.isVisible =
+                        !pros.isNullOrEmpty()
+
+
+                    val favIcon =
+                        if (state.isSaved) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
+                    binding.toolbar.menu.findItem(R.id.action_favorite)?.setIcon(favIcon)
+
+                    val favColor =
+                        if (state.isSaved) ContextCompat.getColor(requireContext(), R.color.red)
+                        else com.google.android.material.color.MaterialColors.getColor(
+                            binding.root,
+                            androidx.appcompat.R.attr.colorPrimary
+                        )
+                    binding.toolbar.menu.findItem(R.id.action_favorite)?.iconTintList =
+                        android.content.res.ColorStateList.valueOf(favColor)
+
+                    binding.buttonSaveToLog.isVisible = !state.isRecallMode
+                    binding.buttonReLog.isVisible = state.isRecallMode
+                    binding.buttonDelete.isVisible =
+                        state.isRecallMode && arguments?.getString("logId") != null
                 }
             }
         }
@@ -209,10 +275,17 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
             viewModel.event.collect { event ->
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
-                        findNavController().popBackStack()
-                        findNavController().popBackStack()
+                        findNavController().popBackStack(R.id.home, false)
                     }
-                    
+
+                    is AnalyzeResultEvent.Failure -> {
+                        android.widget.Toast.makeText(
+                            requireContext(),
+                            event.message,
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                     is AnalyzeResultEvent.PromptShare -> {
                         val bottomSheet = uz.oybek.ozamiz.ui.feature.community.SharePostBottomSheet(
                             foodName = event.name,
@@ -229,10 +302,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                     }
 
                     is AnalyzeResultEvent.LimitExceeded -> {
-                        val act = requireActivity()
                         findNavController().popBackStack(R.id.home, false)
-                        DailyLimitFragment.newInstance(event.exceededTypes.firstOrNull() ?: DailyLimitFragment.TYPE_CALORIES)
-                            .show(act.supportFragmentManager, DailyLimitFragment.TAG)
                     }
                 }
             }
@@ -272,17 +342,42 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupListeners() {
-        binding.buttonSaveToLog.setOnClickListener {
+        binding.buttonSaveToLog.setOnSafeClickListener {
             viewModel.onSaveClick()
         }
 
-        binding.buttonDelete.setOnClickListener {
+        binding.buttonReLog.setOnSafeClickListener {
+            viewModel.reLog()
+        }
+
+        binding.toolbar.inflateMenu(R.menu.menu_analyze_result)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            if (menuItem.itemId == R.id.action_favorite) {
+                // Immediate feedback
+                val isCurrentlySaved = viewModel.resultLive.value?.isSaved == true
+                menuItem.setIcon(if (isCurrentlySaved) R.drawable.ic_heart_outline else R.drawable.ic_heart_filled)
+                menuItem.iconTintList = android.content.res.ColorStateList.valueOf(
+                    if (isCurrentlySaved) com.google.android.material.color.MaterialColors.getColor(
+                        binding.root,
+                        androidx.appcompat.R.attr.colorPrimary
+                    )
+                    else ContextCompat.getColor(requireContext(), R.color.red)
+                )
+
+                viewModel.toggleFavorite()
+                true
+            } else false
+        }
+
+        binding.buttonDelete.setOnSafeClickListener {
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("O'chirish")
                 .setMessage("Haqiqatan ham bu yozuvni o'chirmoqchimisiz?")
                 .setPositiveButton("Ha") { _, _ ->
-                    viewModel.deleteLog {
-                        findNavController().popBackStack()
+                    viewModel.deleteLog { success ->
+                        if (success) {
+                            findNavController().popBackStack()
+                        }
                     }
                 }
                 .setNegativeButton("Yo'q", null)

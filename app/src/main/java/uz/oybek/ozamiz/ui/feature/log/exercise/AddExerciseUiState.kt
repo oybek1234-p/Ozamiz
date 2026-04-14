@@ -22,7 +22,7 @@ sealed class AddExerciseUiState {
         AddExerciseUiState()
 
     object Saving : AddExerciseUiState()
-    object Success : AddExerciseUiState()
+    data class Success(val exerciseId: String) : AddExerciseUiState()
     data class Error(val message: String) : AddExerciseUiState()
 }
 
@@ -63,7 +63,7 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
         if (duration == null || duration <= 0) {
             return
         }
-        _uiState.value = AddExerciseUiState.Success
+        _uiState.value = AddExerciseUiState.Success(exercise.name)
         viewModelScope.launch {
             val caloriesBurned = exercise.getCalories(duration)
             val exerciseLog = ExerciseLog(

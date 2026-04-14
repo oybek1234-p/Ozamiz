@@ -19,6 +19,11 @@ import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.model.FoodLog
+import uz.oybek.ozamiz.data.food.SavedFoodRepository
+import uz.oybek.ozamiz.data.logs.FoodLogRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import java.util.Date
 
 data class LogFoodState(
@@ -45,6 +50,8 @@ sealed interface LogEvent {
     data class ClarificationNeeded(
         val data: FoodAnalysis
     ) : LogEvent
+
+    data class Message(val text: String) : LogEvent
 }
 
 class LogFoodViewModel() : ViewModel() {
@@ -55,10 +62,75 @@ class LogFoodViewModel() : ViewModel() {
     private val _event = Channel<LogEvent>()
     val event = _event.receiveAsFlow()
 
+    private val _loadingFoodIds = MutableStateFlow<Set<String>>(emptySet())
+    val loadingFoodIds = _loadingFoodIds.asStateFlow()
+
+    val savedFoods = SavedFoodRepository.getSavedFoods()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val savedFoodIds = savedFoods.map { it.map { food -> food.logId }.toSet() }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
+
     fun updateMeal(
         meal: String
     ) {
         _state.update { it.copy(meal = meal) }
+    }
+
+    fun logFood(foodLog: FoodLog, date: Date) {
+        viewModelScope.launch {
+            FoodLogRepository.add(
+                image = null,
+                foodLog = foodLog,
+                date = date
+            )
+        }
+    }
+
+    fun reLogFood(foodLog: FoodLog) {
+        viewModelScope.launch {
+            val duplicate = foodLog.copy(
+                logId = "",
+                timestamp = System.currentTimeMillis()
+            )
+            FoodLogRepository.add(null, duplicate, state.value.date)
+            _event.send(LogEvent.Message("Qayta qo'shildi!"))
+        }
+    }
+
+    fun toggleFavorite(foodLog: FoodLog) {
+        viewModelScope.launch {
+            val isSaved = SavedFoodRepository.isFoodSaved(foodLog.logId)
+            if (isSaved) {
+                SavedFoodRepository.removeSavedFood(foodLog.logId)
+                _event.send(LogEvent.Message("Sevimlilardan olib tashlandi"))
+            } else {
+                SavedFoodRepository.saveFood(foodLog)
+                _event.send(LogEvent.Message("Sevimlilarga qo'shildi!"))
+            }
+        }
+    }
+
+    fun removeFavorite(foodLog: FoodLog) {
+        viewModelScope.launch {
+            SavedFoodRepository.removeSavedFood(foodLog.logId)
+            _event.send(LogEvent.Message("Sevimlilardan olib tashlandi"))
+        }
+    }
+
+    fun logSavedFood(foodLog: FoodLog) {
+        viewModelScope.launch {
+            _loadingFoodIds.update { it + foodLog.logId }
+            val log = foodLog.copy(
+                logId = "",
+                timestamp = System.currentTimeMillis(),
+                mealType = state.value.meal
+            )
+            kotlinx.coroutines.delay(1000)
+            FoodLogRepository.add(null, log, state.value.date)
+            _loadingFoodIds.update { it - foodLog.logId }
+            _event.send(LogEvent.Message("Qo'shildi!"))
+        }
     }
 
     fun updateDescription(text: String?) {
@@ -186,6 +258,31 @@ class LogFoodViewModel() : ViewModel() {
                 result.photoUrl = state.image?.toString()
                 result.mealType = state.meal
                 FoodAnalyzer.updateCachedResult(result.id, state.image?.toString(), state.meal)
+                
+                if (result.result?.isAmbiguous == true) {
+                    _event.send(LogEvent.ClarificationNeeded(result))
+                } else {
+                    _event.send(LogEvent.Analyzed(result))
+                }
+            } else {
+                _event.send(LogEvent.Error.AnalyzeError)
+            }
+        }
+    }
+
+    fun analyzeAudio(
+        audioUri: Uri
+    ) {
+        analyzeJob?.cancel()
+        analyzeJob = viewModelScope.launch {
+            _state.update { it.copy(isAnalyzing = true) }
+            val result = FoodAnalyzer.analyzeAudio(audioUri, state.value.meal)
+            
+            _state.update { it.copy(result = result, isAnalyzing = false) }
+            
+            if (result != null) {
+                result.mealType = state.value.meal
+                FoodAnalyzer.updateCachedResult(result.id, null, state.value.meal)
                 
                 if (result.result?.isAmbiguous == true) {
                     _event.send(LogEvent.ClarificationNeeded(result))

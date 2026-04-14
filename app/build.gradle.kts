@@ -18,23 +18,20 @@ android {
             excludes += "META-INF/INDEX.LIST"
         }
     }
-
     defaultConfig {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 57
-        versionName = "3.1"
+        versionCode = 67
+        versionName = "3.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    
     buildTypes {
-
         debug {
             isDebuggable = true
         }
-
         release {
             isDebuggable = false
             isMinifyEnabled = false
@@ -116,10 +113,12 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-messaging")
 
+
     implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
 
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation(libs.google.firebase.ai)
 
+    implementation("com.facebook.android:facebook-android-sdk:latest.release")
 }

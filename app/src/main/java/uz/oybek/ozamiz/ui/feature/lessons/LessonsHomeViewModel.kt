@@ -10,6 +10,9 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.lessons.LessonRepository
 import uz.oybek.ozamiz.data.lessons.model.Section
 import uz.oybek.ozamiz.data.lessons.model.Topic
+import uz.oybek.ozamiz.data.user.UserRepository
+
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 /**
  * ViewModel for user-facing lessons home
@@ -57,6 +60,8 @@ class LessonsHomeViewModel : ViewModel() {
         val items = mutableListOf<LessonListItem>()
         var isFirstGlobalTopic = true
         var isPreviousTopicCompleted = true 
+        var globalTopicCount = 0
+        val isPremiumUser = UserRepository.user.isPremium()
 
         sections.sortedBy { it.order }.forEach { section ->
             items.add(LessonListItem.SectionHeader(section))
@@ -70,12 +75,16 @@ class LessonsHomeViewModel : ViewModel() {
                     // Unlocked if: It's the first topic OR it's already completed OR the previous one is completed
                     val isLocked = !isFirstGlobalTopic && !isCompleted && !isPreviousTopicCompleted
                     
+                    val isPremiumRequired = !isPremiumUser && (globalTopicCount >= 6 || topic.title.contains("Yashirin sabablar", ignoreCase = true))
+
                     items.add(LessonListItem.TopicItem(
                         topic = topic,
                         isCompleted = isCompleted,
-                        isLocked = isLocked
+                        isLocked = isLocked,
+                        isPremiumRequired = isPremiumRequired
                     ))
                     
+                    globalTopicCount++
                     isFirstGlobalTopic = false
                     isPreviousTopicCompleted = isCompleted
                 }
@@ -120,6 +129,7 @@ sealed class LessonListItem {
     data class TopicItem(
         val topic: Topic,
         val isCompleted: Boolean = false,
-        val isLocked: Boolean = false
+        val isLocked: Boolean = false,
+        val isPremiumRequired: Boolean = false
     ) : LessonListItem()
 }

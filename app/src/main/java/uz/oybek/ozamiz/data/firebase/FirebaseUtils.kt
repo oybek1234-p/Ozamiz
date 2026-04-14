@@ -11,6 +11,7 @@ fun <T> DataSnapshot.getValueSafe(type: Class<T>, default: T? = null): T? {
     }
 }
 
-val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+val currentUserId: String
+    get() = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
 fun generateKey() = System.currentTimeMillis().toString()

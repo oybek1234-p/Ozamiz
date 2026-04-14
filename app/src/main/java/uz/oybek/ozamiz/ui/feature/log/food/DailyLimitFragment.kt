@@ -52,85 +52,28 @@ class DailyLimitFragment : BottomSheetDialogFragment() {
     private fun setupContent(type: String) {
         when (type) {
             TYPE_CALORIES -> {
-                binding.textTitle.text = "Bugun yetarlicha ovqatlandingiz"
-                binding.textExplanation.text = "Tanangiz kerakli quvvatni oldi. Endi u yog'larni eritishga o'tadi"
+                binding.textTitle.isVisible = true
+                binding.textTitle.text = "Tanangiz kerakli quvvatni oldi.\nEndi u yog'larni eritishga o'tadi"
 
                 binding.card1.isVisible = true
                 binding.textEmoji1.text = "🥤"
-                binding.textAdvice1.text = "Suv yoki qora choy iching. Ochlikni yengadi va moddalar almashinuvini tezlashtiradi."
+                binding.textAdvice1.text = "Suv yoki choy iching"
 
                 binding.card2.isVisible = true
                 binding.textEmoji2.text = "🥗"
-                binding.textAdvice2.text = "Bodring, pomidor yoki ko'katlar — kaloriyasi yo'q, lekin qorinni to'q tutadi."
+                binding.textAdvice2.text = "Bodring, pomidor yoki ko'katlar"
 
                 binding.card3.isVisible = true
                 binding.textEmoji3.text = "🥚"
-                binding.textAdvice3.text = "1-2 ta qaynatilgan tuxum oqi. Sof oqsil mushaklar uchun ayni muddao."
+                binding.textAdvice3.text = "Qaynatilgan tuxum oqi"
 
                 binding.card4.isVisible = true
                 binding.textEmoji4.text = "🥛"
-                binding.textAdvice4.text = "Bir stakan yog'siz qatiq yoki kefir. Uyqudan oldin oshqozonga yengillik beradi."
+                binding.textAdvice4.text = "Yog'siz qatiq yoki kefir"
 
                 binding.card5.isVisible = true
                 binding.textEmoji5.text = "🥣"
-                binding.textAdvice5.text = "Suyuq sabzavotli sho'rva. Qorinni isitadi va tinchlantiradi."
-            }
-            TYPE_PROTEIN -> {
-                binding.textTitle.text = "Oqsil miqdori yetarli! 💪"
-                binding.textExplanation.text = "Xavotirga o'rin yo'q! Ortiqcha oqsil yog'ga aylanmaydi, balki mushaklarni tiklashga yordam beradi."
-
-                binding.card1.isVisible = true
-                binding.textEmoji1.text = "🍶"
-                binding.textAdvice1.text = "Ko'proq suv iching. Bu buyraklarga ortiqcha oqsilni hazm qilishda yordam beradi."
-
-                binding.card2.isVisible = true
-                binding.textEmoji2.text = "🚫"
-                binding.textAdvice2.text = "Buguncha go'sht, tuxum va pishloqni to'xtatib turamiz."
-
-                binding.card3.isVisible = true
-                binding.textEmoji3.text = "ℹ️"
-                binding.textAdvice3.text = "Ertadan yana odatiy rejimda davom etamiz!"
-
-                binding.card4.isVisible = false
-                binding.card5.isVisible = false
-            }
-            TYPE_FAT -> {
-                binding.textTitle.text = "Yog' miqdori biroz oshdi"
-                binding.textExplanation.text = "Foydali yog'lar gormonlar uchun muhim. Shunchaki ertaga me'yorni saqlashga harakat qilamiz."
-
-                binding.card1.isVisible = true
-                binding.textEmoji1.text = "🍵"
-                binding.textAdvice1.text = "Iliq limonli suv yoki ko'k choy iching. Bu jigarga yengillik beradi."
-
-                binding.card2.isVisible = true
-                binding.textEmoji2.text = "🚫"
-                binding.textAdvice2.text = "Bugun qovurilgan ovqatlar, sariyog' va yong'oqlarni chetga surib turamiz."
-
-                binding.card3.isVisible = true
-                binding.textEmoji3.text = "ℹ️"
-                binding.textAdvice3.text = "Sog'lom yog'lar kerak, faqat me'yorida bo'lgani yaxshi."
-
-                binding.card4.isVisible = false
-                binding.card5.isVisible = false
-            }
-            TYPE_CARBS -> {
-                binding.textTitle.text = "Uglevodlar biroz ko'paydi"
-                binding.textExplanation.text = "Bu energiya darhol yog'ga aylanmaydi, aksincha, ertangi kun uchun ajoyib zaxira quvvat bo'ladi."
-
-                binding.card1.isVisible = true
-                binding.textEmoji1.text = "🚶"
-                binding.textAdvice1.text = "20 daqiqa piyoda yuring. Bu qondagi qand miqdorini tushirib, energiyani sarflaydi."
-
-                binding.card2.isVisible = true
-                binding.textEmoji2.text = "🚫"
-                binding.textAdvice2.text = "Buguncha non, xamir ovqat va shirinliklarni to'xtatib turamiz."
-
-                binding.card3.isVisible = true
-                binding.textEmoji3.text = "ℹ️"
-                binding.textAdvice3.text = "Ertaga bu zaxira energiyani mashg'ulotlarda ishlatib yuboramiz!"
-
-                binding.card4.isVisible = false
-                binding.card5.isVisible = false
+                binding.textAdvice5.text = "Suyuq sabzavotli sho'rva"
             }
         }
     }
@@ -145,9 +88,6 @@ class DailyLimitFragment : BottomSheetDialogFragment() {
         const val ARG_TYPE = "arg_type"
 
         const val TYPE_CALORIES = "calories"
-        const val TYPE_PROTEIN = "protein"
-        const val TYPE_FAT = "fat"
-        const val TYPE_CARBS = "carbs"
 
         fun newInstance(type: String = TYPE_CALORIES): DailyLimitFragment {
             return DailyLimitFragment().apply {

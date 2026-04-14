@@ -22,10 +22,7 @@
         android:icon="@drawable/food_ic"
         />
 
-    <item android:id="@+id/communityFragment"
-        android:title="Boshqalar"
-        android:icon="@drawable/people_ic"
-        />
+
 
     <item
         android:icon="@drawable/profile_ic"

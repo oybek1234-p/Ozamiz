@@ -27,12 +27,14 @@ data class AnalyzeResultState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val currentStreak: Int = 0,
-    val totalFatBurnedGram: Int = 0,
-    val totalDaysTracked: Int = 0
+
+    val isSaved: Boolean = false,
+    val isRecallMode: Boolean = false
 )
 
 sealed interface AnalyzeResultEvent {
     object Saved : AnalyzeResultEvent
+    data class Failure(val message: String) : AnalyzeResultEvent
     data class LimitExceeded(val exceededTypes: List<String>) : AnalyzeResultEvent
     data class PromptShare(val name: String, val photoUrl: String, val calories: Int, val exceededTypes: List<String>? = null) : AnalyzeResultEvent
 }
@@ -47,6 +49,7 @@ class AnalyzeResultViewModel : ViewModel() {
 
     private var loadedLogDate: java.util.Date? = null
     private var loadedLogId: String? = null
+    private var loadedUserId: String? = null
 
     private var uploadJob: kotlinx.coroutines.Deferred<String?>? = null
 
@@ -71,12 +74,26 @@ class AnalyzeResultViewModel : ViewModel() {
             )
         }
         startUploadIfNeeded(result?.photoUrl)
-        loadJourneyProgress()
+
+        checkIfSaved()
+    }
+
+    fun setRecallResult(result: FoodAnalysis) {
+        liveResult.update {
+            it.copy(
+                result = result,
+                isRecallMode = true
+            )
+        }
+        startUploadIfNeeded(result.photoUrl)
+
+        checkIfSaved()
     }
 
     fun loadLog(logId: String, date: java.util.Date, userId: String? = null) {
         loadedLogDate = date
         loadedLogId = logId
+        loadedUserId = userId
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
             val streak = uz.oybek.ozamiz.data.user.UserRepository.user?.streakInfo?.currentStreak ?: 0
@@ -99,26 +116,77 @@ class AnalyzeResultViewModel : ViewModel() {
                     ),
                     mealType = log.mealType
                 )
-                liveResult.update { it.copy(result = analysis, isLoading = false, currentStreak = streak) }
+                liveResult.update { 
+                    it.copy(
+                        result = analysis, 
+                        isLoading = false, 
+                        currentStreak = streak,
+                        isRecallMode = true
+                    ) 
+                }
             } else {
-                liveResult.update { it.copy(isError = true, isLoading = false) }
+                liveResult.update { it.copy(isError = true, isLoading = false, isRecallMode = false) }
             }
-            loadJourneyProgress()
+
+            checkIfSaved()
         }
     }
 
-    fun deleteLog(onComplete: () -> Unit) {
+    private fun checkIfSaved() {
+        val currentResult = liveResult.value.result ?: return
+        viewModelScope.launch {
+            val isSaved = uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(currentResult.result?.name ?: "")
+            liveResult.update { it.copy(isSaved = isSaved) }
+        }
+    }
+
+    fun toggleFavorite() {
+        if (liveResult.value.isLoading) return
+        val currentResult = liveResult.value.result ?: return
+        val foodLog = currentResult.toFoodLog()
+        viewModelScope.launch {
+            val isSaved = uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(foodLog.description)
+            if (isSaved) {
+                uz.oybek.ozamiz.data.food.SavedFoodRepository.removeSavedFood(foodLog.description)
+                _event.send(AnalyzeResultEvent.Failure("Saqlanganlardan olib tashlandi"))
+            } else {
+                uz.oybek.ozamiz.data.food.SavedFoodRepository.saveFood(foodLog)
+                _event.send(AnalyzeResultEvent.Failure("Saqlanganlarga qo'shildi"))
+            }
+            checkIfSaved()
+        }
+    }
+
+    fun reLog() {
+        if (liveResult.value.isLoading) return
+        val currentResult = liveResult.value.result ?: return
+        val log = currentResult.toFoodLog().copy(
+            logId = "",
+            timestamp = System.currentTimeMillis()
+        )
+        viewModelScope.launch {
+            liveResult.update { it.copy(isLoading = true) }
+            FoodLogRepository.add(currentResult.photoUrl, log, java.util.Date())
+            liveResult.update { it.copy(isLoading = false) }
+            _event.send(AnalyzeResultEvent.Saved)
+        }
+    }
+
+    fun deleteLog(onComplete: (Boolean) -> Unit) {
+        if (liveResult.value.isLoading) return
         val logId = loadedLogId ?: return
         val date = loadedLogDate ?: return
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
-            FoodLogRepository.delete(logId, date)
-            onComplete()
+            val success = FoodLogRepository.delete(logId, date, loadedUserId)
+            liveResult.update { it.copy(isLoading = false) }
+            onComplete(success)
         }
     }
 
 
     fun updateLog(newDescription: String) {
+        if (liveResult.value.isLoading) return
         val currentResult = liveResult.value.result ?: return
         val logId = loadedLogId
         val date = loadedLogDate
@@ -150,7 +218,7 @@ class AnalyzeResultViewModel : ViewModel() {
                 if (logId != null && date != null) {
                     val updatedLog = analysis.toFoodLog()
                     updatedLog.logId = logId
-                    FoodLogRepository.update(logId, updatedLog, date)
+                    FoodLogRepository.update(logId, updatedLog, date, loadedUserId)
                 }
             } else {
                 liveResult.update { it.copy(isLoading = false, isError = true) }
@@ -159,6 +227,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun onSaveClick() {
+        if (liveResult.value.isLoading) return
         val result = liveResult.value.result ?: return
         val photoUrl = result.photoUrl
         val score = result.result?.healthScore ?: 0
@@ -167,7 +236,9 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun saveFood(shouldShare: Boolean) {
+        if (liveResult.value.isLoading) return
         val result = liveResult.value.result ?: return
+        liveResult.update { it.copy(isLoading = true) }
         CoroutineScope(Dispatchers.IO).launch {
             // 1. Upload image if needed
             val finalUrl = uploadJob?.await() ?: result.photoUrl
@@ -237,21 +308,8 @@ class AnalyzeResultViewModel : ViewModel() {
 
                 val exceededTypes = mutableListOf<String>()
                 if (summary != null && targetCalories > 0) {
-                    val targetProtein = (targetCalories * 0.30) / 4.0
-                    val targetFat = (targetCalories * 0.25) / 9.0
-                    val targetCarbs = (targetCalories * 0.45) / 4.0
-
                     if (summary.consumedCalories > targetCalories) {
                         exceededTypes.add(DailyLimitFragment.TYPE_CALORIES)
-                    }
-                    if (summary.consumedProtein > targetProtein) {
-                        exceededTypes.add(DailyLimitFragment.TYPE_PROTEIN)
-                    }
-                    if (summary.consumedFat > targetFat) {
-                        exceededTypes.add(DailyLimitFragment.TYPE_FAT)
-                    }
-                    if (summary.consumedCarbs > targetCarbs) {
-                        exceededTypes.add(DailyLimitFragment.TYPE_CARBS)
                     }
                 }
 
@@ -262,15 +320,18 @@ class AnalyzeResultViewModel : ViewModel() {
                     )
                     _event.send(AnalyzeResultEvent.LimitExceeded(exceededTypes))
                 } else {
+                    liveResult.update { it.copy(isLoading = false) }
                     _event.send(AnalyzeResultEvent.Saved)
                 }
             } else {
+                liveResult.update { it.copy(isLoading = false) }
                 _event.send(AnalyzeResultEvent.Saved)
             }
         }
     }
 
     fun submitAnswer(answer: String) {
+        if (liveResult.value.isLoading) return
         val currentAnalysis = liveResult.value.result ?: return
         val id = currentAnalysis.id
 
@@ -352,50 +413,5 @@ class AnalyzeResultViewModel : ViewModel() {
         }
     }
 
-    private fun loadJourneyProgress() {
-        viewModelScope.launch {
-            try {
-                val uid = com.google.firebase.Firebase.auth.currentUser?.uid ?: return@launch
-                val user = uz.oybek.ozamiz.data.user.UserRepository.user ?: return@launch
-                val targetCalories = user.targetCalories
-                if (targetCalories <= 0) return@launch
 
-                var totalFatBurned = 0
-                var daysTracked = 0
-
-                val calendar = java.util.Calendar.getInstance()
-                for (i in 1..7) {
-                    calendar.time = java.util.Date()
-                    calendar.add(java.util.Calendar.DAY_OF_YEAR, -i)
-                    val dateStr = uz.oybek.ozamiz.data.utils.DateUtils.getFormattedDateString(
-                        calendar.time,
-                        "yyyy-MM-dd"
-                    )
-
-                    val summaryRef =
-                        uz.oybek.ozamiz.data.firebase.FirebasePaths.dailySummaryReference(uid, dateStr)
-                    val snapshot = summaryRef.get().await()
-                    val summary =
-                        snapshot.getValue(uz.oybek.ozamiz.data.logs.model.DailySummary::class.java)
-
-                    if (summary != null && summary.consumedCalories > 0) {
-                        val deficit = targetCalories - summary.consumedCalories
-                        if (deficit > 0) {
-                            totalFatBurned += (deficit / 7.7).toInt()
-                        }
-                        daysTracked++
-                    }
-                }
-
-                liveResult.update {
-                    it.copy(
-                        totalFatBurnedGram = totalFatBurned,
-                        totalDaysTracked = daysTracked
-                    )
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-}
+}

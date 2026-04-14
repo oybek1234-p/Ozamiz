@@ -50,10 +50,10 @@ class FoodSelectionBottomSheet(
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_dropdown_item_1line,
-            servings.map { it.label }
+            servings.map { it.description }
         )
         binding.autoCompleteServingSize.setAdapter(adapter)
-        binding.autoCompleteServingSize.setText(selectedServingSize?.label, false)
+        binding.autoCompleteServingSize.setText(selectedServingSize?.description, false)
 
         binding.autoCompleteServingSize.setOnItemClickListener { _, _, position, _ ->
             selectedServingSize = servings[position]
@@ -76,7 +76,7 @@ class FoodSelectionBottomSheet(
 
     private fun updateNutrition() {
         val serving = selectedServingSize ?: return
-        val weight = serving.weight * quantity
+        val weight = serving.grams * quantity
         
         val calories = (foodItem.caloriesPer100g * weight / 100).roundToInt()
         val carbs = (foodItem.carbsPer100g * weight / 100)
@@ -111,7 +111,7 @@ class FoodSelectionBottomSheet(
 
     private fun createFoodLog(): FoodLog {
         val serving = selectedServingSize!!
-        val weight = serving.weight * quantity
+        val weight = serving.grams * quantity
         
         val calories = (foodItem.caloriesPer100g * weight / 100).roundToInt()
         val carbs = (foodItem.carbsPer100g * weight / 100)
@@ -119,7 +119,7 @@ class FoodSelectionBottomSheet(
         val fat = (foodItem.fatPer100g * weight / 100)
 
         return FoodLog(
-            description = "${foodItem.name} ($quantity ${serving.label})",
+            description = "${foodItem.name} ($quantity ${serving.description})",
             calories = calories,
             protein = protein,
             fat = fat,

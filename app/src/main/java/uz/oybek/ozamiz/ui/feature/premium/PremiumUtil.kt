@@ -33,10 +33,19 @@ fun User.premiumExpired(): Boolean {
     return (currentDate - premiumGotDate) > thirtyDaysInMillis
 }
 
+fun User.isPremium(): Boolean {
+    return premium && !premiumExpired()
+}
+
 fun User.isPremiumOrTrial(): Boolean {
-    if (premium && !premiumExpired()) return true
-    val streak = streakInfo?.currentStreak ?: 0
-    return streak < 2
+    if (isPremium()) return true
+    
+    val regDate = registerDate ?: return true
+    val twoDaysInMillis = 2L * 24 * 60 * 60 * 1000
+    val currentTime = System.currentTimeMillis()
+    val diff = currentTime - regDate.time
+    
+    return diff < twoDaysInMillis
 }
 
 fun User.getPremiumExpireDate(): String {

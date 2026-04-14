@@ -38,6 +38,8 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+
+
                 <!-- Add Weight Card (Always Visible) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardAddWeight"

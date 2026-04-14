@@ -13,9 +13,6 @@ import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
 import uz.oybek.ozamiz.data.user.local.user
 
-/**
- * Firebase Gemini orqali ovqatni tahlil qiladi
- */
 object FoodAnalyzer {
 
     private val gson = Gson()
@@ -49,13 +46,6 @@ object FoodAnalyzer {
         Log.d("FoodAnalyzer", "🔍 Starting analysis with history size: ${history.size}")
         
         runCatching {
-            // Using generateContent with history is manually managing chat
-            // Essentially we pass the whole conversation as input or use startChat if we want stateful
-            // But since we want to be stateless in repository, simple generation with context is often sufficient
-            // However, Gemini API 'generateContent' takes a single Content.
-            // For chat, we should use model.startChat(history).sendMessage(lastMessage)
-            
-            // Let's assume the last message is the new input, and previous are history.
             val correctHistory = history.dropLast(1)
             val lastMessage = history.last()
             
@@ -69,23 +59,17 @@ object FoodAnalyzer {
             
             response.text?.parseResult()?.let { result ->
                 Log.d("FoodAnalyzer", "✅ Parsed result: calories=${result.calories}, isAmbiguous=${result.isAmbiguous}")
-                // Make sure to preserve ID if possible, or just generate new hash
                 FoodAnalysis(
                     id = result.hashCode(),
-                    photoUrl = null, // Set by ViewModel
+                    photoUrl = null,
                     result = result,
-                    mealType = "" // Set by ViewModel
+                    mealType = ""
                 ).also { 
                     cache[it.id] = it
-                    // Append the model response to history and save
-                    // We need to reconstruct the model content because 'response' is a GenerateContentResponse
-                    // But for the next turn, we need the model's reply in the history.
-                    // The easiest way is to add the generated text as a model part.
                     val modelContent = com.google.firebase.ai.type.content(role = "model") {
                         text(response.text ?: "")
                     }
                     conversationCache[it.id] = history + modelContent
-                    Log.d("FoodAnalyzer", "💾 Cached result with id: ${it.id}")
                 }
             } ?: run {
                 Log.e("FoodAnalyzer", "❌ Failed to parse response text: ${response.text}")
@@ -97,6 +81,21 @@ object FoodAnalyzer {
             Log.e("FoodAnalyzer", "❌ Stack trace: ${it.stackTraceToString()}")
         }
             .getOrNull()
+    }
+
+    suspend fun analyzeAudio(
+        audioUri: Uri,
+        meal: String
+    ): FoodAnalysis? = withContext(Dispatchers.IO) {
+        val audioBytes = audioUri.toBytes() ?: return@withContext null
+        val prompt = FoodAnalyzerConfig.buildFoodPrompt("", meal, user.gender)
+        
+        val content = content {
+            inlineData(audioBytes, "audio/ogg")
+            text(prompt)
+        }
+
+        analyze(listOf(content))
     }
 
     suspend fun createInitialContent(

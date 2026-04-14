@@ -10,10 +10,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.setFragmentResultListener
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentLessonsHomeBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 
 /**
  * User-facing lessons home fragment
@@ -39,6 +41,7 @@ class LessonsHomeFragment : BaseFragment<FragmentLessonsHomeBinding>() {
         setupRecyclerView(bind)
         setupSwipeRefresh(bind)
         observeViewModel(bind)
+        setupPremiumListener()
         
         viewModel.loadData(requireContext())
     }
@@ -100,6 +103,9 @@ class LessonsHomeFragment : BaseFragment<FragmentLessonsHomeBinding>() {
 
     private fun handleTopicClick(topicItem: LessonListItem.TopicItem) {
         when {
+            topicItem.isPremiumRequired -> {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+            }
             topicItem.isLocked -> {
                 Toast.makeText(requireContext(), "Avvalgi darsni tugating", Toast.LENGTH_SHORT).show()
             }
@@ -109,6 +115,15 @@ class LessonsHomeFragment : BaseFragment<FragmentLessonsHomeBinding>() {
                     putString("topicTitle", topicItem.topic.title)
                 }
                 navigate(R.id.action_lessonsHomeFragment_to_topicViewerFragment, args)
+            }
+        }
+    }
+
+    private fun setupPremiumListener() {
+        setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
+            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
+            if (result == "go_to_payment") {
+                findNavController().navigate(R.id.paymentGetCheckFragment)
             }
         }
     }

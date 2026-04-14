@@ -47,7 +47,7 @@ data class FoodAnalysisResult(
     val healthScore: Int? = null,
     val aiInsight: String? = null,
     val pros: List<String>? = null,
-    val cons: List<String>? = null,
+    val advice: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
     
     // For interactive flow

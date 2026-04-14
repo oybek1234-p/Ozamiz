@@ -9,12 +9,14 @@
     android:padding="24dp">
 
         <TextView
+            android:id="@+id/text_achievement_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="72sp"
             android:text="🥇" />
 
         <TextView
+            android:id="@+id/text_achievement_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -25,11 +27,12 @@
             android:textAlignment="center" />
 
         <TextView
+            android:id="@+id/text_achievement_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/roboto_regular"
-            android:text="Siz bugungi rejalashtirilgan kaloriya sarfining 70% idan ko'prog'ini yoqishga muvaffaq bo'ldingiz! Oldinga davom eting!"
+            android:text="Siz bugungi rejalashtirilgan kaloriya sarfining 70% idan ko'prog'ini yoqdingiz!"
             android:textColor="?colorOnSurfaceVariant"
             android:textSize="14sp"
             android:textAlignment="center" />

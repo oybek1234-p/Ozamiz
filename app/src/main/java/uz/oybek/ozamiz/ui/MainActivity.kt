@@ -302,4 +302,19 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    fun requestAppReview() {
+        try {
+            val manager = com.google.android.play.core.review.ReviewManagerFactory.create(this)
+            val request = manager.requestReviewFlow()
+            request.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val reviewInfo = task.result
+                    manager.launchReviewFlow(this, reviewInfo)
+                }
+            }
+        } catch (e: Exception) {
+            handleException(e)
+        }
+    }
 }

@@ -11,10 +11,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FragmentMenuListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
 
@@ -36,6 +41,7 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
         setupRecyclerViews(bind)
         setupListeners(bind)
         observeState(bind)
+        setupPremiumListener()
     }
 
     private fun setupRecyclerViews(bind: FragmentMenuListBinding) {
@@ -54,9 +60,16 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
         bind.recyclerSecondaryCategories.adapter = secondaryFilterAdapter
 
         menuAdapter = MenuAdapter { menu ->
-            navigate(R.id.menuDetailFragment, Bundle().apply {
-                putParcelable("menu", menu)
-            })
+            val isPremiumUser = UserRepository.user.isPremium()
+            val position = menuAdapter.currentList.indexOf(menu)
+            
+            if (!isPremiumUser && position >= 6) {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+            } else {
+                navigate(R.id.menuDetailFragment, Bundle().apply {
+                    putParcelable("menu", menu)
+                })
+            }
         }
         bind.recyclerMenus.layoutManager = GridLayoutManager(requireContext(), 2)
         bind.recyclerMenus.adapter = menuAdapter
@@ -91,6 +104,14 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
 
                     menuAdapter.submitList(state.menus)
                 }
+            }
+        }
+    }
+    private fun setupPremiumListener() {
+        setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
+            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
+            if (result == "go_to_payment") {
+                findNavController().navigate(R.id.paymentGetCheckFragment)
             }
         }
     }

@@ -11,7 +11,7 @@ import uz.oybek.ozamiz.databinding.ItemFoodSearchResultBinding
 import kotlin.math.roundToInt
 
 class FoodSearchAdapter(
-    private val onAddClick: (FoodItem) -> Unit,
+    private val onAddClick: (FoodItem, com.google.android.material.button.MaterialButton, android.view.View) -> Unit,
     private val onItemClick: (FoodItem) -> Unit
 ) : ListAdapter<FoodItem, FoodSearchAdapter.FoodViewHolder>(FoodDiffCallback()) {
 
@@ -34,12 +34,12 @@ class FoodSearchAdapter(
             
             val defaultServing = item.servingSizes.firstOrNull()
             binding.textViewFoodServing.text = if (defaultServing != null) {
-                "${defaultServing.label} (${defaultServing.weight.roundToInt()} g)"
+                "${defaultServing.description} (${defaultServing.grams.roundToInt()} g)"
             } else {
                 "100 g"
             }
             
-            val weight = defaultServing?.weight ?: 100.0
+            val weight = defaultServing?.grams ?: 100.0
             val calories = (item.caloriesPer100g * weight / 100).roundToInt()
             val carbs = (item.carbsPer100g * weight / 100)
             val protein = (item.proteinPer100g * weight / 100)
@@ -52,7 +52,7 @@ class FoodSearchAdapter(
 
             binding.imageViewVerified.isVisible = item.isVerified
 
-            binding.buttonAddFood.setOnClickListener { onAddClick(item) }
+            binding.buttonAddFood.setOnClickListener { onAddClick(item, binding.buttonAddFood, binding.progressAddFood) }
             binding.root.setOnClickListener { onItemClick(item) }
         }
     }

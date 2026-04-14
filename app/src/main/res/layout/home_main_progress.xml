@@ -124,6 +124,7 @@
               >
                 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_limit_icon"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
                     android:layout_gravity="center"
@@ -141,14 +142,14 @@
 
                 <TextView
                     android:id="@+id/text_limit_title"
-                    style="@style/TextAppearance.Material3.HeadlineSmall"
+                    style="@style/TextAppearance.Material3.TitleLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:fontFamily="@font/roboto_bold"
                     android:gravity="center"
                     android:textColor="?attr/colorOnSurface"
-                    tools:text="Bugunga shusi kifoya" />
+                    tools:text="Yog' yoqilyapti" />
 
                 <TextView
                     android:id="@+id/text_limit_subtitle"
@@ -167,7 +168,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
                     android:layout_marginTop="24dp"
-                    android:text="Nima yeyman?"
+                    android:text="Batafsil"
                     app:cornerRadius="16dp"
                     android:textSize="16sp" />
             </LinearLayout>

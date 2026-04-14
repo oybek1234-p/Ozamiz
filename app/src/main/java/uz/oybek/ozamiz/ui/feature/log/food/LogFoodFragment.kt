@@ -21,9 +21,12 @@ import kotlinx.coroutines.flow.collectLatest
 
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
+import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
+import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FoodAnalyzingLoaderBinding
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
@@ -81,6 +84,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         setupUI(bind)
         observeData(bind)
         initVoiceRecorder()
+        initTextInput()
         setMeal(meal)
         viewModel.updateMeal(meal)
         initTodayLogs(logDate)
@@ -113,14 +117,19 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         setFragmentResultListener(
             VoiceRecorderBottomSheet.REQUEST_KEY
         ) { _, bundle ->
-            bundle.getString(VoiceRecorderBottomSheet.RESULT_TEXT)
-                ?.let {
-                    val currentText = viewModel.state.value.description
-                    viewModel.updateDescription(
-                        text = "$currentText $it".trim()
-                    )
-                    viewModel.analyze()
+            bundle.getString(VoiceRecorderBottomSheet.RESULT_URI)
+                ?.let { uriString ->
+                    viewModel.analyzeAudio(Uri.parse(uriString))
                 }
+        }
+    }
+
+    private fun initTextInput() {
+        setFragmentResultListener(TextInputBottomSheet.REQUEST_KEY) { _, bundle ->
+            bundle.getString(TextInputBottomSheet.RESULT_TEXT)?.let { text ->
+                viewModel.updateDescription(text)
+                viewModel.analyze()
+            }
         }
     }
 
@@ -129,7 +138,8 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             toolbarLogFood.setNavigationOnClickListener {
                 closeFragment()
             }
-            historyButton.setOnClickListener {
+            toolbarLogFood.title = "Ovqat kiritish"
+            historyButton.setOnSafeClickListener {
                 arguments?.let {
                     val argument = getArgument(it)
                     navigate(
@@ -154,73 +164,78 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     chipGroupMealType.addView(this)
                 }
             }
-            inputQuickDescription.setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
-                    hideSoftInput(requireActivity())
-                    viewModel.analyze()
-                    true
-                } else false
-            }
-            inputQuickDescription.addTextChangedListener {
-                viewModel.updateDescription(text = it.toString())
-            }
-            buttonAnalyzeAndSave.setOnClickListener {
-                hideSoftInput(requireActivity())
-                viewModel.analyze()
-            }
-            buttonQuickVoice.setOnClickListener {
+            buttonQuickVoice.setOnSafeClickListener {
                 checkPremium { findNavController().navigate(R.id.voiceInputBottomSheet) }
             }
-            buttonQuickCamera.setOnClickListener {
+            buttonQuickCamera.setOnSafeClickListener {
                 checkPremium { checkAndLaunchCamera() }
             }
-            buttonShowTextInput.setOnClickListener {
-                cardTextInput.isVisible = !cardTextInput.isVisible
-                if (cardTextInput.isVisible) {
-                    inputQuickDescription.requestFocus()
-                    val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-                    imm.showSoftInput(inputQuickDescription, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
-                }
+            buttonShowTextInput.setOnSafeClickListener {
+                checkPremium { TextInputBottomSheet().show(parentFragmentManager, TextInputBottomSheet.TAG) }
             }
-            
-            (layoutInflater.inflate(
-                R.layout.item_meal_type_selectable,
-                chipGroupSuggestions,
-                false
-            ) as Chip).apply {
-                text = "🔍 Qidiruv"
-                setOnClickListener {
-                    findNavController().navigate(
-                        R.id.action_logFoodFragment_to_searchFoodFragment,
-                        Bundle().apply {
-                            putString("mealType", viewModel.state.value.meal)
-                            putLong("timestamp", logDate.time)
+            buttonSearchList.setOnSafeClickListener {
+                findNavController().navigate(
+                    R.id.action_logFoodFragment_to_searchFoodFragment,
+                    Bundle().apply {
+                        putString("mealType", viewModel.state.value.meal)
+                        putLong("timestamp", logDate.time)
+                    }
+                )
+            }
+            buttonGoToFavorites.setOnSafeClickListener {
+                findNavController().navigate(R.id.action_logFoodFragment_to_savedFoodsFragment)
+            }
+
+            // Populate suggestions
+            chipGroupSuggestions.removeAllViews()
+            FoodDatabase.allFoods.take(10).forEach { food ->
+
+                val chip = layoutInflater.inflate(R.layout.item_suggestion_chip, chipGroupSuggestions, false) as Chip
+                chip.text = food.name
+                chip.setOnClickListener {
+                    FoodSelectionBottomSheet(
+                        foodItem = food,
+                        mealType = viewModel.state.value.meal,
+                        onLogAdded = { log ->
+                            viewModel.logFood(log, logDate)
+                            showToast("Qo'shildi!")
                         }
-                    )
+                    ).show(parentFragmentManager, FoodSelectionBottomSheet.TAG)
                 }
-                chipGroupSuggestions.addView(this)
+                chipGroupSuggestions.addView(chip)
             }
         }
 
+
+
     private fun initTodayLogs(date: Date) {
-        val adapter = uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter { foodLog ->
-            navigate(
-                R.id.calorieResultBottomSheet,
-                Bundle().apply {
-                    putString("logId", foodLog.logId)
-                    putLong("timestamp", date.time)
-                }
-            )
-        }
+        val adapter = uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter(
+            onItemClick = { foodLog ->
+                navigate(
+                    R.id.calorieResultBottomSheet,
+                    Bundle().apply {
+                        putString("logId", foodLog.logId)
+                        putLong("timestamp", date.time)
+                    }
+                )
+            }
+        )
         binding.recyclerRecentLogs.adapter = adapter
-        
+
         viewLifecycleOwner.lifecycleScope.launch {
-            FoodLogRepository.getLatestLogs(date, 2)
-                .collectLatest { logs ->
-                    val hasLogs = logs.isNotEmpty()
-                    binding.layoutRecentHistory.isVisible = hasLogs
-                    adapter.submitList(logs)
+            launch {
+                FoodLogRepository.getLatestLogs(date, 2)
+                    .collectLatest { logs ->
+                        val hasLogs = logs.isNotEmpty()
+                        binding.layoutRecentHistory.isVisible = hasLogs
+                        adapter.submitList(logs)
+                    }
+            }
+            launch {
+                viewModel.savedFoodIds.collectLatest { ids ->
+                    adapter.setSavedFoodIds(ids)
                 }
+            }
         }
     }
 
@@ -281,9 +296,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         viewLifecycleOwner.lifecycleScope.launch {
             launch {
                 viewModel.state.collectLatest { state ->
-                    if (state.description != bind.inputQuickDescription.text.toString()) {
-                        bind.inputQuickDescription.setText(state.description)
-                    }
                     showLoading(state)
                 }
             }
@@ -310,6 +322,9 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         }
                         is LogEvent.Analyzed -> {
                             navigateToResult(it.data)
+                        }
+                        is LogEvent.Message -> {
+                            showToast(it.text)
                         }
                     }
                 }

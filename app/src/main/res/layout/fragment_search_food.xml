@@ -29,7 +29,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         app:hintEnabled="false"
-        app:startIconDrawable="@drawable/search_ic"
+        app:startIconDrawable="@drawable/ic_search"
         app:endIconMode="clear_text"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         app:boxCornerRadiusBottomEnd="16dp"
@@ -74,7 +74,7 @@
             <ImageView
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:src="@drawable/search_ic"
+                android:src="@drawable/ic_search"
                 android:alpha="0.2"
                 app:tint="?attr/colorOnSurface" />
 

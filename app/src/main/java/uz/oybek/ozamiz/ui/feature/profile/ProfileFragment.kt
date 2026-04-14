@@ -59,6 +59,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             }
         }
         setupSection(
+            bind.sectionCommunity,
+            R.drawable.people_ic,
+            "Hamjamiyat"
+        ) {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                navigate(R.id.communityFragment)
+            }
+        }
+        setupSection(
             bind.sectionSupport, R.drawable.help_ic, getString(R.string.help_and_support)
         ) {
             (activity as? MainActivity)?.showSupportSheet()

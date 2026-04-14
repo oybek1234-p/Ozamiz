@@ -31,7 +31,7 @@ object FoodLogRepository {
         currentUserId ?: return emptyFlow()
         val date = date.dateApiFormat()
         val query = FirebasePaths
-            .foodLogsReference(currentUserId, date)
+            .foodLogsReference(currentUserId!!, date)
             .orderByChild(FirebaseConstants.TIMESTAMP)
         return Pager(
             PagingConfig(
@@ -142,7 +142,7 @@ object FoodLogRepository {
         currentUserId ?: return false
         try {
             val dateStr = date.dateApiFormat()
-            val reference = FirebasePaths.foodLogsReference(currentUserId, dateStr)
+            val reference = FirebasePaths.foodLogsReference(currentUserId!!, dateStr)
             foodLog.logId = generateKey()
             reference
                 .child(foodLog.logId)
@@ -176,13 +176,14 @@ object FoodLogRepository {
     suspend fun update(
         logId: String,
         updated: FoodLog,
-        date: Date
+        date: Date,
+        targetUid: String? = null
     ): Boolean {
-        currentUserId ?: return false
+        val userId = targetUid ?: currentUserId ?: return false
         if (logId.isEmpty()) return false
         val dateStr = date.dateApiFormat()
         val reference =
-            FirebasePaths.foodLogsReference(currentUserId, dateStr)
+            FirebasePaths.foodLogsReference(userId, dateStr)
         updated.timestamp = ServerValue.TIMESTAMP
         return try {
             reference
@@ -191,7 +192,7 @@ object FoodLogRepository {
                 .await()
 
             // Calculate deltas
-            val oldLog = getFoodLog(logId, date)
+            val oldLog = getFoodLog(logId, date, userId)
             val calDelta = updated.calories - (oldLog?.calories ?: 0)
             val proDelta = (updated.protein ?: 0.0) - (oldLog?.protein ?: 0.0)
             val carbDelta = (updated.carbs ?: 0.0) - (oldLog?.carbs ?: 0.0)
@@ -199,6 +200,7 @@ object FoodLogRepository {
 
             DailySummaryRepository.updateSummary(
                 date = date,
+                targetUid = userId,
                 caloriesDelta = calDelta,
                 proteinDelta = proDelta,
                 carbsDelta = carbDelta,
@@ -212,15 +214,16 @@ object FoodLogRepository {
 
     suspend fun delete(
         logId: String,
-        date: Date
+        date: Date,
+        targetUid: String? = null
     ): Boolean {
-        currentUserId ?: return false
+        val userId = targetUid ?: currentUserId ?: return false
         if (logId.isEmpty()) return false
         val dateStr = date.dateApiFormat()
         val reference =
-            FirebasePaths.foodLogsReference(currentUserId, dateStr)
+            FirebasePaths.foodLogsReference(userId, dateStr)
         return try {
-            val oldLog = getFoodLog(logId, date)
+            val oldLog = getFoodLog(logId, date, userId)
             reference
                 .child(logId)
                 .removeValue()
@@ -229,6 +232,7 @@ object FoodLogRepository {
             if (oldLog != null) {
                 DailySummaryRepository.updateSummary(
                     date = date,
+                    targetUid = userId,
                     caloriesDelta = -oldLog.calories,
                     proteinDelta = -(oldLog.protein ?: 0.0),
                     carbsDelta = -(oldLog.carbs ?: 0.0),

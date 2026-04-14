@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
+import androidx.fragment.app.setFragmentResult
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAddExerciseLogBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -80,6 +81,9 @@ class AddExerciseLogFragment
                                 state.caloriesBurned)
                         }
                         is AddExerciseUiState.Success -> {
+                            setFragmentResult("exercise_added_request", android.os.Bundle().apply {
+                                putString("exerciseId", state.exerciseId)
+                            })
                             findNavController().popBackStack(R.id.home, false)
                         }
                         is AddExerciseUiState.Error -> {

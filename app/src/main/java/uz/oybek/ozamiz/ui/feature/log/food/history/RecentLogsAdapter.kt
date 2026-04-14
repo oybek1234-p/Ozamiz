@@ -3,6 +3,7 @@ package uz.oybek.ozamiz.ui.feature.log.food.history
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +18,13 @@ import java.util.Locale
 class RecentLogsAdapter(
     private val onItemClick: (FoodLog) -> Unit
 ) : ListAdapter<FoodLog, RecentLogsAdapter.FoodLogViewHolder>(FOOD_LOG_DIFF_CALLBACK) {
+
+    private var savedFoodIds: Set<String> = emptySet()
+
+    fun setSavedFoodIds(ids: Set<String>) {
+        savedFoodIds = ids
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodLogViewHolder {
         val binding = ItemTodaysFoodBinding.inflate(
@@ -66,11 +74,6 @@ class RecentLogsAdapter(
             } else {
                 binding.imageViewFood.visibility = View.GONE
             }
-
-            // Macros
-            binding.textViewProtein.text = "${foodLog.protein?.toInt() ?: 0}g"
-            binding.textViewCarbs.text = "${foodLog.carbs?.toInt() ?: 0}g"
-            binding.textViewFat.text = "${foodLog.fat?.toInt() ?: 0}g"
         }
     }
 

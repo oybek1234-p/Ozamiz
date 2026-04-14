@@ -17,6 +17,7 @@
             app:lottie_rawRes="@raw/success_anim" />
 
         <TextView
+            android:id="@+id/text_achievement_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -27,11 +28,12 @@
             android:textAlignment="center" />
 
         <TextView
+            android:id="@+id/text_achievement_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/roboto_regular"
-            android:text="Bugungi suv ichish maqsadingizning 70% idan ko'prog'ini bajardingiz! Tana sizdan minnatdor."
+            android:text="Bugungi suv ichish maqsadingizning 70% idan ko'prog'ini bajardingiz!"
             android:textColor="?colorOnSurfaceVariant"
             android:textSize="14sp"
             android:textAlignment="center" />

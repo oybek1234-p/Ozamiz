@@ -59,14 +59,4 @@
         android:textColor="?colorOnSurfaceVariant"
         tools:text="12:37" />
 
-    <!-- Macros are hidden as per original logic (visibility=gone) and user request for smaller item -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone">
-        <TextView android:id="@+id/textView_protein" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/textView_carbs" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <TextView android:id="@+id/textView_fat" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    </LinearLayout>
-
 </LinearLayout>

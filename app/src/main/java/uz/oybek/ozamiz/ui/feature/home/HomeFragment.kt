@@ -29,8 +29,10 @@ import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.food.DailyLimitFragment
 import uz.oybek.ozamiz.ui.feature.log.food.LogFoodFragment
+import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Calendar
 import java.util.Date
+import uz.oybek.ozamiz.ui.feature.home.TodayExercisesBottomSheet
 import kotlin.math.absoluteValue
 
 class LogFragment : BaseFragment<FragmentHomeBinding>() {
@@ -38,26 +40,8 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private val viewModel: HomeViewModel by activityViewModels()
     private var dateAdapter: DateScrollerAdapter? = null
 
-    private lateinit var exerciseAdapter: HomeExerciseLogAdapter
-    private lateinit var recommendedFoodAdapter: HomeRecommendedFoodAdapter
     private var lastShownLevelIndex: Int = -1
-    private var lastShownStreak: Int = -1
 
-    private fun getLastSeenStreak(): Int {
-        val prefs = requireContext().getSharedPreferences(
-            "level_prefs",
-            android.content.Context.MODE_PRIVATE
-        )
-        return prefs.getInt("last_seen_streak_milestone", 0)
-    }
-
-    private fun saveLastSeenStreak(streak: Int) {
-        val prefs = requireContext().getSharedPreferences(
-            "level_prefs",
-            android.content.Context.MODE_PRIVATE
-        )
-        prefs.edit().putInt("last_seen_streak_milestone", streak).apply()
-    }
 
     private fun getLastSeenLevelIndex(): Int {
         val prefs = requireContext().getSharedPreferences(
@@ -113,7 +97,44 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             updateUi(lastState!!, false)
         }
         observeUiState(bind)
+        setupFragmentResults()
         checkNotificationPermission()
+    }
+
+    private fun setupFragmentResults() {
+        childFragmentManager.setFragmentResultListener(
+            "water_added_request",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val added = bundle.getBoolean("added", false)
+            if (added) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(300) // Small delay to let dialog dismiss animation finish
+                    showWaterMotivationSnackbar()
+                    lastState?.let {
+                        checkWaterGoalReached(it)
+                        checkCalorieOptimalAchievement(it)
+                    }
+                }
+            }
+        }
+
+        parentFragmentManager.setFragmentResultListener(
+            "exercise_added_request",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val exerciseId = bundle.getString("exerciseId")
+            if (exerciseId != null) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(300)
+                    showExerciseMotivationSnackbar(exerciseId)
+                    lastState?.let {
+                        check70PercentExercise(it)
+                        checkCalorieOptimalAchievement(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun checkNotificationPermission() {
@@ -149,39 +170,29 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         bind.swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
         }
-        exerciseAdapter = HomeExerciseLogAdapter { log -> }
-        bind.recyclerExerciseLogs.apply {
-            adapter = exerciseAdapter
-            layoutManager = LinearLayoutManager(context)
-            isNestedScrollingEnabled = false
-        }
-
-        recommendedFoodAdapter = HomeRecommendedFoodAdapter { menu ->
-            val args = Bundle().apply {
-                putParcelable("menu", menu)
+        bind.btnTodayExercises.setOnSafeClickListener {
+            lastState?.let { state ->
+                TodayExercisesBottomSheet.newInstance(state.exerciseLogs)
+                    .show(childFragmentManager, TodayExercisesBottomSheet.TAG)
             }
-            navigate(R.id.menuDetailFragment, args)
-        }
-        bind.recyclerFoodRecommendations.apply {
-            adapter = recommendedFoodAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
 
-        bind.btnQuickWalk.setOnClickListener {
+
+        bind.btnQuickWalk.setOnSafeClickListener {
             val args = Bundle().apply {
                 putString("exerciseId", "PiyodaYurish")
             }
             navigate(R.id.addExerciseLogFragment, args)
         }
 
-        bind.btnQuickRun.setOnClickListener {
+        bind.btnQuickRun.setOnSafeClickListener {
             val args = Bundle().apply {
                 putString("exerciseId", "Yugurish")
             }
             navigate(R.id.addExerciseLogFragment, args)
         }
 
-        bind.btnQuickOther.setOnClickListener {
+        bind.btnQuickOther.setOnSafeClickListener {
             navigate(R.id.selectExerciseFragment)
         }
         fun onMealClick(meal: String) {
@@ -191,14 +202,14 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 meal = meal
             )
         }
-        bind.cardBreakfast.root.setOnClickListener { onMealClick(MealTime.Breakfast.id) }
-        bind.cardBreakfast.btnAddMeal.setOnClickListener { onMealClick(MealTime.Breakfast.id) }
-        bind.cardLunch.root.setOnClickListener { onMealClick(MealTime.Lunch.id) }
-        bind.cardLunch.btnAddMeal.setOnClickListener { onMealClick(MealTime.Lunch.id) }
-        bind.cardDinner.root.setOnClickListener { onMealClick(MealTime.Dinner.id) }
-        bind.cardDinner.btnAddMeal.setOnClickListener { onMealClick(MealTime.Dinner.id) }
-        bind.cardSnack.root.setOnClickListener { onMealClick(MealTime.Snack.id) }
-        bind.cardSnack.btnAddMeal.setOnClickListener { onMealClick(MealTime.Snack.id) }
+        bind.cardBreakfast.root.setOnSafeClickListener { onMealClick(MealTime.Breakfast.id) }
+        bind.cardBreakfast.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Breakfast.id) }
+        bind.cardLunch.root.setOnSafeClickListener { onMealClick(MealTime.Lunch.id) }
+        bind.cardLunch.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Lunch.id) }
+        bind.cardDinner.root.setOnSafeClickListener { onMealClick(MealTime.Dinner.id) }
+        bind.cardDinner.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Dinner.id) }
+        bind.cardSnack.root.setOnSafeClickListener { onMealClick(MealTime.Snack.id) }
+        bind.cardSnack.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Snack.id) }
 
         bind.cardBreakfast.imgMealIcon.setImageResource(R.drawable.breakfast_ic)
         bind.cardBreakfast.textMealName.text = getString(R.string.breakfast)
@@ -209,13 +220,13 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         bind.cardSnack.imgMealIcon.setImageResource(R.drawable.snack_ic)
         bind.cardSnack.textMealName.text = getString(R.string.snack)
 
-        bind.cardMenus.setOnClickListener {
+        bind.cardMenus.setOnSafeClickListener {
             navigate(R.id.action_home_to_menuListFragment)
         }
-        bind.cardDietolog.setOnClickListener {
+        bind.cardDietolog.setOnSafeClickListener {
             navigate(R.id.aiChatFragment)
         }
-        bind.mainProgress.btnHowItWorks.setOnClickListener {
+        bind.mainProgress.btnHowItWorks.setOnSafeClickListener {
             if (viewModel.uiState.value.isCalorieExceeded || viewModel.uiState.value.isCalorieOptimal) {
                 DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CALORIES)
                     .show(childFragmentManager, DailyLimitFragment.TAG)
@@ -244,22 +255,26 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             navigate(R.id.action_home_to_macroInfoFragment, args)
         }
 
-        bind.btnOpenWaterDialog.setOnClickListener {
+        bind.btnOpenWaterDialog.setOnSafeClickListener {
             uz.oybek.ozamiz.ui.feature.log.water.LogWaterDialog()
                 .show(childFragmentManager, "LogWaterDialog")
         }
 
-        bind.coinDisplayLayout.setOnClickListener {
+        bind.coinDisplayLayout.setOnSafeClickListener {
             navigate(R.id.action_home_to_levelFragment)
         }
 
-        bind.mainProgress.btnDetailedInfo.setOnClickListener {
+        bind.mainProgress.btnDetailedInfo.setOnSafeClickListener {
             DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CALORIES)
                 .show(childFragmentManager, DailyLimitFragment.TAG)
         }
 
         viewModel.onHomeEntered()
         setupDailyTip(bind)
+
+        bind.btnAddWeightHome.setOnSafeClickListener {
+            navigate(R.id.photoUploadInfoFragment)
+        }
     }
 
     private fun setupDailyTip(bind: FragmentHomeBinding) {
@@ -298,37 +313,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                             updateUi(state, shouldAnimate)
                         }
 
-                        if (state.waterJustAdded) {
-                            if (DateUtils.isSameDay(state.selectedDate, Date())) {
-                                val todayStr = Date().dateApiFormat()
-                                if (getPersistentDate("last_water_motivation_shown") != todayStr) {
-                                    showWaterMotivationSnackbar()
-                                    savePersistentDate("last_water_motivation_shown", todayStr)
-                                }
-                                checkWaterGoalReached(state)
-                            }
-                            viewModel.clearWaterJustAdded()
-                        }
-
-                        if (state.exerciseJustAddedType != null) {
-                            if (DateUtils.isSameDay(state.selectedDate, Date())) {
-                                val todayStr = Date().dateApiFormat()
-                                if (getPersistentDate("last_exercise_motivation_shown") != todayStr) {
-                                    showExerciseMotivationSnackbar(state.exerciseJustAddedType)
-                                    savePersistentDate("last_exercise_motivation_shown", todayStr)
-                                }
-                                check70PercentExercise(state)
-                            }
-                            viewModel.clearExerciseJustAdded()
-                        }
-
-                        if (state.foodJustAdded) {
-                            if (DateUtils.isSameDay(state.selectedDate, Date())) {
-                                checkCalorieOptimalAchievement(state)
-                            }
-                            viewModel.clearFoodJustAdded()
-                        }
-
                         if (state.pointsJustAdded == 0) {
                             bind.textPointsCount.text = state.userPoints.toString()
                         }
@@ -340,7 +324,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
                         if (state.pointsJustAdded > 0) {
                             checkLevelUp(state.userPoints)
-                            state.streakInfo?.currentStreak?.let { checkStreakMilestone(it) }
                         }
 
                         val tip = state.dailyTip
@@ -360,86 +343,31 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                             bind.cardDailyTip.isVisible = false
                         }
 
-                        val analysis = state.yesterdayAnalysis
-                        val isToday = uz.oybek.ozamiz.data.utils.DateUtils.isSameDay(
-                            state.selectedDate,
-                            java.util.Date()
-                        )
+                        bind.cardMotivation.isVisible = false
 
-                        // Today's forecast condition
-                        val showTodayForecast = isToday &&
-                                state.todayForecastFatGram > 0 &&
-                                !state.isTodayForecastDismissed &&
-                                state.caloriesConsumed >= state.caloriesTarget
+                        bind.cardWeightLog.isVisible = state.showWeightLogCard
+                    }
+                }
 
-                        // Yesterday's analysis card logic
-                        if (analysis.isAvailable && isToday && !state.isYesterdayCardDismissed && !showTodayForecast) {
-                            bind.cardYesterdayAnalysis.root.isVisible = true
-                            bind.cardYesterdayAnalysis.btnClose.setOnClickListener { viewModel.onYesterdayCardDismissed() }
-                            if (analysis.isSuccess) {
-                                bind.cardYesterdayAnalysis.textTitle.text = "Ajoyib natija! 🏆"
-                                if (analysis.fatBurnedGram > 0) {
-                                    bind.cardYesterdayAnalysis.textDescription.text =
-                                        "Siz kecha ${analysis.fatBurnedGram} gram yog' yo'qotdingiz! 1 oylik prognoz - ${
-                                            String.format(
-                                                "%.1f",
-                                                analysis.monthlyPredictionGram
-                                            )
-                                        } kg"
-                                } else {
-                                    bind.cardYesterdayAnalysis.textDescription.text =
-                                        "Vazningizni ideal holatda saqlab qoldingiz!"
-                                }
-                            } else {
-                                bind.cardYesterdayAnalysis.textTitle.text = "Siz kuchliroqsiz! 💪"
-                                bind.cardYesterdayAnalysis.textEmoji.text = "🚀"
-                                bind.cardYesterdayAnalysis.textDescription.text =
-                                    "Kecha energiya zaxirasi to'ldirildi. Bugun uni faollikka aylantiramiz!"
+                launch {
+                    viewModel.foodJustAddedEvent.collect {
+                        val state = viewModel.uiState.value
+                        if (DateUtils.isSameDay(state.selectedDate, Date())) {
+                            check50PercentCalorieAchievement(state)
+                            checkCalorieOptimalAchievement(state)
+                            if (state.isCalorieExceeded || state.isCalorieOptimal) {
+                                DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CALORIES)
+                                    .show(childFragmentManager, DailyLimitFragment.TAG)
                             }
-
-                            val openSheet = {
-                                YesterdayAnalysisBottomSheet.newInstance(analysis) {
-                                    viewModel.onYesterdayAnalysisShown()
-                                }.show(childFragmentManager, YesterdayAnalysisBottomSheet.TAG)
-                            }
-
-                            bind.cardYesterdayAnalysis.root.setOnClickListener { openSheet() }
-                            bind.cardYesterdayAnalysis.btnDetails.setOnClickListener { openSheet() }
-
-                            if (analysis.showSheet && childFragmentManager.findFragmentByTag(
-                                    YesterdayAnalysisBottomSheet.TAG
-                                ) == null
-                            ) {
-                                // Delay slightly to avoid overlapping with other potential dialogs
-                                lifecycleScope.launch {
-                                    delay(800)
-                                    if (isResumed && childFragmentManager.findFragmentByTag(YesterdayAnalysisBottomSheet.TAG) == null) {
-                                        openSheet()
-                                    }
-                                }
-                            }
-                        } else {
-                            bind.cardYesterdayAnalysis.root.isVisible = false
-                        }
-
-                        // Bugungi maqsad card
-                        if (showTodayForecast) {
-                            bind.cardTodayForecast.root.isVisible = true
-                            bind.cardTodayForecast.btnClose.setOnClickListener { viewModel.onTodayForecastDismissed() }
-                            bind.cardTodayForecast.textDescription.text =
-                                "Agar bugun boshqa ovqat yemay, faqat suv ichsangiz, tanangiz yana ${state.todayForecastFatGram} gram yog' yo'qotadi! 🚀"
-                        } else {
-                            bind.cardTodayForecast.root.isVisible = false
                         }
                     }
                 }
 
                 launch {
                     viewModel.showRateAppEvent.collect {
-                        delay(2000) // Much longer delay to not annoy the user at launch
+                        delay(2000)
                         if (isResumed && childFragmentManager.fragments.isEmpty()) {
-                            RateAppSheet.newInstance()
-                                .show(childFragmentManager, RateAppSheet.TAG)
+                            (activity as? uz.oybek.ozamiz.ui.MainActivity)?.requestAppReview()
                         }
                     }
                 }
@@ -473,265 +401,199 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun updateUi(
-        state: HomeUiState,
-        animate: Boolean
-    ) {
+    private fun updateUi(state: HomeUiState, animate: Boolean) {
         lastState = state
         binding.toolbarTitle.text = if (DateUtils.isSameDay(state.selectedDate, Date())) {
             getString(R.string.today)
         } else {
             DateUtils.getFormattedDateString(state.selectedDate, "d MMMM")
         }
-        dateAdapter?.submitList(state.datesForScroller)
-        dateAdapter?.setSelectedDate(state.selectedDate)
-        dateAdapter?.updateData(state.dailySummaries, state.caloriesTarget)
+
+        dateAdapter?.apply {
+            submitList(state.datesForScroller)
+            setSelectedDate(state.selectedDate)
+            updateData(state.dailySummaries, state.caloriesTarget)
+        }
         scrollToSelectedDate(state.selectedDate)
 
-        val liters = String.format("%.1f", state.waterConsumed / 1000f)
-        val goalLiters = String.format("%.1f", state.waterTarget / 1000f)
-        binding.textCurrentWaterLiters.text = "$liters litr ichildi"
-        binding.textWaterGoal.text = "Kunlik maqsad: $goalLiters litr"
-        binding.textWaterGoal.isVisible = true
+        val litersStr = String.format("%.1f", state.waterConsumed / 1000f)
+        val goalLitersStr = String.format("%.1f", state.waterTarget / 1000f)
+        binding.textCurrentWaterLiters.text = "$litersStr litr ichildi"
+        binding.textWaterGoal.text = "Kunlik maqsad: $goalLitersStr litr"
+        binding.textWaterGoal.isVisible = state.waterTarget > 0
 
         binding.progressWater.max = state.waterTarget
         binding.progressWater.setProgressCompat(state.waterConsumed, animate)
 
         val streakInfo = state.streakInfo
+        binding.streakDisplayLayout.isVisible = streakInfo != null
         if (streakInfo != null) {
-            binding.streakDisplayLayout.isVisible = true
             binding.textStreakCount.text = streakInfo.currentStreak.toString()
-
             if (binding.streakDisplayLayout.scaleX == 1f) {
-                binding.streakDisplayLayout.animate()
-                    .scaleX(1.1f).scaleY(1.1f)
-                    .setDuration(300)
+                binding.streakDisplayLayout.animate().scaleX(1.1f).scaleY(1.1f).setDuration(300)
                     .withEndAction {
-                        binding.streakDisplayLayout.animate()
-                            .scaleX(1f).scaleY(1f)
-                            .setDuration(300)
+                        binding.streakDisplayLayout.animate().scaleX(1f).scaleY(1f).setDuration(300)
                             .start()
                     }
                     .start()
             }
             binding.streakDisplayLayout.setOnClickListener {
-                uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet
-                    .newInstance(streakInfo)
+                uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet.newInstance(streakInfo)
                     .show(
                         childFragmentManager,
                         uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet.TAG
                     )
             }
-        } else {
-            binding.streakDisplayLayout.isVisible = false
         }
 
-        val primaryColor = com.google.android.material.color.MaterialColors.getColor(
-            requireView(),
-            androidx.appcompat.R.attr.colorPrimary
-        )
-        val redColor = ContextCompat.getColor(requireContext(), R.color.red)
-        val orangeColor = ContextCompat.getColor(requireContext(), R.color.orange)
-        val yellowColor = com.google.android.material.color.MaterialColors.getColor(
-            requireView(),
-            R.attr.customYellow
-        )
-        val greenColor = com.google.android.material.color.MaterialColors.getColor(
-            requireView(),
-            R.attr.customGreen
-        )
-        val trackColor = com.google.android.material.color.MaterialColors.getColor(
-            requireView(),
-            com.google.android.material.R.attr.colorSurfaceContainerHigh
-        )
-        val onSurfaceColor = com.google.android.material.color.MaterialColors.getColor(
-            requireView(),
-            com.google.android.material.R.attr.colorOnSurface
-        )
+        // Cache colors to avoid redundant lookups
+        val colors = object {
+            val primary = com.google.android.material.color.MaterialColors.getColor(
+                requireView(),
+                androidx.appcompat.R.attr.colorPrimary
+            )
+            val red = ContextCompat.getColor(requireContext(), R.color.red)
+            val gray = ContextCompat.getColor(requireContext(), R.color.grey)
+            val orange = ContextCompat.getColor(requireContext(), R.color.orange)
+            val yellow = com.google.android.material.color.MaterialColors.getColor(
+                requireView(),
+                R.attr.customYellow
+            )
+            val green = com.google.android.material.color.MaterialColors.getColor(
+                requireView(),
+                R.attr.customGreen
+            )
+            val track = com.google.android.material.color.MaterialColors.getColor(
+                requireView(),
+                com.google.android.material.R.attr.colorSurfaceContainerHigh
+            )
+            val onSurface = com.google.android.material.color.MaterialColors.getColor(
+                requireView(),
+                com.google.android.material.R.attr.colorOnSurface
+            )
+            val onSurfaceVariant = com.google.android.material.color.MaterialColors.getColor(
+                requireView(),
+                com.google.android.material.R.attr.colorOnSurfaceVariant
+            )
+        }
 
         binding.mainProgress.apply {
             textCaloriesRemainingCount.text = state.caloriesRemaining.absoluteValue.toString()
-
             textEatenCount.text =
                 "${state.caloriesConsumed}    Maqsad: ${state.caloriesTarget} oshirmaslik"
-
             progressCaloriesCircular.max = state.caloriesTarget
             progressCaloriesCircular.setProgressCompat(
                 state.caloriesConsumed.absoluteValue,
                 animate
             )
-            if (state.isCalorieOptimal) {
+
+            if (state.caloriesConsumed >= state.caloriesTarget) {
                 layoutNormalProgress.isVisible = false
                 layoutLimitState.isVisible = true
-                textLimitTitle.text = "Bugungga yetarli yedingiz"
-                textLimitSubtitle.text = "Boshqa ovqat yemaslikka harakat qiling!"
-                imgLimitState.setImageResource(R.drawable.check_ic)
-                imgLimitState.imageTintList = android.content.res.ColorStateList.valueOf(greenColor)
-                macrosContainer.isVisible = false
+                cardLimitIcon.isVisible = false
+                textLimitTitle.text = "Yog' yoqilyapti"
+                textLimitSubtitle.text = "Ortiqcha ovqat yog' yoqishni to'xtatadi."
                 binding.layoutMacroWarnings.isVisible = false
+                macrosContainer.isVisible = false
+            } else {
+                layoutNormalProgress.isVisible = true
+                layoutLimitState.isVisible = false
+                binding.layoutMacroWarnings.isVisible = false
+                macrosContainer.isVisible = true
             }
-            progressCaloriesCircular.setIndicatorColor(primaryColor)
-            progressCaloriesCircular.trackColor = trackColor
-            textCaloriesRemainingCount.setTextColor(onSurfaceColor)
+            progressCaloriesCircular.setIndicatorColor(colors.primary)
+            progressCaloriesCircular.trackColor = colors.track
+            textCaloriesRemainingCount.setTextColor(colors.onSurface)
 
+            // Macros Helper
+            fun bindMacro(
+                progress: com.google.android.material.progressindicator.LinearProgressIndicator,
+                text: android.widget.TextView,
+                consumed: Int,
+                target: Int,
+                isExceeded: Boolean,
+                exceededColor: Int,
+                normalColor: Int
+            ) {
+                val isOptimal = consumed >= target && !isExceeded
+                val remaining = target - consumed
+                progress.max = if (isExceeded) consumed else target
+                progress.setProgressCompat(consumed, animate)
+                progress.setIndicatorColor(if (isExceeded) colors.gray else if (isOptimal) colors.green else normalColor)
+                progress.trackColor = colors.track
+                text.setTextColor(if (isExceeded) colors.gray else if (isOptimal) colors.green else colors.onSurface)
+                text.text = when {
+                    isExceeded -> getString(R.string.macro_exceeded_format, consumed - target)
+                    isOptimal -> "To'ldi"
+                    else -> getString(R.string.macro_remaining_format, remaining)
+                }
+            }
 
-            val proteinExceeded = state.isProteinExceeded
-            val proteinOptimal =
-                state.proteinConsumed >= state.proteinTarget && !state.isProteinExceeded
-            val proteinTargetReached = state.proteinConsumed >= state.proteinTarget
-            binding.mainProgress.cardProtein.isVisible = !proteinTargetReached
-
-            val proteinRemaining = state.proteinTarget - state.proteinConsumed
-            progressProtein.max =
-                if (proteinExceeded) state.proteinConsumed else state.proteinTarget
-            progressProtein.setProgressCompat(state.proteinConsumed, animate)
-            progressProtein.setIndicatorColor(if (proteinExceeded) redColor else if (proteinOptimal) greenColor else orangeColor)
-            progressProtein.trackColor = trackColor
-            textProteinValue.setTextColor(if (proteinExceeded) redColor else if (proteinOptimal) greenColor else onSurfaceColor)
-            textProteinValue.text = if (proteinExceeded)
-                getString(R.string.macro_exceeded_format, -proteinRemaining)
-            else if (proteinOptimal)
-                "Bugungga yetadi"
-            else
-                getString(R.string.macro_remaining_format, proteinRemaining)
-
-            val fatExceeded = state.isFatExceeded
-            val fatOptimal = state.fatConsumed >= state.fatTarget && !state.isFatExceeded
-            val fatTargetReached = state.fatConsumed >= state.fatTarget
-            binding.mainProgress.cardFat.isVisible = !fatTargetReached
-
-            val fatRemaining = state.fatTarget - state.fatConsumed
-            progressFat.max = if (fatExceeded) state.fatConsumed else state.fatTarget
-            progressFat.setProgressCompat(state.fatConsumed, animate)
-            progressFat.setIndicatorColor(if (fatExceeded) redColor else if (fatOptimal) greenColor else yellowColor)
-            progressFat.trackColor = trackColor
-            textFatValue.setTextColor(if (fatExceeded) redColor else if (fatOptimal) greenColor else onSurfaceColor)
-            textFatValue.text = if (fatExceeded)
-                getString(R.string.macro_exceeded_format, -fatRemaining)
-            else if (fatOptimal)
-                "Bugungga yetadi"
-            else
-                getString(R.string.macro_remaining_format, fatRemaining)
-
-            // Carbs
-            val carbsExceeded = state.isCarbsExceeded
-            val carbsOptimal = state.carbsConsumed >= state.carbsTarget && !state.isCarbsExceeded
-            val carbsTargetReached = state.carbsConsumed >= state.carbsTarget
-            binding.mainProgress.cardCarbs.isVisible = !carbsTargetReached
-
-            val carbsRemaining = state.carbsTarget - state.carbsConsumed
-            progressCarbs.max = if (carbsExceeded) state.carbsConsumed else state.carbsTarget
-            progressCarbs.setProgressCompat(state.carbsConsumed, animate)
-            progressCarbs.setIndicatorColor(if (carbsExceeded) redColor else if (carbsOptimal) greenColor else greenColor)
-            progressCarbs.trackColor = trackColor
-            textCarbsValue.setTextColor(if (carbsExceeded) redColor else if (carbsOptimal) greenColor else onSurfaceColor)
-            textCarbsValue.text = if (carbsExceeded)
-                getString(R.string.macro_exceeded_format, -carbsRemaining)
-            else if (carbsOptimal)
-                "Bugungga yetadi"
-            else
-                getString(R.string.macro_remaining_format, carbsRemaining)
+            bindMacro(
+                progressProtein,
+                textProteinValue,
+                state.proteinConsumed,
+                state.proteinTarget,
+                state.isProteinExceeded,
+                colors.gray,
+                colors.orange
+            )
+            bindMacro(
+                progressFat,
+                textFatValue,
+                state.fatConsumed,
+                state.fatTarget,
+                state.isFatExceeded,
+                colors.gray,
+                colors.yellow
+            )
+            bindMacro(
+                progressCarbs,
+                textCarbsValue,
+                state.carbsConsumed,
+                state.carbsTarget,
+                state.isCarbsExceeded,
+                colors.gray,
+                colors.green
+            )
         }
 
-        val breakfastCalories = state.dailyFoodLogs.filter { it.mealType == MealTime.Breakfast.id }
-            .sumOf { it.calories }
-        val lunchCalories =
-            state.dailyFoodLogs.filter { it.mealType == MealTime.Lunch.id }.sumOf { it.calories }
-        val dinnerCalories =
-            state.dailyFoodLogs.filter { it.mealType == MealTime.Dinner.id }.sumOf { it.calories }
-        val snackCalories =
-            state.dailyFoodLogs.filter { it.mealType == MealTime.Snack.id }.sumOf { it.calories }
+        // Meal Cards
+        val mealCalories = state.dailyFoodLogs.groupBy { it.mealType }
+            .mapValues { entry -> entry.value.sumOf { it.calories } }
 
         val target = state.caloriesTarget.toFloat()
-        val bMax = (target * 0.3f).toInt().takeIf { it > 0 } ?: 600
-        val lMax = (target * 0.4f).toInt().takeIf { it > 0 } ?: 800
-        val dMax = (target * 0.2f).toInt().takeIf { it > 0 } ?: 400
-        val sMax = (target * 0.1f).toInt().takeIf { it > 0 } ?: 200
-
-        val onSurfaceVarColor = com.google.android.material.color.MaterialColors.getColor(
-            requireView(),
-            com.google.android.material.R.attr.colorOnSurfaceVariant
+        val meals = listOf(
+            Triple(binding.cardBreakfast, MealTime.Breakfast.id, (target * 0.3f).toInt()),
+            Triple(binding.cardLunch, MealTime.Lunch.id, (target * 0.4f).toInt()),
+            Triple(binding.cardDinner, MealTime.Dinner.id, (target * 0.2f).toInt()),
+            Triple(binding.cardSnack, MealTime.Snack.id, (target * 0.1f).toInt())
         )
 
-        fun bindMealCard(
-            cardBinding: uz.oybek.ozamiz.databinding.ItemHomeMealCardBinding,
-            consumed: Int,
-            max: Int
-        ) {
-            cardBinding.textMealCalories.isVisible = true
-            cardBinding.progressMeal.isVisible = true
-            if (consumed >= max) {
-                cardBinding.textMealCalories.text = "Bugungga yetadi"
-                cardBinding.textMealCalories.setTextColor(greenColor)
-                cardBinding.progressMeal.max = max
-                cardBinding.progressMeal.setProgressCompat(max, animate)
+        meals.forEach { (card, id, baseMax) ->
+            val consumed = mealCalories[id] ?: 0
+            val max = baseMax.takeIf { it > 0 } ?: 400
+
+            if (consumed >= max || state.caloriesConsumed >= state.caloriesTarget) {
+                card.layoutCalories.isVisible = false
             } else {
-                cardBinding.textMealCalories.text = "${max - consumed} kkal qoldi"
-                cardBinding.textMealCalories.setTextColor(onSurfaceVarColor)
-                cardBinding.progressMeal.max = max
-                cardBinding.progressMeal.setProgressCompat(consumed, animate)
+                card.layoutCalories.isVisible = true
+                card.textMealCalories.text = "${max - consumed} kkal qoldi"
+                card.textMealCalories.setTextColor(colors.onSurfaceVariant)
+                card.progressMeal.max = max
+                card.progressMeal.setProgressCompat(consumed, animate)
             }
         }
 
-        bindMealCard(binding.cardBreakfast, breakfastCalories, bMax)
-        bindMealCard(binding.cardLunch, lunchCalories, lMax)
-        bindMealCard(binding.cardDinner, dinnerCalories, dMax)
-        bindMealCard(binding.cardSnack, snackCalories, sMax)
-
-        // Exercise Progress
         binding.progressExercise.max = state.exerciseTarget
         binding.progressExercise.setProgressCompat(state.exerciseBurnt, animate)
         binding.textExerciseProgress.text = "${state.exerciseBurnt} / ${state.exerciseTarget} kkal"
 
-        val hasExercises = state.exerciseLogs.isNotEmpty()
-        binding.recyclerExerciseLogs.isVisible = hasExercises
-        if (hasExercises) {
-            exerciseAdapter.submitList(state.exerciseLogs)
-        }
-        binding.recyclerExerciseLogs.scrollToPosition(0)
+        binding.btnTodayExercises.isVisible = state.exerciseLogs.isNotEmpty()
 
-
-
-        binding.warningProtein.root.isVisible = state.isProteinExceeded
-        if (state.isProteinExceeded) {
-            binding.warningProtein.textWarningTitle.text = "Oqsil oshdi!"
-            binding.warningProtein.textWarningSubtitle.text =
-                "Cheklang: Go'sht, tuxum, tovuq, baliq, tvorog, mosh, protein."
-            binding.warningProtein.root.setOnClickListener {
-                DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_PROTEIN)
-                    .show(childFragmentManager, DailyLimitFragment.TAG)
-            }
-        }
-
-        binding.warningCarbs.root.isVisible = state.isCarbsExceeded
-        if (state.isCarbsExceeded) {
-            binding.warningCarbs.textWarningTitle.text = "Uglevod oshdi!"
-            binding.warningCarbs.textWarningSubtitle.text =
-                "Cheklang: Non, guruch, makaron, kartoshka, shirinliklar, pishiriqlar, banan, uzum."
-            binding.warningCarbs.root.setOnClickListener {
-                DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CARBS)
-                    .show(childFragmentManager, DailyLimitFragment.TAG)
-            }
-        }
-
-        binding.warningFat.root.isVisible = state.isFatExceeded
-        if (state.isFatExceeded) {
-            binding.warningFat.textWarningTitle.text = "Yog' oshdi!"
-            binding.warningFat.textWarningSubtitle.text =
-                "Cheklang: Qovurilgan ovqat, yog'li go'sht, sariyog', mayonez, pishloq, yong'oq, fast-fud."
-            binding.warningFat.root.setOnClickListener {
-                DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_FAT)
-                    .show(childFragmentManager, DailyLimitFragment.TAG)
-            }
-        }
-
-        val hasRecommendedFoods = state.recommendedFoods.isNotEmpty()
-        binding.layoutRecommendations.isVisible = hasRecommendedFoods
-        if (hasRecommendedFoods) {
-            binding.textRecommendationTitle.text =
-                "${state.recommendingForMeal}ga tavsiya"
-            recommendedFoodAdapter.submitList(state.recommendedFoods)
-        }
+        binding.warningProtein.root.isVisible = false
+        binding.warningCarbs.root.isVisible = false
+        binding.warningFat.root.isVisible = false
     }
 
 
@@ -887,13 +749,19 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         val snackbar = Snackbar.make(binding.root, "", 5000)
         val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
         snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
-        snackbarLayout.setPadding(0, 0, 0, 16.dpToPx())
+        snackbarLayout.setPadding(0, 0, 0, 0)
 
         snackbarLayout.clipChildren = false
         snackbarLayout.clipToPadding = false
         (snackbarLayout.parent as? ViewGroup)?.let {
             it.clipChildren = false
             it.clipToPadding = false
+        }
+
+        // Anchor to bottom nav to avoid being hidden behind it
+        val bottomNav = activity?.findViewById<View>(R.id.bottom_nav_view)
+        if (bottomNav != null) {
+            snackbar.anchorView = bottomNav
         }
 
         val customView = layoutInflater.inflate(R.layout.custom_water_snackbar, null)
@@ -905,14 +773,15 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             snackbar.dismiss()
         }
 
-        snackbarLayout.addView(customView, 0)
+        snackbarLayout.removeAllViews()
+        snackbarLayout.addView(customView)
         snackbar.show()
     }
 
     private fun checkWaterGoalReached(state: HomeUiState) {
         val todayStr = Date().dateApiFormat()
         if (state.waterTarget > 0 &&
-            state.waterConsumed >= state.waterTarget &&
+            state.waterConsumed >= state.waterTarget * 0.7 &&
             getPersistentDate("last_water_goal_shown") != todayStr
         ) {
             showWaterGoalReachedAchievement()
@@ -929,6 +798,33 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         dialog.show()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        val variations = listOf(
+            "Ajoyib natija!" to "Bugungi suv maqsadingizning 70% idan o'tdingiz. Davom eting! 💧",
+            "Barakalla!" to "Tana namligi a'lo darajada. 70% reja bajarildi! 🌊",
+            "Salomatlik sari!" to "Suv ichishda faol ekansiz, 70% marra zabt etildi. 🥤",
+            "Suv qiroli/malikasi!" to "Bugun deyarli hamma rejalashtirilgan suvni ichdingiz. 🤴👸",
+            "Namlik darajasi yuqori!" to "Siz deyarli marra desiz, 70% suv ichildi! 💎",
+            "Muvaffaqiyat!" to "Bugun o'zingizga bo'lgan g'amxo'rligiz 70% marraga yetdi. ✨",
+            "Toza energiya!" to "Suv sizga kuch bermoqda, 70% reja ortda qoldi. ⚡",
+            "Siz uddaladingiz!" to "Kunlik suv me'yorining 70% i ichildi. Jismingiz quvonmoqda! 😊",
+            "Super intizom!" to "Suv tartibingiz hayratlanarli! 70% bajarildi. 👏",
+            "Yashang!" to "Har bir qultum salomatlik! 70% marra bosib o'tildi. 🌈",
+            "Tetiklik ramzi!" to "Bugungi suv ichish faolligiz 70% ga yetdi. 🚀",
+            "A'lo kayfiyat!" to "Suv sizga tetiklik bermoqda, 70% reja tayyor! 🍀",
+            "Namlik kuchi!" to "Tana hujayralari bugun 70% ga to'yingan. Davom eting! 🧊",
+            "Maqsad yaqin!" to "Suv maqsadingiz sari 70% masofani bosib o'tdingiz. 🎯",
+            "Siz haqiqiy namunasiz!" to "Suv ichish tartibiz 70% reja bilan davom etmoqda. 🔥",
+            "Zabarast natija!" to "Bugun suv ichishda shaxsiy rekord sari 70% ga keldingiz. 🥇",
+            "Hujayralar bayrami!" to "Tanangiz namlikka boy bo'lmoqda (70% reja). 🎉",
+            "Suv bilan tetiklashish!" to "Bugun deyarli reja bajardi, 70% ortda qoldi. 🎐",
+            "Ideal muvozanat!" to "Suv balansingiz bugun 70% ga tiklandi. 🌀",
+            "Ofarin!" to "Bugun suv ichish rejasining 70% ini yakunladingiz. 🎖️"
+        )
+        val selected = variations.random()
+
+        dialog.findViewById<TextView>(R.id.text_achievement_title)?.text = selected.first
+        dialog.findViewById<TextView>(R.id.text_achievement_subtitle)?.text = selected.second
+
         val btnAjoyib = dialog.findViewById<View>(R.id.btn_ajoyib)
         btnAjoyib?.setOnClickListener {
             dialog.dismiss()
@@ -944,7 +840,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             "Har bir daqiqalik $lowerType sizni maqsadli vazningizga yaqinlashtiradi.",
             "$type yordamida nafaqat kaloriya, balki stress gormonlari ham yoqiladi.",
             "Muntazam $lowerType bilan shug'ullanish orqali immunitetingiz 30% ga kuchayadi.",
-            "$type uyqu sifatini ajoyib darajada yaxshilaydi va asablarni tinchlantiradi.",
+            "$type uyqu sifatini ajoyib darajada yaxshilaydi va asablarni tinchlantirishga yordam beradi.",
             "Faol $lowerType bazal metabolizmni tezlashtiradi, ya'ni dam olganda ham oza boshlaysiz.",
             "$type bo'g'im va mushaklarning elastikligini saqlash uchun eng kuchli vositadir.",
             "$type yurak mushagini chiniqtiradi, natijada yurak kamroq urib, ko'proq qon haydaydi.",
@@ -964,7 +860,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         val snackbar = Snackbar.make(binding.root, "", 5000)
         val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
         snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
-        snackbarLayout.setPadding(0, 0, 0, 16.dpToPx())
+        snackbarLayout.setPadding(0, 0, 0, 0)
 
         snackbarLayout.clipChildren = false
         snackbarLayout.clipToPadding = false
@@ -972,17 +868,19 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             it.clipChildren = false
             it.clipToPadding = false
         }
-
+        val bottomNav = activity?.findViewById<View>(R.id.bottom_nav_view)
+        if (bottomNav != null) {
+            snackbar.anchorView = bottomNav
+        }
         val customView = layoutInflater.inflate(R.layout.custom_exercise_snackbar, null)
         val textView = customView.findViewById<TextView>(R.id.text_snackbar_motivation)
         textView.text = message
-
         val btnClose = customView.findViewById<View>(R.id.btn_close_snackbar)
         btnClose.setOnClickListener {
             snackbar.dismiss()
         }
-
-        snackbarLayout.addView(customView, 0)
+        snackbarLayout.removeAllViews()
+        snackbarLayout.addView(customView)
         snackbar.show()
     }
 
@@ -1006,25 +904,77 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         dialog.show()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        val variations = listOf(
+            Triple("🥇", "Mashg'ulot qahramoni!", "Bugungi mashqlar rejasining 70% idan o'tdingiz!"),
+            Triple(
+                "🔥",
+                "Yog'lar \"yig'layapti\"!",
+                "70% rejalashtirilgan kaloriya yoqildi. Davom eting!"
+            ),
+            Triple("⚡", "Super energiya!", "Siz bugun juda faolsiz, 70% marra zabt etildi!"),
+            Triple("🏆", "Chempionlik sari!", "Mashqlarga bo'lgan bu g'ayrat 70% marraga yetdi!"),
+            Triple("💪", "Kuch va qudrat!", "Tanangiz chiniqmoqda (70% reja bajarildi)!"),
+            Triple("🏃", "Tezkor natija!", "Faolligingiz bugun 70% dan oshdi. Barakalla!"),
+            Triple("✨", "Yashang!", "Siz bugun o'zingizni yengdingiz, 70% kaloriya yoqildi!"),
+            Triple("🚀", "Kosmik tezlik!", "Mashqlar tartibingiz hayratda qoldirmoqda (70% reja)!"),
+            Triple("🎯", "Aniq nishon!", "Bugungi faollik rejasining 70% i tayyor!"),
+            Triple("🌟", "Yulduzli natija!", "Bugun deyarli hamma mashqlarni uddaladingiz (70%)!"),
+            Triple(
+                "🌈",
+                "Siz ajoyibsiz!",
+                "Har bir harakat sizni go'zallikka yaqinlashtiradi (70%)!"
+            ),
+            Triple("💎", "Qimmatbaho sog'lik!", "Bugunga mo'ljallangan 70% kaloriya sarflandi!"),
+            Triple("🧨", "Portlovchi kuch!", "Siz bugun haqiqiy vulqonsiz! 70% reja bajarildi!"),
+            Triple("🧗", "Cho'qqi sari!", "Faollik masofasining 70% i bosib o'tildi!"),
+            Triple("🥊", "Zarbdor natija!", "Siz har qanday dangasalikni yengdingiz (70%)!"),
+            Triple("🧘", "Garmoniya va kuch!", "Tana va ruh birdamligi 70% ga yetdi!"),
+            Triple("🚲", "Tezkor harakat!", "Kaloriya yoqishda bugun to'xtamadingiz (70% reja)!"),
+            Triple("🤸", "Elastiklik mukammal!", "Bugungi mashqlar natijasi 70% ga yetdi!"),
+            Triple(
+                "🛹",
+                "Yangi marra!",
+                "Siz bugun 70% kaloriya sarflab shaxsiy rekordga yaqinlashdingiz!"
+            ),
+            Triple(
+                "🎖️",
+                "Xizmatlaringiz beqiyos!",
+                "Bugun 70% faollik bilan o'zingizni xursand qildingiz!"
+            )
+        )
+        val selected = variations.random()
+
+        dialog.findViewById<TextView>(R.id.text_achievement_emoji)?.text = selected.first
+        dialog.findViewById<TextView>(R.id.text_achievement_title)?.text = selected.second
+        dialog.findViewById<TextView>(R.id.text_achievement_subtitle)?.text = selected.third
+
         val btnAjoyib = dialog.findViewById<View>(R.id.btn_ajoyib)
         btnAjoyib?.setOnClickListener {
             dialog.dismiss()
         }
     }
 
-
     private fun checkCalorieOptimalAchievement(state: HomeUiState) {
         val todayStr = Date().dateApiFormat()
 
-        // Let's check if the user is in optimal calorie range and has consumed more than 80% of target
         if (state.caloriesTarget > 0 &&
-            state.caloriesConsumed >= state.caloriesTarget * 0.8 &&
-            state.isCalorieOptimal &&
+            state.caloriesConsumed >= state.caloriesTarget &&
             getPersistentDate("last_calorie_goal_shown") != todayStr
         ) {
-
             showCalorieOptimalAchievement()
             savePersistentDate("last_calorie_goal_shown", todayStr)
+        }
+    }
+
+    private fun check50PercentCalorieAchievement(state: HomeUiState) {
+        val todayStr = Date().dateApiFormat()
+
+        if (state.caloriesTarget > 0 &&
+            state.caloriesConsumed >= state.caloriesTarget * 0.5 &&
+            getPersistentDate("last_calorie_50_shown") != todayStr
+        ) {
+            show50PercentCalorieAchievement()
+            savePersistentDate("last_calorie_50_shown", todayStr)
         }
     }
 
@@ -1043,11 +993,90 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    private fun show50PercentCalorieAchievement() {
+        if (activity == null || isDetached) return
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(R.layout.dialog_food_achievement)
+            .create()
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        val variations = listOf(
+            "Yarim yo'l!" to "Kunlik kaloriyaning 50% qismi bajarildi. Juda yaxshi!",
+            "Oltin o'rtaliq!" to "Siz bugungi ozuqa rejangizning qoq markazidasiz.",
+            "Energiya balansi!" to "50% kaloriya - bu sog'lom turmush tarzi sari dadil qadam.",
+            "Muvozanat ustasi!" to "Me'yorni saqlashda davom eting, yarmi muvaffaqiyatli o'tdi.",
+            "Barakalla!" to "Bugun ovqatlanish tartibi a'lo darajada ketmoqda.",
+            "Sog'lom tanlov!" to "50% kaloriya sarflandi, qolgan qismini ham me'yorda ushlang.",
+            "Intizom kuchi!" to "Rejangizning yarmi tayyor. O'zingiz bilan faxrlaning!",
+            "Ideal start!" to "Kun yarmida 50% kaloriya - bu eng to'g'ri ko'rsatkich.",
+            "Ozuqa nazorati!" to "Siz o'z tanangizni eshityapsiz, 50% marra zabt etildi.",
+            "Ofarin!" to "Kaloriyalar nazoratda, sog'lik esa siz tomonda!",
+            "Metabolizm quvvati!" to "Tanangiz keragidan ortiq yuklama olmadi, 50% reja joyida.",
+            "Go'zallik siri!" to "To'g'ri vazn sari yo'lning yarmi bugun bosib o'tildi.",
+            "Diqqatli bo'ling!" to "50% kaloriya - endi qolgan vaqtda ham hushyorlikni yo'qotmang.",
+            "Siz uddaladingiz!" to "Bugungi kaloriyaning yarmi o'zlashtirildi. Super!",
+            "Shijoat!" to "Sog'lom ovqatlanishda bugun sizga teng keladigani yo'q.",
+            "Aniq reja!" to "Har bir Luqma hisobda, 50% marra esa ortda!",
+            "Yengillik hissi!" to "Ortiqcha emassiz, 50% kaloriya bilan kunni davom eting.",
+            "Ritmda qoling!" to "Kunlik ehtiyojingizning yarmi qondirildi. Zo'r!",
+            "Matonat!" to "Istaklaringizni nazorat qila olyapsiz, 50% natija buni ko'rsatmoqda.",
+            "Zabarast!" to "50% kaloriya - bugun siz haqiqiy sog'lom turmush tarzi targ'ibotchisisiz.",
+            "Tana garmoniyasi!" to "Ichki xotirjamlik va 50% kaloriya - mukammal uyg'unlik.",
+            "G'alaba!" to "Bugungi eng katta g'alaba o'z rejangizga sodiqligizdir (50%).",
+            "Nurli qomat!" to "Ideal vazn sari yana bir yarim kunlik qadam tashlandi.",
+            "O'zgarishlar vaqti!" to "Har bir 50% li marra sizni yangi hayotga yaqinlashtiradi.",
+            "Iroda sinovi!" to "Siz irodali bo'lib chiqdingiz, 50% kaloriya - bu isbot!",
+            "Ajoyib!" to "O'z organizmingizni ilmiy yondashuv bilan boshqaryapsiz.",
+            "Kichik g'alaba!" to "50% kaloriya bilan bugun o'zingizni xursand qildingiz.",
+            "Tabassum qiling!" to "Siz bugun tartiblisiz, 50% reja bu - yaxshi kayfiyat demak.",
+            "Yashang!" to "Har bir to'g'ri Luqma sog'ligingizga sarmoyadir.",
+            "Kelajak sarmoyasi!" to "Bugungi 50% intizom - ertangi sog'lom tana poydevori.",
+            "A'lo kayfiyat!" to "O'zingizni yengillashtiryapsiz, 50% kaloriya - bu parvoz!",
+            "Nazorat ostida!" to "Siz bugun vaziyatni to'liq nazorat qilyapsiz.",
+            "Hayratlanarli!" to "Sizning bu qat'iyatingiz ko'pchilikka o'rnak bo'ladi.",
+            "Haqiqiy natija!" to "Kaloriya rejasining 50% i bu shunchaki raqam emas, bu mehnat!",
+            "Sog'lik ustuvor!" to "Bugun o'zingizni haqiqatdan sevasiz, 50% marra buni deydi.",
+            "Dadil olg'a!" to "Yarim yo'l o'tildi, marrani ko'zlang va davom eting.",
+            "Mukammallik!" to "Har bir harakatingizda aniqlik va sog'lik bor.",
+            "Ijobiy natija!" to "50% kaloriya - siz kutilganidan ham yaxshiroq ketyapsiz.",
+            "Samimiyat!" to "Samimiy mehnat ortidan chiroyli qomat keladi.",
+            "Oltin qomat!" to "50% marra - boylik emas, sog'lik yig'moqdasiz.",
+            "Daryo kabi!" to "Sekin va ishonchli ravishda 50% marraga oqib keldingiz.",
+            "Cheksiz imkoniyat!" to "O'zining ovqatlanishini boshqargan inson dunyoni boshqaradi.",
+            "Sog'lom tushlik!" to "50% kaloriya bilan kunning eng muhim qismini o'tadingiz.",
+            "Yangi marra!" to "Har bir 50% sizni yangi yuqori darajaga olib chiqadi.",
+            "G'ayrat!" to "Sizdagi bu g'ayrat bilan har qanday maqsad taslim bo'ladi.",
+            "Sog'lom tan!" to "Kunlik me'yorning yarmi tayyor. Barakalla!",
+            "Natija sari!" to "Aniq va ishonchli ketyapsiz, 50% ortda qoldi.",
+            "Maqsad nishoni!" to "Kaloriya o'qini aniq 50% ga urdingiz!",
+            "Haqiqiy intizom!" to "Siz bugun eng yaxshisisiz, 50% reja bajarildi!",
+            "Sog'lom hayot!" to "Har bir 50% - bu baxtli va sog'lom umr garovidir."
+        )
+        val selected = variations.random()
+
+        dialog.findViewById<TextView>(R.id.text_achievement_title)?.text = selected.first
+        dialog.findViewById<TextView>(R.id.text_achievement_subtitle)?.text = selected.second
+
+        val btnAjoyib = dialog.findViewById<View>(R.id.btn_ajoyib)
+        btnAjoyib?.setOnClickListener {
+            dialog.dismiss()
+        }
+    }
+
     private fun checkLevelUp(points: Int) {
+        val currentIndex = LevelManager.getCurrentLevelIndex(points)
         if (lastShownLevelIndex == -1) {
             lastShownLevelIndex = getLastSeenLevelIndex()
+            // If it was 0 (new install) but points > 0, we still don't want to show it immediately
+            // to avoid "automatic" popups on entry. We only show on actual increase from the first seen level.
+            if (lastShownLevelIndex == 0 && currentIndex > 0) {
+                lastShownLevelIndex = currentIndex
+                saveLastSeenLevelIndex(currentIndex)
+            }
         }
-        val currentIndex = LevelManager.getCurrentLevelIndex(points)
+
         if (currentIndex > lastShownLevelIndex) {
             lastShownLevelIndex = currentIndex
             saveLastSeenLevelIndex(currentIndex)
@@ -1090,65 +1119,5 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
-    private fun checkStreakMilestone(streak: Int) {
-        if (lastShownStreak == -1) {
-            lastShownStreak = getLastSeenStreak()
-        }
 
-        val milestones = listOf(3, 7, 14, 30, 60, 100, 150, 200, 365)
-        val currentMilestone = milestones.lastOrNull { streak >= it } ?: 0
-
-        if (currentMilestone > lastShownStreak) {
-            lastShownStreak = currentMilestone
-            saveLastSeenStreak(currentMilestone)
-            showStreakMilestoneDialog(currentMilestone)
-        }
-    }
-
-    private fun showStreakMilestoneDialog(days: Int) {
-        if (activity == null || isDetached) return
-
-        val inflater = LayoutInflater.from(requireContext())
-        val dialogView = inflater.inflate(R.layout.dialog_level_up, null)
-
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogView)
-            .create()
-
-        val color = 0xFF4CAF50 // Green for streak
-        val emoji = when {
-            days >= 30 -> "👑"
-            days >= 7 -> "🔥"
-            else -> "⚡"
-        }
-
-        val title = when (days) {
-            3 -> "Ajoyib boshlanish!"
-            7 -> "Bir hafta!"
-            14 -> "Ikk haftalik intizom!"
-            30 -> "Bir oylik g'alaba!"
-            else -> "$days kunlik natija!"
-        }
-
-        val motivation =
-            "Siz ketma-ket $days kundan beri o'z maqsadingiz sari bormoqdasiz. To'xtamang!"
-
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_emoji)?.text = emoji
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_name)?.apply {
-            text = "$days kun"
-            setTextColor(color.toInt())
-        }
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_up_title)?.apply {
-            text = title
-            setTextColor(color.toInt())
-        }
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_motivation)?.text =
-            motivation
-        dialogView.findViewById<View>(R.id.btn_level_up_ok)?.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-    }
 }

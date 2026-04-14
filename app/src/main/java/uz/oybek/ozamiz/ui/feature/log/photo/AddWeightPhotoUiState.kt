@@ -46,10 +46,7 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
             _uiState.update { it.copy(error = getApplication<Application>().getString(R.string.error_invalid_weight_input)) }
             return
         }
-        if (imageUri == null) {
-            _uiState.update { it.copy(error = getApplication<Application>().getString(R.string.error_photo_required)) }
-            return
-        }
+        /* Optional photo check removed as per user request */
 
         _uiState.update { it.copy(isLoading = true, error = null) }
 //
@@ -63,7 +60,9 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
                     
                     LocalUser.update {
                         lastWeightLogTimestamp = System.currentTimeMillis()
-                        avatarUrl = newLog.photoUrl // Profil rasmini yangilash
+                        if (newLog.photoUrl.isNotEmpty()) {
+                            avatarUrl = newLog.photoUrl // Profil rasmini yangilash
+                        }
                         weight = weightKg // Update Current Weight!
                         
                         if (startWeight == null || startWeight == -1.0) {

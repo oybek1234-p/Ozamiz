@@ -271,6 +271,22 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- MENU BO'LIMI: Hamjamiyat -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <include
+                    android:id="@+id/section_community"
+                    layout="@layout/item_profile_section" />
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- MENU BO'LIMI 2: Yordam -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

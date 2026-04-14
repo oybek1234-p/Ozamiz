@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
@@ -19,29 +18,19 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:layout_marginTop="32dp"
-            android:text="Bugunga yetarli yedingiz!"
             android:textColor="?attr/colorOnSurface"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/text_explanation"
-            style="@style/Text2_15"
+            style="@style/Text1_16"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:gravity="center"
+            android:gravity="start"
+            android:text="Juda qorningiz ochsa:"
             android:lineSpacingExtra="6dp"
-            android:text="Hozir tanangiz 'yog'larni eritish' rejimida"
             android:textColor="?attr/colorOnSurface" />
-
-        <TextView
-            style="@style/Title3_17"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="Yesangiz bo'ladi"
-            android:textColor="?attr/colorOnSurface"
-            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,7 +38,6 @@
             android:orientation="vertical"
             android:layout_marginTop="16dp">
 
-            <!-- Suyuqlik -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_1"
                 android:layout_width="match_parent"

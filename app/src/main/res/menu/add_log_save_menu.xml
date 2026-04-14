@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/next"
-        android:icon="@drawable/search_ic"
+        android:icon="@drawable/ic_search"
         android:title="Qidirish"
         app:showAsAction="ifRoom" />
 

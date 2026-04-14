@@ -2,19 +2,25 @@ package uz.oybek.ozamiz.ui.feature.log.food
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.model.FoodItem
+import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
-import uz.oybek.ozamiz.ui.utils.showToast
+import uz.oybek.ozamiz.ui.utils.showKeyboard
 import java.util.Date
 
 class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
@@ -23,7 +29,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private val adapter by lazy {
         FoodSearchAdapter(
-            onAddClick = { showSelectionSheet(it) },
+            onAddClick = { food, btn, progress -> directAdd(food, btn, progress) },
             onItemClick = { showSelectionSheet(it) }
         )
     }
@@ -46,6 +52,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
         setupUI(bind)
         observeData(bind)
         viewModel.updateMealType(mealType)
+        bind.inputSearchFood.showKeyboard()
     }
 
     private fun setupUI(bind: FragmentSearchFoodBinding) = with(bind) {
@@ -77,13 +84,67 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
         }
     }
 
+    private fun directAdd(foodItem: FoodItem, button: MaterialButton, progress: View) {
+        animateClick(button)
+        
+        viewLifecycleOwner.lifecycleScope.launch {
+            button.isEnabled = false
+            button.setIconResource(R.drawable.check_ic)
+            progress.isVisible = true
+            
+            val defaultServing = foodItem.servingSizes.firstOrNull()
+            val weight = defaultServing?.grams ?: 100.0
+            val quantityDescription = if (defaultServing != null) "1 ${defaultServing.description}" else "100 g"
+
+            val calories = (foodItem.caloriesPer100g * weight / 100).toInt()
+            val protein = (foodItem.proteinPer100g * weight / 100)
+            val fat = (foodItem.fatPer100g * weight / 100)
+            val carbs = (foodItem.carbsPer100g * weight / 100)
+
+            val log = FoodLog(
+                description = "${foodItem.name} ($quantityDescription)",
+                calories = calories,
+                protein = protein,
+                fat = fat,
+                carbs = carbs,
+                mealType = mealType,
+                aiGenerated = false,
+                timestamp = System.currentTimeMillis()
+            )
+
+            viewModel.logFood(log, Date(timestamp))
+            Snackbar.make(binding.root, "${foodItem.name} qo'shildi!", Snackbar.LENGTH_SHORT).show()
+            
+            delay(1000)
+            
+            progress.isVisible = false
+            button.setIconResource(R.drawable.add_ic)
+            button.isEnabled = true
+        }
+    }
+
+    private fun animateClick(view: View) {
+        view.animate()
+            .scaleX(1.2f)
+            .scaleY(1.2f)
+            .setDuration(100)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(100)
+                    .start()
+            }
+            .start()
+    }
+
     private fun showSelectionSheet(foodItem: FoodItem) {
         FoodSelectionBottomSheet(
             foodItem = foodItem,
             mealType = mealType,
             onLogAdded = { log ->
                 viewModel.logFood(log, Date(timestamp))
-                showToast("Qo'shildi!")
+                Snackbar.make(binding.root, "Qo'shildi!", Snackbar.LENGTH_SHORT).show()
                 binding.inputSearchFood.setText("")
                 hideSoftInput(requireActivity())
             }

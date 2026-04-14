@@ -36,7 +36,7 @@ class VoiceRecorderBottomSheet : BottomSheetDialogFragment() {
     companion object {
         const val TAG = "VoiceRecorderSheet"
         const val REQUEST_KEY = "VoiceResult"
-        const val RESULT_TEXT = "text"
+        const val RESULT_URI = "uri"
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -64,15 +64,20 @@ class VoiceRecorderBottomSheet : BottomSheetDialogFragment() {
                 binding.lottieRecordingIndicator.isVisible = state is VoiceUiState.Recording
 
                 if (state is VoiceUiState.Recording) {
-                    binding.textViewRecordStatus.text = getString(R.string.recording_speak_now)
+                    binding.textViewRecordStatus.text = getString(R.string.voice_listening)
+                    binding.buttonAnalyze.text = getString(R.string.voice_analyze)
                     binding.lottieRecordingIndicator.playAnimation()
                     startTimer()
                 } else {
                     binding.lottieRecordingIndicator.pauseAnimation()
                 }
 
+                if (state is VoiceUiState.Processing) {
+                    binding.textViewRecordStatus.text = getString(R.string.voice_checking)
+                }
+
                 if (state is VoiceUiState.Success) {
-                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_TEXT to state.text))
+                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_URI to state.uri.toString()))
                     dismiss()
                 }
                 if (state is VoiceUiState.Error) {

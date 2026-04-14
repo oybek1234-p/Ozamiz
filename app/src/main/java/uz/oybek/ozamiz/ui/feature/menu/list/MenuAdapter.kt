@@ -9,6 +9,12 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.databinding.ItemMenuBinding
 import uz.oybek.ozamiz.ui.utils.loadPhoto
+import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import jp.wasabeef.glide.transformations.BlurTransformation
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuAdapter(
     private val onMenuClick: (Menu) -> Unit
@@ -33,13 +39,35 @@ class MenuAdapter(
             binding.textCalories.text =
                 binding.root.context.getString(R.string.calories_format, item.calories)
 
+            val isPremiumUser = UserRepository.user.isPremium()
+            val isPremiumRequired = !isPremiumUser && adapterPosition >= 6
+
             if (item.imageUrl != null) {
-                binding.imageMenu.loadPhoto(item.imageUrl!!)
+                var glideRequest = Glide.with(binding.imageMenu)
+                    .load(item.imageUrl)
+                    .placeholder(R.drawable.placeholder_food)
+                    .centerCrop()
+                
+                if (isPremiumRequired) {
+                    glideRequest = glideRequest.apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
+                }
+                glideRequest.into(binding.imageMenu)
             } else {
                 binding.imageMenu.setImageResource(R.drawable.placeholder_food)
             }
 
-            binding.root.setOnClickListener { onMenuClick(item) }
+            binding.premiumOverlay.isVisible = isPremiumRequired
+
+            binding.root.setOnClickListener { 
+                if (isPremiumRequired) {
+                    // We need a way to show premium dialog. 
+                    // Usually we might want to pass a callback or use an event.
+                    // For now, let's assume we can trigger it or just use the click listener provided in constructor.
+                    onMenuClick(item)
+                } else {
+                    onMenuClick(item) 
+                }
+            }
         }
     }
 

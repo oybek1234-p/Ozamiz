@@ -36,8 +36,8 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
         return success
     }
 
-    override suspend fun delete(logId: String, date: Date): Boolean {
-        val userId = currentUserId ?: return false
+    suspend fun delete(logId: String, date: Date, targetUid: String? = null): Boolean {
+        val userId = targetUid ?: currentUserId ?: return false
         val dateStr = date.dateApiFormat()
         
         val oldLog = try {
@@ -46,10 +46,18 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
             null
         }
 
-        val success = super.delete(logId, date)
+        val reference = getReference(userId, dateStr)
+        val success = try {
+            reference.child(logId).removeValue().await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+
         if (success && oldLog != null) {
             DailySummaryRepository.updateSummary(
                 date = date,
+                targetUid = userId,
                 exerciseDelta = -oldLog.caloriesBurned
             )
         }

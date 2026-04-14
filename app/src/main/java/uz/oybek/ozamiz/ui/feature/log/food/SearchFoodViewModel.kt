@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.food.FoodRepository
+import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.logs.model.FoodLog
@@ -20,6 +20,7 @@ data class SearchFoodState(
     val mealType: String = ""
 )
 
+
 class SearchFoodViewModel : ViewModel() {
 
     private val _state = MutableStateFlow(SearchFoodState())
@@ -29,18 +30,32 @@ class SearchFoodViewModel : ViewModel() {
 
     fun updateMealType(mealType: String) {
         _state.update { it.copy(mealType = mealType) }
+        if (state.value.query.isBlank()) {
+            loadInitialFoods()
+        }
+    }
+
+    private fun loadInitialFoods() {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            _state.update { it.copy(isSearching = true) }
+            val results = FoodDatabase.allFoods.take(15)
+            _state.update { it.copy(searchResults = results, isSearching = false) }
+        }
     }
 
     fun searchFoods(query: String) {
         searchJob?.cancel()
         _state.update { it.copy(query = query) }
         if (query.isBlank()) {
-            _state.update { it.copy(searchResults = emptyList(), isSearching = false) }
+            loadInitialFoods()
             return
         }
         searchJob = viewModelScope.launch {
             _state.update { it.copy(isSearching = true) }
-            val results = FoodRepository.searchFoods(query)
+            val results = FoodDatabase.allFoods.filter { 
+                it.name.contains(query, ignoreCase = true) 
+            }.take(30)
             _state.update { it.copy(searchResults = results, isSearching = false) }
         }
     }

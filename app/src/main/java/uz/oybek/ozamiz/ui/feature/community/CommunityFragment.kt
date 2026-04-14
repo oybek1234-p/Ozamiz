@@ -21,7 +21,6 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
     }
 
     override fun viewCreated(bind: FragmentCommunityBinding) {
-
         setupRecyclerView()
         setupSwipeRefresh()
         observeViewModel()

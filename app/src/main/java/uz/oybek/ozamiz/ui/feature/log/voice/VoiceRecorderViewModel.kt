@@ -14,7 +14,7 @@ sealed class VoiceUiState {
     data object Idle : VoiceUiState()
     data object Recording : VoiceUiState()
     data object Processing : VoiceUiState()
-    data class Success(val text: String) : VoiceUiState()
+    data class Success(val uri: android.net.Uri) : VoiceUiState()
     data class Error(val message: String) : VoiceUiState()
 }
 
@@ -27,16 +27,8 @@ class VoiceRecorderViewModel : ViewModel() {
         _uiState.value = VoiceUiState.Recording
     }
 
-    fun analyzeAudio(uri: Uri) {
-        _uiState.value = VoiceUiState.Processing
-        viewModelScope.launch {
-            when (val result = GeminiSpeechRecognizer.transcribeAudio(uri)) {
-                is DataWrapper.Success -> _uiState.value =
-                    VoiceUiState.Success(result.data)
-                is DataWrapper.Error -> _uiState.value =
-                    VoiceUiState.Error(result.error ?: "Ovozni aniqlab bo'lmadi")
-            }
-        }
+    fun analyzeAudio(uri: android.net.Uri) {
+        _uiState.value = VoiceUiState.Success(uri)
     }
 
     fun reset() {

@@ -22,12 +22,11 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
     companion object {
         const val TAG = "PremiumBottomSheetDialog"
         const val REQUEST_KEY = "PremiumBottomSheetRequestKey"
-        const val RESULT_ACTION = "PremiumResultAction" // e.g., "go_to_payment", "dismissed"
+        const val RESULT_ACTION = "PremiumResultAction"
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = PremiumSheetBinding.inflate(inflater, container, false)
         return binding.root
@@ -52,7 +51,7 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             state.premiumPrice?.let {
                 binding.priceView.text = "$it so'm / oyiga"
             }
-            
+
             if (state.paymentChecking) {
                 binding.layoutBenefits.visibility = View.GONE
                 binding.layoutVerificationPending.visibility = View.VISIBLE
@@ -65,11 +64,12 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             }
         }
         binding.button.setOnClickListener {
-            setFragmentResult(REQUEST_KEY,
-                bundleOf(RESULT_ACTION to "go_to_payment"))
+            setFragmentResult(
+                REQUEST_KEY, bundleOf(RESULT_ACTION to "go_to_payment")
+            )
             dismiss()
         }
-        
+
         binding.buttonClose.setOnClickListener {
             dismiss()
         }

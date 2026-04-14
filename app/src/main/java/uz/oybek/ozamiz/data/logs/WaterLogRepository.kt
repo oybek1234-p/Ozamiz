@@ -30,9 +30,9 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
         return success
     }
 
-    override suspend fun delete(logId: String, date: Date): Boolean {
+    suspend fun delete(logId: String, date: Date, targetUid: String? = null): Boolean {
         // Need to fetch old log to know amount
-        val userId = currentUserId ?: return false
+        val userId = targetUid ?: currentUserId ?: return false
         val dateStr = date.dateApiFormat()
         val oldLog = try {
             getReference(userId, dateStr).child(logId).get().await().getValue(WaterLog::class.java)
@@ -40,10 +40,18 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
             null
         }
 
-        val success = super.delete(logId, date)
+        val reference = getReference(userId, dateStr)
+        val success = try {
+            reference.child(logId).removeValue().await()
+            true
+        } catch (e: Exception) {
+            false
+        }
+
         if (success && oldLog != null) {
             DailySummaryRepository.updateSummary(
                 date = date,
+                targetUid = userId,
                 waterDelta = -oldLog.amountMl
             )
         }

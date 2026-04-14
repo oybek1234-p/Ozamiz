@@ -35,3 +35,12 @@ inline fun View.onClick(crossinline action: () -> Unit) {
 inline fun View.onLongClick(crossinline action: () -> Boolean) {
     setOnLongClickListener { action() }
 }
+
+fun View.setOnSafeClickListener(interval: Int = 1000, action: (View) -> Unit) {
+    var lastClickTime: Long = 0
+    setOnClickListener {
+        if (System.currentTimeMillis() - lastClickTime < interval) return@setOnClickListener
+        lastClickTime = System.currentTimeMillis()
+        action(it)
+    }
+}

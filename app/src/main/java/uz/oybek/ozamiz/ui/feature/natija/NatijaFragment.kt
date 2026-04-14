@@ -123,11 +123,10 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                             bind.layoutPhotoAfter.isVisible = false
                         }
                         
-                        // Show spacer when only one photo to keep it at half width
                         bind.spacerPhotoBalance.isVisible = onlyOnePhoto
                     }
 
-                    // Always update stats
+
                     updateStats(bind, state)
                 }
             }

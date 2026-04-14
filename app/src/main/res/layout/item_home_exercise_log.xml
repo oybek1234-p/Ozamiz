@@ -68,13 +68,7 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/img_arrow"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/arrow_right"
-            app:tint="?attr/colorOutline" />
+
 
     </LinearLayout>
 

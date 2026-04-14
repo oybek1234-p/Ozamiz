@@ -66,10 +66,6 @@ class TodaysFoodAdapter(
                 binding.imageViewFood.visibility = View.GONE
             }
 
-            // Macros
-            binding.textViewProtein.text = "${foodLog.protein?.toInt() ?: 0}g"
-            binding.textViewCarbs.text = "${foodLog.carbs?.toInt() ?: 0}g"
-            binding.textViewFat.text = "${foodLog.fat?.toInt() ?: 0}g"
         }
     }
 

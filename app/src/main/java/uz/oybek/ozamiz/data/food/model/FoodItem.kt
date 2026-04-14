@@ -13,6 +13,6 @@ data class FoodItem(
 )
 
 data class ServingSize(
-    val label: String = "",
-    val weight: Double = 0.0 // in grams
+    val description: String = "",
+    val grams: Double = 0.0
 )
