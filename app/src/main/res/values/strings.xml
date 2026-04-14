@@ -454,6 +454,18 @@
     <string name="yuborish">Yuborish</string>
     <string name="ovqatlar_bo_yicha_cheksiz_maslahatlar">Ovqatlar bo‘yicha cheksiz maslahatlar</string>
     <string name="reklama_yo_q">Reklamalarsiz foydalaning</string>
+    <string name="premium_feature_ai_title">Cheklovsiz ovqat tahlili</string>
+    <string name="premium_feature_ai_desc">Ovqatlarni rasmga oling va soniyalar ichida natijani biling.</string>
+    <string name="premium_feature_dietologist_title">Shaxsiy AI Dietolog</string>
+    <string name="premium_feature_dietologist_desc">Sog\'lom ovqatlanish bo\'yicha 24/7 istalgan savolingizga javob oling.</string>
+    <string name="premium_feature_stats_title">Chuqur Statistika</string>
+    <string name="premium_feature_stats_desc">Haftalik va oylik natijalaringizni chuqur tahlil qiling.</string>
+    <string name="premium_feature_recipes_title">Premium Retseptlar</string>
+    <string name="premium_feature_recipes_desc">Sog\'lom va mazali taomlar bazasiga to\'liq kirish.</string>
+    <string name="premium_feature_support_title">Prioritetli Yordam</string>
+    <string name="premium_feature_support_desc">Har qanday muammoda birinchilardan bo\'lib yordam oling.</string>
+    <string name="premium_feature_ads_title">Reklamasiz Interfeys</string>
+    <string name="premium_feature_ads_desc">Fokusni faqat o\'zingizga va maqsadingizga qarating.</string>
     <string name="_35000_sum">35000 sum</string>
     <string name="sotib_olish">Sotib olish</string>
     <string name="premiumga_o_tish">Premiumga o\'tish</string>
@@ -584,4 +596,14 @@
     <string name="limit_exceeded_title">Kunlik me\'yor to\'ldi</string>
     <string name="limit_exceeded_message">Siz bugun kunlik kaloriya me\'yoriga yetdingiz.</string>
     <string name="what_can_i_eat_now">💡 Nima yeyishim mumkin?</string>
+    <string name="premium_emoji_crown">⭐</string>
+    <string name="premium_emoji_robot">🤖</string>
+    <string name="premium_emoji_salad">🥗</string>
+    <string name="premium_emoji_pan">🍳</string>
+    <string name="premium_emoji_forbidden">👍</string>
+    <string name="premium_emoji_hourglass">⏳</string>
+    <string name="premium_emoji_check">✅</string>
+    <string name="premium_emoji_info">ℹ️</string>
+    <string name="premium_subtitle">Barcha imkoniyatlar bir joyda ✨</string>
+    <string name="premium_features_title">Premium imkoniyatlari</string>
 </resources>

@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.databinding.PaymentCheckFragmentBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.NumberFormattingUtils
 import uz.oybek.ozamiz.ui.utils.showToast
 
 class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
@@ -39,8 +40,8 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
                 nextButton.isEnabled = !state.isLoading && selectedCheckUri != null
                 checkButton.isEnabled = !state.isLoading
 
-                state.paymentCardNumber?.let { cardNumber.text = it }
-                state.premiumPrice?.let { textView10.text = "$it so'm" }
+                cardNumber.text = NumberFormattingUtils.formatCardNumber(state.paymentCardNumber)
+                textView10.text = "${NumberFormattingUtils.formatPrice(state.premiumPrice)} so'm"
 
                 state.errorMessage?.let {
                     showToast(it)

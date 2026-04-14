@@ -1013,7 +1013,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             dialog.dismiss()
         }
     }
-
+    
     private fun checkLevelUp(points: Int) {
         val currentIndex = LevelManager.getCurrentLevelIndex(points)
         if (lastShownLevelIndex == -1) {

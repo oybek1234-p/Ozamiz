@@ -41,28 +41,41 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         }
         setupViews(bind, menu!!)
         setupListeners(bind)
+        setupScrollBehavior(bind)
+    }
+
+    private fun setupScrollBehavior(bind: FragmentMenuDetailBinding) {
+        bind.appBar.addOnOffsetChangedListener(com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            val context = appBarLayout.context
+            val isCollapsed = Math.abs(verticalOffset) >= appBarLayout.totalScrollRange - 100
+            
+            val tintColor = if (isCollapsed) {
+                com.google.android.material.color.MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0)
+            } else {
+                android.graphics.Color.WHITE
+            }
+            
+            bind.btnBack.imageTintList = android.content.res.ColorStateList.valueOf(tintColor)
+            bind.btnBack.backgroundTintList = if (isCollapsed) {
+                android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
+            } else {
+                null // Defaults to the drawable's color/tint
+            }
+            
+            bind.scrimView.alpha = 1f - (Math.abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat())
+        })
     }
 
     private fun setupViews(bind: FragmentMenuDetailBinding, menu: Menu) {
         bind.textName.text = menu.name
 
-        if (menu.ingredients.isNullOrBlank()) {
-            bind.labelIngredients.visibility = android.view.View.GONE
-            bind.cardIngredients.visibility = android.view.View.GONE
-        } else {
-            bind.textIngredients.text = menu.ingredients
-            bind.labelIngredients.visibility = android.view.View.VISIBLE
-            bind.cardIngredients.visibility = android.view.View.VISIBLE
-        }
+        bind.labelIngredients.visibility = if (menu.ingredients.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
+        bind.textIngredients.visibility = bind.labelIngredients.visibility
+        bind.textIngredients.text = menu.ingredients
 
-        if (menu.description.isNullOrBlank()) {
-            bind.labelDescription.visibility = android.view.View.GONE
-            bind.cardDescription.visibility = android.view.View.GONE
-        } else {
-            bind.textDescription.text = menu.description
-            bind.labelDescription.visibility = android.view.View.VISIBLE
-            bind.cardDescription.visibility = android.view.View.VISIBLE
-        }
+        bind.labelDescription.visibility = if (menu.description.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
+        bind.textDescription.visibility = bind.labelDescription.visibility
+        bind.textDescription.text = menu.description
 
         bind.textCalories.text = getString(R.string.calories_format, menu.calories)
         bind.textProtein.text = "${menu.protein} g"

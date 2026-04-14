@@ -39,8 +39,6 @@ class MenuAdapter(
             binding.textCalories.text =
                 binding.root.context.getString(R.string.calories_format, item.calories)
 
-            binding.textMacros.text = "P: ${item.protein.toInt()}g • F: ${item.fat.toInt()}g • C: ${item.carbs.toInt()}g"
-
             val isPremiumUser = UserRepository.user.isPremium()
             val isPremiumRequired = !isPremiumUser && adapterPosition >= 6
 

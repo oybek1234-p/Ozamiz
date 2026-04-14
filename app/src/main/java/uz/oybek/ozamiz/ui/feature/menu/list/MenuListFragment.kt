@@ -77,6 +77,7 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
 
     private fun setupListeners(bind: FragmentMenuListBinding) {
         bind.btnBack.isVisible = false
+        bind.btnAddMenu.isVisible = UserRepository.user.admin
         bind.btnAddMenu.setOnClickListener { navigate(R.id.addMenuFragment) }
 
 

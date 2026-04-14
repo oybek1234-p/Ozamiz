@@ -80,8 +80,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="12dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="12dp">
+            android:paddingTop="12dp"
+            android:paddingBottom="16dp">
 
             <TextView
                 android:id="@+id/textName"
@@ -91,34 +91,10 @@
                 android:fontFamily="@font/roboto_bold"
                 android:maxLines="2"
                 android:minLines="2"
+                android:gravity="center"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 tools:text="O'rtacha qovurilgan go'sht va sabzavotlar" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/textMacros"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/roboto_regular"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="11sp"
-                    tools:text="P: 24g • F: 12g • C: 45g" />
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/arrow_back"
-                    android:rotation="180"
-                    app:tint="?attr/colorOnSurfaceVariant" />
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

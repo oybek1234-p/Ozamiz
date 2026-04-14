@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface">
@@ -9,12 +8,15 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurface"
+        android:background="?attr/colorSurface"
+        app:liftOnScroll="false"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:contentScrim="?attr/colorSurface"
+            app:statusBarScrim="?attr/colorSurface"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <LinearLayout
@@ -23,43 +25,13 @@
                 android:orientation="vertical"
                 android:paddingBottom="12dp">
 
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="20dp"
-                    android:paddingTop="20dp"
-                    android:paddingBottom="16dp">
-
-                    <TextView
-                        android:id="@+id/textTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Taomnomalar"
-                        android:textSize="28sp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/textTitle"
-                        android:text="Siz uchun saralangan mazali taomlar"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/roboto_regular"
-                        android:textColor="?colorOnSurfaceVariant"
-                        android:layout_marginTop="2dp"/>
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/btnAddMenu"
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        app:contentPadding="@dimen/dimen_8"
-                        app:shapeAppearance="@style/CircleImageView"
-                        android:background="?colorPrimaryContainer"
-                        android:src="@drawable/add_ic"
-                        app:tint="?colorPrimary"/>
+                    android:paddingTop="16dp"
+                    android:paddingBottom="8dp">
 
                     <ImageButton
                         android:id="@+id/btnBack"
@@ -80,6 +52,7 @@
                     android:layout_marginHorizontal="20dp"
                     android:layout_marginBottom="16dp"
                     app:cardCornerRadius="16dp"
+                    android:layout_marginTop="@dimen/dimen_24"
                     app:cardElevation="2dp"
                     app:strokeWidth="0dp">
 
@@ -130,6 +103,7 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:clipToPadding="false"
                     android:paddingHorizontal="20dp"/>
+
             </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -144,6 +118,17 @@
         android:paddingHorizontal="12dp"
         android:paddingTop="8dp"
         android:paddingBottom="80dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnAddMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@drawable/add_ic"
+        android:visibility="gone"
+        app:tint="@android:color/white"
+        app:backgroundTint="?colorPrimary"/>
         
     <ProgressBar
         android:id="@+id/progressBar"

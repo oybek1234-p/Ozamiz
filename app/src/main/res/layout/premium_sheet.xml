@@ -3,176 +3,356 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-    </data>
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="?colorSurfaceContainer"
-        android:paddingHorizontal="@dimen/dimen_24"
-        android:paddingTop="@dimen/dimen_12"
-        android:paddingBottom="@dimen/dimen_24">
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_premium_sheet"
+        android:orientation="vertical">
 
-
-        <TextView
-            android:id="@+id/textView17"
-            style="@style/Title4_24"
-            android:fontFamily="@font/roboto_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/premium"
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
             android:layout_gravity="center_horizontal"
-            android:drawablePadding="@dimen/dimen_12"
-            android:textColor="?colorPrimary"
-            app:drawableStartCompat="@drawable/star_ic"
-            app:drawableTint="?colorPrimary" />
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp"
+            android:background="?colorOutlineVariant" />
 
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:overScrollMode="never">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:id="@+id/header_premium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="8dp">
+
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:padding="@dimen/dimen_8"
+                            android:layout_gravity="center"
+                            android:text="@string/premium_emoji_crown"
+                            android:textSize="58sp" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/textView_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="Premium"
+                        android:textColor="?colorPrimary"
+                        android:textSize="32sp"
+                        android:letterSpacing="0.15" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/premium_subtitle"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:alpha="0.8" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_benefits"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/dimen_24"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="@string/premium_features_title"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="18sp" />
+
+                    <!-- Feature: AI Tahlil -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="?colorSurfaceContainerLow"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/premium_emoji_salad"
+                                android:textSize="26sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/premium_feature_ai_title"
+                                    android:textColor="?colorOnSurface"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/premium_feature_ai_desc"
+                                    android:textColor="?colorOnSurfaceVariant"
+                                    android:textSize="13sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+
+                    <!-- Feature: Retseptlar -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="?colorSurfaceContainerLow"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/premium_emoji_pan"
+                                android:textSize="26sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/premium_feature_recipes_title"
+                                    android:textColor="?colorOnSurface"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/premium_feature_recipes_desc"
+                                    android:textColor="?colorOnSurfaceVariant"
+                                    android:textSize="13sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Feature: Reklamasiz -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="?colorSurfaceContainerLow"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/premium_emoji_forbidden"
+                                android:textSize="26sp" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/premium_feature_ads_title"
+                                    android:textColor="?colorOnSurface"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="@string/premium_feature_ads_desc"
+                                    android:textColor="?colorOnSurfaceVariant"
+                                    android:textSize="13sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+                <!-- ===== VERIFICATION PENDING STATE ===== -->
+                <LinearLayout
+                    android:id="@+id/layout_verification_pending"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingVertical="16dp"
+                    android:visibility="gone"
+                    tools:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/premium_emoji_hourglass"
+                        android:textSize="60sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="To'lov Tekshirilmoqda"
+                        android:textAlignment="center"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="22sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:lineSpacingMultiplier="1.4"
+                        android:text="To'lovingiz qabul qilindi.\nAdmin 24 soat ichida tasdiqlaydi."
+                        android:textAlignment="center"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Bottom Pinned UI (in wrap content mode) -->
         <LinearLayout
-            android:id="@+id/layout_benefits"
+            android:id="@+id/layout_pinned_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="36dp"
+            android:background="@drawable/bg_premium_sheet"
             android:visibility="gone"
-            tools:visibility="visible"
-            android:layout_marginTop="@dimen/dimen_18" >
+            tools:visibility="visible">
 
-            <TextView
-                style="@style/Headline2_16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/check_ic"
-                android:drawablePadding="8dp"
-                android:text="Cheklovsiz AI Tahlil"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:textSize="18sp"
-                android:textColor="?colorOnSurface"
-                app:drawableTint="@color/green" />
-
-            <TextView
-                style="@style/Text1_16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
-                android:layout_marginTop="@dimen/dimen_8"
-                android:text="Ovqatlarni rasmga oling va bir zumda kaloriya hamda makrolarni aniqlang."
-                android:textColor="?colorOnSurfaceVariant" />
-
-            <TextView
-                style="@style/Headline2_16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableStart="@drawable/check_ic"
-                android:drawablePadding="8dp"
-                android:text="Shaxsiy AI Dietolog"
-                android:layout_marginTop="@dimen/dimen_18"
-                android:textSize="18sp"
-                android:textColor="?colorOnSurface"
-                app:drawableTint="@color/green" />
-
-            <TextView
-                style="@style/Text1_16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
-                android:layout_marginTop="@dimen/dimen_8"
-                android:text="Sog'lom ovqatlanish, retseptlar va maslahatlar bo'yicha AI bilan cheklovsiz suhbat."
-                android:textColor="?colorOnSurfaceVariant" />
-
-
-            <TextView
-                style="@style/Headline3_15"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
-                android:drawableStart="@drawable/check_ic"
-                android:text="@string/reklama_yo_q"
-                android:layout_marginTop="@dimen/dimen_18"
-                android:textSize="18sp"
-                android:textColor="?colorOnSurface"
-                app:drawableTint="@color/green" />
-
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="16dp"
+                android:background="?colorSurfaceContainerHighest" />
 
             <TextView
                 android:id="@+id/price_view"
-                style="@style/Title2_20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/dimen_24"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/roboto_bold"
                 android:textColor="?colorPrimary"
-                tools:text="35000 so'm / oyiga" />
-
+                android:textSize="22sp"
+                tools:text="35 000 so'm / oyiga" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_24"
-                android:text="@string/sotib_olish" />
+                android:layout_height="58dp"
+                android:backgroundTint="?colorPrimary"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/sotib_olish"
+                android:textColor="?colorOnPrimary"
+                android:textSize="17sp"
+                app:cornerRadius="18dp" />
+
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/layout_verification_pending"
+            android:id="@+id/layout_pinned_close"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="36dp"
             android:visibility="gone"
-            android:backgroundTint="?colorSurfaceContainerHigh"
-            tools:visibility="visible"
-            android:layout_marginTop="@dimen/dimen_24">
-
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/admin_ic"
-                app:tint="?colorPrimary"
-                android:padding="16dp" />
-
-            <TextView
-                style="@style/Title2_20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_24"
-                android:text="To'lov Tekshirilmoqda"
-                android:fontFamily="@font/roboto_bold"
-                android:textColor="?colorOnSurface"
-                android:textAlignment="center" />
-
-            <TextView
-                style="@style/Text1_16"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_12"
-                android:text="Sizning to'lov chekingiz qabul qilindi. Operatorlarimiz uni 24 soat ichida tekshirib chiqadilar."
-                android:textColor="?colorOnSurfaceVariant"
-                android:textAlignment="center"
-                android:lineSpacingMultiplier="1.2" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:cardBackgroundColor="?colorSecondaryContainer"
-                app:cardCornerRadius="12dp"
-                app:strokeWidth="0dp">
-
-
-            </com.google.android.material.card.MaterialCardView>
-
+            tools:visibility="gone">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_close"
-                style="@style/Widget.Material3.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_24"
-                android:text="@string/tushunarli" />
+                android:layout_height="58dp"
+                android:backgroundTint="?colorPrimary"
+                android:text="@string/tushunarli"
+                android:textColor="?colorOnPrimary"
+                android:textSize="17sp"
+                app:cornerRadius="18dp" />
 
         </LinearLayout>
+
     </LinearLayout>
 </layout>
