@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.AppConstants
@@ -48,7 +47,7 @@ class HomeViewModel : ViewModel() {
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private val _foodJustAddedEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
+    private val _foodJustAddedEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1)
     val foodJustAddedEvent = _foodJustAddedEvent.asSharedFlow()
 
     private val _showRateAppEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
@@ -64,6 +63,7 @@ class HomeViewModel : ViewModel() {
     private var previousPoints = -1
     private var isFirstLoadCompleted = false
     private var isTipInitialized = false
+    private var isFoodAdditionPending = false
     private var dataCollectionJob: Job? = null
 
     private var summaryJob: Job? = null
@@ -184,11 +184,8 @@ class HomeViewModel : ViewModel() {
             }
 
             val summaryFlow = DailyLogRepository.observeDailySummary(date)
-                .onStart { emit(DataWrapper.Success(DailySummary())) }
             val exerciseFlow = ExerciseLogRepository.getLogs(date)
-                .onStart { emit(emptyList()) }
             val foodFlow = FoodLogRepository.getAllLogs(date)
-                .onStart { emit(emptyList()) }
 
             combine(
                 summaryFlow,
@@ -363,8 +360,9 @@ class HomeViewModel : ViewModel() {
                         isCalorieExceeded = summary.consumedCalories > user.targetCalories + 200,
                     )
                 }
-                if (foodJustAddedEvent) {
+                if (foodJustAddedEvent || isFoodAdditionPending) {
                     viewModelScope.launch { _foodJustAddedEvent.emit(Unit) }
+                    isFoodAdditionPending = false
                 }
                 previousWaterAmount = currentWater
                 previousFoodCalories = currentFoodCalories
@@ -376,6 +374,14 @@ class HomeViewModel : ViewModel() {
                 _uiState.update { it.copy(isInitialLoading = false, isRefreshing = false) }
             }
         }
+    }
+
+    fun onFoodAdded() {
+        isFoodAdditionPending = true
+    }
+
+    fun consumeFoodAddedEvent() {
+        _foodJustAddedEvent.resetReplayCache()
     }
 
     private fun calculateGlasses(current: Int, old: Int): List<WaterGlassState> {

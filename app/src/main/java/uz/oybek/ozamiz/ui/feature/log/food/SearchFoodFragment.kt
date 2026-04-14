@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -15,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
@@ -26,6 +28,7 @@ import java.util.Date
 class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private val viewModel: SearchFoodViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
 
     private val adapter by lazy {
         FoodSearchAdapter(
@@ -113,6 +116,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             )
 
             viewModel.logFood(log, Date(timestamp))
+            homeViewModel.onFoodAdded()
             Snackbar.make(binding.root, "${foodItem.name} qo'shildi!", Snackbar.LENGTH_SHORT).show()
             
             delay(1000)
@@ -144,6 +148,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             mealType = mealType,
             onLogAdded = { log ->
                 viewModel.logFood(log, Date(timestamp))
+                homeViewModel.onFoodAdded()
                 Snackbar.make(binding.root, "Qo'shildi!", Snackbar.LENGTH_SHORT).show()
                 binding.inputSearchFood.setText("")
                 hideSoftInput(requireActivity())

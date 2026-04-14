@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.model.FoodDatabase
@@ -42,6 +44,7 @@ import java.util.Date
 class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private val viewModel: LogFoodViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
 
     private var imageFileUri: Uri? = null
 
@@ -198,6 +201,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         mealType = viewModel.state.value.meal,
                         onLogAdded = { log ->
                             viewModel.logFood(log, logDate)
+                            homeViewModel.onFoodAdded()
                             showToast("Qo'shildi!")
                         }
                     ).show(parentFragmentManager, FoodSelectionBottomSheet.TAG)

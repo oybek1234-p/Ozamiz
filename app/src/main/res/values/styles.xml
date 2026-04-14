@@ -110,4 +110,12 @@
         <item name="android:layout_marginStart">4dp</item>
     </style>
 
+    <style name="ShapeAppearanceOverlay.App.CornerTop" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
 </resources>

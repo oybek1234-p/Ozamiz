@@ -39,6 +39,8 @@ class MenuAdapter(
             binding.textCalories.text =
                 binding.root.context.getString(R.string.calories_format, item.calories)
 
+            binding.textMacros.text = "P: ${item.protein.toInt()}g • F: ${item.fat.toInt()}g • C: ${item.carbs.toInt()}g"
+
             val isPremiumUser = UserRepository.user.isPremium()
             val isPremiumRequired = !isPremiumUser && adapterPosition >= 6
 
@@ -59,14 +61,7 @@ class MenuAdapter(
             binding.premiumOverlay.isVisible = isPremiumRequired
 
             binding.root.setOnClickListener { 
-                if (isPremiumRequired) {
-                    // We need a way to show premium dialog. 
-                    // Usually we might want to pass a callback or use an event.
-                    // For now, let's assume we can trigger it or just use the click listener provided in constructor.
-                    onMenuClick(item)
-                } else {
-                    onMenuClick(item) 
-                }
+                onMenuClick(item)
             }
         }
     }

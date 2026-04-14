@@ -38,20 +38,38 @@ class MenuFilterAdapter(
 
         fun bind(item: MenuCategory) {
             binding.textName.text = item.name
-            
+
             val isSelected = item.id == selectedCategoryId
             val context = binding.root.context
             val selectedColor = MaterialColors.getColor(context, selectionColorAttr, 0)
-            val primaryContainerColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow, 0)
+            val containerColor = MaterialColors.getColor(
+                context,
+                com.google.android.material.R.attr.colorSurfaceContainerHigh,
+                0
+            )
+
+            binding.root.setBackgroundResource(R.drawable.pill_background)
 
             if (isSelected) {
-                binding.root.setBackgroundResource(R.drawable.round_lay)
                 binding.root.background.setTint(selectedColor)
-                binding.textName.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0))
+                binding.textName.setTextColor(
+                    MaterialColors.getColor(
+                        context,
+                        com.google.android.material.R.attr.colorOnPrimary,
+                        0
+                    )
+                )
+                binding.textName.typeface = context.resources.getFont(R.font.roboto_bold)
             } else {
-                binding.root.setBackgroundResource(R.drawable.round_lay)
-                binding.root.background.setTint(primaryContainerColor)
-                binding.textName.setTextColor(MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0))
+                binding.root.background.setTint(containerColor)
+                binding.textName.setTextColor(
+                    MaterialColors.getColor(
+                        context,
+                        com.google.android.material.R.attr.colorOnSurfaceVariant,
+                        0
+                    )
+                )
+                binding.textName.typeface = context.resources.getFont(R.font.roboto_medium)
             }
 
             binding.root.setOnClickListener { onCategoryClick(item) }

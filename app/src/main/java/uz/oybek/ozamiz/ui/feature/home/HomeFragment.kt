@@ -32,7 +32,6 @@ import uz.oybek.ozamiz.ui.feature.log.food.LogFoodFragment
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Calendar
 import java.util.Date
-import uz.oybek.ozamiz.ui.feature.home.TodayExercisesBottomSheet
 import kotlin.math.absoluteValue
 
 class LogFragment : BaseFragment<FragmentHomeBinding>() {
@@ -41,7 +40,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private var dateAdapter: DateScrollerAdapter? = null
 
     private var lastShownLevelIndex: Int = -1
-
 
     private fun getLastSeenLevelIndex(): Int {
         val prefs = requireContext().getSharedPreferences(
@@ -109,11 +107,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             val added = bundle.getBoolean("added", false)
             if (added) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    delay(300) // Small delay to let dialog dismiss animation finish
+                    delay(300)
                     showWaterMotivationSnackbar()
                     lastState?.let {
                         checkWaterGoalReached(it)
-                        checkCalorieOptimalAchievement(it)
                     }
                 }
             }
@@ -130,7 +127,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                     showExerciseMotivationSnackbar(exerciseId)
                     lastState?.let {
                         check70PercentExercise(it)
-                        checkCalorieOptimalAchievement(it)
                     }
                 }
             }
@@ -352,9 +348,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 launch {
                     viewModel.foodJustAddedEvent.collect {
                         val state = viewModel.uiState.value
+                        viewModel.consumeFoodAddedEvent()
                         if (DateUtils.isSameDay(state.selectedDate, Date())) {
                             check50PercentCalorieAchievement(state)
-                            checkCalorieOptimalAchievement(state)
                             if (state.isCalorieExceeded || state.isCalorieOptimal) {
                                 DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CALORIES)
                                     .show(childFragmentManager, DailyLimitFragment.TAG)
@@ -562,6 +558,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         val mealCalories = state.dailyFoodLogs.groupBy { it.mealType }
             .mapValues { entry -> entry.value.sumOf { it.calories } }
 
+        val latestFoodByMeal = state.dailyFoodLogs.groupBy { it.mealType }
+            .mapValues { entry ->
+                entry.value.maxByOrNull { (it.timestamp as? Number)?.toLong() ?: 0L }
+            }
+
         val target = state.caloriesTarget.toFloat()
         val meals = listOf(
             Triple(binding.cardBreakfast, MealTime.Breakfast.id, (target * 0.3f).toInt()),
@@ -573,11 +574,15 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         meals.forEach { (card, id, baseMax) ->
             val consumed = mealCalories[id] ?: 0
             val max = baseMax.takeIf { it > 0 } ?: 400
+            val latestFood = latestFoodByMeal[id]
 
             if (consumed >= max || state.caloriesConsumed >= state.caloriesTarget) {
                 card.layoutCalories.isVisible = false
+                card.textMealLastFood.isVisible = latestFood != null
+                card.textMealLastFood.text = latestFood?.description
             } else {
                 card.layoutCalories.isVisible = true
+                card.textMealLastFood.isVisible = false
                 card.textMealCalories.text = "${max - consumed} kkal qoldi"
                 card.textMealCalories.setTextColor(colors.onSurfaceVariant)
                 card.progressMeal.max = max
@@ -911,35 +916,35 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 "Yog'lar \"yig'layapti\"!",
                 "70% rejalashtirilgan kaloriya yoqildi. Davom eting!"
             ),
-            Triple("⚡", "Super energiya!", "Siz bugun juda faolsiz, 70% marra zabt etildi!"),
-            Triple("🏆", "Chempionlik sari!", "Mashqlarga bo'lgan bu g'ayrat 70% marraga yetdi!"),
-            Triple("💪", "Kuch va qudrat!", "Tanangiz chiniqmoqda (70% reja bajarildi)!"),
-            Triple("🏃", "Tezkor natija!", "Faolligingiz bugun 70% dan oshdi. Barakalla!"),
-            Triple("✨", "Yashang!", "Siz bugun o'zingizni yengdingiz, 70% kaloriya yoqildi!"),
-            Triple("🚀", "Kosmik tezlik!", "Mashqlar tartibingiz hayratda qoldirmoqda (70% reja)!"),
+            Triple("⚡", "Super energiya!", "Siz bugun juda faolsiz, marra zabt etildi!"),
+            Triple("🏆", "Chempionlik sari!", "Mashqlarga bo'lgan bu g'ayrat marraga yetdi!"),
+            Triple("💪", "Kuch va qudrat!", "Tanangiz chiniqmoqda!"),
+            Triple("🏃", "Tezkor natija!", "Faolligingiz bugun dan oshdi. Barakalla!"),
+            Triple("✨", "Yashang!", "Siz bugun o'zingizni yengdingiz,!"),
+            Triple("🚀", "Kosmik tezlik!", "Mashqlar tartibingiz hayratda qoldirmoqda!"),
             Triple("🎯", "Aniq nishon!", "Bugungi faollik rejasining 70% i tayyor!"),
-            Triple("🌟", "Yulduzli natija!", "Bugun deyarli hamma mashqlarni uddaladingiz (70%)!"),
+            Triple("🌟", "Yulduzli natija!", "Bugun deyarli hamma mashqlarni uddaladingiz!"),
             Triple(
                 "🌈",
                 "Siz ajoyibsiz!",
-                "Har bir harakat sizni go'zallikka yaqinlashtiradi (70%)!"
+                "Har bir harakat sizni go'zallikka yaqinlashtiradi!"
             ),
             Triple("💎", "Qimmatbaho sog'lik!", "Bugunga mo'ljallangan 70% kaloriya sarflandi!"),
-            Triple("🧨", "Portlovchi kuch!", "Siz bugun haqiqiy vulqonsiz! 70% reja bajarildi!"),
+            Triple("🧨", "Portlovchi kuch!", "Siz bugun haqiqiy vulqonsiz! "),
             Triple("🧗", "Cho'qqi sari!", "Faollik masofasining 70% i bosib o'tildi!"),
-            Triple("🥊", "Zarbdor natija!", "Siz har qanday dangasalikni yengdingiz (70%)!"),
-            Triple("🧘", "Garmoniya va kuch!", "Tana va ruh birdamligi 70% ga yetdi!"),
-            Triple("🚲", "Tezkor harakat!", "Kaloriya yoqishda bugun to'xtamadingiz (70% reja)!"),
+            Triple("🥊", "Zarbdor natija!", "Siz har qanday dangasalikni yengdingiz!"),
+            Triple("🧘", "Garmoniya va kuch!", "Tana va ruh birdamligi!"),
+            Triple("🚲", "Tezkor harakat!", "Kaloriya yoqishda bugun to'xtamadingiz!"),
             Triple("🤸", "Elastiklik mukammal!", "Bugungi mashqlar natijasi 70% ga yetdi!"),
             Triple(
                 "🛹",
                 "Yangi marra!",
-                "Siz bugun 70% kaloriya sarflab shaxsiy rekordga yaqinlashdingiz!"
+                "Siz bugun kaloriya sarflab shaxsiy rekordga yaqinlashdingiz!"
             ),
             Triple(
                 "🎖️",
                 "Xizmatlaringiz beqiyos!",
-                "Bugun 70% faollik bilan o'zingizni xursand qildingiz!"
+                "Bugun faollik bilan o'zingizni xursand qildingiz!"
             )
         )
         val selected = variations.random()
@@ -951,18 +956,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         val btnAjoyib = dialog.findViewById<View>(R.id.btn_ajoyib)
         btnAjoyib?.setOnClickListener {
             dialog.dismiss()
-        }
-    }
-
-    private fun checkCalorieOptimalAchievement(state: HomeUiState) {
-        val todayStr = Date().dateApiFormat()
-
-        if (state.caloriesTarget > 0 &&
-            state.caloriesConsumed >= state.caloriesTarget &&
-            getPersistentDate("last_calorie_goal_shown") != todayStr
-        ) {
-            showCalorieOptimalAchievement()
-            savePersistentDate("last_calorie_goal_shown", todayStr)
         }
     }
 
@@ -978,20 +971,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun showCalorieOptimalAchievement() {
-        if (activity == null || isDetached) return
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(R.layout.dialog_food_achievement)
-            .create()
-
-        dialog.show()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        val btnAjoyib = dialog.findViewById<View>(R.id.btn_ajoyib)
-        btnAjoyib?.setOnClickListener {
-            dialog.dismiss()
-        }
-    }
 
     private fun show50PercentCalorieAchievement() {
         if (activity == null || isDetached) return
@@ -1003,56 +982,26 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val variations = listOf(
-            "Yarim yo'l!" to "Kunlik kaloriyaning 50% qismi bajarildi. Juda yaxshi!",
-            "Oltin o'rtaliq!" to "Siz bugungi ozuqa rejangizning qoq markazidasiz.",
-            "Energiya balansi!" to "50% kaloriya - bu sog'lom turmush tarzi sari dadil qadam.",
-            "Muvozanat ustasi!" to "Me'yorni saqlashda davom eting, yarmi muvaffaqiyatli o'tdi.",
-            "Barakalla!" to "Bugun ovqatlanish tartibi a'lo darajada ketmoqda.",
-            "Sog'lom tanlov!" to "50% kaloriya sarflandi, qolgan qismini ham me'yorda ushlang.",
-            "Intizom kuchi!" to "Rejangizning yarmi tayyor. O'zingiz bilan faxrlaning!",
-            "Ideal start!" to "Kun yarmida 50% kaloriya - bu eng to'g'ri ko'rsatkich.",
-            "Ozuqa nazorati!" to "Siz o'z tanangizni eshityapsiz, 50% marra zabt etildi.",
-            "Ofarin!" to "Kaloriyalar nazoratda, sog'lik esa siz tomonda!",
-            "Metabolizm quvvati!" to "Tanangiz keragidan ortiq yuklama olmadi, 50% reja joyida.",
-            "Go'zallik siri!" to "To'g'ri vazn sari yo'lning yarmi bugun bosib o'tildi.",
-            "Diqqatli bo'ling!" to "50% kaloriya - endi qolgan vaqtda ham hushyorlikni yo'qotmang.",
-            "Siz uddaladingiz!" to "Bugungi kaloriyaning yarmi o'zlashtirildi. Super!",
-            "Shijoat!" to "Sog'lom ovqatlanishda bugun sizga teng keladigani yo'q.",
-            "Aniq reja!" to "Har bir Luqma hisobda, 50% marra esa ortda!",
-            "Yengillik hissi!" to "Ortiqcha emassiz, 50% kaloriya bilan kunni davom eting.",
-            "Ritmda qoling!" to "Kunlik ehtiyojingizning yarmi qondirildi. Zo'r!",
-            "Matonat!" to "Istaklaringizni nazorat qila olyapsiz, 50% natija buni ko'rsatmoqda.",
-            "Zabarast!" to "50% kaloriya - bugun siz haqiqiy sog'lom turmush tarzi targ'ibotchisisiz.",
-            "Tana garmoniyasi!" to "Ichki xotirjamlik va 50% kaloriya - mukammal uyg'unlik.",
-            "G'alaba!" to "Bugungi eng katta g'alaba o'z rejangizga sodiqligizdir (50%).",
-            "Nurli qomat!" to "Ideal vazn sari yana bir yarim kunlik qadam tashlandi.",
-            "O'zgarishlar vaqti!" to "Har bir 50% li marra sizni yangi hayotga yaqinlashtiradi.",
-            "Iroda sinovi!" to "Siz irodali bo'lib chiqdingiz, 50% kaloriya - bu isbot!",
-            "Ajoyib!" to "O'z organizmingizni ilmiy yondashuv bilan boshqaryapsiz.",
-            "Kichik g'alaba!" to "50% kaloriya bilan bugun o'zingizni xursand qildingiz.",
-            "Tabassum qiling!" to "Siz bugun tartiblisiz, 50% reja bu - yaxshi kayfiyat demak.",
-            "Yashang!" to "Har bir to'g'ri Luqma sog'ligingizga sarmoyadir.",
-            "Kelajak sarmoyasi!" to "Bugungi 50% intizom - ertangi sog'lom tana poydevori.",
-            "A'lo kayfiyat!" to "O'zingizni yengillashtiryapsiz, 50% kaloriya - bu parvoz!",
-            "Nazorat ostida!" to "Siz bugun vaziyatni to'liq nazorat qilyapsiz.",
-            "Hayratlanarli!" to "Sizning bu qat'iyatingiz ko'pchilikka o'rnak bo'ladi.",
-            "Haqiqiy natija!" to "Kaloriya rejasining 50% i bu shunchaki raqam emas, bu mehnat!",
-            "Sog'lik ustuvor!" to "Bugun o'zingizni haqiqatdan sevasiz, 50% marra buni deydi.",
-            "Dadil olg'a!" to "Yarim yo'l o'tildi, marrani ko'zlang va davom eting.",
-            "Mukammallik!" to "Har bir harakatingizda aniqlik va sog'lik bor.",
-            "Ijobiy natija!" to "50% kaloriya - siz kutilganidan ham yaxshiroq ketyapsiz.",
-            "Samimiyat!" to "Samimiy mehnat ortidan chiroyli qomat keladi.",
-            "Oltin qomat!" to "50% marra - boylik emas, sog'lik yig'moqdasiz.",
-            "Daryo kabi!" to "Sekin va ishonchli ravishda 50% marraga oqib keldingiz.",
-            "Cheksiz imkoniyat!" to "O'zining ovqatlanishini boshqargan inson dunyoni boshqaradi.",
-            "Sog'lom tushlik!" to "50% kaloriya bilan kunning eng muhim qismini o'tadingiz.",
-            "Yangi marra!" to "Har bir 50% sizni yangi yuqori darajaga olib chiqadi.",
-            "G'ayrat!" to "Sizdagi bu g'ayrat bilan har qanday maqsad taslim bo'ladi.",
-            "Sog'lom tan!" to "Kunlik me'yorning yarmi tayyor. Barakalla!",
-            "Natija sari!" to "Aniq va ishonchli ketyapsiz, 50% ortda qoldi.",
-            "Maqsad nishoni!" to "Kaloriya o'qini aniq 50% ga urdingiz!",
-            "Haqiqiy intizom!" to "Siz bugun eng yaxshisisiz, 50% reja bajarildi!",
-            "Sog'lom hayot!" to "Har bir 50% - bu baxtli va sog'lom umr garovidir."
+            "Ajoyib ketyapsiz!" to "Shu tarzda davom eting, natija uzoq kuttirmaydi!",
+            "Zo'r, to'xtamang!" to "Sizdagi bu shijoat ko'pchilikni hayratda qoldiradi.",
+            "Ofarin, davom eting!" to "Maqsad sari tashlangan har bir qadam muhim.",
+            "Hammasi a'lo!" to "Siz bugun juda tartiblisiz, barakalla!",
+            "Barakalla, olg'a!" to "O'zingizni asrashda chiroyli natija ko'rsatyapsiz.",
+            "Shijoatni so'ndirmang!" to "Intizomingiz sizni go'zallik sari yetaklaydi.",
+            "Siz haqiqiy namunali odamsiz!" to "Sog'lom hayot sari yo'lda sizga tengi yo'q.",
+            "A'lo darajada!" to "Bugun ovqatlanish tartibingiz shunchaki super!",
+            "Davom eting!" to "Har bir to'g'ri tanlov - bu sizning g'alabangiz.",
+            "Zo'r natija!" to "Taslim bo'lmasligingiz bizni quvontirmoqda.",
+            "Intizomingizga qoyil!" to "Vaziyatni to'liq nazorat qilishingiz tahsinga loyiq.",
+            "Ajoyib, taslim bo'lmang!" to "Siz bugun o'z maqsadingizga juda yaqinsiz.",
+            "Ofarin, super!" to "Sizni bunday g'ayrat bilan har qanday marra nishon!",
+            "Yashang, shunday davom eting!" to "Tanangiz sizdan chin dildan minnatdor.",
+            "Zo'r, shijoat bu - kuch!" to "Sizdagi bu kuchli iroda har qanday to'siqni yengadi.",
+            "Ajoyib intizom!" to "Tartibli bo'lish sizga juda yarashyapti.",
+            "Omad, to'xtab qolmang!" to "G'alaba sari yo'lingiz nurli bo'lsin.",
+            "Ofarin!" to "Charchamang, go'zal qomat sizni kutmoqda.",
+            "Zo'r ketyapsiz!" to "Bugun siz haqiqatan ham ajoyib ketyapsiz.",
+            "Ajoyib, olg'a!" to "Bugungi har bir harakatingiz - ertangi sog'ligingiz!"
         )
         val selected = variations.random()
 
@@ -1069,8 +1018,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         val currentIndex = LevelManager.getCurrentLevelIndex(points)
         if (lastShownLevelIndex == -1) {
             lastShownLevelIndex = getLastSeenLevelIndex()
-            // If it was 0 (new install) but points > 0, we still don't want to show it immediately
-            // to avoid "automatic" popups on entry. We only show on actual increase from the first seen level.
             if (lastShownLevelIndex == 0 && currentIndex > 0) {
                 lastShownLevelIndex = currentIndex
                 saveLastSeenLevelIndex(currentIndex)

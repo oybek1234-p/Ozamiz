@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurface">
@@ -8,116 +9,140 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurfaceContainer"
+        android:background="?colorSurface"
         app:elevation="0dp">
 
-        <LinearLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="16dp">
-
-                <ImageButton
-                    android:id="@+id/btnBack"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/oval_back"
-                    android:backgroundTint="?colorSurfaceContainerHigh"
-                    android:src="@drawable/arrow_back"
-                    android:padding="8dp"
-                    android:contentDescription="Back"
-                    app:tint="?colorOnSurface"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Menyular"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/roboto_bold"
-                    android:textColor="?colorOnSurface"
-                    android:layout_marginStart="12dp"/>
-
-                <ImageButton
-                    android:id="@+id/btnAddMenu"
-                    android:layout_width="24dp"
-                    android:layout_height="40dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:src="@drawable/add_ic"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="Add Menu"
-                    app:tint="?attr/colorPrimary" />
-            </LinearLayout>
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
-                android:layout_marginBottom="12dp">
+                android:orientation="vertical"
+                android:paddingBottom="12dp">
 
-                <FrameLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    
-                    <EditText
-                        android:id="@+id/editSearch"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:background="@drawable/round_lay_stroke"
-                        android:hint="Taom qidirish..."
-                        android:paddingStart="40dp"
-                        android:paddingEnd="16dp"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="20dp"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/textTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Taomnomalar"
+                        android:textSize="28sp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurface"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/textTitle"
+                        android:text="Siz uchun saralangan mazali taomlar"
                         android:textSize="14sp"
-                        android:textColor="?colorOnSurface"
-                        android:maxLines="1"
-                        android:inputType="text"/>
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:layout_marginTop="2dp"/>
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_search"
-                        android:layout_gravity="center_vertical|start"
-                        android:layout_marginStart="12dp"
-                        app:tint="?colorOnSurfaceVariant"/>
-                </FrameLayout>            
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/btnAddMenu"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        app:contentPadding="@dimen/dimen_8"
+                        app:shapeAppearance="@style/CircleImageView"
+                        android:background="?colorPrimaryContainer"
+                        android:src="@drawable/add_ic"
+                        app:tint="?colorPrimary"/>
+
+                    <ImageButton
+                        android:id="@+id/btnBack"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:visibility="gone"
+                        android:background="@drawable/oval_back"
+                        android:backgroundTint="?colorSurfaceContainerHigh"
+                        android:src="@drawable/arrow_back"
+                        android:padding="8dp"
+                        android:contentDescription="Back"
+                        app:tint="?colorOnSurface"/>
+                </RelativeLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="?colorSurfaceContainerLow">
+                        
+                        <EditText
+                            android:id="@+id/editSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:hint="Taom qidirish..."
+                            android:paddingStart="44dp"
+                            android:paddingEnd="16dp"
+                            android:textSize="15sp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textColor="?colorOnSurface"
+                            android:maxLines="1"
+                            android:inputType="text"/>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_search"
+                            android:layout_gravity="center_vertical|start"
+                            android:layout_marginStart="14dp"
+                            app:tint="?colorOnSurfaceVariant"/>
+                    </FrameLayout>            
+                </com.google.android.material.card.MaterialCardView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerPrimaryCategories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="20dp"
+                    android:layout_marginBottom="8dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerSecondaryCategories"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="20dp"/>
             </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerPrimaryCategories"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:clipToPadding="false"
-                android:paddingHorizontal="16dp"
-                android:layout_marginBottom="8dp"/>
-
-            <!-- Secondary Categories -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerSecondaryCategories"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:clipToPadding="false"
-                android:paddingHorizontal="16dp"/>
-        </LinearLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMenus"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?colorSurfaceContainer"
+        android:background="?colorSurface"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:clipToPadding="false"
-        android:paddingHorizontal="8dp"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
         android:paddingBottom="80dp"/>
         
     <ProgressBar

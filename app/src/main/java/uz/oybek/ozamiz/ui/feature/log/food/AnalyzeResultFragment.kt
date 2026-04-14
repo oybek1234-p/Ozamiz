@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -19,6 +20,7 @@ import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
+import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -30,6 +32,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AnalyzeResultViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
     private lateinit var ingredientsAdapter: IngredientsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -275,6 +278,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
             viewModel.event.collect { event ->
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
+                        homeViewModel.onFoodAdded()
                         findNavController().popBackStack(R.id.home, false)
                     }
 
@@ -302,6 +306,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                     }
 
                     is AnalyzeResultEvent.LimitExceeded -> {
+                        homeViewModel.onFoodAdded()
                         findNavController().popBackStack(R.id.home, false)
                     }
                 }
