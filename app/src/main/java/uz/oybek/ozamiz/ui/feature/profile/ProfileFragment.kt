@@ -41,7 +41,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         return FragmentProfileBinding.inflate(inflater, container, false)
     }
 
+    private val pickImageLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let { viewModel.updateAvatar(it) }
+    }
+
     override fun viewCreated(bind: FragmentProfileBinding) {
+        bind.btnEditAvatar.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
         setupSection(
             bind.sectionMyInfo,
             R.drawable.person_filled,
@@ -59,12 +66,12 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             }
         }
         setupSection(
-            bind.sectionCommunity,
-            R.drawable.people_ic,
-            "Hamjamiyat"
+            bind.sectionUserLessons,
+            R.drawable.study_ic,
+            "Darsliklar"
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.communityFragment)
+                navigate(R.id.lessonsHomeFragment)
             }
         }
         setupSection(
@@ -74,6 +81,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
         setupSection(bind.sectionRateApp, R.drawable.star_ic, getString(R.string.rate_app)) {
             openAppInPlayStore()
+        }
+        setupSection(
+            bind.sectionCommunity, R.drawable.people_ic, getString(R.string.hamjamiyat)
+        ) {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                navigate(R.id.communityFragment)
+            }
         }
         setupSection(
             bind.sectionAdminPremiumUsersContent, R.drawable.admin_ic, "Premium Tekshiruv"
@@ -96,14 +110,23 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 navigate(R.id.action_profileFragment_to_adminUsersListFragment)
             }
         }
+        setupSection(
+            bind.sectionAdminPosts, R.drawable.post_ic, "Admin: Postlar"
+        ) {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                navigate(R.id.action_profileFragment_to_adminPostManagerFragment)
+            }
+        }
         bind.buttonLogout.setOnClickListener {
             showLogoutConfirmationDialog()
         }
 
         bind.premiumButton.setOnClickListener {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                findNavController().navigate(R.id.paymentGetCheckFragment)
-            }
+            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(childFragmentManager, uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG)
+        }
+        
+        bind.premiumView.setOnClickListener {
+            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(childFragmentManager, uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG)
         }
 
         bind.cardUserLevel.setOnClickListener {
@@ -116,9 +139,16 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     }
 
     private fun setupPaymentCheckListener() {
-        setFragmentResultListener("payment_check_submitted") { _, bundle ->
-            if (bundle.getBoolean("submitted")) {
-                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(parentFragmentManager, uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG)
+        childFragmentManager.setFragmentResultListener(
+            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val result = bundle.getString(uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.RESULT_ACTION)
+            if (result == "go_to_payment") {
+                val price = bundle.getLong("selected_price", 29000L)
+                val isYearly = bundle.getBoolean("is_yearly", false)
+                val args = androidx.core.os.bundleOf("price" to price, "is_yearly" to isYearly)
+                findNavController().navigate(R.id.action_profileFragment_to_paymentGetCheckFragment, args)
             }
         }
     }

@@ -42,7 +42,7 @@ class CommunityViewModel : ViewModel() {
         _state.update { it.copy(isLoading = isFirstLoad, isPaging = !isFirstLoad, error = null) }
 
         viewModelScope.launch {
-            val result = CommunityPostRepository.getPosts(limit = 8, lastVisiblePostId = lastVisiblePostId)
+            val result = CommunityPostRepository.getPosts(limit = 8, lastVisiblePostId = lastVisiblePostId, verifiedOnly = true)
             result.onSuccess { newPosts ->
                 if (newPosts.isEmpty()) {
                     _state.update { it.copy(isLoading = false, isPaging = false, hasReachedEnd = true) }
@@ -65,21 +65,38 @@ class CommunityViewModel : ViewModel() {
     }
 
     fun toggleLike(postId: String) {
-        val userId = Firebase.auth.currentUser?.uid ?: return
+        val user = uz.oybek.ozamiz.data.user.local.LocalUser.user
+        if (user.uid.isEmpty()) return
+        
         viewModelScope.launch {
-            val result = CommunityPostRepository.toggleLike(postId, userId)
+            val post = _state.value.posts.find { it.id == postId } ?: return@launch
+            val result = CommunityPostRepository.toggleLike(postId, user.uid)
             result.onSuccess { isLiked ->
                 // Optimistically update the UI
                 _state.update { currentState ->
-                    val newPosts = currentState.posts.map { post ->
-                        if (post.id == postId) {
-                            val newLikesCount = if (isLiked) post.likesCount + 1 else post.likesCount - 1
-                            val newLikedBy = post.likedBy.toMutableList()
-                            if (isLiked) newLikedBy.add(userId) else newLikedBy.remove(userId)
-                            post.copy(likesCount = newLikesCount, likedBy = newLikedBy)
-                        } else post
+                    val newPosts = currentState.posts.map { p ->
+                        if (p.id == postId) {
+                            val newLikesCount = if (isLiked) p.likesCount + 1 else p.likesCount - 1
+                            val newLikedBy = p.likedBy.toMutableList()
+                            if (isLiked) newLikedBy.add(user.uid) else newLikedBy.remove(user.uid)
+                            p.copy(likesCount = newLikesCount, likedBy = newLikedBy)
+                        } else p
                     }
                     currentState.copy(posts = newPosts)
+                }
+
+                if (isLiked && post.userId != user.uid) {
+                    val notification = uz.oybek.ozamiz.data.notification.model.NotificationModel(
+                        type = uz.oybek.ozamiz.data.notification.model.NotificationModel.TYPE_LIKE,
+                        fromUserId = user.uid,
+                        fromUserName = user.name,
+                        fromUserAvatar = user.avatarUrl,
+                        toUserId = post.userId,
+                        postId = post.id,
+                        message = "Sizning postingizga layk bosdi",
+                        timestamp = java.util.Date()
+                    )
+                    uz.oybek.ozamiz.data.notification.NotificationRepository.sendNotification(notification)
                 }
             }
         }
@@ -96,7 +113,6 @@ class CommunityViewModel : ViewModel() {
             }
         }
     }
-
     fun markViewed(postId: String) {
         val userId = Firebase.auth.currentUser?.uid ?: return
         viewModelScope.launch {

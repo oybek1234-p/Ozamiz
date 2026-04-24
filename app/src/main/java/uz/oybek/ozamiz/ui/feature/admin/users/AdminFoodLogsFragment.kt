@@ -52,7 +52,7 @@ class AdminFoodLogsFragment : BaseFragment<FragmentAdminFoodLogsBinding>() {
                     "timestamp" to log.timestamp,
                     "userId" to argUserId
                 )
-                findNavController().navigate(R.id.calorieResultBottomSheet, bundle)
+                findNavController().navigate(R.id.analyzeResultFragment, bundle)
             }
         }
         bind.recyclerView.layoutManager = LinearLayoutManager(requireContext())

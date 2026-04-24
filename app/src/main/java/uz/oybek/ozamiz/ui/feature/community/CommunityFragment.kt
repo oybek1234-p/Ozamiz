@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentCommunityBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.data.user.UserRepository
 
 class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
@@ -20,10 +21,15 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
         showBottomSheet = true
     }
 
+    private val viewModel: CommunityViewModel by viewModels()
+    private lateinit var adapter: CommunityPostAdapter
+
     override fun viewCreated(bind: FragmentCommunityBinding) {
+        setupToolbar()
         setupRecyclerView()
         setupSwipeRefresh()
         observeViewModel()
+        observeNotifications()
     }
 
     override fun inflateBinding(
@@ -33,8 +39,14 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
         return FragmentCommunityBinding.inflate(inflater, container, false)
     }
 
-    private val viewModel: CommunityViewModel by viewModels()
-    private lateinit var adapter: CommunityPostAdapter
+    private fun setupToolbar() {
+        binding.btnNotifications.setOnClickListener {
+            findNavController().navigate(R.id.action_communityFragment_to_notificationsFragment)
+        }
+        binding.fabAddPost.setOnClickListener {
+            findNavController().navigate(R.id.action_communityFragment_to_addPostFragment)
+        }
+    }
 
     private fun setupRecyclerView() {
         adapter = CommunityPostAdapter(
@@ -97,6 +109,13 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
                 binding.tvEmpty.isVisible = !state.isLoading && state.posts.isEmpty()
             }
+        }
+    }
+
+    private fun observeNotifications() {
+        UserRepository.observeUnReadMessages { count ->
+            binding.tvNotificationBadge.isVisible = count > 0
+            binding.tvNotificationBadge.text = count.toString()
         }
     }
 }

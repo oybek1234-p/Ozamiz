@@ -15,6 +15,7 @@ import com.google.firebase.firestore.persistentCacheSettings
 import uz.oybek.ozamiz.data.motivation.MotivationAlarmScheduler
 import uz.oybek.ozamiz.data.motivation.MotivationNotificationManager
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.ai.AiMenuRepository
 import uz.oybek.ozamiz.util.handleException
 
 lateinit var appContext: Context
@@ -26,6 +27,7 @@ class Application : Application() {
         appContext = this
 
         LocalUser.getUser()
+        AiMenuRepository.init(this)
         initFirebase()
 
         try {

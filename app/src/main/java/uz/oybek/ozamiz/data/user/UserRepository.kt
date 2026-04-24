@@ -1,6 +1,5 @@
 package uz.oybek.ozamiz.data.user
 
-import uz.oybek.ozamiz.data.streak.StreakInfo
 import android.net.Uri
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -8,7 +7,6 @@ import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.OnDisconnect
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
@@ -17,10 +15,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.getValueSafe
+import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DataWrapper
-
 import uz.oybek.ozamiz.util.handleException
 import java.util.Date
 import kotlin.coroutines.resume
@@ -34,7 +32,7 @@ object UserRepository {
         LocalUser.getUser()
     }
 
-    suspend fun uploadPremiumCheckData(userId: String, checkImageUri: Uri): DataWrapper<Unit> {
+    suspend fun uploadPremiumCheckData(userId: String, checkImageUri: Uri, isYearly: Boolean): DataWrapper<Unit> {
         if (userId.isBlank()) return DataWrapper.Error("Foydalanuvchi ID si bo'sh")
         val userSpecificPaymentPath = "$PAYMENT_CHECK_PHOTOS_PATH/$userId" // <<< YENI YO'L
 
@@ -48,12 +46,14 @@ object UserRepository {
                 val updates = mapOf(
                     User::paymentChecking.name to true,
                     User::paymentCheckPhotoUrl.name to imageUrl,
-                    User::premiumDate.name to ServerValue.TIMESTAMP
+                    User::premiumDate.name to ServerValue.TIMESTAMP,
+                    "isPremiumYearly" to isYearly
                 )
                 usersReference.child(userId).updateChildren(updates).await()
                 updateUser {
                     it.paymentChecking = true
                     it.paymentCheckPhotoUrl = imageUrl
+                    it.isPremiumYearly = isYearly
                 }
                 DataWrapper.Success(Unit)
             } else {
@@ -89,6 +89,7 @@ object UserRepository {
             "lastSeenTime" to lastSeenTime,
             "unreadMessages" to unreadMessages,
             "premium" to premium,
+            "isPremiumYearly" to isPremiumYearly,
             "premiumDate" to premiumDate,
 
             "gender" to gender,
@@ -119,18 +120,19 @@ object UserRepository {
         usersReference.child(user.uid).child(User::lastSeenTime.name).removeEventListener(listener)
     }
 
-    fun setPremium(userId: String, premium: Boolean, approved: Boolean) { // Added 'approved'
+    fun setPremium(userId: String, premium: Boolean, approved: Boolean, isYearly: Boolean = false) { // Added 'isYearly'
         if (userId.isEmpty()) return
         val updates = mutableMapOf<String, Any?>(
             User::premium.name to premium,
-            User::paymentChecking.name to false // No longer checking
+            User::paymentChecking.name to false
         )
         if (approved) {
-            updates[User::premiumDate.name] = ServerValue.TIMESTAMP // Set premium start date
+            updates[User::premiumDate.name] = ServerValue.TIMESTAMP
+            updates["isPremiumYearly"] = isYearly
         } else {
-            updates[User::paymentCheckPhotoUrl.name] = null // Clear photo URL on rejection
-            // Optionally clear premiumDate too, or set to 0
+            updates[User::paymentCheckPhotoUrl.name] = null
             updates[User::premiumDate.name] = 0L
+            updates["isPremiumYearly"] = false
         }
         usersReference.child(userId).updateChildren(updates)
     }
@@ -272,7 +274,8 @@ object UserRepository {
     fun updateLastSeen() {
         if (user.valid) {
             LocalUser.user.lastSeenTime = System.currentTimeMillis()
-            usersReference.child(user.uid).child(User::lastSeenTime.name).setValue(ServerValue.TIMESTAMP)
+            usersReference.child(user.uid).child(User::lastSeenTime.name)
+                .setValue(ServerValue.TIMESTAMP)
             LocalUser.saveUser()
         }
     }
@@ -359,11 +362,13 @@ object UserRepository {
 
     fun observeCurrentUser(result: (user: User?) -> Unit) {
         userListeners.add(result)
+        
+        // Call immediately if local data is available
+        if (user.valid) {
+            result.invoke(user)
+        }
+
         if (isObserving) {
-            // Already observing Firebase, but call the new listener immediately with current data
-            if (user.valid) {
-                result.invoke(user)
-            }
             return
         }
         if (user.valid.not()) return
@@ -407,12 +412,40 @@ object UserRepository {
                 currentData.value = maxOf(0, current + amount)
                 return com.google.firebase.database.Transaction.success(currentData)
             }
-            override fun onComplete(error: com.google.firebase.database.DatabaseError?, committed: Boolean, snapshot: com.google.firebase.database.DataSnapshot?) {
+
+            override fun onComplete(
+                error: com.google.firebase.database.DatabaseError?,
+                committed: Boolean,
+                snapshot: com.google.firebase.database.DataSnapshot?
+            ) {
                 if (committed && error == null) {
-                    val newTotal = snapshot?.getValue(Int::class.java) ?: maxOf(0, LocalUser.user.scorePoints + amount)
+                    val newTotal = snapshot?.getValue(Int::class.java) ?: maxOf(
+                        0,
+                        LocalUser.user.scorePoints + amount
+                    )
                     LocalUser.user.scorePoints = newTotal
                     LocalUser.saveUser()
                 }
+            }
+        })
+
+    }
+    fun incrementUnreadMessages(userId: String) {
+        if (userId.isEmpty()) return
+        val ref = usersReference.child(userId).child(User::unreadMessages.name)
+        ref.runTransaction(object : com.google.firebase.database.Transaction.Handler {
+            override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
+                val current = currentData.getValue(Int::class.java) ?: 0
+                currentData.value = current + 1
+                return com.google.firebase.database.Transaction.success(currentData)
+            }
+
+            override fun onComplete(
+                error: DatabaseError?,
+                committed: Boolean,
+                snapshot: DataSnapshot?
+            ) {
+                // Done
             }
         })
     }

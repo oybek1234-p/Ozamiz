@@ -1,33 +1,35 @@
 package uz.oybek.ozamiz.ui.feature.menu.list
 
-import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.fragment.app.setFragmentResultListener
-import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FragmentMenuListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.R
+
+
+import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.button.MaterialButton
+import uz.oybek.ozamiz.ui.utils.onClick
+import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
+import uz.oybek.ozamiz.ui.utils.show
 
 class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
 
     private val viewModel: MenuListViewModel by viewModels()
-    private lateinit var primaryFilterAdapter: MenuFilterAdapter
-    private lateinit var secondaryFilterAdapter: MenuFilterAdapter
-    private lateinit var menuAdapter: MenuAdapter
-
     init {
         showBottomSheet = true
     }
@@ -38,82 +40,98 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
     ) = FragmentMenuListBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentMenuListBinding) {
-        setupRecyclerViews(bind)
         setupListeners(bind)
         observeState(bind)
-        setupPremiumListener()
-    }
-
-    private fun setupRecyclerViews(bind: FragmentMenuListBinding) {
-        primaryFilterAdapter = MenuFilterAdapter(
-            selectionColorAttr = androidx.appcompat.R.attr.colorPrimary
-        ) { category ->
-            viewModel.onPrimaryCategorySelected(category.id)
-        }
-        bind.recyclerPrimaryCategories.adapter = primaryFilterAdapter
-
-        secondaryFilterAdapter = MenuFilterAdapter(
-            selectionColorAttr = com.google.android.material.R.attr.colorSecondary
-        ) { category ->
-            viewModel.onSecondaryCategorySelected(category.id)
-        }
-        bind.recyclerSecondaryCategories.adapter = secondaryFilterAdapter
-
-        menuAdapter = MenuAdapter { menu ->
-            val isPremiumUser = UserRepository.user.isPremium()
-            val position = menuAdapter.currentList.indexOf(menu)
-            
-            if (!isPremiumUser && position >= 6) {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-            } else {
-                navigate(R.id.menuDetailFragment, Bundle().apply {
-                    putParcelable("menu", menu)
-                })
-            }
-        }
-        bind.recyclerMenus.layoutManager = GridLayoutManager(requireContext(), 2)
-        bind.recyclerMenus.adapter = menuAdapter
     }
 
     private fun setupListeners(bind: FragmentMenuListBinding) {
-        bind.btnBack.isVisible = false
-        bind.btnAddMenu.isVisible = UserRepository.user.admin
-        bind.btnAddMenu.setOnClickListener { navigate(R.id.addMenuFragment) }
+        bind.btnStartPlan.setOnSafeClickListener {
+            showSelectionBottomSheet()
+        }
 
+        bind.btnReset.setOnClickListener {
+            showSelectionBottomSheet()
+        }
+    }
 
-        bind.editSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.onSearchQuery(s.toString())
+    private fun showSelectionBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_menu_selection, null)
+        dialog.setContentView(view)
+
+        view.findViewById<View>(R.id.btnHomeFood).onClick {
+            dialog.dismiss()
+            showInputBottomSheet()
+        }
+
+        view.findViewById<View>(R.id.btnEatingOut).onClick {
+            dialog.dismiss()
+            viewModel.generateAiMenu("OUT")
+        }
+
+        view.findViewById<View>(R.id.btnAiRecommendation).onClick {
+            dialog.dismiss()
+            viewModel.generateAiMenu("RANDOM")
+        }
+
+        dialog.show()
+    }
+
+    private fun showInputBottomSheet() {
+        val dialog = BottomSheetDialog(requireContext())
+        val view = layoutInflater.inflate(R.layout.bottom_sheet_menu_input, null)
+        dialog.setContentView(view)
+
+        val etInput = view.findViewById<EditText>(R.id.etFridgeFoods)
+        val btnGenerate = view.findViewById<MaterialButton>(R.id.btnGenerate)
+
+        etInput.requestFocus()
+        Handler(Looper.getMainLooper()).postDelayed({
+            val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.showSoftInput(etInput, InputMethodManager.SHOW_IMPLICIT)
+        }, 200)
+
+        btnGenerate.onClick {
+            val text = etInput.text.toString()
+            if (text.isNotBlank()) {
+                viewModel.updateFridgeFoods(text)
+                dialog.dismiss()
+                viewModel.generateAiMenu("HOME")
             }
+        }
 
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        dialog.show()
     }
 
     private fun observeState(bind: FragmentMenuListBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    bind.progressBar.isVisible = state.isLoading
+                    bind.llInitial.isVisible = state.uiMode == MenuUiMode.INITIAL
+                    bind.llInput.isVisible = state.uiMode == MenuUiMode.INPUT
+                    bind.llLoading.isVisible = state.uiMode == MenuUiMode.LOADING
+                    bind.llCards.isVisible = state.uiMode == MenuUiMode.RESULT
+                    bind.btnReset.isVisible = state.uiMode == MenuUiMode.RESULT
 
-                    primaryFilterAdapter.submitList(state.primaryCategories)
-                    primaryFilterAdapter.setSelectedCategory(state.selectedPrimaryId)
-
-                    secondaryFilterAdapter.submitList(state.secondaryCategories)
-                    secondaryFilterAdapter.setSelectedCategory(state.selectedSecondaryId)
-
-                    menuAdapter.submitList(state.menus)
+                    state.aiMenu?.let { menu ->
+                        bind.tvBreakfast.text = menu.breakfast
+                        
+                        bind.cardSnack1.isVisible = !menu.snack1.isNullOrBlank()
+                        bind.tvSnack1.text = menu.snack1
+                        
+                        bind.tvLunch.text = menu.lunch
+                        
+                        bind.cardSnack2.isVisible = !menu.snack2.isNullOrBlank()
+                        bind.tvSnack2.text = menu.snack2
+                        
+                        bind.tvDinner.text = menu.dinner
+                        bind.tvTip.text = menu.tip
+                        
+                        viewModel.saveAiMenu(Gson().toJson(menu), requireContext())
+                    }
                 }
             }
         }
     }
-    private fun setupPremiumListener() {
-        setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
-            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
-            if (result == "go_to_payment") {
-                findNavController().navigate(R.id.paymentGetCheckFragment)
-            }
-        }
-    }
 }
+

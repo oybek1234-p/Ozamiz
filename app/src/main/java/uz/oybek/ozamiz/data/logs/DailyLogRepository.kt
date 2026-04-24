@@ -55,6 +55,35 @@ object DailyLogRepository {
             }
         }
 
+    fun observeDailyLogs(date: Date): Flow<DataWrapper<DailyLogs>> =
+        callbackFlow {
+            val userId = currentUserId
+            if (userId == null) {
+                trySend(DataWrapper.Error())
+                close()
+                return@callbackFlow
+            }
+
+            val formattedDate = date.dateApiFormat()
+            val reference = FirebasePaths
+                .userLogsReference(userId)
+                .child(formattedDate)
+
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val dailyLogs = snapshot.getValueSafe(DailyLogs::class.java) ?: DailyLogs()
+                    trySend(DataWrapper.Success(dailyLogs))
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(DataWrapper.Error())
+                    close()
+                }
+            }
+            reference.addValueEventListener(listener)
+            awaitClose { reference.removeEventListener(listener) }
+        }
+
     private fun calculateSummary(logs: DailyLogs?): DailySummary {
         if (logs == null) {
             return DailySummary()

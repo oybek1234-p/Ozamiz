@@ -53,6 +53,19 @@
                             app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                             tools:src="@drawable/user_photo_placeholder" />
 
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/btn_edit_avatar"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="bottom|end"
+                            android:layout_margin="2dp"
+                            app:fabCustomSize="32dp"
+                            app:maxImageSize="16dp"
+                            app:srcCompat="@drawable/add_ic"
+                            app:tint="@android:color/white"
+                            app:backgroundTint="?attr/colorPrimary"
+                            style="@style/Widget.Material3.FloatingActionButton.Primary" />
+
                     </FrameLayout>
 
                     <TextView
@@ -103,7 +116,7 @@
                                 android:fontFamily="@font/roboto_medium"
                                 android:textColor="?attr/colorPrimary"
                                 android:textSize="14sp"
-                                tools:text="Iroda" />
+                                tools:text="Irodali" />
 
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -167,7 +180,7 @@
                                 android:layout_height="28dp"
                                 android:src="@drawable/star_ic"
                                 app:tint="#FFFFFF" />
-
+                            
                             <TextView
                                 style="@style/TextAppearance.Material3.TitleMedium"
                                 android:layout_width="0dp"
@@ -175,7 +188,7 @@
                                 android:layout_marginStart="10dp"
                                 android:layout_weight="1"
                                 android:fontFamily="@font/roboto_bold"
-                                android:text="Premium a'zolik"
+                                android:text="Premium"
                                 android:textColor="#FFFFFF"
                                 android:textSize="18sp" />
 
@@ -274,7 +287,7 @@
                             android:layout_marginTop="20dp"
                             android:backgroundTint="#CCFFFFFF"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="Faollashtirish"
+                            android:text="Sotib olish"
                             android:textColor="#005336"
                             android:textSize="15sp"
                             app:cornerRadius="14dp"
@@ -317,8 +330,11 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+
+
             <!-- MENU BO'LIMI: Hamjamiyat -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_community"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
@@ -365,7 +381,23 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- MENU BO'LIMI 3: Darsliklar -->
+            <!-- MENU BO'LIMI: Darsliklar -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <include
+                    android:id="@+id/section_user_lessons"
+                    layout="@layout/item_profile_section" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- MENU BO'LIMI 3: Darsliklar (Admin) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/container_admin_lessons"
                 android:layout_width="match_parent"
@@ -414,6 +446,16 @@
 
                     <include
                         android:id="@+id/section_admin_all_users"
+                        layout="@layout/item_profile_section" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="52dp"
+                        android:background="?colorSurfaceContainerHighest" />
+
+                    <include
+                        android:id="@+id/section_admin_posts"
                         layout="@layout/item_profile_section" />
 
                 </LinearLayout>

@@ -14,6 +14,23 @@
         app:navigationIcon="@drawable/arrow_back"
         app:title="Foydalanuvchilar" />
 
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chip_group_filters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        app:singleSelection="false">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_premium_only"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/premium" />
+    </com.google.android.material.chip.ChipGroup>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_users"
         android:layout_width="match_parent"

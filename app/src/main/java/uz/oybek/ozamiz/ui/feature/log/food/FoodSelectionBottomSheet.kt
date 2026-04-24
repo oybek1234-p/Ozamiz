@@ -97,16 +97,6 @@ class FoodSelectionBottomSheet(
 
         binding.rowFat.textViewNutrientLabel.text = "Yog'"
         binding.rowFat.textViewNutrientValue.text = String.format("%.1f g", fat)
-
-        // Mini macros
-        binding.miniCarbs.textViewMiniLabel.text = "Uglevod"
-        binding.miniCarbs.textViewMiniValue.text = String.format("%.0fg", carbs)
-
-        binding.miniProtein.textViewMiniLabel.text = "Oqsil"
-        binding.miniProtein.textViewMiniValue.text = String.format("%.0fg", protein)
-
-        binding.miniFat.textViewMiniLabel.text = "Yog'"
-        binding.miniFat.textViewMiniValue.text = String.format("%.0fg", fat)
     }
 
     private fun createFoodLog(): FoodLog {

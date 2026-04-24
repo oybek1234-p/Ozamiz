@@ -71,8 +71,8 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
             },
             onViewed = { postId ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val currentUserId = Firebase.auth.currentUser?.uid ?: return@launch
-                    CommunityPostRepository.markViewed(postId, currentUserId)
+                    val currentUserId = com.google.firebase.Firebase.auth.currentUser?.uid ?: return@launch
+                    uz.oybek.ozamiz.data.community.CommunityPostRepository.markViewed(postId, currentUserId)
                 }
             },
             onDeleteClick = {
@@ -119,6 +119,12 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
 
                     val level = LevelSystem.getLevel(user.scorePoints)
                     bind.tvProfileLevel.text = level.name
+
+                    com.bumptech.glide.Glide.with(this@CommunityProfileFragment)
+                        .load(user.avatarUrl)
+                        .placeholder(R.drawable.user_photo_placeholder)
+                        .circleCrop()
+                        .into(bind.imgProfileAvatar)
                 }
 
                 // 2. Fetch first page of posts

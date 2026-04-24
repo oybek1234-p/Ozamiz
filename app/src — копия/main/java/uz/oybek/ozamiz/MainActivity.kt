@@ -164,17 +164,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun requestNotificationPermission() {
-        val permissionState =
-            ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS);
-
-        if (permissionState == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1
-            );
-        }
-    }
-
     private fun initInternetConnectivity() {
         val networkRequest =
             NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)

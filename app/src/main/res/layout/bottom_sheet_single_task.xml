@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <View
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_rounded_8"
+        android:backgroundTint="?attr/colorOutlineVariant" />
+
+    <TextView
+        android:id="@+id/text_task_emoji"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/round_lay"
+        android:backgroundTint="?attr/colorTertiaryContainer"
+        android:gravity="center"
+        android:textSize="32sp"
+        tools:text="🥗" />
+
+    <TextView
+        android:id="@+id/text_task_title"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/roboto_bold"
+        android:gravity="start"
+        android:lineSpacingExtra="2dp"
+        android:textSize="20sp"
+        tools:text="Sabzavotli taom" />
+
+    <TextView
+        android:id="@+id/text_task_benefit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="start"
+        android:lineSpacingExtra="2dp"
+        android:textColor="?attr/colorTertiary"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="Metabolizmni va hazm jarayonini tezlashtiradi" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical">
+
+        <TextView
+            android:id="@+id/text_task_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="6dp"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="17sp"
+            tools:text="Har bir ovqatingizga kamida bitta yangi sabzavot qo'shing. Bu hazm qilishni yaxshilaydi hamda metabolizmni jadallashtiradi." />
+    </ScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_understood"
+        style="@style/FilledButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="Tushunarli"
+        android:textSize="17sp"
+        app:cornerRadius="20dp" />
+
+</LinearLayout>

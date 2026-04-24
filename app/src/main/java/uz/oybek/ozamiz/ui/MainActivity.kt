@@ -17,7 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -86,13 +85,19 @@ class MainActivity : AppCompatActivity() {
         initUser()
 
         binding.apply {
-                navHost =
-                (supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment)
+            navHost = (supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment)
             navController = navHost.navController
             NavigationUI.setupWithNavController(
-                navigationBarView = binding.bottomNavView,
-                navController = navController
+                navigationBarView = binding.bottomNavView, navController = navController
             )
+
+            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+
+                binding.bottomNavView.setPadding(0, 0, 0, systemBars.bottom)
+                insets
+            }
         }
         val inflater = navHost.navController.navInflater
         val graph = inflater.inflate(R.navigation.main_navigation)
@@ -110,12 +115,6 @@ class MainActivity : AppCompatActivity() {
 
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
-        
-        lifecycleScope.launch {
-            uz.oybek.ozamiz.data.lessons.LessonSeeder.seedData()
-        }
-
-
     }
 
     private fun checkRegisterDate() {
@@ -140,9 +139,7 @@ class MainActivity : AppCompatActivity() {
     fun showSupportSheet() {
         val dialog = BottomSheetDialog(this, R.style.SheetStyle)
         val bindingDialog = SupportSheetBinding.inflate(
-            LayoutInflater.from(this),
-            null,
-            false
+            LayoutInflater.from(this), null, false
         )
         dialog.setContentView(bindingDialog.root)
         bindingDialog.apply {
@@ -182,8 +179,7 @@ class MainActivity : AppCompatActivity() {
 
             appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
                 if (isDestroyed || isFinishing) return@addOnSuccessListener
-                if (appUpdateInfo.updateAvailability() ==
-                    UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
                         AppUpdateType.FLEXIBLE
                     )
                 ) {
@@ -249,7 +245,6 @@ class MainActivity : AppCompatActivity() {
                     if (window.decorView.isAttachedToWindow && !internetBottomSheet.isShowing) {
                         internetBottomSheet.show()
                     }
-                    hasInternet = false
                 }
             }
         }
@@ -269,36 +264,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private var bottomSetUp = false
     private var bottomNavShown = true
 
     private val decelerateInterpolator = DecelerateInterpolator(1.5f)
     fun showBottomSheet(show: Boolean, animate: Boolean) {
         if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return
         bottomNavShown = show
-        binding.bottomNavView.apply {
-            if (!bottomSetUp && show) {
-                bottomSetUp = true
-            }
-            if (show && !isVisible) {
-                visibleOrGone(true)
-            }
-            if (!show && !isVisible) return
+        binding.bottomNavView.post {
+            binding.bottomNavView.apply {
+                if (show && !isVisible) {
+                    visibleOrGone(true)
+                }
 
-            val targetY = if (show) 0f else measuredHeight.toFloat()
-            if (animate) {
-                if (show) translationY =
-                    measuredHeight.toFloat()
+                val h = if (measuredHeight > 0) measuredHeight.toFloat() else 200f
+                val targetY = if (show) 0f else h
 
-                animate().setDuration(180).setInterpolator(decelerateInterpolator)
-                    .translationY(targetY).withEndAction {
-                        if (!show) {
-                            visibleOrGone(false)
-                        }
-                    }.start()
-            } else {
-                translationY = targetY
-                visibleOrGone(show)
+                if (animate) {
+                    if (show && translationY == 0f) translationY = h
+
+                    animate().setDuration(220).setInterpolator(decelerateInterpolator)
+                        .translationY(targetY).withEndAction {
+                            if (!show) {
+                                visibleOrGone(false)
+                            }
+                        }.start()
+                } else {
+                    translationY = targetY
+                    visibleOrGone(show)
+                }
             }
         }
     }

@@ -13,11 +13,11 @@ object MotivationAlarmScheduler {
     private val ALARM_HOURS = intArrayOf(8, 10, 13, 16, 19)
     private val ALARM_MINUTES = intArrayOf(0, 0, 0, 0, 0)
 
-    fun scheduleAll(context: Context) {
+    fun scheduleAll(context: Context, force: Boolean = false) {
         val prefs = context.getSharedPreferences("motivation_prefs", Context.MODE_PRIVATE)
         val lastScheduled = prefs.getLong("last_scheduled_time", 0)
-        // Buni har safar dastur ochilganda chaqirmaslik uchun, 12 soat kutish (yoki boot bo'lganda)
-        if (System.currentTimeMillis() - lastScheduled < 12 * 60 * 60 * 1000L) {
+        
+        if (!force && System.currentTimeMillis() - lastScheduled < 12 * 60 * 60 * 1000L) {
             return
         }
         prefs.edit().putLong("last_scheduled_time", System.currentTimeMillis()).apply()

@@ -11,7 +11,9 @@ import uz.oybek.ozamiz.data.utils.DataWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import com.google.firebase.ai.type.GenerateContentResponse
+import uz.oybek.ozamiz.data.logs.model.DailyLogs
+import uz.oybek.ozamiz.data.logs.model.DailySummary
+import uz.oybek.ozamiz.data.user.model.User
 
 object AiChatRepository {
 
@@ -30,6 +32,39 @@ object AiChatRepository {
 
     fun clearHistory() {
         chatHistory.clear()
+    }
+
+    suspend fun getMealTips(
+        summary: DailySummary,
+        logs: DailyLogs,
+        user: User
+    ): List<String> = withContext(Dispatchers.IO) {
+        try {
+            val foodLogs = logs.foodLogs?.values?.joinToString(", ") { it.description } ?: ""
+            val prompt = FoodAnalyzerConfig.buildMealTipsPrompt(
+                summary = summary.consumedCalories.toString(),
+                foodLogs = foodLogs,
+                waterMl = summary.consumedWaterMl,
+                burnedCalories = summary.burnedCalories,
+                targetCalories = user.targetCalories,
+                targetWeight = user.targetWeight
+            )
+
+            val tipsModel = Firebase.ai.generativeModel(
+                modelName = FoodAnalyzerConfig.MODEL_NAME,
+                systemInstruction = content { text(FoodAnalyzerConfig.MEAL_TIPS_INSTRUCTION) }
+            )
+
+            val response = tipsModel.generateContent(prompt)
+            val text = response.text ?: ""
+
+            text.split("\n")
+                .map { it.trim().removePrefix("•").trim() }
+                .filter { it.isNotBlank() }
+                .take(5)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     suspend fun sendMessage(

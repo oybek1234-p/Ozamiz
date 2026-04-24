@@ -36,7 +36,7 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
         adapter = SavedFoodAdapter(
             onItemClick = { foodLog ->
                 navigate(
-                    R.id.calorieResultBottomSheet,
+                    R.id.analyzeResultFragment,
                     Bundle().apply {
                         putString("description", foodLog.description)
                         putDouble("calories", foodLog.calories.toDouble())

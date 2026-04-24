@@ -53,7 +53,7 @@ class AdminPaymentVerificationDetailViewModel : ViewModel() {
 
         viewModelScope.launch {
             // Approve/Reject Logic
-            UserRepository.setPremium(userToVerify.uid, approve, approve)
+            UserRepository.setPremium(userToVerify.uid, approve, approve, userToVerify.isPremiumYearly)
 
             if (!approve && !userToVerify.paymentCheckPhotoUrl.isNullOrEmpty()) {
                 ImageUploader.deleteImage(userToVerify.paymentCheckPhotoUrl)

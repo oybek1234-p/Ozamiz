@@ -103,6 +103,10 @@ object MotivationRepository {
         val hour = calendar.get(Calendar.HOUR_OF_DAY)
         val day = calendar.get(Calendar.DAY_OF_YEAR)
         
+        // Exact time overrides for requested meal reminders
+        if (hour == 8) return "Nonushtani rasmga oling"
+        if (hour == 13) return "Tushlikni hisoblaymizmi?"
+
         val timeSlot = when (hour) {
             in 7..8 -> "morning"
             in 9..11 -> "mid_morning"

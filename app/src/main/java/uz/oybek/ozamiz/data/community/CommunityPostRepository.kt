@@ -34,9 +34,17 @@ object CommunityPostRepository {
         }
     }
 
-    suspend fun getPosts(limit: Long = 8, lastVisiblePostId: String? = null): Result<List<CommunityPost>> {
+    suspend fun getPosts(
+        limit: Long = 8,
+        lastVisiblePostId: String? = null,
+        verifiedOnly: Boolean = true
+    ): Result<List<CommunityPost>> {
         return try {
             var query = communityCollection.orderBy("timestamp", Query.Direction.DESCENDING).limit(limit)
+
+            if (verifiedOnly) {
+                query = query.whereEqualTo("verified", true).whereEqualTo("isVisible", true)
+            }
 
             if (lastVisiblePostId != null) {
                 val lastDocument = documentCache[lastVisiblePostId] 
@@ -110,7 +118,7 @@ object CommunityPostRepository {
         }
     }
 
-    // It's basic, just increment views array if user not in it
+
     suspend fun markViewed(postId: String, userId: String) {
         try {
             val docRef = communityCollection.document(postId)
@@ -128,4 +136,40 @@ object CommunityPostRepository {
             // Ignore view error
         }
     }
+
+    suspend fun getUnverifiedPosts(limit: Long = 20): Result<List<CommunityPost>> {
+        return try {
+            val query = communityCollection.whereEqualTo("verified", false)
+                .orderBy("timestamp", Query.Direction.DESCENDING).limit(limit)
+            val snapshot = query.get().await()
+            val posts = snapshot.documents.mapNotNull { it.toObject(CommunityPost::class.java) }
+            Result.success(posts)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun verifyPost(postId: String, visible: Boolean = true): Result<Unit> {
+        return try {
+            communityCollection.document(postId).update(
+                mapOf(
+                    "verified" to true,
+                    "isVisible" to visible
+                )
+            ).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun setPostVisibility(postId: String, visible: Boolean): Result<Unit> {
+        return try {
+            communityCollection.document(postId).update("isVisible", visible).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
 }

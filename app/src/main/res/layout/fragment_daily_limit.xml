@@ -23,211 +23,50 @@
 
         <TextView
             android:id="@+id/text_explanation"
-            style="@style/Text1_16"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:alpha="0.85"
+            android:gravity="start"
+            android:textSize="16sp"
+            android:lineSpacingExtra="4dp"
+            android:textColor="?attr/colorOnSurface" />
+
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_hunger_advice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:gravity="start"
-            android:text="Juda qorningiz ochsa:"
-            android:lineSpacingExtra="6dp"
-            android:textColor="?attr/colorOnSurface" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="16dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_1"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant">
-                <LinearLayout
+                android:orientation="vertical"
+                android:padding="16dp">
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:id="@+id/text_emoji_1"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:gravity="center"
-                        android:text="🥤"
-                        android:textSize="24sp"
-                        android:background="@drawable/bg_emoji_circle" />
-                    <TextView
-                        android:id="@+id/text_advice_1"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:text="Suv yoki qora choy iching. Bu ochlik hissini pasaytirishga va metabolizmni yaxshilashga yordam beradi."
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Sabzavotlar -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant">
-                <LinearLayout
+                    android:text="Och qolsangiz nima yeyish mumkin?"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textStyle="bold"
+                    android:textSize="14sp" />
+                <TextView
+                    android:id="@+id/text_unified_advice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:id="@+id/text_emoji_2"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:gravity="center"
-                        android:text="🥗"
-                        android:textSize="24sp"
-                        android:background="@drawable/bg_emoji_circle" />
-                    <TextView
-                        android:id="@+id/text_advice_2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:text="Bodring, pomidor yoki ko'katlar yeng. Ularda kaloriya deyarli yo'q, lekin ular qorinni to'q tutadi."
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Tuxum oqi -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:id="@+id/text_emoji_3"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:gravity="center"
-                        android:text="🥚"
-                        android:textSize="24sp"
-                        android:background="@drawable/bg_emoji_circle" />
-                    <TextView
-                        android:id="@+id/text_advice_3"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:text="1-2 ta qaynatilgan tuxumning faqat oqi. Bu sof oqsil bo'lib, mushaklaringizga yordam beradi."
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Qatiq -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:id="@+id/text_emoji_4"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:gravity="center"
-                        android:text="🥛"
-                        android:textSize="24sp"
-                        android:background="@drawable/bg_emoji_circle" />
-                    <TextView
-                        android:id="@+id/text_advice_4"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:text="Yog'siz qatiq yoki kefir. Hazm qilishni yaxshilaydi va uxlashdan oldin qorinni tinchlantiradi."
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Sho'rva -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:strokeWidth="1dp"
-                app:strokeColor="?attr/colorOutlineVariant">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
-                    <TextView
-                        android:id="@+id/text_emoji_5"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:gravity="center"
-                        android:text="🥣"
-                        android:textSize="24sp"
-                        android:background="@drawable/bg_emoji_circle" />
-                    <TextView
-                        android:id="@+id/text_advice_5"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="16dp"
-                        android:text="Yog'siz sabzavotli sho'rva (faqat suyuq qismi). Oshqozonga orom beradi."
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
+                    android:layout_marginTop="8dp"
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="3dp"
+                    android:textColor="?attr/colorOnSurface"
+                    android:alpha="0.8" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_close"

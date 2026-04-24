@@ -22,12 +22,11 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 67
-        versionName = "3.5"
-
+        versionCode = 75
+        versionName = "3.9"
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    
     buildTypes {
         debug {
             isDebuggable = true
@@ -121,4 +120,11 @@ dependencies {
     implementation(libs.google.firebase.ai)
 
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
+
+    // CameraX
+    val cameraxVersion = "1.4.0"
+    implementation("androidx.camera:camera-core:$cameraxVersion")
+    implementation("androidx.camera:camera-camera2:$cameraxVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
+    implementation("androidx.camera:camera-view:$cameraxVersion")
 }

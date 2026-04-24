@@ -13,9 +13,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.setFragmentResultListener
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FragmentLessonsHomeBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
 
 /**
  * User-facing lessons home fragment
@@ -102,8 +104,9 @@ class LessonsHomeFragment : BaseFragment<FragmentLessonsHomeBinding>() {
     }
 
     private fun handleTopicClick(topicItem: LessonListItem.TopicItem) {
+        val isPremium = UserRepository.user.isPremiumOrTrial()
         when {
-            topicItem.isPremiumRequired -> {
+            topicItem.isPremiumRequired && !isPremium -> {
                 PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
             }
             topicItem.isLocked -> {
@@ -123,7 +126,13 @@ class LessonsHomeFragment : BaseFragment<FragmentLessonsHomeBinding>() {
         setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
             val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
             if (result == "go_to_payment") {
-                findNavController().navigate(R.id.paymentGetCheckFragment)
+                val price = bundle.getLong("selected_price", 29000L)
+                val isYearly = bundle.getBoolean("is_yearly", false)
+                val args = Bundle().apply { 
+                    putLong("price", price)
+                    putBoolean("is_yearly", isYearly)
+                }
+                findNavController().navigate(R.id.paymentGetCheckFragment, args)
             }
         }
     }

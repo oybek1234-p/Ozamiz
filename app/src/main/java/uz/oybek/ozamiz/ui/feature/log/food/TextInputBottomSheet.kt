@@ -26,6 +26,9 @@ class TextInputBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        arguments?.getString(ARG_TITLE)?.let { binding.textTitle.text = it }
+        arguments?.getString(ARG_PLACEHOLDER)?.let { binding.inputQuickDescription.hint = it }
+
         binding.inputQuickDescription.requestFocus()
 
         binding.buttonAnalyzeAndSave.setOnClickListener {
@@ -57,5 +60,14 @@ class TextInputBottomSheet : BottomSheetDialogFragment() {
         const val TAG = "TextInputBottomSheet"
         const val REQUEST_KEY = "text_input_request"
         const val RESULT_TEXT = "result_text"
+        private const val ARG_TITLE = "arg_title"
+        private const val ARG_PLACEHOLDER = "arg_placeholder"
+
+        fun newInstance(title: String? = null, placeholder: String? = null) = TextInputBottomSheet().apply {
+            arguments = bundleOf(
+                ARG_TITLE to title,
+                ARG_PLACEHOLDER to placeholder
+            )
+        }
     }
 }

@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.profile
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -36,5 +37,24 @@ class ProfileViewModel : ViewModel() {
 
     fun logout() {
 
+    }
+
+    fun updateAvatar(uri: Uri) {
+        viewModelScope.launch {
+            val userId = LocalUser.user.uid
+            if (userId.isBlank()) return@launch
+
+            val path = "user_avatars/$userId"
+            val url = uz.oybek.ozamiz.data.firebase.uploader.ImageUploader.uploadImage(uri, path)
+
+            if (url != null) {
+                LocalUser.update {
+                    avatarUrl = url
+                }
+                UserRepository.updateUser { user ->
+                    user.avatarUrl = url
+                }
+            }
+        }
     }
 }

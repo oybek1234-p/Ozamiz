@@ -30,7 +30,14 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
     override fun viewCreated(bind: FragmentAdminUsersListBinding) {
         setupRecyclerView(bind)
         setupToolbar(bind)
+        setupFilters(bind)
         observeViewModel(bind)
+    }
+
+    private fun setupFilters(bind: FragmentAdminUsersListBinding) {
+        bind.chipPremiumOnly.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.togglePremiumFilter(isChecked)
+        }
     }
 
     private fun setupToolbar(bind: FragmentAdminUsersListBinding) {
@@ -58,6 +65,13 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
                 launch {
                     viewModel.isLoading.collect { loading ->
                         bind.progressBar.isVisible = loading
+                    }
+                }
+                launch {
+                    viewModel.isPremiumFilterActive.collect { isActive ->
+                        if (bind.chipPremiumOnly.isChecked != isActive) {
+                            bind.chipPremiumOnly.isChecked = isActive
+                        }
                     }
                 }
             }

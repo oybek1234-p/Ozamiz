@@ -12,7 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import androidx.fragment.app.Fragment
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class AnalyzeResultFragment : BottomSheetDialogFragment() {
+class AnalyzeResultFragment : Fragment() {
 
     private var _binding: BottomSheetCalorieResultBinding? = null
     private val binding get() = _binding!!
@@ -37,7 +37,6 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(STYLE_NORMAL, R.style.BottomSheetStyle)
         arguments?.let {
             val logId = it.getString("logId")
             val userId = it.getString("userId")
@@ -64,6 +63,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         setupListeners()
         setupUI()
+        checkOnboardingBounce()
         if (arguments?.getBoolean("isFromFavorite") == true) {
             val args = requireArguments()
             val analysis = FoodAnalysis(
@@ -138,58 +138,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                         binding.imageViewFoodPhoto.isVisible = false
                     }
                     binding.textViewFoodName.text = analysisResult.name
-                    val streak = state.currentStreak
-                    val milestones = listOf(3, 7, 14, 18, 30, 60, 100, 150, 200, 365)
-                    val isMilestone = milestones.contains(streak)
 
-                    if (streak >= 2) {
-                        binding.cardStreakMilestone.isVisible = true
-                        binding.textViewStreakEmoji.text = when {
-                            streak >= 30 -> "👑"
-                            streak >= 7 -> "🔥"
-                            else -> "⚡"
-                        }
-                        binding.textViewStreakTitle.text = when (streak) {
-                            3 -> "Ajoyib boshlanish!"
-                            7 -> "Bir hafta!"
-                            14 -> "Ikki hafta!"
-                            18 -> "Ajoyib natija!"
-                            30 -> "Bir oylik g'alaba!"
-                            else -> "Davom eting!"
-                        }
-                        binding.textViewStreakSubtitle.text =
-                            "Siz ketma-ket $streak kundan beri aktivsiz!"
-
-                        if (isMilestone) {
-                            binding.cardStreakMilestone.setCardBackgroundColor(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.green_alpha_10
-                                )
-                            )
-                            binding.textViewStreakTitle.setTextColor(
-                                ContextCompat.getColor(
-                                    requireContext(),
-                                    R.color.green
-                                )
-                            )
-                        } else {
-                            binding.cardStreakMilestone.setCardBackgroundColor(
-                                com.google.android.material.color.MaterialColors.getColor(
-                                    binding.root,
-                                    com.google.android.material.R.attr.colorSurfaceContainer
-                                )
-                            )
-                            binding.textViewStreakTitle.setTextColor(
-                                com.google.android.material.color.MaterialColors.getColor(
-                                    binding.root,
-                                    com.google.android.material.R.attr.colorOnSurface
-                                )
-                            )
-                        }
-                    } else {
-                        binding.cardStreakMilestone.isVisible = false
-                    }
                     val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
                     binding.textViewTimestamp.text =
                         dateFormat.format(Date(analysisResult.timestamp))
@@ -198,27 +147,9 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                         IngredientsAdapter(
                             ingredients = analysisResult.ingredients ?: emptyList()
                         )
-                    val score = analysisResult.healthScore ?: 0
-                    binding.textViewHealthScore.isVisible = false
-
-                    val pointsDelta = when {
-                        score >= 8 -> 10
-                        score == 7 -> 5
-                        score == 6 -> 0
-                        score in 4..5 -> -5
-                        else -> -10
-                    }
-
-                    binding.cardHealthScore.isVisible = score > 0 && pointsDelta > 0
-                    binding.textViewPointsDelta.isVisible = pointsDelta > 0
-                    binding.textViewPointsDelta.text = "+$pointsDelta ball"
-                    binding.textViewPointsDelta.setTextColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.green
-                        )
-                    )
-                    binding.textViewPointsDelta.setTextAppearance(R.style.Headline2_16)
+                    
+                    binding.cardHealthScore.isVisible = false
+                    binding.textViewPointsDelta.isVisible = false
 
                     val pros = analysisResult.pros
                     if (!pros.isNullOrEmpty()) {
@@ -231,7 +162,7 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                                 setTextColor(
                                     com.google.android.material.color.MaterialColors.getColor(
                                         binding.root,
-                                        com.google.android.material.R.attr.colorOnSurface
+                                        com.google.android.material.R.attr.colorOnSurfaceVariant
                                     )
                                 )
                                 layoutParams = android.widget.LinearLayout.LayoutParams(
@@ -278,8 +209,18 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
             viewModel.event.collect { event ->
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
+                        checkCompleteOnboarding()
                         homeViewModel.onFoodAdded()
                         findNavController().popBackStack(R.id.home, false)
+                    }
+
+                    is AnalyzeResultEvent.ShowTips -> {
+                        checkCompleteOnboarding()
+                        homeViewModel.onFoodAdded()
+                        val bundle = Bundle().apply {
+                            putStringArray("tips", event.tips.toTypedArray())
+                        }
+                        findNavController().navigate(R.id.action_analyzeResultFragment_to_mealTipsFragment, bundle)
                     }
 
                     is AnalyzeResultEvent.Failure -> {
@@ -311,6 +252,14 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun checkCompleteOnboarding() {
+        val context = context ?: return
+        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        if (prefs.getInt("app_onboarding_step", 0) == 1) {
+            prefs.edit().putInt("app_onboarding_step", 2).apply()
         }
     }
 
@@ -494,6 +443,33 @@ class AnalyzeResultFragment : BottomSheetDialogFragment() {
             .show()
     }
 
+
+    private fun checkOnboardingBounce() {
+        val context = context ?: return
+        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        if (prefs.getInt("app_onboarding_step", 0) == 1) {
+            startSaveButtonBounce()
+        }
+    }
+
+    private fun startSaveButtonBounce() {
+        if (_binding == null || !isAdded || view == null) return
+        val btn = binding.buttonSaveToLog
+        if (!btn.isVisible) return
+
+        btn.animate().scaleX(0.9f).scaleY(0.9f).setDuration(300).withEndAction {
+            if (_binding == null || !isAdded) return@withEndAction
+            btn.animate().scaleX(1.05f).scaleY(1.05f).setDuration(300).withEndAction {
+                if (_binding == null || !isAdded) return@withEndAction
+                btn.animate().scaleX(1f).scaleY(1f).setDuration(300).withEndAction {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        kotlinx.coroutines.delay(500)
+                        startSaveButtonBounce()
+                    }
+                }.start()
+            }.start()
+        }.start()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

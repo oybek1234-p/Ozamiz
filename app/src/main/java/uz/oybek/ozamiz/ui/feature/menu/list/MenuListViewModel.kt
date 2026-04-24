@@ -8,10 +8,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.menu.MenuRepository
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.data.menu.model.MenuCategory
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import com.google.gson.Gson
+import uz.oybek.ozamiz.data.ai.AiChatRepository
+import uz.oybek.ozamiz.data.ai.AiMenuRepository
+import uz.oybek.ozamiz.data.ai.model.AiMenuResponse
+import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzerConfig
+import uz.oybek.ozamiz.data.menu.MenuRepository
+import uz.oybek.ozamiz.data.user.UserRepository
+
+enum class MenuUiMode {
+    INITIAL, INPUT, LOADING, RESULT
+}
 
 data class MenuListUiState(
     val primaryCategories: List<MenuCategory> = emptyList(),
@@ -19,7 +29,11 @@ data class MenuListUiState(
     val menus: List<Menu> = emptyList(),
     val selectedPrimaryId: String = "",
     val selectedSecondaryId: String = "",
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val aiMenu: AiMenuResponse? = null,
+    val uiMode: MenuUiMode = MenuUiMode.INITIAL,
+    val fridgeFoods: String = "",
+    val dislikedFoods: String = ""
 )
 
 class MenuListViewModel : ViewModel() {
@@ -31,8 +45,68 @@ class MenuListViewModel : ViewModel() {
     private var allMenus: List<Menu> = emptyList()
 
     init {
-        loadCategories()
-        loadMenus()
+        loadSavedAiMenu()
+    }
+
+    private fun loadSavedAiMenu() {
+        AiMenuRepository.currentMenu.value?.let { json ->
+            try {
+                val menu = Gson().fromJson(json, AiMenuResponse::class.java)
+                _uiState.value = _uiState.value.copy(aiMenu = menu, uiMode = MenuUiMode.RESULT)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(uiMode = MenuUiMode.INITIAL)
+            }
+        }
+    }
+
+    fun generateAiMenu(mode: String = "RANDOM") {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(uiMode = MenuUiMode.LOADING, isLoading = true)
+            val state = _uiState.value
+            val user = UserRepository.user
+            
+            val prompt = FoodAnalyzerConfig.buildAiMenuPrompt(
+                gender = user.gender,
+                weight = user.weight,
+                height = user.height,
+                targetCalories = user.targetCalories,
+                mode = mode,
+                fridgeFoods = state.fridgeFoods,
+                dislikedFoods = state.dislikedFoods
+            )
+            
+            val result = AiChatRepository.sendMessage(
+                message = prompt,
+                systemInstruction = FoodAnalyzerConfig.AI_MENU_INSTRUCTION
+            )
+            
+            if (result is DataWrapper.Success) {
+                try {
+                    val cleanJson = result.data.substringAfter("{").substringBeforeLast("}")
+                    val json = "{$cleanJson}"
+                    val menu = Gson().fromJson(json, AiMenuResponse::class.java)
+                    _uiState.value = _uiState.value.copy(
+                        aiMenu = menu, 
+                        isLoading = false, 
+                        uiMode = MenuUiMode.RESULT
+                    )
+                } catch (e: Exception) {
+                    _uiState.value = _uiState.value.copy(isLoading = false, uiMode = MenuUiMode.INITIAL)
+                }
+            } else {
+                _uiState.value = _uiState.value.copy(isLoading = false, uiMode = MenuUiMode.INITIAL)
+            }
+        }
+    }
+
+    fun saveAiMenu(json: String, context: android.content.Context) {
+        viewModelScope.launch {
+            AiMenuRepository.saveMenu(context, json)
+        }
+    }
+
+    fun updateFridgeFoods(foods: String) {
+        _uiState.value = _uiState.value.copy(fridgeFoods = foods)
     }
 
     private fun loadCategories() {

@@ -24,6 +24,11 @@ import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.first
+import uz.oybek.ozamiz.data.logs.DailyLogRepository
+import uz.oybek.ozamiz.data.logs.model.DailyLogs
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.utils.DataWrapper
 import java.util.Date
 
 data class LogFoodState(
@@ -71,28 +76,21 @@ class LogFoodViewModel() : ViewModel() {
     val savedFoodIds = savedFoods.map { it.map { food -> food.logId }.toSet() }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
 
-    fun updateMeal(
-        meal: String
-    ) {
+    private var analyzeJob: Job? = null
+
+    fun updateMeal(meal: String) {
         _state.update { it.copy(meal = meal) }
     }
 
     fun logFood(foodLog: FoodLog, date: Date) {
         viewModelScope.launch {
-            FoodLogRepository.add(
-                image = null,
-                foodLog = foodLog,
-                date = date
-            )
+            FoodLogRepository.add(image = null, foodLog = foodLog, date = date)
         }
     }
 
     fun reLogFood(foodLog: FoodLog) {
         viewModelScope.launch {
-            val duplicate = foodLog.copy(
-                logId = "",
-                timestamp = System.currentTimeMillis()
-            )
+            val duplicate = foodLog.copy(logId = "", timestamp = System.currentTimeMillis())
             FoodLogRepository.add(null, duplicate, state.value.date)
             _event.send(LogEvent.Message("Qayta qo'shildi!"))
         }
@@ -121,12 +119,7 @@ class LogFoodViewModel() : ViewModel() {
     fun logSavedFood(foodLog: FoodLog) {
         viewModelScope.launch {
             _loadingFoodIds.update { it + foodLog.logId }
-            val log = foodLog.copy(
-                logId = "",
-                timestamp = System.currentTimeMillis(),
-                mealType = state.value.meal
-            )
-            kotlinx.coroutines.delay(1000)
+            val log = foodLog.copy(logId = "", timestamp = System.currentTimeMillis(), mealType = state.value.meal)
             FoodLogRepository.add(null, log, state.value.date)
             _loadingFoodIds.update { it - foodLog.logId }
             _event.send(LogEvent.Message("Qo'shildi!"))
@@ -135,53 +128,36 @@ class LogFoodViewModel() : ViewModel() {
 
     fun updateDescription(text: String?) {
         _state.update { it.copy(description = text.toString()) }
-
     }
 
-    fun analyzePhoto(
-        image: Uri
-    ) {
+    fun analyzePhoto(image: Uri) {
         _state.update { it.copy(image = image) }
         analyze()
     }
 
-    private var analyzeJob: Job? = null
+    private suspend fun getDailyStats(date: Date): Triple<Int, Int, Int> {
+        val dailyLogsWrapper = DailyLogRepository.observeDailyLogs(date).first()
+        val dailyLogs = (dailyLogsWrapper as? DataWrapper.Success)?.data ?: DailyLogs()
+        val consumed = dailyLogs.foodLogs?.values?.sumOf { it.calories } ?: 0
+        val water = dailyLogs.waterLogs?.values?.sumOf { it.amountMl } ?: 0
+        val burned = dailyLogs.exerciseLogs?.values?.sumOf { it.caloriesBurned } ?: 0
+        return Triple(consumed, water, burned)
+    }
 
     fun submitAnswer(answer: String) {
-        val currentAnalysis = state.value.result ?: run {
-            android.util.Log.e("LogFoodViewModel", "❌ submitAnswer: currentAnalysis is null")
-            return
-        }
-        val id = currentAnalysis.id
-
-        android.util.Log.d("LogFoodViewModel", "🔍 submitAnswer called with: '$answer', id=$id")
-
+        val currentAnalysis = state.value.result ?: return
         viewModelScope.launch {
             _state.update { it.copy(isAnalyzing = true) }
-
-            val history = uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer.getHistory(id)
-            android.util.Log.d("LogFoodViewModel", "📚 History size: ${history.size}")
-
+            val history = FoodAnalyzer.getHistory(currentAnalysis.id)
             if (history.isEmpty()) {
-                android.util.Log.e("LogFoodViewModel", "❌ History is empty for id=$id")
                 _state.update { it.copy(isAnalyzing = false) }
                 _event.send(LogEvent.Error.AnalyzeError)
                 return@launch
             }
 
-            val answerContent = com.google.firebase.ai.type.content(role = "user") {
-                text(answer)
-            }
-            val newHistory = history + answerContent
-            android.util.Log.d("LogFoodViewModel", "📝 New history size: ${newHistory.size}")
-
-            val result = uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer.analyze(newHistory)
-
-            android.util.Log.d(
-                "LogFoodViewModel",
-                "📊 Analysis result: ${if (result != null) "SUCCESS" else "NULL"}"
-            )
-
+            val answerContent = com.google.firebase.ai.type.content(role = "user") { text(answer) }
+            val result = FoodAnalyzer.analyze(history + answerContent)
+            
             _state.update { it.copy(result = result, isAnalyzing = false) }
 
             if (result != null) {
@@ -189,24 +165,9 @@ class LogFoodViewModel() : ViewModel() {
                 result.mealType = currentAnalysis.mealType
                 FoodAnalyzer.updateCachedResult(result.id, currentAnalysis.photoUrl, currentAnalysis.mealType)
 
-                android.util.Log.d(
-                    "LogFoodViewModel",
-                    "✅ Result preserved with photoUrl=${result.photoUrl}, mealType=${result.mealType}"
-                )
-                android.util.Log.d(
-                    "LogFoodViewModel",
-                    "🔍 isAmbiguous=${result.result?.isAmbiguous}"
-                )
-
-                if (result.result?.isAmbiguous == true) {
-                    android.util.Log.d("LogFoodViewModel", "❓ Sending ClarificationNeeded event")
-                    _event.send(LogEvent.ClarificationNeeded(result))
-                } else {
-                    android.util.Log.d("LogFoodViewModel", "✅ Sending Analyzed event")
-                    _event.send(LogEvent.Analyzed(result))
-                }
+                if (result.result?.isAmbiguous == true) _event.send(LogEvent.ClarificationNeeded(result))
+                else _event.send(LogEvent.Analyzed(result))
             } else {
-                android.util.Log.e("LogFoodViewModel", "❌ Result is null, sending AnalyzeError")
                 _event.send(LogEvent.Error.AnalyzeError)
             }
         }
@@ -215,80 +176,54 @@ class LogFoodViewModel() : ViewModel() {
     fun analyze() {
         analyzeJob?.cancel()
         analyzeJob = viewModelScope.launch {
-            val state = this@LogFoodViewModel.state.value
-
-            if (state.description.isBlank()
-                && state.image == null
-            ) {
+            val currentState = state.value
+            if (currentState.description.isBlank() && currentState.image == null) {
                 _event.send(LogEvent.Error.EmptyInput)
                 return@launch
             }
 
             _state.update { it.copy(isAnalyzing = true) }
-
-            val compressor = state.image?.let {
-                ImageCompressor.compressImageFile(
-                    it
-                )
-            }
-            
-            android.util.Log.d("LogFoodViewModel", "AI Analyze: Image compressed, creating initial content to send to FoodAnalyzer...")
+            val compressed = currentState.image?.let { ImageCompressor.compressImageFile(it) }
+            val (consumed, water, burned) = getDailyStats(currentState.date)
+            val target = UserRepository.user.targetCalories
 
             val initialContent = FoodAnalyzer.createInitialContent(
-                compressor?.toUri(),
-                state.description,
-                state.meal
+                compressed?.toUri(), currentState.description, currentState.meal,
+                consumed, water, burned, target
             )
 
-            // Initial history contains just the user's prompt
-            val history = listOf(initialContent)
+            val result = FoodAnalyzer.analyze(listOf(initialContent))
+            _state.update { it.copy(result = result, isAnalyzing = false) }
 
-            android.util.Log.d("LogFoodViewModel", "AI Analyze: Sending request to Gemini...")
-            val result = FoodAnalyzer.analyze(history)
-            android.util.Log.d("LogFoodViewModel", "AI Analyze: Request complete. Result success=${result != null}")
-
-            _state.update {
-                it.copy(
-                    result = result,
-                    isAnalyzing = false
-                )
-            }
             if (result != null) {
-                // Set the local image path for later upload and meal type
-                result.photoUrl = state.image?.toString()
-                result.mealType = state.meal
-                FoodAnalyzer.updateCachedResult(result.id, state.image?.toString(), state.meal)
+                result.photoUrl = currentState.image?.toString()
+                result.mealType = currentState.meal
+                FoodAnalyzer.updateCachedResult(result.id, currentState.image?.toString(), currentState.meal)
                 
-                if (result.result?.isAmbiguous == true) {
-                    _event.send(LogEvent.ClarificationNeeded(result))
-                } else {
-                    _event.send(LogEvent.Analyzed(result))
-                }
+                if (result.result?.isAmbiguous == true) _event.send(LogEvent.ClarificationNeeded(result))
+                else _event.send(LogEvent.Analyzed(result))
             } else {
                 _event.send(LogEvent.Error.AnalyzeError)
             }
         }
     }
 
-    fun analyzeAudio(
-        audioUri: Uri
-    ) {
+    fun analyzeAudio(audioUri: Uri) {
         analyzeJob?.cancel()
         analyzeJob = viewModelScope.launch {
             _state.update { it.copy(isAnalyzing = true) }
-            val result = FoodAnalyzer.analyzeAudio(audioUri, state.value.meal)
-            
+            val (consumed, water, burned) = getDailyStats(state.value.date)
+            val target = UserRepository.user.targetCalories
+
+            val result = FoodAnalyzer.analyzeAudio(audioUri, state.value.meal, consumed, water, burned, target)
             _state.update { it.copy(result = result, isAnalyzing = false) }
             
             if (result != null) {
                 result.mealType = state.value.meal
                 FoodAnalyzer.updateCachedResult(result.id, null, state.value.meal)
                 
-                if (result.result?.isAmbiguous == true) {
-                    _event.send(LogEvent.ClarificationNeeded(result))
-                } else {
-                    _event.send(LogEvent.Analyzed(result))
-                }
+                if (result.result?.isAmbiguous == true) _event.send(LogEvent.ClarificationNeeded(result))
+                else _event.send(LogEvent.Analyzed(result))
             } else {
                 _event.send(LogEvent.Error.AnalyzeError)
             }

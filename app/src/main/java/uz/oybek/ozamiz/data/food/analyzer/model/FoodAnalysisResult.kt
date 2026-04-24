@@ -53,5 +53,8 @@ data class FoodAnalysisResult(
     // For interactive flow
     val isAmbiguous: Boolean = false,
     val question: String? = null,
-    val options: List<String>? = null
+    val options: List<String>? = null,
+    
+    // recommendations
+    val tips: List<String>? = null
 )

@@ -15,8 +15,8 @@
     <string name="voice_listening">Eshityapman</string>
     <string name="voice_analyze">Tahlil qilish</string>
     <string name="voice_checking">Tekshiryapmiz</string>
-    <string name="ai_chat_greeting">Qanday savollaringiz bor?</string>
-    <string name="app_name">Ozamiz</string>
+    <string name="ai_chat_greeting">Salom %1$s, men sizning shaxsiy diyetologingizman.</string>
+    <string name="app_name">Vaznim</string>
     <string name="daqiqa_oldin">daqiqa oldin</string>
     <string name="sohat_oldin">soat oldin</string>
     <string name="kun_oldin">kun oldin</string>
@@ -52,12 +52,12 @@
     <string name="kaloriya">Kaloriya</string>
     <string name="oqsillar">Oqsillar</string>
     <string name="_16_187_g">16/187 g</string>
-    <string name="protein">Protein</string>
+    <string name="protein">Oqsil</string>
     <string name="yog">Yog\'</string>
     <string name="yeyildi">Yeyildi</string>
     <string name="nonushta">Nonushta</string>
     <string name="kechki_ovqat">Kechki ovqat</string>
-    <string name="tamaddi">Tamaddi</string>
+    <string name="tamaddi">Orada</string>
     <string name="nomi">Nomi</string>
     <string name="natija_title">Natija</string>
     <string name="title_home">Asosiy</string>
@@ -68,7 +68,7 @@
     <string name="category_breakfast">Nonushta</string>
     <string name="category_lunch">Tushlik</string>
     <string name="category_dinner">Kechki ovqat</string>
-    <string name="category_snack">Tamaddi</string>
+    <string name="category_snack">Orada</string>
     <string name="empty_food_list">Bu kategoriyada hali ovqatlar yo\'q.</string>
     <string name="edit">Tahrirlash</string>
     <string name="delete">O\'chirish</string>
@@ -267,7 +267,7 @@
     <string name="estimated_calories_format">%d kaloriya</string>
     <string name="gallery">Galereya</string> <!-- Bu endi ishlatilmaydi, lekin o'chirmaymiz -->
     <string name="camera">Kamera</string>
-    <string name="calories_remaining">kaloriya ovqat yeyish mumkin</string>
+    <string name="calories_remaining">kaloriya qoldi</string>
     <string name="calories_sufficient">Bugunga yetarli</string>
     <string name="calories_exceeded_slightly">Bugunga yetarli</string>
     <string name="calories_exceeded_warning">Me\'yor to\'ldi</string>
@@ -566,7 +566,7 @@
     <string name="label_eaten">Eaten</string>
     <string name="label_burned">Burned</string>
     <string name="label_carbs">Carbs</string>
-    <string name="label_protein">Protein</string>
+    <string name="label_protein">Oqsil</string>
     <string name="label_fat">Fat</string>
     <string name="macro_short_format">%1$d / %2$d g</string>
     <string name="macro_remaining_format">%1$d qoldi</string>
@@ -606,4 +606,6 @@
     <string name="premium_emoji_info">ℹ️</string>
     <string name="premium_subtitle">Barcha imkoniyatlar bir joyda ✨</string>
     <string name="premium_features_title">Premium imkoniyatlari</string>
+    <string name="ai_chatbot_title">Dietolog</string>
+    <string name="hamjamiyat">Boshqalar</string>
 </resources>

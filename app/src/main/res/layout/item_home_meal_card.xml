@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
+    android:layout_marginBottom="8dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground"
@@ -18,20 +18,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="82dp"
-        android:padding="16dp">
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:padding="@dimen/dimen_12">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/img_meal_icon"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/round_lay"
-            android:backgroundTint="?attr/colorPrimaryContainer"
+        <FrameLayout
+            android:id="@+id/layout_progress_container"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:scaleType="centerCrop"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearance="@style/CircleImageView"
-            tools:src="@drawable/food_ic" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progress_meal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:indicatorColor="?attr/colorPrimary"
+                app:indicatorSize="52dp"
+                app:trackColor="?attr/colorSurfaceContainerHigh"
+                app:trackCornerRadius="4dp"
+                app:trackThickness="4dp"
+                app:indicatorTrackGapSize="0dp"
+                tools:progress="60" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/img_meal_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                tools:src="@drawable/breakfast_ic" />
+        </FrameLayout>
 
         <LinearLayout
             android:id="@+id/layout_text_container"
@@ -42,7 +62,7 @@
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_add_meal"
-            app:layout_constraintStart_toEndOf="@id/img_meal_icon"
+            app:layout_constraintStart_toEndOf="@id/layout_progress_container"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
@@ -55,60 +75,43 @@
                 android:textSize="17sp"
                 tools:text="Ertalabki" />
 
-            <FrameLayout
+            <LinearLayout
+                android:id="@+id/layout_calories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp">
+                android:layout_marginTop="2dp"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:id="@+id/layout_calories"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/text_meal_calories"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/text_meal_calories"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto_medium"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="13sp"
-                        tools:text="450 kkal yeyildi" />
-
-                    <com.google.android.material.progressindicator.LinearProgressIndicator
-                        android:id="@+id/progress_meal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        app:indicatorColor="?attr/colorPrimary"
-                        app:indicatorTrackGapSize="0dp"
-                        app:trackColor="?attr/colorSurfaceContainerHigh"
-                        app:trackCornerRadius="3dp"
-                        app:trackStopIndicatorPadding="0dp"
-                        app:trackStopIndicatorSize="0dp"
-                        app:trackThickness="6dp"
-                        tools:progress="60" />
-                </LinearLayout>
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="13sp"
+                    tools:text="450 kkal yeyildi" />
 
                 <TextView
                     android:id="@+id/text_meal_last_food"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:ellipsize="end"
                     android:fontFamily="@font/roboto_medium"
                     android:maxLines="1"
-                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textColor="?attr/colorPrimary"
                     android:textSize="13sp"
                     android:visibility="gone"
                     tools:text="Osh"
                     tools:visibility="visible" />
-            </FrameLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <ImageView
             android:id="@+id/btn_add_meal"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/round_lay"
             android:backgroundTint="?attr/colorSurfaceContainerHighest"
             android:padding="8dp"

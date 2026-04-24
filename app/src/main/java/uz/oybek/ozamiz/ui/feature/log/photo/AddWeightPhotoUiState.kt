@@ -55,28 +55,28 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
 
             when (result) {
                 is DataWrapper.Success -> {
-                    // Muvaffaqiyatli saqlangandan so'ng LocalUserni yangilash
                     val newLog = result.data
-                    
+                    val previousWeight = LocalUser.user.weight
+
                     LocalUser.update {
                         lastWeightLogTimestamp = System.currentTimeMillis()
-                        if (newLog.photoUrl.isNotEmpty()) {
-                            avatarUrl = newLog.photoUrl // Profil rasmini yangilash
-                        }
-                        weight = weightKg // Update Current Weight!
-                        
+                        weight = weightKg
+
                         if (startWeight == null || startWeight == -1.0) {
-                            startWeight = weightKg // Set Start Weight if not set
+                            startWeight = weightKg
                         }
                     }
 
-                    // Firebase'da foydalanuvchi ma'lumotlarini yangilash
                     UserRepository.updateUser { userToUpdate ->
                         userToUpdate.lastWeightLogTimestamp = LocalUser.user.lastWeightLogTimestamp
-                        userToUpdate.avatarUrl = LocalUser.user.avatarUrl
                         userToUpdate.weight = LocalUser.user.weight
                         userToUpdate.startWeight = LocalUser.user.startWeight
                     }
+
+                    if (previousWeight > 0.0 && previousWeight != weightKg) {
+                        uz.oybek.ozamiz.data.community.AchievementPostHelper.onWeightDropped(previousWeight, weightKg)
+                    }
+
                     _uiState.update { it.copy(isLoading = false, logAddedSuccessfully = true) }
                 }
 

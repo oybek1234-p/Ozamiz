@@ -8,17 +8,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.premium.PaymentInfo
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.utils.DataWrapper
 
 data class PaymentGetCheckUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val premiumPrice: Long? = null,
     val paymentCardNumber: String? = null,
     val errorMessage: String? = null,
-    val successMessage: String? = null
+    val successMessage: String? = null,
+    val isYearly: Boolean = false
 )
 
 class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(application) {
@@ -27,20 +28,23 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
     val uiState: LiveData<PaymentGetCheckUiState> = _uiState
 
     init {
-        loadInitialData()
+        loadCardNumber()
     }
 
-    private fun loadInitialData() {
-        _uiState.value = _uiState.value?.copy(isLoading = true)
-        PremiumUtil.loadPremiumPrice { price ->
-            PaymentInfo.loadPaymentCard { card ->
-                _uiState.postValue(
-                    _uiState.value?.copy(
-                        isLoading = false,
-                        premiumPrice = price,
-                        paymentCardNumber = card
-                    )
-                )
+    fun initData(price: Long, isYearly: Boolean) {
+        val current = _uiState.value ?: PaymentGetCheckUiState()
+        _uiState.value = current.copy(
+            premiumPrice = price,
+            isYearly = isYearly,
+            isLoading = current.paymentCardNumber == null
+        )
+    }
+
+    private fun loadCardNumber() {
+        PaymentInfo.loadPaymentCard { card ->
+            viewModelScope.launch {
+                val current = _uiState.value ?: PaymentGetCheckUiState()
+                _uiState.postValue(current.copy(isLoading = false, paymentCardNumber = card))
             }
         }
     }
@@ -48,13 +52,19 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
     fun submitPaymentCheck(checkImageUri: Uri) {
         val userId = LocalUser.user.uid
         if (userId.isBlank()) {
-            _uiState.value = _uiState.value?.copy(errorMessage = getApplication<Application>().getString(R.string.error_user_not_found))
+            _uiState.value =
+                _uiState.value?.copy(errorMessage = getApplication<Application>().getString(R.string.error_user_not_found))
             return
         }
 
-        _uiState.value = _uiState.value?.copy(isLoading = true, errorMessage = null, successMessage = null)
+        _uiState.value =
+            _uiState.value?.copy(isLoading = true, errorMessage = null, successMessage = null)
         viewModelScope.launch {
-            val result = UserRepository.uploadPremiumCheckData(userId, checkImageUri)
+            val result = UserRepository.uploadPremiumCheckData(
+                userId,
+                checkImageUri,
+                _uiState.value?.isYearly ?: false
+            )
             when (result) {
                 is DataWrapper.Success -> {
                     _uiState.postValue(
@@ -64,6 +74,7 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
                         )
                     )
                 }
+
                 is DataWrapper.Error -> {
                     _uiState.postValue(
                         _uiState.value?.copy(
@@ -72,7 +83,6 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
                         )
                     )
                 }
-
             }
         }
     }
@@ -80,6 +90,7 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
     fun clearError() {
         _uiState.value = _uiState.value?.copy(errorMessage = null)
     }
+
     fun clearSuccess() {
         _uiState.value = _uiState.value?.copy(successMessage = null)
     }

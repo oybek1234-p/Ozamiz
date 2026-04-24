@@ -6,9 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentDailyLimitBinding
 
@@ -42,38 +45,34 @@ class DailyLimitFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val type = arguments?.getString(ARG_TYPE) ?: TYPE_CALORIES
-        setupContent(type)
+        val lastFoodTimestamp = arguments?.getLong(ARG_LAST_FOOD_TIME, 0L)?.takeIf { it > 0 }
+        val remainingCalories = arguments?.getInt(ARG_REMAINING_CALORIES, 0) ?: 0
+
+        setupContent(type, lastFoodTimestamp, remainingCalories)
 
         binding.btnClose.setOnClickListener {
             dismiss()
         }
     }
 
-    private fun setupContent(type: String) {
+    private fun setupContent(type: String, lastFoodTimestamp: Long?, remainingCalories: Int) {
         when (type) {
             TYPE_CALORIES -> {
                 binding.textTitle.isVisible = true
-                binding.textTitle.text = "Tanangiz kerakli quvvatni oldi.\nEndi u yog'larni eritishga o'tadi"
+                binding.textTitle.text = "Limitga yetdingiz"
 
-                binding.card1.isVisible = true
-                binding.textEmoji1.text = "🥤"
-                binding.textAdvice1.text = "Suv yoki choy iching"
+                binding.textExplanation.text = "Bugungi kaloriya miqdori to'ldi, ovqat yemasangiz tanangiz yog' yoqishni boshlaydi."
 
-                binding.card2.isVisible = true
-                binding.textEmoji2.text = "🥗"
-                binding.textAdvice2.text = "Bodring, pomidor yoki ko'katlar"
-
-                binding.card3.isVisible = true
-                binding.textEmoji3.text = "🥚"
-                binding.textAdvice3.text = "Qaynatilgan tuxum oqi"
-
-                binding.card4.isVisible = true
-                binding.textEmoji4.text = "🥛"
-                binding.textAdvice4.text = "Yog'siz qatiq yoki kefir"
-
-                binding.card5.isVisible = true
-                binding.textEmoji5.text = "🥣"
-                binding.textAdvice5.text = "Suyuq sabzavotli sho'rva"
+                binding.textUnifiedAdvice.text = "🥛 Yog'siz qatiq yoki kefir\n" +
+                        "🥗 Bodring, pomidor yoki ko'katlar\n" +
+                        "🥚 Qaynatilgan tuxum oqi\n" +
+                        "🥤 Toza suv yoki shakarsiz choy"
+            }
+            TYPE_REMAINING -> {
+                binding.textTitle.isVisible = true
+                binding.textTitle.text = "Ajoyib! 😊"
+                binding.textExplanation.text = "Sizda yana $remainingCalories kaloriya ovqat qoldi. Limitdan oshirmasangiz, tanangiz yog' yoqishni boshlaydi, limitdan oshirmaslikka harakat qiling."
+                binding.cardHungerAdvice.isVisible = false
             }
         }
     }
@@ -86,13 +85,25 @@ class DailyLimitFragment : BottomSheetDialogFragment() {
     companion object {
         const val TAG = "DailyLimitFragment"
         const val ARG_TYPE = "arg_type"
-
+        const val ARG_LAST_FOOD_TIME = "arg_last_food_time"
+        const val ARG_REMAINING_CALORIES = "arg_remaining_calories"
         const val TYPE_CALORIES = "calories"
+        const val TYPE_REMAINING = "remaining"
 
-        fun newInstance(type: String = TYPE_CALORIES): DailyLimitFragment {
+        fun newInstance(
+            type: String = TYPE_CALORIES,
+            lastFoodTimestamp: Long? = null,
+            remainingCalories: Int? = null
+        ): DailyLimitFragment {
             return DailyLimitFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_TYPE, type)
+                    if (lastFoodTimestamp != null) {
+                        putLong(ARG_LAST_FOOD_TIME, lastFoodTimestamp)
+                    }
+                    if (remainingCalories != null) {
+                        putInt(ARG_REMAINING_CALORIES, remainingCalories)
+                    }
                 }
             }
         }

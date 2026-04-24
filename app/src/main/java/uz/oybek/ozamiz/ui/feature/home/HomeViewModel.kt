@@ -16,8 +16,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.AppConstants
 import uz.oybek.ozamiz.appContext
+import uz.oybek.ozamiz.data.ai.AiMenuRepository
 import uz.oybek.ozamiz.data.course.LocalCourseRepository
 import uz.oybek.ozamiz.data.food.DietController
+import uz.oybek.ozamiz.data.health.local.LocalHealthTasks
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.logs.DailySummaryRepository
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
@@ -53,8 +55,19 @@ class HomeViewModel : ViewModel() {
     private val _showRateAppEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
     val showRateAppEvent = _showRateAppEvent.asSharedFlow()
 
-    private val _showPremiumEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
-    val showPremiumEvent = _showPremiumEvent.asSharedFlow()
+    private val _showAppOnboardingEvent =
+        kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1)
+    val showAppOnboardingEvent = _showAppOnboardingEvent.asSharedFlow()
+
+    private val _showHealthTaskOnboardingEvent =
+        kotlinx.coroutines.flow.MutableSharedFlow<String>(replay = 1)
+    val showHealthTaskOnboardingEvent = _showHealthTaskOnboardingEvent.asSharedFlow()
+
+    private val onboardingTaskQueue = mutableListOf<String>()
+
+    fun consumeOnboardingEvent() {
+        _showHealthTaskOnboardingEvent.resetReplayCache()
+    }
 
     private val glassVolume = AppConstants.Water.GLASS_VOLUME_ML
     private var previousWaterAmount = 0
@@ -64,18 +77,55 @@ class HomeViewModel : ViewModel() {
     private var isFirstLoadCompleted = false
     private var isTipInitialized = false
     private var isFoodAdditionPending = false
+    private var isWaterAdditionPending = false
+    private var isExerciseAdditionPending = false
     private var dataCollectionJob: Job? = null
 
     private var summaryJob: Job? = null
 
     init {
-        _uiState.update {
-            it.copy(
-                datesForScroller = DateUtils.generateDatesForScroller(),
-                selectedDate = DateUtils.getStartOfDay(Date())
-            )
+        AiMenuRepository.init(appContext)
+        observeAiMenu()
+        val initialUser = UserRepository.user
+        val initialDates = DateUtils.generateDatesForScroller()
+        val initialSelectedDate = DateUtils.getStartOfDay(Date())
+
+        if (initialUser.valid) {
+            val targetCals =
+                if (initialUser.targetCalories > 0) initialUser.targetCalories else DietController.calculateTargetCalories(
+                    initialUser
+                )
+            val targetWater =
+                if (initialUser.targetWaterMl > 0) initialUser.targetWaterMl else DietController.calculateTargetWaterMl(
+                    initialUser.weight
+                )
+            val macros = DietController.calculateMacrosByPercent(targetCals)
+
+            _uiState.update {
+                it.copy(
+                    isInitialLoading = false,
+                    datesForScroller = initialDates,
+                    selectedDate = initialSelectedDate,
+                    caloriesTarget = targetCals,
+                    waterTarget = targetWater,
+                    proteinTarget = macros.protein,
+                    fatTarget = macros.fat,
+                    carbsTarget = macros.carbs,
+                    caloriesRemaining = targetCals,
+                    userPoints = initialUser.scorePoints,
+                    streakInfo = initialUser.streakInfo
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    datesForScroller = initialDates,
+                    selectedDate = initialSelectedDate
+                )
+            }
         }
         initDailyTip()
+        initHealthTasks()
 
         viewModelScope.launch {
             try {
@@ -92,13 +142,26 @@ class HomeViewModel : ViewModel() {
                     if (previousPoints >= 0 && newPoints != previousPoints) newPoints - previousPoints else 0
                 previousPoints = newPoints
 
+                val targetCals =
+                    if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(
+                        user
+                    )
+                val targetWater =
+                    if (user.targetWaterMl > 0) user.targetWaterMl else DietController.calculateTargetWaterMl(
+                        user.weight
+                    )
+                val macros = DietController.calculateMacrosByPercent(targetCals)
+
                 _uiState.update {
                     it.copy(
                         streakInfo = user.streakInfo,
                         userPoints = newPoints,
                         pointsJustAdded = if (added > 0) added else 0,
-                        caloriesTarget = user.targetCalories,
-                        waterTarget = user.targetWaterMl,
+                        caloriesTarget = targetCals,
+                        waterTarget = targetWater,
+                        proteinTarget = macros.protein,
+                        fatTarget = macros.fat,
+                        carbsTarget = macros.carbs,
                         isInitialLoading = false
                     )
                 }
@@ -157,20 +220,6 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun checkUserAchievements(user: User) {
-        val regDate = user.registerDate ?: return
-        val daysPassed = (System.currentTimeMillis() - regDate.time) / (1000 * 60 * 60 * 24)
-        val prefs =
-            appContext.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-
-        if (daysPassed >= 1 && !user.premium && !user.paymentChecking) {
-            val hasShownPremium = prefs.getBoolean("has_shown_premium_sheet", false)
-            if (!hasShownPremium) {
-                viewModelScope.launch {
-                    _showPremiumEvent.emit(Unit)
-                    prefs.edit().putBoolean("has_shown_premium_sheet", true).apply()
-                }
-            }
-        }
     }
 
     private fun startLoadingData(date: Date) {
@@ -182,7 +231,6 @@ class HomeViewModel : ViewModel() {
                     _uiState.update { it.copy(isRefreshing = false, isInitialLoading = false) }
                 }
             }
-
             val summaryFlow = DailyLogRepository.observeDailySummary(date)
             val exerciseFlow = ExerciseLogRepository.getLogs(date)
             val foodFlow = FoodLogRepository.getAllLogs(date)
@@ -231,107 +279,36 @@ class HomeViewModel : ViewModel() {
                 } else null
 
 
-                val motivationalEvent =
-                    waterJustAddedEvent || foodJustAddedEvent || exerciseJustAddedEvent
-                val motivationalMessage = if (motivationalEvent) {
-                    val name = user.name.ifBlank { "Foydalanuvchi" }
-                    val isFemale = user.gender == 1
+                val netCalories = currentFoodCalories
+                val progress =
+                    if (user.targetCalories > 0) netCalories.toFloat() / user.targetCalories else 0f
 
-                    val femaleMessages = listOf(
-                        "$name, o'zingizga ajratgan vaqtingiz o'zini oqlayapti, malikalardek ochilib ketyapsiz 👑",
-                        "Kundan-kun chiroyli, kundan-kun nafis bo'lyapsiz, bu hali faqat boshlanishi! 🚀",
-                        "$name, o'zingizni sevishni boshlaganingiz qiyofangizdan so'zsiz bilinib turibdi 💖",
-                        "Bu ketishda tez orada hamma sizdan go'zallik sirini so'raydi, to'xtamang ✨",
-                        "Ichki xotirjamlik va tashqi go'zallik sizda mukammal uyg'unlashmoqda 🌸",
-                        "$name, qadam-baqadam o'zingizning eng zo'r versiyangizga aylanib boryapsiz 👌",
-                        "Bugun ham o'zingiz uchun eng zo'r ishlarni qildingiz, malikam 👑",
-                        "Ko'rinish va kayfiyat a'lo darajada! Faqat olg'a qadam bosing ✨",
-                        "$name, hayotingizga kirib kelgan bu yangi ritm sizga nihoyatda yarashyapti 🎵",
-                        "O'zingizga bo'lgan ishonch har qanday libosdan ham ko'proq chiroy beryapti 👗",
-                        "Siz kabi o'z ustida ishlashni sevadigan ayollar doim e'tibor markazida bo'ladi 🌟",
-                        "$name, bugungi sa'y-harakatlaringiz o'zingizga bo'lgan muhabbatning eng go'zal isbotidir 🌸",
-                        "Yashirin jozibangiz kundan-kun yuzaga chiqib kelyapti, bu jarayon juda chiroyli 🎭",
-                        "Har kuni oynaga qarab o'zingiz bilan faxrlanishingizga to'la haqqingiz bor 👌",
-                        "$name, maqsadingiz sari intilishingiz sizni yanada viqorli va kuchli ko'rsatyapti 👑",
-                        "Sizning holatingiz – 'Men buni eplayman va eng go'zali bo'laman' degan chin shijoatdir 💪",
-                        "Kundan-kun ochilib, yanada nafis bo'lib boryapsiz, bu haqiqiy go'zallik ✨",
-                        "$name, siz nafaqat o'zgaryapsiz, balki o'zingizning eng asl go'zalligingizni topyapsiz 🦋",
-                        "Bugungi kuningiz ham latofat va sog'lik sari tashlangan muvaffaqiyatli qadam bo'ldi 🥇",
-                        "O'zini sevgan ayol doim atrofdagilarni ham ilhomlantiradi, siz xuddi shundaysiz 💖",
-                        "$name, sizdagi bu sabr va mehnat tez orada mo'jizaviy qomatga aylanadi ✨",
-                        "Bu yo'lda ko'rsatayotgan mardona harakatlaringiz sizni haqiqiy malika qilmoqda 👑",
-                        "O'zingizga ishongan holatda oldinga siljishingiz — eng to'g'ri tanlovingizdir 🌟",
-                        "$name, sizni kuzatib, inson o'zini qanday qadrlashi kerakligini o'rganadi 🌿",
-                        "Harakatdan aslo to'xtamang, natija siz kutgandan ham shirin va chiroyli bo'ladi 🍓",
-                        "Kundan-kun yengillashib, chiroyingizga chiroy qo'shilayotganini his qilish naqadar maroqli 🕊️",
-                        "$name, siz o'ylaganingizdan ko'proq kuchli va jozibalisuz! 💎",
-                        "Go'zallik siri nima deyishsa, tinimsiz harakat deb sizni ko'rsatishlari aniq 💯",
-                        "Har bir yangi kun sizga faqatgina latofat va yangi muvaffaqiyatlar olib kelsin 🌸"
-                    )
+                val waterPercent =
+                    if (user.targetWaterMl > 0) currentWater.toFloat() / user.targetWaterMl else 0f
+                val waterStatus = when {
+                    waterPercent >= 1f -> "G'alaba! 🎉"
+                    waterPercent >= 0.7f -> "Deyarli tayyor ✨"
+                    waterPercent >= 0.3f -> "Zo'r ketyapsiz 👍"
+                    else -> "Suv ichamiz 💧"
+                }
 
-                    val maleMessages = listOf(
-                        "$name, temir irodangiz natijasini beryapti, qomat zo'r bo'lyapti! 💪",
-                        "Kundan-kun kelishgan va baquvvat bo'lib boryapsiz! 🚀",
-                        "$name, o'z ustida ishlaydigan erkak doim hurmatga loyiq 👊",
-                        "Bu intizom bilan tez orada haqiqiy atlet qomatiga ega bo'lasiz 🔥",
-                        "Mashg'ulotlar o'z so'zini aytyapti, formangiz ancha tiklandi 🏋️‍♂️",
-                        "$name, haqiqiy chempionlarga xos xarakter ko'rsatyapsiz 🏆",
-                        "Qat'iyat va mehnat — sizdagi yigitlik g'ururining belgisi ⚡",
-                        "$name, yelkalar kengayib, qomat chiroyli shakl olyapti, qoyil! 🦍",
-                        "O'z maqsadiga intilgan erkakning viqori boshqacha bo'ladi 🦅",
-                        "Bugungi mehnatingiz sizni ertaga yanada baquvvat qiladi 🧱",
-                        "$name, kundan-kun o'zingizning eng zo'r versiyangizga aylanyapsiz 💯",
-                        "Chekinmaslik — bu sizning eng kuchli qurolingiz ⚔️",
-                        "Irodangiz po'latdek ekan, natija shunga yarasha bo'lyapti 🛡️",
-                        "$name, sport formasi sizga juda yarashyapti, gap yo'q! 👕",
-                        "O'zini yenggan inson har qanday to'siqni yengadi, barakalla! 🏔️",
-                        "$name, bu ketishda atrofdagilarga zo'r o'rnak bo'lyapsiz 🌟",
-                        "Maqsad sari dadil qadam, ko'rinishingiz ancha o'zgargan! 🚶‍♂️",
-                        "Har bir kuningiz iroda va kuch sinovi, siz buni eplayapsiz ⚙️",
-                        "$name, qadam-baqadam ideal qomat sari borayapsiz, to'xtamang 🎯",
-                        "Bu shijoatni ko'rib qoyil qolmaslikning iloji yo'q 👏",
-                        "$name, sog'lom rejim sizning kuchingizga kuch qo'shyapti 🥗",
-                        "Haqiqiy erkakcha harakat, chinakam natija! 🚀",
-                        "O'z formangizni tiklayotganingiz shaxdingizdan ma'lum 🦅",
-                        "$name, charchoqni yengib, faqat oldinga qarab boryapsiz, hurmat! 🤝",
-                        "Kundan-kun qadamlar yengil, qomat kelishgan bo'lib boryapti 🚶‍♂️",
-                        "Kuchli xarakter ortida har doim chiroyli natija turadi 💎",
-                        "$name, bu iroda bilan tog'ni talqon qilsangiz arziydi 💪",
-                        "O'ziga qat'iy talab qo'ya olgan yigitgina shunday natijaga erishadi 👑",
-                        "Yashirin energiyangiz ochilib kelyapti, shunchaki daxshat! 🔥",
-                        "$name, kundan-kun sportchilar qomatiga yaqinlashyapsiz 🏋️‍♂️",
-                        "Bugungi harakat — kelajakdagi zo'r sog'liq va qomat kafolati 🛡️",
-                        "Har bir tomchi teringiz irodangizning isbotidir, qoyil! 💧",
-                        "$name, qat'iyatingiz sizga o'zgacha bir salobat beryapti 🦁",
-                        "Shunchaki oldinga harakat qiling, eng zo'r forma o'zi ergashib keladi 🏃‍♂️",
-                        "Sizdagi bu ishtiyoq har qanday maqsadni taslim qiladi 🎯",
-                        "$name, kiyimlar ancha o'ziga moslashib qolibdi, natija zo'r! 👕",
-                        "O'ziga ishonch va intizom – sizdagi eng kuchli xislatlar ⚡",
-                        "Mehnat qilgan yigit elda, mashq qilgan qomat joyida! 🦅",
-                        "$name, natija sari aniq va ishonchli ketyapsiz, tormoz bermang! 🚀",
-                        "Bugun ham o'z dangasaligingiz ustidan g'alaba qozondingiz, chempion! 🏆",
-                        "Kuch — bilakda emas, irodada ekanligini isbotlayapsiz 💪",
-                        "$name, o'zingizga bo'lgan e'tibor sizni yanada salobatli ko'rsatyapti 🦍",
-                        "Haqiqiy g'ururli inson o'z ustida ishlashdan charchamaydi 🤝",
-                        "Natijalar ko'zga ko'rinyapti, formangiz ancha yaxshilangan! 📈",
-                        "$name, po'lat irodangiz sizni faqat yuqoriga olib chiqadi 🏔️",
-                        "Kundan-kun qomatingiz o'z shakliga kirmoqda, a'lo darajada! 👌",
-                        "Bunday intizom bilan har qanday qiyinchilik taslim bo'ladi ⚔️",
-                        "$name, sizdagi bu o'zgarish faqat qomat emas, xarakter kuchayganidan darak! 🦅",
-                        "Zo'r forma, zo'r xarakter! Harakatdan to'xtamang 🔥",
-                        "O'zgarishlar ajoyib, $name, siz o'ylaganingizdan ham baquvvatroqsiz! 💯"
-                    )
-
-                    if (isFemale) femaleMessages.random() else maleMessages.random()
-                } else _uiState.value.motivationalMessage
+                val exercisePercent =
+                    if (AppConstants.Exercise.DEFAULT_TARGET_CALORIES > 0) currentExerciseBurnt.toFloat() / AppConstants.Exercise.DEFAULT_TARGET_CALORIES else 0f
+                val exerciseStatus = when {
+                    exercisePercent >= 1f -> "Marra zabt etildi! 🏆"
+                    exercisePercent >= 0.7f -> "Daxshatli shijoat! 💪"
+                    exercisePercent >= 0.2f -> "Yog' yonyapti ⚡"
+                    else -> "Harakatni boshlang 🏃"
+                }
 
                 _uiState.update {
                     it.copy(
                         isInitialLoading = false,
                         isRefreshing = false,
                         selectedDate = date,
-                        caloriesRemaining = user.targetCalories - summary.consumedCalories,
-                        caloriesConsumed = summary.consumedCalories,
+                        caloriesRemaining = user.targetCalories - netCalories,
+                        caloriesConsumed = netCalories,
+                        foodConsumed = currentFoodCalories,
                         caloriesTarget = user.targetCalories,
                         waterConsumed = currentWater,
                         waterTarget = user.targetWaterMl,
@@ -356,14 +333,45 @@ class HomeViewModel : ViewModel() {
                         isProteinExceeded = summary.consumedProtein > macros.protein + 50,
                         isCarbsExceeded = summary.consumedCarbs > macros.carbs + 70,
                         isFatExceeded = summary.consumedFat > macros.fat + 30,
-                        isCalorieOptimal = summary.consumedCalories >= user.targetCalories && summary.consumedCalories <= user.targetCalories + 200,
-                        isCalorieExceeded = summary.consumedCalories > user.targetCalories + 200,
+                        isCalorieOptimal = netCalories >= user.targetCalories - 50 && netCalories <= user.targetCalories + 100,
+                        isCalorieExceeded = netCalories > user.targetCalories + 100,
+                        lastFoodTimestamp = foodLogs.maxOfOrNull {
+                            (it.timestamp as? Number)?.toLong() ?: 0L
+                        },
+                        waterStatusMessage = waterStatus,
+                        exerciseStatusMessage = exerciseStatus
                     )
                 }
-                if (foodJustAddedEvent || isFoodAdditionPending) {
-                    viewModelScope.launch { _foodJustAddedEvent.emit(Unit) }
+
+                if (isFoodAdditionPending && foodJustAddedEvent) {
+                    viewModelScope.launch {
+                        _foodJustAddedEvent.emit(Unit)
+                    }
                     isFoodAdditionPending = false
                 }
+
+                if (isWaterAdditionPending && waterJustAddedEvent) {
+                    val waterTarget = user.targetWaterMl
+                    if (waterTarget in 1..currentWater) {
+                        uz.oybek.ozamiz.data.community.AchievementPostHelper.onWaterGoalReached(
+                            currentWater,
+                            waterTarget
+                        )
+                    }
+                    isWaterAdditionPending = false
+                }
+
+                if (isExerciseAdditionPending && exerciseJustAddedEvent) {
+                    val exerciseTarget = AppConstants.Exercise.DEFAULT_TARGET_CALORIES
+                    if (exerciseTarget > 0 && currentExerciseBurnt >= exerciseTarget) {
+                        uz.oybek.ozamiz.data.community.AchievementPostHelper.onExerciseGoalReached(
+                            currentExerciseBurnt,
+                            exerciseTarget
+                        )
+                    }
+                    isExerciseAdditionPending = false
+                }
+
                 previousWaterAmount = currentWater
                 previousFoodCalories = currentFoodCalories
                 previousExerciseBurnt = currentExerciseBurnt
@@ -378,6 +386,7 @@ class HomeViewModel : ViewModel() {
 
     fun onFoodAdded() {
         isFoodAdditionPending = true
+        refresh()
     }
 
     fun consumeFoodAddedEvent() {
@@ -428,13 +437,20 @@ class HomeViewModel : ViewModel() {
             }
         }
 
+        isWaterAdditionPending = true
         viewModelScope.launch {
             WaterLogRepository.add(WaterLog(amountMl = amount), date)
             StreakRepository.updateStreak()
             if (pointsToAdd > 0) {
                 UserRepository.addPoints(pointsToAdd)
             }
+            refresh()
         }
+    }
+
+    fun onExerciseAdded() {
+        isExerciseAdditionPending = true
+        refresh()
     }
 
     fun clearPointsJustAdded() = _uiState.update { it.copy(pointsJustAdded = 0) }
@@ -471,6 +487,35 @@ class HomeViewModel : ViewModel() {
         if (!isDismissedToday && !_uiState.value.isTipVisible) {
             _uiState.update { it.copy(isTipVisible = true) }
         }
+        checkAppOnboarding()
+    }
+
+    private fun checkAppOnboarding() {
+        val prefs =
+            appContext.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val isFirst = prefs.getBoolean("is_first_registration", false)
+        val step = prefs.getInt("app_onboarding_step", 0)
+        if (isFirst || step == 0) {
+            viewModelScope.launch {
+                if (isFirst) {
+                    prefs.edit().putBoolean("is_first_registration", false).apply()
+                }
+                _showAppOnboardingEvent.emit(Unit)
+            }
+        }
+    }
+
+    fun onAppOnboardingPresented() {
+        val prefs =
+            appContext.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit().putInt("app_onboarding_step", 1).apply()
+        _showAppOnboardingEvent.resetReplayCache()
+    }
+
+    fun onAppOnboardingComplete() {
+        val prefs =
+            appContext.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        prefs.edit().putInt("app_onboarding_step", 2).apply()
     }
 
     fun onTipDismissed() {
@@ -496,5 +541,73 @@ class HomeViewModel : ViewModel() {
         _uiState.update { it.copy(dailyTip = tip) }
     }
 
+    private fun observeAiMenu() {
+        viewModelScope.launch {
+            AiMenuRepository.currentMenu.collect { menu ->
+                _uiState.update { it.copy(todayAiMenu = menu) }
+            }
+        }
+    }
 
+    private fun initHealthTasks() {
+        updateHealthTasks()
+    }
+
+    private fun checkHealthTasksIntro() {
+        if (LocalHealthTasks.shouldShowDailyIntro()) {
+            val tasks = _uiState.value.dailyHealthTasks
+            if (tasks.isNotEmpty()) {
+                onboardingTaskQueue.clear()
+                onboardingTaskQueue.addAll(tasks.map { it.task.id })
+                showNextOnboardingTask()
+            }
+        }
+    }
+
+    fun showNextOnboardingTask() {
+        viewModelScope.launch {
+            if (onboardingTaskQueue.isNotEmpty()) {
+                val taskId = onboardingTaskQueue.removeAt(0)
+                delay(500)
+                _showHealthTaskOnboardingEvent.emit(taskId)
+            } else {
+                LocalHealthTasks.markDailyIntroAsDone()
+            }
+        }
+    }
+
+
+    private fun updateHealthTasks() {
+        val tasks = LocalHealthTasks.getTodayTasks()
+        val summary = LocalHealthTasks.getCompletionSummary()
+        _uiState.update {
+            it.copy(
+                dailyHealthTasks = emptyList(),
+                healthTasksSummary = summary
+            )
+        }
+    }
+
+    fun onHealthTaskToggled(taskId: String, isCompleted: Boolean) {
+        LocalHealthTasks.toggleTaskCompletion(taskId, isCompleted)
+        updateHealthTasks()
+
+        if (isCompleted) {
+            addPoints(10)
+        } else {
+        }
+    }
+
+    private fun addPoints(points: Int) {
+        val currentPoints = _uiState.value.userPoints
+        _uiState.update {
+            it.copy(
+                userPoints = currentPoints + points,
+                pointsJustAdded = points
+            )
+        }
+        viewModelScope.launch {
+            UserRepository.addPoints(points)
+        }
+    }
 }

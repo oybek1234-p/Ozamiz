@@ -46,6 +46,8 @@ class OnBoardingFragment : BaseFragment<FragmentOnboardingBinding>() {
             .observe(viewLifecycleOwner) {
                 when (it) {
                     is OnBoardingDirection.Finished -> {
+                        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        prefs.edit().putBoolean("is_first_registration", true).apply()
                         UserRepository.updateUser {  }
                         mainActivity()?.recreateUi()
                     }

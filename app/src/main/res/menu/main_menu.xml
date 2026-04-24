@@ -2,13 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/home"
-        android:title="Sanash"
+        android:title="Asosiy"
         android:icon="@drawable/calculate_ic"
         />
 
-    <item android:id="@+id/lessonsHomeFragment"
-        android:title="Darslar"
-        android:icon="@drawable/study_ic"
+    <item android:id="@+id/communityFragment"
+        android:title="@string/hamjamiyat"
+        android:icon="@drawable/people_ic"
+        />
+
+    <item android:id="@+id/aiChatFragment"
+        android:title="@string/ai_chatbot_title"
+        android:icon="@drawable/chat_ic"
         />
 
     <item android:id="@+id/natijaFragment2"

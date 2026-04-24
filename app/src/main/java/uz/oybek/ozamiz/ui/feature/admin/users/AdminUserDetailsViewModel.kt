@@ -52,12 +52,20 @@ class AdminUserDetailsViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                val currentUser = _user.value
+                val newPremiumDate = if (currentUser != null && currentUser.premium != premium) {
+                    if (premium) System.currentTimeMillis() else 0L
+                } else {
+                    currentUser?.premiumDate ?: (if (premium) System.currentTimeMillis() else 0L)
+                }
+
                 val updates = mapOf(
                     "weight" to weight,
                     "targetWeight" to targetWeight,
                     "height" to height,
                     "age" to age,
-                    "premium" to premium
+                    "premium" to premium,
+                    "premiumDate" to newPremiumDate
                 )
                 FirebasePaths.userReference(userId).updateChildren(updates).await()
                 // Reload user to reflect changes

@@ -21,6 +21,6 @@ class MotivationAlarmReceiver : BroadcastReceiver() {
         }
 
         // Reschedule all alarms (exact alarms are one-shot, so must reschedule)
-        MotivationAlarmScheduler.scheduleAll(context)
+        MotivationAlarmScheduler.scheduleAll(context, force = true)
     }
 }

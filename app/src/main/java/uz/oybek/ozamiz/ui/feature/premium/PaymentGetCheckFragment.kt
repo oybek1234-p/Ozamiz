@@ -32,6 +32,11 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
         }
 
     override fun viewCreated(bind: PaymentCheckFragmentBinding) {
+        val price = arguments?.getLong("price", 0L) ?: 0L
+        val isYearly = arguments?.getBoolean("is_yearly", false) ?: false
+        if (price > 0L) {
+            viewModel.initData(price, isYearly)
+        }
         bind.apply {
             toolbar.setUpBackButton(this@PaymentGetCheckFragment)
 

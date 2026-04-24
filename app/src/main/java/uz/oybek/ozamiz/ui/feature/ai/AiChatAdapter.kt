@@ -8,14 +8,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.data.ai.model.ChatMessage
 import uz.oybek.ozamiz.databinding.ItemChatMessageBinding
-import android.text.SpannableStringBuilder
-import android.text.style.StyleSpan
-import android.graphics.Typeface
-import android.text.Spanned
 import java.util.regex.Pattern
 import uz.oybek.ozamiz.databinding.ItemChatThinkingBinding
+import uz.oybek.ozamiz.ui.utils.MarkdownUtils
 
-class AiChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback) {
+class AiChatAdapter(
+    private val onRecreateClick: () -> Unit,
+    private val onSaveMenuClick: (String) -> Unit
+) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback) {
 
     companion object {
         private const val TYPE_USER = 0
@@ -39,7 +39,9 @@ class AiChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCall
                 ItemChatThinkingBinding.inflate(inflater, parent, false)
             )
             else -> MessageViewHolder(
-                ItemChatMessageBinding.inflate(inflater, parent, false)
+                ItemChatMessageBinding.inflate(inflater, parent, false),
+                onRecreateClick,
+                onSaveMenuClick
             )
         }
     }
@@ -51,48 +53,42 @@ class AiChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCall
         }
     }
 
-    class MessageViewHolder(private val binding: ItemChatMessageBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class MessageViewHolder(
+        private val binding: ItemChatMessageBinding,
+        private val onRecreateClick: () -> Unit,
+        private val onSaveMenuClick: (String) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(message: ChatMessage) {
             binding.apply {
-                val cleanedText = cleanText(message.text)
+                val cleanedText = message.text
                 if (message.isUser) {
                     userMessageLayout.isVisible = true
                     aiMessageLayout.isVisible = false
-                    userMessageText.text = formatMarkdown(cleanedText)
+                    userMessageText.text = MarkdownUtils.formatMarkdown(cleanedText)
                 } else {
                     userMessageLayout.isVisible = false
                     aiMessageLayout.isVisible = true
-                    aiMessageText.text = formatMarkdown(cleanedText)
+                    aiMessageText.text = MarkdownUtils.formatMarkdown(cleanedText)
+                    
+                    val isMenu = cleanedText.contains("variant", ignoreCase = true) && 
+                            (cleanedText.contains("Nonushta", ignoreCase = true) || 
+                             cleanedText.contains("Tushlik", ignoreCase = true) || 
+                             cleanedText.contains("Kechki", ignoreCase = true))
+                    
+                    btnRecreate.isVisible = isMenu
+                    btnRecreate.setOnClickListener {
+                        onRecreateClick()
+                    }
+
+                    btnSaveMenu.isVisible = isMenu
+                    btnSaveMenu.setOnClickListener {
+                        onSaveMenuClick(message.text)
+                    }
                 }
             }
         }
 
-        private fun cleanText(text: String): String {
-            return text.replace("|", "")
-                .replace("***", "")
-                .replace(Regex("\\n{3,}"), "\n\n") // Normalize multiple newlines
-                .trim()
-        }
-
-        private fun formatMarkdown(text: String): CharSequence {
-            val builder = SpannableStringBuilder()
-            val pattern = Pattern.compile("\\*\\*(.*?)\\*\\*")
-            val matcher = pattern.matcher(text)
-            
-            var lastIndex = 0
-            while (matcher.find()) {
-                builder.append(text.substring(lastIndex, matcher.start()))
-                val boldText = matcher.group(1) ?: ""
-                val start = builder.length
-                builder.append(boldText)
-                builder.setSpan(StyleSpan(Typeface.BOLD), start, builder.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                lastIndex = matcher.end()
-            }
-            builder.append(text.substring(lastIndex))
-            return builder
-        }
     }
 
     class ThinkingViewHolder(binding: ItemChatThinkingBinding) :

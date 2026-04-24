@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.color.MaterialColors
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.PremiumSheetBinding
 import uz.oybek.ozamiz.ui.utils.NumberFormattingUtils
@@ -37,24 +39,11 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private fun updateSheetHeight(dialog: BottomSheetDialog) {
-        val sheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) ?: return
+        val sheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            ?: return
         val behavior = BottomSheetBehavior.from(sheet)
-        
-        val isPending = UserRepository.user.paymentChecking
-        
-        if (isPending) {
-            // For pending state, allow natural wrap_content height
-            sheet.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        } else {
-            // For benefits list, force full height to support pinned footer button
-            sheet.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
-        sheet.requestLayout()
-        
         behavior.skipCollapsed = true
-        behavior.isDraggable = true
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     override fun onCreateView(
@@ -72,19 +61,55 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
         showState(UserRepository.user.paymentChecking)
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
-            if (state.isLoading) return@observe
-            state.premiumPrice?.let {
-                val formattedPrice = NumberFormattingUtils.formatPrice(it)
-                binding.priceView.text = "$formattedPrice so'm / oyiga"
-            }
-            showState(state.paymentChecking)
+            val loaded = state.monthlyPrice > 0L
+            binding.progressLoader.isVisible = !loaded
+            binding.layoutPlans.alpha = if (loaded) 1f else 0f
+
+            if (!loaded) return@observe
             
-            // Re-run height update if state changes while open
-            (dialog as? BottomSheetDialog)?.let { updateSheetHeight(it) }
+            val monthlyPrice = state.monthlyPrice
+            val yearlyPrice = state.yearlyPrice
+            val isMonthly = state.selectedPrice == monthlyPrice
+            val context = requireContext()
+            
+            val primaryColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, android.graphics.Color.GREEN)
+            val outlineColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, android.graphics.Color.LTGRAY)
+            val surfaceColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerLowest, android.graphics.Color.WHITE)
+            
+            // Monthly Card
+            binding.cardMonthly.strokeWidth = if (isMonthly) 2.dpToPx() else 1.dpToPx()
+            binding.cardMonthly.strokeColor = if (isMonthly) primaryColor else outlineColor
+            binding.cardMonthly.setCardBackgroundColor(surfaceColor)
+            binding.radioMonthly.isChecked = isMonthly
+
+            // Yearly Card
+            binding.cardYearly.strokeWidth = if (!isMonthly) 2.dpToPx() else 1.dpToPx()
+            binding.cardYearly.strokeColor = if (!isMonthly) primaryColor else outlineColor
+            binding.cardYearly.setCardBackgroundColor(surfaceColor)
+            binding.radioYearly.isChecked = !isMonthly
+            binding.textMonthlyPrice.text = "${NumberFormattingUtils.formatPrice(monthlyPrice)} sum"
+            binding.textYearlyPrice.text = "${NumberFormattingUtils.formatPrice(yearlyPrice)} sum"
+
+            showState(state.paymentChecking)
+        }
+
+        binding.cardMonthly.setOnClickListener {
+            val price = viewModel.uiState.value?.monthlyPrice ?: 29000L
+            viewModel.updateSelectedPrice(price)
+        }
+
+        binding.cardYearly.setOnClickListener {
+            val price = viewModel.uiState.value?.yearlyPrice ?: 149000L
+            viewModel.updateSelectedPrice(price)
         }
 
         binding.button.setOnClickListener {
-            setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to "go_to_payment"))
+            val selectedPrice = viewModel.uiState.value?.selectedPrice ?: 29000L
+            setFragmentResult(REQUEST_KEY, bundleOf(
+                RESULT_ACTION to "go_to_payment",
+                "selected_price" to selectedPrice,
+                "is_yearly" to (selectedPrice == viewModel.uiState.value?.yearlyPrice)
+            ))
             dismiss()
         }
 
@@ -93,16 +118,22 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
+
+
+    private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
+
     private fun showState(isPending: Boolean) {
         if (isPending) {
-            binding.headerPremium.visibility = View.GONE // HIDDEN per user request for pending state
+            binding.headerPremium.visibility = View.GONE
             binding.layoutBenefits.visibility = View.GONE
+            binding.layoutSelection.visibility = View.GONE
             binding.layoutPinnedBottom.visibility = View.GONE
             binding.layoutVerificationPending.visibility = View.VISIBLE
             binding.layoutPinnedClose.visibility = View.VISIBLE
         } else {
             binding.headerPremium.visibility = View.VISIBLE
             binding.layoutBenefits.visibility = View.VISIBLE
+            binding.layoutSelection.visibility = View.VISIBLE
             binding.layoutPinnedBottom.visibility = View.VISIBLE
             binding.layoutVerificationPending.visibility = View.GONE
             binding.layoutPinnedClose.visibility = View.GONE

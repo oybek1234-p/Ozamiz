@@ -8,7 +8,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:background="@drawable/round_lay"
+        android:background="@drawable/bg_bottom_sheet_top_rounded"
         android:backgroundTint="?colorSurfaceContainerLowest"
         android:layout_height="wrap_content">
 

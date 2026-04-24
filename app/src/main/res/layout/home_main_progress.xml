@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Normal Progress State -->
+            <!-- Main Progress Card Content -->
             <LinearLayout
                 android:id="@+id/layout_normal_progress"
                 android:layout_width="match_parent"
@@ -34,11 +34,12 @@
                     android:layout_height="wrap_content">
 
                     <LinearLayout
+                        android:id="@+id/layout_calorie_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:layout_alignParentStart="true"
+                        android:gravity="start|center_vertical"
+                        android:orientation="horizontal">
 
                         <TextView
                             android:id="@+id/text_calories_remaining_count"
@@ -55,9 +56,39 @@
                             style="@style/TextAppearance.Material3.TitleMedium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginStart="8dp"
                             android:text="@string/calories_remaining"
                             android:textColor="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+
+                    <!-- Simple Limit Status -->
+                    <LinearLayout
+                        android:id="@+id/layout_limit_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toStartOf="@id/btn_how_it_works"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/text_limit_title"
+                            style="@style/TextAppearance.Material3.HeadlineSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            tools:text="🔥 Yog' yoqilyapti" />
+
+                        <TextView
+                            android:id="@+id/text_limit_subtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp"
+                            tools:text="Boshqa ovqat yemang, ortiqchasi yog' yoqishni to'xtatadi" />
                     </LinearLayout>
 
                     <ImageView
@@ -74,17 +105,18 @@
                         app:tint="?attr/colorOnSurfaceVariant" />
                 </RelativeLayout>
 
-                <!-- Progress -->
+                <!-- Progress indicators (always visible) -->
                 <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/progress_calories_circular"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="16dp"
                     app:indicatorColor="?attr/colorPrimary"
                     app:trackColor="?attr/colorSurfaceContainerHigh"
                     app:trackCornerRadius="6dp"
                     app:trackThickness="12dp"
                     app:indicatorTrackGapSize="0dp"
+                    app:trackStopIndicatorSize="0dp"
                     tools:progress="40" />
 
                 <!-- Eaten / Target Info -->
@@ -95,82 +127,28 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/check_ic"
-                        app:tint="?attr/colorOnSurfaceVariant" />
-
                     <TextView
                         android:id="@+id/text_eaten_count"
                         style="@style/TextAppearance.Material3.BodyMedium"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
                         android:layout_weight="1"
                         android:textColor="?attr/colorOnSurfaceVariant"
                         tools:text="Yeyildi: 2600. Maqsad: 2600 kkal" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_detailed_info"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="0dp"
+                        android:minHeight="0dp"
+                        android:padding="0dp"
+                        android:text="Batafsil"
+                        android:textColor="?attr/colorPrimary"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
                 </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layout_limit_state"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                android:padding="24dp"
-                android:gravity="center"
-              >
-                
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_limit_icon"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_gravity="center"
-                    app:cardCornerRadius="40dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
-                    app:strokeWidth="0dp">
-                    <ImageView
-                        android:id="@+id/img_limit_state"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="16dp"
-                        android:src="@drawable/info_ic" />
-                </com.google.android.material.card.MaterialCardView>
-
-                <TextView
-                    android:id="@+id/text_limit_title"
-                    style="@style/TextAppearance.Material3.TitleLarge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:fontFamily="@font/roboto_bold"
-                    android:gravity="center"
-                    android:textColor="?attr/colorOnSurface"
-                    tools:text="Yog' yoqilyapti" />
-
-                <TextView
-                    android:id="@+id/text_limit_subtitle"
-                    style="@style/Text1_16"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:gravity="center"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:lineSpacingExtra="4dp"
-                    tools:text="Siz bugun uchun belgilangan limitga yetdingiz." />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_detailed_info"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="24dp"
-                    android:text="Batafsil"
-                    app:cornerRadius="16dp"
-                    android:textSize="16sp" />
             </LinearLayout>
 
         </FrameLayout>
@@ -181,7 +159,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"

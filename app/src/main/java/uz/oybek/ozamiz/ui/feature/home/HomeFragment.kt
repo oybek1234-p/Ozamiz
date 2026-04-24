@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
@@ -17,18 +18,20 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.level.LevelManager
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.food.DailyLimitFragment
 import uz.oybek.ozamiz.ui.feature.log.food.LogFoodFragment
+import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Calendar
 import java.util.Date
@@ -38,106 +41,188 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val viewModel: HomeViewModel by activityViewModels()
     private var dateAdapter: DateScrollerAdapter? = null
-
     private var lastShownLevelIndex: Int = -1
-
-    private fun getLastSeenLevelIndex(): Int {
-        val prefs = requireContext().getSharedPreferences(
-            "level_prefs",
-            android.content.Context.MODE_PRIVATE
-        )
-        return prefs.getInt("last_seen_level_index", 0)
-    }
-
-    private fun saveLastSeenLevelIndex(index: Int) {
-        val prefs = requireContext().getSharedPreferences(
-            "level_prefs",
-            android.content.Context.MODE_PRIVATE
-        )
-        prefs.edit().putInt("last_seen_level_index", index).apply()
-    }
-
-    private fun getPersistentDate(key: String): String? {
-        val prefs = requireContext().getSharedPreferences(
-            "achievement_prefs",
-            android.content.Context.MODE_PRIVATE
-        )
-        return prefs.getString(key, null)
-    }
-
-    private fun savePersistentDate(key: String, date: String) {
-        val prefs = requireContext().getSharedPreferences(
-            "achievement_prefs",
-            android.content.Context.MODE_PRIVATE
-        )
-        prefs.edit().putString(key, date).apply()
-    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
     }
 
+    private val cachedColors by lazy {
+        object {
+            val primary = com.google.android.material.color.MaterialColors.getColor(
+                requireContext(), androidx.appcompat.R.attr.colorPrimary, Color.BLUE
+            )
+            val red = ContextCompat.getColor(requireContext(), R.color.red)
+            val gray = ContextCompat.getColor(requireContext(), R.color.grey)
+            val orange = ContextCompat.getColor(requireContext(), R.color.orange)
+            val yellow = com.google.android.material.color.MaterialColors.getColor(
+                requireContext(), R.attr.customYellow, Color.YELLOW
+            )
+            val green = com.google.android.material.color.MaterialColors.getColor(
+                requireContext(), R.attr.customGreen, Color.GREEN
+            )
+            val track = com.google.android.material.color.MaterialColors.getColor(
+                requireContext(),
+                com.google.android.material.R.attr.colorSurfaceContainerHigh,
+                Color.LTGRAY
+            )
+            val onSurface = com.google.android.material.color.MaterialColors.getColor(
+                requireContext(), com.google.android.material.R.attr.colorOnSurface, Color.BLACK
+            )
+            val onSurfaceVariant = com.google.android.material.color.MaterialColors.getColor(
+                requireContext(),
+                com.google.android.material.R.attr.colorOnSurfaceVariant,
+                Color.DKGRAY
+            )
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        dateAdapter = null
+    }
+
+    private fun getLastSeenLevelIndex(): Int {
+        val prefs = requireContext().getSharedPreferences(
+            "level_prefs", android.content.Context.MODE_PRIVATE
+        )
+        return prefs.getInt("last_seen_level_index", 0)
+    }
+
+    private fun saveLastSeenLevelIndex(index: Int) {
+        val prefs = requireContext().getSharedPreferences(
+            "level_prefs", android.content.Context.MODE_PRIVATE
+        )
+        prefs.edit().putInt("last_seen_level_index", index).apply()
+    }
+
+    private fun getPersistentDate(key: String): String? {
+        val prefs = requireContext().getSharedPreferences(
+            "achievement_prefs", android.content.Context.MODE_PRIVATE
+        )
+        return prefs.getString(key, null)
+    }
+
+    private fun savePersistentDate(key: String, date: String) {
+        val prefs = requireContext().getSharedPreferences(
+            "achievement_prefs", android.content.Context.MODE_PRIVATE
+        )
+        prefs.edit().putString(key, date).apply()
+    }
+
+
     init {
         showBottomSheet = true
     }
 
+    override fun viewCreated(bind: FragmentHomeBinding) {
+        setupViews(bind)
+        lastState?.let { updateUi(it, false) }
+        observeUiState(bind)
+        setupFragmentResults()
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(2000)
+            checkNotificationPermission()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onHomeEntered()
+        checkSpotlightOnResume()
+    }
+
+    private fun checkSpotlightOnResume() {
+        val prefs =
+            requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+        val step = prefs.getInt("app_onboarding_step", 0)
+        if (step == 1) {
+            startBreakfastSpotlight()
+        } else {
+            resetBreakfastSpotlight()
+        }
+    }
+
+    private fun resetBreakfastSpotlight() {
+        if (bindingT == null) return
+        val btn = binding.cardBreakfast.btnAddMeal
+        btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            com.google.android.material.color.MaterialColors.getColor(
+                btn.context,
+                com.google.android.material.R.attr.colorSurfaceContainerHighest,
+                Color.GRAY
+            )
+        )
+        btn.imageTintList = android.content.res.ColorStateList.valueOf(
+            com.google.android.material.color.MaterialColors.getColor(
+                btn.context,
+                com.google.android.material.R.attr.colorOnSurface,
+                Color.BLACK
+            )
+        )
+        btn.scaleX = 1f
+        btn.scaleY = 1f
+        btn.animate().cancel()
+    }
+
     override fun inflateBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
+        inflater: LayoutInflater, container: ViewGroup?
     ): FragmentHomeBinding {
         return FragmentHomeBinding.inflate(inflater, container, false)
     }
 
-    override fun viewCreated(bind: FragmentHomeBinding) {
-        setupViews(bind)
-        if (lastState != null) {
-            updateUi(lastState!!, false)
-        }
-        observeUiState(bind)
-        setupFragmentResults()
-        checkNotificationPermission()
-    }
-
     private fun setupFragmentResults() {
         childFragmentManager.setFragmentResultListener(
-            "water_added_request",
-            viewLifecycleOwner
+            "water_added_request", viewLifecycleOwner
         ) { _, bundle ->
             val added = bundle.getBoolean("added", false)
             if (added) {
+                vibrateDevice()
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(300)
-                    showWaterMotivationSnackbar()
                     lastState?.let {
                         checkWaterGoalReached(it)
                     }
                 }
             }
         }
-
         parentFragmentManager.setFragmentResultListener(
-            "exercise_added_request",
-            viewLifecycleOwner
+            "exercise_added_request", viewLifecycleOwner
         ) { _, bundle ->
             val exerciseId = bundle.getString("exerciseId")
             if (exerciseId != null) {
+                vibrateDevice()
+                viewModel.onExerciseAdded()
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(300)
-                    showExerciseMotivationSnackbar(exerciseId)
                     lastState?.let {
                         check70PercentExercise(it)
                     }
                 }
             }
         }
+
+        parentFragmentManager.setFragmentResultListener(
+            "navigate_to_ai_chat", viewLifecycleOwner
+        ) { _, bundle ->
+            navigate(R.id.aiChatFragment, bundle)
+        }
+    }
+
+
+    private fun checkPremium(action: () -> Unit) {
+        if (UserRepository.user.isPremiumOrTrial()) {
+            action()
+        } else {
+            PremiumBottomSheetDialog().show(childFragmentManager, PremiumBottomSheetDialog.TAG)
+        }
     }
 
     private fun checkNotificationPermission() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
-                    requireContext(),
-                    android.Manifest.permission.POST_NOTIFICATIONS
+                    requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
                 ) != android.content.pm.PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -158,8 +243,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         bind.dateScrollerRecyclerView.apply {
             adapter = dateAdapter
             layoutManager = LinearLayoutManager(
-                context,
-                LinearLayoutManager.HORIZONTAL, false
+                context, LinearLayoutManager.HORIZONTAL, false
             )
             itemAnimator = null
         }
@@ -175,27 +259,34 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
 
         bind.btnQuickWalk.setOnSafeClickListener {
-            val args = Bundle().apply {
-                putString("exerciseId", "PiyodaYurish")
+            checkPremium {
+                val args = Bundle().apply {
+                    putString("exerciseId", "PiyodaYurish")
+                }
+                navigate(R.id.addExerciseLogFragment, args)
             }
-            navigate(R.id.addExerciseLogFragment, args)
         }
 
         bind.btnQuickRun.setOnSafeClickListener {
-            val args = Bundle().apply {
-                putString("exerciseId", "Yugurish")
+            checkPremium {
+                val args = Bundle().apply {
+                    putString("exerciseId", "Yugurish")
+                }
+                navigate(R.id.addExerciseLogFragment, args)
             }
-            navigate(R.id.addExerciseLogFragment, args)
         }
 
         bind.btnQuickOther.setOnSafeClickListener {
-            navigate(R.id.selectExerciseFragment)
+            checkPremium {
+                navigate(R.id.selectExerciseFragment)
+            }
         }
         fun onMealClick(meal: String) {
             LogFoodFragment.navigate(
                 navController = findNavController(),
                 timeStamp = currentDate(),
-                meal = meal
+                meal = meal,
+                openCamera = false
             )
         }
         bind.cardBreakfast.root.setOnSafeClickListener { onMealClick(MealTime.Breakfast.id) }
@@ -220,12 +311,15 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             navigate(R.id.action_home_to_menuListFragment)
         }
         bind.cardDietolog.setOnSafeClickListener {
-            navigate(R.id.aiChatFragment)
+            checkPremium {
+                navigate(R.id.aiChatFragment)
+            }
         }
         bind.mainProgress.btnHowItWorks.setOnSafeClickListener {
             if (viewModel.uiState.value.isCalorieExceeded || viewModel.uiState.value.isCalorieOptimal) {
-                DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CALORIES)
-                    .show(childFragmentManager, DailyLimitFragment.TAG)
+                DailyLimitFragment.newInstance(
+                    DailyLimitFragment.TYPE_CALORIES, viewModel.uiState.value.lastFoodTimestamp
+                ).show(childFragmentManager, DailyLimitFragment.TAG)
             } else {
                 navigate(R.id.action_home_to_calorieInfoFragment)
             }
@@ -252,8 +346,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         bind.btnOpenWaterDialog.setOnSafeClickListener {
-            uz.oybek.ozamiz.ui.feature.log.water.LogWaterDialog()
-                .show(childFragmentManager, "LogWaterDialog")
+            checkPremium {
+                uz.oybek.ozamiz.ui.feature.log.water.LogWaterDialog()
+                    .show(childFragmentManager, "LogWaterDialog")
+            }
         }
 
         bind.coinDisplayLayout.setOnSafeClickListener {
@@ -261,15 +357,25 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
         bind.mainProgress.btnDetailedInfo.setOnSafeClickListener {
-            DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CALORIES)
-                .show(childFragmentManager, DailyLimitFragment.TAG)
+            DailyLimitFragment.newInstance(
+                DailyLimitFragment.TYPE_CALORIES, viewModel.uiState.value.lastFoodTimestamp
+            ).show(childFragmentManager, DailyLimitFragment.TAG)
         }
 
-        viewModel.onHomeEntered()
         setupDailyTip(bind)
 
         bind.btnAddWeightHome.setOnSafeClickListener {
             navigate(R.id.photoUploadInfoFragment)
+        }
+
+
+
+
+        bind.cardDailyHealthTasks.setOnSafeClickListener {
+            findNavController().navigate(R.id.action_home_to_dailyTasksFragment)
+        }
+        bind.btnTasksDone.setOnSafeClickListener {
+            findNavController().navigate(R.id.action_home_to_dailyTasksFragment)
         }
     }
 
@@ -338,27 +444,47 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                         } else {
                             bind.cardDailyTip.isVisible = false
                         }
-
-                        bind.cardMotivation.isVisible = false
-
                         bind.cardWeightLog.isVisible = state.showWeightLogCard
+
+                        bind.cardDailyHealthTasks.isVisible = state.dailyHealthTasks.isNotEmpty()
+                        bind.textHealthTasksStatus.text = state.healthTasksSummary
                     }
                 }
-
                 launch {
                     viewModel.foodJustAddedEvent.collect {
+                        delay(500)
+
+                        while (!isResumed || childFragmentManager.fragments.any { it is androidx.fragment.app.DialogFragment }) {
+                            delay(500)
+                        }
+
                         val state = viewModel.uiState.value
                         viewModel.consumeFoodAddedEvent()
+
                         if (DateUtils.isSameDay(state.selectedDate, Date())) {
+                            // Check for 50% / 100% achievements
                             check50PercentCalorieAchievement(state)
                             if (state.isCalorieExceeded || state.isCalorieOptimal) {
-                                DailyLimitFragment.newInstance(DailyLimitFragment.TYPE_CALORIES)
-                                    .show(childFragmentManager, DailyLimitFragment.TAG)
+                                DailyLimitFragment.newInstance(
+                                    DailyLimitFragment.TYPE_CALORIES, state.lastFoodTimestamp
+                                ).show(childFragmentManager, DailyLimitFragment.TAG)
+                            } else {
+                                // If within onboarding, show remaining calories message
+                                val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                                val step = prefs.getInt("app_onboarding_step", 0)
+                                if (step == 1) {
+                                    DailyLimitFragment.newInstance(
+                                        type = DailyLimitFragment.TYPE_REMAINING,
+                                        remainingCalories = state.caloriesRemaining
+                                    ).show(childFragmentManager, DailyLimitFragment.TAG)
+                                    // Move to next step or keep at 1 if you want it to appear only once
+                                    // Let's mark onboarding as complete (step 2) after the first food addition message
+                                    viewModel.onAppOnboardingComplete()
+                                }
                             }
                         }
                     }
                 }
-
                 launch {
                     viewModel.showRateAppEvent.collect {
                         delay(2000)
@@ -367,30 +493,39 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                         }
                     }
                 }
-
                 launch {
-                    viewModel.showPremiumEvent.collect {
-                        delay(1500) // Staggered delay
-                        if (isResumed && childFragmentManager.fragments.isEmpty()) {
-                            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog()
-                                .show(
-                                    childFragmentManager,
-                                    uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG
-                                )
+                    childFragmentManager.setFragmentResultListener(
+                        PremiumBottomSheetDialog.REQUEST_KEY, viewLifecycleOwner
+                    ) { _, bundle ->
+                        val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
+                        if (result == "go_to_payment") {
+                            val price = bundle.getLong("selected_price", 29000L)
+                            val isYearly = bundle.getBoolean("is_yearly", false)
+                            val args = bundleOf("price" to price, "is_yearly" to isYearly)
+                            navigate(R.id.paymentGetCheckFragment, args)
                         }
                     }
                 }
-
                 launch {
-                    childFragmentManager.setFragmentResultListener(
-                        uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.REQUEST_KEY,
-                        viewLifecycleOwner
-                    ) { _, bundle ->
-                        val result =
-                            bundle.getString(uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.RESULT_ACTION)
-                        if (result == "go_to_payment") {
-                            navigate(R.id.paymentGetCheckFragment)
-                        }
+                    viewModel.showHealthTaskOnboardingEvent.collect { taskId ->
+                        SingleTaskBottomSheet.newInstance(taskId) {
+                            viewModel.showNextOnboardingTask()
+                        }.show(childFragmentManager, SingleTaskBottomSheet.TAG)
+                        viewModel.consumeOnboardingEvent()
+                    }
+                }
+                launch {
+                    viewModel.showAppOnboardingEvent.collect {
+                        AppOnboardingBottomSheet {
+                            viewModel.onAppOnboardingPresented()
+                            startBreakfastSpotlight()
+                        }.show(childFragmentManager, AppOnboardingBottomSheet.TAG)
+                    }
+                }
+                launch {
+                    while (true) {
+                        delay(30000)
+                        lastState?.let { updateBurningStatus(it) }
                     }
                 }
             }
@@ -421,6 +556,13 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         binding.progressWater.max = state.waterTarget
         binding.progressWater.setProgressCompat(state.waterConsumed, animate)
 
+        val waterProgressPercent =
+            if (state.waterTarget > 0) state.waterConsumed.toFloat() / state.waterTarget else 0f
+        val isWater70Percent = waterProgressPercent >= 0.7f
+
+        binding.titleWater.text =
+            if (isWater70Percent) getString(R.string.water_title) + " 🥳" else getString(R.string.water_title)
+
         val streakInfo = state.streakInfo
         binding.streakDisplayLayout.isVisible = streakInfo != null
         if (streakInfo != null) {
@@ -430,85 +572,52 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                     .withEndAction {
                         binding.streakDisplayLayout.animate().scaleX(1f).scaleY(1f).setDuration(300)
                             .start()
-                    }
-                    .start()
+                    }.start()
             }
             binding.streakDisplayLayout.setOnClickListener {
-                uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet.newInstance(streakInfo)
-                    .show(
-                        childFragmentManager,
-                        uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet.TAG
-                    )
+                uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet.newInstance(streakInfo).show(
+                    childFragmentManager, uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet.TAG
+                )
             }
         }
-
-        // Cache colors to avoid redundant lookups
-        val colors = object {
-            val primary = com.google.android.material.color.MaterialColors.getColor(
-                requireView(),
-                androidx.appcompat.R.attr.colorPrimary
-            )
-            val red = ContextCompat.getColor(requireContext(), R.color.red)
-            val gray = ContextCompat.getColor(requireContext(), R.color.grey)
-            val orange = ContextCompat.getColor(requireContext(), R.color.orange)
-            val yellow = com.google.android.material.color.MaterialColors.getColor(
-                requireView(),
-                R.attr.customYellow
-            )
-            val green = com.google.android.material.color.MaterialColors.getColor(
-                requireView(),
-                R.attr.customGreen
-            )
-            val track = com.google.android.material.color.MaterialColors.getColor(
-                requireView(),
-                com.google.android.material.R.attr.colorSurfaceContainerHigh
-            )
-            val onSurface = com.google.android.material.color.MaterialColors.getColor(
-                requireView(),
-                com.google.android.material.R.attr.colorOnSurface
-            )
-            val onSurfaceVariant = com.google.android.material.color.MaterialColors.getColor(
-                requireView(),
-                com.google.android.material.R.attr.colorOnSurfaceVariant
-            )
-        }
+        val colors = cachedColors
 
         binding.mainProgress.apply {
+            textCaloriesRemainingLabel.text =
+                if (state.caloriesRemaining < 0) "kkal oshdi" else "kkal qoldi"
             textCaloriesRemainingCount.text = state.caloriesRemaining.absoluteValue.toString()
             textEatenCount.text =
-                "${state.caloriesConsumed}    Maqsad: ${state.caloriesTarget} oshirmaslik"
+                "${state.caloriesConsumed} yeyildi   ${state.caloriesTarget} maqsad"
             progressCaloriesCircular.max = state.caloriesTarget
             progressCaloriesCircular.setProgressCompat(
-                state.caloriesConsumed.absoluteValue,
-                animate
+                state.caloriesConsumed.absoluteValue.coerceAtMost(state.caloriesTarget), animate
             )
 
-            if (state.caloriesConsumed >= state.caloriesTarget) {
-                layoutNormalProgress.isVisible = false
-                layoutLimitState.isVisible = true
-                cardLimitIcon.isVisible = false
-                textLimitTitle.text = "Yog' yoqilyapti"
-                textLimitSubtitle.text = "Ortiqcha ovqat yog' yoqishni to'xtatadi."
+            if (state.caloriesConsumed >= state.caloriesTarget - 50) {
+                layoutCalorieText.isVisible = false
+                layoutLimitInfo.isVisible = true
+                btnDetailedInfo.isVisible = true
+                updateBurningStatus(state)
                 binding.layoutMacroWarnings.isVisible = false
-                macrosContainer.isVisible = false
+                macrosContainer.isVisible = true
             } else {
-                layoutNormalProgress.isVisible = true
-                layoutLimitState.isVisible = false
+                layoutCalorieText.isVisible = true
+                layoutLimitInfo.isVisible = false
+                btnDetailedInfo.isVisible = false
                 binding.layoutMacroWarnings.isVisible = false
                 macrosContainer.isVisible = true
             }
+
             progressCaloriesCircular.setIndicatorColor(colors.primary)
             progressCaloriesCircular.trackColor = colors.track
             textCaloriesRemainingCount.setTextColor(colors.onSurface)
 
-            // Macros Helper
             fun bindMacro(
                 progress: com.google.android.material.progressindicator.LinearProgressIndicator,
                 text: android.widget.TextView,
                 consumed: Int,
                 target: Int,
                 isExceeded: Boolean,
-                exceededColor: Int,
                 normalColor: Int
             ) {
                 val isOptimal = consumed >= target && !isExceeded
@@ -519,7 +628,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 progress.trackColor = colors.track
                 text.setTextColor(if (isExceeded) colors.gray else if (isOptimal) colors.green else colors.onSurface)
                 text.text = when {
-                    isExceeded -> getString(R.string.macro_exceeded_format, consumed - target)
+                    isExceeded -> getString(
+                        R.string.macro_exceeded_format, (consumed - target).absoluteValue
+                    )
+
                     isOptimal -> "To'ldi"
                     else -> getString(R.string.macro_remaining_format, remaining)
                 }
@@ -531,7 +643,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 state.proteinConsumed,
                 state.proteinTarget,
                 state.isProteinExceeded,
-                colors.gray,
                 colors.orange
             )
             bindMacro(
@@ -540,7 +651,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 state.fatConsumed,
                 state.fatTarget,
                 state.isFatExceeded,
-                colors.gray,
                 colors.yellow
             )
             bindMacro(
@@ -549,20 +659,14 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 state.carbsConsumed,
                 state.carbsTarget,
                 state.isCarbsExceeded,
-                colors.gray,
                 colors.green
             )
         }
 
-        // Meal Cards
         val mealCalories = state.dailyFoodLogs.groupBy { it.mealType }
-            .mapValues { entry -> entry.value.sumOf { it.calories } }
-
+            .mapValues { it.value.sumOf { f -> f.calories } }
         val latestFoodByMeal = state.dailyFoodLogs.groupBy { it.mealType }
-            .mapValues { entry ->
-                entry.value.maxByOrNull { (it.timestamp as? Number)?.toLong() ?: 0L }
-            }
-
+            .mapValues { it.value.maxByOrNull { f -> (f.timestamp as? Number)?.toLong() ?: 0L } }
         val target = state.caloriesTarget.toFloat()
         val meals = listOf(
             Triple(binding.cardBreakfast, MealTime.Breakfast.id, (target * 0.3f).toInt()),
@@ -573,8 +677,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
         meals.forEach { (card, id, baseMax) ->
             val consumed = mealCalories[id] ?: 0
-            val max = baseMax.takeIf { it > 0 } ?: 400
+            val max = if (baseMax > 0) baseMax else 400
             val latestFood = latestFoodByMeal[id]
+            card.progressMeal.max = max
+            card.progressMeal.setProgressCompat(consumed.coerceAtMost(max), animate)
 
             if (consumed >= max || state.caloriesConsumed >= state.caloriesTarget) {
                 card.layoutCalories.isVisible = false
@@ -585,22 +691,43 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 card.textMealLastFood.isVisible = false
                 card.textMealCalories.text = "${max - consumed} kkal qoldi"
                 card.textMealCalories.setTextColor(colors.onSurfaceVariant)
-                card.progressMeal.max = max
-                card.progressMeal.setProgressCompat(consumed, animate)
             }
         }
-
         binding.progressExercise.max = state.exerciseTarget
         binding.progressExercise.setProgressCompat(state.exerciseBurnt, animate)
         binding.textExerciseProgress.text = "${state.exerciseBurnt} / ${state.exerciseTarget} kkal"
-
+        val isExercise70 =
+            (if (state.exerciseTarget > 0) state.exerciseBurnt.toFloat() / state.exerciseTarget else 0f) >= 0.7f
+        binding.titleExercise.text = if (isExercise70) "Yog' yoqish 🔥" else "Yog' yoqish"
         binding.btnTodayExercises.isVisible = state.exerciseLogs.isNotEmpty()
-
+        binding.textWaterStatus.text = state.waterStatusMessage
+        binding.textExerciseStatus.text = state.exerciseStatusMessage
         binding.warningProtein.root.isVisible = false
         binding.warningCarbs.root.isVisible = false
         binding.warningFat.root.isVisible = false
     }
 
+    private fun updateBurningStatus(state: HomeUiState) {
+        if (state.caloriesConsumed >= state.caloriesTarget - 50) {
+            binding.mainProgress.apply {
+                val timeSinceLastFood =
+                    state.lastFoodTimestamp?.let { System.currentTimeMillis() - it }
+                        ?: Long.MAX_VALUE
+                val twoHoursInMs = 2 * 60 * 60 * 1000L
+                val isTwoHoursPassed = timeSinceLastFood >= twoHoursInMs
+
+                if (state.caloriesConsumed <= state.caloriesTarget + 100 && isTwoHoursPassed) {
+                    textLimitTitle.text = "🔥 Yog' yoqilyapti"
+                    textLimitSubtitle.text =
+                        "Boshqa ovqat yemay turing, ortiqchasi yog' yoqishni to'xtatadi"
+                } else {
+                    textLimitTitle.text = "Limitga yetdingiz"
+                    textLimitSubtitle.text =
+                        "Boshqa ovqat yemay turing, ortiqchasi yog' yoqishni to'xtatadi"
+                }
+            }
+        }
+    }
 
     private fun scrollToSelectedDate(selectedDate: Date) {
         binding.dateScrollerRecyclerView.post {
@@ -608,11 +735,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 DateUtils.isSameDay(it, selectedDate)
             }
             if (selectedIndex != -1) {
-                (binding.dateScrollerRecyclerView.layoutManager as? LinearLayoutManager)
-                    ?.scrollToPositionWithOffset(
-                        selectedIndex,
-                        (binding.root.width / 2) - 32f.dpToPx()
-                    )
+                (binding.dateScrollerRecyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
+                    selectedIndex, (binding.root.width / 2) - 32f.dpToPx()
+                )
             }
         }
     }
@@ -626,7 +751,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         bind.lottieCoin.progress = 0f
         bind.lottieCoin.playAnimation()
 
-        // Hide original sync update briefly to avoid conflict
         animationJob = viewLifecycleOwner.lifecycleScope.launch {
             val stepsCount = pointsAdded.absoluteValue.coerceAtMost(10)
             val stepValue = pointsAdded / stepsCount
@@ -636,30 +760,18 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             for (i in 1..stepsCount) {
                 val currentVal = if (i == stepsCount) finalPoints else startPoints + (i * stepValue)
                 bind.textPointsCount.text = currentVal.toString()
-
-                // Pure code-based animation
                 bind.textPointsCount.apply {
-                    // Reset to initial for each bounce start
                     translationY = 15f
                     scaleX = 0.9f
                     scaleY = 0.9f
                     alpha = 0.8f
 
-                    animate()
-                        .translationY(0f)
-                        .scaleX(1.1f)
-                        .scaleY(1.1f)
-                        .alpha(1f)
+                    animate().translationY(0f).scaleX(1.1f).scaleY(1.1f).alpha(1f)
                         .setDuration(stepDelay / 2)
                         .setInterpolator(android.view.animation.OvershootInterpolator())
                         .withEndAction {
-                            animate()
-                                .scaleX(1.0f)
-                                .scaleY(1.0f)
-                                .setDuration(stepDelay / 2)
-                                .start()
-                        }
-                        .start()
+                            animate().scaleX(1.0f).scaleY(1.0f).setDuration(stepDelay / 2).start()
+                        }.start()
                 }
                 delay(stepDelay)
             }
@@ -674,120 +786,63 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             text = if (pointsAdded > 0) "+$pointsAdded" else "$pointsAdded"
             setTextColor(
                 ContextCompat.getColor(
-                    requireContext(),
-                    if (pointsAdded > 0) R.color.green else R.color.red
+                    requireContext(), if (pointsAdded > 0) R.color.green else R.color.red
                 )
             )
             alpha = 1f
             isVisible = true
 
-            animate()
-                .alpha(0f)
-                .setDuration(1200)
-                .setStartDelay(500)
-                .withEndAction {
-                    isVisible = false
-                }
-                .start()
+            animate().alpha(0f).setDuration(1200).setStartDelay(500).withEndAction {
+                isVisible = false
+            }.start()
+        }
+    }
+
+    private fun startBreakfastSpotlight() {
+        if (view == null) return
+        val lifecycleOwner = try {
+            viewLifecycleOwner
+        } catch (e: IllegalStateException) {
+            null
+        } ?: return
+
+        lifecycleOwner.lifecycleScope.launch {
+            if (bindingT == null) return@launch
+            val btn = binding.cardBreakfast.btnAddMeal
+
+            btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                com.google.android.material.color.MaterialColors.getColor(
+                    btn.context,
+                    androidx.appcompat.R.attr.colorPrimary,
+                    Color.BLUE
+                )
+            )
+            btn.imageTintList = android.content.res.ColorStateList.valueOf(Color.WHITE)
+
+            // Faster bounce
+            btn.animate().scaleX(0.75f).scaleY(0.75f).setDuration(250).withEndAction {
+                if (bindingT == null) return@withEndAction
+                btn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(250).withEndAction {
+                    if (bindingT == null) return@withEndAction
+                    btn.animate().scaleX(1f).scaleY(1f).setDuration(250).withEndAction {
+                        lifecycleOwner.lifecycleScope.launch {
+                            delay(400)
+                            startBreakfastSpotlight()
+                        }
+                    }.start()
+                }.start()
+            }.start()
         }
     }
 
     private fun Float.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()
-    private fun Int.dpToPx(): Int = (this.toFloat() * resources.displayMetrics.density).toInt()
 
-    val messages = listOf(
-        "Suv miya faoliyatini tezlashtiradi va diqqatni jamlashga yordam beradi.",
-        "Tana haroratini me'yorda ushlab turish bevosita suvga bog'liq.",
-        "Suv bo'g'imlar va xaftaga to'qimalarini moylash vazifasini bajaradi.",
-        "Ovqat hazm qilish jarayoni suv ishtirokisiz to'liq amalga oshmaydi.",
-        "Suv organizmdagi zararli toksinlarni buyrak orqali yuvib chiqaradi.",
-        "Teri hujayralari yangilanishi va tarang tortilishi uchun suv kerak.",
-        "Qon bosimini bir maromda saqlashda toza suv yordam beradi.",
-        "Suv tomirlar orqali kislorodni hujayralarga yetkazib beradi.",
-        "Toza suv ichish buyrak toshlari hosil bo'lishining oldini oladi.",
-        "Tish va suyaklarni mustahkamlovchi minerallarni suv tashiydi.",
-        "Nafas yo'llarini namlab, infeksiyalardan himoya qiluvchi vosita bu - suv.",
-        "Suv metabolizmni 24-30 foizgacha tezlashtirishi ilmiy tasdiqlangan.",
-        "Ortiqcha vazndan xalos bo'lishda suv tana yog'larini parchalashga yordam beradi.",
-        "Suv infarkt va insult xavfini sezilarli darajada kamaytiradi.",
-        "Yetarli suv ichish qabziyat (ich qotishi) muammosining oldini oladi.",
-        "Bosh og'rig'i ko'pincha suvsizlanishning birinchi belgisidir.",
-        "Suv ichish jigarga o'z tozalash funksiyasini bajarishga yordam beradi.",
-        "Suvsizlik jismoniy charchoqni 50 foizgacha oshirib yuborishi mumkin.",
-        "Gormonlar balansi barqaror bo'lishida qon tarkibidagi suv muhim.",
-        "Yurak mushaklari to'liq qon haydashi uchun tana doim namlangan bo'lishi lozim.",
-        "Suv sport mashg'ulotlarida mushaklarning shikastlanish xavfini kamaytiradi.",
-        "Qonning quyuqlanishiga yo'l qo'ymaslik suv orqali amalga oshadi.",
-        "Ko'zlar qurib qolmasligi va yaxshi ko'rishi toza suvga ham bog'liq.",
-        "Immunitetni oshiradigan oq qon hujayralari harakati suvni talab qiladi.",
-        "Hujayralar ichidagi biokimyoviy jarayonlar faqat suvli muhitda kechadi.",
-        "Suv qorin ochish hissini pasaytirishi va ortiqcha ovqatlanishni to'xtatishi mumkin.",
-        "Qariyalik jarayonlarini sekinlashtirish hujayrani suv bilan to'yintirishdan boshlanadi.",
-        "Siydik yo'li infeksiyalaridan saqlanish uchun ko'proq suv ichish kerak.",
-        "To'qimalarning elastikligi aynan ularning tarang suv balansiga bog'liq.",
-        "Toza suv og'iz bo'shlig'ida bakteriyalar ko'payishining oldini oladi.",
-        "Ovqatdagi barcha foydali vitaminlar qonga o'tishida suv vositachi bo'ladi.",
-        "Suv tanadagi tuz va minerallar balansini, ya'ni elektrolitlarni saqlaydi.",
-        "Sochlar qalin va yaltiroq o'sishi qon aylanishiga, qon hajmi esa suvga bog'liq.",
-        "Kayfiyat keskin tushib ketishi miya suvsizlanishi oqibati bo'lishi mumkin.",
-        "Allergiya gormoni gistamin ishlab chiqarilishini suv miqdori biroz pasaytiradi.",
-        "Tana shikastlanganda hujayralarni tiklovchi ozuqalarni faqat suv tashiydi.",
-        "Asab tizimidagi impulslar uzatilishida elektrolitlar va suv zarur.",
-        "Buyraklar sog'lom ishlashi uchun doimiy toza suyuqlik aylanishi shart.",
-        "Jismoniy terlash tanani sovutadi, buni esa suv ta'minlaydi.",
-        "Suv qon zardobi hajmini ushlab turib, kuchli holsizlikni cheklaydi.",
-        "Kundalik charchoq hissini yo'qotishning eng oddiy yechimi bu - suv.",
-        "Suvsizlanish odamda asabiylik va vahima hissini kuchaytiradi.",
-        "Meditsinada qonni tozalash asosan ko'proq suyuqlik yuborish bilan boshlanadi.",
-        "Ichak mikroflorasi sog'lom bo'lishi ham me'yoriy namlik bilan bog'liq.",
-        "Qandli diabet rivojlanish xavfini toza suv kamaytirishi isbotlangan.",
-        "Suyak iligi barcha hujayralarni ishlab chiqarishida doimiy suv talab qiladi.",
-        "Muskul massasini ko'paytirish uchun oqsil bilan birga suv ham juda muhim.",
-        "Ovqat tarkibidagi oqsil va uglevodlarni sintez qilish jarayoni suv bilan tezlashadi.",
-        "Miyaning kulrang moddasi o'z energiyasini qayta tiklashida namlik talab qiladi.",
-        "Yaxshi o'zlashtirilgan suv kasallik pallalarida viruslarni yuvish vazifasini o'taydi."
-    )
-
-    private fun showWaterMotivationSnackbar() {
-        val message = messages.random()
-
-        val snackbar = Snackbar.make(binding.root, "", 5000)
-        val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
-        snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
-        snackbarLayout.setPadding(0, 0, 0, 0)
-
-        snackbarLayout.clipChildren = false
-        snackbarLayout.clipToPadding = false
-        (snackbarLayout.parent as? ViewGroup)?.let {
-            it.clipChildren = false
-            it.clipToPadding = false
-        }
-
-        // Anchor to bottom nav to avoid being hidden behind it
-        val bottomNav = activity?.findViewById<View>(R.id.bottom_nav_view)
-        if (bottomNav != null) {
-            snackbar.anchorView = bottomNav
-        }
-
-        val customView = layoutInflater.inflate(R.layout.custom_water_snackbar, null)
-        val textView = customView.findViewById<TextView>(R.id.text_snackbar_motivation)
-        textView.text = message
-
-        val btnClose = customView.findViewById<View>(R.id.btn_close_snackbar)
-        btnClose.setOnClickListener {
-            snackbar.dismiss()
-        }
-
-        snackbarLayout.removeAllViews()
-        snackbarLayout.addView(customView)
-        snackbar.show()
-    }
 
     private fun checkWaterGoalReached(state: HomeUiState) {
         val todayStr = Date().dateApiFormat()
-        if (state.waterTarget > 0 &&
-            state.waterConsumed >= state.waterTarget * 0.7 &&
-            getPersistentDate("last_water_goal_shown") != todayStr
+        if (state.waterTarget > 0 && state.waterConsumed >= state.waterTarget * 0.7 && getPersistentDate(
+                "last_water_goal_shown"
+            ) != todayStr
         ) {
             showWaterGoalReachedAchievement()
             savePersistentDate("last_water_goal_shown", todayStr)
@@ -796,34 +851,34 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun showWaterGoalReachedAchievement() {
         if (activity == null || isDetached) return
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(R.layout.dialog_water_achievement)
-            .create()
+        val dialog =
+            MaterialAlertDialogBuilder(requireContext()).setView(R.layout.dialog_water_achievement)
+                .create()
 
         dialog.show()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val variations = listOf(
-            "Ajoyib natija!" to "Bugungi suv maqsadingizning 70% idan o'tdingiz. Davom eting! 💧",
-            "Barakalla!" to "Tana namligi a'lo darajada. 70% reja bajarildi! 🌊",
-            "Salomatlik sari!" to "Suv ichishda faol ekansiz, 70% marra zabt etildi. 🥤",
+            "Ajoyib natija!" to "Bugungi suv maqsadingizga juda qattiq yaqinlashdingiz. Davom eting! 💧",
+            "Barakalla!" to "Tana namligi a'lo darajada. Bugungi reja deyarli bajarildi! 🌊",
+            "Salomatlik sari!" to "Suv ichishda faol ekansiz, katta marra zabt etildi. 🥤",
             "Suv qiroli/malikasi!" to "Bugun deyarli hamma rejalashtirilgan suvni ichdingiz. 🤴👸",
-            "Namlik darajasi yuqori!" to "Siz deyarli marra desiz, 70% suv ichildi! 💎",
-            "Muvaffaqiyat!" to "Bugun o'zingizga bo'lgan g'amxo'rligiz 70% marraga yetdi. ✨",
-            "Toza energiya!" to "Suv sizga kuch bermoqda, 70% reja ortda qoldi. ⚡",
-            "Siz uddaladingiz!" to "Kunlik suv me'yorining 70% i ichildi. Jismingiz quvonmoqda! 😊",
-            "Super intizom!" to "Suv tartibingiz hayratlanarli! 70% bajarildi. 👏",
-            "Yashang!" to "Har bir qultum salomatlik! 70% marra bosib o'tildi. 🌈",
-            "Tetiklik ramzi!" to "Bugungi suv ichish faolligiz 70% ga yetdi. 🚀",
-            "A'lo kayfiyat!" to "Suv sizga tetiklik bermoqda, 70% reja tayyor! 🍀",
-            "Namlik kuchi!" to "Tana hujayralari bugun 70% ga to'yingan. Davom eting! 🧊",
-            "Maqsad yaqin!" to "Suv maqsadingiz sari 70% masofani bosib o'tdingiz. 🎯",
-            "Siz haqiqiy namunasiz!" to "Suv ichish tartibiz 70% reja bilan davom etmoqda. 🔥",
-            "Zabarast natija!" to "Bugun suv ichishda shaxsiy rekord sari 70% ga keldingiz. 🥇",
-            "Hujayralar bayrami!" to "Tanangiz namlikka boy bo'lmoqda (70% reja). 🎉",
-            "Suv bilan tetiklashish!" to "Bugun deyarli reja bajardi, 70% ortda qoldi. 🎐",
-            "Ideal muvozanat!" to "Suv balansingiz bugun 70% ga tiklandi. 🌀",
-            "Ofarin!" to "Bugun suv ichish rejasining 70% ini yakunladingiz. 🎖️"
+            "Namlik darajasi yuqori!" to "Siz deyarli marra desiz, suvning katta qismi ichildi! 💎",
+            "Muvaffaqiyat!" to "Bugun o'zingizga bo'lgan g'amxo'rligiz yangi marraga yetdi. ✨",
+            "Toza energiya!" to "Suv sizga kuch bermoqda, katta reja ortda qoldi. ⚡",
+            "Siz uddaladingiz!" to "Kunlik suv me'yorining katta qismi ichildi. Jismingiz quvonmoqda! 😊",
+            "Super intizom!" to "Suv tartibingiz hayratlanarli! Reja deyarli bajarildi. 👏",
+            "Yashang!" to "Har bir qultum salomatlik! Katta marra bosib o'tildi. 🌈",
+            "Tetiklik ramzi!" to "Bugungi suv ichish faolligiz yuqori darajaga yetdi. 🚀",
+            "A'lo kayfiyat!" to "Suv sizga tetiklik bermoqda, reja tayyor! 🍀",
+            "Namlik kuchi!" to "Tana hujayralari bugun suvga to'yingan. Davom eting! 🧊",
+            "Maqsad yaqin!" to "Suv maqsadingiz sari katta masofani bosib o'tdingiz. 🎯",
+            "Siz haqiqiy namunasiz!" to "Suv ichish tartibiz a'lo darajada davom etmoqda. 🔥",
+            "Zabarast natija!" to "Bugun suv ichishda shaxsiy rekord sari yaqin keldingiz. 🥇",
+            "Hujayralar bayrami!" to "Tanangiz namlikka boy bo'lmoqda. 🎉",
+            "Suv bilan tetiklashish!" to "Bugun deyarli reja bajardi, katta qism ortda qoldi. 🎐",
+            "Ideal muvozanat!" to "Suv balansingiz bugun sezilarli tiklandi. 🌀",
+            "Ofarin!" to "Bugun suv ichish rejasini deyarli yakunladingiz. 🎖️"
         )
         val selected = variations.random()
 
@@ -836,64 +891,12 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun getExerciseMotivationTexts(exerciseInfo: String?): List<String> {
-        val type = exerciseInfo?.replaceFirstChar { it.uppercase() } ?: "Harakat"
-        val lowerType = exerciseInfo?.lowercase() ?: "harakat"
-        return listOf(
-            "$type organizmdagi ortiqcha yog'larni tabiiy energiya manbaiga aylantiradi.",
-            "$type qon aylanishini tezlashtirib, barcha organlarga kislorod yetkazib beradi.",
-            "Har bir daqiqalik $lowerType sizni maqsadli vazningizga yaqinlashtiradi.",
-            "$type yordamida nafaqat kaloriya, balki stress gormonlari ham yoqiladi.",
-            "Muntazam $lowerType bilan shug'ullanish orqali immunitetingiz 30% ga kuchayadi.",
-            "$type uyqu sifatini ajoyib darajada yaxshilaydi va asablarni tinchlantirishga yordam beradi.",
-            "Faol $lowerType bazal metabolizmni tezlashtiradi, ya'ni dam olganda ham oza boshlaysiz.",
-            "$type bo'g'im va mushaklarning elastikligini saqlash uchun eng kuchli vositadir.",
-            "$type yurak mushagini chiniqtiradi, natijada yurak kamroq urib, ko'proq qon haydaydi.",
-            "$type bilan qon tozalanishi tezlashadi va teringiz sog'lom porlaydi."
-        )
-    }
-
-    private fun showExerciseMotivationSnackbar(exerciseId: String) {
-        val exerciseName = try {
-            uz.oybek.ozamiz.data.logs.model.UserExercise.valueOf(exerciseId).exerciseName
-        } catch (e: Exception) {
-            "Harakat"
-        }
-        val messages = getExerciseMotivationTexts(exerciseName)
-        val message = messages.random()
-
-        val snackbar = Snackbar.make(binding.root, "", 5000)
-        val snackbarLayout = snackbar.view as Snackbar.SnackbarLayout
-        snackbarLayout.setBackgroundColor(Color.TRANSPARENT)
-        snackbarLayout.setPadding(0, 0, 0, 0)
-
-        snackbarLayout.clipChildren = false
-        snackbarLayout.clipToPadding = false
-        (snackbarLayout.parent as? ViewGroup)?.let {
-            it.clipChildren = false
-            it.clipToPadding = false
-        }
-        val bottomNav = activity?.findViewById<View>(R.id.bottom_nav_view)
-        if (bottomNav != null) {
-            snackbar.anchorView = bottomNav
-        }
-        val customView = layoutInflater.inflate(R.layout.custom_exercise_snackbar, null)
-        val textView = customView.findViewById<TextView>(R.id.text_snackbar_motivation)
-        textView.text = message
-        val btnClose = customView.findViewById<View>(R.id.btn_close_snackbar)
-        btnClose.setOnClickListener {
-            snackbar.dismiss()
-        }
-        snackbarLayout.removeAllViews()
-        snackbarLayout.addView(customView)
-        snackbar.show()
-    }
 
     private fun check70PercentExercise(state: HomeUiState) {
         val todayStr = Date().dateApiFormat()
-        if (state.exerciseTarget > 0 &&
-            state.exerciseBurnt >= state.exerciseTarget * 0.7 &&
-            getPersistentDate("last_exercise_70_shown") != todayStr
+        if (state.exerciseTarget > 0 && state.exerciseBurnt >= state.exerciseTarget * 0.7 && getPersistentDate(
+                "last_exercise_70_shown"
+            ) != todayStr
         ) {
             show70PercentExerciseAchievement()
             savePersistentDate("last_exercise_70_shown", todayStr)
@@ -902,49 +905,47 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun show70PercentExerciseAchievement() {
         if (activity == null || isDetached) return
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(R.layout.dialog_exercise_achievement)
-            .create()
+        val dialog =
+            MaterialAlertDialogBuilder(requireContext()).setView(R.layout.dialog_exercise_achievement)
+                .create()
 
         dialog.show()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val variations = listOf(
-            Triple("🥇", "Mashg'ulot qahramoni!", "Bugungi mashqlar rejasining 70% idan o'tdingiz!"),
+            Triple(
+                "🥇",
+                "Mashg'ulot qahramoni!",
+                "Bugungi mashqlar rejasining katta qismidan o'tdingiz!"
+            ),
             Triple(
                 "🔥",
                 "Yog'lar \"yig'layapti\"!",
-                "70% rejalashtirilgan kaloriya yoqildi. Davom eting!"
+                "Rejalashtirilgan kaloriyalarning ko'p qismi yoqildi. Davom eting!"
             ),
             Triple("⚡", "Super energiya!", "Siz bugun juda faolsiz, marra zabt etildi!"),
             Triple("🏆", "Chempionlik sari!", "Mashqlarga bo'lgan bu g'ayrat marraga yetdi!"),
             Triple("💪", "Kuch va qudrat!", "Tanangiz chiniqmoqda!"),
-            Triple("🏃", "Tezkor natija!", "Faolligingiz bugun dan oshdi. Barakalla!"),
-            Triple("✨", "Yashang!", "Siz bugun o'zingizni yengdingiz,!"),
+            Triple("🏃", "Tezkor natija!", "Faolligingiz bugun ancha oshdi. Barakalla!"),
+            Triple("✨", "Yashang!", "Siz bugun o'zingizni yengdingiz!"),
             Triple("🚀", "Kosmik tezlik!", "Mashqlar tartibingiz hayratda qoldirmoqda!"),
-            Triple("🎯", "Aniq nishon!", "Bugungi faollik rejasining 70% i tayyor!"),
+            Triple("🎯", "Aniq nishon!", "Bugungi faollik rejasining katta qismi tayyor!"),
             Triple("🌟", "Yulduzli natija!", "Bugun deyarli hamma mashqlarni uddaladingiz!"),
             Triple(
-                "🌈",
-                "Siz ajoyibsiz!",
-                "Har bir harakat sizni go'zallikka yaqinlashtiradi!"
+                "🌈", "Siz ajoyibsiz!", "Har bir harakat sizni go'zallikka yaqinlashtiradi!"
             ),
-            Triple("💎", "Qimmatbaho sog'lik!", "Bugunga mo'ljallangan 70% kaloriya sarflandi!"),
+            Triple("💎", "Qimmatbaho sog'lik!", "Bugunga mo'ljallangan ko'plab kaloriya sarflandi!"),
             Triple("🧨", "Portlovchi kuch!", "Siz bugun haqiqiy vulqonsiz! "),
-            Triple("🧗", "Cho'qqi sari!", "Faollik masofasining 70% i bosib o'tildi!"),
+            Triple("🧗", "Cho'qqi sari!", "Faollik masofasining katta qismi bosib o'tildi!"),
             Triple("🥊", "Zarbdor natija!", "Siz har qanday dangasalikni yengdingiz!"),
             Triple("🧘", "Garmoniya va kuch!", "Tana va ruh birdamligi!"),
             Triple("🚲", "Tezkor harakat!", "Kaloriya yoqishda bugun to'xtamadingiz!"),
-            Triple("🤸", "Elastiklik mukammal!", "Bugungi mashqlar natijasi 70% ga yetdi!"),
+            Triple("🤸", "Elastiklik mukammal!", "Bugungi mashqlar natijasi yuqori darajaga yetdi!"),
             Triple(
-                "🛹",
-                "Yangi marra!",
-                "Siz bugun kaloriya sarflab shaxsiy rekordga yaqinlashdingiz!"
+                "🛹", "Yangi marra!", "Siz bugun kaloriya sarflab shaxsiy rekordga yaqinlashdingiz!"
             ),
             Triple(
-                "🎖️",
-                "Xizmatlaringiz beqiyos!",
-                "Bugun faollik bilan o'zingizni xursand qildingiz!"
+                "🎖️", "Xizmatlaringiz beqiyos!", "Bugun faollik bilan o'zingizni xursand qildingiz!"
             )
         )
         val selected = variations.random()
@@ -962,9 +963,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private fun check50PercentCalorieAchievement(state: HomeUiState) {
         val todayStr = Date().dateApiFormat()
 
-        if (state.caloriesTarget > 0 &&
-            state.caloriesConsumed >= state.caloriesTarget * 0.5 &&
-            getPersistentDate("last_calorie_50_shown") != todayStr
+        if (state.caloriesTarget > 0 && state.caloriesConsumed >= state.caloriesTarget * 0.5 && getPersistentDate(
+                "last_calorie_50_shown"
+            ) != todayStr
         ) {
             show50PercentCalorieAchievement()
             savePersistentDate("last_calorie_50_shown", todayStr)
@@ -974,9 +975,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun show50PercentCalorieAchievement() {
         if (activity == null || isDetached) return
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(R.layout.dialog_food_achievement)
-            .create()
+        val dialog =
+            MaterialAlertDialogBuilder(requireContext()).setView(R.layout.dialog_food_achievement)
+                .create()
 
         dialog.show()
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -1013,7 +1014,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             dialog.dismiss()
         }
     }
-    
+
     private fun checkLevelUp(points: Int) {
         val currentIndex = LevelManager.getCurrentLevelIndex(points)
         if (lastShownLevelIndex == -1) {
@@ -1029,10 +1030,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             saveLastSeenLevelIndex(currentIndex)
             val newLevel = LevelManager.levels[currentIndex]
             showLevelUpDialog(
-                newLevel.emoji,
-                newLevel.name,
-                newLevel.motivationText,
-                newLevel.color
+                newLevel.emoji, newLevel.name, newLevel.motivationText, newLevel.color
             )
         }
     }
@@ -1043,9 +1041,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         val inflater = LayoutInflater.from(requireContext())
         val dialogView = inflater.inflate(R.layout.dialog_level_up, null)
 
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogView)
-            .create()
+        val dialog = MaterialAlertDialogBuilder(requireContext()).setView(dialogView).create()
 
         val parsedColor = Color.parseColor(String.format("#%06X", 0xFFFFFF and color.toInt()))
 
@@ -1066,5 +1062,30 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
+    private fun vibrateDevice() {
+        try {
+            val vibrator =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    val vibratorManager =
+                        requireContext().getSystemService(android.content.Context.VIBRATOR_MANAGER_SERVICE) as? android.os.VibratorManager
+                    vibratorManager?.defaultVibrator
+                } else {
+                    @Suppress("DEPRECATION") requireContext().getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+                }
 
+            if (vibrator?.hasVibrator() == true) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    vibrator.vibrate(
+                        android.os.VibrationEffect.createOneShot(
+                            50, android.os.VibrationEffect.DEFAULT_AMPLITUDE
+                        )
+                    )
+                } else {
+                    @Suppress("DEPRECATION") vibrator.vibrate(50)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

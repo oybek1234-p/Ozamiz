@@ -85,10 +85,16 @@ object FoodAnalyzer {
 
     suspend fun analyzeAudio(
         audioUri: Uri,
-        meal: String
+        meal: String,
+        consumedCalories: Int,
+        waterMl: Int,
+        burnedCalories: Int,
+        targetCalories: Int
     ): FoodAnalysis? = withContext(Dispatchers.IO) {
         val audioBytes = audioUri.toBytes() ?: return@withContext null
-        val prompt = FoodAnalyzerConfig.buildFoodPrompt("", meal, user.gender)
+        val prompt = FoodAnalyzerConfig.buildFoodPrompt(
+            "", meal, user.gender, consumedCalories, waterMl, burnedCalories, targetCalories
+        )
         
         val content = content {
             inlineData(audioBytes, "audio/ogg")
@@ -101,9 +107,15 @@ object FoodAnalyzer {
     suspend fun createInitialContent(
        imageUrl: Uri?,
        description: String,
-       meal: String
+       meal: String,
+       consumedCalories: Int,
+       waterMl: Int,
+       burnedCalories: Int,
+       targetCalories: Int
     ): com.google.firebase.ai.type.Content = withContext(Dispatchers.IO) {
-        val prompt = FoodAnalyzerConfig.buildFoodPrompt(description, meal, user.gender)
+        val prompt = FoodAnalyzerConfig.buildFoodPrompt(
+            description, meal, user.gender, consumedCalories, waterMl, burnedCalories, targetCalories
+        )
         content {
             imageUrl?.toBytes()?.let { inlineData(it, "image/jpeg") }
             text(prompt)

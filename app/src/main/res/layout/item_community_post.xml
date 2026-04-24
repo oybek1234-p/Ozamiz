@@ -56,18 +56,6 @@
                         android:textSize="16sp"
                         tools:text="Oybek" />
 
-                    <TextView
-                        android:id="@+id/tvUserLevel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_score_badge"
-                        android:fontFamily="@font/roboto_medium"
-                        android:paddingHorizontal="6dp"
-                        android:paddingVertical="1dp"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="11sp"
-                        tools:text="Lvl 12" />
                 </LinearLayout>
 
                 <TextView
@@ -103,7 +91,7 @@
         <ImageView
             android:id="@+id/imgFoodPhoto"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="200dp"
             android:scaleType="centerCrop"
             tools:src="@drawable/placeholder_food" />
 
@@ -114,17 +102,71 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Food Name & Calories -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvFoodName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"
+                    tools:text="Tovuqli pishiriq" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvFoodCalories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/roboto_medium"
+                        tools:text="350 kkal" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp"
+                    tools:text="O'zim tayyorladim, juda mazali chiqdi!" />
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="?attr/colorOutline"
+                    android:textSize="12sp"
+                    tools:text="2 soat oldin" />
+            </LinearLayout>
+
+            <!-- Likes & Views -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:id="@+id/btnLike"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackground"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="4dp"
@@ -146,6 +188,35 @@
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp"
                         tools:text="12" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btnComment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/imgComment"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        app:srcCompat="@drawable/comment_ic"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:id="@+id/tvCommentsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp"
+                        tools:text="5" />
                 </LinearLayout>
 
                 <Space
@@ -174,72 +245,6 @@
                         android:textSize="14sp"
                         tools:text="240 ko'rdi" />
                 </LinearLayout>
-            </LinearLayout>
-
-            <!-- Food Name & Calories -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tvFoodName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="16sp"
-                    tools:text="Tovuqli pishiriq" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/tvFoodCalories"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/roboto_medium"
-                        tools:text="350 kkal" />
-
-                    <TextView
-                        android:id="@+id/tvHealthScore"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_score_badge"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/roboto_medium"
-                        android:visibility="gone"
-                        tools:text="8/10 ball" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvComment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="14sp"
-                    tools:text="O'zim tayyorladim, juda mazali chiqdi!" />
-
-                <TextView
-                    android:id="@+id/tvTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:textColor="?attr/colorOutline"
-                    android:textSize="12sp"
-                    tools:text="2 soat oldin" />
             </LinearLayout>
 
         </LinearLayout>

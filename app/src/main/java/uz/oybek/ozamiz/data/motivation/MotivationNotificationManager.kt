@@ -12,7 +12,7 @@ class MotivationNotificationManager(private val context: Context) {
 
     companion object {
         const val CHANNEL_ID = "motivation_channel_v2" // Changed to force update
-        const val CHANNEL_NAME = "Motivation Messages"
+        const val CHANNEL_NAME = "Eslatmalar"
         const val NOTIFICATION_ID = 1001
     }
 

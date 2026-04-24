@@ -21,7 +21,7 @@ class DailyFoodLogsFragment : BaseFragment<FragmentDailyFoodLogsBinding>() {
     private val adapter by lazy {
         TodaysFoodAdapter { foodLog ->
             navigate(
-                R.id.calorieResultBottomSheet,
+                R.id.analyzeResultFragment,
                 Bundle().apply {
                     putString("logId", foodLog.logId)
                     putLong(

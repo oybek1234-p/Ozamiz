@@ -10,14 +10,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.ai.AiChatRepository
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
 import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
+import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
@@ -37,6 +43,7 @@ sealed interface AnalyzeResultEvent {
     data class Failure(val message: String) : AnalyzeResultEvent
     data class LimitExceeded(val exceededTypes: List<String>) : AnalyzeResultEvent
     data class PromptShare(val name: String, val photoUrl: String, val calories: Int, val exceededTypes: List<String>? = null) : AnalyzeResultEvent
+    data class ShowTips(val tips: List<String>) : AnalyzeResultEvent
 }
 
 class AnalyzeResultViewModel : ViewModel() {
@@ -193,13 +200,29 @@ class AnalyzeResultViewModel : ViewModel() {
 
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
+            val dateToUse = date ?: java.util.Date()
+            val target = UserRepository.user.targetCalories
+            val dailyLogsWrapper = DailyLogRepository.observeDailyLogs(dateToUse).first()
+            val dailyLogs = (dailyLogsWrapper as? DataWrapper.Success)?.data ?: DailyLogs()
+            
+            val foodLogs = dailyLogs.foodLogs?.values ?: emptyList()
+            val waterLogs = dailyLogs.waterLogs?.values ?: emptyList()
+            val exerciseLogs = dailyLogs.exerciseLogs?.values ?: emptyList()
+            
+            val consumed = foodLogs.sumOf { it.calories }
+            val water = waterLogs.sumOf { it.amountMl }
+            val burned = exerciseLogs.sumOf { it.caloriesBurned }
 
             val prompt = "$newDescription. (Do not ask questions, provide best possible estimate)"
             val initialContent =
                 FoodAnalyzer.createInitialContent(
                     null,
                     prompt,
-                    currentResult.mealType
+                    currentResult.mealType,
+                    consumed,
+                    water,
+                    burned,
+                    target
                 )
             val history = listOf(initialContent)
 
@@ -275,11 +298,16 @@ class AnalyzeResultViewModel : ViewModel() {
                         val post = uz.oybek.ozamiz.data.community.model.CommunityPost(
                             userId = userId,
                             userName = user.name.ifBlank { "Foydalanuvchi" },
+                            userAvatarUrl = user.avatarUrl,
                             photoUrl = result.photoUrl!!,
+                            photos = listOf(result.photoUrl!!),
+                            title = result.result!!.name,
                             foodName = result.result!!.name,
                             calories = result.result!!.calories,
                             healthScore = result.result!!.healthScore ?: 0,
-                            userScore = user.scorePoints
+                            userScore = user.scorePoints,
+                            verified = false,
+                            isVisible = false
                         )
                         uz.oybek.ozamiz.data.community.CommunityPostRepository.addPost(post)
                     }
@@ -320,8 +348,19 @@ class AnalyzeResultViewModel : ViewModel() {
                     )
                     _event.send(AnalyzeResultEvent.LimitExceeded(exceededTypes))
                 } else {
+                    val analysisTips = liveResult.value.result?.result?.tips
                     liveResult.update { it.copy(isLoading = false) }
-                    _event.send(AnalyzeResultEvent.Saved)
+                    
+                    if (!analysisTips.isNullOrEmpty()) {
+                        _event.send(AnalyzeResultEvent.ShowTips(analysisTips))
+                    } else {
+                        // Fallback in case AI missed tips field or we are viewing an old log
+                        _event.send(AnalyzeResultEvent.ShowTips(listOf(
+                            "Bugun suv ichish me'yorini to'ldirishga harakat qiling.",
+                            "Kechki ovqatda ko'proq sabzavotlar yeyish foydali bo'ladi.",
+                            "Hozirgi natijangiz maqsad sari yaxshi qadam bo'ldi!"
+                        )))
+                    }
                 }
             } else {
                 liveResult.update { it.copy(isLoading = false) }

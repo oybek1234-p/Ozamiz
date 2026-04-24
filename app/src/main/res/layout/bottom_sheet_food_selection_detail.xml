@@ -54,16 +54,6 @@
                     android:textColor="?attr/colorPrimary"
                     android:textSize="24sp"
                     tools:text="450 kkal" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    
-                    <include android:id="@+id/mini_carbs" layout="@layout/item_mini_macro" />
-                    <include android:id="@+id/mini_protein" layout="@layout/item_mini_macro" />
-                    <include android:id="@+id/mini_fat" layout="@layout/item_mini_macro" />
-                </LinearLayout>
             </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider

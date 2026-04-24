@@ -19,7 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:title="AI Diyetolog"
-            app:navigationIcon="@drawable/arrow_back"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge"
             android:background="?attr/colorSurfaceContainer"
             app:titleCentered="true">
@@ -50,40 +49,6 @@
         app:layout_constraintTop_toBottomOf="@id/appBarLayout"
         tools:listitem="@layout/item_chat_message" />
 
-    <!-- Empty State: Greeting and Suggestions -->
-    <LinearLayout
-        android:id="@+id/emptyStateContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="start"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
-        app:layout_constraintTop_toBottomOf="@id/appBarLayout"
-        app:layout_constraintVertical_bias="0.3">
-
-        <TextView
-            android:id="@+id/greetingTitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            style="@style/TextAppearance.Material3.HeadlineSmall"
-            android:fontFamily="@font/roboto_medium"
-            android:textColor="?attr/colorOnSurface"
-            tools:text="Salom Oybek, men sizning shaxsiy dietologingizman, qanday savolaringiz bor?" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/suggestedQuestionsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="5"
-            tools:listitem="@layout/item_suggested_question" />
-
-    </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottomContainer"
