@@ -3,8 +3,9 @@ package uz.oybek.ozamiz.data.community
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.firestore
+import uz.oybek.ozamiz.data.firebase.firestore
+import uz.oybek.ozamiz.data.firebase.auth
+import uz.oybek.ozamiz.data.firebase.userWeightLogsCollection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -47,7 +48,7 @@ object AchievementPostHelper {
         type: String = uz.oybek.ozamiz.data.community.model.PostType.MANUAL,
         photos: List<String> = emptyList()
     ): CommunityPost? {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return null
+        val uid = auth.currentUser?.uid ?: return null
         val user = UserRepository.user
         return CommunityPost(
             userId = uid,
@@ -99,7 +100,7 @@ object AchievementPostHelper {
         if (hasPostedToday("exercise_goal")) return
         markPostedToday("exercise_goal")
 
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid ?: return
         val today = DateUtils.getFormattedDateString(java.util.Date(), "yyyy-MM-dd")
         
         CoroutineScope(Dispatchers.IO).launch {
@@ -132,12 +133,10 @@ object AchievementPostHelper {
         if (dropped <= 0.0) return
         if (!isUserVerified()) return
 
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid ?: return
         
         CoroutineScope(Dispatchers.IO).launch {
-            val logsSnapshot = com.google.firebase.Firebase.firestore.collection("users")
-                .document(uid)
-                .collection("weightLogs")
+            val logsSnapshot = firestore.userWeightLogsCollection(uid)
                 .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(2)
                 .get()

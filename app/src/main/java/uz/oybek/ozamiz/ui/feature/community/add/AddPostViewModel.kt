@@ -4,12 +4,13 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
+import uz.oybek.ozamiz.util.returnResult
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
 
 class AddPostViewModel : ViewModel() {
 
     suspend fun uploadPost(post: CommunityPost, imageUris: List<Uri>): Result<Unit> {
-        return try {
+        return returnResult {
             val uploadedUrls = mutableListOf<String>()
             imageUris.forEachIndexed { index, uri ->
                 val path = "community_posts/${post.userId}/${System.currentTimeMillis()}_$index"
@@ -23,9 +24,7 @@ class AddPostViewModel : ViewModel() {
                 post.photoUrl = uploadedUrls.first() // For backward compatibility
                 post.photos = uploadedUrls
             }
-            CommunityPostRepository.addPost(post)
-        } catch (e: Exception) {
-            Result.failure(e)
+            CommunityPostRepository.addPost(post).getOrThrow()
         }
     }
 }

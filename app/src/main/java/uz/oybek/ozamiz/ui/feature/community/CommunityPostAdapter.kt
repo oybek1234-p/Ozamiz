@@ -88,9 +88,9 @@ class CommunityPostAdapter(
                 val hours = TimeUnit.MILLISECONDS.toHours(diff)
                 val days = TimeUnit.MILLISECONDS.toDays(diff)
                 binding.tvTime.text = when {
-                    days > 0 -> "$days kun oldin"
-                    hours > 0 -> "$hours soat oldin"
-                    else -> "Yaqinda"
+                    days > 0 -> "$days ${binding.root.context.getString(R.string.kun_oldin)}"
+                    hours > 0 -> "$hours ${binding.root.context.getString(R.string.sohat_oldin)}"
+                    else -> binding.root.context.getString(R.string.yaqinda)
                 }
             } else {
                 binding.tvTime.text = ""

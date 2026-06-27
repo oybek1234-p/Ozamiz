@@ -35,29 +35,48 @@ object FaceBlurrer {
     }
 
     private fun applyBlur(bitmap: Bitmap, rect: Rect) {
-        val left = rect.left.coerceAtLeast(0)
-        val top = rect.top.coerceAtLeast(0)
-        val right = rect.right.coerceAtMost(bitmap.width)
-        val bottom = rect.bottom.coerceAtMost(bitmap.height)
+        val width = rect.width()
+        val height = rect.height()
         
-        val width = right - left
-        val height = bottom - top
+        // Expand the rect by 20% to cover the whole head, not just facial features
+        val expandX = (width * 0.2f).toInt()
+        val expandY = (height * 0.2f).toInt()
         
-        if (width <= 0 || height <= 0) return
+        val left = (rect.left - expandX).coerceAtLeast(0)
+        val top = (rect.top - expandY).coerceAtLeast(0)
+        val right = (rect.right + expandX).coerceAtMost(bitmap.width)
+        val bottom = (rect.bottom + expandY).coerceAtMost(bitmap.height)
+        
+        val newWidth = right - left
+        val newHeight = bottom - top
+        
+        if (newWidth <= 0 || newHeight <= 0) return
 
-        val pixelSize = 25
+        // Dynamic pixel block size based on the width to guarantee heavy obfuscation
+        val pixelSize = maxOf(newWidth / 6, 30)
+        
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+            style = Paint.Style.FILL
+        }
+
         for (y in top until bottom step pixelSize) {
             for (x in left until right step pixelSize) {
-                val color = try { bitmap.getPixel(x, y) } catch (e: Exception) { 0 }
+                val sampleX = x.coerceIn(0, bitmap.width - 1)
+                val sampleY = y.coerceIn(0, bitmap.height - 1)
+                
+                paint.color = try { bitmap.getPixel(sampleX, sampleY) } catch (e: Exception) { 0 }
                 
                 val blockRight = (x + pixelSize).coerceAtMost(right)
                 val blockBottom = (y + pixelSize).coerceAtMost(bottom)
                 
-                for (i in x until blockRight) {
-                    for (j in y until blockBottom) {
-                        try { bitmap.setPixel(i, j, color) } catch (e: Exception) {}
-                    }
-                }
+                canvas.drawRect(
+                    x.toFloat(), 
+                    y.toFloat(), 
+                    blockRight.toFloat(), 
+                    blockBottom.toFloat(), 
+                    paint
+                )
             }
         }
     }

@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/compile_error.txt
+/git_paths.txt

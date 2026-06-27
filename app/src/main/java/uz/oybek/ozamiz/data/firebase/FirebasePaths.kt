@@ -1,11 +1,11 @@
 package uz.oybek.ozamiz.data.firebase
 
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+
 
 object FirebasePaths {
 
-    private val root: DatabaseReference = FirebaseDatabase.getInstance().reference
+    private val root: DatabaseReference = database.reference
 
     object Database {
         const val PATH_USERS = "users"
@@ -20,6 +20,7 @@ object FirebasePaths {
     object Firestore {
         const val WEIGHT_PHOTOS = "weightPhoto"
         const val COMMUNITY_POSTS = "communityPosts"
+        const val PUBLIC_USERS = "public_users"
     }
 
     object Storage {

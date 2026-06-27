@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.data.user
 import android.net.Uri
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -12,13 +11,18 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.firebase.database
+import uz.oybek.ozamiz.data.firebase.firestore
+import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.firebase.getValueSafe
+import uz.oybek.ozamiz.data.firebase.publicUsersCollection
+import uz.oybek.ozamiz.data.firebase.toObjectsList
+import uz.oybek.ozamiz.util.returnResult
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
@@ -66,89 +70,26 @@ object UserRepository {
                 DataWrapper.Error("Rasm yuklanmadi")
             }
         } catch (e: Exception) {
-            DataWrapper.Error(e.localizedMessage ?: "Chek ma'lumotlarini yuklashda xatolik")
+            handleException(e)
+            DataWrapper.Error("")
         }
     }
 
-    private val usersReference: DatabaseReference by lazy {
-        Firebase.database.getReference("users")
-    }
+    private val usersReference: DatabaseReference get() = database.getReference("users")
 
-    private val firestore: FirebaseFirestore by lazy {
-        Firebase.firestore
-    }
-
-    private val publicUsersCollection by lazy {
-        firestore.collection("public_users")
-    }
+    private val publicUsersCollection get() = firestore.publicUsersCollection
 
     val user: User get() = LocalUser.user
     private var isObserving = false
     private var userListener: ValueEventListener? = null
 
     private fun saveUserNetwork() {
-        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        val currentUid = auth.currentUser?.uid
         if (user.valid && user.uid == currentUid) {
-            val userMap = user.toMap()
-            usersReference.child(user.uid).updateChildren(userMap)
-            
-        
-            val publicMap = user.toPublicMap()
-            publicUsersCollection.document(user.uid).set(publicMap)
+            usersReference.child(user.uid).setValue(user)
+            publicUsersCollection.document(user.uid).set(user)
         }
     }
-
-    private fun User.toMap(): Map<String, Any?> {
-        return mapOf(
-            "uid" to uid,
-            "name" to name,
-            "phoneNumber" to phoneNumber,
-            "gmail" to gmail,
-            "lastSeenTime" to lastSeenTime,
-            "unreadMessages" to unreadMessages,
-            "premium" to premium,
-            "isPremiumYearly" to isPremiumYearly,
-            "premiumDate" to premiumDate,
-
-            "gender" to gender,
-            "region" to region,
-            "age" to age,
-            "height" to height,
-            "weight" to weight,
-            "targetWeight" to targetWeight,
-            "startWeight" to startWeight,
-            "activityLevel" to activityLevel,
-            "targetCalories" to targetCalories,
-            "targetProtein" to targetProtein,
-            "targetFat" to targetFat,
-            "targetCarbs" to targetCarbs,
-            "targetWaterMl" to targetWaterMl,
-            "problems" to problems,
-            "goal" to goal,
-
-            "streakInfo" to streakInfo,
-            "lastWeightLogTimestamp" to lastWeightLogTimestamp,
-            "avatarUrl" to avatarUrl,
-            "registerDate" to registerDate,
-            "paymentChecking" to paymentChecking,
-            "paymentCheckPhotoUrl" to paymentCheckPhotoUrl,
-            "admin" to admin,
-            "scorePoints" to scorePoints
-        )
-    }
-
-    private fun User.toPublicMap(): Map<String, Any?> {
-        return mapOf(
-            "uid" to uid,
-            "name" to name,
-            "avatarUrl" to avatarUrl,
-            "scorePoints" to scorePoints,
-            "lastSeenTime" to lastSeenTime,
-            "premium" to premium,
-            "streakInfo" to streakInfo
-        )
-    }
-
 
     fun removeLastSeenListener(listener: ValueEventListener) {
         usersReference.child(user.uid).child(User::lastSeenTime.name).removeEventListener(listener)
@@ -170,8 +111,7 @@ object UserRepository {
             updates["isPremiumYearly"] = false
         }
         usersReference.child(userId).updateChildren(updates)
-        
-        // Sync with public_users
+
         val publicUpdates = mapOf(
             "premium" to premium
         )
@@ -194,9 +134,7 @@ object UserRepository {
             DataWrapper.Success(users)
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error(
-                e.localizedMessage ?: "Tekshiruvdagi foydalanuvchilarni yuklashda xatolik"
-            )
+            DataWrapper.Error("")
         }
     }
 
@@ -241,7 +179,7 @@ object UserRepository {
             isObserving = false
             userListener = null
         }
-        Firebase.auth.signOut()
+        auth.signOut()
         LocalUser.user = User()
         LocalUser.saveUser()
     }
@@ -280,7 +218,7 @@ object UserRepository {
     }
 
     suspend fun authFirebaseUser(): User {
-        val firebaseUser = Firebase.auth.currentUser
+        val firebaseUser = auth.currentUser
         if (firebaseUser == null || firebaseUser.uid.isEmpty()) {
             return User()
         }
@@ -326,7 +264,7 @@ object UserRepository {
 
 
     suspend fun refreshUser() {
-        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+        val currentUid = auth.currentUser?.uid
         if (currentUid != null) {
             val networkUser = loadUser(currentUid)
             if (networkUser != null && networkUser.valid) {
@@ -457,7 +395,7 @@ object UserRepository {
         lastUserId: String? = null,
         sortBy: UserSortType = UserSortType.MOST_POINTS
     ): Result<List<User>> {
-        return try {
+        return returnResult {
             val queryField = when (sortBy) {
                 UserSortType.MOST_POINTS -> User::scorePoints.name
                 UserSortType.RECENT_ACTIVITY -> User::lastSeenTime.name
@@ -474,10 +412,8 @@ object UserRepository {
             }
 
             val snapshot = query.limit(limit.toLong()).get().await()
-            val users = snapshot.documents.mapNotNull { it.toObject(User::class.java) }
-            Result.success(users)
-        } catch (e: Exception) {
-            Result.failure(e)
+            val users = snapshot.toObjectsList<User>()
+            users
         }
     }
 }

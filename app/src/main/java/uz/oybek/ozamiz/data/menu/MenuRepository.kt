@@ -1,9 +1,8 @@
 package uz.oybek.ozamiz.data.menu
 
 import android.net.Uri
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.firestore
+import uz.oybek.ozamiz.data.firebase.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -15,11 +14,13 @@ import uz.oybek.ozamiz.data.menu.model.MenuCategory
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.util.handleException
 
+import uz.oybek.ozamiz.data.firebase.menusCollection
+import uz.oybek.ozamiz.data.firebase.menuCategoriesCollection
+
 object MenuRepository {
 
-    private val db by lazy { Firebase.firestore }
-    private val menuCollection = db.collection("menus")
-    private val categoryCollection = db.collection("menu_categories")
+    private val menuCollection = firestore.menusCollection
+    private val categoryCollection = firestore.menuCategoriesCollection
 
     fun getCategories(): Flow<List<MenuCategory>> = callbackFlow {
         val listener = categoryCollection.addSnapshotListener { value, error ->

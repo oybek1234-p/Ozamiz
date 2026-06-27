@@ -47,7 +47,7 @@ class AdminFoodLogsViewModel : ViewModel() {
                     if (snapshot.exists()) {
                         for (dateSnapshot in snapshot.children) {
                             // Parse Food Logs
-                            dateSnapshot.child("foodLogs").children.forEach { foodSnap ->
+                            dateSnapshot.child(FirebasePaths.Database.FOOD_LOGS).children.forEach { foodSnap ->
                                 val food = foodSnap.getValue(FoodLog::class.java)
                                 if (food != null) {
                                     val ts = (food.timestamp as? Long) ?: ((food.timestamp as? Double)?.toLong()) ?: 0L
@@ -65,14 +65,14 @@ class AdminFoodLogsViewModel : ViewModel() {
                                 }
                             }
                             // ... Water and Exercise parsing ...
-                            dateSnapshot.child("waterLogs").children.forEach { waterSnap ->
+                            dateSnapshot.child(FirebasePaths.Database.WATER_LOGS).children.forEach { waterSnap ->
                                 val water = waterSnap.getValue(WaterLog::class.java)
                                 if (water != null) {
                                     val ts = (water.timestamp as? Long) ?: ((water.timestamp as? Double)?.toLong()) ?: 0L
                                     allLogs.add(AdminGenericLog(water.logId.ifEmpty { waterSnap.key ?: "" }, "Suv", "${water.amountMl} ml", "", null, ts, "water"))
                                 }
                             }
-                            dateSnapshot.child("exerciseLogs").children.forEach { exSnap ->
+                            dateSnapshot.child(FirebasePaths.Database.EXERCISE_LOGS).children.forEach { exSnap ->
                                 val ex = exSnap.getValue(ExerciseLog::class.java)
                                 if (ex != null) {
                                     val ts = (ex.timestamp as? Long) ?: ((ex.timestamp as? Double)?.toLong()) ?: 0L

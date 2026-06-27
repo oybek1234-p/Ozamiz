@@ -1,13 +1,13 @@
 package uz.oybek.ozamiz.data.logs
 
 import android.net.Uri
-import com.google.firebase.Firebase
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.firestore
+import uz.oybek.ozamiz.data.firebase.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
+import uz.oybek.ozamiz.data.firebase.userWeightLogsCollection
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.generateKey
@@ -50,25 +50,21 @@ object WeightLogRepository {
         )
 
         return try {
-            Firebase.firestore.collection(COLLECTION_USERS)
-                .document(userId)
-                .collection(COLLECTION_WEIGHT_LOGS)
+            firestore.userWeightLogsCollection(userId)
                 .document(logId)
                 .set(newLog)
                 .await()
             DataWrapper.Success(newLog)
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error(e.localizedMessage)
+            DataWrapper.Error("")
         }
     }
 
     fun getLogsFlow(userId: String): Flow<DataWrapper<List<WeightLog>>> = flow {
         if (userId.isEmpty()) return@flow
         emitAll(callbackFlow {
-            val registration = Firebase.firestore.collection(COLLECTION_USERS)
-                .document(userId)
-                .collection(COLLECTION_WEIGHT_LOGS)
+            val registration = firestore.userWeightLogsCollection(userId)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
@@ -94,9 +90,7 @@ object WeightLogRepository {
 
     suspend fun hasAny(userId: String): Boolean {
         return try {
-            val snapshot = Firebase.firestore.collection(COLLECTION_USERS)
-                .document(userId)
-                .collection(COLLECTION_WEIGHT_LOGS)
+            val snapshot = firestore.userWeightLogsCollection(userId)
                 .limit(1)
                 .get()
                 .await()
@@ -120,9 +114,7 @@ object WeightLogRepository {
 
     suspend fun deleteLog(log: WeightLog): DataWrapper<Unit> {
         return try {
-            Firebase.firestore.collection(COLLECTION_USERS)
-                .document(log.userId)
-                .collection(COLLECTION_WEIGHT_LOGS)
+            firestore.userWeightLogsCollection(log.userId)
                 .document(log.logId)
                 .delete()
                 .await()
@@ -135,7 +127,7 @@ object WeightLogRepository {
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error(e.localizedMessage)
+            DataWrapper.Error("")
         }
     }
 }

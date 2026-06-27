@@ -17,6 +17,8 @@ import uz.oybek.ozamiz.data.motivation.MotivationNotificationManager
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.ai.AiMenuRepository
 import uz.oybek.ozamiz.util.handleException
+import uz.oybek.ozamiz.data.firebase.firestore
+import uz.oybek.ozamiz.data.firebase.database
 
 lateinit var appContext: Context
 
@@ -47,12 +49,12 @@ class Application : Application() {
 
     private fun initFirebase() {
         FirebaseApp.initializeApp(this)
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
+        database.setPersistenceEnabled(true)
 
         val settings = firestoreSettings {
             setLocalCacheSettings(persistentCacheSettings {})
         }
-        FirebaseFirestore.getInstance().firestoreSettings = settings
+        firestore.firestoreSettings = settings
 
         MotivationNotificationManager(this).createNotificationChannel()
         MotivationAlarmScheduler.scheduleAll(this)

@@ -28,7 +28,7 @@ class AdminPostManagerViewModel : ViewModel() {
 
     fun verifyPost(postId: String) {
         viewModelScope.launch {
-            val result = CommunityPostRepository.verifyPost(postId, true)
+            val result = CommunityPostRepository.verifyPost(postId)
             if (result.isSuccess) {
                 loadUnverifiedPosts()
             }
