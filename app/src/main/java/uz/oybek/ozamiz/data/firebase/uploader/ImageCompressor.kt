@@ -124,6 +124,24 @@ object ImageCompressor {
         }
     }
 
+    suspend fun compressImageFileDirect(
+        file: File,
+        maxSizeKb: Int = 150
+    ): File? = withContext(Dispatchers.IO) {
+        try {
+            val compressedFile = Compressor.compress(appContext, file) {
+                resolution(500, 500)
+                quality(85)
+                format(Bitmap.CompressFormat.WEBP)
+                size(maxSizeKb * 1024L)
+            }
+            compressedFile
+        } catch (e: Exception) {
+            handleException(e)
+            null
+        }
+    }
+
     private fun fromUri(uri: Uri): File? {
         return try {
             val inputStream = appContext.contentResolver.openInputStream(uri)
@@ -136,7 +154,11 @@ object ImageCompressor {
             inputStream.copyTo(outputStream)
             inputStream.close()
             outputStream.close()
-            file
+            if (file.exists() && file.length() > 0) {
+                file
+            } else {
+                null
+            }
         } catch (e: Exception) {
             null
         }

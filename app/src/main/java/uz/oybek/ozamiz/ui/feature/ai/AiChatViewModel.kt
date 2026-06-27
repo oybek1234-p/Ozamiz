@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.ai.AiChatRepository
-import uz.oybek.ozamiz.data.ai.AiHistoryRepository
 import kotlinx.coroutines.flow.first
 import uz.oybek.ozamiz.data.ai.AiMenuRepository
 import uz.oybek.ozamiz.data.ai.model.ChatMessage
@@ -28,9 +27,16 @@ class AiChatViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    private fun getInitialMessage(): String {
+        val u = UserRepository.user
+        val goalText = if (u.goal == "gain_weight") "sog'lom semirish (vazn yig'ish)" else "sog'lom ozish"
+        val targetWeight = u.targetWeight?.toInt() ?: 60
+        return "Assalomu Aleykum ${u.name}! 😊 Ozamiz ilovasiga xush kelibsiz. Sizning maqsadingiz — **$targetWeight kg** vaznga erishish va $goalText.\n\nMen sizning shaxsiy AI-dietologingizman. Bugun nima yeyishni rejalashtirish, mashqlar bo'yicha maslahatlar yoki maqsadingizga erishish haqida har qanday savolingiz bo'lsa, bemalol so'rashingiz mumkin. Qayerdan boshlaymiz?"
+    }
+
     private val _messages = MutableStateFlow(listOf(
         ChatMessage(
-            text = "Assalomu Aleykum ${UserRepository.user.name}! 😊 Men sizning shaxsiy dietologingizman. Bugun nima yemoqchisiz, mashqlar bo'yicha maslahatlar yoki vazn tashlash haqida har qanday savolingiz bo'lsa, bemalol so'rashingiz mumkin",
+            text = getInitialMessage(),
             isUser = false
         )
     ))
@@ -66,14 +72,6 @@ class AiChatViewModel : ViewModel() {
 
     private fun startNewChatSession() {
         chatIdDeferred = kotlinx.coroutines.CompletableDeferred()
-        viewModelScope.launch {
-            try {
-                val id = AiHistoryRepository.createNewChat(user.uid)
-                chatIdDeferred.complete(id)
-            } catch (_: Exception) {
-                chatIdDeferred.complete(null)
-            }
-        }
     }
 
     private fun refreshSuggestions() {
@@ -86,47 +84,36 @@ class AiChatViewModel : ViewModel() {
         val userMessage = ChatMessage(text = text, isUser = true)
         _messages.value = _messages.value + userMessage
         _showQuestions.value = false
-
-        if (!isInitialContext) {
-            viewModelScope.launch {
-                val chatId = chatIdDeferred.await() ?: return@launch
-                try {
-                    AiHistoryRepository.saveMessage(user.uid, chatId, userMessage)
-                    if (_messages.value.count { it.isUser } == 1) {
-                        val title = text.take(40)
-                        AiHistoryRepository.updateChatTitle(user.uid, chatId, title)
-                    }
-                } catch (_: Exception) { }
-            }
-        }
-
         _isLoading.value = true
 
         viewModelScope.launch {
             val systemInstruction = buildSystemInstruction(text, user) // Pass the user object
 
             var aiMessageAdded = false
-            var currentAiMessage: ChatMessage? = null
+            var currentAiMessageText = ""
+            var lastUpdateTimestamp = 0L
 
             AiChatRepository.sendMessageStream(text, systemInstruction).collect { result ->
                 when (result) {
                     is DataWrapper.Success -> {
-                        _isLoading.value = false
+                        currentAiMessageText = result.data
+                        val now = System.currentTimeMillis()
+                        
+                        // Throttle updates to ~10fps during streaming for UI stability
+                        if (now - lastUpdateTimestamp > 100 || !aiMessageAdded) {
+                            lastUpdateTimestamp = now
+                            _isLoading.value = false
 
-                        if (!aiMessageAdded) {
-                            val newMessage = ChatMessage(text = result.data, isUser = false)
-                            currentAiMessage = newMessage
-                            _messages.value = _messages.value + newMessage
-                            aiMessageAdded = true
-                        } else {
-                            currentAiMessage?.let { msg ->
-                                val updatedMessage = msg.copy(text = result.data)
+                            if (!aiMessageAdded) {
+                                val newMessage = ChatMessage(text = currentAiMessageText, isUser = false)
+                                _messages.value = _messages.value + newMessage
+                                aiMessageAdded = true
+                            } else {
                                 val currentList = _messages.value.toMutableList()
-                                val index = currentList.indexOf(msg)
-                                if (index != -1) {
-                                    currentList[index] = updatedMessage
+                                if (currentList.isNotEmpty()) {
+                                    val lastIdx = currentList.size - 1
+                                    currentList[lastIdx] = currentList[lastIdx].copy(text = currentAiMessageText)
                                     _messages.value = currentList
-                                    currentAiMessage = updatedMessage
                                 }
                             }
                         }
@@ -138,12 +125,21 @@ class AiChatViewModel : ViewModel() {
                 }
             }
 
-            currentAiMessage?.let { aiMsg ->
+            // Final update to ensure the last chunk is displayed
+            var finalAiMessage: ChatMessage? = null
+            if (aiMessageAdded) {
+                val currentList = _messages.value.toMutableList()
+                val lastIdx = currentList.size - 1
+                val updated = currentList[lastIdx].copy(text = currentAiMessageText)
+                currentList[lastIdx] = updated
+                _messages.value = currentList
+                finalAiMessage = updated
+            }
+
+            finalAiMessage?.let { aiMsg ->
                 val chatId = chatIdDeferred.await() ?: return@let
                 try {
-                    AiHistoryRepository.saveMessage(user.uid, chatId, aiMsg)
 
-                    // Auto-save menu if it was an initial recommendation request
                     if (isInitialContext && (text.contains("menyu", true) || text.contains("ovqat", true))) {
                         AiMenuRepository.saveMenu(appContext, aiMsg.text)
                     }
@@ -155,7 +151,7 @@ class AiChatViewModel : ViewModel() {
     fun startNewChat() {
         _messages.value = listOf(
             ChatMessage(
-                text = "Assalomu Aleykum ${UserRepository.user.name}! 😊 Ozamiz hamjamiyatiga xush kelibsiz. Sizning maqsadingiz — **${UserRepository.user.targetWeight?.toInt() ?: 60} kg** vaznga sog'lom yo'l bilan erishish.\n\nMen sizning shaxsiy AI-dietologingizman. Bugun nima yeyishni rejalashtirish, mashqlar bo'yicha maslahatlar yoki vazn tashlash jarayoni haqida har qanday savolingiz bo'lsa, bemalol so'rashingiz mumkin. Qayerdan boshlaymiz?",
+                text = getInitialMessage(),
                 isUser = false
             )
         )
@@ -207,7 +203,7 @@ class AiChatViewModel : ViewModel() {
 
             userInfoSection = """
                 🔴 FOYDALANUVCHINING OXIRGI HAFTADAGI O'RTACHA HOLATI:
-                - Maqsadi: ${user.targetWeight ?: "vazn saqlash"} kg
+                - Maqsadi: ${user.goal} (Maqsad vazn: ${user.targetWeight ?: "saqlash"} kg)
                 - O'rtacha kunlik yegan miqdori: $avgCal kkal. (Me'yor: ${user.targetCalories} kkal)
                 - O'rtacha kunlik ichgan suvi: $avgWater ml (Kunlik me'yor: ${user.targetWaterMl} ml)
                 - O'rtacha kunlik mashq qilingan yog': $avgBurned kkal
@@ -231,129 +227,26 @@ class AiChatViewModel : ViewModel() {
 
             userInfoSection = """
                 🔴 FOYDALANUVCHINING $dateContextText:
-                - Maqsadi: ${user.targetWeight ?: "vazn saqlash"} kg
+                - Maqsadi: ${user.goal} (Maqsad vazn: ${user.targetWeight ?: "saqlash"} kg)
                 - Yeganlari: $foodNames. (Yegan miqdori: $totalCalories kkal. Kunlik me'yor: $targetCalories kkal)
                 - Ichgan suvi: $waterConsumed ml (Kunlik me'yor: $targetWater ml)
                 - Mashqi: $exerciseDetails
             """.trimIndent()
         }
 
-        val isFullMenuRequest = userMessage.contains("menyu", ignoreCase = true) || userMessage.contains("ovqat", ignoreCase = true)
-        val isNonushtaRequest = userMessage.contains("nonushta", ignoreCase = true) || userMessage.contains("ertalab", ignoreCase = true)
-        val isTushlikRequest = userMessage.contains("tushlik", ignoreCase = true)
-        val isKechkiOvqatRequest = userMessage.contains("kechki ovqat", ignoreCase = true) || userMessage.contains("kechki", ignoreCase = true)
-        val isMenuRequest = isFullMenuRequest || isNonushtaRequest || isTushlikRequest || isKechkiOvqatRequest
-
-        var historyContext = ""
-        if (isMenuRequest) {
-            val lastMenus = AiMenuRepository.getLastMenus(3)
-            if (lastMenus.isNotEmpty()) {
-                historyContext = "\n🔴 OLDINGI MENYULAR (ULARDAGI TAOMLARNI TAKRORLAMANG):\n" +
-                        lastMenus.joinToString("\n---\n") + "\n"
-            }
-        }
-
-        if (isMenuRequest) {
-            val baseMenuInstruction = """
-                🔴 QAT'IY QOIDALAR (BUZILISHI TAQIQLANADI):
-                1. SALOMLASHMANG! "Mana menyu", "Yoqimli ishtaha" kabi ortiqcha gaplarni UMUMAN yozmang. Faqat londa va aniq ma'lumot bering.
-                2. ILMIY SO'ZLAR TAQIQLANADI! "Kaloriya", "Uglevod" demang.
-                3. EMOJILAR QOIDASI: Har bir mahal uchun 🌅, ☀️, 🌙 emojilarini, menyu variantlari uchun ♦ emojisini, maslahat layfxaklari uchun esa 📌 emojisini ishlating. Boshqa emojilarni ishlatmang.
-                4. XILMA-XILLIK: Oldingi berilgan menyulardagi taomlarni takrorlamang! Har safar yangi va qiziqarli variantlar taklif qiling.
-                
-            """.trimIndent() + "\n" + userInfoSection + historyContext
-            
-            val specificMenuInstruction = if (isNonushtaRequest || isTushlikRequest || isKechkiOvqatRequest) {
-                val mealName = when {
-                    isNonushtaRequest -> "Nonushta"
-                    isTushlikRequest -> "Tushlik"
-                    isKechkiOvqatRequest -> "Kechki ovqat"
-                    else -> "" // Should not happen
-                }
-                val mealEmoji = when {
-                    isNonushtaRequest -> "🌅"
-                    isTushlikRequest -> "☀️"
-                    isKechkiOvqatRequest -> "🌙"
-                    else -> "" // Should not happen
-                }
-                """
-                
-                🔴 MENYU TUZISH QOIDALARI:
-                - BOSHIDA HECH QANDAY UMUMIY ORTIQCHA GAPLR BO'LMASIN, QISQA BULSIN!
-                - O'ZBEKONA TAOMLAR: Mastava, sho'rva, dimlama, grechka, tuxum, qatiq kabi oddiy ovqatlar bo'lsin.
-                - PORSIYA MIQDORI: Har doim faqat "1" raqamini ishlatmang! Ovqatga mos keladigan, tushunarli va xilma-xil o'lchovlardan foydalaning. Masalan: "ikki dona", "ozgina", "yarim piyola", "bir kosa", "bir nechta bo'lak", "o'rtacha bir dona", "150 gramm" kabi.
-                - MAJBURIY: ${mealEmoji} **${mealName} uchun variantlar:** sarlavhasi ostida har doim **5 TADAN variant** bering. Undan kamiga yo'l qo'ymang!
-                - TAVSIYA (LAYFXAK): Har doim menyu oxirida bitta "💡 Foydali usul" berish MAJBURIY.
-                
-                JAVOBINGIZ AYNAN SHU FORMATDA BO'LSIN (Hech narsani tushirib qoldirmang):
-    
-                ${mealEmoji} **${mealName} uchun variantlar:**
-                ♦ 1-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 2-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 3-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 4-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 5-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-    
-                💡 **Foydali usul:** 
-                [Bu yerga 1 ta juda qisqa va aniq amaliy layfxak yozing]
-                """.trimIndent()
-            } else { 
-                """
-                
-                🔴 MENYU TUZISH QOIDALARI:
-                - BOSHIDA HECH QANDAY UMUMIY ORTIQCHA GAPLR BO'LMASIN, QISQA BULSIN!
-                - MAJBURIY: Hech qaysi mahalni tushirib qoldirmang! Faqat maslahat berib qutulmang!
-                - O'ZBEKONA TAOMLAR: Mastava, sho'rva, dimlama, grechka, tuxum, qatiq kabi oddiy ovqatlar bo'lsun.
-                - PORSIYA MIQDORI: Har doim faqat "1" raqamini ishlatmang! Ovqatga mos keladigan, tushunarli va xilma-xil o'lchovlardan foydalaning. Masalan: "ikki dona", "ozgina", "yarim piyola", "bir kosa", "bir nechta bo'lak", "o'rtacha bir dona", "150 gramm" kabi.
-                - HAR BIR MAHAL (Nonushta, Tushlik, Kechki ovqat) UCHUN MAJBURIY 5 TADAN variant bering.
-                - TAVSIYA (LAYFXAK): Har doim menyu oxirida bitta "💡 Foydali usul" berish MAJBURIY.
-                
-                JAVOBINGIZ AYNAN SHU FORMATDA BO'LSIN (Hech narsani tushirib qoldirmang):
-    
-                🌅 **Nonushta, Tushlik, Kechki ovqat:**
-                ♦ 1-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 2-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 3-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 4-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 5-variant: [Ovqat nomi va tushunarli, xilma-xil miqdori]
-    
-                ☀️ **Tushlik:**
-                ♦ 1-variant: [Ovqat nomi, tushunarli, xilma-xil miqdori va salat turi]
-                ♦ 2-variant: [Ovqat nomi, tushunarli, xilma-xil miqdori va salat turi]
-                ♦ 3-variant: [Ovqat nomi, tushunarli, xilma-xil miqdori va salat turi]
-                ♦ 4-variant: [Ovqat nomi, tushunarli, xilma-xil miqdori va salat turi]
-                ♦ 5-variant: [Ovqat nomi, tushunarli, xilma-xil miqdori va salat turi]
-    
-                🌙 **Kechki ovqat:**
-                ♦ 1-variant: [Yengil ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 2-variant: [Yengil ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 3-variant: [Yengil ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 4-variant: [Yengil ovqat nomi va tushunarli, xilma-xil miqdori]
-                ♦ 5-variant: [Yengil ovqat nomi va tushunarli, xilma-xil miqdori]
-    
-                💡 **Foydali usul:** 
-                [Bu yerga 1 ta juda qisqa va aniq amaliy layfxak yozing]
-                """.trimIndent()
-            }
-            return baseMenuInstruction + specificMenuInstruction
-        } else {
-            return """
+        return """
                 Sizning vazifangiz: Foydalanuvchiga do'stona, g'amxo'r va malakali hamda oddiy til bilan tushuntiruvchi inson-diyetolog sifatida suhbat qurish.
-                Sizdan menyu so'ralmagan, shuning uchun hech qanday qat'iy formatlar, ro'yxatlar kerak emas! Huddi yaqin do'stdek odamdek gaplashing qisqa, sodda qilib javob bering. Oddiy savollariga javob bering yoki maslahat bering. 
+                Foydalanuvchi bilan huddi yaqin do'stdek gaplashing, qisqa va sodda javob bering. Ovqatlar yoki mashqlar bo'yicha savollariga javob bering yoki maslahat bering. 
                 Suhbatda ochiq va do'stona ohangdan (masalan: "Yaxshi ketyapsiz", "Hechqisi yo'q, davom etamiz", "Ajoyib!") foydalaning. Emojilarni o'z o'rnida ishlating.
                 
             """.trimIndent() + "\n" + userInfoSection + "\n" + """
                 
                 ESLATMA:
                 - Haqiqiy odamdek gaplashing.
-                - Har doim foydalanuvchiga hurmat bilan "Siz" deb murojaat qiling ("qildingiz", "qiling", "yaxshimisiz"). Aslo "sen" deb gapirmang!
+                - Har doim foydalanuvchiga hurmat bilan "Siz" deb murojaat qiling. Aslo "sen" deb gapirmang!
                 - Hech qanday "1, 2, 3" formatda yoki qattiq algoritmda javob bermang, qisqa odmi matn yozing!
-                - Juda chuqur ilmiy so'zlar, kaloriya va grammlar bilan foydalanuvchini charchatmang. Iloji boricha oddiy piyola, qoshiq kabi o'zbekona o'lchovlar ishlating!
+                - Juda chuqur ilmiy so'zlar, kaloriya va grammlar bilan foydalanuvchini charchatmang.
+                - Agar menyu so'ralsa, uni 5 xil variantda emas, balki bitta yoki ikkita tavsiya sifatida oddiy matn ko'rinishida yozing.
             """.trimIndent()
-        }
-    }
-
-    companion object {
-        private val ALL_QUESTIONS = emptyList<String>()
     }
 }

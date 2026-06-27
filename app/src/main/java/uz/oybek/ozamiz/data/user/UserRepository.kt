@@ -10,14 +10,19 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.getValueSafe
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.user.model.UserSortType
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.util.handleException
 import java.util.Date
@@ -32,14 +37,15 @@ object UserRepository {
         LocalUser.getUser()
     }
 
-    suspend fun uploadPremiumCheckData(userId: String, checkImageUri: Uri, isYearly: Boolean): DataWrapper<Unit> {
+    suspend fun uploadPremiumCheckData(
+        userId: String, checkImageUri: Uri, isYearly: Boolean
+    ): DataWrapper<Unit> {
         if (userId.isBlank()) return DataWrapper.Error("Foydalanuvchi ID si bo'sh")
         val userSpecificPaymentPath = "$PAYMENT_CHECK_PHOTOS_PATH/$userId" // <<< YENI YO'L
 
         return try {
             val uploadResult = uz.oybek.ozamiz.data.firebase.uploader.ImageUploader.uploadImage(
-                checkImageUri,
-                userSpecificPaymentPath
+                checkImageUri, userSpecificPaymentPath
             )
             if (uploadResult != null) {
                 val imageUrl = uploadResult
@@ -68,6 +74,14 @@ object UserRepository {
         Firebase.database.getReference("users")
     }
 
+    private val firestore: FirebaseFirestore by lazy {
+        Firebase.firestore
+    }
+
+    private val publicUsersCollection by lazy {
+        firestore.collection("public_users")
+    }
+
     val user: User get() = LocalUser.user
     private var isObserving = false
     private var userListener: ValueEventListener? = null
@@ -77,6 +91,10 @@ object UserRepository {
         if (user.valid && user.uid == currentUid) {
             val userMap = user.toMap()
             usersReference.child(user.uid).updateChildren(userMap)
+            
+        
+            val publicMap = user.toPublicMap()
+            publicUsersCollection.document(user.uid).set(publicMap)
         }
     }
 
@@ -101,8 +119,12 @@ object UserRepository {
             "startWeight" to startWeight,
             "activityLevel" to activityLevel,
             "targetCalories" to targetCalories,
+            "targetProtein" to targetProtein,
+            "targetFat" to targetFat,
+            "targetCarbs" to targetCarbs,
             "targetWaterMl" to targetWaterMl,
             "problems" to problems,
+            "goal" to goal,
 
             "streakInfo" to streakInfo,
             "lastWeightLogTimestamp" to lastWeightLogTimestamp,
@@ -115,16 +137,29 @@ object UserRepository {
         )
     }
 
+    private fun User.toPublicMap(): Map<String, Any?> {
+        return mapOf(
+            "uid" to uid,
+            "name" to name,
+            "avatarUrl" to avatarUrl,
+            "scorePoints" to scorePoints,
+            "lastSeenTime" to lastSeenTime,
+            "premium" to premium,
+            "streakInfo" to streakInfo
+        )
+    }
+
 
     fun removeLastSeenListener(listener: ValueEventListener) {
         usersReference.child(user.uid).child(User::lastSeenTime.name).removeEventListener(listener)
     }
 
-    fun setPremium(userId: String, premium: Boolean, approved: Boolean, isYearly: Boolean = false) { // Added 'isYearly'
+    fun setPremium(
+        userId: String, premium: Boolean, approved: Boolean, isYearly: Boolean = false
+    ) { // Added 'isYearly'
         if (userId.isEmpty()) return
         val updates = mutableMapOf<String, Any?>(
-            User::premium.name to premium,
-            User::paymentChecking.name to false
+            User::premium.name to premium, User::paymentChecking.name to false
         )
         if (approved) {
             updates[User::premiumDate.name] = ServerValue.TIMESTAMP
@@ -135,51 +170,12 @@ object UserRepository {
             updates["isPremiumYearly"] = false
         }
         usersReference.child(userId).updateChildren(updates)
-    }
-
-
-    fun observeLastSeen(userId: String, onChange: (time: Long) -> Unit): ValueEventListener? {
-        if (userId.isEmpty()) return null
-        val listener = object : ValueEventListener {
-            override fun onCancelled(error: DatabaseError) {
-
-            }
-
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val value = snapshot.getValue(Long::class.java)
-                if (value is Long) {
-                    onChange.invoke(value)
-                }
-            }
-        }
-        usersReference.child(userId).child(User::lastSeenTime.name).addValueEventListener(listener)
-        return listener
-    }
-
-    fun getLastSeen(userId: String, done: (time: Long) -> Unit) {
-        try {
-            usersReference.child(userId).child(User::lastSeenTime.name).get().addOnSuccessListener {
-                val time = it.getValue(Long::class.java) ?: System.currentTimeMillis()
-                done.invoke(time)
-            }.addOnFailureListener {
-                done.invoke(0L)
-            }
-        } catch (e: Exception) {
-            handleException(e)
-        }
-    }
-
-    fun getPhoneNumber(userId: String, done: (number: String) -> Unit) {
-        try {
-            usersReference.child(userId).child(User::phoneNumber.name).get().addOnSuccessListener {
-                val number = it.getValue(String::class.java) ?: ""
-                done.invoke(number)
-            }.addOnFailureListener {
-                done.invoke("")
-            }
-        } catch (e: Exception) {
-            handleException(e)
-        }
+        
+        // Sync with public_users
+        val publicUpdates = mapOf(
+            "premium" to premium
+        )
+        publicUsersCollection.document(userId).update(publicUpdates)
     }
 
     fun loadAllUsers(scope: CoroutineScope, done: (list: List<User>) -> Unit) {
@@ -268,14 +264,17 @@ object UserRepository {
             LocalUser.user = user
             LocalUser.saveUser()
             saveUserNetwork()
+            userListeners.forEach { it.invoke(user) }
         }
     }
 
     fun updateLastSeen() {
         if (user.valid) {
             LocalUser.user.lastSeenTime = System.currentTimeMillis()
+            val timestamp = ServerValue.TIMESTAMP
             usersReference.child(user.uid).child(User::lastSeenTime.name)
-                .setValue(ServerValue.TIMESTAMP)
+                .setValue(timestamp)
+            publicUsersCollection.document(user.uid).update(User::lastSeenTime.name, System.currentTimeMillis())
             LocalUser.saveUser()
         }
     }
@@ -362,7 +361,7 @@ object UserRepository {
 
     fun observeCurrentUser(result: (user: User?) -> Unit) {
         userListeners.add(result)
-        
+
         // Call immediately if local data is available
         if (user.valid) {
             result.invoke(user)
@@ -406,6 +405,8 @@ object UserRepository {
     fun addPoints(amount: Int) {
         if (user.valid.not() || amount == 0) return
         val ref = usersReference.child(user.uid).child(User::scorePoints.name)
+        val publicDocRef = publicUsersCollection.document(user.uid)
+        
         ref.runTransaction(object : com.google.firebase.database.Transaction.Handler {
             override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
                 val current = currentData.getValue(Int::class.java) ?: 0
@@ -420,16 +421,18 @@ object UserRepository {
             ) {
                 if (committed && error == null) {
                     val newTotal = snapshot?.getValue(Int::class.java) ?: maxOf(
-                        0,
-                        LocalUser.user.scorePoints + amount
+                        0, LocalUser.user.scorePoints + amount
                     )
                     LocalUser.user.scorePoints = newTotal
                     LocalUser.saveUser()
+                    
+                    // Sync with public_users
+                    publicDocRef.update(User::scorePoints.name, newTotal)
                 }
             }
         })
-
     }
+
     fun incrementUnreadMessages(userId: String) {
         if (userId.isEmpty()) return
         val ref = usersReference.child(userId).child(User::unreadMessages.name)
@@ -441,12 +444,40 @@ object UserRepository {
             }
 
             override fun onComplete(
-                error: DatabaseError?,
-                committed: Boolean,
-                snapshot: DataSnapshot?
+                error: DatabaseError?, committed: Boolean, snapshot: DataSnapshot?
             ) {
                 // Done
             }
         })
+    }
+
+    suspend fun getUsers(
+        limit: Int,
+        lastValue: Any? = null,
+        lastUserId: String? = null,
+        sortBy: UserSortType = UserSortType.MOST_POINTS
+    ): Result<List<User>> {
+        return try {
+            val queryField = when (sortBy) {
+                UserSortType.MOST_POINTS -> User::scorePoints.name
+                UserSortType.RECENT_ACTIVITY -> User::lastSeenTime.name
+                UserSortType.MOST_ACTIVE -> User::scorePoints.name
+            }
+
+            var query = publicUsersCollection.orderBy(queryField, Query.Direction.DESCENDING)
+
+            if (lastValue != null && lastUserId != null) {
+                val lastDocument = publicUsersCollection.document(lastUserId).get().await()
+                if (lastDocument.exists()) {
+                    query = query.startAfter(lastDocument)
+                }
+            }
+
+            val snapshot = query.limit(limit.toLong()).get().await()
+            val users = snapshot.documents.mapNotNull { it.toObject(User::class.java) }
+            Result.success(users)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

@@ -16,6 +16,7 @@ import com.google.android.material.color.MaterialColors
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.PremiumSheetBinding
 import uz.oybek.ozamiz.ui.utils.NumberFormattingUtils
+import uz.oybek.ozamiz.ui.utils.showToast
 
 class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -89,22 +90,29 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             binding.radioYearly.isChecked = !isMonthly
             binding.textMonthlyPrice.text = "${NumberFormattingUtils.formatPrice(monthlyPrice)} sum"
             binding.textYearlyPrice.text = "${NumberFormattingUtils.formatPrice(yearlyPrice)} sum"
+            
+            val yearlyMonthlyEquivalent = yearlyPrice / 12
+            binding.textYearlyMonthlyEquivalent.text = "${NumberFormattingUtils.formatPrice(yearlyMonthlyEquivalent)} sum / oy"
 
             showState(state.paymentChecking)
         }
 
         binding.cardMonthly.setOnClickListener {
-            val price = viewModel.uiState.value?.monthlyPrice ?: 29000L
-            viewModel.updateSelectedPrice(price)
+            val price = viewModel.uiState.value?.monthlyPrice ?: 0L
+            if (price > 0) viewModel.updateSelectedPrice(price)
         }
 
         binding.cardYearly.setOnClickListener {
-            val price = viewModel.uiState.value?.yearlyPrice ?: 149000L
-            viewModel.updateSelectedPrice(price)
+            val price = viewModel.uiState.value?.yearlyPrice ?: 0L
+            if (price > 0) viewModel.updateSelectedPrice(price)
         }
 
         binding.button.setOnClickListener {
-            val selectedPrice = viewModel.uiState.value?.selectedPrice ?: 29000L
+            val selectedPrice = viewModel.uiState.value?.selectedPrice ?: 0L
+            if (selectedPrice <= 0) {
+                showToast("Narx yuklanmadi")
+                return@setOnClickListener
+            }
             setFragmentResult(REQUEST_KEY, bundleOf(
                 RESULT_ACTION to "go_to_payment",
                 "selected_price" to selectedPrice,

@@ -21,22 +21,17 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
         showBottomSheet = true
     }
 
-    private val viewModel: CommunityViewModel by viewModels()
-    private lateinit var adapter: CommunityPostAdapter
-
-    override fun viewCreated(bind: FragmentCommunityBinding) {
-        setupToolbar()
-        setupRecyclerView()
-        setupSwipeRefresh()
-        observeViewModel()
-        observeNotifications()
-    }
-
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentCommunityBinding {
         return FragmentCommunityBinding.inflate(inflater, container, false)
+    }
+
+    override fun viewCreated(bind: FragmentCommunityBinding) {
+        setupToolbar()
+        setupViewPager()
+        observeNotifications()
     }
 
     private fun setupToolbar() {
@@ -48,74 +43,35 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
         }
     }
 
-    private fun setupRecyclerView() {
-        adapter = CommunityPostAdapter(
-            onLikeClick = { postId -> viewModel.toggleLike(postId) },
-            onUserClick = { userId, userName ->
-                val bundle = Bundle().apply {
-                    putString("userId", userId)
-                    putString("userName", userName)
-                }
-                findNavController().navigate(
-                    R.id.action_communityFragment_to_communityProfileFragment,
-                    bundle
-                )
-            },
-            onViewed = { postId -> viewModel.markViewed(postId) },
-            onDeleteClick = { post ->
-                androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle("O'chirish")
-                    .setMessage("Haqiqatan ham ushbu postni o'chirmoqchimisiz?")
-                    .setPositiveButton("Ha") { _, _ ->
-                        viewModel.deletePost(post.id)
-                    }
-                    .setNegativeButton("Yo'q", null)
-                    .show()
+    private fun setupViewPager() {
+        val adapter = CommunityTabAdapter(this)
+        binding.viewPager.adapter = adapter
+
+        com.google.android.material.tabs.TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Postlar"
+                1 -> "Foydalanuvchilar"
+                else -> null
             }
-        )
-
-        binding.rvPosts.adapter = adapter
-        binding.rvPosts.layoutManager = LinearLayoutManager(requireContext())
-
-        binding.rvPosts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val totalItemCount = layoutManager.itemCount
-                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-
-                if (!viewModel.state.value.isLoading && !viewModel.state.value.isPaging && !viewModel.state.value.hasReachedEnd) {
-                    if (totalItemCount <= lastVisibleItem + 2) {
-                        viewModel.loadPosts()
-                    }
-                }
-            }
-        })
-    }
-
-    private fun setupSwipeRefresh() {
-        binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refresh()
-        }
-    }
-
-    private fun observeViewModel() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.state.collect { state ->
-                binding.swipeRefresh.isRefreshing = state.isLoading
-                binding.progressBar.isVisible = state.isPaging
-
-                adapter.submitList(state.posts)
-
-                binding.tvEmpty.isVisible = !state.isLoading && state.posts.isEmpty()
-            }
-        }
+        }.attach()
     }
 
     private fun observeNotifications() {
         UserRepository.observeUnReadMessages { count ->
             binding.tvNotificationBadge.isVisible = count > 0
             binding.tvNotificationBadge.text = count.toString()
+        }
+    }
+
+    private inner class CommunityTabAdapter(fragment: androidx.fragment.app.Fragment) : 
+        androidx.viewpager2.adapter.FragmentStateAdapter(fragment) {
+        override fun getItemCount(): Int = 2
+        override fun createFragment(position: Int): androidx.fragment.app.Fragment {
+            return when (position) {
+                0 -> CommunityPostsFragment()
+                1 -> CommunityUsersFragment()
+                else -> throw IllegalStateException("Invalid position")
+            }
         }
     }
 }

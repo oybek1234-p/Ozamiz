@@ -37,9 +37,12 @@ class AdminPostManagerViewModel : ViewModel() {
 
     fun deletePost(postId: String) {
         viewModelScope.launch {
-            val result = CommunityPostRepository.deletePost(postId)
+            _isLoading.value = true
+            val result = CommunityPostRepository.adminDeletePost(postId)
             if (result.isSuccess) {
                 loadUnverifiedPosts()
+            } else {
+                _isLoading.value = false
             }
         }
     }

@@ -9,10 +9,6 @@ import uz.oybek.ozamiz.data.logs.model.WaterLog
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
 
-/**
- * Repository for water log operations.
- * Extends BaseLogRepository to eliminate code duplication.
- */
 object WaterLogRepository : BaseLogRepository<WaterLog>() {
 
     override fun getReference(userId: String, date: String): DatabaseReference {

@@ -227,7 +227,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
-                                android:text="Jami ozish"
+                                android:text="Jami ozgarish"
                                 android:textColor="?attr/colorOnSurface" />
 
                             <TextView
@@ -442,6 +442,7 @@
                                     app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
 
                                 <TextView
+                                    android:id="@+id/tvPhotoBeforeLabel"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"
@@ -474,6 +475,7 @@
                                     app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
 
                                 <TextView
+                                    android:id="@+id/tvPhotoAfterLabel"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center_horizontal"

@@ -105,7 +105,7 @@
                                     android:layout_marginStart="16dp"
                                     android:layout_weight="1"
                                     android:fontFamily="@font/roboto_bold"
-                                    android:text="Rasmga tushirish"
+                                    android:text="Ovqatni rasmga olish"
                                     android:textColor="?attr/colorOnPrimary"
                                     android:textSize="16sp" />
 

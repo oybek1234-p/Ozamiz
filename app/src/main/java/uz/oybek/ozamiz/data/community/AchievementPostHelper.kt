@@ -2,14 +2,23 @@ package uz.oybek.ozamiz.data.community
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.community.model.CommunityPost
+import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
+import uz.oybek.ozamiz.data.logs.model.ExerciseLog
+import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.data.utils.sortByRecent
 
 object AchievementPostHelper {
 
@@ -32,7 +41,12 @@ object AchievementPostHelper {
         return user.valid && !user.uid.isNullOrBlank()
     }
 
-    private fun buildPost(title: String, description: String): CommunityPost? {
+    private fun buildPost(
+        title: String,
+        description: String,
+        type: String = uz.oybek.ozamiz.data.community.model.PostType.MANUAL,
+        photos: List<String> = emptyList()
+    ): CommunityPost? {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return null
         val user = UserRepository.user
         return CommunityPost(
@@ -41,27 +55,37 @@ object AchievementPostHelper {
             userAvatarUrl = user.avatarUrl,
             title = title,
             description = description,
-            verified = false,
-            isVisible = false
+            type = type,
+            photos = photos,
+            verified = true,
+            isVisible = true,
+            isPremiumUser = user.premium
         )
     }
 
     fun onWaterGoalReached(consumedMl: Int, targetMl: Int) {
-        if (targetMl <= 0 || consumedMl < targetMl) return
+        if (targetMl !in 1..consumedMl) return
         if (!isUserVerified()) return
         if (hasPostedToday("water_goal")) return
         markPostedToday("water_goal")
 
         val liters = String.format("%.1f", targetMl / 1000f)
         val messages = listOf(
-            "💧 Bugun kunlik suv me'yorini to'ldirdi! $liters litr suv — bu katta yutuq!",
-            "🏆 $liters litr — maqsad bajarildi! Suv ichish odati sog'liq kaliti.",
-            "✅ Ajoyib! Bugun $liters litr suv ichib, kunlik normani to'ldirdi!",
-            "💪 $liters litr suv — kunlik me'yor to'liq bajarildi. Davom eting!"
+            "💧 Bugun kunlik suv normasi bajarildi — tana mazza qildi! Suv metobolizmni tezlashtirib, ozishga yordam beradi.",
+            "🌊 Maqsad bajarildi! Suv ichish ishtahani bo'g'ib, ortiqcha ovqatlanishdan saqlaydi.",
+            "✅ Kunlik norma to'ldirildi! Toza suv terini yoshartiradi va organizmni tozalaydi.",
+            "💪 Suv mushaklar ishlashi va quvvat uchun eng yaxshi energiya manbaidir. Davom eting!",
+            "💡 Bilasizmi? Suv ichish miya faoliyatini yaxshilaydi va charchoqni oladi. Ajoyib natija!",
+            "🏃 Bugun maqsadga erishildi! Suv bo'g'imlar sog'lig'i va harakatlanish uchun juda muhim.",
+            "✨ Tana yangilandi! Suv ichish yog'larni parchalash jarayonini sezilarli darajada tezlashtiradi.",
+            "🎯 Norma bajarildi. Har bir piyola suv sizni orzungizdagi qomatga yaqinlashtiradi!",
+            "🌟 Ajoyib natija! Suv ichish odati organizmdagi barcha tana a'zolari ishini muvozanatga soladi.",
+            "🔔 Davom eting! Sog'lom hayot — bu doimiy ravishda suv ichish demakdir!"
         )
         val post = buildPost(
-            title = "Suv me'yori bajarildi 💧",
-            description = messages.random()
+            title = "$liters litr suv ichildi! 💧",
+            description = messages.random(),
+            type = uz.oybek.ozamiz.data.community.model.PostType.WATER
         ) ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -70,23 +94,35 @@ object AchievementPostHelper {
     }
 
     fun onExerciseGoalReached(burntCalories: Int, targetCalories: Int) {
-        if (targetCalories <= 0 || burntCalories < targetCalories) return
+        if (targetCalories !in 1..burntCalories) return
         if (!isUserVerified()) return
         if (hasPostedToday("exercise_goal")) return
         markPostedToday("exercise_goal")
 
-        val messages = listOf(
-            "🔥 Bugun $burntCalories kaloriya yoqdi! Kunlik mashq maqsadi to'liq bajarildi!",
-            "💪 Ajoyib! $burntCalories kaloriya — bu haqiqiy iroda va shijoat!",
-            "🏃 $burntCalories kaloriya yoqib, bugungi mashq maqsadiga yetdi. Zo'r!",
-            "⚡ $burntCalories kaloriya yog' yoqildi — bugungi mashq rekord bo'ldi!"
-        )
-        val post = buildPost(
-            title = "Mashq maqsadi bajarildi 🏆",
-            description = messages.random()
-        ) ?: return
-
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val today = DateUtils.getFormattedDateString(java.util.Date(), "yyyy-MM-dd")
+        
         CoroutineScope(Dispatchers.IO).launch {
+            val result = ExerciseLogRepository.getLogsFlow(uid, today).first()
+            val logs = when(result) {
+                is DataWrapper.Success -> result.data
+                else -> emptyList()
+            }
+
+            val exerciseNames = logs.map { it.exerciseType }.distinct().take(3).joinToString(", ")
+
+            val fatBurnedGr = (burntCalories / 7.7).toInt()
+            val prefix = if (exerciseNames.isNotEmpty()) "$exerciseNames. " else ""
+            
+            val resultTitle = "$prefix$burntCalories kkal yoqildi! 🔥"
+            val description = "Bugun $fatBurnedGr gr yog' kamaydi. Ajoyib natija! 🏆"
+            
+            val post = buildPost(
+                title = resultTitle,
+                description = description,
+                type = uz.oybek.ozamiz.data.community.model.PostType.MANUAL
+            ) ?: return@launch
+            
             CommunityPostRepository.addPost(post)
         }
     }
@@ -96,38 +132,41 @@ object AchievementPostHelper {
         if (dropped <= 0.0) return
         if (!isUserVerified()) return
 
-        val droppedStr = String.format("%.1f", dropped)
-        val prevStr = String.format("%.1f", previousWeightKg)
-        val newStr = String.format("%.1f", newWeightKg)
-
-        val title = "-$droppedStr kg 📉"
-
-        val description = when {
-            dropped >= 5.0 -> listOf(
-                "🏆 Ulkan natija! $prevStr → $newStr kg. Bu hayot o'zgartiruvchi yutuq!",
-                "🔥 $prevStr dan $newStr kg'ga tushdi. Kuchli iroda va barqaror mehnat natijasidir!",
-                "💥 $prevStr → $newStr kg. $droppedStr kilogram — haqiqiy g'alaba!"
-            )
-            dropped >= 2.0 -> listOf(
-                "💪 $prevStr → $newStr kg. Harakatlar o'z natijasini berayapti, davom eting!",
-                "👏 $droppedStr kg kamaydi — $newStr kg. Sog'lom yo'l bilan oldinga!",
-                "✅ $prevStr dan $newStr kg — yaxshi natija! Muntazamlik ishlayapti."
-            )
-            dropped >= 1.0 -> listOf(
-                "🌟 $prevStr → $newStr kg. Har bir qadam maqsad sari katta qadam!",
-                "📊 $newStr kg — kun sayin yaxshilanmoqda. Shoshmasdan lekin aniq!",
-                "🎯 $droppedStr kg tushdi! $prevStr → $newStr kg. Yo'lda davom eting!"
-            )
-            else -> listOf(
-                "📉 $prevStr → $newStr kg. Kichik qadamlar ham katta yo'lning boshlang'ichidir!",
-                "💡 $newStr kg — natijalar ko'rinmoqda. Davom eting!",
-                "🔔 $prevStr → $newStr kg. Har gramm hisoba — oldinga!"
-            )
-        }.random()
-
-        val post = buildPost(title = title, description = description) ?: return
-
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        
         CoroutineScope(Dispatchers.IO).launch {
+            val logsSnapshot = com.google.firebase.Firebase.firestore.collection("users")
+                .document(uid)
+                .collection("weightLogs")
+                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .limit(2)
+                .get()
+                .await()
+            val logs = logsSnapshot.toObjects(WeightLog::class.java).sortByRecent { it.timestamp }
+            
+            val photos = if (logs.size >= 2) {
+                listOf(logs[1].photoUrl, logs[0].photoUrl).filter { it.isNotEmpty() }
+            } else if (logs.isNotEmpty()) {
+                listOf(logs[0].photoUrl).filter { it.isNotEmpty() }
+            } else {
+                emptyList()
+            }
+
+            val prevStr = if (previousWeightKg % 1.0 == 0.0) previousWeightKg.toInt().toString() else String.format("%.1f", previousWeightKg)
+            val newStr = if (newWeightKg % 1.0 == 0.0) newWeightKg.toInt().toString() else String.format("%.1f", newWeightKg)
+            val droppedStr = if (dropped % 1.0 == 0.0) dropped.toInt().toString() else String.format("%.1f", dropped)
+            
+            val title = "${droppedStr}kg vazn tashlandi! ${prevStr}kg dan ${newStr}kg ga."
+            val messages = listOf("Tabriklaymiz! 🎉", "Ajoyib natija! 🏆", "Qoyil! 💪")
+            val description = messages.random()
+
+            val post = buildPost(
+                title = title,
+                description = description,
+                type = uz.oybek.ozamiz.data.community.model.PostType.WEIGHT_LOSS,
+                photos = photos
+            ) ?: return@launch
+
             CommunityPostRepository.addPost(post)
         }
     }

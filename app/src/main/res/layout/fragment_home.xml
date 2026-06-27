@@ -31,26 +31,25 @@
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingStart="8dp"
+                    android:paddingStart="@dimen/dimen_18"
                     android:paddingEnd="4dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_coin"
-                        android:layout_width="@dimen/dimen_48"
-                        android:layout_height="@dimen/dimen_48"
-                        android:scaleType="centerCrop"
-                        app:lottie_autoPlay="false"
-                        app:lottie_loop="false"
-                        app:lottie_rawRes="@raw/coin_anim" />
+                    <TextView
+                        android:id="@+id/text_level_emoji_home"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"
+                        tools:text="🔥" />
 
                     <TextView
                         android:id="@+id/text_points_count"
                         style="@style/Headline2_16"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
                         android:fontFamily="@font/roboto_bold"
                         android:textColor="?colorOnSurface"
                         tools:text="0" />
@@ -112,7 +111,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
                         android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface"
+                        android:textColor="#FFA100"
                         tools:text="3" />
                 </LinearLayout>
 
@@ -185,7 +184,6 @@
                         android:id="@+id/card_snack"
                         layout="@layout/item_home_meal_card" />
                 </LinearLayout>
-
 
 
                 <LinearLayout
@@ -807,94 +805,6 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </com.google.android.material.card.MaterialCardView>
-
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_daily_health_tasks"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="8dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?selectableItemBackground"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="28dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:padding="20dp">
-
-                        <LinearLayout
-                            android:id="@+id/layout_emoji_container"
-                            android:layout_width="56dp"
-                            android:layout_height="56dp"
-                            android:background="@drawable/round_lay"
-                            android:backgroundTint="?attr/colorTertiaryContainer"
-                            android:gravity="center"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-                            <TextView
-                                android:id="@+id/text_health_tasks_emoji"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🎯"
-                                android:textSize="28sp" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:id="@+id/text_health_tasks_title"
-                            style="@style/TextAppearance.Material3.TitleMedium"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Kunlik vazifalar"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="18sp"
-                            app:layout_constraintEnd_toStartOf="@+id/btn_tasks_done"
-                            app:layout_constraintStart_toEndOf="@id/layout_emoji_container"
-                            app:layout_constraintTop_toTopOf="@id/layout_emoji_container" />
-
-                        <TextView
-                            android:id="@+id/text_health_tasks_status"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Hali vazifalar bajarilmadi"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:alpha="0.75"
-                            android:textSize="14sp"
-                            android:fontFamily="@font/roboto_medium"
-                            app:layout_constraintEnd_toEndOf="@id/text_health_tasks_title"
-                            app:layout_constraintStart_toStartOf="@id/text_health_tasks_title"
-                            app:layout_constraintTop_toBottomOf="@id/text_health_tasks_title" />
-
-                        <ImageView
-                            android:id="@+id/btn_tasks_done"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
-                            android:padding="6dp"
-                            android:background="@drawable/oval_back"
-                            android:backgroundTint="?attr/colorTertiary"
-                            android:alpha="1.0"
-                            app:tint="?attr/colorOnTertiary"
-                            android:src="@drawable/arrow_back"
-                            android:rotation="180"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </com.google.android.material.card.MaterialCardView>
-
 
 
             </LinearLayout>

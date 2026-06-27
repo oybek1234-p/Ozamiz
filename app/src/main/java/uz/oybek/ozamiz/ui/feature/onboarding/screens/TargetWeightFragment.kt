@@ -14,26 +14,33 @@ class TargetWeightFragment
     : OnBoardingChildFragment<
         FragmentTargetWeightBinding>() {
     override fun viewCreated(bind: FragmentTargetWeightBinding) {
-        bind.apply {
-            button.setOnClickListener {
-                val inputTarget = textInput
-                    .editText
-                    ?.text
-                    ?.toString()
-                    ?.toIntOrNull()
-                if (inputTarget != null && inputTarget > 40) {
-                    LocalUser.update {
-                        targetWeight = inputTarget.toDouble()
-                    }
-                    LocalUser.update {
-                        targetCalories = DietController.calculateTargetCalories(this)
-                        targetWaterMl = DietController.calculateTargetWaterMl(this.weight)
-                    }
-                    UserRepository.updateUser {}
-                    moveToNextScreen()
-                } else {
-                    textInput.error = getString(R.string.error_weight)
+        val user = LocalUser.user
+        val height = user.height.toDouble()
+
+        val (low, high) = DietController.getIdealWeight(height)
+        bind.tvIdealWeight.text = "Siz uchun ideal vazn: $low - $high kg"
+
+        user.targetWeight?.let {
+            bind.textInput.editText?.setText(it.toInt().toString())
+        }
+
+        bind.button.setOnClickListener {
+            val inputTarget = bind.textInput
+                .editText
+                ?.text
+                ?.toString()
+                ?.toDoubleOrNull()
+
+            if (inputTarget != null && inputTarget >= 40) {
+                LocalUser.update {
+                    targetWeight = inputTarget
+                    // Centralized calculation for calories, macros, and water
+                    DietController.updateTargetValues(this)
                 }
+                UserRepository.updateUser {}
+                moveToNextScreen()
+            } else {
+                bind.textInput.error = getString(R.string.error_weight)
             }
         }
     }
@@ -53,6 +60,4 @@ class TargetWeightFragment
             false
         )
     }
-
-
 }

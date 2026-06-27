@@ -178,10 +178,20 @@ class WeightProjectionView @JvmOverloads constructor(
         val bottomPadding = 80f
 
         startX = padding
-        startY = h * 0.35f
         midX = w * 0.55f
-        midY = h - bottomPadding - 20f
         endX = w - padding
+        
+        val isGain = targetWeight > currentWeight
+        
+        if (isGain) {
+            // Upward curve for weight gain
+            startY = h - bottomPadding - 60f
+            midY = h * 0.25f
+        } else {
+            // Downward curve for weight loss
+            startY = h * 0.25f
+            midY = h - bottomPadding - 60f
+        }
 
         mainPath.reset()
         mainPath.moveTo(startX, startY)
@@ -202,8 +212,8 @@ class WeightProjectionView @JvmOverloads constructor(
         dottedPath.quadTo(midX + (endX - midX) / 2, midY, endX, midY)
 
         fillPaint.shader = LinearGradient(
-            0f, 0f, 0f, h.toFloat(),
-            Colors.fillStart,
+            0f, midY, 0f, h - bottomPadding,
+            Colors.line,
             Color.TRANSPARENT,
             Shader.TileMode.CLAMP
         )

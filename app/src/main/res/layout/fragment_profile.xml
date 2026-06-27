@@ -118,6 +118,24 @@
                                 android:textSize="14sp"
                                 tools:text="Irodali" />
 
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:text="•"
+                                android:textColor="?attr/colorPrimary"
+                                android:alpha="0.5" />
+
+                            <TextView
+                                android:id="@+id/text_profile_points"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="14sp"
+                                tools:text="120 ball" />
+
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -324,7 +342,7 @@
                         android:background="?colorSurfaceContainerHighest" />
 
                     <include
-                        android:id="@+id/section_weight_history"
+                        android:id="@+id/section_calorie_settings"
                         layout="@layout/item_profile_section" />
 
                 </LinearLayout>
@@ -332,22 +350,7 @@
 
 
 
-            <!-- MENU BO'LIMI: Hamjamiyat -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_community"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
 
-                <include
-                    android:id="@+id/section_community"
-                    layout="@layout/item_profile_section" />
-
-            </com.google.android.material.card.MaterialCardView>
 
             <!-- MENU BO'LIMI 2: Yordam -->
             <com.google.android.material.card.MaterialCardView
@@ -381,40 +384,9 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- MENU BO'LIMI: Darsliklar -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
 
-                <include
-                    android:id="@+id/section_user_lessons"
-                    layout="@layout/item_profile_section" />
 
-            </com.google.android.material.card.MaterialCardView>
 
-            <!-- MENU BO'LIMI 3: Darsliklar (Admin) -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/container_admin_lessons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="?attr/colorSurface"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                tools:visibility="visible">
-
-                <include
-                    android:id="@+id/section_admin_lessons"
-                    layout="@layout/item_profile_section" />
-
-            </com.google.android.material.card.MaterialCardView>
 
             <!-- Admin bo'limi (Hidden) -->
             <com.google.android.material.card.MaterialCardView

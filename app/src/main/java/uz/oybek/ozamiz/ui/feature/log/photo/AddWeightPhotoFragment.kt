@@ -39,6 +39,17 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
             }
         }
 
+    private val cameraPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                openCamera()
+            } else {
+                showToast("Kameradan foydalanish uchun ruxsat berilmagan")
+            }
+        }
+
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentAddWeightPhotoBinding {
@@ -89,6 +100,15 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
     }
 
     private fun openCamera() {
+        if (androidx.core.content.ContextCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.CAMERA
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+            return
+        }
+
         val photoFile = java.io.File(
             requireContext().cacheDir,
             "temp_photo_${System.currentTimeMillis()}.jpg"

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_bottom_sheet_rounded"
@@ -13,10 +12,18 @@
         android:orientation="vertical"
         android:paddingBottom="32dp">
 
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            app:dividerColor="?attr/colorOutlineVariant"
+            app:dividerThickness="4dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="8dp">
@@ -28,50 +35,31 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Orqaga"
                 android:src="@drawable/close_ic"
-                app:tint="?attr/colorPrimary" />
+                app:tint="?attr/colorOnSurfaceVariant" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:text="Faollik tafsilotlari"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp" />
 
-            <ImageButton
-                android:id="@+id/btn_share"
+            <View
                 android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Ulashish"
-                android:src="@drawable/share_ic"
-                android:visibility="invisible"
-                app:tint="?attr/colorOnSurface" />
+                android:layout_height="48dp" />
         </LinearLayout>
 
-        <!-- Main Fire Icon Circle -->
         <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="24dp">
+            android:layout_gravity="center">
 
-            <ImageView
-                android:id="@+id/image_fire_main"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_gravity="center"
-                android:src="@drawable/fire_ic"
-                app:tint="@color/yellow" />
+                app:lottie_autoPlay="true"
+                app:lottie_rawRes="@raw/fire_streak"
+                app:lottie_repeatMode="restart" />
         </FrameLayout>
 
-        <!-- Main Count -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -82,18 +70,18 @@
                 android:fontFamily="@font/roboto_bold"
                 android:text="12"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="56sp" />
+                android:textSize="64sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/roboto_medium"
+                android:layout_gravity="bottom"
+                android:layout_marginStart="6dp"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/roboto_bold"
                 android:text="kun"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="20sp"
-                android:layout_gravity="bottom" />
+                android:textColor="?attr/colorPrimary"
+                android:textSize="22sp" />
         </LinearLayout>
 
         <!-- Subtitle -->
@@ -103,11 +91,11 @@
             android:layout_marginTop="4dp"
             android:fontFamily="@font/roboto_medium"
             android:gravity="center"
+            android:letterSpacing="0.08"
             android:text="FAOLLIK"
             android:textAllCaps="true"
             android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="13sp"
-            android:letterSpacing="0.08" />
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/text_motivation_chip"
@@ -145,8 +133,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <LinearLayout
@@ -159,10 +147,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_regular"
+                            android:letterSpacing="0.04"
                             android:text="FAOL KUNLAR"
                             android:textAllCaps="true"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:letterSpacing="0.04"
                             android:textSize="15sp" />
 
                         <TextView
@@ -192,8 +180,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:padding="16dp">
 
                     <LinearLayout
@@ -206,10 +194,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_regular"
+                            android:letterSpacing="0.04"
                             android:text="ENG YAXSHI"
                             android:textAllCaps="true"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:letterSpacing="0.04"
                             android:textSize="15sp" />
 
                         <TextView
@@ -254,10 +242,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto_regular"
+                        android:letterSpacing="0.04"
                         android:text="JAMI FAOL HAFTALAR"
                         android:textAllCaps="true"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        android:letterSpacing="0.04"
                         android:textSize="15sp" />
 
                     <TextView
@@ -323,36 +311,42 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
             <include
                 android:id="@+id/day_2"
                 layout="@layout/item_streak_day"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
             <include
                 android:id="@+id/day_3"
                 layout="@layout/item_streak_day"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
             <include
                 android:id="@+id/day_4"
                 layout="@layout/item_streak_day"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
             <include
                 android:id="@+id/day_5"
                 layout="@layout/item_streak_day"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
             <include
                 android:id="@+id/day_6"
                 layout="@layout/item_streak_day"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
+
             <include
                 android:id="@+id/day_7"
                 layout="@layout/item_streak_day"
@@ -369,9 +363,9 @@
             android:layout_height="56dp"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="32dp"
+            android:fontFamily="@font/roboto_medium"
             android:text="Davom etish"
             android:textSize="16sp"
-            android:fontFamily="@font/roboto_medium"
             app:cornerRadius="28dp" />
 
     </LinearLayout>

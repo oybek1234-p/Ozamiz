@@ -28,21 +28,25 @@ object WeightLogRepository {
     suspend fun add(
         userId: String,
         weightKg: Double,
-        photoUri: Uri?
+        photoUri: Uri?,
+        shouldBlur: Boolean = false
     ): DataWrapper<WeightLog> {
         val uploadedUrl = if (photoUri != null) {
-            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog).toString()
+            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog, shouldBlurFaces = shouldBlur).toString()
         } else {
             ""
         }
 
         val logId = generateKey()
 
+        val currentTime = System.currentTimeMillis()
         val newLog = WeightLog(
             logId = logId,
             userId = userId,
             weightKg = weightKg,
-            photoUrl = uploadedUrl
+            photoUrl = uploadedUrl,
+            timestamp = com.google.firebase.firestore.FieldValue.serverTimestamp(),
+            timestampLong = currentTime
         )
 
         return try {
@@ -65,10 +69,14 @@ object WeightLogRepository {
             val registration = Firebase.firestore.collection(COLLECTION_USERS)
                 .document(userId)
                 .collection(COLLECTION_WEIGHT_LOGS)
-                .orderBy("timestampLong", Query.Direction.DESCENDING)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
-                        trySend(DataWrapper.Error(error.message))
+                        if (error.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED) {
+                            close()
+                        } else {
+                            trySend(DataWrapper.Error(error.message))
+                        }
                         return@addSnapshotListener
                     }
 

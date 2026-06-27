@@ -67,6 +67,7 @@ class SearchFoodViewModel : ViewModel() {
                 foodLog = foodLog,
                 date = date
             )
+            uz.oybek.ozamiz.data.community.CommunityShareHelper.shareFoodLogIfNeeded(foodLog)
         }
     }
 }

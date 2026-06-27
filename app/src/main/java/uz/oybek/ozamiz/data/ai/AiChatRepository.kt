@@ -34,39 +34,6 @@ object AiChatRepository {
         chatHistory.clear()
     }
 
-    suspend fun getMealTips(
-        summary: DailySummary,
-        logs: DailyLogs,
-        user: User
-    ): List<String> = withContext(Dispatchers.IO) {
-        try {
-            val foodLogs = logs.foodLogs?.values?.joinToString(", ") { it.description } ?: ""
-            val prompt = FoodAnalyzerConfig.buildMealTipsPrompt(
-                summary = summary.consumedCalories.toString(),
-                foodLogs = foodLogs,
-                waterMl = summary.consumedWaterMl,
-                burnedCalories = summary.burnedCalories,
-                targetCalories = user.targetCalories,
-                targetWeight = user.targetWeight
-            )
-
-            val tipsModel = Firebase.ai.generativeModel(
-                modelName = FoodAnalyzerConfig.MODEL_NAME,
-                systemInstruction = content { text(FoodAnalyzerConfig.MEAL_TIPS_INSTRUCTION) }
-            )
-
-            val response = tipsModel.generateContent(prompt)
-            val text = response.text ?: ""
-
-            text.split("\n")
-                .map { it.trim().removePrefix("•").trim() }
-                .filter { it.isNotBlank() }
-                .take(5)
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
     suspend fun sendMessage(
         message: String,
         systemInstruction: String

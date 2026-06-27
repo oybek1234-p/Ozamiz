@@ -61,7 +61,7 @@ class TasksFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     binding.apply {
-                        tvLevelName.text = state.currentLevel.name
+                        tvLevelName.text = "${state.currentLevel.emoji} ${state.currentLevel.name}"
                         val totalPointsFormatted = String.format("%,d", state.currentPoints)
                         tvTotalPoints.text = "💎 $totalPointsFormatted"
                         
@@ -69,7 +69,7 @@ class TasksFragment : Fragment() {
                         levelProgress.progress = (state.levelProgress * 100).toInt()
                         
                         if (state.nextLevel != null) {
-                            tvNextLevelInfo.text = "Keyingi daraja: ${state.nextLevel.minPoints} ball"
+                            tvNextLevelInfo.text = "Keyingi daraja: ${state.nextLevel.requiredPoints} ball"
                         } else {
                             tvNextLevelInfo.text = "Max Level"
                         }

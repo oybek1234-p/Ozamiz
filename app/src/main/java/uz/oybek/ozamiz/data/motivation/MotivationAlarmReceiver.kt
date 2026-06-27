@@ -7,7 +7,6 @@ import android.content.Intent
 class MotivationAlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
-        // On boot completed, reschedule all alarms
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
             MotivationAlarmScheduler.scheduleAll(context)
             return
@@ -19,8 +18,6 @@ class MotivationAlarmReceiver : BroadcastReceiver() {
             val notificationManager = MotivationNotificationManager(context)
             notificationManager.showMotivationNotification(message)
         }
-
-        // Reschedule all alarms (exact alarms are one-shot, so must reschedule)
         MotivationAlarmScheduler.scheduleAll(context, force = true)
     }
 }

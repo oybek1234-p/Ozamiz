@@ -80,15 +80,6 @@
                             android:textColor="?attr/colorOnSurface"
                             tools:text="🔥 Yog' yoqilyapti" />
 
-                        <TextView
-                            android:id="@+id/text_limit_subtitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:fontFamily="@font/roboto_medium"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="14sp"
-                            tools:text="Boshqa ovqat yemang, ortiqchasi yog' yoqishni to'xtatadi" />
                     </LinearLayout>
 
                     <ImageView

@@ -4,6 +4,7 @@ import androidx.core.net.toUri
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.database.ServerValue
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -46,38 +47,8 @@ object FoodLogRepository {
         }.flow
     }
 
-    fun getLatestFoodLog(date: Date): Flow<FoodLog?> = callbackFlow {
-        val userId = currentUserId
-        if (userId == null) {
-            close()
-            return@callbackFlow
-        }
-        val dateStr = date.dateApiFormat()
-        val query = FirebasePaths
-            .foodLogsReference(userId, dateStr)
-            .orderByChild(FirebaseConstants.TIMESTAMP)
-            .limitToLast(1)
-
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val log = snapshot.children.firstOrNull()?.getValue(FoodLog::class.java)
-                trySend(log)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
-            }
-        }
-        query.addValueEventListener(listener)
-        awaitClose { query.removeEventListener(listener) }
-    }
-
     fun getLatestLogs(date: Date, limit: Int = 2): Flow<List<FoodLog>> = callbackFlow {
         val userId = currentUserId
-        if (userId == null) {
-            close()
-            return@callbackFlow
-        }
         val dateStr = date.dateApiFormat()
         val query = FirebasePaths
             .foodLogsReference(userId, dateStr)
@@ -92,7 +63,7 @@ object FoodLogRepository {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                trySend(emptyList())
             }
         }
         query.addValueEventListener(listener)
@@ -101,11 +72,6 @@ object FoodLogRepository {
 
     fun getAllLogs(date: Date): Flow<List<FoodLog>> = callbackFlow {
         val userId = currentUserId
-        if (userId == null) {
-            trySend(emptyList())
-            close()
-            return@callbackFlow
-        }
         val dateStr = date.dateApiFormat()
         val query = FirebasePaths
             .foodLogsReference(userId, dateStr)
@@ -117,7 +83,11 @@ object FoodLogRepository {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                if (error.code == DatabaseError.PERMISSION_DENIED) {
+                    close()
+                } else {
+                    close(error.toException())
+                }
             }
         }
         query.addValueEventListener(listener)
@@ -134,6 +104,7 @@ object FoodLogRepository {
                 .await()
                 .getValue(FoodLog::class.java)
         } catch (e: Exception) {
+            com.google.firebase.Firebase.crashlytics.recordException(e)
             null
         }
     }
@@ -160,7 +131,9 @@ object FoodLogRepository {
                     .child(FoodLog::photoUrl.name)
                     .setValue(uploadImageUrl)
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            com.google.firebase.Firebase.crashlytics.recordException(e)
+            return false
         }
         
         DailySummaryRepository.updateSummary(
@@ -207,7 +180,8 @@ object FoodLogRepository {
                 fatDelta = fatDelta
             )
             true
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            com.google.firebase.Firebase.crashlytics.recordException(e)
             false
         }
     }
@@ -240,7 +214,8 @@ object FoodLogRepository {
                 )
             }
             true
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            com.google.firebase.Firebase.crashlytics.recordException(e)
             false
         }
     }

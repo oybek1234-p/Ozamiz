@@ -3,6 +3,8 @@ package uz.oybek.ozamiz.ui.feature.premium
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 data class PremiumSheetUiState(
     val isLoading: Boolean = false,
@@ -31,16 +33,27 @@ class PremiumSheetViewModel : ViewModel() {
         val user = uz.oybek.ozamiz.data.user.UserRepository.user
         val isPaymentChecking = user.paymentChecking
 
-        PremiumUtil.loadPremiumPrices { monthly, yearly ->
-            _uiState.postValue(
-                _uiState.value?.copy(
-                    isLoading = false,
-                    monthlyPrice = monthly,
-                    yearlyPrice = yearly,
-                    selectedPrice = monthly,
-                    paymentChecking = isPaymentChecking
+        viewModelScope.launch {
+            val result = uz.oybek.ozamiz.data.config.ConfigRepository.getPremiumPrices()
+            if (result is uz.oybek.ozamiz.data.utils.DataWrapper.Success) {
+                val (monthly, yearly) = result.data
+                _uiState.postValue(
+                    _uiState.value?.copy(
+                        isLoading = false,
+                        monthlyPrice = monthly,
+                        yearlyPrice = yearly,
+                        selectedPrice = monthly,
+                        paymentChecking = isPaymentChecking
+                    )
                 )
-            )
+            } else {
+                _uiState.postValue(
+                    _uiState.value?.copy(
+                        isLoading = false,
+                        errorMessage = ""
+                    )
+                )
+            }
         }
     }
 }

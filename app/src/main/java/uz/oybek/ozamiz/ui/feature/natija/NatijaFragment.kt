@@ -73,9 +73,25 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                     // Prediction
                     bind.cardPrediction.isVisible = state.estimatedGoalDate != null
                     if (state.estimatedGoalDate != null) {
-                        val dateFormat = SimpleDateFormat("dd MMMM, yyyy", Locale("uz"))
-                        val dateStr = dateFormat.format(Date(state.estimatedGoalDate))
-                        bind.tvPredictionDate.text = "$dateStr"
+                        val targetDate = java.time.Instant.ofEpochMilli(state.estimatedGoalDate)
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDate()
+                        val today = java.time.LocalDate.now()
+                        val period = java.time.Period.between(today, targetDate)
+                        
+                        val months = period.months + (period.years * 12)
+                        val days = period.days
+                        
+                        val durationStr = StringBuilder()
+                        if (months > 0) durationStr.append("$months oy")
+                        if (days > 0) {
+                            if (durationStr.isNotEmpty()) durationStr.append(", ")
+                            durationStr.append("$days kun")
+                        }
+                        if (durationStr.isEmpty()) durationStr.append("Bugun")
+                        else durationStr.append("da")
+
+                        bind.tvPredictionDate.text = durationStr.toString()
                         bind.tvPredictionWeight.text = "${(state.goalWeight ?: 0.0).toInt()} kg"
                     }
 
@@ -90,7 +106,9 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                         // Before
                         if (hasBefore) {
                             bind.layoutPhotoBefore.isVisible = true
-                             Glide.with(this@NatijaFragment)
+                            bind.tvPhotoBeforeLabel.text = "Oldin"
+
+                            Glide.with(this@NatijaFragment)
                                 .load(state.photoBefore)
                                 .placeholder(R.color.grey_line)
                                 .into(bind.imgPhotoBefore)
@@ -108,6 +126,8 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                         // After
                         if (hasAfter) {
                             bind.layoutPhotoAfter.isVisible = true
+                            bind.tvPhotoAfterLabel.text = "Hozir"
+
                             Glide.with(this@NatijaFragment)
                                 .load(state.photoAfter)
                                 .placeholder(R.color.grey_line)
@@ -169,10 +189,6 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
         val diff = state.weightDiff
         val diffText = if (diff > 0) "+${String.format("%.1f", diff)}" else String.format("%.1f", diff)
         bind.tvWeightDiff.text = "$diffText kg"
-
-        val diffColor = if (diff <= 0) Color.parseColor("#4CAF50") else Color.parseColor("#F44336")
-        bind.tvWeightDiff.setTextColor(diffColor)
-        
         updateBmi(bind, state)
     }
 

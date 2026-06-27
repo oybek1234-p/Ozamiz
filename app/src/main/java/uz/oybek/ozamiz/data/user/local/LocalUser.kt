@@ -37,7 +37,8 @@ object LocalUser {
                 json,
                 User::class.java
             )
-        } finally {
+        } catch (e: Exception) {
+            User()
         }
         _userLive.postVal(user)
     }

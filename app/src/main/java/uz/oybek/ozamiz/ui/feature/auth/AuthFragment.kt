@@ -123,8 +123,9 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
                 } catch (e: IntentSender.SendIntentException) {
                     showToast(e.message ?: "")
                 }
-            }?.addOnFailureListener {
-                showToast(it.message ?: "")
+            }?.addOnFailureListener { e ->
+                showToast("Google One Tap error: ${e.localizedMessage}")
+                android.util.Log.e("AuthFragment", "One Tap sign in failed", e)
             }
         }
     }
@@ -158,10 +159,13 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
         if (activity == null) return
         oneTapClient = Identity.getSignInClient(requireActivity())
 
+        val clientId = getString(R.string.your_web_client_id)
         signInRequest = BeginSignInRequest.builder().setGoogleIdTokenRequestOptions(
-            BeginSignInRequest.GoogleIdTokenRequestOptions.builder().setSupported(true)
-                .setServerClientId("730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com")
-                .setFilterByAuthorizedAccounts(false).build()
+            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                .setSupported(true)
+                .setServerClientId(clientId)
+                .setFilterByAuthorizedAccounts(false)
+                .build()
         ).build()
     }
 

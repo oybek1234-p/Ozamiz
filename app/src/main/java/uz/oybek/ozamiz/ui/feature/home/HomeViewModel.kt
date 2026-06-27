@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.AppConstants
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.ai.AiMenuRepository
-import uz.oybek.ozamiz.data.course.LocalCourseRepository
+
 import uz.oybek.ozamiz.data.food.DietController
-import uz.oybek.ozamiz.data.health.local.LocalHealthTasks
+
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.logs.DailySummaryRepository
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
@@ -59,15 +59,12 @@ class HomeViewModel : ViewModel() {
         kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1)
     val showAppOnboardingEvent = _showAppOnboardingEvent.asSharedFlow()
 
-    private val _showHealthTaskOnboardingEvent =
-        kotlinx.coroutines.flow.MutableSharedFlow<String>(replay = 1)
-    val showHealthTaskOnboardingEvent = _showHealthTaskOnboardingEvent.asSharedFlow()
 
-    private val onboardingTaskQueue = mutableListOf<String>()
 
-    fun consumeOnboardingEvent() {
-        _showHealthTaskOnboardingEvent.resetReplayCache()
-    }
+
+
+    private val _showStreakSheetEvent = kotlinx.coroutines.flow.MutableSharedFlow<uz.oybek.ozamiz.data.streak.StreakInfo>()
+    val showStreakSheetEvent = _showStreakSheetEvent.asSharedFlow()
 
     private val glassVolume = AppConstants.Water.GLASS_VOLUME_ML
     private var previousWaterAmount = 0
@@ -101,21 +98,25 @@ class HomeViewModel : ViewModel() {
                 )
             val macros = DietController.calculateMacrosByPercent(targetCals)
 
-            _uiState.update {
-                it.copy(
-                    isInitialLoading = false,
-                    datesForScroller = initialDates,
-                    selectedDate = initialSelectedDate,
-                    caloriesTarget = targetCals,
-                    waterTarget = targetWater,
-                    proteinTarget = macros.protein,
-                    fatTarget = macros.fat,
-                    carbsTarget = macros.carbs,
-                    caloriesRemaining = targetCals,
-                    userPoints = initialUser.scorePoints,
-                    streakInfo = initialUser.streakInfo
-                )
-            }
+                val pTarget = if (initialUser.targetProtein > 0) initialUser.targetProtein else macros.protein
+                val fTarget = if (initialUser.targetFat > 0) initialUser.targetFat else macros.fat
+                val cTarget = if (initialUser.targetCarbs > 0) initialUser.targetCarbs else macros.carbs
+
+                _uiState.update {
+                    it.copy(
+                        isInitialLoading = false,
+                        datesForScroller = initialDates,
+                        selectedDate = initialSelectedDate,
+                        caloriesTarget = targetCals,
+                        waterTarget = targetWater,
+                        proteinTarget = pTarget,
+                        fatTarget = fTarget,
+                        carbsTarget = cTarget,
+                        caloriesRemaining = targetCals,
+                        userPoints = initialUser.scorePoints,
+                        streakInfo = initialUser.streakInfo
+                    )
+                }
         } else {
             _uiState.update {
                 it.copy(
@@ -125,15 +126,7 @@ class HomeViewModel : ViewModel() {
             }
         }
         initDailyTip()
-        initHealthTasks()
 
-        viewModelScope.launch {
-            try {
-                StreakRepository.updateStreak()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
 
         UserRepository.observeCurrentUser { user ->
             if (user != null && user.valid) {
@@ -152,6 +145,10 @@ class HomeViewModel : ViewModel() {
                     )
                 val macros = DietController.calculateMacrosByPercent(targetCals)
 
+                val pTarget = if (user.targetProtein > 0) user.targetProtein else macros.protein
+                val fTarget = if (user.targetFat > 0) user.targetFat else macros.fat
+                val cTarget = if (user.targetCarbs > 0) user.targetCarbs else macros.carbs
+
                 _uiState.update {
                     it.copy(
                         streakInfo = user.streakInfo,
@@ -159,9 +156,9 @@ class HomeViewModel : ViewModel() {
                         pointsJustAdded = if (added > 0) added else 0,
                         caloriesTarget = targetCals,
                         waterTarget = targetWater,
-                        proteinTarget = macros.protein,
-                        fatTarget = macros.fat,
-                        carbsTarget = macros.carbs,
+                        proteinTarget = pTarget,
+                        fatTarget = fTarget,
+                        carbsTarget = cTarget,
                         isInitialLoading = false
                     )
                 }
@@ -196,13 +193,7 @@ class HomeViewModel : ViewModel() {
             }
         }
 
-        LocalCourseRepository.levelsFlow.onEach { levels ->
-            _uiState.update { it.copy(courseLevels = levels) }
-        }.launchIn(viewModelScope)
 
-        LocalCourseRepository.activeLessonFlow.onEach { lesson ->
-            _uiState.update { it.copy(activeLesson = lesson) }
-        }.launchIn(viewModelScope)
 
         WeightLogRepository.getLogsFlow(user.uid).onEach { result ->
             if (result is DataWrapper.Success) {
@@ -262,7 +253,8 @@ class HomeViewModel : ViewModel() {
         when (summaryWrapper) {
             is DataWrapper.Success -> {
                 val summary = summaryWrapper.data
-                val macros = DietController.calculateMacrosByPercent(user.targetCalories)
+                val targetCals = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
+                val macros = DietController.calculateMacrosByPercent(targetCals)
 
                 val currentWater = summary.consumedWaterMl
                 val waterJustAddedEvent = isFirstLoadCompleted && currentWater > previousWaterAmount
@@ -306,10 +298,10 @@ class HomeViewModel : ViewModel() {
                         isInitialLoading = false,
                         isRefreshing = false,
                         selectedDate = date,
-                        caloriesRemaining = user.targetCalories - netCalories,
+                        caloriesRemaining = targetCals - netCalories,
                         caloriesConsumed = netCalories,
                         foodConsumed = currentFoodCalories,
-                        caloriesTarget = user.targetCalories,
+                        caloriesTarget = targetCals,
                         waterConsumed = currentWater,
                         waterTarget = user.targetWaterMl,
                         waterGlasses = calculateGlasses(currentWater, previousWaterAmount),
@@ -318,11 +310,11 @@ class HomeViewModel : ViewModel() {
                         exerciseBurnt = currentExerciseBurnt,
                         exerciseTarget = AppConstants.Exercise.DEFAULT_TARGET_CALORIES,
                         carbsConsumed = summary.consumedCarbs.roundToInt(),
-                        carbsTarget = macros.carbs,
                         proteinConsumed = summary.consumedProtein.roundToInt(),
-                        proteinTarget = macros.protein,
                         fatConsumed = summary.consumedFat.roundToInt(),
-                        fatTarget = macros.fat,
+                        proteinTarget = if (user.targetProtein > 0) user.targetProtein else macros.protein,
+                        fatTarget = if (user.targetFat > 0) user.targetFat else macros.fat,
+                        carbsTarget = if (user.targetCarbs > 0) user.targetCarbs else macros.carbs,
                         exerciseLogs = exerciseLogs.sortedByDescending { log ->
                             log.timestamp as? Long ?: 0L
                         },
@@ -333,8 +325,8 @@ class HomeViewModel : ViewModel() {
                         isProteinExceeded = summary.consumedProtein > macros.protein + 50,
                         isCarbsExceeded = summary.consumedCarbs > macros.carbs + 70,
                         isFatExceeded = summary.consumedFat > macros.fat + 30,
-                        isCalorieOptimal = netCalories >= user.targetCalories - 50 && netCalories <= user.targetCalories + 100,
-                        isCalorieExceeded = netCalories > user.targetCalories + 100,
+                        isCalorieOptimal = netCalories >= targetCals - 50 && netCalories <= targetCals + 100,
+                        isCalorieExceeded = netCalories > targetCals + 100,
                         lastFoodTimestamp = foodLogs.maxOfOrNull {
                             (it.timestamp as? Number)?.toLong() ?: 0L
                         },
@@ -386,6 +378,11 @@ class HomeViewModel : ViewModel() {
 
     fun onFoodAdded() {
         isFoodAdditionPending = true
+        StreakRepository.updateStreak { streakInfo ->
+            viewModelScope.launch {
+                _showStreakSheetEvent.emit(streakInfo)
+            }
+        }
         refresh()
     }
 
@@ -440,7 +437,11 @@ class HomeViewModel : ViewModel() {
         isWaterAdditionPending = true
         viewModelScope.launch {
             WaterLogRepository.add(WaterLog(amountMl = amount), date)
-            StreakRepository.updateStreak()
+            StreakRepository.updateStreak { streakInfo ->
+                viewModelScope.launch {
+                    _showStreakSheetEvent.emit(streakInfo)
+                }
+            }
             if (pointsToAdd > 0) {
                 UserRepository.addPoints(pointsToAdd)
             }
@@ -450,6 +451,11 @@ class HomeViewModel : ViewModel() {
 
     fun onExerciseAdded() {
         isExerciseAdditionPending = true
+        StreakRepository.updateStreak { streakInfo ->
+            viewModelScope.launch {
+                _showStreakSheetEvent.emit(streakInfo)
+            }
+        }
         refresh()
     }
 
@@ -495,14 +501,6 @@ class HomeViewModel : ViewModel() {
             appContext.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
         val isFirst = prefs.getBoolean("is_first_registration", false)
         val step = prefs.getInt("app_onboarding_step", 0)
-        if (isFirst || step == 0) {
-            viewModelScope.launch {
-                if (isFirst) {
-                    prefs.edit().putBoolean("is_first_registration", false).apply()
-                }
-                _showAppOnboardingEvent.emit(Unit)
-            }
-        }
     }
 
     fun onAppOnboardingPresented() {
@@ -549,65 +547,5 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    private fun initHealthTasks() {
-        updateHealthTasks()
-    }
 
-    private fun checkHealthTasksIntro() {
-        if (LocalHealthTasks.shouldShowDailyIntro()) {
-            val tasks = _uiState.value.dailyHealthTasks
-            if (tasks.isNotEmpty()) {
-                onboardingTaskQueue.clear()
-                onboardingTaskQueue.addAll(tasks.map { it.task.id })
-                showNextOnboardingTask()
-            }
-        }
-    }
-
-    fun showNextOnboardingTask() {
-        viewModelScope.launch {
-            if (onboardingTaskQueue.isNotEmpty()) {
-                val taskId = onboardingTaskQueue.removeAt(0)
-                delay(500)
-                _showHealthTaskOnboardingEvent.emit(taskId)
-            } else {
-                LocalHealthTasks.markDailyIntroAsDone()
-            }
-        }
-    }
-
-
-    private fun updateHealthTasks() {
-        val tasks = LocalHealthTasks.getTodayTasks()
-        val summary = LocalHealthTasks.getCompletionSummary()
-        _uiState.update {
-            it.copy(
-                dailyHealthTasks = emptyList(),
-                healthTasksSummary = summary
-            )
-        }
-    }
-
-    fun onHealthTaskToggled(taskId: String, isCompleted: Boolean) {
-        LocalHealthTasks.toggleTaskCompletion(taskId, isCompleted)
-        updateHealthTasks()
-
-        if (isCompleted) {
-            addPoints(10)
-        } else {
-        }
-    }
-
-    private fun addPoints(points: Int) {
-        val currentPoints = _uiState.value.userPoints
-        _uiState.update {
-            it.copy(
-                userPoints = currentPoints + points,
-                pointsJustAdded = points
-            )
-        }
-        viewModelScope.launch {
-            UserRepository.addPoints(points)
-        }
-    }
 }

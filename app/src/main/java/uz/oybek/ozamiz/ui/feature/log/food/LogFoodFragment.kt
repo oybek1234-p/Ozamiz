@@ -341,14 +341,17 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         if (prefs.getInt("app_onboarding_step", 0) == 1) {
             homeViewModel.onAppOnboardingComplete()
         }
-        navigate(R.id.analyzeResultFragment, Bundle().apply { putInt("id", result.id) })
+        navigate(R.id.analyzeResultFragment, Bundle().apply { 
+            putInt("id", result.id) 
+            putLong("timestamp", logDate.time)
+        })
     }
 
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            findNavController().navigate(R.id.foodCameraFragment)
+            findNavController().navigate(R.id.action_logFoodFragment_to_foodCameraFragment)
         } else {
             if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 showSettingsDialog()
@@ -380,7 +383,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            findNavController().navigate(R.id.foodCameraFragment)
+            findNavController().navigate(R.id.action_logFoodFragment_to_foodCameraFragment)
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }

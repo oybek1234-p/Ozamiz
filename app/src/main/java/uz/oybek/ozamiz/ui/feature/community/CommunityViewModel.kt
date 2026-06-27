@@ -10,22 +10,31 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter
 
 data class CommunityState(
     val posts: List<CommunityPost> = emptyList(),
     val isLoading: Boolean = false,
     val isPaging: Boolean = false,
     val hasReachedEnd: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val filter: CommunityPostFilter = uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
 )
 
 class CommunityViewModel : ViewModel() {
     private val _state = MutableStateFlow(CommunityState())
     val state: StateFlow<CommunityState> = _state
-    
+
     private var lastVisiblePostId: String? = null
 
     init {
+        loadPosts()
+    }
+
+    fun setFilter(filter: uz.oybek.ozamiz.data.community.model.CommunityPostFilter) {
+        if (_state.value.filter == filter) return
+        _state.update { it.copy(filter = filter, posts = emptyList(), hasReachedEnd = false) }
+        lastVisiblePostId = null
         loadPosts()
     }
 
@@ -42,20 +51,31 @@ class CommunityViewModel : ViewModel() {
         _state.update { it.copy(isLoading = isFirstLoad, isPaging = !isFirstLoad, error = null) }
 
         viewModelScope.launch {
-            val result = CommunityPostRepository.getPosts(limit = 8, lastVisiblePostId = lastVisiblePostId, verifiedOnly = true)
+            val result = CommunityPostRepository.getPosts(
+                limit = 8,
+                lastVisiblePostId = lastVisiblePostId,
+                verifiedOnly = true,
+                filter = _state.value.filter
+            )
             result.onSuccess { newPosts ->
                 if (newPosts.isEmpty()) {
-                    _state.update { it.copy(isLoading = false, isPaging = false, hasReachedEnd = true) }
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isPaging = false,
+                            hasReachedEnd = true
+                        )
+                    }
                 } else {
                     lastVisiblePostId = newPosts.last().id
                     val updatedPosts = if (isFirstLoad) newPosts else _state.value.posts + newPosts
-                    _state.update { 
+                    _state.update {
                         it.copy(
-                            posts = updatedPosts, 
-                            isLoading = false, 
+                            posts = updatedPosts,
+                            isLoading = false,
                             isPaging = false,
                             hasReachedEnd = newPosts.size < 8
-                        ) 
+                        )
                     }
                 }
             }.onFailure { e ->
@@ -67,7 +87,7 @@ class CommunityViewModel : ViewModel() {
     fun toggleLike(postId: String) {
         val user = uz.oybek.ozamiz.data.user.local.LocalUser.user
         if (user.uid.isEmpty()) return
-        
+
         viewModelScope.launch {
             val post = _state.value.posts.find { it.id == postId } ?: return@launch
             val result = CommunityPostRepository.toggleLike(postId, user.uid)
@@ -96,7 +116,9 @@ class CommunityViewModel : ViewModel() {
                         message = "Sizning postingizga layk bosdi",
                         timestamp = java.util.Date()
                     )
-                    uz.oybek.ozamiz.data.notification.NotificationRepository.sendNotification(notification)
+                    uz.oybek.ozamiz.data.notification.NotificationRepository.sendNotification(
+                        notification
+                    )
                 }
             }
         }
@@ -104,15 +126,23 @@ class CommunityViewModel : ViewModel() {
 
     fun deletePost(postId: String) {
         viewModelScope.launch {
-            val result = CommunityPostRepository.deletePost(postId)
+            val isAdmin = uz.oybek.ozamiz.data.user.UserRepository.user.admin
+            val result = if (isAdmin) {
+                CommunityPostRepository.adminDeletePost(postId)
+            } else {
+                CommunityPostRepository.deletePost(postId)
+            }
             result.onSuccess {
                 _state.update { currentState ->
                     val newPosts = currentState.posts.filter { it.id != postId }
                     currentState.copy(posts = newPosts)
                 }
+            }.onFailure { e ->
+                _state.update { it.copy(error = "O'chirishda xatolik: ${e.localizedMessage}") }
             }
         }
     }
+
     fun markViewed(postId: String) {
         val userId = Firebase.auth.currentUser?.uid ?: return
         viewModelScope.launch {

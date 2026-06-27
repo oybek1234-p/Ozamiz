@@ -62,20 +62,7 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
-        <action
-            android:id="@+id/action_profileFragment_to_adminLessonsFragment"
-            app:destination="@id/adminLessonsFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
-        <action
-            android:id="@+id/action_profileFragment_to_lessonsHomeFragment"
-            app:destination="@id/lessonsHomeFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
+
             
         <action
             android:id="@+id/action_profileFragment_to_adminUsersListFragment"
@@ -88,6 +75,14 @@
         <action
             android:id="@+id/action_profileFragment_to_adminPostManagerFragment"
             app:destination="@id/adminPostManagerFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+
+        <action
+            android:id="@+id/action_profileFragment_to_calorieSettingsFragment"
+            app:destination="@id/calorieSettingsFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
@@ -261,20 +256,10 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
-        <action
-            android:id="@+id/action_home_to_dailyTasksFragment"
-            app:destination="@id/dailyTasksFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
+
     </fragment>
 
-    <fragment
-        android:id="@+id/dailyTasksFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.home.DailyTasksFragment"
-        android:label="Bugungi vazifalar"
-        tools:layout="@layout/fragment_daily_tasks" />
+
 
     <fragment
         android:id="@+id/calorieInfoFragment"
@@ -337,6 +322,13 @@
         <action
             android:id="@+id/action_logFoodFragment_to_savedFoodsFragment"
             app:destination="@id/savedFoodsFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_logFoodFragment_to_foodCameraFragment"
+            app:destination="@id/foodCameraFragment"
             app:enterAnim="@anim/fragment_open_anim"
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
@@ -537,81 +529,7 @@
             app:argType="uz.oybek.ozamiz.data.menu.model.Menu" />
     </fragment>
 
-    <!-- Admin Lessons -->
-    <fragment
-        android:id="@+id/adminLessonsFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.lessons.admin.AdminLessonsFragment"
-        android:label="AdminLessonsFragment"
-        tools:layout="@layout/fragment_admin_lessons">
-        <action
-            android:id="@+id/action_adminLessonsFragment_to_adminTopicDetailFragment"
-            app:destination="@id/adminTopicDetailFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
-    </fragment>
 
-    <fragment
-        android:id="@+id/adminTopicDetailFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.lessons.admin.AdminTopicDetailFragment"
-        android:label="AdminTopicDetailFragment"
-        tools:layout="@layout/fragment_admin_topic_detail">
-        <argument
-            android:name="topicId"
-            app:argType="string" />
-        <argument
-            android:name="topicTitle"
-            app:argType="string" />
-    </fragment>
-
-    <!-- User-facing Lessons -->
-    <fragment
-        android:id="@+id/lessonsHomeFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.lessons.LessonsHomeFragment"
-        android:label="LessonsHomeFragment"
-        tools:layout="@layout/fragment_lessons_home">
-        <action
-            android:id="@+id/action_lessonsHomeFragment_to_topicViewerFragment"
-            app:destination="@id/topicViewerFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/topicViewerFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.lessons.TopicViewerFragment"
-        android:label="TopicViewerFragment"
-        tools:layout="@layout/fragment_topic_viewer">
-        <argument
-            android:name="topicId"
-            app:argType="string" />
-        <argument
-            android:name="topicTitle"
-            app:argType="string" />
-        <action
-            android:id="@+id/action_topicViewerFragment_to_quizFragment"
-            app:destination="@id/lessonQuizFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/lessonQuizFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.lessons.QuizFragment"
-        android:label="QuizFragment"
-        tools:layout="@layout/fragment_lesson_quiz">
-        <argument
-            android:name="topicId"
-            app:argType="string" />
-        <argument
-            android:name="topicTitle"
-            app:argType="string" />
-    </fragment>
 
     <fragment
         android:id="@+id/communityFragment"
@@ -705,5 +623,11 @@
             android:name="tips"
             app:argType="string[]" />
     </fragment>
+
+    <fragment
+        android:id="@+id/calorieSettingsFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.profile.CalorieSettingsFragment"
+        android:label="Hisoblagich"
+        tools:layout="@layout/fragment_calorie_settings" />
 
 </navigation>

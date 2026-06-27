@@ -1,18 +1,17 @@
 package uz.oybek.ozamiz.data.community
 
-import android.annotation.SuppressLint
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.community.model.CommunityPost
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter
+import uz.oybek.ozamiz.data.community.model.PostType
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 
 object CommunityPostRepository {
-    @SuppressLint("StaticFieldLeak")
+
     private val db = FirebaseFirestore.getInstance()
     private val communityCollection = db.collection(FirebasePaths.Firestore.COMMUNITY_POSTS)
-    private val documentCache = mutableMapOf<String, com.google.firebase.firestore.DocumentSnapshot>()
 
     suspend fun addPost(post: CommunityPost): Result<Unit> {
         return try {
@@ -34,31 +33,62 @@ object CommunityPostRepository {
         }
     }
 
+    suspend fun adminDeletePost(postId: String): Result<Unit> {
+        return try {
+            communityCollection.document(postId).update("verified", false).await()
+            Result.success(Unit)
+        } catch (_: Exception) {
+            try {
+                communityCollection.document(postId).delete().await()
+                Result.success(Unit)
+            } catch (e2: Exception) {
+                Result.failure(e2)
+            }
+        }
+    }
+
     suspend fun getPosts(
         limit: Long = 8,
         lastVisiblePostId: String? = null,
-        verifiedOnly: Boolean = true
+        verifiedOnly: Boolean = true,
+        filter: CommunityPostFilter = CommunityPostFilter.ALL
     ): Result<List<CommunityPost>> {
         return try {
-            var query = communityCollection.orderBy("timestamp", Query.Direction.DESCENDING).limit(limit)
+            var query: Query = communityCollection
+                .orderBy("timestamp", Query.Direction.DESCENDING)
 
             if (verifiedOnly) {
-                query = query.whereEqualTo("verified", true).whereEqualTo("isVisible", true)
+                query = query.whereEqualTo("verified", true)
             }
+            when (filter) {
+                CommunityPostFilter.FOOD -> {
+                    query = query.whereEqualTo(
+                        "type",
+                        PostType.FOOD
+                    )
+                        .orderBy("healthScore", Query.Direction.DESCENDING)
+                }
+
+                CommunityPostFilter.WEIGHT_LOSS -> {
+                    query = query.whereEqualTo(
+                        "type",
+                        PostType.WEIGHT_LOSS
+                    )
+                }
+
+                else -> {}
+            }
+            query = query.limit(limit)
 
             if (lastVisiblePostId != null) {
-                val lastDocument = documentCache[lastVisiblePostId] 
-                    ?: communityCollection.document(lastVisiblePostId).get().await()
+                val lastDocument = communityCollection.document(lastVisiblePostId).get().await()
                 if (lastDocument.exists()) {
                     query = query.startAfter(lastDocument)
                 }
             }
 
             val snapshot = query.get().await()
-            val posts = snapshot.documents.mapNotNull { 
-                documentCache[it.id] = it
-                it.toObject(CommunityPost::class.java) 
-            }
+            val posts = snapshot.documents.mapNotNull { it.toObject(CommunityPost::class.java) }
             Result.success(posts)
         } catch (e: Exception) {
             Result.failure(e)
@@ -75,18 +105,14 @@ object CommunityPostRepository {
                 .orderBy("timestamp", Query.Direction.DESCENDING).limit(limit)
 
             if (lastVisiblePostId != null) {
-                val lastDocument = documentCache[lastVisiblePostId] 
-                    ?: communityCollection.document(lastVisiblePostId).get().await()
+                val lastDocument = communityCollection.document(lastVisiblePostId).get().await()
                 if (lastDocument.exists()) {
                     query = query.startAfter(lastDocument)
                 }
             }
 
             val snapshot = query.get().await()
-            val posts = snapshot.documents.mapNotNull { 
-                documentCache[it.id] = it
-                it.toObject(CommunityPost::class.java) 
-            }
+            val posts = snapshot.documents.mapNotNull { it.toObject(CommunityPost::class.java) }
             Result.success(posts)
         } catch (e: Exception) {
             Result.failure(e)
@@ -98,8 +124,9 @@ object CommunityPostRepository {
             val docRef = communityCollection.document(postId)
             return db.runTransaction { transaction ->
                 val snapshot = transaction.get(docRef)
-                val post = snapshot.toObject(CommunityPost::class.java) ?: return@runTransaction false
-                
+                val post =
+                    snapshot.toObject(CommunityPost::class.java) ?: return@runTransaction false
+
                 val likedBy = post.likedBy.toMutableList()
                 val isLiked = if (likedBy.contains(userId)) {
                     likedBy.remove(userId)
@@ -108,7 +135,7 @@ object CommunityPostRepository {
                     likedBy.add(userId)
                     true
                 }
-                
+
                 transaction.update(docRef, "likedBy", likedBy)
                 transaction.update(docRef, "likesCount", likedBy.size)
                 isLiked
@@ -132,8 +159,7 @@ object CommunityPostRepository {
                     transaction.update(docRef, "viewsCount", viewedBy.size)
                 }
             }.await()
-        } catch (e: Exception) {
-            // Ignore view error
+        } catch (_: Exception) {
         }
     }
 
@@ -153,19 +179,9 @@ object CommunityPostRepository {
         return try {
             communityCollection.document(postId).update(
                 mapOf(
-                    "verified" to true,
-                    "isVisible" to visible
+                    "verified" to true
                 )
             ).await()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun setPostVisibility(postId: String, visible: Boolean): Result<Unit> {
-        return try {
-            communityCollection.document(postId).update("isVisible", visible).await()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

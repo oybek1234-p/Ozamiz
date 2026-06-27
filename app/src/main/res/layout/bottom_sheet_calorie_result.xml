@@ -320,9 +320,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-
-
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
@@ -388,5 +385,14 @@
 
         </FrameLayout>
     </LinearLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/confetti_animation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/confeti_effect"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

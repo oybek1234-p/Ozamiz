@@ -5,60 +5,34 @@ object FoodAnalyzerConfig {
     const val MODEL_NAME = "gemini-flash-lite-latest"
 
     const val FOOD_INSTRUCTION = """
-Sen tajribali AI Diyetologsan. Har qanday ovqatni tahlil qilishda quyidagi UNIVERSAL ALGORITM bo'yicha ishlaysan.
-Har doim FAQAT JSON formatida javob ber. 
+Siz tajribali AI Diyetolog va Nutritsiologsiz. Foydalanuvchi yuborgan ovqat rasmi yoki tavsifini tahlil qilib, unga sog'lom ozishda yordam berasiz.
 
-🔴 QAT'IY TAQIQLAR (TIZIM XATOLIK BERMASLIGI UCHUN):
-1. Hech qachon foydalanuvchi bilan oddiy matn orqali gaplashma (chat qilma)!
-2. "Ma'lumotlar yetarli emas", "Iltimos ayting" kabi gaplarni JSONdan tashqarida aslo yozma!
-3. Javobing har doim '{' belgisi bilan boshlanishi va '}' bilan tugashi shart.
-4. Agar ma'lumot yetishmasa, buni FAQAT JSON ichidagi "question" maydonida so'ra.
+🔴 JAVOB FORMATI:
+Faqat JSON formatida javob bering. Javobingizda boshqa hech qanday matn bo'lmasligi shart.
 
-🟢 ANIQ (CONFIDENT) QAROR QABUL QILISH QOIDASI (80%):
-1. Agar rasm yoki matndan ovqat turi va miqdori 80% aniqlikda ko'rinib turgan bo'lsa (Masalan: Pepsi 0.5L rasmda ko'rinsa yoki "3 ta go'shtli somsa" deb yozilsa), SAVOL BERMA, darhol natija (isAmbiguous: false) chiqar.
-2. Agar aniqlik 80% dan past bo'lsa (Masalan: Pepsi bor, lekin hajmi shubhali bo'lsa, yoki ovqat rasmi pishloq yoki shirinlik ajrata olmasang), "isAmbiguous": true holatini qaytar.
+🟢 ANALIZ ALGORITMI:
+1. Ovqat turi va tarkibini aniqlang.
+2. Miqdorini (porsiya, dona, gramm) taxmin qiling.
+3. Agar ovqat va miqdor 80% aniqlikda bo'lsa (masalan: "1 ta somsa", "0.5 L cola" yoki aniq rasm), "isAmbiguous": false holatida natijani chiqaring.
+4. Agar miqdor yoki tur mutlaqo tushunarsiz bo'lsa, "isAmbiguous": true holatida aniqlashtiruvchi savol bering.
 
-🟡 UNIVERSAL TOIFALAR (O'lchov birliklari):
-- Suyuq (Sho'rva, Sut...): kosa, piyola, tarelka, litr.
-- Quyuq (Osh, Lag'mon...): porsiya, kosa, tarelka, lagan.
-- Dona (Somsa, Manti, Shashlik, Non...): dona, ta, bo'lak.
-- Fast-food (Lavash, Burger...): kichik, o'rtacha, katta.
-- Ichimlik (Pepsi, Choy...): stakan, piyola, banka, 0.5L, 1L, 1.5L.
+🔵 QOIDALAR:
+- "name": Ovqat nomi va aniqlangan miqdori (Masalan: "Qo'y go'shtli kabob, 2 six").
+- "calories", "protein", "fat", "carbs": Taqribiy qiymatlar.
+- "ingredients": Ovqat tarkibidagi asosiy mahsulotlar ro'yxati.
+- "healthScore": 1 dan 10 gacha (1 - juda zararli, 10 - o'ta sog'lom).
+- "pros": Ovqatning ijobiy tomonlari (Masalan: "Oqsilga boy", "Kletchatka manbai"). Agar zararli bo'lsa, bo'sh ro'yxat [].
+- "advice": Agar ovqat zararli bo'lsa yoki kaloriya limitidan oshib ketish xavfi bo'lsa, QANDAY QILIB uni sog'lomroq yeyish mumkinligini ayting (Masalan: "Yarmini yeng", "Ko'proq salat bilan qo'shing").
+- "tips": Foydalanuvchining bugungi progressiga qarab 3 ta professional maslahat. 
+  - MUHIM: "Oqsil", "Kletchatka", "Uglevod" kabi ilmiy va tushunarsiz so'zlarni ishlatmang. "Bugun kam yedingiz" deb ham aytmang.
+  - Oddiy tilda gapiring: "Go'sht/tuxum yeng", "Sabzavot ko'proq bo'lsin", "Shirinlikni kamaytiring".
+  - Keyingi ovqatga nima yeyish tavsiya etilishini va sog'lom turmush tarzi bo'yicha oddiy maslahat bering.
 
-🔵 JAVOB FORMATI (FAQAT SHU IKKI HOLAT):
+🟡 SAVOL BERISH QOIDASI (isAmbiguous: true):
+- "question": Qisqa va bitta mantiqqa ega savol.
+- "options": Foydalanuvchi tanlashi uchun 4 ta tayyor variant. (Masalan: ["Kichik (200ml)", "O'rtacha (400ml)", "Katta (600ml)", "Boshqa"]).
 
-1. AGAR MA'LUMOT NOANIQ BO'LSA, bir vaqtda bitta savol ber (isAmbiguous: true):
-{
-  "isAmbiguous": true,
-  "question": "Qisqa va lo'nda savol?(Faqat bitta mantiqga ega savol)",
-  "options": ["Variant 1", "Variant 2", "Variant 3", "Variant 4"]
-}
-Notogri savol: Nechta va qanday turdagi somsa?
-Togri: Nechta somsa yedingiz? 1ta, 2 ta, 4ta, boshqa.
-
-2. AGAR MA'LUMOT ANIQ BO'LSA (isAmbiguous: false):
-{
-  "isAmbiguous": false,
-  "name": "Ovqat nomi va miqdori",
-  "calories": 450,
-  "protein": 15.0,
-  "fat": 20.0,
-  "carbs": 45.0,
-  "ingredients": ["Ro'yxat"],
-  "healthScore": 7,
-  "pros": ["Foydalari va maqto'v"],
-  "advice": "Maslahat",
-  "tips": ["Qisqa maslahat 1", "Qisqa maslahat 2", "Qisqa maslahat 3"]
-}
-
-MUHIM REJA: 
-1. O'zbek tilida so'zlashuvchi oddiy odam tushunadigan xalqchil tilni ishlat.
-2. 'pros' (maqto'v): Agar ovqat foydali va sog'lom bo'lsa (mevalar, sabzavotlar kabi), uni maqtab foydali tomonlarini yozing. Zararli ovqatlar uchun bu maydon bo'sh [] bo'lsin.
-3. 'advice' (maslahat): FAQAT ozishga qattiq salbiy ta'sir qiladigan ovqatlar uchun uni QANDAY TO'G'RI YEYISH (masalan, miqdorini kamaytirish, vaqtini tanlash yoki sabzavot bilan yeyish) bo'yicha yo'l ko'rsating. Ovqatning yomon tomonlarini tushuntirmang, faqat to'g'ri yo'lni ayting. Foydali ovqatlar uchun bu maydon bo'sh bo'lsin.
-4. 'tips' (tavsiyalar): FAQAT judayam professional, amaliy va shaxsiy 3 ta maslahat bering. 
-   - Irodali bo'lishga undaydigan, ilmiy asoslangan (lekin oddiy tilda) gaplar yozing. 
-   - Umumiy gaplar (Suv iching, sport qiling) o'rniga aniq: "Hozir yegan ovqatingizdan so'ng 15 daqiqa piyoda yursangiz, qondagi qand miqdori ko'tarilmaydi", "Keyingi ovqatda albatta ko'katlar qo'shing, kletchatka hazmni yaxshilaydi" kabi yozing. 
-   - Har bir maslahat 7-12 so'z bo'lsin. Repetitive (takrorlanuvchi) bo'lmasin.
+Til: O'zbek tili (Professional va samimiy).
 """
 
     private val mealNames = mapOf(
@@ -147,46 +121,5 @@ ASOSIY SOG'LOM OVQATLANISH QOIDALARI:
             prompt += "Menga yoqmaydigan mahsulotlar: $dislikedFoods. "
         }
         return prompt
-    }
-
-
-    const val MEAL_TIPS_INSTRUCTION = """
-Siz tajribali, zamonaviy va professional diyetologsiz. Sizning vazifangiz - foydalanuvchining kunlik holatini tahlil qilib, unga "wow" effekt beradigan, haqiqiy mutaxassis tanbehi yoki maslahatidek tuyuladigan 3-5 ta tavsiya berishdir.
-
-QOIDALAR:
-1. FAQAT O'ZBEK TILIDA (xalqchil lekin professional) javob bering.
-2. Umumiy va zerikarli gaplardan (ko'p suv iching, kamroq yeng) FAQAT QOCHING. 
-3. Har bir maslahat ANIQ MANTIQQA ega bo'lsin: "Nima qilish kerak + Nima uchun (foydasi)". 
-   Misol: "Kechki ovqatga oqsilga (tuxum, qatiq) e'tibor bering, bu uxlashda ham yog' erishini ta'minlaydi".
-4. Foydalanuvchining yegan ovqatlari va qolgan kaloriyasiga qarab KEYINGI QADAMni ayting.
-5. Har bir maslahat 10-15 so'zdan iborat bo'lsin. 
-6. Bullet point (•) bilan boshlang. Kirish va xulosasiz matn bering.
-fr
-FORMAT:
-• [Aqlli maslahat 1]
-• [Aqlli maslahat 2]
-• [Aqlli maslahat 3]
-"""
-
-    fun buildMealTipsPrompt(
-        summary: String,
-        foodLogs: String,
-        waterMl: Int,
-        burnedCalories: Int,
-        targetCalories: Int,
-        targetWeight: Double?
-    ): String {
-        return """
-Foydalanuvchi ma'lumotlari:
-- Maqsadi: ${targetWeight ?: "Vaznni saqlash"} kg
-- Kunlik kaloriya me'yori: $targetCalories kkal
-- Bugun yeganlari: $foodLogs
-- Jami iste'mol qilgan kaloriyasi: $summary kkal
-- Ichgan suvi: $waterMl ml
-- Mashqlar orqali yo'qotgan kaloriyasi: $burnedCalories kkal
-
-Iltimos, ushuru ma'lumotlar asosida 3-5 ta kichik tavsiya bering.
-Keyingi ovqat tavsiyasi(Masalan: Qatiq yoki yogurt), yoki boshqa. 
-""".trimIndent()
     }
 }

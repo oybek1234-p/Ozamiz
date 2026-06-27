@@ -4,9 +4,8 @@ import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.UserExercise
 import java.util.Date
-import uz.oybek.ozamiz.data.course.model.CourseLevel
-import uz.oybek.ozamiz.data.course.model.CourseLesson
-import uz.oybek.ozamiz.data.health.model.HealthTaskStatus
+
+
 
 data class HomeUiState(
     val isInitialLoading: Boolean = true,
@@ -38,8 +37,7 @@ data class HomeUiState(
     val isFatExceeded: Boolean = false,
     val isCalorieOptimal: Boolean = false,
     val isCalorieExceeded: Boolean = false,
-    val courseLevels: List<CourseLevel> = emptyList(),
-    val activeLesson: CourseLesson? = null,
+
     val userPoints: Int = 0,
     val pointsJustAdded: Int = 0,
     val waterJustAdded: Boolean = false,
@@ -51,8 +49,7 @@ data class HomeUiState(
     val showWeightLogCard: Boolean = false,
     val motivationalMessage: String? = null,
     val todayAiMenu: String? = null,
-    val dailyHealthTasks: List<HealthTaskStatus> = emptyList(),
-    val healthTasksSummary: String = "",
+
     val lastFoodTimestamp: Long? = null,
     val waterStatusMessage: String = "Suv ichishni boshlang 💧",
     val exerciseStatusMessage: String = "Harakatni boshlang 🔥"

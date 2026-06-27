@@ -4,41 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainer"
+    android:background="?attr/colorSurfaceContainer"
     android:focusableInTouchMode="true">
 
-    <uz.oybek.ozamiz.ui.base.MyToolBar
-        android:id="@+id/toolbar"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:title="Ma'lumotlarim" />
+        app:elevation="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <uz.oybek.ozamiz.ui.base.MyToolBar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="Ma'lumotlarim" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView_main_info"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
         android:fillViewport="true"
+        android:paddingBottom="32dp"
         app:layout_constraintBottom_toTopOf="@+id/save_button_container"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="24dp">
+            android:paddingHorizontal="24dp"
+            android:paddingTop="24dp">
 
-            <!-- Ism -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/name_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ismingiz">
+                android:layout_marginBottom="16dp"
+                android:hint="Ismingiz"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -46,29 +56,21 @@
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Jins -->
-            <TextView
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="8dp"
-                android:text="Jinsingiz"
-                android:textColor="?colorOnSurfaceVariant" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/male"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="56dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:text="Erkak"
+                    app:cornerRadius="16dp"
                     app:icon="@drawable/man_ic"
                     app:iconGravity="textStart" />
 
@@ -76,22 +78,26 @@
                     android:id="@+id/female"
                     style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="56dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:text="Ayol"
+                    app:cornerRadius="16dp"
                     app:icon="@drawable/woman_ic"
                     app:iconGravity="textStart" />
             </LinearLayout>
 
-            <!-- Yosh -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/age_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:hint="Yoshingiz">
+                android:layout_marginBottom="32dp"
+                android:hint="Yoshingiz"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -100,11 +106,19 @@
                     android:maxLength="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Bo'y va Vazn -->
+            <!-- Physical Data Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Fizik ko'rsatkichlar"
+                android:textColor="?colorPrimary" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -115,6 +129,10 @@
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:hint="Bo'y"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp"
                     app:suffixText="sm">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -132,6 +150,10 @@
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:hint="Vazn"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp"
                     app:suffixText="kg">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -142,15 +164,14 @@
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- Ideal vazn info -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/idealWeight_con"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
                 android:visibility="gone"
-                app:cardBackgroundColor="?colorSurfaceContainer"
-                app:cardCornerRadius="12dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 tools:visibility="visible">
 
@@ -163,32 +184,44 @@
 
                     <TextView
                         android:id="@+id/textView_ideal_weight_info"
-                        style="@style/TextAppearance.Material3.BodyMedium"
+                        style="@style/TextAppearance.Material3.LabelLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ideal vazn oralig'i"
+                        android:text="Sizning ideal vazn oralig'ingiz"
                         android:textColor="?colorOnSurfaceVariant" />
 
                     <TextView
                         android:id="@+id/textView_ideal_weight_range"
-                        style="@style/TextAppearance.Material3.TitleMedium"
+                        style="@style/TextAppearance.Material3.TitleLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:fontFamily="@font/roboto_bold"
                         android:textColor="?colorPrimary"
-                        android:textStyle="bold"
                         tools:text="60.5 - 75.2 kg" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Maqsad vazn -->
+            <!-- Goals Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Maqsad va faollik"
+                android:textColor="?colorPrimary" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/target_weight_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp"
                 android:hint="Maqsad vazn"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
                 app:suffixText="kg">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -203,21 +236,25 @@
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:paddingStart="4dp"
+                android:layout_marginTop="-12dp"
+                android:layout_marginBottom="12dp"
+                android:paddingHorizontal="4dp"
                 android:textColor="?colorError"
                 android:visibility="gone"
                 tools:text="Bu maqsad juda keskin"
                 tools:visibility="visible" />
 
-            <!-- Kundalik harakat -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/harakat_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:hint="Kundalik harakat">
+                android:layout_marginBottom="32dp"
+                android:hint="Kundalik harakat"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp">
 
                 <AutoCompleteTextView
                     android:layout_width="match_parent"
@@ -229,17 +266,30 @@
                 android:id="@+id/chipGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="-16dp"
+                android:layout_marginBottom="16dp"
                 android:visibility="gone" />
 
-            <!-- Telefon -->
+            <!-- Contact Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="Aloqa"
+                android:textColor="?colorPrimary" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/mobil_raqam_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginBottom="24dp"
                 android:hint="Telefon raqam"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
                 app:startIconDrawable="@drawable/call_ic">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -251,30 +301,39 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- SAQLASH TUGMASI -->
-    <FrameLayout
+    <!-- Footer Action -->
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/save_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurfaceContainerLowest"
-        android:padding="20dp"
+        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/save"
-            style="@style/Widget.Material3.Button"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="@string/save"
-            android:textSize="16sp"
-            app:cornerRadius="12dp" />
-
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            tools:visibility="visible" />
-    </FrameLayout>
+            android:padding="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/save"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/save"
+                android:textSize="16sp"
+                app:cornerRadius="16dp" />
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

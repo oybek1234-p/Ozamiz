@@ -56,6 +56,25 @@
                         android:textSize="16sp"
                         tools:text="Oybek" />
 
+                    <View
+                        android:layout_width="8dp"
+                        android:layout_height="0dp" />
+
+                    <TextView
+                        android:id="@+id/tvPremiumStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_post_type_tag"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:textColor="#594A00"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        tools:text="PREMIUM"
+                        tools:backgroundTint="#FFD700" />
+
                 </LinearLayout>
 
                 <TextView
@@ -87,13 +106,80 @@
 
         </LinearLayout>
 
-        <!-- Main Image -->
-        <ImageView
-            android:id="@+id/imgFoodPhoto"
+        <!-- Main Image/Photos -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            tools:src="@drawable/placeholder_food" />
+            android:layout_height="wrap_content">
+
+            <!-- Single Image (Food, etc.) -->
+            <ImageView
+                android:id="@+id/imgFoodPhoto"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/placeholder_food" />
+
+            <!-- Comparison Images (Weight progress) -->
+            <LinearLayout
+                android:id="@+id/layoutPhotoComparison"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <ImageView
+                        android:id="@+id/imgBefore"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        tools:src="@drawable/user_photo_placeholder" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:layout_margin="8dp"
+                        android:background="#80000000"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:text="Oldin"
+                        android:textColor="@android:color/white"
+                        android:textSize="10sp" />
+                </FrameLayout>
+
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="?attr/colorSurface" />
+
+                <FrameLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+                    <ImageView
+                        android:id="@+id/imgAfter"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        tools:src="@drawable/user_photo_placeholder" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="8dp"
+                        android:background="?attr/colorPrimary"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:text="Hozir"
+                        android:textColor="@android:color/white"
+                        android:textSize="10sp" />
+                </FrameLayout>
+            </LinearLayout>
+        </FrameLayout>
 
         <!-- Footer: Info and Actions -->
         <LinearLayout

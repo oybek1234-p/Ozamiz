@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.logs
 
+import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.MutableData
@@ -99,7 +100,9 @@ object DailySummaryRepository {
                 committed: Boolean,
                 currentData: DataSnapshot?
             ) {
-                // Log error if needed
+                if (error != null) {
+                    com.google.firebase.Firebase.crashlytics.recordException(error.toException())
+                }
             }
         })
     }

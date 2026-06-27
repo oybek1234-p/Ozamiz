@@ -18,13 +18,14 @@ android {
             excludes += "META-INF/INDEX.LIST"
         }
     }
+
     defaultConfig {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 75
-        versionName = "3.9"
-        
+        versionCode = 78
+        versionName = "4.1"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -39,12 +40,10 @@ android {
             )
         }
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -76,55 +75,41 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
     implementation(platform("com.google.firebase:firebase-bom:34.6.0"))
-
-    implementation("com.github.vacxe:phonemask:1.0.5")
     implementation("com.google.firebase:firebase-auth")
-
     implementation("com.google.code.gson:gson:2.13.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-beta01")
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
     implementation("com.google.firebase:firebase-appcheck-debug:19.0.0")
     implementation("com.google.android.play:app-update:2.1.0")
     implementation("com.google.android.play:review:2.0.2")
-
     implementation("com.google.android.flexbox:flexbox:3.0.0")
     implementation("jp.wasabeef:glide-transformations:4.3.0")
-
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-
     implementation("com.airbnb.android:lottie:6.6.7")
     implementation("id.zelory:compressor:3.0.1")
     implementation("androidx.core:core-splashscreen:1.0.1")
-
-    //Bumptech glide implementation
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
-
-
     implementation("com.google.android.gms:play-services-base:18.7.2")
-
     implementation("com.github.ozcanalasalvar.picker:wheelview:2.0.7")
     implementation("com.github.ozcanalasalvar.picker:datepicker:2.0.7")
-
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.2")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-messaging")
-
-
     implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
-
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation(libs.google.firebase.ai)
-
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
-
-    // CameraX
     val cameraxVersion = "1.4.0"
     implementation("androidx.camera:camera-core:$cameraxVersion")
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
+    implementation("com.google.mlkit:face-detection:16.1.7")
+
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }

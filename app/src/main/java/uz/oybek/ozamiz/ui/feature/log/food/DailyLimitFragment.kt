@@ -58,10 +58,17 @@ class DailyLimitFragment : BottomSheetDialogFragment() {
     private fun setupContent(type: String, lastFoodTimestamp: Long?, remainingCalories: Int) {
         when (type) {
             TYPE_CALORIES -> {
-                binding.textTitle.isVisible = true
-                binding.textTitle.text = "Limitga yetdingiz"
+                val count = kotlin.math.abs(remainingCalories)
+                val label = if (remainingCalories < 0) "kkal oshdi" else "kkal qoldi"
+                binding.textTitle.text = "$count $label"
+                if (remainingCalories < -375) {
+                    val yellow = com.google.android.material.color.MaterialColors.getColor(
+                        requireContext(), R.attr.customYellow, android.graphics.Color.YELLOW
+                    )
+                    binding.textTitle.setTextColor(yellow)
+                }
 
-                binding.textExplanation.text = "Bugungi kaloriya miqdori to'ldi, ovqat yemasangiz tanangiz yog' yoqishni boshlaydi."
+                binding.textExplanation.text = ""
 
                 binding.textUnifiedAdvice.text = "🥛 Yog'siz qatiq yoki kefir\n" +
                         "🥗 Bodring, pomidor yoki ko'katlar\n" +
@@ -70,8 +77,8 @@ class DailyLimitFragment : BottomSheetDialogFragment() {
             }
             TYPE_REMAINING -> {
                 binding.textTitle.isVisible = true
-                binding.textTitle.text = "Ajoyib! 😊"
-                binding.textExplanation.text = "Sizda yana $remainingCalories kaloriya ovqat qoldi. Limitdan oshirmasangiz, tanangiz yog' yoqishni boshlaydi, limitdan oshirmaslikka harakat qiling."
+                binding.textTitle.text = "Ma'lumot"
+                binding.textExplanation.text = "Sizda yana $remainingCalories kaloriya ovqat qoldi."
                 binding.cardHungerAdvice.isVisible = false
             }
         }

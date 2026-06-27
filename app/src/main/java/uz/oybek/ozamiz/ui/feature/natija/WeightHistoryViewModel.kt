@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.utils.sortByRecent
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
@@ -31,15 +32,15 @@ class WeightHistoryViewModel : ViewModel() {
         viewModelScope.launch {
             WeightLogRepository.getLogsFlow(user.uid).collect { result ->
                 when (result) {
-                    is DataWrapper.Success -> {
-                        val logs = result.data
-                            .filter { it.weightKg > 0 }
-                            .sortedByDescending { it.timestampLong } // Newest first
-                        
-                        _uiState.update { 
-                            it.copy(isLoading = false, logs = logs) 
+                        is DataWrapper.Success -> {
+                            val sortedLogs = result.data
+                                .filter { it.weightKg > 0 }
+                                .sortByRecent { it.timestamp }
+                            
+                            _uiState.update { 
+                                it.copy(isLoading = false, logs = sortedLogs) 
+                            }
                         }
-                    }
                     is DataWrapper.Error -> {
                         _uiState.update { it.copy(isLoading = false, error = result.error) }
                     }

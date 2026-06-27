@@ -14,18 +14,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
-import uz.oybek.ozamiz.data.ai.AiChatRepository
-import uz.oybek.ozamiz.data.user.UserRepository
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
 import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
-import uz.oybek.ozamiz.data.streak.StreakRepository
+import uz.oybek.ozamiz.data.logs.model.DailyLogs
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
 
 data class AnalyzeResultState(
@@ -42,7 +39,13 @@ sealed interface AnalyzeResultEvent {
     object Saved : AnalyzeResultEvent
     data class Failure(val message: String) : AnalyzeResultEvent
     data class LimitExceeded(val exceededTypes: List<String>) : AnalyzeResultEvent
-    data class PromptShare(val name: String, val photoUrl: String, val calories: Int, val exceededTypes: List<String>? = null) : AnalyzeResultEvent
+    data class PromptShare(
+        val name: String,
+        val photoUrl: String,
+        val calories: Int,
+        val exceededTypes: List<String>? = null
+    ) : AnalyzeResultEvent
+
     data class ShowTips(val tips: List<String>) : AnalyzeResultEvent
 }
 
@@ -97,13 +100,18 @@ class AnalyzeResultViewModel : ViewModel() {
         checkIfSaved()
     }
 
+    fun setLogDate(date: java.util.Date) {
+        loadedLogDate = date
+    }
+
     fun loadLog(logId: String, date: java.util.Date, userId: String? = null) {
         loadedLogDate = date
         loadedLogId = logId
         loadedUserId = userId
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
-            val streak = uz.oybek.ozamiz.data.user.UserRepository.user?.streakInfo?.currentStreak ?: 0
+            val streak =
+                uz.oybek.ozamiz.data.user.UserRepository.user?.streakInfo?.currentStreak ?: 0
             val log = FoodLogRepository.getFoodLog(logId, date, userId)
             if (log != null) {
                 val analysis = FoodAnalysis(
@@ -123,16 +131,22 @@ class AnalyzeResultViewModel : ViewModel() {
                     ),
                     mealType = log.mealType
                 )
-                liveResult.update { 
+                liveResult.update {
                     it.copy(
-                        result = analysis, 
-                        isLoading = false, 
+                        result = analysis,
+                        isLoading = false,
                         currentStreak = streak,
                         isRecallMode = true
-                    ) 
+                    )
                 }
             } else {
-                liveResult.update { it.copy(isError = true, isLoading = false, isRecallMode = false) }
+                liveResult.update {
+                    it.copy(
+                        isError = true,
+                        isLoading = false,
+                        isRecallMode = false
+                    )
+                }
             }
 
             checkIfSaved()
@@ -142,7 +156,9 @@ class AnalyzeResultViewModel : ViewModel() {
     private fun checkIfSaved() {
         val currentResult = liveResult.value.result ?: return
         viewModelScope.launch {
-            val isSaved = uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(currentResult.result?.name ?: "")
+            val isSaved = uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(
+                currentResult.result?.name ?: ""
+            )
             liveResult.update { it.copy(isSaved = isSaved) }
         }
     }
@@ -152,7 +168,8 @@ class AnalyzeResultViewModel : ViewModel() {
         val currentResult = liveResult.value.result ?: return
         val foodLog = currentResult.toFoodLog()
         viewModelScope.launch {
-            val isSaved = uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(foodLog.description)
+            val isSaved =
+                uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(foodLog.description)
             if (isSaved) {
                 uz.oybek.ozamiz.data.food.SavedFoodRepository.removeSavedFood(foodLog.description)
                 _event.send(AnalyzeResultEvent.Failure("Saqlanganlardan olib tashlandi"))
@@ -204,11 +221,11 @@ class AnalyzeResultViewModel : ViewModel() {
             val target = UserRepository.user.targetCalories
             val dailyLogsWrapper = DailyLogRepository.observeDailyLogs(dateToUse).first()
             val dailyLogs = (dailyLogsWrapper as? DataWrapper.Success)?.data ?: DailyLogs()
-            
+
             val foodLogs = dailyLogs.foodLogs?.values ?: emptyList()
             val waterLogs = dailyLogs.waterLogs?.values ?: emptyList()
             val exerciseLogs = dailyLogs.exerciseLogs?.values ?: emptyList()
-            
+
             val consumed = foodLogs.sumOf { it.calories }
             val water = waterLogs.sumOf { it.amountMl }
             val burned = exerciseLogs.sumOf { it.caloriesBurned }
@@ -254,7 +271,8 @@ class AnalyzeResultViewModel : ViewModel() {
         val result = liveResult.value.result ?: return
         val photoUrl = result.photoUrl
         val score = result.result?.healthScore ?: 0
-        val shouldShare = !photoUrl.isNullOrBlank() && photoUrl != "null" && score >= 8
+        // Auto-share if score is 9 or 10, or if there's a photo
+        val shouldShare = score >= 9 || (!photoUrl.isNullOrBlank() && photoUrl != "null")
         saveFood(shouldShare = shouldShare)
     }
 
@@ -275,39 +293,44 @@ class AnalyzeResultViewModel : ViewModel() {
 
             // 2. Prepare concurrent jobs
             val saveJob = async {
-                FoodLogRepository.add(result.photoUrl, log, targetDate)
-                StreakRepository.updateStreak()
-                val score = result.result?.healthScore ?: 0
-                val pointsDelta = when {
-                    score >= 8 -> 10
-                    score == 7 -> 5
-                    score == 6 -> 0
-                    score in 4..5 -> -5
-                    else -> -10
+                val success = FoodLogRepository.add(result.photoUrl, log, targetDate)
+                if (success) {
+                    val score = result.result?.healthScore ?: 0
+                    val pointsDelta = when {
+                        score >= 8 -> 10
+                        score == 7 -> 5
+                        score == 6 -> 0
+                        score in 4..5 -> -5
+                        else -> -10
+                    }
+                    if (pointsDelta != 0) {
+                        uz.oybek.ozamiz.data.user.UserRepository.addPoints(pointsDelta)
+                    }
                 }
-                if (pointsDelta != 0) {
-                    uz.oybek.ozamiz.data.user.UserRepository.addPoints(pointsDelta)
-                }
+                success
             }
 
             val shareJob = if (shouldShare) {
                 async {
-                    val user = uz.oybek.ozamiz.data.user.UserRepository.user
+                    val user = UserRepository.user
                     val userId = Firebase.auth.currentUser?.uid
-                    if (user != null && userId != null) {
+                    if (userId != null) {
                         val post = uz.oybek.ozamiz.data.community.model.CommunityPost(
                             userId = userId,
                             userName = user.name.ifBlank { "Foydalanuvchi" },
                             userAvatarUrl = user.avatarUrl,
-                            photoUrl = result.photoUrl!!,
-                            photos = listOf(result.photoUrl!!),
+                            photoUrl = result.photoUrl.orEmpty(),
+                            photos = listOf(result.photoUrl.orEmpty()),
                             title = result.result!!.name,
-                            foodName = result.result!!.name,
-                            calories = result.result!!.calories,
-                            healthScore = result.result!!.healthScore ?: 0,
+                            description = result.result.pros?.joinToString("\n") { "✅ $it" } ?: "",
+                            foodName = result.result.name,
+                            calories = result.result.calories,
+                            healthScore = result.result.healthScore ?: 0,
                             userScore = user.scorePoints,
-                            verified = false,
-                            isVisible = false
+                            verified = true,
+                            isVisible = true,
+                            type = uz.oybek.ozamiz.data.community.model.PostType.FOOD,
+                            isPremiumUser = user.premium
                         )
                         uz.oybek.ozamiz.data.community.CommunityPostRepository.addPost(post)
                     }
@@ -315,55 +338,22 @@ class AnalyzeResultViewModel : ViewModel() {
             } else null
 
             // 3. Wait for both
-            saveJob.await()
+            val saveSuccess = saveJob.await()
             shareJob?.await()
 
-            // 4. Check limits and trigger notification
-            val uid = Firebase.auth.currentUser?.uid
-            if (uid != null) {
-                val user = uz.oybek.ozamiz.data.user.UserRepository.user
-                val targetCalories = user?.targetCalories ?: 0
-
-                val dateStr = uz.oybek.ozamiz.data.utils.DateUtils.getFormattedDateString(
-                    targetDate,
-                    "yyyy-MM-dd"
-                )
-                val summaryRef =
-                    uz.oybek.ozamiz.data.firebase.FirebasePaths.dailySummaryReference(uid, dateStr)
-                val snapshot = summaryRef.get().await()
-                val summary =
-                    snapshot.getValue(uz.oybek.ozamiz.data.logs.model.DailySummary::class.java)
-
-                val exceededTypes = mutableListOf<String>()
-                if (summary != null && targetCalories > 0) {
-                    if (summary.consumedCalories > targetCalories) {
-                        exceededTypes.add(DailyLimitFragment.TYPE_CALORIES)
-                    }
-                }
-
-                if (exceededTypes.isNotEmpty()) {
-                    uz.oybek.ozamiz.data.motivation.MotivationAlarmScheduler.scheduleNutrientWarning(
-                        uz.oybek.ozamiz.appContext,
-                        exceededTypes
-                    )
-                    _event.send(AnalyzeResultEvent.LimitExceeded(exceededTypes))
-                } else {
-                    val analysisTips = liveResult.value.result?.result?.tips
-                    liveResult.update { it.copy(isLoading = false) }
-                    
-                    if (!analysisTips.isNullOrEmpty()) {
-                        _event.send(AnalyzeResultEvent.ShowTips(analysisTips))
-                    } else {
-                        // Fallback in case AI missed tips field or we are viewing an old log
-                        _event.send(AnalyzeResultEvent.ShowTips(listOf(
-                            "Bugun suv ichish me'yorini to'ldirishga harakat qiling.",
-                            "Kechki ovqatda ko'proq sabzavotlar yeyish foydali bo'ladi.",
-                            "Hozirgi natijangiz maqsad sari yaxshi qadam bo'ldi!"
-                        )))
-                    }
-                }
-            } else {
+            if (!saveSuccess) {
                 liveResult.update { it.copy(isLoading = false) }
+                _event.send(AnalyzeResultEvent.Failure("Ma'lumotlarni saqlashda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring."))
+                return@launch
+            }
+
+            // 4. Trigger notification with tips
+            val analysisTips = result.result?.tips
+            liveResult.update { it.copy(isLoading = false) }
+
+            if (!analysisTips.isNullOrEmpty()) {
+                _event.send(AnalyzeResultEvent.ShowTips(analysisTips))
+            } else {
                 _event.send(AnalyzeResultEvent.Saved)
             }
         }

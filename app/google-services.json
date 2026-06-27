@@ -23,6 +23,14 @@
           }
         },
         {
+          "client_id": "730315334265-eh9k3gro212irrhifp6ebdeetmchjoa9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uz.oybek.ozamiz",
+            "certificate_hash": "aa11abc94c53f7bf2f2cda90aaeda71dda0f01b5"
+          }
+        },
+        {
           "client_id": "730315334265-s4o55tndetqabs0t7assats6kvub173h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

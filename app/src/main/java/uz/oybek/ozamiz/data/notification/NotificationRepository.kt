@@ -37,12 +37,4 @@ object NotificationRepository {
             Result.failure(e)
         }
     }
-
-    suspend fun markAsRead(notificationId: String) {
-        try {
-            notificationsCollection.document(notificationId).update("read", true).await()
-        } catch (e: Exception) {
-            // Ignore
-        }
-    }
 }

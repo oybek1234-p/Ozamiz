@@ -31,12 +31,7 @@
                 android:textColor="?colorOnSurface"
                 tools:text="Siz 15-Yanvar sanasigacha 70 kg vaznga erisha olasiz!" />
 
-            <uz.oybek.ozamiz.ui.feature.onboarding.screens.plan.WeightProjectionView
-                android:id="@+id/view_weight_projection"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp" />
+
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"

@@ -79,6 +79,19 @@
                     app:layout_constraintTop_toBottomOf="@id/tvUserNameProfile"
                     tools:text="Level 7 - Intiluvchan" />
 
+                <TextView
+                    android:id="@+id/tvLastActive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvProfileLevel"
+                    tools:text="Oxirgi marta tizimda: 2 soat oldin" />
+
                 <LinearLayout
                     android:id="@+id/layoutStatsBrief"
                     android:layout_width="match_parent"
@@ -86,7 +99,8 @@
                     android:layout_marginTop="28dp"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    app:layout_constraintTop_toBottomOf="@id/tvProfileLevel">
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@id/tvLastActive">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -195,64 +209,161 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
                         android:padding="20dp">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
+                            android:orientation="horizontal">
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Hozirgi vazn"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="12sp" />
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvCurrentWeight"
-                                android:layout_width="wrap_content"
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Boshlang'ich"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:id="@+id/tvStartWeight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="16sp"
+                                    tools:text="85.0 kg" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="24dp"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="18sp"
-                                tools:text="75.0 kg" />
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Hozirgi"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:id="@+id/tvCurrentWeight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="16sp"
+                                    tools:text="75.0 kg" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="24dp"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Maqsad"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:id="@+id/tvTargetWeight"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="16sp"
+                                    tools:text="68.0 kg" />
+                            </LinearLayout>
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="24dp"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Seriya"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:id="@+id/tvCardStreak"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="16sp"
+                                    tools:text="64 kun" />
+                            </LinearLayout>
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="24dp"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <LinearLayout
+                                android:id="@+id/layoutWeightLoss"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:visibility="gone"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Farq"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="10sp" />
+
+                                <TextView
+                                    android:id="@+id/tvWeightLossResult"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="16sp"
+                                    tools:text="-18 kg" />
+                            </LinearLayout>
                         </LinearLayout>
 
-                        <View
-                            android:layout_width="1dp"
-                            android:layout_height="32dp"
-                            android:background="?attr/colorOutlineVariant" />
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Maqsadli vazn"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:id="@+id/tvTargetWeight"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?attr/colorPrimary"
-                                android:textSize="18sp"
-                                tools:text="68.0 kg" />
-                        </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

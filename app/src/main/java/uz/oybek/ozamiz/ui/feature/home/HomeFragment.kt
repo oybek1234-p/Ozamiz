@@ -22,7 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.model.MealTime
-import uz.oybek.ozamiz.data.level.LevelManager
+import uz.oybek.ozamiz.data.points.LevelManager
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.utils.dateApiFormat
@@ -41,7 +41,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private val viewModel: HomeViewModel by activityViewModels()
     private var dateAdapter: DateScrollerAdapter? = null
-    private var lastShownLevelIndex: Int = -1
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -53,7 +52,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             val primary = com.google.android.material.color.MaterialColors.getColor(
                 requireContext(), androidx.appcompat.R.attr.colorPrimary, Color.BLUE
             )
-            val red = ContextCompat.getColor(requireContext(), R.color.red)
             val gray = ContextCompat.getColor(requireContext(), R.color.grey)
             val orange = ContextCompat.getColor(requireContext(), R.color.orange)
             val yellow = com.google.android.material.color.MaterialColors.getColor(
@@ -81,20 +79,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onDestroyView() {
         super.onDestroyView()
         dateAdapter = null
-    }
-
-    private fun getLastSeenLevelIndex(): Int {
-        val prefs = requireContext().getSharedPreferences(
-            "level_prefs", android.content.Context.MODE_PRIVATE
-        )
-        return prefs.getInt("last_seen_level_index", 0)
-    }
-
-    private fun saveLastSeenLevelIndex(index: Int) {
-        val prefs = requireContext().getSharedPreferences(
-            "level_prefs", android.content.Context.MODE_PRIVATE
-        )
-        prefs.edit().putInt("last_seen_level_index", index).apply()
     }
 
     private fun getPersistentDate(key: String): String? {
@@ -130,40 +114,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     override fun onResume() {
         super.onResume()
         viewModel.onHomeEntered()
-        checkSpotlightOnResume()
-    }
-
-    private fun checkSpotlightOnResume() {
-        val prefs =
-            requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        val step = prefs.getInt("app_onboarding_step", 0)
-        if (step == 1) {
-            startBreakfastSpotlight()
-        } else {
-            resetBreakfastSpotlight()
-        }
-    }
-
-    private fun resetBreakfastSpotlight() {
-        if (bindingT == null) return
-        val btn = binding.cardBreakfast.btnAddMeal
-        btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
-            com.google.android.material.color.MaterialColors.getColor(
-                btn.context,
-                com.google.android.material.R.attr.colorSurfaceContainerHighest,
-                Color.GRAY
-            )
-        )
-        btn.imageTintList = android.content.res.ColorStateList.valueOf(
-            com.google.android.material.color.MaterialColors.getColor(
-                btn.context,
-                com.google.android.material.R.attr.colorOnSurface,
-                Color.BLACK
-            )
-        )
-        btn.scaleX = 1f
-        btn.scaleY = 1f
-        btn.animate().cancel()
     }
 
     override fun inflateBinding(
@@ -220,9 +170,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun checkNotificationPermission() {
+        val ctx = context ?: return
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
-                    requireContext(), android.Manifest.permission.POST_NOTIFICATIONS
+                    ctx, android.Manifest.permission.POST_NOTIFICATIONS
                 ) != android.content.pm.PackageManager.PERMISSION_GRANTED
             ) {
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
@@ -318,7 +269,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         bind.mainProgress.btnHowItWorks.setOnSafeClickListener {
             if (viewModel.uiState.value.isCalorieExceeded || viewModel.uiState.value.isCalorieOptimal) {
                 DailyLimitFragment.newInstance(
-                    DailyLimitFragment.TYPE_CALORIES, viewModel.uiState.value.lastFoodTimestamp
+                    DailyLimitFragment.TYPE_CALORIES,
+                    viewModel.uiState.value.lastFoodTimestamp,
+                    viewModel.uiState.value.caloriesRemaining
                 ).show(childFragmentManager, DailyLimitFragment.TAG)
             } else {
                 navigate(R.id.action_home_to_calorieInfoFragment)
@@ -358,7 +311,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
         bind.mainProgress.btnDetailedInfo.setOnSafeClickListener {
             DailyLimitFragment.newInstance(
-                DailyLimitFragment.TYPE_CALORIES, viewModel.uiState.value.lastFoodTimestamp
+                DailyLimitFragment.TYPE_CALORIES,
+                viewModel.uiState.value.lastFoodTimestamp,
+                viewModel.uiState.value.caloriesRemaining
             ).show(childFragmentManager, DailyLimitFragment.TAG)
         }
 
@@ -369,14 +324,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
 
-
-
-        bind.cardDailyHealthTasks.setOnSafeClickListener {
-            findNavController().navigate(R.id.action_home_to_dailyTasksFragment)
-        }
-        bind.btnTasksDone.setOnSafeClickListener {
-            findNavController().navigate(R.id.action_home_to_dailyTasksFragment)
-        }
     }
 
     private fun setupDailyTip(bind: FragmentHomeBinding) {
@@ -404,6 +351,13 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
+                    viewModel.showStreakSheetEvent.collect { streakInfo ->
+                        uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet.show(
+                            childFragmentManager, true
+                        )
+                    }
+                }
+                launch {
                     viewModel.uiState.collect { state ->
                         bind.progressBarOverall.isVisible = state.isInitialLoading
                         bind.contentScrollView.isVisible = !state.isInitialLoading
@@ -417,37 +371,19 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
                         if (state.pointsJustAdded == 0) {
                             bind.textPointsCount.text = state.userPoints.toString()
+                            val level = LevelManager.getCurrentLevel(state.userPoints)
+                            bind.textLevelEmojiHome.text = level.emoji
                         }
 
                         if (state.pointsJustAdded != 0) {
                             playBounceAnimation(bind, state.userPoints, state.pointsJustAdded)
+
                             showFloatingPointsDelta(bind, state.pointsJustAdded)
                         }
-
-                        if (state.pointsJustAdded > 0) {
-                            checkLevelUp(state.userPoints)
-                        }
-
-                        val tip = state.dailyTip
-                        if (tip != null && state.isTipVisible && uz.oybek.ozamiz.ui.utils.DailyTipUtil.isTipsEnabled(
-                                requireContext()
-                            )
-                        ) {
-                            bind.cardDailyTip.isVisible = true
-                            bind.textTipEmoji.text = tip.emoji
-                            bind.textTipTitle.text = tip.title
-                            bind.textTipDescription.text = tip.content
-                            bind.btnTipDetails.setOnClickListener {
-                                DailyTipDetailsBottomSheet.newInstance(tip)
-                                    .show(childFragmentManager, DailyTipDetailsBottomSheet.TAG)
-                            }
-                        } else {
-                            bind.cardDailyTip.isVisible = false
-                        }
+                        bind.cardDailyTip.isVisible = false
                         bind.cardWeightLog.isVisible = state.showWeightLogCard
 
-                        bind.cardDailyHealthTasks.isVisible = state.dailyHealthTasks.isNotEmpty()
-                        bind.textHealthTasksStatus.text = state.healthTasksSummary
+
                     }
                 }
                 launch {
@@ -462,25 +398,16 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                         viewModel.consumeFoodAddedEvent()
 
                         if (DateUtils.isSameDay(state.selectedDate, Date())) {
-                            // Check for 50% / 100% achievements
-                            check50PercentCalorieAchievement(state)
-                            if (state.isCalorieExceeded || state.isCalorieOptimal) {
+                            val prefs = requireContext().getSharedPreferences(
+                                "app_prefs", android.content.Context.MODE_PRIVATE
+                            )
+                            val step = prefs.getInt("app_onboarding_step", 0)
+                            if (step == 1) {
                                 DailyLimitFragment.newInstance(
-                                    DailyLimitFragment.TYPE_CALORIES, state.lastFoodTimestamp
+                                    type = DailyLimitFragment.TYPE_REMAINING,
+                                    remainingCalories = state.caloriesRemaining
                                 ).show(childFragmentManager, DailyLimitFragment.TAG)
-                            } else {
-                                // If within onboarding, show remaining calories message
-                                val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                                val step = prefs.getInt("app_onboarding_step", 0)
-                                if (step == 1) {
-                                    DailyLimitFragment.newInstance(
-                                        type = DailyLimitFragment.TYPE_REMAINING,
-                                        remainingCalories = state.caloriesRemaining
-                                    ).show(childFragmentManager, DailyLimitFragment.TAG)
-                                    // Move to next step or keep at 1 if you want it to appear only once
-                                    // Let's mark onboarding as complete (step 2) after the first food addition message
-                                    viewModel.onAppOnboardingComplete()
-                                }
+                                viewModel.onAppOnboardingComplete()
                             }
                         }
                     }
@@ -504,14 +431,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                             val args = bundleOf("price" to price, "is_yearly" to isYearly)
                             navigate(R.id.paymentGetCheckFragment, args)
                         }
-                    }
-                }
-                launch {
-                    viewModel.showHealthTaskOnboardingEvent.collect { taskId ->
-                        SingleTaskBottomSheet.newInstance(taskId) {
-                            viewModel.showNextOnboardingTask()
-                        }.show(childFragmentManager, SingleTaskBottomSheet.TAG)
-                        viewModel.consumeOnboardingEvent()
                     }
                 }
                 launch {
@@ -608,9 +527,12 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 macrosContainer.isVisible = true
             }
 
-            progressCaloriesCircular.setIndicatorColor(colors.primary)
+            val exceededColor =
+                if (state.caloriesRemaining < -375) colors.yellow else colors.primary
+            progressCaloriesCircular.setIndicatorColor(exceededColor)
             progressCaloriesCircular.trackColor = colors.track
-            textCaloriesRemainingCount.setTextColor(colors.onSurface)
+            textCaloriesRemainingCount.setTextColor(if (state.caloriesRemaining < -375) colors.yellow else colors.onSurface)
+            textLimitTitle.setTextColor(exceededColor)
 
             fun bindMacro(
                 progress: com.google.android.material.progressindicator.LinearProgressIndicator,
@@ -627,13 +549,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 progress.setIndicatorColor(if (isExceeded) colors.gray else if (isOptimal) colors.green else normalColor)
                 progress.trackColor = colors.track
                 text.setTextColor(if (isExceeded) colors.gray else if (isOptimal) colors.green else colors.onSurface)
-                text.text = when {
-                    isExceeded -> getString(
-                        R.string.macro_exceeded_format, (consumed - target).absoluteValue
-                    )
-
-                    isOptimal -> "To'ldi"
-                    else -> getString(R.string.macro_remaining_format, remaining)
+                val diff = (target - consumed).absoluteValue
+                text.text = if (consumed <= target) {
+                    getString(R.string.macro_remaining_format, diff)
+                } else {
+                    getString(R.string.macro_exceeded_format, diff)
                 }
             }
 
@@ -710,21 +630,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private fun updateBurningStatus(state: HomeUiState) {
         if (state.caloriesConsumed >= state.caloriesTarget - 50) {
             binding.mainProgress.apply {
-                val timeSinceLastFood =
-                    state.lastFoodTimestamp?.let { System.currentTimeMillis() - it }
-                        ?: Long.MAX_VALUE
-                val twoHoursInMs = 2 * 60 * 60 * 1000L
-                val isTwoHoursPassed = timeSinceLastFood >= twoHoursInMs
-
-                if (state.caloriesConsumed <= state.caloriesTarget + 100 && isTwoHoursPassed) {
-                    textLimitTitle.text = "🔥 Yog' yoqilyapti"
-                    textLimitSubtitle.text =
-                        "Boshqa ovqat yemay turing, ortiqchasi yog' yoqishni to'xtatadi"
-                } else {
-                    textLimitTitle.text = "Limitga yetdingiz"
-                    textLimitSubtitle.text =
-                        "Boshqa ovqat yemay turing, ortiqchasi yog' yoqishni to'xtatadi"
-                }
+                val count = state.caloriesRemaining.absoluteValue
+                val label = if (state.caloriesRemaining < 0) "kkal oshdi" else "kkal qoldi"
+                textLimitTitle.text = "$count $label"
             }
         }
     }
@@ -747,9 +655,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         if (pointsAdded == 0) return
         animationJob?.cancel()
         val startPoints = finalPoints - pointsAdded
-        bind.lottieCoin.cancelAnimation()
-        bind.lottieCoin.progress = 0f
-        bind.lottieCoin.playAnimation()
 
         animationJob = viewLifecycleOwner.lifecycleScope.launch {
             val stepsCount = pointsAdded.absoluteValue.coerceAtMost(10)
@@ -812,14 +717,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
             btn.backgroundTintList = android.content.res.ColorStateList.valueOf(
                 com.google.android.material.color.MaterialColors.getColor(
-                    btn.context,
-                    androidx.appcompat.R.attr.colorPrimary,
-                    Color.BLUE
+                    btn.context, androidx.appcompat.R.attr.colorPrimary, Color.BLUE
                 )
             )
             btn.imageTintList = android.content.res.ColorStateList.valueOf(Color.WHITE)
 
-            // Faster bounce
             btn.animate().scaleX(0.75f).scaleY(0.75f).setDuration(250).withEndAction {
                 if (bindingT == null) return@withEndAction
                 btn.animate().scaleX(1.1f).scaleY(1.1f).setDuration(250).withEndAction {
@@ -1013,53 +915,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         btnAjoyib?.setOnClickListener {
             dialog.dismiss()
         }
-    }
-
-    private fun checkLevelUp(points: Int) {
-        val currentIndex = LevelManager.getCurrentLevelIndex(points)
-        if (lastShownLevelIndex == -1) {
-            lastShownLevelIndex = getLastSeenLevelIndex()
-            if (lastShownLevelIndex == 0 && currentIndex > 0) {
-                lastShownLevelIndex = currentIndex
-                saveLastSeenLevelIndex(currentIndex)
-            }
-        }
-
-        if (currentIndex > lastShownLevelIndex) {
-            lastShownLevelIndex = currentIndex
-            saveLastSeenLevelIndex(currentIndex)
-            val newLevel = LevelManager.levels[currentIndex]
-            showLevelUpDialog(
-                newLevel.emoji, newLevel.name, newLevel.motivationText, newLevel.color
-            )
-        }
-    }
-
-    private fun showLevelUpDialog(emoji: String, name: String, motivation: String, color: Long) {
-        if (activity == null || isDetached) return
-
-        val inflater = LayoutInflater.from(requireContext())
-        val dialogView = inflater.inflate(R.layout.dialog_level_up, null)
-
-        val dialog = MaterialAlertDialogBuilder(requireContext()).setView(dialogView).create()
-
-        val parsedColor = Color.parseColor(String.format("#%06X", 0xFFFFFF and color.toInt()))
-
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_emoji)?.text = emoji
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_name)?.apply {
-            text = name
-            setTextColor(parsedColor)
-        }
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_up_title)
-            ?.setTextColor(parsedColor)
-        dialogView.findViewById<android.widget.TextView>(R.id.text_level_motivation)?.text =
-            motivation
-        dialogView.findViewById<View>(R.id.btn_level_up_ok)?.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     private fun vibrateDevice() {

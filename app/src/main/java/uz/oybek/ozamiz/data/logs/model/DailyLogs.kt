@@ -1,6 +1,5 @@
 package uz.oybek.ozamiz.data.logs.model
 
-import uz.oybek.ozamiz.data.logs.model.WeightLog
 import androidx.annotation.Keep
 
 @Keep

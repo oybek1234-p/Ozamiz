@@ -12,7 +12,7 @@ import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
-import uz.oybek.ozamiz.data.points.LevelSystem
+import uz.oybek.ozamiz.data.points.LevelManager
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.databinding.FragmentCommunityProfileBinding
@@ -49,7 +49,7 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
 
         setupAdapter(bind, userId)
         setupScrollListener(bind, userId)
-        loadInitialData(bind, userId)
+        loadInitialData(bind, userId, userName)
     }
 
     private fun setupAdapter(bind: FragmentCommunityProfileBinding, userId: String) {
@@ -77,7 +77,9 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
             },
             onDeleteClick = {
 
-            }
+            },
+            showProfileLink = false,
+            showPremiumBadge = false
         )
         bind.rvProfilePosts.adapter = communityAdapter
     }
@@ -100,38 +102,80 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
         }
     }
 
-    private fun loadInitialData(bind: FragmentCommunityProfileBinding, userId: String) {
+    private fun loadInitialData(bind: FragmentCommunityProfileBinding, userId: String, initialUserName: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             bind.progressLoading.isVisible = true
             bind.layoutStats.isVisible = false
 
             try {
-                // 1. Fetch user data
+                // Har bir maydonni alohida o'qiymiz (Security Rules talabi)
                 val dbRef = FirebasePaths.userReference(userId)
-                val snapshot = dbRef.get().await()
-                val user = snapshot.getValue(User::class.java)
+                
+                val nameTask = dbRef.child("name").get() // Corrected from userName
+                val avatarTask = dbRef.child("avatarUrl").get()
+                val pointsTask = dbRef.child("scorePoints").get()
+                val weightTask = dbRef.child("weight").get()
+                val startWeightTask = dbRef.child("startWeight").get()
+                val targetWeightTask = dbRef.child("targetWeight").get()
+                val streakTask = dbRef.child("streakInfo").get()
+                val lastSeenTimeTask = dbRef.child("lastSeenTime").get()
 
-                if (user != null) {
-                    bind.tvStreak.text = "${user.streakInfo?.activeDays ?: 0} kun"
-                    bind.tvPoints.text = "${user.scorePoints} ball"
-                    bind.tvCurrentWeight.text = if (user.weight > 0) "${user.weight} kg" else "--"
-                    bind.tvTargetWeight.text = if (user.targetWeight != null) "${user.targetWeight} kg" else "--"
+                // Barcha so'rovlar parallel bajarilishini kutamiz
+                val name = nameTask.await().getValue(String::class.java)
+                val avatarUrl = avatarTask.await().getValue(String::class.java)
+                val points = pointsTask.await().getValue(Int::class.java) ?: 0
+                val weight = weightTask.await().getValue(Double::class.java) ?: 0.0
+                val startWeight = startWeightTask.await().getValue(Double::class.java) ?: weight
+                val targetWeight = targetWeightTask.await().getValue(Double::class.java)
+                val streakInfo = streakTask.await().getValue(uz.oybek.ozamiz.data.streak.StreakInfo::class.java)
+                val lastSeenTime = lastSeenTimeTask.await().getValue(Long::class.java) ?: 0L
 
-                    val level = LevelSystem.getLevel(user.scorePoints)
-                    bind.tvProfileLevel.text = level.name
+                bind.tvUserNameProfile.text = name ?: initialUserName
+                bind.tvStreak.text = "${streakInfo?.activeDays ?: 0} kun"
+                bind.tvCardStreak.text = "${streakInfo?.activeDays ?: 0} kun"
+                bind.tvPoints.text = "$points ball"
+                
+                if (lastSeenTime > 0) {
+                    val diff = System.currentTimeMillis() - lastSeenTime
+                    val hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(diff)
+                    val days = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diff)
+                    val timeStr = when {
+                        days > 0 -> "$days kun oldin"
+                        hours > 0 -> "$hours soat oldin"
+                        else -> "Yaqinda"
+                    }
+                    bind.tvLastActive.text = "Onlayn: $timeStr"
+                    bind.tvLastActive.isVisible = true
+                } else {
+                    bind.tvLastActive.isVisible = false
+                }
+                
+                bind.tvStartWeight.text = if (startWeight > 0) "$startWeight kg" else "--"
+                bind.tvCurrentWeight.text = if (weight > 0) "$weight kg" else "--"
+                bind.tvTargetWeight.text = if (targetWeight != null) "$targetWeight kg" else "--"
 
-                    com.bumptech.glide.Glide.with(this@CommunityProfileFragment)
-                        .load(user.avatarUrl)
-                        .placeholder(R.drawable.user_photo_placeholder)
-                        .circleCrop()
-                        .into(bind.imgProfileAvatar)
+                if (startWeight > weight && weight > 0) {
+                    val lost = String.format("%.1f", startWeight - weight)
+                    bind.tvWeightLossResult.text = "-$lost kg"
+                    bind.layoutWeightLoss.isVisible = true
+                } else {
+                    bind.layoutWeightLoss.isVisible = false
                 }
 
-                // 2. Fetch first page of posts
+                val level = LevelManager.getCurrentLevel(points)
+                bind.tvProfileLevel.text = "${level.emoji} ${level.name}"
+
+                com.bumptech.glide.Glide.with(this@CommunityProfileFragment)
+                    .load(avatarUrl)
+                    .placeholder(R.drawable.user_photo_placeholder)
+                    .circleCrop()
+                    .into(bind.imgProfileAvatar)
+
+                // 2. Postlarni yuklash
                 fetchPosts(userId)
 
             } catch (e: Exception) {
-                // Handle error
+                e.printStackTrace()
             } finally {
                 bind.progressLoading.isVisible = false
                 bind.layoutStats.isVisible = true

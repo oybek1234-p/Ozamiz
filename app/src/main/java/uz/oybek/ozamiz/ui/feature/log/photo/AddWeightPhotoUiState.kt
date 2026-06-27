@@ -42,8 +42,8 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
             _uiState.update { it.copy(error = getApplication<Application>().getString(R.string.error_user_not_found)) }
             return
         }
-        if (weightKg == null || weightKg <= 0) {
-            _uiState.update { it.copy(error = getApplication<Application>().getString(R.string.error_invalid_weight_input)) }
+        if (weightKg == null || weightKg < 30.0 || weightKg > 500.0) {
+            _uiState.update { it.copy(error = getApplication<Application>().getString(R.string.error_invalid_weight)) }
             return
         }
         /* Optional photo check removed as per user request */
@@ -51,19 +51,24 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
         _uiState.update { it.copy(isLoading = true, error = null) }
 //
         viewModelScope.launch {
-            val result = WeightLogRepository.add(userId, weightKg, imageUri)
+            val result = WeightLogRepository.add(userId, weightKg, imageUri, shouldBlur = true)
 
             when (result) {
                 is DataWrapper.Success -> {
                     val newLog = result.data
                     val previousWeight = LocalUser.user.weight
+                    val newWeight = weightKg
+                    val newAvatarUrl = newLog.photoUrl
 
                     LocalUser.update {
                         lastWeightLogTimestamp = System.currentTimeMillis()
-                        weight = weightKg
+                        weight = newWeight
+                        if (newAvatarUrl.isNotEmpty()) {
+                            avatarUrl = newAvatarUrl
+                        }
 
                         if (startWeight == null || startWeight == -1.0) {
-                            startWeight = weightKg
+                            startWeight = newWeight
                         }
                     }
 
@@ -71,10 +76,13 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
                         userToUpdate.lastWeightLogTimestamp = LocalUser.user.lastWeightLogTimestamp
                         userToUpdate.weight = LocalUser.user.weight
                         userToUpdate.startWeight = LocalUser.user.startWeight
+                        if (newAvatarUrl.isNotEmpty()) {
+                            userToUpdate.avatarUrl = newAvatarUrl
+                        }
                     }
 
-                    if (previousWeight > 0.0 && previousWeight != weightKg) {
-                        uz.oybek.ozamiz.data.community.AchievementPostHelper.onWeightDropped(previousWeight, weightKg)
+                    if (previousWeight > 0.0 && previousWeight != newWeight) {
+                        uz.oybek.ozamiz.data.community.AchievementPostHelper.onWeightDropped(previousWeight, newWeight)
                     }
 
                     _uiState.update { it.copy(isLoading = false, logAddedSuccessfully = true) }

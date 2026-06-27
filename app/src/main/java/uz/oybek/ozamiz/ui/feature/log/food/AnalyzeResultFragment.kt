@@ -34,6 +34,7 @@ class AnalyzeResultFragment : Fragment() {
     private val viewModel: AnalyzeResultViewModel by viewModels()
     private val homeViewModel: HomeViewModel by activityViewModels()
     private lateinit var ingredientsAdapter: IngredientsAdapter
+    private var hasPlayedConfetti = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +46,11 @@ class AnalyzeResultFragment : Fragment() {
                 viewModel.loadLog(logId, Date(timestamp), userId)
             } else {
                 val id = it.getInt("id", -1)
+                val timestamp = it.getLong("timestamp", -1L)
                 if (id != -1) {
+                    if (timestamp != -1L) {
+                        viewModel.setLogDate(Date(timestamp))
+                    }
                     viewModel.setResult(FoodAnalyzer.getLastAnalyzed(id))
                 }
             }
@@ -148,8 +153,26 @@ class AnalyzeResultFragment : Fragment() {
                             ingredients = analysisResult.ingredients ?: emptyList()
                         )
                     
-                    binding.cardHealthScore.isVisible = false
                     binding.textViewPointsDelta.isVisible = false
+                    binding.cardHealthScore.isVisible = false
+
+                    if (!hasPlayedConfetti) {
+                        val score = analysisResult.healthScore ?: 0
+                        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        val isFirstMeal = prefs.getInt("app_onboarding_step", 0) == 1
+
+                        if (score == 10 || isFirstMeal) {
+                            hasPlayedConfetti = true
+                            binding.confettiAnimation.isVisible = true
+                            binding.confettiAnimation.playAnimation()
+                            
+                            if (score == 10) {
+                                binding.cardHealthScore.isVisible = true
+                                binding.textViewHealthScore.isVisible = true
+                                binding.textViewHealthScore.text = "$score/10"
+                            }
+                        }
+                    }
 
                     val pros = analysisResult.pros
                     if (!pros.isNullOrEmpty()) {
@@ -184,18 +207,8 @@ class AnalyzeResultFragment : Fragment() {
                         !pros.isNullOrEmpty()
 
 
-                    val favIcon =
-                        if (state.isSaved) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
-                    binding.toolbar.menu.findItem(R.id.action_favorite)?.setIcon(favIcon)
-
-                    val favColor =
-                        if (state.isSaved) ContextCompat.getColor(requireContext(), R.color.red)
-                        else com.google.android.material.color.MaterialColors.getColor(
-                            binding.root,
-                            androidx.appcompat.R.attr.colorPrimary
-                        )
-                    binding.toolbar.menu.findItem(R.id.action_favorite)?.iconTintList =
-                        android.content.res.ColorStateList.valueOf(favColor)
+                    binding.cardAiHealth.isVisible =
+                        !pros.isNullOrEmpty()
 
                     binding.buttonSaveToLog.isVisible = !state.isRecallMode
                     binding.buttonReLog.isVisible = state.isRecallMode
@@ -304,24 +317,6 @@ class AnalyzeResultFragment : Fragment() {
             viewModel.reLog()
         }
 
-        binding.toolbar.inflateMenu(R.menu.menu_analyze_result)
-        binding.toolbar.setOnMenuItemClickListener { menuItem ->
-            if (menuItem.itemId == R.id.action_favorite) {
-                // Immediate feedback
-                val isCurrentlySaved = viewModel.resultLive.value?.isSaved == true
-                menuItem.setIcon(if (isCurrentlySaved) R.drawable.ic_heart_outline else R.drawable.ic_heart_filled)
-                menuItem.iconTintList = android.content.res.ColorStateList.valueOf(
-                    if (isCurrentlySaved) com.google.android.material.color.MaterialColors.getColor(
-                        binding.root,
-                        androidx.appcompat.R.attr.colorPrimary
-                    )
-                    else ContextCompat.getColor(requireContext(), R.color.red)
-                )
-
-                viewModel.toggleFavorite()
-                true
-            } else false
-        }
 
         binding.buttonDelete.setOnSafeClickListener {
             androidx.appcompat.app.AlertDialog.Builder(requireContext())

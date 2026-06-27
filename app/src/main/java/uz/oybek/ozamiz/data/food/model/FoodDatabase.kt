@@ -1469,24 +1469,6 @@ object FoodDatabase {
         FoodItem("482", "Bichak (qovoqli)", 200.0, 5.0, 9.0, 24.0, listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari"),
         FoodItem("483", "Shilpildoq", 220.0, 10.0, 12.0, 18.0, listOf(ServingSize("Kosa", 350.0)), true, "Taomlar"),
         FoodItem("484", "Yaxna (mol tilidan)", 160.0, 18.0, 9.0, 1.0, listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"),
-
-        // Yana 300 ta mahsulot qo'shish uchun umumiy kategoriyalarni to'ldirishda davom etamiz.
-        // Bu jarayon vaqt talab qiladi, ammo asosiy andoza shu.
-        // Hozirda 400 ga yaqin mahsulot bor. To'liq 700-800 talik ro'yxat uchun quyidagi
-        // kategoriyalardan mahsulotlar qo'shiladi:
-        // - Turli xil pishloqlar
-        // - Dudlangan mahsulotlar (kolbasa, baliq, pishloq)
-        // - Konservalar (go'shtli, baliqli, sabzavotli)
-        // - Turli xil salatlar (Yevropa va Osiyo)
-        // - Yormalar (kuskus, bulgur, kinoa)
-        // - Makaron mahsulotlari (spagetti, penne va boshqalar)
-        // - Turli mamlakatlar oshxonasi (italyan, xitoy, yapon, koreys)
-        // - Qandolat mahsulotlari (konfetlar, iris, karamel)
-        // - Yong'oq va urug'lar turlari
-        // - Turli non turlari (baget, chiabatta)
-        // ... va hokazo.
-
-        // Ro'yxatni 750 taga to'ldirish uchun qo'shimcha mahsulotlar
         FoodItem("500", "Baget (fransuz noni)", 270.0, 10.0, 1.5, 55.0, listOf(ServingSize("Bo'lak", 30.0)), true, "Non va non mahsulotlari"),
         FoodItem("501", "Kruassan (sariyog'li)", 406.0, 8.0, 21.0, 46.0, listOf(ServingSize("Dona", 50.0)), true, "Non va non mahsulotlari"),
         FoodItem("502", "Spagetti (qaynatilgan)", 158.0, 5.8, 0.9, 31.0, listOf(ServingSize("Porsiya", 180.0)), true, "Garnirlar"),
@@ -1537,7 +1519,578 @@ object FoodDatabase {
         FoodItem("547", "Xachapuri (adjaruli)", 320.0, 14.0, 18.0, 26.0, listOf(ServingSize("Dona", 300.0)), true, "Non va non mahsulotlari"),
         FoodItem("548", "Xinkali", 220.0, 10.0, 12.0, 18.0, listOf(ServingSize("Dona", 70.0)), true, "Taomlar"),
         FoodItem("549", "Lyulya-kabob", 280.0, 14.0, 24.0, 2.0, listOf(ServingSize("Porsiya", 150.0)), true, "Go'shtli taomlar"),
-        FoodItem("550", "Qo'y go'shti (dimlangan)", 310.0, 22.0, 25.0, 0.0, listOf(ServingSize("Porsiya", 200.0)), true, "Go'shtli taomlar")
+        FoodItem("550", "Qo'y go'shti (dimlangan)", 310.0, 22.0, 25.0, 0.0, listOf(ServingSize("Porsiya", 200.0)), true, "Go'shtli taomlar"),
+        // --- START OF NEW FOOD ITEMS ---
 
+        FoodItem(
+            "601", "Pepsi", 41.0, 0.0, 0.0, 10.4,
+            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1L)", 1000.0), ServingSize("Idish (1.5L)", 1500.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "602", "Coca-Cola Zero", 0.3, 0.0, 0.0, 0.0,
+            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1L)", 1000.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "603", "Fanta", 48.0, 0.0, 0.0, 11.7,
+            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1.5L)", 1500.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "604", "Sprite", 40.0, 0.0, 0.0, 9.8,
+            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1.5L)", 1500.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "605", "Dena sharbati (olchali)", 52.0, 0.2, 0.0, 12.5,
+            listOf(ServingSize("Stakan (200ml)", 200.0), ServingSize("Paket (1L)", 1000.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "606", "Bliss sharbati (olmali)", 46.0, 0.1, 0.1, 11.0,
+            listOf(ServingSize("Stakan (200ml)", 200.0), ServingSize("Paket (1L)", 1000.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "607", "Adrenaline Rush energetik ichimligi", 52.0, 0.0, 0.0, 12.8,
+            listOf(ServingSize("Idish (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "608", "Flash Up energetik ichimligi", 50.0, 0.0, 0.0, 12.0,
+            listOf(ServingSize("Idish (0.5L)", 500.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "609", "Lipton sovuq choyi (limonli)", 29.0, 0.0, 0.0, 6.9,
+            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0)),
+            true, "Ichimliklar"
+        ),
+
+        // Shirinliklar va Shokoladlar (Eng ommabop brendlar)
+        FoodItem(
+            "610", "Snickers", 485.0, 8.6, 23.0, 61.0,
+            listOf(ServingSize("Kichik (50g)", 50.0), ServingSize("Katta (95g)", 95.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "611", "Mars", 449.0, 4.4, 17.0, 70.0,
+            listOf(ServingSize("Dona (51g)", 51.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "612", "Bounty", 488.0, 3.8, 26.0, 59.0,
+            listOf(ServingSize("Dona (57g)", 57.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "613", "Twix", 495.0, 4.5, 24.0, 65.0,
+            listOf(ServingSize("Dona (55g)", 55.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "614", "KitKat", 522.0, 6.2, 27.0, 64.0,
+            listOf(ServingSize("Dona (41.5g)", 41.5)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "615", "Alpen Gold (yong'oqli)", 532.0, 6.3, 30.0, 58.0,
+            listOf(ServingSize("Bo'lakcha (5g)", 5.0), ServingSize("Plitka (85g)", 85.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "616", "M&M's (yong'oqli)", 513.0, 10.0, 26.0, 60.0,
+            listOf(ServingSize("Kichik paket (45g)", 45.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "617", "Oreo pechenyesi", 476.0, 5.4, 20.0, 68.0,
+            listOf(ServingSize("Dona (11g)", 11.0), ServingSize("Paket (95g)", 95.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+
+        // Muzqaymoqlar (Marojniy)
+        FoodItem(
+            "618", "Muzqaymoq 'Magnat'", 310.0, 4.0, 20.0, 28.0,
+            listOf(ServingSize("Dona (70g)", 70.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "619", "Muzqaymoq stakanda (plombir)", 220.0, 3.5, 12.0, 24.0,
+            listOf(ServingSize("Dona (70g)", 70.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "620", "Muzqaymoq 'Korovka iz Korenovki'", 230.0, 3.7, 15.0, 21.0,
+            listOf(ServingSize("Stakan (100g)", 100.0), ServingSize("Vanna (400g)", 400.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "621", "Muzqaymoq Eskimo", 280.0, 3.0, 18.0, 26.0,
+            listOf(ServingSize("Dona (65g)", 65.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+
+        // Gazaklar (Chips, Kirieshki va boshqalar)
+        FoodItem(
+            "622", "Lays chips (piyozli)", 520.0, 6.0, 31.0, 53.0,
+            listOf(ServingSize("Kichik paket (40g)", 40.0), ServingSize("Katta paket (140g)", 140.0)),
+            true, "Gazaklar"
+        ),
+        FoodItem(
+            "623", "Pringles chips (original)", 530.0, 4.5, 33.0, 52.0,
+            listOf(ServingSize("Bankacha (165g)", 165.0)),
+            true, "Gazaklar"
+        ),
+        FoodItem(
+            "624", "Kirieshki (qotirilgan non)", 410.0, 11.0, 9.0, 70.0,
+            listOf(ServingSize("Paketcha (40g)", 40.0), ServingSize("Katta paket (100g)", 100.0)),
+            true, "Gazaklar"
+        ),
+        FoodItem(
+            "625", "Tuzlangan pista (semichka)", 601.0, 21.0, 53.0, 20.0,
+            listOf(ServingSize("Stakan (100g)", 100.0), ServingSize("Paketcha (50g)", 50.0)),
+            true, "Gazaklar"
+        ),
+        FoodItem(
+            "626", "Tuzlangan yer yong'oq", 590.0, 25.0, 48.0, 18.0,
+            listOf(ServingSize("Paketcha (50g)", 50.0)),
+            true, "Gazaklar"
+        ),
+        FoodItem(
+            "627", "Lavash (mol go'shtli, pishloqli)", 280.0, 12.0, 16.0, 21.0,
+            listOf(ServingSize("Kichik", 200.0), ServingSize("Standart", 280.0), ServingSize("Katta", 350.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "628", "Shaurma (tovuqli, pishloqli)", 270.0, 14.0, 15.0, 19.0,
+            listOf(ServingSize("Standart", 260.0), ServingSize("Katta", 340.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "629", "Donar (go'shtli, non orasida)", 240.0, 14.0, 11.0, 22.0,
+            listOf(ServingSize("Standart", 250.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "630", "Chizburger", 303.0, 16.0, 14.0, 28.0,
+            listOf(ServingSize("Standart", 160.0), ServingSize("Double", 260.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "631", "Klab sendvich", 280.0, 15.0, 15.0, 20.0,
+            listOf(ServingSize("Dona", 220.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "632", "Tovuq striplari", 250.0, 20.0, 12.0, 15.0,
+            listOf(ServingSize("3 dona", 90.0), ServingSize("5 dona", 150.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "633", "Pelmeni (muzlatilgan)", 280.0, 12.0, 13.0, 28.0,
+            listOf(ServingSize("Porsiya (150g)", 150.0)),
+            true, "Yarim tayyor mahsulotlar"
+        ),
+        FoodItem(
+            "634", "Vareniki (kartoshkali, muzlatilgan)", 190.0, 5.0, 4.0, 33.0,
+            listOf(ServingSize("Porsiya (150g)", 150.0)),
+            true, "Yarim tayyor mahsulotlar"
+        ),
+        FoodItem(
+            "635", "Sosiska (sutli)", 266.0, 10.0, 24.0, 1.9,
+            listOf(ServingSize("Dona", 50.0)),
+            true, "Go'shtli taomlar"
+        ),
+        FoodItem(
+            "636", "Kolbasa 'Doktorskaya'", 257.0, 12.0, 22.0, 2.0,
+            listOf(ServingSize("Bo'lak (25g)", 25.0)),
+            true, "Go'shtli taomlar"
+        ),
+        FoodItem(
+            "637", "Tovuq naggetslari (muzlatilgan)", 270.0, 14.0, 16.0, 18.0,
+            listOf(ServingSize("Dona (25g)", 25.0)),
+            true, "Yarim tayyor mahsulotlar"
+        ),
+        FoodItem(
+            "638", "Tushonka (mol go'shti, konserva)", 220.0, 16.0, 17.0, 0.0,
+            listOf(ServingSize("Osh qoshiq (30g)", 30.0), ServingSize("Bankacha (325g)", 325.0)),
+            true, "Go'shtli taomlar"
+        ),
+
+        // Sut mahsulotlari (Ommabop)
+        FoodItem(
+            "639", "Yogurt (mevali, Activia)", 92.0, 3.5, 2.4, 14.0,
+            listOf(ServingSize("Idishcha (110g)", 110.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "640", "Ichimlik yogurti (Danone)", 75.0, 2.8, 1.5, 12.5,
+            listOf(ServingSize("Idishcha (290g)", 290.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "641", "Tvorogli sirok (vanilli)", 380.0, 8.0, 25.0, 30.0,
+            listOf(ServingSize("Dona (45g)", 45.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "642", "Eritilgan pishloq 'Drujba'", 280.0, 16.0, 23.0, 2.0,
+            listOf(ServingSize("Paketcha (90g)", 90.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+
+        // Nonushta uchun tez tayyor bo'ladiganlar
+        FoodItem(
+            "643", "Rolton (tez tayyorlanadigan lapsha)", 450.0, 9.0, 21.0, 56.0,
+            listOf(ServingSize("Paket (60g)", 60.0)),
+            true, "Bo'tqalar"
+        ),
+        FoodItem(
+            "644", "Big Bon (tez tayyorlanadigan lapsha)", 460.0, 8.5, 22.0, 55.0,
+            listOf(ServingSize("Konteyner (85g)", 85.0)),
+            true, "Bo'tqalar"
+        ),
+        FoodItem(
+            "645", "Suli yormasi (tez tayyorlanadigan, paketcha)", 350.0, 11.0, 6.0, 65.0,
+            listOf(ServingSize("Paketcha (40g)", 40.0)),
+            true, "Bo'tqalar"
+        ),
+        FoodItem(
+            "646", "Nesquik nonushta yormasi", 377.0, 7.5, 3.8, 75.0,
+            listOf(ServingSize("Porsiya (30g)", 30.0)),
+            true, "Bo'tqalar"
+        ),
+
+        // Boshqa ommabop mahsulotlar
+        FoodItem(
+            "647", "Buxanka non", 260.0, 8.0, 1.5, 52.0,
+            listOf(ServingSize("Bo'lak", 25.0), ServingSize("Butun", 500.0)),
+            true, "Non va non mahsulotlari"
+        ),
+        FoodItem(
+            "648", "Tovuq go'shti gril (do'konniki)", 210.0, 26.0, 12.0, 0.0,
+            listOf(ServingSize("Oyoqcha", 180.0), ServingSize("Yarimta", 500.0), ServingSize("Butun", 1000.0)),
+            true, "Go'shtli taomlar"
+        ),
+        FoodItem(
+            "649", "Konservalangan makkajo'xori", 86.0, 2.8, 1.0, 19.0,
+            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Bankacha (340g)", 340.0)),
+            true, "Dukkaklilar"
+        ),
+        FoodItem(
+            "650", "Konservalangan ko'k no'xat", 60.0, 4.0, 0.2, 10.0,
+            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Bankacha (400g)", 400.0)),
+            true, "Dukkaklilar"
+        ),
+        FoodItem(
+            "651", "Tomat pastasi", 82.0, 4.0, 0.5, 19.0,
+            listOf(ServingSize("Osh qoshiq", 25.0)),
+            true, "Qaylalar va souslar"
+        ),
+        // --- START OF NEW FOOD ITEMS (200+) ---
+
+        // Fastfud va Ko'cha Taomlari (Qo'shimchalar)
+        FoodItem(
+            "652", "Tandir lavash (achchiq)", 290.0, 13.0, 17.0, 22.0,
+            listOf(ServingSize("Standart", 280.0), ServingSize("Katta", 350.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "653", "Pishloqli lavash", 310.0, 14.0, 19.0, 21.0,
+            listOf(ServingSize("Standart", 250.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "654", "Mini lavash", 260.0, 11.0, 15.0, 20.0,
+            listOf(ServingSize("Dona", 160.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "655", "Fransuzcha hot-dog", 320.0, 12.0, 18.0, 28.0,
+            listOf(ServingSize("Dona", 150.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "656", "Pishloqli hot-dog", 340.0, 14.0, 20.0, 26.0,
+            listOf(ServingSize("Dona", 160.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "657", "Pizza (Tovuqli)", 260.0, 14.0, 10.0, 29.0,
+            listOf(ServingSize("Bo'lak", 110.0), ServingSize("O'rtacha (30sm)", 700.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "658", "Pizza (Qo'ziqorinli)", 240.0, 10.0, 9.0, 30.0,
+            listOf(ServingSize("Bo'lak", 110.0), ServingSize("O'rtacha (30sm)", 700.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "659", "Toster (kolbasali)", 290.0, 12.0, 15.0, 26.0,
+            listOf(ServingSize("Dona", 180.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "660", "Toster (tovuqli)", 280.0, 15.0, 13.0, 25.0,
+            listOf(ServingSize("Dona", 180.0)),
+            true, "Fastfud"
+        ),
+        FoodItem(
+            "661", "Trindvich", 300.0, 13.0, 16.0, 25.0,
+            listOf(ServingSize("Dona", 200.0)),
+            true, "Fastfud"
+        ),
+
+        // Non va Pishiriqlar
+        FoodItem(
+            "662", "Sosiskali bulochka (xamirda)", 340.0, 10.0, 20.0, 30.0,
+            listOf(ServingSize("Dona", 100.0)),
+            true, "Non va non mahsulotlari"
+        ),
+        FoodItem(
+            "663", "Kartoshkali pirojki", 250.0, 6.0, 12.0, 29.0,
+            listOf(ServingSize("Dona", 80.0)),
+            true, "Non va non mahsulotlari"
+        ),
+        FoodItem(
+            "664", "Go'shtli pirojki (belyash)", 290.0, 12.0, 18.0, 20.0,
+            listOf(ServingSize("Dona", 90.0)),
+            true, "Non va non mahsulotlari"
+        ),
+        FoodItem(
+            "665", "Karamli pirojki", 220.0, 5.0, 10.0, 27.0,
+            listOf(ServingSize("Dona", 80.0)),
+            true, "Non va non mahsulotlari"
+        ),
+        FoodItem(
+            "666", "Obi non", 250.0, 9.0, 1.5, 50.0,
+            listOf(ServingSize("Chorak", 100.0), ServingSize("Butun", 400.0)),
+            true, "Non va non mahsulotlari"
+        ),
+        FoodItem(
+            "667", "Jizzali non", 350.0, 10.0, 15.0, 43.0,
+            listOf(ServingSize("Bo'lak", 50.0)),
+            true, "Non va non mahsulotlari"
+        ),
+        FoodItem(
+            "668", "Rulet (jemli)", 360.0, 5.0, 8.0, 68.0,
+            listOf(ServingSize("Bo'lak", 40.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "669", "Pirojniy 'Kartoshka'", 390.0, 6.0, 20.0, 48.0,
+            listOf(ServingSize("Dona", 60.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "670", "Pirojniy 'Korzinka'", 420.0, 5.0, 22.0, 50.0,
+            listOf(ServingSize("Dona", 80.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "671", "Olmali pirog", 280.0, 4.0, 12.0, 38.0,
+            listOf(ServingSize("Bo'lak", 100.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "672", "Tvorogli pirog (vatrushka)", 270.0, 10.0, 11.0, 32.0,
+            listOf(ServingSize("Dona", 90.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+
+        // Do'kon Mahsulotlari: Gazaklar, Shirinliklar
+        FoodItem(
+            "673", "Choco-Pie", 430.0, 4.5, 16.0, 70.0,
+            listOf(ServingSize("Dona (28g)", 28.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "674", "Pechene 'Yubileynoye'", 465.0, 7.5, 19.0, 65.0,
+            listOf(ServingSize("Dona (12g)", 12.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "675", "Biskvit 'Barney'", 390.0, 6.0, 15.0, 58.0,
+            listOf(ServingSize("Dona (30g)", 30.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "676", "Shokoladli pasta (Nutella kabi)", 540.0, 6.0, 31.0, 58.0,
+            listOf(ServingSize("Choy qoshiq", 10.0), ServingSize("Osh qoshiq", 25.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "677", "Raffaello konfeti", 620.0, 7.5, 48.0, 38.0,
+            listOf(ServingSize("Dona (10g)", 10.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "678", "Saqich (shakarli)", 300.0, 0.0, 0.0, 75.0,
+            listOf(ServingSize("Yostiqcha", 2.0)),
+            true, "Shirinliklar va desertlar"
+        ),
+        FoodItem(
+            "679", "Popkorn (tuzli)", 480.0, 9.0, 22.0, 62.0,
+            listOf(ServingSize("Stakan", 30.0)),
+            true, "Gazaklar"
+        ),
+        FoodItem(
+            "680", "Makkajo'xori tayoqchalari (kukuruz)", 370.0, 8.0, 2.0, 80.0,
+            listOf(ServingSize("Paket (60g)", 60.0)),
+            true, "Gazaklar"
+        ),
+
+        // Do'kon Mahsulotlari: Yarim-tayyor va Konservalar
+        FoodItem(
+            "681", "Baliq konservasi (tuna)", 185.0, 29.0, 7.0, 0.0,
+            listOf(ServingSize("Osh qoshiq", 30.0), ServingSize("Bankacha (180g)", 180.0)),
+            true, "Go'shtli taomlar"
+        ),
+        FoodItem(
+            "682", "Shprotlar (yog'da)", 360.0, 17.0, 32.0, 0.0,
+            listOf(ServingSize("Dona", 8.0), ServingSize("Bankacha (160g)", 160.0)),
+            true, "Go'shtli taomlar"
+        ),
+        FoodItem(
+            "683", "Konservalangan zaytun", 115.0, 0.8, 11.0, 6.0,
+            listOf(ServingSize("Dona", 4.0)),
+            true, "Salatlar va gazaklar"
+        ),
+        FoodItem(
+            "684", "Muzlatilgan kotlet", 250.0, 15.0, 16.0, 12.0,
+            listOf(ServingSize("Dona", 80.0)),
+            true, "Yarim tayyor mahsulotlar"
+        ),
+        FoodItem(
+            "685", "Muzlatilgan baliq filesi", 90.0, 20.0, 1.0, 0.0,
+            listOf(ServingSize("Bo'lak (100g)", 100.0)),
+            true, "Yarim tayyor mahsulotlar"
+        ),
+        FoodItem(
+            "686", "Xamir (qat-qat, muzlatilgan)", 380.0, 7.0, 22.0, 38.0,
+            listOf(ServingSize("List (100g)", 100.0)),
+            true, "Yarim tayyor mahsulotlar"
+        ),
+        FoodItem(
+            "687", "Muzlatilgan sabzavotlar aralashmasi", 50.0, 2.5, 0.5, 9.0,
+            listOf(ServingSize("Porsiya (150g)", 150.0)),
+            true, "Yarim tayyor mahsulotlar"
+        ),
+        FoodItem(
+            "688", "Crab tayoqchalari", 95.0, 7.0, 1.5, 13.0,
+            listOf(ServingSize("Dona", 20.0)),
+            true, "Dengiz mahsulotlari"
+        ),
+
+        // Sut Mahsulotlari (Qo'shimchalar)
+        FoodItem(
+            "689", "Kolbasali pishloq (dudlangan)", 275.0, 21.0, 20.0, 2.5,
+            listOf(ServingSize("Bo'lak", 25.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "690", "Qaymoqli pishloq (Cream cheese)", 250.0, 6.0, 24.0, 3.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "691", "Qatiq (yog'siz)", 30.0, 3.0, 0.1, 4.0,
+            listOf(ServingSize("Stakan", 200.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "692", "Slivki (10% yog'lilikda)", 120.0, 2.7, 10.0, 4.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "693", "Tvorogli massa (mayizli)", 230.0, 12.0, 15.0, 11.0,
+            listOf(ServingSize("Paketcha (100g)", 100.0)),
+            true, "Sut va sut mahsulotlari"
+        ),
+        FoodItem(
+            "694", "Moxito (alkogolsiz)", 35.0, 0.0, 0.0, 8.5,
+            listOf(ServingSize("Stakan", 250.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "695", "Tarxun (gazli ichimlik)", 42.0, 0.0, 0.0, 10.5,
+            listOf(ServingSize("Stakan", 250.0), ServingSize("Idish (0.5L)", 500.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "696", "Kofe 3 tasi 1 da", 430.0, 2.5, 12.0, 78.0,
+            listOf(ServingSize("Paketcha (18g)", 18.0)), // Kaloriya 100g uchun
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "698", "Shaftoli sharbati", 48.0, 0.4, 0.1, 11.5,
+            listOf(ServingSize("Stakan", 200.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "699", "Montella (gazli suv)", 0.0, 0.0, 0.0, 0.0,
+            listOf(ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1L)", 1000.0)),
+            true, "Ichimliklar"
+        ),
+        FoodItem(
+            "700", "Gilos kompot (uy sharoitida)", 70.0, 0.3, 0.0, 17.0,
+            listOf(ServingSize("Stakan", 200.0)),
+            true, "Ichimliklar"
+        ),
+
+        // Uy Taomlari va Boshqalar
+        FoodItem(
+            "701", "Makaron po-flotski", 280.0, 14.0, 15.0, 22.0,
+            listOf(ServingSize("Likop", 250.0)),
+            true, "Taomlar"
+        ),
+        FoodItem(
+            "702", "Grechka (go'sht bilan)", 160.0, 10.0, 7.0, 15.0,
+            listOf(ServingSize("Likop", 250.0)),
+            true, "Taomlar"
+        ),
+        FoodItem(
+            "703", "Qovurma sho'rva", 100.0, 7.0, 6.0, 5.0,
+            listOf(ServingSize("Kosa", 350.0)),
+            true, "Taomlar"
+        ),
+        FoodItem(
+            "704", "Tuxum quymoq (pomidorli)", 120.0, 8.0, 9.0, 2.0,
+            listOf(ServingSize("Porsiya (2 tuxum)", 150.0)),
+            true, "Sut va tuxum"
+        ),
+        FoodItem(
+            "705", "Dimlama (behi bilan)", 130.0, 8.0, 7.0, 9.0,
+            listOf(ServingSize("Kosa", 300.0)),
+            true, "Taomlar"
+        ),
+        FoodItem(
+            "706", "Tovuq (pechda pishirilgan)", 190.0, 25.0, 10.0, 0.0,
+            listOf(ServingSize("Oyoqcha", 150.0), ServingSize("Ko'krak filesi", 120.0)),
+            true, "Go'shtli taomlar"
+        ),
+        FoodItem(
+            "707", "Baliq (bug'da pishirilgan)", 140.0, 22.0, 6.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)),
+            true, "Go'shtli taomlar"
+        ),
+        FoodItem(
+            "708", "Sirnik (tvorogdan)", 185.0, 15.0, 7.0, 15.0,
+            listOf(ServingSize("Dona", 50.0)),
+            true, "Taomlar"
+        ),
+        FoodItem(
+            "709", "Okroshka (kvassda)", 75.0, 4.0, 4.5, 5.0,
+            listOf(ServingSize("Kosa", 300.0)),
+            true, "Taomlar"
+        ),
+        FoodItem(
+            "712", "Achchiq qalampir sousi (Chili)", 40.0, 1.0, 0.2, 8.0,
+            listOf(ServingSize("Choy qoshiq", 5.0)),
+            true, "Qaylalar va souslar"
+        )
     )
 }

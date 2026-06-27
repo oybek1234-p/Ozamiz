@@ -24,7 +24,11 @@ object MenuRepository {
     fun getCategories(): Flow<List<MenuCategory>> = callbackFlow {
         val listener = categoryCollection.addSnapshotListener { value, error ->
             if (error != null) {
-                close(error)
+                if (error.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED) {
+                    close()
+                } else {
+                    close(error)
+                }
                 return@addSnapshotListener
             }
             trySend(value?.toObjects(MenuCategory::class.java) ?: emptyList())
@@ -35,7 +39,8 @@ object MenuRepository {
     suspend fun addCategory(name: String, isSecondary: Boolean = false): DataWrapper<Unit> {
         return try {
             val id = categoryCollection.document().id
-            categoryCollection.document(id).set(MenuCategory(id = id, name = name, isSecondary = isSecondary)).await()
+            categoryCollection.document(id)
+                .set(MenuCategory(id = id, name = name, isSecondary = isSecondary)).await()
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
             handleException(e)
@@ -74,7 +79,11 @@ object MenuRepository {
         }
         val listener = query.addSnapshotListener { value, error ->
             if (error != null) {
-                close(error)
+                if (error.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED) {
+                    close()
+                } else {
+                    close(error)
+                }
                 return@addSnapshotListener
             }
             trySend(value?.toObjects(Menu::class.java) ?: emptyList())

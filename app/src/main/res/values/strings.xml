@@ -361,7 +361,7 @@
     <!-- GetMainInfoFragment uchun stringlar (agar o'zgartirilgan bo'lsa) -->
     <string name="get_info_title_new">Keling, tanishaylik!</string>
     <string name="get_info_title_edit">Ma\'lumotlarni tahrirlash</string>
-    <string name="get_info_welcome_message">Ozish safaringizni biz bilan boshlayotganingizdan xursandmiz! Keling, avval siz haqingizda va maqsadlaringizni aniqlab olaylik.</string>
+    <string name="get_info_welcome_message">Sog\'lom hayot sari safaringizni biz bilan boshlayotganingizdan xursandmiz! Keling, avval siz haqingizda va maqsadlaringizni aniqlab olaylik.</string>
     <string name="name_hint_asterisk">Ismingiz*</string>
     <string name="gender_male">Erkak</string>
     <string name="gender_female">Ayol</string>
@@ -385,7 +385,7 @@
     <string name="error_invalid_height">Bo\'yingizni to\'g\'ri kiriting (50–250 sm).</string>
     <string name="error_invalid_weight">Vazningizni to\'g\'ri kiriting (20–500 kg).</string>
     <string name="error_invalid_target_weight">Maqsad vaznni to\'g\'ri kiriting (20–500 kg).</string>
-    <string name="error_target_weight_lose_vs_current">Ozish uchun maqsad vazn joriy vazndan kichik bo\'lishi kerak.</string>
+    <string name="error_target_weight_lose_vs_current">Vazn tashlash uchun maqsad vazn joriy vazndan kichik bo\'lishi kerak.</string>
     <string name="error_target_weight_gain_vs_current">Semirish uchun maqsad vazn joriy vazndan katta bo\'lishi kerak.</string>
     <string name="warning_target_weight_too_low">Bu maqsad juda keskin. Sog\'ligingiz uchun xavfli darajada past bo\'lishi mumkin.</string>
     <string name="warning_target_weight_too_high">Bu maqsad juda katta. Sog\'ligingiz uchun xavfli darajada yuqori bo\'lishi mumkin.</string>
@@ -496,8 +496,7 @@
     <string name="admin_premium_verifications">Premium Tekshiruv</string> <!-- ProfileFragmentdagi button uchun -->
     <string name="image_load_error_placeholder_text">Rasmni yuklab bo\'lmadi</string>
     <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida</string>
-    <string name="dars_nomi">Dars nomi</string>
-    <string name="dars_haqida">Dars haqida</string>
+
     <string name="qandli_diabet">Qandli diabet</string>
     <string name="emizikli_ayol">Emizikli ayol</string>
     <string name="homilador_ayol">Homilador ayol</string>
@@ -507,14 +506,14 @@
     <string name="splash_text">Ideal qomat — sizga yarashadi!</string>
     <string name="email_orqali">Email orqali</string>
     <string name="what_gender">Jinsingiz nima?</string>
-    <string name="what_gender_subtitle">Har bir odam uchun ozish maqsadi belgishashimiz uchun jinsingiz muhim</string>
+    <string name="what_gender_subtitle">Har bir odam uchun maqsad belgilashimiz uchun jinsingiz muhim</string>
     <string name="what_name">Ismingiz kiriting</string>
-    <string name="start_stable_loss">Samarali va sog\'lom ozishni boshlang!</string>
+    <string name="start_stable_loss">Samarali va sog\'lom o\'zgarishni boshlang!</string>
     <string name="diagram_text_1">🙌 Ozamiz bilan nima xohlasangiz, shuni yeng. Sevimli taomlardan tiyilish va qiyin "qoidalar" endi yo‘q!</string>
-    <string name="diagram_text_2">🍏 Biz sizga kundalik hayotingizga mos tushadigan, eng muhimi — qayta semirmaslikka olib keladigan sog‘lom ozish yo‘lini o‘rgatamiz.</string>
+    <string name="diagram_text_2">🍏 Biz sizga kundalik hayotingizga mos tushadigan, eng muhimi — sog\'lom o\'zgarish yo\'lini o\'rgatamiz.</string>
     <string name="ismingiz">Ismingiz...</string>
     <string name="calorie_info_title">Bu juda oson</string>
-    <string name="calorie_info_subtitle">Ozish siri — sarflagandan kamroq kaloriya yeyish, lekin me’yorni saqlashdir. Sog‘lom ozishingizda biz yordam beramiz!</string>
+    <string name="calorie_info_subtitle">Natija siri — to\'g\'ri kaloriya me\'yorini saqlashdir. Sog\'lom maqsadingizda biz yordam beramiz!</string>
     <string name="what_age">Necha yoshsiz?</string>
     <string name="yoshingiz">Yoshingiz</string>
     <string name="age_error">Yoshingizni to\'g\'ri kiriting</string>
@@ -570,7 +569,7 @@
     <string name="label_fat">Fat</string>
     <string name="macro_short_format">%1$d / %2$d g</string>
     <string name="macro_remaining_format">%1$d qoldi</string>
-    <string name="macro_exceeded_format">Yetarli</string>
+    <string name="macro_exceeded_format">%1$d oshdi</string>
     <string name="protein_desc">Mushak quruvchi</string>
     <string name="fat_desc">Energiya manbai</string>
     <string name="carbs_desc">Kuch manbai</string>
@@ -582,7 +581,7 @@
     <string name="menus_title">Menyular</string>
     <string name="menus_subtitle">Sog\'lom va foydali taomlar</string>
     <string name="burned">Sarflandi</string>
-    <string name="sun">Suniy intelekt ovqatni ozishga foydasini hisoblaydi</string>
+    <string name="sun">Suniy intelekt ovqatning foydasini hisoblaydi</string>
     <string name="rasmoling">1. Ovqatni rasmga oling.</string>
     <string name="ilovakalhison">2. Ilova kaloriya miqdorini hisoblaydi.</string>
     <string name="log_input_empty">Ovqat haqida kiriting</string>

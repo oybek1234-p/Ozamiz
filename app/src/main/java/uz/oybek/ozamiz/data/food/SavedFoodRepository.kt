@@ -29,7 +29,11 @@ object SavedFoodRepository {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                close(error.toException())
+                if (error.code == DatabaseError.PERMISSION_DENIED) {
+                    close()
+                } else {
+                    close(error.toException())
+                }
             }
         }
         reference.addValueEventListener(listener)

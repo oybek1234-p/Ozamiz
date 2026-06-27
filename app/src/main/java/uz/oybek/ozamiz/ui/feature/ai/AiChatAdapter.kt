@@ -8,13 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.data.ai.model.ChatMessage
 import uz.oybek.ozamiz.databinding.ItemChatMessageBinding
-import java.util.regex.Pattern
 import uz.oybek.ozamiz.databinding.ItemChatThinkingBinding
 import uz.oybek.ozamiz.ui.utils.MarkdownUtils
 
 class AiChatAdapter(
-    private val onRecreateClick: () -> Unit,
-    private val onSaveMenuClick: (String) -> Unit
+    private val onRecreateClick: () -> Unit, private val onSaveMenuClick: (String) -> Unit
 ) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback) {
 
     companion object {
@@ -38,6 +36,7 @@ class AiChatAdapter(
             TYPE_THINKING -> ThinkingViewHolder(
                 ItemChatThinkingBinding.inflate(inflater, parent, false)
             )
+
             else -> MessageViewHolder(
                 ItemChatMessageBinding.inflate(inflater, parent, false),
                 onRecreateClick,
@@ -70,25 +69,9 @@ class AiChatAdapter(
                     userMessageLayout.isVisible = false
                     aiMessageLayout.isVisible = true
                     aiMessageText.text = MarkdownUtils.formatMarkdown(cleanedText)
-                    
-                    val isMenu = cleanedText.contains("variant", ignoreCase = true) && 
-                            (cleanedText.contains("Nonushta", ignoreCase = true) || 
-                             cleanedText.contains("Tushlik", ignoreCase = true) || 
-                             cleanedText.contains("Kechki", ignoreCase = true))
-                    
-                    btnRecreate.isVisible = isMenu
-                    btnRecreate.setOnClickListener {
-                        onRecreateClick()
-                    }
-
-                    btnSaveMenu.isVisible = isMenu
-                    btnSaveMenu.setOnClickListener {
-                        onSaveMenuClick(message.text)
-                    }
                 }
             }
         }
-
     }
 
     class ThinkingViewHolder(binding: ItemChatThinkingBinding) :

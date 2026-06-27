@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.community.model
 
+import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
@@ -22,7 +23,20 @@ data class CommunityPost(
     var timestamp: Date? = null,
     var comment: String? = null,
     var verified: Boolean = false,
+    @get:PropertyName("visible")
+    @set:PropertyName("visible")
     var isVisible: Boolean = false,
     var healthScore: Int = 0,
-    var userScore: Int = 0
+    var userScore: Int = 0,
+    var type: String = PostType.MANUAL,
+    @get:PropertyName("premiumUser")
+    @set:PropertyName("premiumUser")
+    var isPremiumUser: Boolean = false
 )
+
+object PostType {
+    const val FOOD = "FOOD"
+    const val WEIGHT_LOSS = "WEIGHT_LOSS"
+    const val WATER = "WATER"
+    const val MANUAL = "MANUAL"
+}

@@ -15,24 +15,15 @@ sealed class OnBoardingDirection {
 
 object OnBoardingDirections {
 
-    val screensNavList = listOf(
+    val screensNavList: List<OnBoardingDirection> = listOf(
         OnBoardingDirection.SingleScreen(R.id.genderFragment),
         OnBoardingDirection.SingleScreen(R.id.nameFragment),
-        OnBoardingDirection.MultipleAnswer(MultipleAnswersQuestion.GOAL),
-        OnBoardingDirection.MultipleAnswer(MultipleAnswersQuestion.HISTORY),
-        OnBoardingDirection.MultipleAnswer(MultipleAnswersQuestion.STRUGGLES),
-        OnBoardingDirection.SingleScreen(R.id.diagramFragment),
-        OnBoardingDirection.MultipleAnswer(MultipleAnswersQuestion.CALORIES),
-        OnBoardingDirection.SingleScreen(R.id.calorieInfoFragment),
-        OnBoardingDirection.MultipleAnswer(MultipleAnswersQuestion.FASTING),
+        OnBoardingDirection.SingleScreen(R.id.goalOnboardFragment),
         OnBoardingDirection.SingleScreen(R.id.ageFragment),
         OnBoardingDirection.SingleScreen(R.id.heightFragment),
         OnBoardingDirection.SingleScreen(R.id.activityLevelFragment),
         OnBoardingDirection.SingleScreen(R.id.weightFragment),
         OnBoardingDirection.SingleScreen(R.id.targetWeightFragment),
-        OnBoardingDirection.SingleScreen(R.id.seeEffectFragment),
-        OnBoardingDirection.MultipleAnswer(MultipleAnswersQuestion.CHALLENGE),
-        OnBoardingDirection.SingleScreen(R.id.photosOnboardFragment),
         OnBoardingDirection.SingleScreen(R.id.planFragment)
     )
 }

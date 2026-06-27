@@ -9,11 +9,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.R
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.databinding.FragmentAddPostBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.data.community.model.CommunityPost
+import uz.oybek.ozamiz.data.community.model.PostType
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import java.util.Date
 
@@ -123,7 +125,9 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
                 description = description,
                 timestamp = Date(),
                 verified = false,
-                isVisible = false
+                isVisible = false,
+                type = PostType.MANUAL,
+                isPremiumUser = user.premium
             )
 
             val result = viewModel.uploadPost(post, selectedImages)

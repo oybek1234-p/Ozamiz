@@ -41,12 +41,7 @@ object DailyLogRepository {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    try {
-                        trySend(DataWrapper.Error())
-                        close()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+                    trySend(DataWrapper.Error())
                 }
             }
             reference.addValueEventListener(listener)
@@ -77,7 +72,6 @@ object DailyLogRepository {
 
                 override fun onCancelled(error: DatabaseError) {
                     trySend(DataWrapper.Error())
-                    close()
                 }
             }
             reference.addValueEventListener(listener)

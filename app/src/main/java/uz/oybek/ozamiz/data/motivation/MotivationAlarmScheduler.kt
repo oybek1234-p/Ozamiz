@@ -9,7 +9,6 @@ import java.util.Calendar
 
 object MotivationAlarmScheduler {
 
-    // 5 alarm times: morning (8:00), mid-morning (10:00), lunch (13:00), afternoon (16:00), evening (19:00)
     private val ALARM_HOURS = intArrayOf(8, 10, 13, 16, 19)
     private val ALARM_MINUTES = intArrayOf(0, 0, 0, 0, 0)
 

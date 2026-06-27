@@ -42,6 +42,22 @@ object DateUtils {
             getStartOfDay(calendar.time)
         }
     }
+
+    fun toLongTimestamp(ts: Any?): Long {
+        return when (ts) {
+            is Long -> ts
+            is com.google.firebase.Timestamp -> ts.toDate().time
+            is java.util.Date -> ts.time
+            is Map<*, *> -> {
+                (ts["timestampLong"] as? Long) ?: (ts["seconds"] as? Long)?.let { it * 1000 } ?: System.currentTimeMillis()
+            }
+            else -> System.currentTimeMillis()
+        }
+    }
+}
+
+fun <T> List<T>.sortByRecent(timestampSelector: (T) -> Any?): List<T> {
+    return this.sortedByDescending { DateUtils.toLongTimestamp(timestampSelector(it)) }
 }
 
 fun Date.dateApiFormat(): String =

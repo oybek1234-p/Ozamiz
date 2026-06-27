@@ -30,13 +30,6 @@ class PlanFragment : OnBoardingChildFragment<FragmentPlanBinding>() {
                 targetWeight
             )
         )
-        val currentWeight = user.weight.toFloat()
-        val targetWeightFloat = targetWeight.toFloat()
-        bind.viewWeightProjection.setData(
-            currentWeight,
-            targetWeightFloat,
-            dateStr
-        )
 
         bind.buttonLoveIt.setOnClickListener {
             moveToNextScreen()

@@ -10,9 +10,9 @@ import kotlin.math.roundToInt
 
 object DietController {
 
-
-    private const val AVERAGE_WEIGHT_LOSS_PER_WEEK_KG = 0.7
-    const val WEIGHT_CALORIE_LOSS_TARGET = -750
+    private const val AVERAGE_WEIGHT_LOSS_PER_WEEK_KG = 0.5
+    const val DEFICIT_CALORIES = 500
+    const val SURPLUS_CALORIES = 400
 
     fun calculateEstimatedGoalDate(): Date {
         val user = LocalUser.user
@@ -30,43 +30,65 @@ object DietController {
         return calendar.time
     }
 
-    fun getIdealWeight(heightM: Double): Pair<Int, Int> {
-        val pair = Pair(
-            (18.5 * heightM * heightM).toInt(),
-            (24.9 * heightM * heightM).toInt()
-        )
-        return pair
+    fun getIdealWeight(heightCm: Double): Pair<Int, Int> {
+        val heightM = heightCm / 100.0
+        val low = (18.5 * heightM * heightM).toInt()
+        val high = (24.9 * heightM * heightM).toInt()
+        return Pair(low, high)
+    }
+
+    fun calculateBMI(weightKg: Double, heightCm: Double): Double {
+        if (heightCm <= 0) return 0.0
+        val heightM = heightCm / 100.0
+        return weightKg / (heightM * heightM)
     }
 
     fun calculateBMR(user: User): Double {
         return if (user.gender == Gender.MALE) {
-            (10 * user.weight) +
-                    (6.25 * user.height) -
-                    (5 * user.age) + 5
+            (10 * user.weight) + (6.25 * user.height) - (5 * user.age) + 5
         } else {
-            (10 * user.weight) +
-                    (6.25 * user.height) -
-                    (5 * user.age) - 161
+            (10 * user.weight) + (6.25 * user.height) - (5 * user.age) - 161
         }
     }
 
     fun calculateTDEE(user: User): Double {
         val bmr = calculateBMR(user)
-        val activityLevel =
-            UserActivityLevel.valueOf(user.activityLevel)
+        val activityLevel = UserActivityLevel.valueOf(user.activityLevel)
         return bmr * activityLevel.multiplier
     }
 
     fun calculateTargetCalories(user: User): Int {
         val tdee = calculateTDEE(user)
-        val target = tdee + WEIGHT_CALORIE_LOSS_TARGET
-        val minimumCalories = 1200.0
+        val target = if (user.goal == "gain_weight") {
+            tdee + SURPLUS_CALORIES
+        } else {
+            tdee - DEFICIT_CALORIES
+        }
+        val minimumCalories = if (user.gender == Gender.MALE) 1500.0 else 1200.0
         return maxOf(target, minimumCalories).roundToInt()
     }
 
     fun calculateTargetWaterMl(weightKg: Double): Int {
         val waterMl = weightKg * 35
         return (waterMl / 100).roundToInt() * 100
+    }
+
+    fun updateTargetValues(user: User) {
+        val targetCals = calculateTargetCalories(user)
+        user.targetCalories = targetCals
+        
+        val macros = if (user.goal == "gain_weight") {
+            // High carb, moderate protein for bulking
+            calculateMacrosByPercent(targetCals, proteinPercent = 0.25, fatPercent = 0.25, carbPercent = 0.50)
+        } else {
+            // Higher protein for cutting
+            calculateMacrosByPercent(targetCals, proteinPercent = 0.35, fatPercent = 0.25, carbPercent = 0.40)
+        }
+        
+        user.targetProtein = macros.protein
+        user.targetFat = macros.fat
+        user.targetCarbs = macros.carbs
+        user.targetWaterMl = calculateTargetWaterMl(user.weight)
     }
 
     fun calculateMacrosByPercent(

@@ -10,7 +10,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.level.LevelManager
+import uz.oybek.ozamiz.data.points.LevelManager
+import uz.oybek.ozamiz.data.points.model.Level
 import uz.oybek.ozamiz.databinding.FragmentLevelBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
@@ -39,16 +40,13 @@ class LevelFragment : BaseFragment<FragmentLevelBinding>() {
         val currentLevel = LevelManager.getCurrentLevel(points)
         val nextLevel = LevelManager.getNextLevel(points)
         val progress = LevelManager.getProgressToNextLevel(points)
-        val color = Color.parseColor(String.format("#%06X", 0xFFFFFF and currentLevel.color.toInt()))
 
         bind.textCurrentEmoji.text = currentLevel.emoji
         bind.textCurrentLevelName.text = currentLevel.name
         bind.textCurrentPoints.text = "$points ball"
-        bind.textCurrentPoints.setTextColor(color)
 
         bind.progressToNextLevel.max = 100
         bind.progressToNextLevel.setProgressCompat((progress * 100).toInt(), true)
-        bind.progressToNextLevel.setIndicatorColor(color)
 
         if (nextLevel != null) {
             val remaining = nextLevel.requiredPoints - points

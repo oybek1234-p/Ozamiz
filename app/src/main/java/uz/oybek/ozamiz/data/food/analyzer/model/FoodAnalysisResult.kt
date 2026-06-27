@@ -28,7 +28,7 @@ data class FoodAnalysis(
             photoUrl = photoUrl,
             timestamp = System.currentTimeMillis(),
             mealType = mealType,
-            aiInsights = result?.aiInsight,
+            aiInsights = result?.pros?.joinToString("\n") { "✅ $it" } ?: result?.aiInsight,
             aiGenerated = true,
             healthLevel = result?.healthScore,
             logId = id.toString()

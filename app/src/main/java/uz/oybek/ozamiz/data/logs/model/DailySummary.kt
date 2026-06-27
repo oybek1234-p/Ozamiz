@@ -12,6 +12,5 @@ data class DailySummary(
     val consumedFat: Double = 0.0,
     val timestamp: Long = 0L
 ) {
-    // No-argument constructor for Firebase
     constructor() : this(0, 0, 0, 0.0, 0.0, 0.0, 0L)
 }

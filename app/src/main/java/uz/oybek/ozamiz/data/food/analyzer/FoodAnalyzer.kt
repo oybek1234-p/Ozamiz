@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
 import com.google.firebase.ai.type.content
+import com.google.firebase.crashlytics.crashlytics
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,6 +34,7 @@ object FoodAnalyzer {
             it.mealType = mealType
         }
     }
+
     fun getHistory(id: Int) = conversationCache[id] ?: emptyList()
 
     suspend fun analyze(
@@ -44,29 +46,35 @@ object FoodAnalyzer {
         }
 
         Log.d("FoodAnalyzer", "🔍 Starting analysis with history size: ${history.size}")
-        
+
         runCatching {
             val correctHistory = history.dropLast(1)
             val lastMessage = history.last()
-            
-            Log.d("FoodAnalyzer", "📝 History messages: ${correctHistory.size}, Last message role: ${lastMessage.role}")
-            
+
+            Log.d(
+                "FoodAnalyzer",
+                "📝 History messages: ${correctHistory.size}, Last message role: ${lastMessage.role}"
+            )
+
             val chat = model.startChat(correctHistory)
             Log.d("FoodAnalyzer", "💬 Chat started, sending message...")
-            
+
             val response = chat.sendMessage(lastMessage)
             Log.d("FoodAnalyzer", "✅ Response received: ${response.text?.take(100)}...")
-            
+
             response.text?.parseResult()?.let { result ->
-                Log.d("FoodAnalyzer", "✅ Parsed result: calories=${result.calories}, isAmbiguous=${result.isAmbiguous}")
+                Log.d(
+                    "FoodAnalyzer",
+                    "✅ Parsed result: calories=${result.calories}, isAmbiguous=${result.isAmbiguous}"
+                )
                 FoodAnalysis(
                     id = result.hashCode(),
                     photoUrl = null,
                     result = result,
                     mealType = ""
-                ).also { 
+                ).also {
                     cache[it.id] = it
-                    val modelContent = com.google.firebase.ai.type.content(role = "model") {
+                    val modelContent = content(role = "model") {
                         text(response.text ?: "")
                     }
                     conversationCache[it.id] = history + modelContent
@@ -75,10 +83,9 @@ object FoodAnalyzer {
                 Log.e("FoodAnalyzer", "❌ Failed to parse response text: ${response.text}")
                 null
             }
-        }.onFailure { 
+        }.onFailure {
             Log.e("FoodAnalyzer", "❌ Analysis error: ${it.message}", it)
-            Log.e("FoodAnalyzer", "❌ Error type: ${it.javaClass.simpleName}")
-            Log.e("FoodAnalyzer", "❌ Stack trace: ${it.stackTraceToString()}")
+            Firebase.crashlytics.recordException(it)
         }
             .getOrNull()
     }
@@ -95,7 +102,7 @@ object FoodAnalyzer {
         val prompt = FoodAnalyzerConfig.buildFoodPrompt(
             "", meal, user.gender, consumedCalories, waterMl, burnedCalories, targetCalories
         )
-        
+
         val content = content {
             inlineData(audioBytes, "audio/ogg")
             text(prompt)
@@ -105,16 +112,22 @@ object FoodAnalyzer {
     }
 
     suspend fun createInitialContent(
-       imageUrl: Uri?,
-       description: String,
-       meal: String,
-       consumedCalories: Int,
-       waterMl: Int,
-       burnedCalories: Int,
-       targetCalories: Int
+        imageUrl: Uri?,
+        description: String,
+        meal: String,
+        consumedCalories: Int,
+        waterMl: Int,
+        burnedCalories: Int,
+        targetCalories: Int
     ): com.google.firebase.ai.type.Content = withContext(Dispatchers.IO) {
         val prompt = FoodAnalyzerConfig.buildFoodPrompt(
-            description, meal, user.gender, consumedCalories, waterMl, burnedCalories, targetCalories
+            description,
+            meal,
+            user.gender,
+            consumedCalories,
+            waterMl,
+            burnedCalories,
+            targetCalories
         )
         content {
             imageUrl?.toBytes()?.let { inlineData(it, "image/jpeg") }
@@ -126,27 +139,25 @@ object FoodAnalyzer {
         appContext.contentResolver.openInputStream(this)?.readBytes()
     }.getOrNull()
 
-    private fun String.parseResult(): FoodAnalysisResult? = runCatching {
-        val cleaned = this.trim()
-        
-        val jsonString = when {
-            cleaned.contains("```json") -> {
-                cleaned.substringAfter("```json")
-                    .substringBeforeLast("```")
-                    .trim()
+    private fun String.parseResult(): FoodAnalysisResult? {
+        return try {
+            val cleaned = this.trim()
+            val jsonStart = cleaned.indexOf("{")
+            val jsonEnd = cleaned.lastIndexOf("}")
+
+            if (jsonStart == -1 || jsonEnd == -1) {
+                Log.e("FoodAnalyzer", "❌ No JSON object found in response: ${cleaned.take(200)}")
+                return null
             }
-            cleaned.startsWith("```") && cleaned.endsWith("```") -> {
-                cleaned.removePrefix("```")
-                    .removeSuffix("```")
-                    .trim()
-            }
-            cleaned.startsWith("{") -> cleaned
-            else -> {
-                Log.e("FoodAnalyzer", "❌ Unexpected response format: ${cleaned.take(100)}")
-                cleaned
-            }
+
+            val jsonString = cleaned.substring(jsonStart, jsonEnd + 1)
+            Log.d("FoodAnalyzer", "🔍 Extracted JSON: ${jsonString.take(200)}")
+
+            gson.fromJson(jsonString, FoodAnalysisResult::class.java)
+        } catch (e: Exception) {
+            Log.e("FoodAnalyzer", "❌ Parsing error: ${e.message}")
+            com.google.firebase.Firebase.crashlytics.recordException(e)
+            null
         }
-        Log.d("FoodAnalyzer", "🔍 Extracted JSON: ${jsonString.take(200)}")
-        gson.fromJson(jsonString, FoodAnalysisResult::class.java)
-    }.getOrNull()
+    }
 }

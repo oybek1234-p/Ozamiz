@@ -17,7 +17,7 @@ class CameraOverlayView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val backgroundPaint = Paint().apply {
-        color = Color.parseColor("#99000000")
+        color = Color.parseColor("#77000000")
         isAntiAlias = true
     }
 
@@ -35,7 +35,7 @@ class CameraOverlayView @JvmOverloads constructor(
     }
 
     private val rectF = RectF()
-    private val cornerRadius = 20f * resources.displayMetrics.density
+    private val cornerRadius = 24f * resources.displayMetrics.density
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -43,11 +43,11 @@ class CameraOverlayView @JvmOverloads constructor(
         val width = width.toFloat()
         val height = height.toFloat()
 
-        val rectWidth = width * 0.8f
-        val rectHeight = rectWidth * 0.75f
+        val rectWidth = width * 0.85f
+        val rectHeight = rectWidth
 
         val left = (width - rectWidth) / 2
-        val top = (height - rectHeight) / 2
+        val top = (height - rectHeight) / 2 - 40f * resources.displayMetrics.density
         val right = left + rectWidth
         val bottom = top + rectHeight
 

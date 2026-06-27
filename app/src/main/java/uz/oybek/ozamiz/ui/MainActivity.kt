@@ -102,8 +102,12 @@ class MainActivity : AppCompatActivity() {
         val inflater = navHost.navController.navInflater
         val graph = inflater.inflate(R.navigation.main_navigation)
         val user = LocalUser.user
+        val firebaseUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
 
-        if (user.valid) {
+        if (user.valid && firebaseUser == null) {
+            UserRepository.signOut()
+            graph.setStartDestination(R.id.authFragment)
+        } else if (user.valid) {
             checkRegisterDate()
             if (user.name.isEmpty()) {
                 graph.setStartDestination(R.id.onboarding)

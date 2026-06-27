@@ -155,20 +155,16 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         }
 
         val weight = weightStr?.toDoubleOrNull()
-        if (weight == null || weight < 20 || weight > 500) {
-            showToast("Iltimos, vazningizni to'g'ri kiriting (kg)")
+        if (weight == null || weight < 30.0 || weight > 500.0) {
+            showToast("Iltimos, vazningizni to'g'ri kiriting (30–500 kg)")
             return
         }
 
         var targetWeight: Double? = null
         if (!targetWeightStr.isNullOrEmpty()) {
             targetWeight = targetWeightStr.toDoubleOrNull()
-            if (targetWeight == null || targetWeight < 20 || targetWeight > 500) {
-                showToast("Maqsad vaznni to'g'ri kiriting")
-                return
-            }
-            if (targetWeight >= weight) {
-                showToast("Ozish uchun maqsad vazn joriy vazndan kichik bo'lishi kerak")
+            if (targetWeight == null || targetWeight < 30.0 || targetWeight > 500.0) {
+                showToast("Maqsad vaznni to'g'ri kiriting (30–500 kg)")
                 return
             }
         }
@@ -210,17 +206,6 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         if (currentWeight == null || targetWeight == null) {
             bind.targetWeightWarning.isVisible = false
             return
-        }
-
-        val warningMessage = when {
-            targetWeight >= currentWeight -> "Ozish uchun maqsad vazn joriy vazndan kichik bo'lishi kerak."
-            (currentWeight - targetWeight) > 30 -> "Bu maqsad juda keskin. Kichikroq qadamlar bilan boshlash tavsiya etiladi."
-            else -> null
-        }
-
-        bind.targetWeightWarning.apply {
-            text = warningMessage
-            isVisible = warningMessage != null
         }
     }
 

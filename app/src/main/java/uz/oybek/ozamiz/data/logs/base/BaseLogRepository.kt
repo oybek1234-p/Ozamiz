@@ -7,10 +7,6 @@ import uz.oybek.ozamiz.data.firebase.generateKey
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
 
-/**
- * Base repository for log operations with Firebase Realtime Database.
- * Eliminates code duplication across FoodLogRepository, WaterLogRepository, ExerciseLogRepository.
- */
 abstract class BaseLogRepository<T : LogItem> {
 
     /**

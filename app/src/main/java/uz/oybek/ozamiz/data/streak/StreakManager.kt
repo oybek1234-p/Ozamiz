@@ -81,27 +81,7 @@ object StreakManager {
                     )
                     streakContinued = true
                 }
-                daysDiff > 1L && daysDiff <= 3L -> {
-                    // Missed 1 or 2 days -> Streak Stays Same (Maintenance)
-                    // We DO NOT increment currentStreak, but we also DO NOT reset it.
-                    // We just update lastActionDate and activeDays?
-                    // "Streak stays same" implies the count doesn't drop. 
-                    // Should we increment activeDays? Yes, because we are active today.
-                    // Should we increment current streak? The user said "stay same". 
-                    // Technically if I skip a day, my consecutive streak is broken, but the user wants 'mercy'.
-                    // Usually mercy means "it doesn't reset to 0", but maybe doesn't increment either if it's not consecutive?
-                    // User said: "It will only use not opened the app for 3 days. otherwise it will stay same."
-                    // Let's interpret "stay same" as "count is preserved". 
-                    // Is today a continuation? If today is a new active day, logic suggests we add +1 if we are "keeping" the streak.
-                    // BUT, accurate interpretation of "stay same" usually means "don't reset".
-                    // If I have 15, miss a day, then come back. It is 15. 
-                    // If I come back today, it should probably be 16? 
-                    // Or maybe it stays 15 until I recover? 
-                    // Let's assume standard "Freeze" logic: It doesn't reset, but since the chain is broken, maybe we just Resume?
-                    // Let's Increment. Because if I am back, I am back!
-                    // Wait, if I miss 1 day, and I am back, my streak flows. 
-                    // Let's Increment it. 
-                    
+                daysDiff in 2..3L -> {
                     currentStreakInfo = currentStreakInfo.copy(
                         currentStreak = currentStreakInfo.currentStreak + 1, // Resume incrementing
                         activeDays = currentStreakInfo.activeDays + 1,
@@ -111,7 +91,6 @@ object StreakManager {
                     streakContinued = true
                 }
                 else -> {
-                    // > 3 days (4 or more) -> Reset
                      if (oldCurrentStreak > 0 && !isVeryFirstActionEver) {
                         streakBrokenAndReset = true
                     }
@@ -140,9 +119,5 @@ object StreakManager {
             newBestStreakAchieved,
             isFirstActionToday
         )
-    }
-
-    fun shouldShowFirstLogCongratulation(updateResult: StreakUpdateResult): Boolean {
-        return updateResult.isFirstActionToday && updateResult.streakStartedNew
     }
 }

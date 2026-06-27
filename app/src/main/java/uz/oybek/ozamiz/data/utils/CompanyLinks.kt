@@ -8,7 +8,6 @@ class CompanyLinks {
 
     companion object {
         const val PHONE_NUMBER = "+998971871415"
-        const val INSTAGRAM = ""
         const val TELEGRAM = "@oybek1415"
 
         private const val TELEGRAM_SUFFIX = "https://t.me/"

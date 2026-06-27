@@ -33,10 +33,18 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         const val TAG = "StreakInfoSheet"
         private const val ARG_STREAK_INFO = "streak_info_arg"
 
-        fun newInstance(streakInfo: StreakInfo): StreakInfoSheet {
+        fun newInstance(streakInfo: StreakInfo, isNewAction: Boolean = false): StreakInfoSheet {
             val fragment = StreakInfoSheet()
-            fragment.arguments = bundleOf(ARG_STREAK_INFO to streakInfo)
+            fragment.arguments = androidx.core.os.bundleOf(
+                ARG_STREAK_INFO to streakInfo,
+                "is_new_action" to isNewAction
+            )
             return fragment
+        }
+
+        fun show(fragmentManager: androidx.fragment.app.FragmentManager, isNewAction: Boolean = false) {
+            val streakInfo = uz.oybek.ozamiz.data.user.UserRepository.user.streakInfo ?: return
+            newInstance(streakInfo, isNewAction).show(fragmentManager, TAG)
         }
     }
 
@@ -85,8 +93,13 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
             dismiss()
         }
 
+        val isNewAction = arguments?.getBoolean("is_new_action", false) ?: false
+
         streakInfo?.let { info ->
             setupViews(info)
+            if (isNewAction) {
+                animateStreakIncrement()
+            }
         } ?: run {
             binding.textStreakMainCount.text = "0"
             binding.textMotivationChip.text = "Faollikni boshlang! 💪"
@@ -95,6 +108,40 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         binding.buttonStreakDialogContinue.setOnClickListener {
             dismiss()
         }
+    }
+
+    private fun animateStreakIncrement() {
+        val finalStreak = streakInfo?.currentStreak ?: return
+        if (finalStreak <= 0) return
+        
+        val startStreak = finalStreak - 1
+        binding.textStreakMainCount.text = startStreak.toString()
+        
+        binding.textStreakMainCount.postDelayed({
+            android.animation.ValueAnimator.ofInt(startStreak, finalStreak).apply {
+                duration = 1000
+                addUpdateListener { animator ->
+                    binding.textStreakMainCount.text = animator.animatedValue.toString()
+                }
+                addListener(object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: android.animation.Animator) {
+                        binding.textStreakMainCount.animate()
+                            .scaleX(1.3f)
+                            .scaleY(1.3f)
+                            .setDuration(500)
+                            .withEndAction {
+                                binding.textStreakMainCount.animate()
+                                    .scaleX(1.0f)
+                                    .scaleY(1.0f)
+                                    .setDuration(500)
+                                    .start()
+                            }
+                            .start()
+                    }
+                })
+                start()
+            }
+        }, 500)
     }
 
     private fun setupViews(info: StreakInfo) {
@@ -121,11 +168,7 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         val formatter = DateTimeFormatter.ofPattern("d MMM", Locale("uz"))
         binding.textWeekRange.text = "${monday.format(formatter)} - ${sunday.format(formatter)}"
 
-        // Weekly Progress
         setupWeeklyProgress(info)
-        
-        // Animate Fire
-        animateFire(binding.imageFireMain)
     }
 
     private fun getMotivationText(streak: Int): String {

@@ -24,7 +24,7 @@ import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.getPremiumExpireDate
 import uz.oybek.ozamiz.ui.feature.premium.premiumExpired
-import uz.oybek.ozamiz.data.level.LevelManager
+import uz.oybek.ozamiz.data.points.LevelManager
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
@@ -56,24 +56,17 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         ) {
             findNavController().navigate(R.id.getMainInfoFragment)
         }
+
         setupSection(
-            bind.sectionWeightHistory,
-            R.drawable.history_24px,
-            getString(R.string.weight_history_title)
+            bind.sectionCalorieSettings,
+            R.drawable.calculate_ic,
+            "Hisoblagich"
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.weightPhotoHistoryFragment)
+                navigate(R.id.action_profileFragment_to_calorieSettingsFragment)
             }
         }
-        setupSection(
-            bind.sectionUserLessons,
-            R.drawable.study_ic,
-            "Darsliklar"
-        ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.lessonsHomeFragment)
-            }
-        }
+
         setupSection(
             bind.sectionSupport, R.drawable.help_ic, getString(R.string.help_and_support)
         ) {
@@ -82,13 +75,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         setupSection(bind.sectionRateApp, R.drawable.star_ic, getString(R.string.rate_app)) {
             openAppInPlayStore()
         }
-        setupSection(
-            bind.sectionCommunity, R.drawable.people_ic, getString(R.string.hamjamiyat)
-        ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.communityFragment)
-            }
-        }
+
         setupSection(
             bind.sectionAdminPremiumUsersContent, R.drawable.admin_ic, "Premium Tekshiruv"
         ) {
@@ -96,13 +83,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
             }
         }
-        setupSection(
-            bind.sectionAdminLessons, R.drawable.ic_profile, "Admin: Darsliklar"
-        ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.action_profileFragment_to_adminLessonsFragment)
-            }
-        }
+
         setupSection(
             bind.sectionAdminAllUsers, R.drawable.group_ic, "Admin: Foydalanuvchilar"
         ) {
@@ -179,6 +160,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         val level = LevelManager.getCurrentLevel(user.scorePoints)
                         bind.textProfileLevelEmoji.text = level.emoji
                         bind.textProfileLevelName.text = level.name
+                        bind.textProfilePoints.text = "${user.scorePoints} ball"
                         
                         bind.buttonLogout.isVisible = true
 
@@ -202,7 +184,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                             }
                         }
                         bind.sectionAdminPremiumUsers.isVisible = user.admin
-                        bind.containerAdminLessons.isVisible = user.admin
                     } else {
                         bind.textViewUserName.text = getString(R.string.default_user_name)
                         bind.imageViewUserAvatar.setImageResource(R.drawable.ic_profile)
@@ -210,7 +191,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         bind.premiumActiveC.isVisible = false
                         bind.premiumView.isVisible = false
                         bind.sectionAdminPremiumUsers.isVisible = false
-                        bind.containerAdminLessons.isVisible = false
                     }
                 }
             }

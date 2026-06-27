@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.natija
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,10 @@ data class NatijaUiState(
     val weeklyRate: Double = 0.0,
     val photoBefore: String? = null,
     val photoAfter: String? = null,
+    val photoBeforeDate: Long? = null,
+    val photoAfterDate: Long? = null,
+    val photoBeforeWeight: Double? = null,
+    val photoAfterWeight: Double? = null,
     val showTopBanner: Boolean = false,
     val showBottomBanner: Boolean = false,
 
@@ -54,6 +59,7 @@ class NatijaViewModel : ViewModel() {
                 when (result) {
                     is DataWrapper.Success -> {
                         val logs = result.data.sortedBy { it.timestampLong }
+                        Log.e("Kot",logs.toString())
                         val validLogs = logs.filter { it.weightKg > 0 }
 
                         if (validLogs.isNotEmpty()) {
@@ -130,11 +136,35 @@ class NatijaViewModel : ViewModel() {
 
         val lastLog = validLogs.last()
 
-        val photoLogs = logs.filter { it.photoUrl.isNotEmpty() }
+        val photoLogs = logs.filter { it.photoUrl.isNotEmpty() && it.timestampLong > 0 }
+            .sortedByDescending { it.timestampLong }
 
-        // User wants to compare the last two added photos.
-        val lastPhoto = photoLogs.lastOrNull()?.photoUrl
-        val firstPhoto = if (photoLogs.size >= 2) photoLogs[photoLogs.size - 2].photoUrl else null
+        // Group by day to get the latest photo from each day
+        val dailyPhotos = photoLogs.groupBy { 
+            val cal = java.util.Calendar.getInstance()
+            cal.timeInMillis = it.timestampLong
+            cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+            cal.set(java.util.Calendar.MINUTE, 0)
+            cal.set(java.util.Calendar.SECOND, 0)
+            cal.set(java.util.Calendar.MILLISECOND, 0)
+            cal.timeInMillis
+        }.values.map { it.first() }
+
+        val lastPhotoLog = dailyPhotos.getOrNull(0)
+        val prevPhotoLog = if (dailyPhotos.size >= 2) {
+            dailyPhotos[1]
+        } else if (photoLogs.size >= 2) {
+            photoLogs[1]
+        } else {
+            null
+        }
+
+        val lastPhoto = lastPhotoLog?.photoUrl
+        val firstPhoto = prevPhotoLog?.photoUrl
+        val lastPhotoDate = lastPhotoLog?.timestampLong
+        val firstPhotoDate = prevPhotoLog?.timestampLong
+        val lastPhotoWeight = lastPhotoLog?.weightKg
+        val prevPhotoWeight = prevPhotoLog?.weightKg
 
         // Weekly Rate and Prediction
         var weeklyRate = 0.0
@@ -178,6 +208,10 @@ class NatijaViewModel : ViewModel() {
                 weeklyRate = weeklyRate,
                 photoBefore = firstPhoto,
                 photoAfter = lastPhoto,
+                photoBeforeDate = firstPhotoDate,
+                photoAfterDate = lastPhotoDate,
+                photoBeforeWeight = prevPhotoWeight,
+                photoAfterWeight = lastPhotoWeight,
                 showTopBanner = showTop,
                 showBottomBanner = showBottom,
                 estimatedGoalDate = predictionDate,

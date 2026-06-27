@@ -1,22 +1,27 @@
 package uz.oybek.ozamiz.ui.feature.level
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import uz.oybek.ozamiz.data.level.LevelInfo
+import uz.oybek.ozamiz.data.points.model.Level
 import uz.oybek.ozamiz.databinding.ItemLevelBinding
 
 class LevelAdapter(
-    private val levels: List<LevelInfo>,
-    private val currentPoints: Int
+    private val levels: List<Level>, private val currentPoints: Int
 ) : RecyclerView.Adapter<LevelAdapter.LevelViewHolder>() {
 
-    inner class LevelViewHolder(val binding: ItemLevelBinding) : RecyclerView.ViewHolder(binding.root)
+    class LevelViewHolder(val binding: ItemLevelBinding) : RecyclerView.ViewHolder(binding.root)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LevelViewHolder {
-        val binding = ItemLevelBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): LevelViewHolder {
+        val binding =
+            ItemLevelBinding.inflate(
+                LayoutInflater.from(
+                    parent.context
+                ), parent, false
+            )
         return LevelViewHolder(binding)
     }
 
@@ -29,55 +34,80 @@ class LevelAdapter(
             val next = levels.getOrNull(position + 1)
             isUnlocked && (next == null || currentPoints < next.requiredPoints)
         }
+        val isCompleted = isUnlocked && !isCurrentLevel
 
         with(holder.binding) {
             textItemEmoji.text = level.emoji
             textItemLevelName.text = level.name
 
-            val color = Color.parseColor(String.format("#%06X", 0xFFFFFF and level.color.toInt()))
-
             if (level.requiredPoints == 0) {
                 textItemRequiredPoints.text = "Boshlang'ich"
-                textItemRequiredPoints.setTextColor(color)
             } else {
-                textItemRequiredPoints.text = "${level.requiredPoints} bal"
-                textItemRequiredPoints.setTextColor(color)
+                textItemRequiredPoints.text = "${level.requiredPoints} ball"
             }
+
+            val primaryColor = com.google.android.material.color.MaterialColors.getColor(
+                root, androidx.appcompat.R.attr.colorPrimary
+            )
+            val colorOnSurface = com.google.android.material.color.MaterialColors.getColor(
+                root, com.google.android.material.R.attr.colorOnSurface
+            )
+            val colorOutline = com.google.android.material.color.MaterialColors.getColor(
+                root, com.google.android.material.R.attr.colorOutlineVariant
+            )
+            val colorSurfaceVariant = com.google.android.material.color.MaterialColors.getColor(
+                root, com.google.android.material.R.attr.colorSurfaceContainerHigh
+            )
+            cardEmojiContainer.setCardBackgroundColor(colorSurfaceVariant)
 
             if (isUnlocked) {
                 imgLevelLock.visibility = android.view.View.GONE
-                val next = levels.getOrNull(position + 1)
-                if (next != null && isCurrentLevel) {
-                    val range = next.requiredPoints - level.requiredPoints
-                    val earned = currentPoints - level.requiredPoints
-                    val progress = ((earned.toFloat() / range.toFloat()) * 100).toInt()
-                    progressItemLevel.max = 100
-                    progressItemLevel.setProgressCompat(progress, true)
-                    progressItemLevel.setIndicatorColor(color)
-                } else if (!isCurrentLevel) {
-                    progressItemLevel.max = 100
-                    progressItemLevel.setProgressCompat(100, false)
-                    progressItemLevel.setIndicatorColor(color)
-                } else {
-                    progressItemLevel.max = 100
-                    progressItemLevel.setProgressCompat(100, false)
-                    progressItemLevel.setIndicatorColor(color)
-                }
-                root.alpha = 1f
+                imgLevelCheck.visibility =
+                    if (isCompleted) android.view.View.VISIBLE else android.view.View.GONE
+                textItemRequiredPoints.setTextColor(primaryColor)
+
                 if (isCurrentLevel) {
-                    root.strokeWidth = 4
-                    root.strokeColor = color
+                    textItemStatus.visibility = android.view.View.VISIBLE
+                    textItemStatus.text = "Hozirgi bosqich"
+                    textItemStatus.setTextColor(primaryColor)
+
+                    cardItemLevel.strokeWidth = 4
+                    cardItemLevel.strokeColor = primaryColor
+                    cardItemLevel.setCardBackgroundColor(
+                        com.google.android.material.color.MaterialColors.getColor(
+                            root, com.google.android.material.R.attr.colorPrimaryContainer
+                        )
+                    )
                 } else {
-                    root.strokeWidth = 3
-                    root.strokeColor = android.graphics.Color.parseColor("#22000000")
+                    textItemStatus.visibility = android.view.View.VISIBLE
+                    textItemStatus.text = "Tugallangan"
+                    textItemStatus.setTextColor(
+                        com.google.android.material.color.MaterialColors.getColor(
+                            root, com.google.android.material.R.attr.colorOnSurfaceVariant
+                        )
+                    )
+                    cardItemLevel.strokeWidth = 1
+                    cardItemLevel.strokeColor = colorOutline
+                    cardItemLevel.setCardBackgroundColor(
+                        com.google.android.material.color.MaterialColors.getColor(
+                            root, com.google.android.material.R.attr.colorSurfaceContainerLowest
+                        )
+                    )
                 }
             } else {
                 imgLevelLock.visibility = android.view.View.VISIBLE
-                progressItemLevel.max = 100
-                progressItemLevel.setProgressCompat(0, false)
-                progressItemLevel.setIndicatorColor(Color.GRAY)
-                root.alpha = 0.5f
-                root.strokeWidth = 1
+                imgLevelCheck.visibility = android.view.View.GONE
+                textItemStatus.visibility = android.view.View.GONE
+
+                textItemRequiredPoints.setTextColor(colorOnSurface)
+
+                cardItemLevel.strokeWidth = 1
+                cardItemLevel.strokeColor = colorOutline
+                cardItemLevel.setCardBackgroundColor(
+                    com.google.android.material.color.MaterialColors.getColor(
+                        root, com.google.android.material.R.attr.colorSurface
+                    )
+                )
             }
         }
     }

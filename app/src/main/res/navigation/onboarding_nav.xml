@@ -13,6 +13,10 @@
         android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.NameFragment"
         android:label="NameFragment" />
     <fragment
+        android:id="@+id/goalOnboardFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.GoalOnboardFragment"
+        android:label="GoalOnboardFragment" />
+    <fragment
         android:id="@+id/multipleAnswerFragment"
         android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.MultipleAnswerFragment"
         android:label="MultipleAnswerFragment" />

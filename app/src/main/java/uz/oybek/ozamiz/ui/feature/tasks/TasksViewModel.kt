@@ -7,7 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.points.LevelSystem
+import uz.oybek.ozamiz.data.points.LevelManager
+import uz.oybek.ozamiz.data.points.model.Level
 import uz.oybek.ozamiz.data.points.PointsRepository
 import uz.oybek.ozamiz.data.points.TaskRepository
 import uz.oybek.ozamiz.data.points.model.Task
@@ -20,8 +21,8 @@ data class DailyTaskUiState(
     val tasks: List<Task> = emptyList(),
     val completedTaskIds: List<String> = emptyList(),
     val currentPoints: Int = 0,
-    val currentLevel: LevelSystem.Level = LevelSystem.getLevel(0),
-    val nextLevel: LevelSystem.Level? = null,
+    val currentLevel: Level = LevelManager.getCurrentLevel(0),
+    val nextLevel: Level? = null,
     val levelProgress: Float = 0f,
     val streak: Int = 0,
     val multiplier: Float = 1.0f,
@@ -49,9 +50,9 @@ class TasksViewModel : ViewModel() {
         val completedIds = if (user.lastTaskDate == today) user.completedTaskIds else emptyList()
         
         val tasks = TaskRepository.getTasksForUser(user)
-        val level = LevelSystem.getLevel(user.scorePoints)
-        val nextLevel = LevelSystem.getNextLevel(user.scorePoints)
-        val progress = LevelSystem.getProgress(user.scorePoints)
+        val level = LevelManager.getCurrentLevel(user.scorePoints)
+        val nextLevel = LevelManager.getNextLevel(user.scorePoints)
+        val progress = LevelManager.getProgressToNextLevel(user.scorePoints)
         val streak = user.streakInfo?.currentStreak ?: 0
         val multiplier = PointsRepository.calculateMultiplier(streak)
 

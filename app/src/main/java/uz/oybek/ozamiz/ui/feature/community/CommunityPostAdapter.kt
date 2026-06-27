@@ -11,7 +11,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.community.model.CommunityPost
-import uz.oybek.ozamiz.data.points.LevelSystem
+
 import uz.oybek.ozamiz.databinding.ItemCommunityPostBinding
 import java.util.concurrent.TimeUnit
 
@@ -20,7 +20,9 @@ class CommunityPostAdapter(
     private val onUserClick: (String, String) -> Unit,
     private val onDeleteClick: (CommunityPost) -> Unit,
     private val onViewed: (String) -> Unit,
-    private val onVerifyClick: ((CommunityPost) -> Unit)? = null
+    private val onVerifyClick: ((CommunityPost) -> Unit)? = null,
+    private val showProfileLink: Boolean = true,
+    private val showPremiumBadge: Boolean = true
 ) : ListAdapter<CommunityPost, CommunityPostAdapter.PostViewHolder>(PostDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -51,9 +53,24 @@ class CommunityPostAdapter(
                 .error(R.drawable.user_photo_placeholder)
                 .circleCrop()
                 .into(binding.imgUserAvatar)
-            binding.tvFoodName.text = if (post.title.isNotEmpty()) post.title else post.foodName
-            binding.tvFoodCalories.text = "${post.calories} kkal"
-            binding.tvFoodCalories.isVisible = post.calories > 0
+            // Bind Premium status
+            binding.tvPremiumStatus.isVisible = post.isPremiumUser && showPremiumBadge
+            if (post.isPremiumUser && showPremiumBadge) {
+                binding.tvPremiumStatus.text = "PREMIUM"
+                binding.tvPremiumStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor("#FFD700")
+                )
+            }
+
+            // Hide calories and food name if not a food post
+            val isFoodPost = post.type == uz.oybek.ozamiz.data.community.model.PostType.FOOD
+            binding.tvFoodCalories.isVisible = isFoodPost && post.calories > 0
+            if (isFoodPost) {
+                binding.tvFoodName.text = post.foodName.ifBlank { post.title }
+                binding.tvFoodCalories.text = "${post.calories} kkal"
+            } else {
+                binding.tvFoodName.text = post.title
+            }
 
             binding.tvLikesCount.text = post.likesCount.toString()
             binding.tvViewsCount.text = "${post.viewsCount} ko'rdi"
@@ -79,13 +96,24 @@ class CommunityPostAdapter(
                 binding.tvTime.text = ""
             }
             
-            val photoUrl = if (post.photos.isNotEmpty()) post.photos.first() else post.photoUrl
-            if (photoUrl.isNotEmpty()) {
+            val isWeightLoss = post.type == uz.oybek.ozamiz.data.community.model.PostType.WEIGHT_LOSS || post.type == "ACHIEVEMENT"
+            val photos = (if (post.photos.isNotEmpty()) post.photos else if (post.photoUrl.isNotEmpty()) listOf(post.photoUrl) else emptyList()).filter { it.isNotBlank() }
+
+            if (photos.size >= 2 && isWeightLoss) {
+                binding.imgFoodPhoto.isVisible = false
+                binding.layoutPhotoComparison.isVisible = true
+                
+                // Show the two most recent photos (or first and last for progress)
+                Glide.with(binding.root).load(photos.first()).placeholder(R.drawable.user_photo_placeholder).into(binding.imgBefore)
+                Glide.with(binding.root).load(photos.last()).placeholder(R.drawable.user_photo_placeholder).into(binding.imgAfter)
+            } else if (photos.isNotEmpty()) {
                 binding.imgFoodPhoto.isVisible = true
-                Glide.with(binding.root).load(photoUrl).placeholder(R.drawable.placeholder_food)
+                binding.layoutPhotoComparison.isVisible = false
+                Glide.with(binding.root).load(photos.last()).placeholder(R.drawable.placeholder_food)
                     .into(binding.imgFoodPhoto)
             } else {
                 binding.imgFoodPhoto.isVisible = false
+                binding.layoutPhotoComparison.isVisible = false
             }
 
             var isLiked = currentUserId != null && post.likedBy.contains(currentUserId)
@@ -118,14 +146,19 @@ class CommunityPostAdapter(
             binding.imgUserAvatar.setOnClickListener(userClickListener)
             binding.tvUserName.setOnClickListener(userClickListener)
             binding.btnViewProfile.setOnClickListener(userClickListener)
+            binding.btnViewProfile.isVisible = showProfileLink
 
             // Admin features
+            val isAdmin = uz.oybek.ozamiz.data.user.UserRepository.user.admin
             val isOwner = currentUserId != null && post.userId == currentUserId
-            binding.btnMore.isVisible = isOwner || onVerifyClick != null
+            
+            // Only show more button if user is owner or admin
+            binding.btnMore.isVisible = isOwner || isAdmin
+            
             binding.btnMore.setOnClickListener { view ->
                 val popup = android.widget.PopupMenu(view.context, view)
-                if (isOwner) popup.menu.add("O'chirish")
-                if (onVerifyClick != null && !post.verified) popup.menu.add("Tasdiqlash")
+                if (isOwner || isAdmin) popup.menu.add("O'chirish")
+                if (isAdmin && !post.verified) popup.menu.add("Tasdiqlash")
                 popup.setOnMenuItemClickListener { item ->
                     when (item.title) {
                         "O'chirish" -> onDeleteClick(post)

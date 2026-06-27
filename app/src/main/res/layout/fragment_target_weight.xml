@@ -32,19 +32,33 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="@string/vazningiz_kg"
             android:inputType="numberDecimal"
-            android:maxLength="3"
-            android:layout_height="wrap_content" />
+            android:maxLength="3" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/tvIdealWeight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/roboto_medium"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_input"
+        tools:text="Siz uchun ideal vazn: 60 - 75 kg" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_24"
+        android:layout_height="56dp"
+        android:fontFamily="@font/roboto_bold"
         android:text="@string/davom_etish"
-        app:layout_constraintTop_toBottomOf="@+id/text_input"
+        app:cornerRadius="16dp"
+        android:layout_marginTop="@dimen/dimen_24"
+        app:layout_constraintTop_toBottomOf="@+id/tvIdealWeight"
         tools:layout_editor_absoluteX="24dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

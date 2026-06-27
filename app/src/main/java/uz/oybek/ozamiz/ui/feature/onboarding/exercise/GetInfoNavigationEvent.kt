@@ -36,10 +36,8 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
 
     fun calculateAndSetIdealWeight(heightCm: Int?, gender: Int) {
         if (heightCm != null && heightCm > 0 && (gender == Gender.MALE || gender == Gender.FEMALE)) {
-            val heightM = heightCm / 100.0
-            val idealWeight = DietController.getIdealWeight(heightM)
+            val idealWeight = DietController.getIdealWeight(heightCm.toDouble())
 
-            // XATOLIK TUZATILDI: .toDouble() qo'shildi
             _idealWeightRangeText.postValue(
                 String.format(
                     "%.0f kg - %.0f kg",
@@ -81,8 +79,8 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
                     registerDate = existingUser.registerDate
                 )
 
-                userToUpdate.targetCalories = DietController.calculateTargetCalories(userToUpdate)
-                userToUpdate.targetWaterMl = DietController.calculateTargetWaterMl(userToUpdate.weight)
+                // Centralized calculation for calories, macros, and water
+                DietController.updateTargetValues(userToUpdate)
 
                 UserRepository.updateUser { dbUser ->
                     dbUser.name = userToUpdate.name
@@ -94,6 +92,9 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
                     dbUser.startWeight = userToUpdate.startWeight
                     dbUser.problems = userToUpdate.problems
                     dbUser.targetCalories = userToUpdate.targetCalories
+                    dbUser.targetProtein = userToUpdate.targetProtein
+                    dbUser.targetFat = userToUpdate.targetFat
+                    dbUser.targetCarbs = userToUpdate.targetCarbs
                     dbUser.targetWaterMl = userToUpdate.targetWaterMl
                     dbUser.phoneNumber = userToUpdate.phoneNumber
                     dbUser.activityLevel = userToUpdate.activityLevel

@@ -1,26 +1,10 @@
 package uz.oybek.ozamiz.ui.feature.premium
 
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
 import uz.oybek.ozamiz.data.user.model.User
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-
-object PremiumUtil {
-    private val settingsReference = Firebase.database.reference
-
-    fun loadPremiumPrices(done: (monthly: Long, yearly: Long) -> Unit) {
-        settingsReference.get().addOnSuccessListener { snapshot ->
-            val monthly = snapshot.child("premiumPrice").value.toString().replace(" ", "").toLongOrNull() ?: 29000L
-            val yearly = snapshot.child("premiumYearPrice").value.toString().replace(" ", "").toLongOrNull() ?: 149000L
-            done.invoke(monthly, yearly)
-        }.addOnFailureListener {
-            done.invoke(29000L, 149000L)
-        }
-    }
-}
 
 fun User.premiumExpired(): Boolean {
     if (!premium) return true
