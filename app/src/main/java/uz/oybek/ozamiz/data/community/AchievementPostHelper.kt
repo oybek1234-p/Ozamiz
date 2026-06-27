@@ -72,16 +72,16 @@ object AchievementPostHelper {
 
         val liters = String.format("%.1f", targetMl / 1000f)
         val messages = listOf(
-            "💧 Bugun kunlik suv normasi bajarildi — tana mazza qildi! Suv metobolizmni tezlashtirib, ozishga yordam beradi.",
-            "🌊 Maqsad bajarildi! Suv ichish ishtahani bo'g'ib, ortiqcha ovqatlanishdan saqlaydi.",
-            "✅ Kunlik norma to'ldirildi! Toza suv terini yoshartiradi va organizmni tozalaydi.",
-            "💪 Suv mushaklar ishlashi va quvvat uchun eng yaxshi energiya manbaidir. Davom eting!",
-            "💡 Bilasizmi? Suv ichish miya faoliyatini yaxshilaydi va charchoqni oladi. Ajoyib natija!",
-            "🏃 Bugun maqsadga erishildi! Suv bo'g'imlar sog'lig'i va harakatlanish uchun juda muhim.",
-            "✨ Tana yangilandi! Suv ichish yog'larni parchalash jarayonini sezilarli darajada tezlashtiradi.",
-            "🎯 Norma bajarildi. Har bir piyola suv sizni orzungizdagi qomatga yaqinlashtiradi!",
-            "🌟 Ajoyib natija! Suv ichish odati organizmdagi barcha tana a'zolari ishini muvozanatga soladi.",
-            "🔔 Davom eting! Sog'lom hayot — bu doimiy ravishda suv ichish demakdir!"
+            "💧 Bugun kunlik suv normasi bajarildi. Suv metobolizmni tezlashtirib, ozishga yordam beradi.",
+            "🌊 Suv ichish ishtahani bo'g'ib, ortiqcha ovqatlanishdan saqlaydi.",
+            "✅ Kunlik norma to'ldirildi. Toza suv terini yoshartiradi va organizmni tozalaydi.",
+            "💪 Suv mushaklar ishlashi va quvvat uchun muhim manba hisoblanadi.",
+            "💡 Suv ichish miya faoliyatini yaxshilaydi va charchoqni oladi.",
+            "🏃 Bugun maqsadga erishildi. Suv bo'g'imlar sog'lig'i va harakatlanish uchun juda muhim.",
+            "✨ Suv ichish yog'larni parchalash jarayonini sezilarli darajada tezlashtiradi.",
+            "🎯 Norma bajarildi. Har bir piyola suv sog'lom qomatga yaqinlashtiradi.",
+            "🌟 Suv ichish odati organizmdagi barcha tana a'zolari ishini muvozanatga soladi.",
+            "🔔 Sog'lom hayot doimiy ravishda kerakli miqdorda suv ichish demakdir."
         )
         val post = buildPost(
             title = "$liters litr suv ichildi! 💧",
@@ -116,7 +116,7 @@ object AchievementPostHelper {
             val prefix = if (exerciseNames.isNotEmpty()) "$exerciseNames. " else ""
             
             val resultTitle = "$prefix$burntCalories kkal yoqildi! 🔥"
-            val description = "Bugun $fatBurnedGr gr yog' kamaydi. Ajoyib natija! 🏆"
+            val description = "Bugun o'rtacha $fatBurnedGr gr yog' kamaydi."
             
             val post = buildPost(
                 title = resultTitle,

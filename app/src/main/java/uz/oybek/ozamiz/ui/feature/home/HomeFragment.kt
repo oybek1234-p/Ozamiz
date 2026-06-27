@@ -383,6 +383,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                         bind.cardDailyTip.isVisible = false
                         bind.cardWeightLog.isVisible = state.showWeightLogCard
 
+                        if (!state.dailyAiDietitianAdvice.isNullOrBlank() && childFragmentManager.findFragmentByTag(AiAdviceBottomSheet.TAG) == null) {
+                            AiAdviceBottomSheet.newInstance(state.dailyAiDietitianAdvice)
+                                .show(childFragmentManager, AiAdviceBottomSheet.TAG)
+                        }
 
                     }
                 }

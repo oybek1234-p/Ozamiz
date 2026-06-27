@@ -49,6 +49,7 @@ data class HomeUiState(
     val showWeightLogCard: Boolean = false,
     val motivationalMessage: String? = null,
     val todayAiMenu: String? = null,
+    val dailyAiDietitianAdvice: String? = null,
 
     val lastFoodTimestamp: Long? = null,
     val waterStatusMessage: String = "Suv ichishni boshlang 💧",

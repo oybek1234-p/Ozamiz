@@ -83,6 +83,10 @@ class HomeViewModel : ViewModel() {
     init {
         AiMenuRepository.init(appContext)
         observeAiMenu()
+        viewModelScope.launch {
+            uz.oybek.ozamiz.data.ai.DailyAiAnalysisRepository.checkAndGenerateAdvice()
+        }
+        observeAiDietitianAdvice()
         val initialUser = UserRepository.user
         val initialDates = DateUtils.generateDatesForScroller()
         val initialSelectedDate = DateUtils.getStartOfDay(Date())
@@ -537,6 +541,14 @@ class HomeViewModel : ViewModel() {
         prefs.edit().putInt("current_tip_index", nextIndex).apply()
         val tip = DailyTipUtil.getTip(nextIndex)
         _uiState.update { it.copy(dailyTip = tip) }
+    }
+
+    private fun observeAiDietitianAdvice() {
+        uz.oybek.ozamiz.data.ai.DailyAiAnalysisRepository.currentAdvice
+            .onEach { advice ->
+                _uiState.update { it.copy(dailyAiDietitianAdvice = advice) }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun observeAiMenu() {

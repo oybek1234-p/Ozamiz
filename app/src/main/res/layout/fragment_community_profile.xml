@@ -331,41 +331,23 @@
                                     android:textSize="16sp"
                                     tools:text="64 kun" />
                             </LinearLayout>
-                            <View
-                                android:layout_width="1dp"
-                                android:layout_height="24dp"
-                                android:background="?attr/colorOutlineVariant" />
 
-                            <LinearLayout
-                                android:id="@+id/layoutWeightLoss"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:gravity="center"
-                                android:visibility="gone"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Farq"
-                                    android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="10sp" />
-
-                                <TextView
-                                    android:id="@+id/tvWeightLossResult"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:fontFamily="@font/roboto_bold"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="16sp"
-                                    tools:text="-18 kg" />
-                            </LinearLayout>
                         </LinearLayout>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/tvOuterWeightLoss"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    android:visibility="gone"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp"
+                    tools:visibility="visible"
+                    tools:text="26 kilogram ozildi" />
 
                 <TextView
                     android:layout_width="wrap_content"
