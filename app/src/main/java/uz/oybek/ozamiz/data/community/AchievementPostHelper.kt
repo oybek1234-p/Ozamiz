@@ -1,5 +1,9 @@
 package uz.oybek.ozamiz.data.community
 
+import uz.oybek.ozamiz.data.community.model.PostType.MANUAL
+import uz.oybek.ozamiz.data.community.model.PostType.WATER
+import uz.oybek.ozamiz.data.community.model.PostType.WEIGHT_LOSS
+
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
@@ -45,7 +49,7 @@ object AchievementPostHelper {
     private fun buildPost(
         title: String,
         description: String,
-        type: String = uz.oybek.ozamiz.data.community.model.PostType.MANUAL,
+        type: String = MANUAL,
         photos: List<String> = emptyList()
     ): CommunityPost? {
         val uid = auth.currentUser?.uid ?: return null
@@ -86,7 +90,7 @@ object AchievementPostHelper {
         val post = buildPost(
             title = "$liters litr suv ichildi! 💧",
             description = messages.random(),
-            type = uz.oybek.ozamiz.data.community.model.PostType.WATER
+            type = WATER
         ) ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -121,7 +125,7 @@ object AchievementPostHelper {
             val post = buildPost(
                 title = resultTitle,
                 description = description,
-                type = uz.oybek.ozamiz.data.community.model.PostType.MANUAL
+                type = MANUAL
             ) ?: return@launch
             
             CommunityPostRepository.addPost(post)
@@ -137,7 +141,7 @@ object AchievementPostHelper {
         
         CoroutineScope(Dispatchers.IO).launch {
             val logsSnapshot = firestore.userWeightLogsCollection(uid)
-                .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .orderBy(WeightLog::timestamp.name, com.google.firebase.firestore.Query.Direction.DESCENDING)
                 .limit(2)
                 .get()
                 .await()
@@ -162,7 +166,7 @@ object AchievementPostHelper {
             val post = buildPost(
                 title = title,
                 description = description,
-                type = uz.oybek.ozamiz.data.community.model.PostType.WEIGHT_LOSS,
+                type = WEIGHT_LOSS,
                 photos = photos
             ) ?: return@launch
 

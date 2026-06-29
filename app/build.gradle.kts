@@ -23,14 +23,18 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 78
-        versionName = "4.1"
+        versionCode = 79
+        versionName = "5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resourceConfigurations.addAll(listOf("en", "ru", "uz"))
     }
     buildTypes {
         debug {
             isDebuggable = true
+            ndk {
+                abiFilters.add("arm64-v8a")
+            }
         }
         release {
             isDebuggable = false
@@ -108,6 +112,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("com.google.mlkit:face-detection:16.1.7")
+    implementation("com.github.deano2390:MaterialShowcaseView:1.3.4")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

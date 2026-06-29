@@ -152,25 +152,15 @@ class AnalyzeResultFragment : Fragment() {
                         IngredientsAdapter(
                             ingredients = analysisResult.ingredients ?: emptyList()
                         )
-                    
-                    binding.textViewPointsDelta.isVisible = false
-                    binding.cardHealthScore.isVisible = false
 
                     if (!hasPlayedConfetti) {
                         val score = analysisResult.healthScore ?: 0
-                        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                        val isFirstMeal = prefs.getInt("app_onboarding_step", 0) == 1
+                        val isFirstMeal = viewModel.isAppOnboardingStepOne()
 
                         if (score == 10 || isFirstMeal) {
                             hasPlayedConfetti = true
                             binding.confettiAnimation.isVisible = true
                             binding.confettiAnimation.playAnimation()
-                            
-                            if (score == 10) {
-                                binding.cardHealthScore.isVisible = true
-                                binding.textViewHealthScore.isVisible = true
-                                binding.textViewHealthScore.text = "$score/10"
-                            }
                         }
                     }
 
@@ -201,17 +191,50 @@ class AnalyzeResultFragment : Fragment() {
                         binding.layoutPros.isVisible = false
                     }
 
-                    binding.layoutAdvice.isVisible = false
+                    val cons = analysisResult.cons
+                    if (!cons.isNullOrEmpty()) {
+                        binding.layoutCons.isVisible = true
+                        binding.containerCons.removeAllViews()
+                        cons.forEach { con ->
+                            val tv = android.widget.TextView(requireContext()).apply {
+                                text = "• $con"
+                                setTextAppearance(R.style.Headline2_16)
+                                setTextColor(
+                                    com.google.android.material.color.MaterialColors.getColor(
+                                        binding.root,
+                                        com.google.android.material.R.attr.colorOnSurfaceVariant
+                                    )
+                                )
+                                layoutParams = android.widget.LinearLayout.LayoutParams(
+                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                                ).apply {
+                                    topMargin = 16
+                                }
+                            }
+                            binding.containerCons.addView(tv)
+                        }
+                    } else {
+                        binding.layoutCons.isVisible = false
+                    }
 
-                    binding.cardAiHealth.isVisible =
-                        !pros.isNullOrEmpty()
+                    val adviceText = analysisResult.advice
+                    if (!adviceText.isNullOrBlank()) {
+                        binding.layoutAdvice.isVisible = true
+                        binding.textViewAdvice.text = adviceText
+                    } else {
+                        binding.layoutAdvice.isVisible = false
+                    }
 
-
-                    binding.cardAiHealth.isVisible =
-                        !pros.isNullOrEmpty()
+                    binding.cardAiHealth.isVisible = !pros.isNullOrEmpty() || !cons.isNullOrEmpty() || !adviceText.isNullOrBlank()
 
                     binding.buttonSaveToLog.isVisible = !state.isRecallMode
-                    binding.buttonReLog.isVisible = state.isRecallMode
+                    binding.buttonSaveToLog.text = "Saqlash"
+                    binding.buttonSaveToLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
+                    
+                    binding.buttonReLog.isVisible = !state.isRecallMode
+                    binding.buttonReLog.text = "Qayta kiritish"
+                    binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.close_ic)
                     binding.buttonDelete.isVisible =
                         state.isRecallMode && arguments?.getString("logId") != null
                 }
@@ -269,10 +292,8 @@ class AnalyzeResultFragment : Fragment() {
     }
 
     private fun checkCompleteOnboarding() {
-        val context = context ?: return
-        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        if (prefs.getInt("app_onboarding_step", 0) == 1) {
-            prefs.edit().putInt("app_onboarding_step", 2).apply()
+        if (viewModel.isAppOnboardingStepOne()) {
+            viewModel.setAppOnboardingStep(2)
         }
     }
 
@@ -310,11 +331,13 @@ class AnalyzeResultFragment : Fragment() {
 
     private fun setupListeners() {
         binding.buttonSaveToLog.setOnSafeClickListener {
-            viewModel.onSaveClick()
+            findNavController().popBackStack(R.id.home, false)
         }
 
         binding.buttonReLog.setOnSafeClickListener {
-            viewModel.reLog()
+            viewModel.deleteLog {
+                findNavController().popBackStack()
+            }
         }
 
 
@@ -333,8 +356,27 @@ class AnalyzeResultFragment : Fragment() {
                 .show()
         }
         binding.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            val isRecall = viewModel.resultLive.value?.isRecallMode == true
+            if (isRecall) {
+                findNavController().popBackStack()
+            } else {
+                findNavController().popBackStack(R.id.home, false)
+            }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : androidx.activity.OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val isRecall = viewModel.resultLive.value?.isRecallMode == true
+                    if (isRecall) {
+                        findNavController().popBackStack()
+                    } else {
+                        findNavController().popBackStack(R.id.home, false)
+                    }
+                }
+            }
+        )
 
         val nameEditListener = View.OnClickListener {
             val currentName = binding.textViewFoodName.text.toString()
@@ -440,9 +482,7 @@ class AnalyzeResultFragment : Fragment() {
 
 
     private fun checkOnboardingBounce() {
-        val context = context ?: return
-        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        if (prefs.getInt("app_onboarding_step", 0) == 1) {
+        if (viewModel.isAppOnboardingStepOne()) {
             startSaveButtonBounce()
         }
     }

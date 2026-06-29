@@ -43,6 +43,7 @@ class MenuListViewModel : ViewModel() {
     private var searchJob: Job? = null
 
     private var allMenus: List<Menu> = emptyList()
+    private var staticMenusLoaded = false
 
     init {
         loadSavedAiMenu()
@@ -107,6 +108,14 @@ class MenuListViewModel : ViewModel() {
 
     fun updateFridgeFoods(foods: String) {
         _uiState.value = _uiState.value.copy(fridgeFoods = foods)
+    }
+
+    fun loadStaticMenusIfNeeded() {
+        if (!staticMenusLoaded) {
+            staticMenusLoaded = true
+            loadCategories()
+            loadMenus()
+        }
     }
 
     private fun loadCategories() {
@@ -191,4 +200,7 @@ class MenuListViewModel : ViewModel() {
     fun refresh() {
         loadMenus()
     }
+
+    val isAdmin: Boolean
+        get() = UserRepository.user.admin
 }

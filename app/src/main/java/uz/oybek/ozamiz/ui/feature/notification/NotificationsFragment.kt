@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.databinding.FragmentNotificationsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.data.user.UserRepository
 
 class NotificationsFragment : BaseFragment<FragmentNotificationsBinding>() {
 
@@ -24,7 +23,7 @@ class NotificationsFragment : BaseFragment<FragmentNotificationsBinding>() {
         observeViewModel()
         
         viewModel.loadNotifications()
-        UserRepository.setUnreadNotificationsZero()
+        viewModel.markAllAsRead()
     }
 
     override fun inflateBinding(

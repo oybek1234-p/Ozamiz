@@ -1,5 +1,9 @@
 package uz.oybek.ozamiz.ui.feature.community
 
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.FOOD
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.WEIGHT_LOSS
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -40,10 +44,10 @@ class CommunityPostsFragment : BaseFragment<FragmentCommunityPostsBinding>() {
     private fun setupFilters() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { group, checkedIds ->
             val filter = when (checkedIds.firstOrNull()) {
-                R.id.chipAll -> uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
-                R.id.chipFood -> uz.oybek.ozamiz.data.community.model.CommunityPostFilter.FOOD
-                R.id.chipOzganlar -> uz.oybek.ozamiz.data.community.model.CommunityPostFilter.WEIGHT_LOSS
-                else -> uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
+                R.id.chipAll -> ALL
+                R.id.chipFood -> FOOD
+                R.id.chipOzganlar -> WEIGHT_LOSS
+                else -> ALL
             }
             viewModel.setFilter(filter)
         }

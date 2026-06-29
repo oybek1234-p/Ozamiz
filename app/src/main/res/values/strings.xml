@@ -163,7 +163,7 @@
     <string name="breakfast">Nonushta</string>
     <string name="lunch">Tushlik</string>
     <string name="dinner">Kechki ovqat</string>
-    <string name="snack">Tamaddi</string>
+    <string name="snack">Orada</string>
 
 
     <string name="add_workout">Workout Qo\'shish</string>
@@ -339,7 +339,7 @@
     <string name="meal_set_title_breakfast">Nonushta Setlari</string>
     <string name="meal_set_title_lunch">Tushlik Setlari</string>
     <string name="meal_set_title_dinner">Kechki Ovqat Setlari</string>
-    <string name="meal_set_title_snack">Tamaddi Setlari</string>
+    <string name="meal_set_title_snack">Orada Setlari</string>
     <string name="foods_title">Ovqatlar</string> <!-- Default title -->
     <string name="empty_list_message">Ro\'yxat bo\'sh</string>
     <string name="empty_search_message">Qidiruv natijasi topilmadi</string>
@@ -606,5 +606,7 @@
     <string name="premium_subtitle">Barcha imkoniyatlar bir joyda ✨</string>
     <string name="premium_features_title">Premium imkoniyatlari</string>
     <string name="ai_chatbot_title">Dietolog</string>
+    <string name="ai_dietolog">Dietolog</string>
     <string name="hamjamiyat">Boshqalar</string>
+    <string name="ai_rec_format">%1$s:\n%2$s</string>
 </resources>

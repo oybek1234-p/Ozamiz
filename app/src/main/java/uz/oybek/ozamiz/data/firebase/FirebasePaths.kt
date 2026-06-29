@@ -21,6 +21,15 @@ object FirebasePaths {
         const val WEIGHT_PHOTOS = "weightPhoto"
         const val COMMUNITY_POSTS = "communityPosts"
         const val PUBLIC_USERS = "public_users"
+        const val AI_CHATS = "aiChat"
+        const val NOTIFICATIONS = "notifications"
+        const val MENUS = "menus"
+        const val MENU_CATEGORIES = "menu_categories"
+        const val USERS = "users"
+        const val USER_MENUS = "user_menus"
+        const val DAILY_MENUS = "daily_menus"
+        const val MESSAGES = "messages"
+        const val AI_RECOMMENDATION_FEEDBACK = "ai_recommendation_feedback"
     }
 
     object Storage {

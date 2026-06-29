@@ -26,8 +26,8 @@ object NotificationRepository {
     suspend fun getNotifications(userId: String, limit: Long = 50): Result<List<NotificationModel>> {
         return returnResult {
             val snapshot = notificationsCollection
-                .whereEqualTo("toUserId", userId)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .whereEqualTo(NotificationModel::toUserId.name, userId)
+                .orderBy(NotificationModel::timestamp.name, Query.Direction.DESCENDING)
                 .limit(limit)
                 .get().await()
             snapshot.documents.mapNotNull { it.toObject(NotificationModel::class.java) }

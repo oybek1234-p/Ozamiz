@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.profile
 
+import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
+
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -39,13 +41,26 @@ class ProfileViewModel : ViewModel() {
 
     }
 
+    val user: User
+        get() = UserRepository.user
+
+    fun updateCalorieSettings(calories: Int, protein: Int, fat: Int, carbs: Int, goal: String) {
+        UserRepository.updateUser {
+            it.targetCalories = calories
+            it.targetProtein = protein
+            it.targetFat = fat
+            it.targetCarbs = carbs
+            it.goal = goal
+        }
+    }
+
     fun updateAvatar(uri: Uri) {
         viewModelScope.launch {
             val userId = LocalUser.user.uid
             if (userId.isBlank()) return@launch
 
             val path = "user_avatars/$userId"
-            val url = uz.oybek.ozamiz.data.firebase.uploader.ImageUploader.uploadImage(uri, path)
+            val url = ImageUploader.uploadImage(uri, path)
 
             if (url != null) {
                 LocalUser.update {

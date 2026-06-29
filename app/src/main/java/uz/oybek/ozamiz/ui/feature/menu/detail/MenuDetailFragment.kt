@@ -6,10 +6,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.menu.MenuRepository
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.databinding.FragmentMenuDetailBinding
@@ -18,6 +18,7 @@ import uz.oybek.ozamiz.ui.utils.loadPhoto
 
 class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
 
+    private val viewModel: MenuDetailViewModel by viewModels()
     private var menu: Menu? = null
 
     override fun inflateBinding(
@@ -42,6 +43,13 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         setupViews(bind, menu!!)
         setupListeners(bind)
         setupScrollBehavior(bind)
+        
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.deleteSuccess.collect {
+                Toast.makeText(context, "O'chirildi", Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
+        }
     }
 
     private fun setupScrollBehavior(bind: FragmentMenuDetailBinding) {
@@ -109,12 +117,6 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
     }
 
     private fun deleteMenu() {
-        lifecycleScope.launch {
-            val result = MenuRepository.deleteMenu(menu?.id ?: return@launch)
-            if (result is DataWrapper.Success) {
-                Toast.makeText(context, "O'chirildi", Toast.LENGTH_SHORT).show()
-                findNavController().popBackStack()
-            }
-        }
+        viewModel.deleteMenu(menu?.id ?: return)
     }
 }

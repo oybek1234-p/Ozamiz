@@ -13,6 +13,18 @@
         app:title="Postlar boshqaruvi"
         app:navigationIcon="@drawable/arrow_back" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_delete_all"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Barcha ko'ringanlarni o'chirish"
+        android:textColor="?attr/colorError"
+        app:backgroundTint="?attr/colorErrorContainer" />
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

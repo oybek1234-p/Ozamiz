@@ -10,7 +10,7 @@ import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.logs.FoodLogRepository
+import androidx.fragment.app.viewModels
 import uz.oybek.ozamiz.databinding.FragmentDailyFoodLogsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.food.history.TodaysFoodAdapter
@@ -18,6 +18,7 @@ import java.util.Date
 
 class DailyFoodLogsFragment : BaseFragment<FragmentDailyFoodLogsBinding>() {
 
+    private val viewModel: DailyFoodLogsViewModel by viewModels()
     private val adapter by lazy {
         TodaysFoodAdapter { foodLog ->
             navigate(
@@ -48,11 +49,9 @@ class DailyFoodLogsFragment : BaseFragment<FragmentDailyFoodLogsBinding>() {
         bind.recyclerView.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
-            FoodLogRepository.foodLogsPaged(date)
-                .cachedIn(viewLifecycleOwner.lifecycleScope)
-                .collectLatest {
-                    adapter.submitData(it)
-                }
+            viewModel.getFoodLogsPaged(date).collectLatest {
+                adapter.submitData(it)
+            }
         }
     }
 }

@@ -8,7 +8,6 @@ import uz.oybek.ozamiz.data.firebase.postsCollection
 import uz.oybek.ozamiz.data.firebase.toObjectsList
 import uz.oybek.ozamiz.data.firebase.firestore
 import com.google.firebase.firestore.Query
-import uz.oybek.ozamiz.data.firebase.database
 
 import uz.oybek.ozamiz.util.returnResult
 
@@ -32,11 +31,7 @@ object CommunityPostRepository {
 
     suspend fun adminDeletePost(postId: String): Result<Unit> {
         return returnResult {
-            try {
-                firestore.postsCollection.document(postId).update(CommunityPost::verified.name, false).await()
-            } catch (_: Exception) {
-                firestore.postsCollection.document(postId).delete().await()
-            }
+            firestore.postsCollection.document(postId).delete().await()
         }
     }
 

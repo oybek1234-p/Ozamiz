@@ -243,21 +243,46 @@
                             android:layout_marginTop="4dp"
                             android:orientation="vertical" />
                     </LinearLayout>
+                    
+                    <LinearLayout
+                        android:id="@+id/layout_cons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/Title3_17"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Zararlari"
+                                android:textColor="#F59E0B" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/container_cons"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:orientation="vertical" />
+                    </LinearLayout>
 
                     <LinearLayout
                         android:id="@+id/layout_advice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
                         android:orientation="vertical"
                         android:visibility="gone"
                         tools:visibility="visible">
-
-                        <TextView
-                            style="@style/Title3_17"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Maslahat"
-                            android:textColor="?colorPrimary" />
 
                         <TextView
                             android:id="@+id/textView_advice"
@@ -271,54 +296,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_health_score"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dimen_12"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <TextView
-                        style="@style/Title3_17"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Baho"
-                        android:textColor="?colorOnSurface" />
-
-                    <TextView
-                        android:id="@+id/textView_health_score"
-                        style="@style/Headline2_16"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto_bold"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="4dp"
-                        android:textColor="?attr/colorPrimary"
-                        android:visibility="gone"
-                        tools:text="8.5/10" />
-
-                    <TextView
-                        android:id="@+id/textView_points_delta"
-                        style="@style/Headline2_16"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:fontFamily="@font/roboto_medium"
-                        tools:text="+5 ball" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
@@ -348,15 +325,19 @@
             app:strokeColor="?colorError"
             tools:visibility="gone" />
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_re_log"
                 style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="56dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
                 android:fontFamily="@font/roboto_medium"
                 android:text="Qayta qo'shish"
                 android:visibility="gone"
@@ -364,26 +345,35 @@
                 app:iconGravity="textStart"
                 tools:visibility="visible" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_save_to_log"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:backgroundTint="?colorPrimary"
-                android:fontFamily="@font/roboto_medium"
-                android:text="@string/save"
-                android:textColor="?colorSurface" />
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1">
 
-            <ProgressBar
-                android:id="@+id/progress_bar_button"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:elevation="4dp"
-                android:indeterminateTint="?colorSurface"
-                android:visibility="gone" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_save_to_log"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:backgroundTint="?colorPrimary"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/save"
+                    android:textColor="?colorSurface"
+                    app:iconGravity="textStart" />
 
-        </FrameLayout>
+                <ProgressBar
+                    android:id="@+id/progress_bar_button"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:elevation="4dp"
+                    android:indeterminateTint="?colorSurface"
+                    android:visibility="gone" />
+
+            </FrameLayout>
+
+        </LinearLayout>
     </LinearLayout>
 
     <com.airbnb.lottie.LottieAnimationView

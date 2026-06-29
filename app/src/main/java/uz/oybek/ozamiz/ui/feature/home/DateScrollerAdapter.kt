@@ -124,7 +124,7 @@ class DateScrollerAdapter(
         private val outlineVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, 0)
         
         private val greenColor = ContextCompat.getColor(context, R.color.green)
-        private val redColor = ContextCompat.getColor(context, R.color.red)
+        private val yellowColor = com.google.android.material.color.MaterialColors.getColor(context, R.attr.customYellow, android.graphics.Color.YELLOW)
 
         fun bind(date: Date) {
             val isSelected = isSameDay(date, selectedDate)
@@ -162,12 +162,20 @@ class DateScrollerAdapter(
             val consumed = summary?.consumedCalories ?: 0
             val max = if (targetCalories > 0) targetCalories else 1
             val progress = (consumed.toFloat() / max * 100).toInt()
-            val isExceeded = consumed > targetCalories + 200
+            val isExceeded = consumed > targetCalories
+            val isCompleted = consumed == targetCalories || (!isExceeded && consumed >= targetCalories * 0.95)
 
             binding.progressRing.max = 100
-            // Animate progress change
             binding.progressRing.setProgressCompat(if (isExceeded) 100 else progress, true)
-            binding.progressRing.setIndicatorColor(if (isExceeded) greenColor else greenColor)
+            
+            val ringColor = when {
+                isExceeded -> yellowColor
+                isCompleted -> greenColor
+                else -> outlineVariant
+            }
+            
+            binding.progressRing.setIndicatorColor(ringColor)
+            binding.progressRing.trackColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerHigh, 0)
         }
     }
 

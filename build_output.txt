@@ -1,4 +1,4 @@
-Starting a Gradle Daemon (subsequent builds will be faster)
+Starting a Gradle Daemon, 1 incompatible Daemon could not be reused, use --status for details
 
 FAILURE: Build failed with an exception.
 
@@ -6,7 +6,7 @@ FAILURE: Build failed with an exception.
 Unable to start the daemon process.
 This problem might be caused by incorrect configuration of the daemon.
 For example, an unrecognized jvm option is used.For more details on the daemon, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html in the Gradle documentation.
-Process command line: C:\Program Files (x86)\Java\jre1.8.0_451\bin\java.exe -Xmx2048m -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp D:\Android Studio\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\gradle-daemon-main-8.13.jar -javaagent:D:\Android Studio\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\agents\gradle-instrumentation-agent-8.13.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.13
+Process command line: C:\Program Files (x86)\Java\jre1.8.0_451\bin\java.exe -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1024m -Xmx2g -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp D:\Android Studio\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\gradle-daemon-main-8.13.jar -javaagent:D:\Android Studio\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\agents\gradle-instrumentation-agent-8.13.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.13
 Please read the following process output to find out more:
 -----------------------
 Error occurred during initialization of VM

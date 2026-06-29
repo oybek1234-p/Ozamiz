@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/bg_bottom_sheet_rounded"
     android:fillViewport="true">
 
@@ -83,33 +84,6 @@
                 android:textColor="?attr/colorPrimary"
                 android:textSize="22sp" />
         </LinearLayout>
-
-        <!-- Subtitle -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:fontFamily="@font/roboto_medium"
-            android:gravity="center"
-            android:letterSpacing="0.08"
-            android:text="FAOLLIK"
-            android:textAllCaps="true"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/text_motivation_chip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_primary_chip"
-            android:fontFamily="@font/roboto_medium"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:text="Siz 12 kun ketma-ket faolsiz! 🔥"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -220,6 +194,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
@@ -267,93 +242,33 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Activity Section Header -->
-        <LinearLayout
+        <!-- Top Streak Users Header -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="32dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:fontFamily="@font/roboto_bold"
+            android:text="Top odamlar"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="18sp" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Faoliyat"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp" />
+        <ProgressBar
+            android:id="@+id/progress_top_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp" />
 
-            <TextView
-                android:id="@+id/text_week_range"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_medium"
-                android:text="Okt 23 - Okt 29"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-        <!-- Weekly Progress Row -->
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_top_users"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:weightSum="7">
-
-            <include
-                android:id="@+id/day_1"
-                layout="@layout/item_streak_day"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/day_2"
-                layout="@layout/item_streak_day"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/day_3"
-                layout="@layout/item_streak_day"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/day_4"
-                layout="@layout/item_streak_day"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/day_5"
-                layout="@layout/item_streak_day"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/day_6"
-                layout="@layout/item_streak_day"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-
-            <include
-                android:id="@+id/day_7"
-                layout="@layout/item_streak_day"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-        </LinearLayout>
+            android:layout_marginTop="12dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="24dp"
+            android:nestedScrollingEnabled="false"
+            tools:listitem="@layout/item_top_streak_user" />
 
         <!-- Continue Button -->
         <com.google.android.material.button.MaterialButton

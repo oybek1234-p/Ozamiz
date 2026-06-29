@@ -2,8 +2,10 @@ package uz.oybek.ozamiz.data.ai
 
 import com.google.firebase.Firebase
 import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.Content
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzerConfig
@@ -13,9 +15,38 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.DailySummary
-import uz.oybek.ozamiz.data.user.model.User
+import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.ai.model.ChatMessage
+import uz.oybek.ozamiz.data.firebase.FirebasePaths
+import uz.oybek.ozamiz.data.firebase.firestore
+import uz.oybek.ozamiz.data.firebase.aiChatsCollection
+import uz.oybek.ozamiz.data.user.UserRepository
 
 object AiChatRepository {
+
+    suspend fun saveMessageToFirestore(chatId: String, text: String, isUser: Boolean, timestamp: Long): Any? = withContext(Dispatchers.IO) {
+        try {
+            val chatRef = firestore.aiChatsCollection.document(chatId)
+            val msgRef = chatRef.collection(FirebasePaths.Firestore.MESSAGES).document()
+
+            chatRef.set(
+                mapOf(
+                    "userId" to UserRepository.user.uid,
+                    "userName" to UserRepository.user.name,
+                    "lastModified" to timestamp
+                ),
+                SetOptions.merge()
+            ).await()
+            msgRef.set(mapOf(
+                ChatMessage::id.name to msgRef.id,
+                ChatMessage::text.name to text,
+                ChatMessage::isUser.name to isUser,
+                ChatMessage::timestamp.name to timestamp
+            )).await()
+            
+            chatRef.update("lastModified", timestamp).await()
+        } catch (_: Exception) {}
+    }
 
     private val model by lazy {
         Firebase.ai.generativeModel(
@@ -28,10 +59,20 @@ object AiChatRepository {
         )
     }
 
-    private var chatHistory = mutableListOf<com.google.firebase.ai.type.Content>()
+    private var chatHistory = mutableListOf<Content>()
 
     fun clearHistory() {
         chatHistory.clear()
+    }
+
+    fun syncHistory(messages: List<ChatMessage>) {
+        chatHistory.clear()
+        messages.forEach { msg ->
+            val role = if (msg.isUser) "user" else "model"
+            // To prevent empty strings from throwing exception
+            val safeText = if (msg.text.isBlank()) "..." else msg.text
+            chatHistory.add(content(role = role) { text(safeText) })
+        }
     }
 
     suspend fun sendMessage(

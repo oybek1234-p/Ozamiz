@@ -4,24 +4,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.community.CommunityPostRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.points.LevelManager
-import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.firebase.publicUsersCollection
-import uz.oybek.ozamiz.data.firebase.toObjectSafe
 import uz.oybek.ozamiz.databinding.FragmentCommunityProfileBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 
 class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>() {
 
+    private val viewModel: CommunityProfileViewModel by viewModels()
     private lateinit var communityAdapter: CommunityPostAdapter
     private var isLoading = false
     private var isLastPage = false
@@ -58,8 +52,10 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
         communityAdapter = CommunityPostAdapter(
             onLikeClick = { postId ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val currentUserId = Firebase.auth.currentUser?.uid ?: return@launch
-                    CommunityPostRepository.toggleLike(postId, currentUserId)
+                    val currentUserId = viewModel.currentUserId
+                    if (currentUserId.isNotEmpty()) {
+                        viewModel.toggleLike(postId, currentUserId)
+                    }
                 }
             },
             onUserClick = { clickedUserId, clickedUserName ->
@@ -73,8 +69,10 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
             },
             onViewed = { postId ->
                 viewLifecycleOwner.lifecycleScope.launch {
-                    val currentUserId = com.google.firebase.Firebase.auth.currentUser?.uid ?: return@launch
-                    uz.oybek.ozamiz.data.community.CommunityPostRepository.markViewed(postId, currentUserId)
+                    val currentUserId = viewModel.currentUserId
+                    if (currentUserId.isNotEmpty()) {
+                        viewModel.markViewed(postId, currentUserId)
+                    }
                 }
             },
             onDeleteClick = {
@@ -110,9 +108,7 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
             bind.layoutStats.isVisible = false
 
             try {
-                val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
-                val snapshot = db.publicUsersCollection.document(userId).get().await()
-                val user = snapshot.toObjectSafe<User>()
+                val user = viewModel.getPublicUser(userId)
 
                 if (user != null) {
                     val name = user.name
@@ -189,7 +185,7 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
 
     private suspend fun fetchPosts(userId: String) {
         isLoading = true
-        val result = CommunityPostRepository.getUserPosts(userId, 8, lastVisiblePostId)
+        val result = viewModel.getUserPosts(userId, 8, lastVisiblePostId)
         result.onSuccess { newPosts ->
             if (newPosts.isEmpty()) {
                 isLastPage = true

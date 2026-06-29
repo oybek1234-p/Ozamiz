@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.data.motivation
 
+import uz.oybek.ozamiz.data.motivation.NutrientWarningReceiver
+
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -78,7 +80,7 @@ object MotivationAlarmScheduler {
 
     fun scheduleNutrientWarning(context: Context, exceededTypes: List<String>) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, uz.oybek.ozamiz.data.motivation.NutrientWarningReceiver::class.java).apply {
+        val intent = Intent(context, NutrientWarningReceiver::class.java).apply {
             putStringArrayListExtra("EXCEEDED_TYPES", ArrayList(exceededTypes))
         }
 

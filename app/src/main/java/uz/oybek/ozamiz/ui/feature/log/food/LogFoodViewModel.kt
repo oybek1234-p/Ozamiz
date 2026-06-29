@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
+
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -28,7 +30,9 @@ import kotlinx.coroutines.flow.first
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
 import java.util.Date
 
 data class LogFoodState(
@@ -235,4 +239,19 @@ class LogFoodViewModel() : ViewModel() {
         _state.update { it.copy(isAnalyzing = false) }
     }
 
+    val isUserPremium: Boolean
+        get() = UserRepository.user.premium
+
+    val isUserPremiumOrTrial: Boolean
+        get() = UserRepository.user.premium || UserRepository.user.isPremiumOrTrial()
+
+    fun isFoodTourSeen(): Boolean {
+        return LocalPreferencesRepository.isFoodTourSeen()
+    }
+
+    fun setFoodTourSeen(seen: Boolean) {
+        LocalPreferencesRepository.setFoodTourSeen(seen)
+    }
+
+    fun getLatestLogs(date: Date, limit: Int = 2) = FoodLogRepository.getLatestLogs(date, limit)
 }

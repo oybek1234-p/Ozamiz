@@ -2,9 +2,12 @@ package uz.oybek.ozamiz.ui.feature.auth
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.auth
+import uz.oybek.ozamiz.data.auth.AuthRepository
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.ui.utils.postVal
 
 sealed class SendState {
@@ -36,12 +39,37 @@ class AuthViewModel : ViewModel() {
         credential: AuthCredential, verified: (done: Boolean) -> Unit
     ) {
         verifyState.postVal(VerifyState.Verifying)
-        Firebase.auth
-            .signInWithCredential(credential)
-            .addOnSuccessListener {
+        viewModelScope.launch {
+            val result = AuthRepository.signInWithCredential(credential)
+            if (result.isSuccess) {
                 verified.invoke(true)
-            }.addOnFailureListener {
+            } else {
                 verified.invoke(false)
             }
+        }
+    }
+
+    fun signInEmail(
+        email: String, password: String, result: (Result<Any>) -> Unit
+    ) {
+        viewModelScope.launch {
+            val res = AuthRepository.signInWithEmailAndPassword(email, password)
+            if (res.isSuccess) result.invoke(Result.success(Any()))
+            else result.invoke(Result.failure(res.exceptionOrNull() ?: Exception("Unknown fail")))
+        }
+    }
+
+    fun signUpEmail(
+        email: String, password: String, result: (Result<Any>) -> Unit
+    ) {
+        viewModelScope.launch {
+            val res = AuthRepository.createUserWithEmailAndPassword(email, password)
+            if (res.isSuccess) result.invoke(Result.success(Any()))
+            else result.invoke(Result.failure(res.exceptionOrNull() ?: Exception("Unknown fail")))
+        }
+    }
+
+    suspend fun authFirebaseUser(): User {
+        return UserRepository.authFirebaseUser()
     }
 }

@@ -4,22 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.Firebase
-import com.google.firebase.FirebaseNetworkException
-import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.LoginGmailFragmentBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.auth.AuthViewModel
 import uz.oybek.ozamiz.ui.utils.postVal
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import uz.oybek.ozamiz.ui.utils.showToast
@@ -27,7 +20,7 @@ import uz.oybek.ozamiz.ui.utils.showToast
 class LoginGmailFragment :
     BaseFragment<LoginGmailFragmentBinding>() {
 
-    lateinit var auth: FirebaseAuth
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
@@ -37,7 +30,6 @@ class LoginGmailFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = Firebase.auth
     }
 
     private var loading = MutableLiveData(false)
@@ -50,73 +42,60 @@ class LoginGmailFragment :
     private fun signInUser(email: String, password: String) {
         if (loading.value == true) return
         loading.postVal(true)
-        auth.signInWithEmailAndPassword(
-            email,
-            password
-        ).addOnSuccessListener {
-            signedIn()
-        }.addOnFailureListener {
-            when (it) {
-                is FirebaseAuthInvalidUserException -> {
-                    createNewUser(email, password)
+        viewModel.signInEmail(email, password) { result ->
+            if (result.isSuccess) {
+                signedIn()
+            } else {
+                val exception = result.exceptionOrNull()
+                val msg = exception?.localizedMessage ?: ""
+                when {
+                    msg.contains("no user record") || msg.contains("invalid_user") || msg.contains("INVALID_LOGIN_CREDENTIALS") -> {
+                        createNewUser(email, password)
+                    }
+                    msg.contains("network") || msg.contains("timeout") -> {
+                        showToast(appContext.getString(R.string.internet_invalid))
+                    }
+                    msg.contains("too many requests") || msg.contains("TOO_MANY_ATTEMPTS_TRY_LATER") -> {
+                        showToast(appContext.getString(R.string.retry_later))
+                    }
+                    else -> {
+                        showToast(appContext.getString(R.string.email_or_pass_not_valid))
+                        binding.boglanishButton.isVisible = true
+                    }
                 }
-
-                is FirebaseAuthInvalidCredentialsException -> {
-                    showToast(appContext.getString(R.string.email_or_pass_not_valid))
-                }
-
-                is FirebaseNetworkException -> {
-                    showToast(appContext.getString(R.string.internet_invalid))
-                }
-
-                is FirebaseTooManyRequestsException -> {
-                    showToast(appContext.getString(R.string.retry_later))
-                }
-
-                else -> {
-                    showToast(appContext.getString(R.string.biz_bilan_bog_lanish))
-                    binding.boglanishButton.isVisible = true
-                }
+                loading.postVal(false)
             }
-            loading.postVal(false)
         }
     }
 
     private fun createNewUser(email: String, password: String) {
         loading.postVal(true)
 
-        auth.createUserWithEmailAndPassword(
-            email,
-            password
-        ).addOnSuccessListener {
-            loading.postVal(false)
-            signedIn()
-        }.addOnFailureListener {
-            loading.postVal(false)
-            when (it) {
-                is FirebaseAuthWeakPasswordException -> {
-                    showToast(appContext.getString(R.string.weak_password))
-                }
-
-                is FirebaseAuthInvalidUserException -> {
-                    showToast(appContext.getString(R.string.email_or_pass_not_valid))
-                }
-
-                is FirebaseAuthInvalidCredentialsException -> {
-                    showToast(appContext.getString(R.string.email_or_pass_not_valid))
-                }
-
-                is FirebaseNetworkException -> {
-                    showToast(appContext.getString(R.string.internet_invalid))
-                }
-
-                is FirebaseTooManyRequestsException -> {
-                    showToast(appContext.getString(R.string.retry_later))
-                }
-
-                else -> {
-                    showToast(appContext.getString(R.string.biz_bilan_bog_lanish))
-                    binding.boglanishButton.isVisible = true
+        viewModel.signUpEmail(email, password) { result ->
+            if (result.isSuccess) {
+                loading.postVal(false)
+                signedIn()
+            } else {
+                loading.postVal(false)
+                val exception = result.exceptionOrNull()
+                val msg = exception?.localizedMessage ?: ""
+                when {
+                    msg.contains("weak password") || msg.contains("WEAK_PASSWORD") -> {
+                        showToast(appContext.getString(R.string.weak_password))
+                    }
+                    msg.contains("invalid credential") || msg.contains("INVALID_EMAIL") -> {
+                        showToast(appContext.getString(R.string.email_or_pass_not_valid))
+                    }
+                    msg.contains("network") || msg.contains("timeout") -> {
+                        showToast(appContext.getString(R.string.internet_invalid))
+                    }
+                    msg.contains("too many requests") || msg.contains("TOO_MANY_ATTEMPTS_TRY_LATER") -> {
+                        showToast(appContext.getString(R.string.retry_later))
+                    }
+                    else -> {
+                        showToast(appContext.getString(R.string.biz_bilan_bog_lanish))
+                        binding.boglanishButton.isVisible = true
+                    }
                 }
             }
         }
@@ -124,9 +103,9 @@ class LoginGmailFragment :
 
     private fun signedIn() {
         loading.postVal(true)
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             if (activity == null) return@launch
-            val user = UserRepository.authFirebaseUser()
+            val user = viewModel.authFirebaseUser()
             loading.postVal(false)
             if (user.valid.not()) return@launch
             mainActivity()?.recreateUi(true)

@@ -46,4 +46,15 @@ class AdminPostManagerViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteAllLoadedPosts() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val currentList = _posts.value
+            currentList.forEach { post ->
+                CommunityPostRepository.adminDeletePost(post.id)
+            }
+            loadUnverifiedPosts()
+        }
+    }
 }

@@ -33,6 +33,9 @@ class AdminPostManagerFragment : BaseFragment<FragmentAdminPostManagerBinding>()
 
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        binding.btnDeleteAll.setOnClickListener {
+            viewModel.deleteAllLoadedPosts()
+        }
     }
 
     private fun setupRecyclerView() {

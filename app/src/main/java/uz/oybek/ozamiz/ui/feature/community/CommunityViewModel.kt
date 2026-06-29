@@ -1,16 +1,20 @@
 package uz.oybek.ozamiz.ui.feature.community
 
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
+import uz.oybek.ozamiz.data.notification.NotificationRepository
+import uz.oybek.ozamiz.data.notification.model.NotificationModel
+import uz.oybek.ozamiz.data.user.local.LocalUser
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.CommunityPostFilter
+import uz.oybek.ozamiz.data.notification.model.NotificationModel.Companion.TYPE_LIKE
 
 data class CommunityState(
     val posts: List<CommunityPost> = emptyList(),
@@ -18,7 +22,7 @@ data class CommunityState(
     val isPaging: Boolean = false,
     val hasReachedEnd: Boolean = false,
     val error: String? = null,
-    val filter: CommunityPostFilter = uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
+    val filter: CommunityPostFilter = ALL
 )
 
 class CommunityViewModel : ViewModel() {
@@ -31,7 +35,7 @@ class CommunityViewModel : ViewModel() {
         loadPosts()
     }
 
-    fun setFilter(filter: uz.oybek.ozamiz.data.community.model.CommunityPostFilter) {
+    fun setFilter(filter: CommunityPostFilter) {
         if (_state.value.filter == filter) return
         _state.update { it.copy(filter = filter, posts = emptyList(), hasReachedEnd = false) }
         lastVisiblePostId = null
@@ -85,14 +89,13 @@ class CommunityViewModel : ViewModel() {
     }
 
     fun toggleLike(postId: String) {
-        val user = uz.oybek.ozamiz.data.user.local.LocalUser.user
+        val user = LocalUser.user
         if (user.uid.isEmpty()) return
 
         viewModelScope.launch {
             val post = _state.value.posts.find { it.id == postId } ?: return@launch
             val result = CommunityPostRepository.toggleLike(postId, user.uid)
             result.onSuccess { isLiked ->
-                // Optimistically update the UI
                 _state.update { currentState ->
                     val newPosts = currentState.posts.map { p ->
                         if (p.id == postId) {
@@ -104,10 +107,9 @@ class CommunityViewModel : ViewModel() {
                     }
                     currentState.copy(posts = newPosts)
                 }
-
                 if (isLiked && post.userId != user.uid) {
-                    val notification = uz.oybek.ozamiz.data.notification.model.NotificationModel(
-                        type = uz.oybek.ozamiz.data.notification.model.NotificationModel.TYPE_LIKE,
+                    val notification = NotificationModel(
+                        type = TYPE_LIKE,
                         fromUserId = user.uid,
                         fromUserName = user.name,
                         fromUserAvatar = user.avatarUrl,
@@ -116,7 +118,7 @@ class CommunityViewModel : ViewModel() {
                         message = "Sizning postingizga layk bosdi",
                         timestamp = java.util.Date()
                     )
-                    uz.oybek.ozamiz.data.notification.NotificationRepository.sendNotification(
+                    NotificationRepository.sendNotification(
                         notification
                     )
                 }
@@ -126,7 +128,7 @@ class CommunityViewModel : ViewModel() {
 
     fun deletePost(postId: String) {
         viewModelScope.launch {
-            val isAdmin = uz.oybek.ozamiz.data.user.UserRepository.user.admin
+            val isAdmin = UserRepository.user.admin
             val result = if (isAdmin) {
                 CommunityPostRepository.adminDeletePost(postId)
             } else {
@@ -144,9 +146,14 @@ class CommunityViewModel : ViewModel() {
     }
 
     fun markViewed(postId: String) {
-        val userId = Firebase.auth.currentUser?.uid ?: return
+        val userId = UserRepository.user.uid
+        if (userId.isEmpty()) return
         viewModelScope.launch {
             CommunityPostRepository.markViewed(postId, userId)
         }
+    }
+
+    fun observeUnReadMessages(action: (Int) -> Unit) {
+        UserRepository.observeUnReadMessages(action)
     }
 }

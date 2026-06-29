@@ -19,24 +19,27 @@ val FirebaseFirestore.postsCollection: CollectionReference
 val FirebaseFirestore.publicUsersCollection: CollectionReference
     get() = collection(FirebasePaths.Firestore.PUBLIC_USERS)
 
+val FirebaseFirestore.aiChatsCollection: CollectionReference
+    get() = collection(FirebasePaths.Firestore.AI_CHATS)
+
 val FirebaseFirestore.notificationsCollection: CollectionReference
-    get() = collection("notifications")
+    get() = collection(FirebasePaths.Firestore.NOTIFICATIONS)
 
 val FirebaseFirestore.menusCollection: CollectionReference
-    get() = collection("menus")
+    get() = collection(FirebasePaths.Firestore.MENUS)
 
 val FirebaseFirestore.menuCategoriesCollection: CollectionReference
-    get() = collection("menu_categories")
+    get() = collection(FirebasePaths.Firestore.MENU_CATEGORIES)
 
 val FirebaseFirestore.usersCollection: CollectionReference
-    get() = collection("users")
+    get() = collection(FirebasePaths.Firestore.USERS)
 
 fun FirebaseFirestore.userWeightLogsCollection(userId: String): CollectionReference {
-    return usersCollection.document(userId).collection("weightLogs")
+    return usersCollection.document(userId).collection(FirebasePaths.Database.WEIGHT_LOGS)
 }
 
 fun FirebaseFirestore.userMenusCollection(userId: String): CollectionReference {
-    return collection("user_menus").document(userId).collection("daily_menus")
+    return collection(FirebasePaths.Firestore.USER_MENUS).document(userId).collection(FirebasePaths.Firestore.DAILY_MENUS)
 }
 
 // --- Mapping Extensions ---

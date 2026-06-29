@@ -21,12 +21,10 @@ Faqat JSON formatida javob bering. Javobingizda boshqa hech qanday matn bo'lmasl
 - "calories", "protein", "fat", "carbs": Taqribiy qiymatlar.
 - "ingredients": Ovqat tarkibidagi asosiy mahsulotlar ro'yxati.
 - "healthScore": 1 dan 10 gacha (1 - juda zararli, 10 - o'ta sog'lom).
-- "pros": Ovqatning ijobiy tomonlari (Masalan: "Oqsilga boy", "Kletchatka manbai"). Agar zararli bo'lsa, bo'sh ro'yxat [].
-- "advice": Agar ovqat zararli bo'lsa yoki kaloriya limitidan oshib ketish xavfi bo'lsa, QANDAY QILIB uni sog'lomroq yeyish mumkinligini ayting (Masalan: "Yarmini yeng", "Ko'proq salat bilan qo'shing").
-- "tips": Foydalanuvchining bugungi progressiga qarab 3 ta professional maslahat. 
-  - MUHIM: "Oqsil", "Kletchatka", "Uglevod" kabi ilmiy va tushunarsiz so'zlarni ishlatmang. "Bugun kam yedingiz" deb ham aytmang.
-  - Oddiy tilda gapiring: "Go'sht/tuxum yeng", "Sabzavot ko'proq bo'lsin", "Shirinlikni kamaytiring".
-  - Keyingi ovqatga nima yeyish tavsiya etilishini va sog'lom turmush tarzi bo'yicha oddiy maslahat bering.
+- "pros": Agar ovqat ko'proq SOG'LOM bo'lsa (healthScore >= 6), uning foydalari. Tibbiyot terminlaridan foydalanmasdan, oddiy odam tushunadigan qilib yozing (Masalan: "Oqsili ko'p va tez to'q tutadi", "Ozg'inlik uchun eng zo'r tanlov"). Agar yog'li/shirin bo'lsa buni BO'SH QALDIRING: [].
+- "cons": Agar ovqat ko'proq ZARARLI bo'lsa (healthScore <= 5), xavfli tomonlari. DIQQAT: Hech qachon "qondagi qand miqdorini oshiradi", "tish emalini yemirib yuboradi" kabi noo'rin yoki murakkab tibbiy atamalarni ishlatmang! O'zlashtirish oson bo'lishi uchun faqat ozish/semirishga yoki organizm ishiga qanday ta'sir qilishini oddiy izohlang (Masalan: 'Shakar juda ko'p, semirtirishi mumkin' yoki 'Xamiri ko'p ekan, kechqurunga og'irlik qiladi'). Agar sog'lom bo'lsa buni BO'SH QALDIRING: [].
+QAT'IY QOIDA: Bitta ovqatda ham 'pros' ham 'cons' baravar chiqarilmasdan, FAQAT bittasi tanlansin! Mantiqan yog'li ovqatning foydasi bo'lmaydi.
+- "advice": O'zbek dietologi kabi O'TA QISQA (1 yoki max 2 gap) qilib ovqat yuzasidan SAMIMIY va MOTIVATSION xulosa bering. Odamni ruhlantiring! Agar ovqat zararsiz va yengil bo'lsa (meva, dovcha, qatiq kabi), kechasi yegan taqdirda ham umuman tanqid qilmang, faqat ijobiy narsalar ayting. FAQATGINA o'ta zararli, og'ir va yog'li ovqatlarnigina tanqid qilsa bo'ladi. ("Obbo", "Qayerdan chiqdi" demasdan, xotirjam do'stona maslahat).
 
 🟡 SAVOL BERISH QOIDASI (isAmbiguous: true):
 - "question": Qisqa va bitta mantiqqa ega savol.
@@ -53,13 +51,16 @@ Til: O'zbek tili (Professional va samimiy).
     ): String {
         val genderText = if (gender == 1) "Erkak kishi" else "Ayol kishi"
         val mealText = mealNames[meal.lowercase()] ?: meal
+        
+        val currentTime = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+
         val context =
-            "Bugun: $consumedCalories/$targetCalories kkal yedi, $waterMl ml suv ichdi, $burnedCalories kkal yo'qotdi."
+            "Hozir soat $currentTime. U '$mealText' deb belgiladi. Bugungi statistika: $consumedCalories/$targetCalories kkal, $waterMl suv."
 
         return if (description.isNotBlank()) {
-            "$genderText, $mealText vaqtida: $description. $context. Natija berishda tips maydonini to'ldir."
+            "$genderText: $description. $context."
         } else {
-            "$genderText, $mealText vaqtida rasm yukladi. $context. Natija berishda tips maydonini to'ldir."
+            "$genderText rasm yukladi. $context."
         }
     }
 

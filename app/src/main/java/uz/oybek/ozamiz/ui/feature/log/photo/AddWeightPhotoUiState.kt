@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.log.photo
 
+import uz.oybek.ozamiz.data.community.AchievementPostHelper
+
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -82,7 +84,7 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
                     }
 
                     if (previousWeight > 0.0 && previousWeight != newWeight) {
-                        uz.oybek.ozamiz.data.community.AchievementPostHelper.onWeightDropped(previousWeight, newWeight)
+                        AchievementPostHelper.onWeightDropped(previousWeight, newWeight)
                     }
 
                     _uiState.update { it.copy(isLoading = false, logAddedSuccessfully = true) }

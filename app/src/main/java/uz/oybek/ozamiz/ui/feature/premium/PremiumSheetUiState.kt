@@ -1,5 +1,9 @@
 package uz.oybek.ozamiz.ui.feature.premium
 
+import uz.oybek.ozamiz.data.config.ConfigRepository
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.utils.DataWrapper.Success
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +21,11 @@ data class PremiumSheetUiState(
 
 class PremiumSheetViewModel : ViewModel() {
 
-    private val _uiState = MutableLiveData(PremiumSheetUiState())
+    private val _uiState = MutableLiveData(
+        PremiumSheetUiState(
+            paymentChecking = UserRepository.user.paymentChecking
+        )
+    )
     val uiState: LiveData<PremiumSheetUiState> = _uiState
 
     init {
@@ -30,12 +38,12 @@ class PremiumSheetViewModel : ViewModel() {
 
     private fun loadPremiumPrices() {
         _uiState.value = _uiState.value?.copy(isLoading = true)
-        val user = uz.oybek.ozamiz.data.user.UserRepository.user
+        val user = UserRepository.user
         val isPaymentChecking = user.paymentChecking
 
         viewModelScope.launch {
-            val result = uz.oybek.ozamiz.data.config.ConfigRepository.getPremiumPrices()
-            if (result is uz.oybek.ozamiz.data.utils.DataWrapper.Success) {
+            val result = ConfigRepository.getPremiumPrices()
+            if (result is Success) {
                 val (monthly, yearly) = result.data
                 _uiState.postValue(
                     _uiState.value?.copy(

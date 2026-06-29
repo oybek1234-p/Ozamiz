@@ -13,9 +13,10 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentCommunityBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.data.user.UserRepository
 
 class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
+
+    private val viewModel: CommunityViewModel by viewModels()
 
     init {
         showBottomSheet = true
@@ -57,7 +58,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
     }
 
     private fun observeNotifications() {
-        UserRepository.observeUnReadMessages { count ->
+        viewModel.observeUnReadMessages { count ->
             binding.tvNotificationBadge.isVisible = count > 0
             binding.tvNotificationBadge.text = count.toString()
         }

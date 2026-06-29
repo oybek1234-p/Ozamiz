@@ -1,34 +1,31 @@
 package uz.oybek.ozamiz.data.user
 
 import android.net.Uri
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.firebase.FirebasePaths
+import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.firebase.database
 import uz.oybek.ozamiz.data.firebase.firestore
-import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.firebase.getValueSafe
 import uz.oybek.ozamiz.data.firebase.publicUsersCollection
-import uz.oybek.ozamiz.data.firebase.toObjectsList
-import uz.oybek.ozamiz.util.returnResult
+import uz.oybek.ozamiz.data.firebase.toObjectSafe
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.user.model.UserSortType
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.util.handleException
+import uz.oybek.ozamiz.util.returnResult
 import java.util.Date
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -97,7 +94,7 @@ object UserRepository {
 
     fun setPremium(
         userId: String, premium: Boolean, approved: Boolean, isYearly: Boolean = false
-    ) { // Added 'isYearly'
+    ) {
         if (userId.isEmpty()) return
         val updates = mutableMapOf<String, Any?>(
             User::premium.name to premium, User::paymentChecking.name to false
@@ -212,7 +209,8 @@ object UserRepository {
             val timestamp = ServerValue.TIMESTAMP
             usersReference.child(user.uid).child(User::lastSeenTime.name)
                 .setValue(timestamp)
-            publicUsersCollection.document(user.uid).update(User::lastSeenTime.name, System.currentTimeMillis())
+            publicUsersCollection.document(user.uid)
+                .update(User::lastSeenTime.name, System.currentTimeMillis())
             LocalUser.saveUser()
         }
     }
@@ -344,7 +342,7 @@ object UserRepository {
         if (user.valid.not() || amount == 0) return
         val ref = usersReference.child(user.uid).child(User::scorePoints.name)
         val publicDocRef = publicUsersCollection.document(user.uid)
-        
+
         ref.runTransaction(object : com.google.firebase.database.Transaction.Handler {
             override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
                 val current = currentData.getValue(Int::class.java) ?: 0
@@ -363,7 +361,7 @@ object UserRepository {
                     )
                     LocalUser.user.scorePoints = newTotal
                     LocalUser.saveUser()
-                    
+
                     // Sync with public_users
                     publicDocRef.update(User::scorePoints.name, newTotal)
                 }
@@ -400,6 +398,7 @@ object UserRepository {
                 UserSortType.MOST_POINTS -> User::scorePoints.name
                 UserSortType.RECENT_ACTIVITY -> User::lastSeenTime.name
                 UserSortType.MOST_ACTIVE -> User::scorePoints.name
+                UserSortType.TOP_STREAK -> "streakInfo.${StreakInfo::currentStreak.name}"
             }
 
             var query = publicUsersCollection.orderBy(queryField, Query.Direction.DESCENDING)
@@ -412,8 +411,31 @@ object UserRepository {
             }
 
             val snapshot = query.limit(limit.toLong()).get().await()
-            val users = snapshot.toObjectsList<User>()
-            users
+            snapshot.toObjects<User>()
         }
+    }
+
+    suspend fun getPublicUser(userId: String): User? {
+        return try {
+            val snapshot = publicUsersCollection.document(userId).get().await()
+            snapshot.toObjectSafe<User>()
+        } catch (e: Exception) {
+            handleException(e)
+            null
+        }
+    }
+
+    suspend fun getAdminUser(userId: String): User? {
+        return try {
+            val snapshot = FirebasePaths.userReference(userId).get().await()
+            snapshot.getValueSafe(User::class.java)
+        } catch (e: Exception) {
+            handleException(e)
+            null
+        }
+    }
+
+    suspend fun updateAdminUser(userId: String, updates: Map<String, Any?>) {
+        FirebasePaths.userReference(userId).updateChildren(updates).await()
     }
 }

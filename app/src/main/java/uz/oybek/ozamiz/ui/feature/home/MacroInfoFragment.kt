@@ -17,6 +17,7 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
         const val MACRO_PROTEIN = "protein"
         const val MACRO_FAT = "fat"
         const val MACRO_CARBS = "carbs"
+        const val MACRO_CALORIES = "calories"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +46,17 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
             MACRO_PROTEIN -> setupProteinInfo(bind)
             MACRO_FAT -> setupFatInfo(bind)
             MACRO_CARBS -> setupCarbsInfo(bind)
+            MACRO_CALORIES -> setupCaloriesInfo(bind)
         }
+    }
+
+    private fun setupCaloriesInfo(bind: FragmentMacroInfoBinding) {
+        bind.toolbar.title = "Kaloriya (Calories)"
+
+        bind.textMacroDescription.text =
+            "Kaloriya — bu oziq-ovqatlardan oladigan energiyamiz o'lchovi. Insonning ozishi yoki semirishi yig'ilgan kaloriyalar balansiga bog'liq.\n\n" +
+            "⚡ Vazn tashlash: Kunlik sarflaydiganingizdan kamroq energiya qabul qilishingiz kerak (kaloriya defitsiti).\n\n" +
+            "⚖️ Me'yor: Har bir insonning o'z maqsadi (ozish / saqlash / orttirish) asosida individual kunlik ehtiyoj belgilanadi."
     }
 
     private fun hideExtraSections(bind: FragmentMacroInfoBinding) {

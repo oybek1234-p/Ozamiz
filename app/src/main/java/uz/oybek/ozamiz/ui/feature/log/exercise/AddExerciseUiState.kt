@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.log.exercise
 
+import uz.oybek.ozamiz.data.user.UserRepository
+
 import android.app.Application
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
@@ -9,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.UserExercise
@@ -74,7 +75,7 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
             val points = (caloriesBurned / 10).coerceAtLeast(1)
             ExerciseLogRepository.add(exerciseLog, selectedDate)
             // Streak updated via onExerciseAdded() in HomeViewModel after navigation
-            uz.oybek.ozamiz.data.user.UserRepository.addPoints(points)
+            UserRepository.addPoints(points)
         }
     }
 }

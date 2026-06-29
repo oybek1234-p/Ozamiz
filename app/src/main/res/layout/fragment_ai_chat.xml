@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorSurfaceContainer"
-            app:title="AI Diyetolog"
+            app:title="Dietolog"
             app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge">
 
@@ -52,6 +52,23 @@
         android:visibility="gone"
         tools:listitem="@layout/item_chat_message"
         tools:visibility="visible" />
+
+    <HorizontalScrollView
+        android:id="@+id/quick_questions_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:clipToPadding="false"
+        android:paddingHorizontal="12dp"
+        android:layout_marginBottom="8dp">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_questions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleLine="true">
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottomContainer"

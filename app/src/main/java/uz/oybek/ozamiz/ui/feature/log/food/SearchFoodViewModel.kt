@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import uz.oybek.ozamiz.data.community.CommunityShareHelper
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -67,7 +69,7 @@ class SearchFoodViewModel : ViewModel() {
                 foodLog = foodLog,
                 date = date
             )
-            uz.oybek.ozamiz.data.community.CommunityShareHelper.shareFoodLogIfNeeded(foodLog)
+            CommunityShareHelper.shareFoodLogIfNeeded(foodLog)
         }
     }
 }

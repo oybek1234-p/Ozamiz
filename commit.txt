@@ -1,0 +1,35 @@
+commit 837d9a13e4a266427d04ec65d63e44997959a813
+Author: oybek1234-p <74933246+oybek1234-p@users.noreply.github.com>
+Date:   Wed Apr 8 18:23:12 2026 +0500
+
+    New update
+
+diff --git a/app/src/main/java/uz/oybek/ozamiz/ui/MainActivity.kt b/app/src/main/java/uz/oybek/ozamiz/ui/MainActivity.kt
+index 2473d9e..2276c44 100644
+--- a/app/src/main/java/uz/oybek/ozamiz/ui/MainActivity.kt
++++ b/app/src/main/java/uz/oybek/ozamiz/ui/MainActivity.kt
+@@ -121,16 +121,20 @@ class MainActivity : AppCompatActivity() {
+     private fun checkRegisterDate() {
+         if (LocalUser.user.registerDate == null) {
+             UserRepository.updateUser {
+-                it.registerDate = Calendar.getInstance()
+-                    .apply {
+-                        add(Calendar.YEAR, -1)
+-                    }.time
++                it.registerDate = Calendar.getInstance().time
+             }
+         }
+     }
+ 
+     private fun initUser() {
+         LocalUser.getUser()
++        if (LocalUser.user.valid) {
++            UserRepository.updateLastSeen()
++            UserRepository.observeCurrentUser { }
++            lifecycleScope.launch(Dispatchers.IO) {
++                UserRepository.refreshUser()
++            }
++        }
+     }
+ 
+     fun showSupportSheet() {

@@ -21,18 +21,15 @@ import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
 import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.MealTime
-import uz.oybek.ozamiz.data.logs.FoodLogRepository
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FoodAnalyzingLoaderBinding
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
-import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.showToast
 import java.util.Date
@@ -46,6 +43,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     private var logDate: Date = Date()
     private var loadingSheet: BottomSheetDialog? = null
     private var loadingShown = false
+    private var tourOverlay: uz.oybek.ozamiz.ui.utils.GuidedTourOverlay? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,20 +71,30 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         initTodayLogs(logDate)
         setupPremiumListener()
         initFoodCamera()
-        checkAppOnboardingAutoPrompt()
-    }
-
-    private fun checkAppOnboardingAutoPrompt() {
-        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        if (prefs.getInt("app_onboarding_step", 0) == 1) {
-            TextInputBottomSheet.newInstance(
-                title = "Bugun nonushtada nima yeganingizni kiriting",
-                placeholder = "Masalan: 1 ta olma"
-            ).show(parentFragmentManager, TextInputBottomSheet.TAG)
+        viewLifecycleOwner.lifecycleScope.launch {
+            kotlinx.coroutines.delay(500)
+            checkAppOnboardingAutoPrompt()
         }
     }
 
+    private fun checkAppOnboardingAutoPrompt() {
+        if (viewModel.isFoodTourSeen()) return
+        viewModel.setFoodTourSeen(true)
+
+        tourOverlay = uz.oybek.ozamiz.ui.utils.GuidedTourOverlay(requireContext())
+        tourOverlay?.showFor(
+            activity = requireActivity(),
+            targetView = binding.buttonQuickCamera,
+            title = "Sun'iy Intellekt Kamerasi",
+            text = "Ovqatingizni kiritish yoqimsiz jarayon emas! Shunchaki rasmga oling. Sun'iy intellekt taomingiz qanday ekanini o'zi aniqlab, undagi jami kaloriya, oqsil, yog' va uglevodlarni soniyalarda aniq hisoblab beradi. Ozingiz qidirib yurishga vaqt sarflamaysiz!",
+            buttonText = "Ajoyib, Rasmga olish",
+            onNext = { checkOnlyPremium { launchCamera() } }
+        )
+    }
+
     override fun onDestroyView() {
+        tourOverlay?.removeImmediately()
+        tourOverlay = null
         loadingSheet?.dismiss()
         loadingSheet = null
         super.onDestroyView()
@@ -124,7 +132,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             if (bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION) == "go_to_payment") {
                 val price = bundle.getLong("selected_price", 29000L)
                 val isYearly = bundle.getBoolean("is_yearly", false)
-                val args = Bundle().apply { 
+                val args = Bundle().apply {
                     putLong("price", price)
                     putBoolean("is_yearly", isYearly)
                 }
@@ -139,7 +147,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     private fun checkPremium(action: () -> Unit) {
-        if (UserRepository.user.isPremiumOrTrial()) {
+        if (viewModel.isUserPremiumOrTrial) {
             action()
         } else {
             PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
@@ -147,7 +155,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     private fun checkOnlyPremium(action: () -> Unit) {
-        if (UserRepository.user.isPremium()) {
+        if (viewModel.isUserPremium) {
             action()
         } else {
             PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
@@ -191,7 +199,9 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             }
         }
 
-        buttonQuickCamera.setOnSafeClickListener { checkOnlyPremium { launchCamera() } }
+        buttonQuickCamera.setOnSafeClickListener {
+            checkPremium { launchCamera() }
+        }
         buttonShowTextInput.setOnSafeClickListener {
             checkPremium {
                 TextInputBottomSheet().show(
@@ -250,7 +260,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    FoodLogRepository.getLatestLogs(date, 2).collectLatest { logs ->
+                    viewModel.getLatestLogs(date, 2).collectLatest { logs ->
                         binding.layoutRecentHistory.isVisible = logs.isNotEmpty()
                         adapter.submitList(logs)
                     }
@@ -337,12 +347,11 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     private fun navigateToResult(result: FoodAnalysis) {
-        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-        if (prefs.getInt("app_onboarding_step", 0) == 1) {
+        if (LocalPreferencesRepository.getAppOnboardingStep() == 1) {
             homeViewModel.onAppOnboardingComplete()
         }
-        navigate(R.id.analyzeResultFragment, Bundle().apply { 
-            putInt("id", result.id) 
+        navigate(R.id.analyzeResultFragment, Bundle().apply {
+            putInt("id", result.id)
             putLong("timestamp", logDate.time)
         })
     }

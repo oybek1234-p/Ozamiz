@@ -1,5 +1,12 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import uz.oybek.ozamiz.data.community.CommunityPostRepository
+import uz.oybek.ozamiz.data.community.model.CommunityPost
+import uz.oybek.ozamiz.data.community.model.PostType.FOOD
+import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
+import uz.oybek.ozamiz.data.food.SavedFoodRepository
+import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
+
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -60,6 +67,7 @@ class AnalyzeResultViewModel : ViewModel() {
     private var loadedLogDate: java.util.Date? = null
     private var loadedLogId: String? = null
     private var loadedUserId: String? = null
+    private var loadedCommunityPostId: String? = null
 
     private var uploadJob: kotlinx.coroutines.Deferred<String?>? = null
 
@@ -76,7 +84,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun setResult(result: FoodAnalysis?) {
-        val streak = uz.oybek.ozamiz.data.user.UserRepository.user?.streakInfo?.currentStreak ?: 0
+        val streak = UserRepository.user.streakInfo?.currentStreak ?: 0
         liveResult.update {
             it.copy(
                 result = result,
@@ -86,6 +94,81 @@ class AnalyzeResultViewModel : ViewModel() {
         startUploadIfNeeded(result?.photoUrl)
 
         checkIfSaved()
+        autoSaveFood()
+    }
+
+    private fun autoSaveFood() {
+        if (liveResult.value.isRecallMode) return
+        val result = liveResult.value.result ?: return
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val finalUrl = uploadJob?.await() ?: result.photoUrl
+            if (finalUrl != result.photoUrl && finalUrl != null) {
+                result.photoUrl = finalUrl
+                FoodAnalyzer.updateCachedResult(result.id, finalUrl, result.mealType)
+            }
+            val log = result.toFoodLog()
+            val targetDate = loadedLogDate ?: LogFragment.currentDate
+
+            val success = FoodLogRepository.add(result.photoUrl, log, targetDate)
+            if (success) {
+                loadedLogId = log.logId
+                loadedLogDate = targetDate
+
+                val score = result.result?.healthScore ?: 0
+                val pointsDelta = when {
+                    score >= 8 -> 10
+                    score == 7 -> 5
+                    score == 6 -> 0
+                    score in 4..5 -> -5
+                    else -> -10
+                }
+                if (pointsDelta != 0) {
+                    UserRepository.addPoints(pointsDelta)
+                }
+
+                val shouldShare = score >= 9 || (!result.photoUrl.isNullOrBlank() && result.photoUrl != "null")
+                if (shouldShare) {
+                    val user = UserRepository.user
+                    val userId = Firebase.auth.currentUser?.uid
+                    if (userId != null) {
+                        val post = CommunityPost(
+                            userId = userId,
+                            userName = user.name.ifBlank { "Foydalanuvchi" },
+                            userAvatarUrl = user.avatarUrl,
+                            photoUrl = result.photoUrl.orEmpty(),
+                            photos = listOf(result.photoUrl.orEmpty()),
+                            title = result.result!!.name,
+                            description = buildString {
+                                val currentScore = result.result.healthScore ?: 0
+                                if (currentScore <= 5) {
+                                    val consStr = result.result.cons?.joinToString("\n") { "❌ $it" }
+                                    if (!consStr.isNullOrBlank()) append(consStr)
+                                } else {
+                                    val prosStr = result.result.pros?.joinToString("\n") { "✅ $it" }
+                                    if (!prosStr.isNullOrBlank()) append(prosStr)
+                                    val advStr = result.result.advice
+                                    if (!advStr.isNullOrBlank()) {
+                                        if (isNotEmpty()) append("\n\n")
+                                        append("💬 $advStr")
+                                    }
+                                }
+                            },
+                            foodName = result.result.name,
+                            calories = result.result.calories,
+                            healthScore = score,
+                            userScore = user.scorePoints,
+                            verified = true,
+                            isVisible = true,
+                            type = FOOD,
+                            isPremiumUser = user.premium
+                        )
+                        CommunityPostRepository.addPost(post)
+                        loadedCommunityPostId = post.id
+                    }
+                }
+            }
+        }
     }
 
     fun setRecallResult(result: FoodAnalysis) {
@@ -111,13 +194,13 @@ class AnalyzeResultViewModel : ViewModel() {
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
             val streak =
-                uz.oybek.ozamiz.data.user.UserRepository.user?.streakInfo?.currentStreak ?: 0
+                UserRepository.user?.streakInfo?.currentStreak ?: 0
             val log = FoodLogRepository.getFoodLog(logId, date, userId)
             if (log != null) {
                 val analysis = FoodAnalysis(
                     id = log.logId.hashCode(),
                     photoUrl = log.photoUrl?.takeIf { it.isNotBlank() },
-                    result = uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult(
+                    result = FoodAnalysisResult(
                         name = log.description,
                         calories = log.calories,
                         protein = log.protein,
@@ -156,11 +239,19 @@ class AnalyzeResultViewModel : ViewModel() {
     private fun checkIfSaved() {
         val currentResult = liveResult.value.result ?: return
         viewModelScope.launch {
-            val isSaved = uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(
+            val isSaved = SavedFoodRepository.isFoodSaved(
                 currentResult.result?.name ?: ""
             )
             liveResult.update { it.copy(isSaved = isSaved) }
         }
+    }
+
+    fun isAppOnboardingStepOne(): Boolean {
+        return LocalPreferencesRepository.getAppOnboardingStep() == 1
+    }
+
+    fun setAppOnboardingStep(step: Int) {
+        LocalPreferencesRepository.setAppOnboardingStep(step)
     }
 
     fun toggleFavorite() {
@@ -169,12 +260,12 @@ class AnalyzeResultViewModel : ViewModel() {
         val foodLog = currentResult.toFoodLog()
         viewModelScope.launch {
             val isSaved =
-                uz.oybek.ozamiz.data.food.SavedFoodRepository.isFoodSaved(foodLog.description)
+                SavedFoodRepository.isFoodSaved(foodLog.description)
             if (isSaved) {
-                uz.oybek.ozamiz.data.food.SavedFoodRepository.removeSavedFood(foodLog.description)
+                SavedFoodRepository.removeSavedFood(foodLog.description)
                 _event.send(AnalyzeResultEvent.Failure("Saqlanganlardan olib tashlandi"))
             } else {
-                uz.oybek.ozamiz.data.food.SavedFoodRepository.saveFood(foodLog)
+                SavedFoodRepository.saveFood(foodLog)
                 _event.send(AnalyzeResultEvent.Failure("Saqlanganlarga qo'shildi"))
             }
             checkIfSaved()
@@ -200,9 +291,14 @@ class AnalyzeResultViewModel : ViewModel() {
         if (liveResult.value.isLoading) return
         val logId = loadedLogId ?: return
         val date = loadedLogDate ?: return
+        val postId = loadedCommunityPostId
+        
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
             val success = FoodLogRepository.delete(logId, date, loadedUserId)
+            if (success && postId != null) {
+                CommunityPostRepository.deletePost(postId)
+            }
             liveResult.update { it.copy(isLoading = false) }
             onComplete(success)
         }
@@ -267,13 +363,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun onSaveClick() {
-        if (liveResult.value.isLoading) return
-        val result = liveResult.value.result ?: return
-        val photoUrl = result.photoUrl
-        val score = result.result?.healthScore ?: 0
-        // Auto-share if score is 9 or 10, or if there's a photo
-        val shouldShare = score >= 9 || (!photoUrl.isNullOrBlank() && photoUrl != "null")
-        saveFood(shouldShare = shouldShare)
+        // Obsolete manually triggered save function
     }
 
     fun saveFood(shouldShare: Boolean) {
@@ -281,7 +371,6 @@ class AnalyzeResultViewModel : ViewModel() {
         val result = liveResult.value.result ?: return
         liveResult.update { it.copy(isLoading = true) }
         CoroutineScope(Dispatchers.IO).launch {
-            // 1. Upload image if needed
             val finalUrl = uploadJob?.await() ?: result.photoUrl
             if (finalUrl != result.photoUrl && finalUrl != null) {
                 result.photoUrl = finalUrl
@@ -291,7 +380,6 @@ class AnalyzeResultViewModel : ViewModel() {
             val log = result.toFoodLog()
             val targetDate = loadedLogDate ?: LogFragment.currentDate
 
-            // 2. Prepare concurrent jobs
             val saveJob = async {
                 val success = FoodLogRepository.add(result.photoUrl, log, targetDate)
                 if (success) {
@@ -304,7 +392,7 @@ class AnalyzeResultViewModel : ViewModel() {
                         else -> -10
                     }
                     if (pointsDelta != 0) {
-                        uz.oybek.ozamiz.data.user.UserRepository.addPoints(pointsDelta)
+                        UserRepository.addPoints(pointsDelta)
                     }
                 }
                 success
@@ -315,7 +403,7 @@ class AnalyzeResultViewModel : ViewModel() {
                     val user = UserRepository.user
                     val userId = Firebase.auth.currentUser?.uid
                     if (userId != null) {
-                        val post = uz.oybek.ozamiz.data.community.model.CommunityPost(
+                        val post = CommunityPost(
                             userId = userId,
                             userName = user.name.ifBlank { "Foydalanuvchi" },
                             userAvatarUrl = user.avatarUrl,
@@ -329,10 +417,10 @@ class AnalyzeResultViewModel : ViewModel() {
                             userScore = user.scorePoints,
                             verified = true,
                             isVisible = true,
-                            type = uz.oybek.ozamiz.data.community.model.PostType.FOOD,
+                            type = FOOD,
                             isPremiumUser = user.premium
                         )
-                        uz.oybek.ozamiz.data.community.CommunityPostRepository.addPost(post)
+                        CommunityPostRepository.addPost(post)
                     }
                 }
             } else null
@@ -348,14 +436,20 @@ class AnalyzeResultViewModel : ViewModel() {
             }
 
             // 4. Trigger notification with tips
-            val analysisTips = result.result?.tips
             liveResult.update { it.copy(isLoading = false) }
 
-            if (!analysisTips.isNullOrEmpty()) {
-                _event.send(AnalyzeResultEvent.ShowTips(analysisTips))
-            } else {
-                _event.send(AnalyzeResultEvent.Saved)
-            }
+            _event.send(AnalyzeResultEvent.Saved)
+        }
+    }
+
+    private fun syncLogUpdate() {
+        val currentResult = liveResult.value.result ?: return
+        val logId = loadedLogId ?: return
+        val date = loadedLogDate ?: return
+        viewModelScope.launch {
+            val updatedLog = currentResult.toFoodLog()
+            updatedLog.logId = logId
+            FoodLogRepository.update(logId, updatedLog, date, loadedUserId)
         }
     }
 
@@ -404,6 +498,7 @@ class AnalyzeResultViewModel : ViewModel() {
                 )
             )
         }
+        syncLogUpdate()
     }
 
     fun updateProtein(protein: Double) {
@@ -416,6 +511,7 @@ class AnalyzeResultViewModel : ViewModel() {
                 )
             )
         }
+        syncLogUpdate()
     }
 
     fun updateFat(fat: Double) {
@@ -428,6 +524,7 @@ class AnalyzeResultViewModel : ViewModel() {
                 )
             )
         }
+        syncLogUpdate()
     }
 
     fun updateCarbs(carbs: Double) {
@@ -440,6 +537,7 @@ class AnalyzeResultViewModel : ViewModel() {
                 )
             )
         }
+        syncLogUpdate()
     }
 
 

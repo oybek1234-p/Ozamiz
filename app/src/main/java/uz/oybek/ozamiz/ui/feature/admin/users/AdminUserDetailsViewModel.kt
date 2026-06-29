@@ -2,7 +2,6 @@ package uz.oybek.ozamiz.ui.feature.admin.users
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,6 +10,7 @@ import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.user.UserRepository
 
 class AdminUserDetailsViewModel : ViewModel() {
 
@@ -22,16 +22,13 @@ class AdminUserDetailsViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-    
-    private val root = FirebaseDatabase.getInstance().reference
 
     fun loadUser(userId: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 // Fetch user Profile
-                val userSnapshot = FirebasePaths.userReference(userId).get().await()
-                val loadedUser = userSnapshot.getValue(User::class.java)
+                val loadedUser = UserRepository.getAdminUser(userId)
                 _user.value = loadedUser
             } catch (e: Exception) {
                 // Handle error
@@ -67,7 +64,7 @@ class AdminUserDetailsViewModel : ViewModel() {
                     "premium" to premium,
                     "premiumDate" to newPremiumDate
                 )
-                FirebasePaths.userReference(userId).updateChildren(updates).await()
+                UserRepository.updateAdminUser(userId, updates)
                 // Reload user to reflect changes
                 loadUser(userId)
             } catch (e: Exception) {

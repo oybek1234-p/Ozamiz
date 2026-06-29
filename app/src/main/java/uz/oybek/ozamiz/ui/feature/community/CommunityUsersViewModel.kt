@@ -71,6 +71,7 @@ class CommunityUsersViewModel : ViewModel() {
                         UserSortType.MOST_POINTS -> lastUser.scorePoints
                         UserSortType.RECENT_ACTIVITY -> lastUser.lastSeenTime
                         UserSortType.MOST_ACTIVE -> lastUser.scorePoints
+                        UserSortType.TOP_STREAK -> lastUser.scorePoints
                     }
 
                     _state.update {

@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui
 
+import uz.oybek.ozamiz.data.ai.Dietolog
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentSender
@@ -9,6 +11,7 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -34,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.CompanyLinks
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
@@ -44,6 +48,7 @@ import uz.oybek.ozamiz.ui.utils.visibleOrGone
 import uz.oybek.ozamiz.util.PhoneUtils
 import uz.oybek.ozamiz.util.handleException
 import java.util.Calendar
+import androidx.core.view.isInvisible
 
 class MainActivity : AppCompatActivity() {
 
@@ -116,6 +121,41 @@ class MainActivity : AppCompatActivity() {
             graph.setStartDestination(R.id.authFragment)
         }
         navHost.navController.graph = graph
+        
+        // Bottom Navigation Chat Badge Logic
+        binding.bottomNavView.post {
+            // Initial check on launch
+            if (LocalPreferencesRepository.getHasUnreadChat()) {
+                val badge = binding.bottomNavView.getOrCreateBadge(R.id.aiChatFragment)
+                badge.isVisible = true
+                badge.number = 1
+            }
+
+            // Listen for destination changes to clear badge
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                if (destination.id == R.id.aiChatFragment) {
+                    val badge = binding.bottomNavView.getBadge(R.id.aiChatFragment)
+                    if (badge != null) {
+                        badge.isVisible = false
+                        badge.clearNumber()
+                    }
+                    LocalPreferencesRepository.setHasUnreadChat(false)
+                }
+            }
+        }
+
+        // Catch new messages dynamically
+        lifecycleScope.launch {
+            Dietolog.latestMessage.collect { advice ->
+                if (!advice.isNullOrBlank() && navController.currentDestination?.id != R.id.aiChatFragment) {
+                    binding.bottomNavView.post {
+                        val badge = binding.bottomNavView.getOrCreateBadge(R.id.aiChatFragment)
+                        badge.isVisible = true
+                        badge.number = if (badge.number == 0) 1 else badge.number + 1
+                    }
+                }
+            }
+        }
 
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
@@ -271,9 +311,13 @@ class MainActivity : AppCompatActivity() {
     private var bottomNavShown = true
 
     private val decelerateInterpolator = DecelerateInterpolator(1.5f)
-    fun showBottomSheet(show: Boolean, animate: Boolean) {
+    fun showBottomSheet(show: Boolean, animate: Boolean,justInvisible: Boolean = false) {
         if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return
         bottomNavShown = show
+        if (show.not() && justInvisible) {
+            binding.bottomNavView.isInvisible = false
+            return
+        }
         binding.bottomNavView.post {
             binding.bottomNavView.apply {
                 if (show && !isVisible) {

@@ -2,17 +2,17 @@ package uz.oybek.ozamiz.data.logs
 
 import android.net.Uri
 import com.google.firebase.firestore.Query
-import uz.oybek.ozamiz.data.firebase.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
-import uz.oybek.ozamiz.data.firebase.userWeightLogsCollection
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.firebase.firestore
 import uz.oybek.ozamiz.data.firebase.generateKey
 import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
+import uz.oybek.ozamiz.data.firebase.userWeightLogsCollection
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
@@ -22,8 +22,6 @@ import java.util.concurrent.TimeUnit
 object WeightLogRepository {
 
     private const val INTERVAL_DAYS = 7
-    private const val COLLECTION_USERS = "users"
-    private const val COLLECTION_WEIGHT_LOGS = "weightLogs"
 
     suspend fun add(
         userId: String,
@@ -32,7 +30,8 @@ object WeightLogRepository {
         shouldBlur: Boolean = false
     ): DataWrapper<WeightLog> {
         val uploadedUrl = if (photoUri != null) {
-            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog, shouldBlurFaces = shouldBlur).toString()
+            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog, shouldBlurFaces = shouldBlur)
+                .toString()
         } else {
             ""
         }
@@ -65,7 +64,7 @@ object WeightLogRepository {
         if (userId.isEmpty()) return@flow
         emitAll(callbackFlow {
             val registration = firestore.userWeightLogsCollection(userId)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .orderBy(WeightLog::timestamp.name, Query.Direction.DESCENDING)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
                         if (error.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED) {

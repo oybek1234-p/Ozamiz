@@ -7,10 +7,10 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FragmentOnboardingBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.onboarding.screens.MultipleAnswerFragment
+
 
 class OnBoardingFragment : BaseFragment<FragmentOnboardingBinding>() {
 
@@ -46,9 +46,7 @@ class OnBoardingFragment : BaseFragment<FragmentOnboardingBinding>() {
             .observe(viewLifecycleOwner) {
                 when (it) {
                     is OnBoardingDirection.Finished -> {
-                        val prefs = requireContext().getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
-                        prefs.edit().putBoolean("is_first_registration", true).apply()
-                        UserRepository.updateUser {  }
+                        viewModel.finishOnboarding()
                         mainActivity()?.recreateUi()
                     }
 

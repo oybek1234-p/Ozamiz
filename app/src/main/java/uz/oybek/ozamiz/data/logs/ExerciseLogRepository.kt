@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.data.logs
 
+import uz.oybek.ozamiz.data.ai.AiEventType.EXERCISE_ADDED
+import uz.oybek.ozamiz.data.ai.Dietolog
+
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -28,6 +31,10 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
             DailySummaryRepository.updateSummary(
                 date = date,
                 exerciseDelta = log.caloriesBurned
+            )
+            Dietolog.sendUserEventAsync(
+                EXERCISE_ADDED, 
+                "${log.durationMin} minut ${log.exerciseType}"
             )
         }
         return success

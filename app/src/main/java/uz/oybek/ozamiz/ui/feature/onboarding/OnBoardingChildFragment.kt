@@ -6,7 +6,7 @@ import uz.oybek.ozamiz.ui.base.BaseFragment
 
 abstract class OnBoardingChildFragment<T : ViewBinding> : BaseFragment<T>() {
 
-    private val viewModel
+    val viewModel
             : OnBoardingViewModel by viewModels(
         ownerProducer = {
             requireParentFragment().requireParentFragment()

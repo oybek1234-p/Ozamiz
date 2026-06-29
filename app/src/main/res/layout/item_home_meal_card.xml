@@ -108,6 +108,20 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/btn_camera_meal"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/round_lay"
+            android:backgroundTint="?attr/colorSurfaceContainerHighest"
+            android:padding="8dp"
+            android:src="@drawable/camera_ic"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_add_meal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorOnSurface" />
+
+        <ImageView
             android:id="@+id/btn_add_meal"
             android:layout_width="32dp"
             android:layout_height="32dp"

@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.natija
 
+import uz.oybek.ozamiz.data.logs.model.WeightLog
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -44,7 +46,7 @@ class WeightHistoryFragment : BaseFragment<FragmentWeightHistoryBinding>() {
         }
     }
 
-    private fun showDeleteConfirmation(log: uz.oybek.ozamiz.data.logs.model.WeightLog) {
+    private fun showDeleteConfirmation(log: WeightLog) {
         com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle("Vaznni o'chirish")
             .setMessage("Haqiqatan ham bu vazn ko'rsatkichini o'chirmoqchimisiz?")

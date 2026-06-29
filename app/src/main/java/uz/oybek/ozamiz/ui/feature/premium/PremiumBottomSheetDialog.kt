@@ -13,7 +13,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.color.MaterialColors
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.PremiumSheetBinding
 import uz.oybek.ozamiz.ui.utils.NumberFormattingUtils
 import uz.oybek.ozamiz.ui.utils.showToast
@@ -58,8 +57,6 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (view.parent as? View)?.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-
-        showState(UserRepository.user.paymentChecking)
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             val loaded = state.monthlyPrice > 0L

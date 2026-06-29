@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.ui.feature.streak
 
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.model.UserSortType.TOP_STREAK
+
 import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
@@ -21,6 +24,10 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 import java.util.Locale
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
+import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.user.model.User
 
 class StreakInfoSheet : BottomSheetDialogFragment() {
 
@@ -43,7 +50,7 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         }
 
         fun show(fragmentManager: androidx.fragment.app.FragmentManager, isNewAction: Boolean = false) {
-            val streakInfo = uz.oybek.ozamiz.data.user.UserRepository.user.streakInfo ?: return
+            val streakInfo = UserRepository.user.streakInfo ?: return
             newInstance(streakInfo, isNewAction).show(fragmentManager, TAG)
         }
     }
@@ -102,11 +109,50 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
             }
         } ?: run {
             binding.textStreakMainCount.text = "0"
-            binding.textMotivationChip.text = "Faollikni boshlang! 💪"
         }
 
         binding.buttonStreakDialogContinue.setOnClickListener {
             dismiss()
+        }
+
+        setupTopUsersList()
+    }
+
+    private fun setupTopUsersList() {
+        val topUsersAdapter = TopStreakUsersAdapter { user ->
+            dismiss()
+            val bundle = bundleOf("userId" to user.uid, "userName" to user.name.ifBlank { "Foydalanuvchi" })
+            findNavController(this).navigate(R.id.communityProfileFragment, bundle)
+        }
+        binding.recyclerTopUsers.apply {
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
+                requireContext(), 
+                androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, 
+                false
+            )
+            adapter = topUsersAdapter
+        }
+
+        loadTopUsers(topUsersAdapter)
+    }
+
+    private fun loadTopUsers(adapter: TopStreakUsersAdapter) {
+        binding.progressTopUsers.visibility = View.VISIBLE
+        binding.recyclerTopUsers.visibility = View.GONE
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val result = UserRepository.getUsers(
+                limit = 10,
+                sortBy = TOP_STREAK
+            )
+            binding.progressTopUsers.visibility = View.GONE
+            binding.recyclerTopUsers.visibility = View.VISIBLE
+
+            result.onSuccess { list ->
+                adapter.submitList(list.filter { (it.streakInfo?.currentStreak ?: 0) >= 0 }.take(10))
+            }.onFailure {
+                // Ignore gracefully
+            }
         }
     }
 
@@ -157,89 +203,8 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         // Active Weeks - kamida 1 hafta
         val weeks = maxOf(1, (info.activeDays + 6) / 7)
         binding.textActiveWeeks.text = "$weeks Hafta"
-
-        // Motivational Chip
-        binding.textMotivationChip.text = getMotivationText(info.currentStreak)
-
-        // Week Range
-        val today = LocalDate.now()
-        val monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        val sunday = monday.plusDays(6)
-        val formatter = DateTimeFormatter.ofPattern("d MMM", Locale("uz"))
-        binding.textWeekRange.text = "${monday.format(formatter)} - ${sunday.format(formatter)}"
-
-        setupWeeklyProgress(info)
     }
 
-    private fun getMotivationText(streak: Int): String {
-        return when {
-            streak == 0 -> "Faollikni boshlang! 💪"
-            streak == 1 -> "Ajoyib boshlanish! Davom eting! 🌟"
-            streak < 7 -> "Siz $streak kun ketma-ket faolsiz! 🔥"
-            streak < 14 -> "Bir hafta o'tdi! Zo'r! 💪"
-            streak < 30 -> "Ajoyib natija! $streak kun! 🏆"
-            else -> "Siz shuncha yo'lni bosib o'tdingiz! 👑"
-        }
-    }
-
-    private fun setupWeeklyProgress(info: StreakInfo) {
-        val historySet = info.activityHistory.toSet()
-        val today = LocalDate.now()
-        val monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        
-        // Uzbek hafta kunlari
-        val daysOfWeekParam = listOf("DU", "SE", "CH", "PA", "JU", "SH", "YA")
-
-        val dayViews = listOf(
-            binding.day1,
-            binding.day2,
-            binding.day3,
-            binding.day4,
-            binding.day5,
-            binding.day6,
-            binding.day7
-        )
-
-        val typedValue = TypedValue()
-        val theme = requireContext().theme
-        
-        theme.resolveAttribute(androidx.appcompat.R.attr.colorPrimary, typedValue, true)
-        val colorPrimary = typedValue.data
-        
-        theme.resolveAttribute(com.google.android.material.R.attr.colorOnPrimary, typedValue, true)
-        val colorOnPrimary = typedValue.data
-        
-        theme.resolveAttribute(com.google.android.material.R.attr.colorOutlineVariant, typedValue, true)
-        val colorOutlineVariant = typedValue.data
-
-        for (i in 0 until 7) {
-            val dateToCheck = monday.plusDays(i.toLong())
-            val dateStr = dateToCheck.format(DateTimeFormatter.ISO_LOCAL_DATE)
-            val isActive = historySet.contains(dateStr)
-            val isToday = dateToCheck == today
-
-            val dayRoot: View = dayViews[i].root
-            val textCircle = dayRoot.findViewById<TextView>(R.id.text_day_circle)
-
-            textCircle.text = daysOfWeekParam[i]
-
-            when {
-                isActive -> {
-                    textCircle.setBackgroundResource(R.drawable.bg_circle_primary)
-                    textCircle.setTextColor(colorOnPrimary)
-                }
-                isToday -> {
-                    textCircle.setBackgroundResource(R.drawable.bg_circle_primary_outline)
-                    textCircle.setTextColor(colorPrimary)
-                }
-                else -> {
-                    textCircle.setBackgroundResource(R.drawable.bg_circle_outline)
-                    textCircle.setTextColor(colorOutlineVariant)
-                }
-            }
-        }
-    }
-    
     private fun animateFire(view: View, scale: Float = 1.05f) {
         view.animate()
             .scaleX(scale)
@@ -261,5 +226,50 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+}
+
+class TopStreakUsersAdapter(
+    private val onUserClick: (User) -> Unit
+) : androidx.recyclerview.widget.RecyclerView.Adapter<TopStreakUsersAdapter.ViewHolder>() {
+
+    private val users = mutableListOf<User>()
+
+    fun submitList(list: List<User>) {
+        users.clear()
+        users.addAll(list)
+        notifyDataSetChanged()
+    }
+
+    inner class ViewHolder(val binding: uz.oybek.ozamiz.databinding.ItemTopStreakUserBinding) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
+        fun bind(user: User) {
+            binding.textName.text = user.name.ifBlank { "Foydalanuvchi" }
+            val streak = user.streakInfo?.currentStreak ?: 0
+            binding.textStreakCount.text = "$streak 🔥"
+            binding.textStreakInfo.text = "${user.streakInfo?.bestStreak ?: 0} kun"
+            if (!user.avatarUrl.isNullOrBlank()) {
+                com.bumptech.glide.Glide.with(binding.root)
+                    .load(user.avatarUrl)
+                    .into(binding.imgAvatar)
+            } else {
+                binding.imgAvatar.setImageResource(R.drawable.user_photo_placeholder)
+            }
+            binding.root.setOnClickListener { onUserClick(user) }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(
+            uz.oybek.ozamiz.databinding.ItemTopStreakUserBinding.inflate(
+                LayoutInflater.from(parent.context), parent, false
+            )
+        )
+    }
+
+    override fun getItemCount() = users.size
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(users[position])
     }
 }

@@ -28,7 +28,22 @@ data class FoodAnalysis(
             photoUrl = photoUrl,
             timestamp = System.currentTimeMillis(),
             mealType = mealType,
-            aiInsights = result?.pros?.joinToString("\n") { "✅ $it" } ?: result?.aiInsight,
+            aiInsights = buildString {
+                val prosStr = result?.pros?.joinToString("\n") { "✅ $it" }
+                if (!prosStr.isNullOrBlank()) append(prosStr)
+                
+                val consStr = result?.cons?.joinToString("\n") { "❌ $it" }
+                if (!consStr.isNullOrBlank()) {
+                    if (isNotEmpty()) append("\n")
+                    append(consStr)
+                }
+
+                val advStr = result?.advice
+                if (!advStr.isNullOrBlank()) {
+                    if (isNotEmpty()) append("\n\n")
+                    append("💡 $advStr")
+                }
+            }.takeIf { it.isNotBlank() } ?: result?.aiInsight,
             aiGenerated = true,
             healthLevel = result?.healthScore,
             logId = id.toString()
@@ -47,6 +62,7 @@ data class FoodAnalysisResult(
     val healthScore: Int? = null,
     val aiInsight: String? = null,
     val pros: List<String>? = null,
+    val cons: List<String>? = null,
     val advice: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
     

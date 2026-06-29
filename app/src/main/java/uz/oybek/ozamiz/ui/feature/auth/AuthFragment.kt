@@ -19,7 +19,6 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.databinding.FragmentAuthBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.postVal
@@ -134,12 +133,12 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
         viewModel.sendState.postVal(SendState.Sending)
         isSigning = true
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             if (activity == null) {
                 isSigning = false
                 return@launch
             }
-            val user = UserRepository.authFirebaseUser()
+            val user = viewModel.authFirebaseUser()
             if (isRemoving || user.valid.not()) {
                 isSigning = false
                 return@launch

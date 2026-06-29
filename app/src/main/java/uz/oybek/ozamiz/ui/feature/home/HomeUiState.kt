@@ -1,5 +1,10 @@
 package uz.oybek.ozamiz.ui.feature.home
 
+import uz.oybek.ozamiz.data.ai.model.AiMealRecommendation
+import uz.oybek.ozamiz.data.logs.model.DailySummary
+import uz.oybek.ozamiz.data.logs.model.FoodLog
+import uz.oybek.ozamiz.data.menu.model.Menu
+
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.UserExercise
@@ -12,7 +17,7 @@ data class HomeUiState(
     val isRefreshing: Boolean = false,
     val selectedDate: Date = Date(),
     val datesForScroller: List<Date> = emptyList(),
-    val dailySummaries: Map<String, uz.oybek.ozamiz.data.logs.model.DailySummary> = emptyMap(),
+    val dailySummaries: Map<String, DailySummary> = emptyMap(),
     val streakInfo: StreakInfo? = null,
     val caloriesRemaining: Int = 0,
     val caloriesConsumed: Int = 0,
@@ -23,7 +28,7 @@ data class HomeUiState(
     val waterGlasses: List<WaterGlassState> = emptyList(),
     val exerciseBurnt: Int = 0,
     val exerciseTarget: Int = 0,
-    val dailyFoodLogs: List<uz.oybek.ozamiz.data.logs.model.FoodLog> = emptyList(),
+    val dailyFoodLogs: List<FoodLog> = emptyList(),
     val carbsConsumed: Int = 0,
     val carbsTarget: Int = 0,
     val proteinConsumed: Int = 0,
@@ -42,7 +47,7 @@ data class HomeUiState(
     val pointsJustAdded: Int = 0,
     val waterJustAdded: Boolean = false,
     val exerciseJustAddedType: String? = null,
-    val recommendedFoods: List<uz.oybek.ozamiz.data.menu.model.Menu> = emptyList(),
+    val recommendedFoods: List<Menu> = emptyList(),
     val recommendingForMeal: String? = null,
     val dailyTip: uz.oybek.ozamiz.ui.utils.DailyTipUtil.Tip? = null,
     val isTipVisible: Boolean = true,
@@ -50,6 +55,11 @@ data class HomeUiState(
     val motivationalMessage: String? = null,
     val todayAiMenu: String? = null,
     val dailyAiDietitianAdvice: String? = null,
+
+    val aiMealRecommendation: AiMealRecommendation? = null,
+    val nextMealTypeName: String? = null,
+    val isAiMealLoading: Boolean = false,
+    val isAiMealDismissed: Boolean = false,
 
     val lastFoodTimestamp: Long? = null,
     val waterStatusMessage: String = "Suv ichishni boshlang 💧",

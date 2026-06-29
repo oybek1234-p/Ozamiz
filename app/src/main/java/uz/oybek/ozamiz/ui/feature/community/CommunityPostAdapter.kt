@@ -1,5 +1,9 @@
 package uz.oybek.ozamiz.ui.feature.community
 
+import uz.oybek.ozamiz.data.community.model.PostType.FOOD
+import uz.oybek.ozamiz.data.community.model.PostType.WEIGHT_LOSS
+import uz.oybek.ozamiz.data.user.UserRepository
+
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -7,8 +11,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 
@@ -38,7 +40,7 @@ class CommunityPostAdapter(
 
     inner class PostViewHolder(private val binding: ItemCommunityPostBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        private val currentUserId = Firebase.auth.currentUser?.uid
+        private val currentUserId = UserRepository.user.uid.ifEmpty { null }
         private var viewed = false
 
         fun bind(post: CommunityPost) {
@@ -63,7 +65,7 @@ class CommunityPostAdapter(
             }
 
             // Hide calories and food name if not a food post
-            val isFoodPost = post.type == uz.oybek.ozamiz.data.community.model.PostType.FOOD
+            val isFoodPost = post.type == FOOD
             binding.tvFoodCalories.isVisible = isFoodPost && post.calories > 0
             if (isFoodPost) {
                 binding.tvFoodName.text = post.foodName.ifBlank { post.title }
@@ -75,7 +77,14 @@ class CommunityPostAdapter(
             binding.tvLikesCount.text = post.likesCount.toString()
             binding.tvViewsCount.text = "${post.viewsCount} ko'rdi"
 
-            val description = if (post.description.isNotEmpty()) post.description else post.comment
+            var description = if (post.description.isNotEmpty()) post.description else post.comment
+            if (isFoodPost && description != null) {
+                val chatIndex = description.indexOf("💬")
+                if (chatIndex != -1) {
+                    description = description.substring(0, chatIndex).trim()
+                }
+            }
+
             if (description.isNullOrBlank()) {
                 binding.tvComment.isVisible = false
             } else {
@@ -96,7 +105,7 @@ class CommunityPostAdapter(
                 binding.tvTime.text = ""
             }
             
-            val isWeightLoss = post.type == uz.oybek.ozamiz.data.community.model.PostType.WEIGHT_LOSS || post.type == "ACHIEVEMENT"
+            val isWeightLoss = post.type == WEIGHT_LOSS || post.type == "ACHIEVEMENT"
             val photos = (if (post.photos.isNotEmpty()) post.photos else if (post.photoUrl.isNotEmpty()) listOf(post.photoUrl) else emptyList()).filter { it.isNotBlank() }
 
             if (photos.size >= 2 && isWeightLoss) {
@@ -149,7 +158,7 @@ class CommunityPostAdapter(
             binding.btnViewProfile.isVisible = showProfileLink
 
             // Admin features
-            val isAdmin = uz.oybek.ozamiz.data.user.UserRepository.user.admin
+            val isAdmin = UserRepository.user.admin
             val isOwner = currentUserId != null && post.userId == currentUserId
             
             // Only show more button if user is owner or admin

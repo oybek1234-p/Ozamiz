@@ -1,5 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.notification
 
+import uz.oybek.ozamiz.data.user.UserRepository
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,5 +27,9 @@ class NotificationsViewModel : ViewModel() {
             }
             _isLoading.value = false
         }
+    }
+
+    fun markAllAsRead() {
+        UserRepository.setUnreadNotificationsZero()
     }
 }
