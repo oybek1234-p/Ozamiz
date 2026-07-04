@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="24dp"
+                    app:cardCornerRadius="28dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
                     app:strokeWidth="1dp">
@@ -109,258 +109,115 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="20dp">
+                        android:padding="24dp">
 
                         <TextView
-                            style="@style/Headline2_16"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="Hozirgi vazn"
                             android:fontFamily="@font/roboto_medium"
-                            android:text="Hozirgi Vazn"
-                            android:textColor="?attr/colorOnSurface" />
-
-                        <TextView
-                            android:id="@+id/tvCurrentWeight"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="-- kg"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="36sp"
-                            tools:text="82.5 kg" />
-
-                        <com.google.android.material.progressindicator.LinearProgressIndicator
-                            android:id="@+id/progressWeight"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:max="100"
-                            android:progress="0"
-                            app:indicatorColor="?attr/colorPrimary"
-                            app:indicatorTrackGapSize="0dp"
-                            app:trackColor="?attr/colorSurfaceContainerHigh"
-                            app:trackCornerRadius="8dp"
-                            app:trackStopIndicatorPadding="0dp"
-                            app:trackStopIndicatorSize="0dp"
-                            app:trackThickness="10dp" />
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center_vertical"
+                            android:gravity="bottom"
                             android:orientation="horizontal">
 
                             <TextView
-                                style="@style/Text1_16"
+                                android:id="@+id/tvCurrentWeight"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Boshlash"
-                                android:textColor="?attr/colorOnSurfaceVariant" />
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="40sp"
+                                tools:text="71.5 kg" />
+
+                            <LinearLayout
+                                android:id="@+id/layoutWeightDiff"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_marginBottom="8dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:background="@drawable/round_lay"
+                                android:backgroundTint="#104CAF50"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="4dp">
+
+                                <ImageView
+                                    android:id="@+id/ivDiffArrow"
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    app:srcCompat="@drawable/trending_down"
+                                    app:tint="#4CAF50" />
+
+                                <TextView
+                                    android:id="@+id/tvWeightDiff"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="2dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textSize="12sp"
+                                    android:textColor="#4CAF50"
+                                    tools:text="-2.5 kg" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progressWeight"
+                            android:layout_width="match_parent"
+                            android:layout_height="12dp"
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackStopIndicatorPadding="0dp"
+                            app:trackStopIndicatorSize="0dp"
+                            android:layout_marginTop="20dp"
+                            app:trackColor="?attr/colorSurfaceContainerHigh"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:trackCornerRadius="10dp"
+                            android:progress="65" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp">
 
                             <TextView
                                 android:id="@+id/tvStartWeight"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="4dp"
-                                android:fontFamily="@font/roboto_bold"
-                                android:text="-- kg"
+                                android:layout_alignParentStart="true"
+                                android:fontFamily="@font/roboto_medium"
                                 android:textColor="?attr/colorOnSurface"
-                                android:textSize="16sp"
-                                tools:text="98 kg" />
-
-                            <View
-                                android:layout_width="0dp"
-                                android:layout_height="1dp"
-                                android:layout_weight="1" />
-
-                            <TextView
-                                style="@style/Text1_16"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Maqsad"
-                                android:textColor="?attr/colorOnSurfaceVariant" />
+                                android:textSize="15sp"
+                                tools:text="80 kg" />
 
                             <TextView
                                 android:id="@+id/tvGoalWeight"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="4dp"
-                                android:fontFamily="@font/roboto_bold"
-                                android:text="-- kg"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="16sp"
-                                tools:text="75 kg" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 2. Detailed Stats Grid (Loss & Remaining) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
-
-                    <!-- Total Loss -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="?attr/colorOutlineVariant"
-                        app:strokeWidth="1dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="20dp">
-
-                            <TextView
-                                style="@style/Text2_15"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Jami ozgarish"
-                                android:textColor="?attr/colorOnSurface" />
-
-                            <TextView
-                                android:id="@+id/tvWeightDiff"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/dimen_8"
-                                android:fontFamily="@font/roboto_bold"
-                                android:text="-- kg"
-                                android:textColor="?attr/colorPrimary"
-                                android:textSize="20sp"
-                                tools:text="-6.5 kg" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="?attr/colorOutlineVariant"
-                        app:strokeWidth="1dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="20dp">
-
-                            <TextView
-                                style="@style/Text2_15"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="8dp"
-                                android:text="Maqsadgacha"
-
-                                android:textColor="?attr/colorOnSurface" />
-
-                            <TextView
-                                android:id="@+id/tvWeightLeft"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="@dimen/dimen_8"
-                                android:fontFamily="@font/roboto_bold"
-                                android:text="-- kg"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="20sp"
-                                tools:text="17.5 kg" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
-
-                <!-- Prediction Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardPrediction"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="20dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                app:srcCompat="@drawable/calendar_ic"
-                                app:tint="?attr/colorPrimary" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
+                                android:layout_alignParentEnd="true"
                                 android:fontFamily="@font/roboto_medium"
-                                android:text="Maqsadga erishish sanasi"
                                 android:textColor="?attr/colorOnSurface"
-                                android:textSize="14sp" />
-                        </LinearLayout>
+                                android:textSize="15sp"
+                                tools:text="65 kg" />
+                        </RelativeLayout>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="8dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:id="@+id/tvPredictionDate"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="22sp"
-                                tools:text="25 Iyul, 2026" />
-
-                            <TextView
-                                android:id="@+id/tvPredictionWeight"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="22sp"
-                                tools:text="70 kg" />
-                        </LinearLayout>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-
+                <!-- 2. Photos & History Section Card -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardPhotos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="20dp"
+                    app:cardCornerRadius="24dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
                     app:strokeWidth="1dp">
@@ -368,60 +225,51 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="18dp">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            app:srcCompat="@drawable/info_ic"
-                            app:tint="?attr/colorPrimary" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="Haftasiga 0.5 - 1 kg ozish xavfsiz hisoblanadi."
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Photos Section (Card) -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layoutPhotos"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp"
-                    tools:visibility="visible">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="20dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
-                            android:fontFamily="@font/roboto_medium"
-                            android:text="Fotolarim"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="16sp" />
-
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:baselineAligned="false"
-                            android:gravity="center"
-                            android:orientation="horizontal">
+                            android:layout_marginBottom="12dp">
+
+                            <TextView
+                                android:id="@+id/tvPhotosTitle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_centerVertical="true"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="Fotolarim"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="16sp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnWeightHistory"
+                                style="@style/Widget.Material3.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:text="Vazn tarixi"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="13sp"
+                                app:icon="@drawable/history_24px"
+                                app:iconSize="18dp"
+                                app:iconPadding="4dp" />
+                        </RelativeLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutPhotosContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:baselineAligned="false"
+                                android:gravity="center"
+                                android:orientation="horizontal">
 
                             <!-- Before Photo -->
                             <LinearLayout
@@ -498,48 +346,10 @@
                                 android:visibility="gone" />
                         </LinearLayout>
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- History Section (Card) -->
-                <!-- History Button Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardHistory"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="20dp">
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Vazn tarixi"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="20sp" />
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:rotation="-90"
-                            app:srcCompat="@drawable/ic_expand_more"
-                            app:tint="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Bottom Add Weight Card (Shown only when 7 days not passed) -->
+                <!-- 3. Bottom Add Weight Card (Shown only when 7 days not passed) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardAddWeightBottom"
                     android:layout_width="match_parent"
@@ -594,12 +404,12 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- BMI Banner -->
+                <!-- 4. Consolidated Analytics Card (BMI, Gradient, Legend & Target Prediction with Tip) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardBmi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="32dp"
+                    android:layout_marginBottom="16dp"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="0dp"
@@ -667,6 +477,9 @@
                                 android:id="@+id/btnBmiInfo"
                                 android:layout_width="24dp"
                                 android:layout_height="24dp"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:clickable="true"
+                                android:focusable="true"
                                 app:srcCompat="@drawable/info_ic"
                                 app:tint="?attr/colorOnSurfaceVariant" />
 
@@ -773,9 +586,106 @@
                                 android:textSize="12sp" />
 
                         </LinearLayout>
-
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                 <!-- 5. Standalone Prediction Card -->
+                 <com.google.android.material.card.MaterialCardView
+                     android:id="@+id/cardPrediction"
+                     android:layout_width="match_parent"
+                     android:layout_height="wrap_content"
+                     android:layout_marginBottom="32dp"
+                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                     app:cardCornerRadius="24dp"
+                     app:cardElevation="0dp"
+                     app:strokeColor="?attr/colorOutlineVariant"
+                     app:strokeWidth="1dp">
+ 
+                     <LinearLayout
+                         android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:orientation="vertical"
+                         android:padding="20dp">
+ 
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_marginBottom="8dp"
+                             android:gravity="center_vertical"
+                             android:orientation="horizontal">
+ 
+                             <ImageView
+                                 android:layout_width="20dp"
+                                 android:layout_height="20dp"
+                                 app:srcCompat="@drawable/calendar_ic"
+                                 app:tint="?attr/colorPrimary" />
+ 
+                             <TextView
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:layout_marginStart="8dp"
+                                 android:fontFamily="@font/roboto_medium"
+                                 android:text="Maqsadga erishish taxminiy sanasi"
+                                 android:textColor="?attr/colorOnSurface"
+                                 android:textSize="14sp" />
+                         </LinearLayout>
+ 
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:gravity="center_vertical"
+                             android:orientation="horizontal">
+ 
+                             <TextView
+                                 android:id="@+id/tvPredictionDate"
+                                 android:layout_width="0dp"
+                                 android:layout_height="wrap_content"
+                                 android:layout_weight="1"
+                                 android:fontFamily="@font/roboto_bold"
+                                 android:textColor="?attr/colorOnSurface"
+                                 android:textSize="22sp"
+                                 tools:text="25 Iyul, 2026" />
+ 
+                             <TextView
+                                 android:id="@+id/tvPredictionWeight"
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:fontFamily="@font/roboto_bold"
+                                 android:textColor="?attr/colorOnSurface"
+                                 android:textSize="22sp"
+                                 tools:text="70 kg" />
+                         </LinearLayout>
+ 
+                         <!-- Safety Tip Nested Inside Prediction Card -->
+                         <LinearLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_marginTop="16dp"
+                             android:background="@drawable/bg_rounded_8"
+                             android:backgroundTint="?attr/colorSurfaceContainer"
+                             android:gravity="center_vertical"
+                             android:orientation="horizontal"
+                             android:padding="12dp">
+ 
+                             <ImageView
+                                 android:layout_width="20dp"
+                                 android:layout_height="20dp"
+                                 app:srcCompat="@drawable/info_ic"
+                                 app:tint="?attr/colorPrimary" />
+ 
+                             <TextView
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:layout_marginStart="8dp"
+                                 android:text="Haftasiga 0.5 - 1 kg ozish salomatlik uchun xavfsiz hisoblanadi."
+                                 android:textColor="?attr/colorOnSurface"
+                                 android:textSize="14sp" />
+                         </LinearLayout>
+ 
+                     </LinearLayout>
+                 </com.google.android.material.card.MaterialCardView>
+
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

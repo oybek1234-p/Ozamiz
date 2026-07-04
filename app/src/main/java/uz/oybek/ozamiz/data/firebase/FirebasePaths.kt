@@ -37,37 +37,60 @@ object FirebasePaths {
         const val FOOD_PHOTOS = "loggedFood"
     }
 
-    fun userReference(userId: String) =
-        root.child(Database.PATH_USERS).child(userId)
+    fun userReference(userId: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        return root.child(Database.PATH_USERS).child(userId)
+    }
 
-    fun userLogsReference(userId: String) =
-        root.child(Database.PATH_LOGS).child(userId)
+    fun userLogsReference(userId: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        return root.child(Database.PATH_LOGS).child(userId)
+    }
 
-    fun foodLogsReference(userId: String, date: String) =
-        userLogsReference(userId)
+    fun foodLogsReference(userId: String, date: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        require(date.isNotBlank()) { "date cannot be blank" }
+        return userLogsReference(userId)
             .child(date)
             .child(Database.FOOD_LOGS)
+    }
 
-    fun exerciseLogsReference(userId: String, date: String) =
-        userLogsReference(userId)
+    fun exerciseLogsReference(userId: String, date: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        require(date.isNotBlank()) { "date cannot be blank" }
+        return userLogsReference(userId)
             .child(date)
             .child(Database.EXERCISE_LOGS)
+    }
 
-    fun waterLogsReference(userId: String, date: String) =
-        userLogsReference(userId)
+    fun waterLogsReference(userId: String, date: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        require(date.isNotBlank()) { "date cannot be blank" }
+        return userLogsReference(userId)
             .child(date)
             .child(Database.WATER_LOGS)
+    }
 
-    fun weightLogsReference(userId: String, date: String) =
-        userLogsReference(userId).child(date).child(Database.WEIGHT_LOGS)
+    fun weightLogsReference(userId: String, date: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        require(date.isNotBlank()) { "date cannot be blank" }
+        return userLogsReference(userId).child(date).child(Database.WEIGHT_LOGS)
+    }
 
-    fun savedFoodsReference(userId: String) =
-        userReference(userId).child(Database.SAVED_FOODS)
+    fun savedFoodsReference(userId: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        return userReference(userId).child(Database.SAVED_FOODS)
+    }
 
-    fun userDailySummariesReference(userId: String) =
-        root.child("daily_summaries").child(userId)
+    fun userDailySummariesReference(userId: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        return root.child("daily_summaries").child(userId)
+    }
 
-    fun dailySummaryReference(userId: String, date: String) =
-        userDailySummariesReference(userId).child(date)
+    fun dailySummaryReference(userId: String, date: String): DatabaseReference {
+        require(userId.isNotBlank()) { "userId cannot be blank" }
+        require(date.isNotBlank()) { "date cannot be blank" }
+        return userDailySummariesReference(userId).child(date)
+    }
 
 }

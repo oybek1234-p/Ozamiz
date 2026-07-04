@@ -18,11 +18,15 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.data.food.model.FoodItem
+import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showKeyboard
+import android.view.animation.OvershootInterpolator
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import java.util.Date
 
 class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
@@ -83,6 +87,17 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
                 adapter.submitList(state.searchResults)
                 bind.progressSearch.isVisible = state.isSearching
                 bind.layoutEmptyState.isVisible = !state.isSearching && state.searchResults.isEmpty() && state.query.isNotBlank()
+                
+                val showCount = !state.isSearching && (state.query.isNotBlank() || state.searchResults.isNotEmpty())
+                bind.textViewSearchResultsCount.isVisible = showCount
+                if (showCount) {
+                    val count = if (state.query.isBlank()) {
+                        FoodDatabase.allFoods.size
+                    } else {
+                        state.searchResults.size
+                    }
+                    bind.textViewSearchResultsCount.text = bind.root.context.getString(R.string.search_foods_count_format, count)
+                }
             }
         }
     }
@@ -119,7 +134,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             homeViewModel.onFoodAdded()
             Snackbar.make(binding.root, "${foodItem.name} qo'shildi!", Snackbar.LENGTH_SHORT).show()
             
-            delay(1000)
+            delay(200)
             
             progress.isVisible = false
             button.setIconResource(R.drawable.add_ic)
@@ -129,14 +144,24 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private fun animateClick(view: View) {
         view.animate()
-            .scaleX(1.2f)
-            .scaleY(1.2f)
-            .setDuration(100)
+            .scaleX(0.5f)
+            .scaleY(0.5f)
+            .setInterpolator(AccelerateDecelerateInterpolator())
+            .setDuration(200)
             .withEndAction {
                 view.animate()
-                    .scaleX(1.0f)
-                    .scaleY(1.0f)
-                    .setDuration(100)
+                    .scaleX(1.4f)
+                    .scaleY(1.4f)
+                    .setInterpolator(OvershootInterpolator(3.0f))
+                    .setDuration(400)
+                    .withEndAction {
+                        view.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setInterpolator(DecelerateInterpolator())
+                            .setDuration(400)
+                            .start()
+                    }
                     .start()
             }
             .start()

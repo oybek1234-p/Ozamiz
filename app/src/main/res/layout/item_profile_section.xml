@@ -31,6 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:textColor="?attr/colorOnSurface"
+        android:textSize="15sp"
         tools:text="Sozlamalar" />
 
     <!-- Chevron -->

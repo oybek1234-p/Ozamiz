@@ -81,9 +81,9 @@
                             android:layout_marginBottom="12dp"
                             android:clickable="true"
                             android:focusable="true"
-                            app:cardBackgroundColor="?attr/colorPrimary"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                             app:cardCornerRadius="16dp"
-                            app:cardElevation="2dp"
+                            app:cardElevation="0dp"
                             app:strokeWidth="0dp">
 
                             <LinearLayout
@@ -97,24 +97,45 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/camera_ic"
-                                    app:tint="?attr/colorOnPrimary" />
+                                    app:tint="?attr/colorOnSurface" />
 
                                 <TextView
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="16dp"
                                     android:layout_weight="1"
-                                    android:fontFamily="@font/roboto_bold"
+                                    android:fontFamily="@font/roboto_medium"
                                     android:text="Ovqatni rasmga olish"
-                                    android:textColor="?attr/colorOnPrimary"
+                                    android:textColor="?attr/colorOnSurface"
                                     android:textSize="16sp" />
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/badge_camera_premium"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="12dp"
+                                    app:cardBackgroundColor="@color/yellow"
+                                    app:cardCornerRadius="6dp"
+                                    app:strokeWidth="0dp"
+                                    android:visibility="gone"
+                                    tools:visibility="visible">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingHorizontal="6dp"
+                                        android:paddingVertical="2dp"
+                                        android:text="PREMIUM"
+                                        android:textColor="#002111"
+                                        android:textSize="10sp"
+                                        android:fontFamily="@font/roboto_bold" />
+                                </com.google.android.material.card.MaterialCardView>
 
                                 <ImageView
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
                                     android:rotation="180"
                                     android:src="@drawable/arrow_back"
-                                    app:tint="?attr/colorOnPrimary" />
+                                    app:tint="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -126,9 +147,10 @@
                             android:layout_marginBottom="12dp"
                             android:clickable="true"
                             android:focusable="true"
+                            app:strokeWidth="0dp"
                             app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                             app:cardCornerRadius="16dp"
-                            app:cardElevation="1dp">
+                            app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -141,7 +163,7 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/edit"
-                                    app:tint="?attr/colorPrimary" />
+                                    app:tint="?attr/colorOnSurface" />
 
                                 <TextView
                                     android:layout_width="0dp"
@@ -152,6 +174,27 @@
                                     android:text="Ovqat haqida yozing"
                                     android:textColor="?attr/colorOnSurface"
                                     android:textSize="16sp" />
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/badge_text_premium"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="12dp"
+                                    app:cardBackgroundColor="@color/yellow"
+                                    app:cardCornerRadius="6dp"
+                                    app:strokeWidth="0dp"
+                                    android:visibility="gone"
+                                    tools:visibility="visible">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingHorizontal="6dp"
+                                        android:paddingVertical="2dp"
+                                        android:text="PREMIUM"
+                                        android:textColor="#002111"
+                                        android:textSize="10sp"
+                                        android:fontFamily="@font/roboto_bold" />
+                                </com.google.android.material.card.MaterialCardView>
 
                                 <ImageView
                                     android:layout_width="20dp"
@@ -171,7 +214,8 @@
                             android:focusable="true"
                             app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                             app:cardCornerRadius="16dp"
-                            app:cardElevation="1dp">
+                            app:strokeWidth="0dp"
+                            app:cardElevation="0dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -184,15 +228,16 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/ic_search"
-                                    app:tint="?attr/colorPrimary" />
+                                    app:tint="?attr/colorOnSurface" />
 
                                 <TextView
+                                    android:id="@+id/text_view_search_list_title"
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="16dp"
                                     android:layout_weight="1"
                                     android:fontFamily="@font/roboto_medium"
-                                    android:text="Ovqatlar ro'yhati"
+                                    android:text="@string/log_food_search_list_title"
                                     android:textColor="?attr/colorOnSurface"
                                     android:textSize="16sp" />
 
@@ -207,21 +252,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dimen_12"
-                    android:clipToPadding="false"
-                    android:paddingHorizontal="24dp"
-                    android:scrollbars="none">
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipGroup_suggestions"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:chipSpacingHorizontal="8dp"
-                        app:singleLine="true" />
-                </HorizontalScrollView>
 
                 <LinearLayout
                     android:id="@+id/layout_recent_history"
@@ -247,16 +278,6 @@
                         android:nestedScrollingEnabled="false"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                         tools:listitem="@layout/item_todays_food" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/history_button"
-                        style="@style/Widget.Material3.Button.TextButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="12dp"
-                        android:text="Barchasini ko'rish"
-                        android:textColor="?attr/colorPrimary" />
                 </LinearLayout>
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>

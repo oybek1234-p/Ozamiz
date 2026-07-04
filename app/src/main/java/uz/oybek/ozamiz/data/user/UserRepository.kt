@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.data.user
 
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -12,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.firebase.database
@@ -24,6 +26,7 @@ import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.user.model.UserSortType
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.util.handleException
 import uz.oybek.ozamiz.util.returnResult
 import java.util.Date
@@ -54,13 +57,15 @@ object UserRepository {
                     User::paymentChecking.name to true,
                     User::paymentCheckPhotoUrl.name to imageUrl,
                     User::premiumDate.name to ServerValue.TIMESTAMP,
-                    "isPremiumYearly" to isYearly
+                    "isPremiumYearly" to isYearly,
+                    "isMonthlyPremium" to !isYearly
                 )
                 usersReference.child(userId).updateChildren(updates).await()
                 updateUser {
                     it.paymentChecking = true
                     it.paymentCheckPhotoUrl = imageUrl
                     it.isPremiumYearly = isYearly
+                    it.isMonthlyPremium = !isYearly
                 }
                 DataWrapper.Success(Unit)
             } else {
@@ -77,19 +82,32 @@ object UserRepository {
     private val publicUsersCollection get() = firestore.publicUsersCollection
 
     val user: User get() = LocalUser.user
+
+    fun getManualAiUsageCount(): Int {
+        val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
+        return LocalPreferencesRepository.getManualAiUsageCount(todayStr)
+    }
+
+    fun incrementManualAiUsageCount() {
+        val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
+        LocalPreferencesRepository.incrementManualAiUsageCount(todayStr)
+    }
+
     private var isObserving = false
     private var userListener: ValueEventListener? = null
 
     private fun saveUserNetwork() {
         val currentUid = auth.currentUser?.uid
         if (user.valid && user.uid == currentUid) {
+            if (user.lastSeenTime is Long) {
+                user.lastSeenTime = ServerValue.TIMESTAMP
+            }
+            if (user.registerDate is Long) {
+                user.registerDate = ServerValue.TIMESTAMP
+            }
             usersReference.child(user.uid).setValue(user)
             publicUsersCollection.document(user.uid).set(user)
         }
-    }
-
-    fun removeLastSeenListener(listener: ValueEventListener) {
-        usersReference.child(user.uid).child(User::lastSeenTime.name).removeEventListener(listener)
     }
 
     fun setPremium(
@@ -102,10 +120,12 @@ object UserRepository {
         if (approved) {
             updates[User::premiumDate.name] = ServerValue.TIMESTAMP
             updates["isPremiumYearly"] = isYearly
+            updates["isMonthlyPremium"] = !isYearly
         } else {
             updates[User::paymentCheckPhotoUrl.name] = null
             updates[User::premiumDate.name] = 0L
             updates["isPremiumYearly"] = false
+            updates["isMonthlyPremium"] = false
         }
         usersReference.child(userId).updateChildren(updates)
 
@@ -118,8 +138,30 @@ object UserRepository {
     fun loadAllUsers(scope: CoroutineScope, done: (list: List<User>) -> Unit) {
         usersReference.get().addOnSuccessListener { it ->
             scope.launch(Dispatchers.Default) {
-                done.invoke(it.children.mapNotNull { it.getValueSafe(User::class.java) })
+                val totalChildren = it.childrenCount
+                Log.d(
+                    "UserRepository",
+                    "loadAllUsers: fetched $totalChildren children from Realtime Database"
+                )
+                val parsedList = it.children.mapNotNull { child ->
+                    val user = child.getValueSafe(User::class.java)
+                    if (user == null) {
+                        Log.w(
+                            "UserRepository",
+                            "loadAllUsers: failed to parse user with key ${child.key}"
+                        )
+                    }
+                    user
+                }
+                Log.d(
+                    "UserRepository",
+                    "loadAllUsers: successfully parsed ${parsedList.size} of $totalChildren users"
+                )
+                done.invoke(parsedList)
             }
+        }.addOnFailureListener { e ->
+            Log.e("UserRepository", "loadAllUsers: failed to fetch users", e)
+            done.invoke(emptyList())
         }
     }
 
@@ -230,36 +272,30 @@ object UserRepository {
                 name = "",
                 phoneNumber = firebaseUser.phoneNumber ?: "",
                 gmail = firebaseUser.email ?: "",
-                lastSeenTime = System.currentTimeMillis(),
+                lastSeenTime = ServerValue.TIMESTAMP,
                 unreadMessages = 0,
                 premium = false,
                 premiumDate = 0L,
-                registerDate = Date(),
+                registerDate = ServerValue.TIMESTAMP,
                 startWeight = null,
                 paymentChecking = false,
                 paymentCheckPhotoUrl = null,
                 admin = false,
                 scorePoints = 0
             )
-            createNewUserAndSet(newUser)
+            createNewUserAndSet(user)
+            LocalUser.user.apply {
+                registerDate = System.currentTimeMillis()
+                lastSeenTime = System.currentTimeMillis()
+                LocalUser.saveUser()
+            }
             newUser
         } else {
-            val userWithIntegrity = networkUser!!.copy(
-                streakInfo = networkUser.streakInfo ?: StreakInfo(),
-                registerDate = networkUser.registerDate ?: Date(),
-                startWeight = networkUser.startWeight, // Keep existing startWeight or null
-                paymentChecking = networkUser.paymentChecking,
-                paymentCheckPhotoUrl = networkUser.paymentCheckPhotoUrl,
-                premium = networkUser.premium,
-                premiumDate = networkUser.premiumDate,
-                admin = networkUser.admin
-            )
-            LocalUser.user = userWithIntegrity
+            LocalUser.user = networkUser
             LocalUser.saveUser()
-            userWithIntegrity
+            networkUser
         }
     }
-
 
     suspend fun refreshUser() {
         val currentUid = auth.currentUser?.uid
@@ -279,7 +315,7 @@ object UserRepository {
             val loadedUser = it.getValueSafe(User::class.java)
             val userWithIntegrity = loadedUser?.copy(
                 streakInfo = loadedUser.streakInfo ?: StreakInfo(),
-                registerDate = loadedUser.registerDate ?: Date(),
+                registerDate = loadedUser.registerDateLong ?: System.currentTimeMillis(),
                 startWeight = loadedUser.startWeight,
                 paymentChecking = loadedUser.paymentChecking,
                 paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
@@ -319,7 +355,7 @@ object UserRepository {
                 val loadedUser = snapshot.getValueSafe(User::class.java) ?: return
                 val userWithIntegrity = loadedUser.copy(
                     streakInfo = loadedUser.streakInfo ?: StreakInfo(),
-                    registerDate = loadedUser.registerDate ?: Date(),
+                    registerDate = loadedUser.registerDateLong ?: System.currentTimeMillis(),
                     startWeight = loadedUser.startWeight,
                     paymentChecking = loadedUser.paymentChecking,
                     paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
@@ -416,6 +452,7 @@ object UserRepository {
     }
 
     suspend fun getPublicUser(userId: String): User? {
+        if (userId.isBlank()) throw IllegalArgumentException("User ID cannot be blank")
         return try {
             val snapshot = publicUsersCollection.document(userId).get().await()
             snapshot.toObjectSafe<User>()
@@ -426,6 +463,7 @@ object UserRepository {
     }
 
     suspend fun getAdminUser(userId: String): User? {
+        if (userId.isBlank()) throw IllegalArgumentException("User ID cannot be blank")
         return try {
             val snapshot = FirebasePaths.userReference(userId).get().await()
             snapshot.getValueSafe(User::class.java)
@@ -436,6 +474,13 @@ object UserRepository {
     }
 
     suspend fun updateAdminUser(userId: String, updates: Map<String, Any?>) {
+        if (userId.isBlank()) throw IllegalArgumentException("User ID cannot be blank")
         FirebasePaths.userReference(userId).updateChildren(updates).await()
+    }
+
+    suspend fun deleteUserAdmin(userId: String) {
+        if (userId.isBlank()) throw IllegalArgumentException("User ID cannot be blank")
+        FirebasePaths.userReference(userId).removeValue().await()
+        publicUsersCollection.document(userId).delete().await()
     }
 }

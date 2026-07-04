@@ -15,8 +15,23 @@ object StreakManager {
         val streakBrokenAndReset: Boolean = false,
         val streakStartedNew: Boolean = false,
         val newBestStreakAchieved: Boolean = false,
-        val isFirstActionToday: Boolean = false
+        val isFirstActionToday: Boolean = false,
+        val returnedAfterManyDays: Boolean = false
     )
+
+    fun isStreakActive(streakInfo: StreakInfo?): Boolean {
+        if (streakInfo == null) return false
+        val lastDateStr = streakInfo.lastActionDate
+        if (lastDateStr.isBlank()) return false
+        return try {
+            val lastDate = LocalDate.parse(lastDateStr, dateFormatter)
+            val today = LocalDate.now()
+            val daysDiff = ChronoUnit.DAYS.between(lastDate, today)
+            daysDiff <= 1L
+        } catch (e: Exception) {
+            false
+        }
+    }
 
     fun updateUserStreakOnAction(currentUser: User): StreakUpdateResult {
         val today = LocalDate.now()
@@ -35,7 +50,6 @@ object StreakManager {
             lastActionDateLD = try {
                 LocalDate.parse(oldLastActionDateStr, dateFormatter)
             } catch (e: Exception) {
-                // Invalid date format, treat as very old
                 today.minusDays(100)
             }
         } else {
@@ -48,31 +62,25 @@ object StreakManager {
         var streakStartedNew = false
         var newBestStreakAchieved = false
         var isFirstActionToday = false
+        var returnedAfterManyDays = false
         
-        // Add today to history if not present
         if (!activityHistory.contains(todayStr)) {
             activityHistory.add(todayStr)
-            // Optional: Limit history size to last 60 entries to save space
             if (activityHistory.size > 60) {
                  activityHistory.removeAt(0)
             }
         }
 
         if (lastActionDateLD == today) {
-            // Action already performed today
             isFirstActionToday = false
-            // Just update history if it wasn't there (handled above) 
-            // and keep other stats same
             currentStreakInfo = currentStreakInfo.copy(activityHistory = activityHistory)
         } else {
             isFirstActionToday = true
             
-            // Calculate days between last action and today
             val daysDiff = ChronoUnit.DAYS.between(lastActionDateLD, today)
             
             when {
                 daysDiff == 1L -> {
-                    // Yesterday was last action -> Increment Streak
                     currentStreakInfo = currentStreakInfo.copy(
                         currentStreak = currentStreakInfo.currentStreak + 1,
                         activeDays = currentStreakInfo.activeDays + 1,
@@ -83,7 +91,7 @@ object StreakManager {
                 }
                 daysDiff in 2..3L -> {
                     currentStreakInfo = currentStreakInfo.copy(
-                        currentStreak = currentStreakInfo.currentStreak + 1, // Resume incrementing
+                        currentStreak = currentStreakInfo.currentStreak + 1,
                         activeDays = currentStreakInfo.activeDays + 1,
                         lastActionDate = todayStr,
                         activityHistory = activityHistory
@@ -94,9 +102,12 @@ object StreakManager {
                      if (oldCurrentStreak > 0 && !isVeryFirstActionEver) {
                         streakBrokenAndReset = true
                     }
+                    if (!isVeryFirstActionEver && daysDiff >= 4L) {
+                        returnedAfterManyDays = true
+                    }
                     currentStreakInfo = currentStreakInfo.copy(
                         currentStreak = 1,
-                        activeDays = currentStreakInfo.activeDays + 1, // Still an active day
+                        activeDays = currentStreakInfo.activeDays + 1,
                         lastActionDate = todayStr,
                         activityHistory = activityHistory
                     )
@@ -117,7 +128,8 @@ object StreakManager {
             streakBrokenAndReset,
             streakStartedNew,
             newBestStreakAchieved,
-            isFirstActionToday
+            isFirstActionToday,
+            returnedAfterManyDays
         )
     }
 }

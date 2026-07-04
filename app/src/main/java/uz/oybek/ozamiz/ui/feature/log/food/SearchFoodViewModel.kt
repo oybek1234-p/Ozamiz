@@ -13,6 +13,7 @@ import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.logs.model.FoodLog
+import uz.oybek.ozamiz.data.streak.StreakRepository
 import java.util.Date
 
 data class SearchFoodState(
@@ -69,6 +70,7 @@ class SearchFoodViewModel : ViewModel() {
                 foodLog = foodLog,
                 date = date
             )
+            StreakRepository.updateStreak()
             CommunityShareHelper.shareFoodLogIfNeeded(foodLog)
         }
     }

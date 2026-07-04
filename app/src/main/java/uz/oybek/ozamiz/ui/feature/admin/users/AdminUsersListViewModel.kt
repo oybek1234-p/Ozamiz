@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.utils.DateUtils
 
 class AdminUsersListViewModel : ViewModel() {
 
@@ -17,13 +18,24 @@ class AdminUsersListViewModel : ViewModel() {
     private val _isPremiumFilterActive = MutableStateFlow(false)
     val isPremiumFilterActive = _isPremiumFilterActive.asStateFlow()
 
-    val users: StateFlow<List<User>> = combine(_users, _isPremiumFilterActive) { users, isFilterActive ->
-        if (isFilterActive) {
-            users.filter { it.premium }
-        } else {
-            users
-        }
-    }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
+
+    val users: StateFlow<List<User>> =
+        combine(_users, _isPremiumFilterActive, _searchQuery) { users, isFilterActive, query ->
+            var filteredList = users
+            if (isFilterActive) {
+                filteredList = filteredList.filter { it.premium }
+            }
+            if (query.isNotEmpty()) {
+                filteredList = filteredList.filter {
+                    it.name.contains(query, ignoreCase = true) ||
+                            it.gmail.contains(query, ignoreCase = true) ||
+                            it.uid.contains(query, ignoreCase = true)
+                }
+            }
+            filteredList
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -35,19 +47,21 @@ class AdminUsersListViewModel : ViewModel() {
     private fun loadUsers() {
         _isLoading.value = true
         UserRepository.loadAllUsers(viewModelScope) { list ->
-            // Sort by lastSeenTime descending (newest first)
-            val sortedList = list.sortedByDescending { it.lastSeenTime }
-            _users.value = sortedList
+            _users.value = list.sortedByDescending {
+                val timestampt = DateUtils.toLongTimestamp(it.lastSeenTime)
+                timestampt
+            }
             _isLoading.value = false
         }
     }
-    
+
     fun togglePremiumFilter(isActive: Boolean) {
         _isPremiumFilterActive.value = isActive
     }
 
-    fun refresh() {
-        loadUsers()
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
     }
+
 }
 

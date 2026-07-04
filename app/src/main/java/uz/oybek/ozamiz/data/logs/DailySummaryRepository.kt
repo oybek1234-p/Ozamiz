@@ -71,7 +71,8 @@ object DailySummaryRepository {
         exerciseDelta: Int = 0,
         proteinDelta: Double = 0.0,
         carbsDelta: Double = 0.0,
-        fatDelta: Double = 0.0
+        fatDelta: Double = 0.0,
+        mealsDelta: Int = 0
     ) {
         val userId = targetUid ?: currentUserId ?: return
         val dateStr = date.dateApiFormat()
@@ -88,6 +89,7 @@ object DailySummaryRepository {
                     consumedProtein = (current.consumedProtein + proteinDelta).coerceAtLeast(0.0),
                     consumedCarbs = (current.consumedCarbs + carbsDelta).coerceAtLeast(0.0),
                     consumedFat = (current.consumedFat + fatDelta).coerceAtLeast(0.0),
+                    mealsCount = (current.mealsCount + mealsDelta).coerceAtLeast(0),
                     timestamp = System.currentTimeMillis()
                 )
                 

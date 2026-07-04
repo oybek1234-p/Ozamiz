@@ -47,10 +47,24 @@
             android:paddingVertical="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <TextView
+        android:id="@+id/text_view_search_results_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="10dp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp"
+        android:fontFamily="@font/roboto_medium"
+        android:visibility="gone"
+        tools:visibility="visible"
+        tools:text="15 ta ovqat topildi" />
+
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="16dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_search_results"

@@ -13,9 +13,6 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentNatijaBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
 
@@ -49,13 +46,11 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
         bind.btnAddWeight.setOnClickListener {
             navigate(R.id.photoUploadInfoFragment)
         }
-        
+
         bind.btnAddWeightBottom.setOnClickListener {
             navigate(R.id.photoUploadInfoFragment)
         }
-        
-        // Open History Fragment
-        bind.cardHistory.setOnClickListener {
+        bind.btnWeightHistory.setOnClickListener {
             navigate(R.id.action_natijaFragment_to_weightHistoryFragment)
         }
     }
@@ -78,10 +73,10 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                             .toLocalDate()
                         val today = java.time.LocalDate.now()
                         val period = java.time.Period.between(today, targetDate)
-                        
+
                         val months = period.months + (period.years * 12)
                         val days = period.days
-                        
+
                         val durationStr = StringBuilder()
                         if (months > 0) durationStr.append("$months oy")
                         if (days > 0) {
@@ -97,12 +92,12 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
 
                     // Photos
                     val hasAnyPhoto = state.photoBefore != null || state.photoAfter != null
-                    bind.layoutPhotos.isVisible = hasAnyPhoto
+                    bind.cardPhotos.isVisible = hasAnyPhoto
                     if (hasAnyPhoto) {
                         val hasBefore = state.photoBefore != null
                         val hasAfter = state.photoAfter != null
                         val onlyOnePhoto = hasBefore xor hasAfter
-                        
+
                         // Before
                         if (hasBefore) {
                             bind.layoutPhotoBefore.isVisible = true
@@ -112,10 +107,12 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                                 .load(state.photoBefore)
                                 .placeholder(R.color.grey_line)
                                 .into(bind.imgPhotoBefore)
-                                
+
                             bind.imgPhotoBefore.setOnClickListener {
                                 state.photoBefore?.let { url ->
-                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(url)
+                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
+                                        url
+                                    )
                                         .show(parentFragmentManager, "full_image")
                                 }
                             }
@@ -132,17 +129,19 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                                 .load(state.photoAfter)
                                 .placeholder(R.color.grey_line)
                                 .into(bind.imgPhotoAfter)
-                                
+
                             bind.imgPhotoAfter.setOnClickListener {
                                 state.photoAfter?.let { url ->
-                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(url)
+                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
+                                        url
+                                    )
                                         .show(parentFragmentManager, "full_image")
                                 }
                             }
                         } else {
                             bind.layoutPhotoAfter.isVisible = false
                         }
-                        
+
                         bind.spacerPhotoBalance.isVisible = onlyOnePhoto
                     }
 
@@ -161,49 +160,88 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
         val startW = state.startWeight ?: currentW
         val goalW = state.goalWeight ?: 0.0
 
-        bind.tvStartWeight.text = if (startW != null && startW > 0) String.format("%.1f kg", startW) else "-- kg"
-        bind.tvCurrentWeight.text = if (currentW != null && currentW > 0) String.format("%.1f kg", currentW) else "-- kg"
-        bind.tvGoalWeight.text = "${goalW.toInt()} kg"
+        bind.tvStartWeight.text = if (startW != null && startW > 0) "Boshlanish: ${
+            String.format(
+                "%.1f",
+                startW
+            )
+        } kg" else "Boshlanish: -- kg"
+        bind.tvCurrentWeight.text =
+            if (currentW != null && currentW > 0) String.format("%.1f kg", currentW) else "-- kg"
+        bind.tvGoalWeight.text = if (goalW > 0) "Maqsad: ${goalW.toInt()} kg" else "Maqsad: -- kg"
 
         // Progress Calculation
         if (startW != null && currentW != null && goalW > 0 && startW != goalW) {
-            val totalToLose = startW - goalW
-            val lost = startW - currentW
-            // Clamp progress between 0 and 100
-            val progress = ((lost / totalToLose) * 100).toInt().coerceIn(0, 100)
-            bind.progressWeight.progress = progress
+            val totalPath = Math.abs(startW - goalW)
+            val achieved = Math.abs(startW - currentW)
+            val progress = ((achieved / totalPath) * 100).toInt().coerceIn(0, 100)
+            bind.progressWeight.setProgress(progress, true)
         } else {
-             bind.progressWeight.progress = 0
+            bind.progressWeight.progress = 0
         }
-
-        // Weight Left (Remaining)
-        if (currentW != null && goalW > 0) {
-             val left = currentW - goalW
-             // If left is positive, show "X kg", else "0 kg" (reached)
-             val leftText = if (left > 0) String.format("%.1f", left) else "0.0"
-             bind.tvWeightLeft.text = "$leftText kg"
-        } else {
-             bind.tvWeightLeft.text = "-- kg"
-        }
-
         val diff = state.weightDiff
-        val diffText = if (diff > 0) "+${String.format("%.1f", diff)}" else String.format("%.1f", diff)
-        bind.tvWeightDiff.text = "$diffText kg"
+        val absDiff = Math.abs(diff)
+        val diffFormatted = String.format("%.1f", absDiff)
+
+        // Maqsad semirishmi yoki ozish?
+        val isGainGoal =
+            (state.goalWeight ?: 0.0) > (state.startWeight ?: state.currentWeight ?: 0.0)
+
+        val greenColor = android.graphics.Color.parseColor("#4CAF50")
+        val redColor = android.graphics.Color.parseColor("#F44336")
+        val greenBg = android.graphics.Color.parseColor("#104CAF50")
+        val redBg = android.graphics.Color.parseColor("#10F44336")
+
+        when {
+            diff < 0 -> {
+                // Vazn kamaydi. Ozish bo'lsa yashil, semirish bo'lsa qizil.
+                val color = if (isGainGoal) redColor else greenColor
+                val bg = if (isGainGoal) redBg else greenBg
+                bind.tvWeightDiff.text = "-$diffFormatted kg"
+                bind.tvWeightDiff.setTextColor(color)
+                bind.ivDiffArrow.setImageResource(R.drawable.trending_down)
+                bind.ivDiffArrow.imageTintList = android.content.res.ColorStateList.valueOf(color)
+                bind.layoutWeightDiff.backgroundTintList =
+                    android.content.res.ColorStateList.valueOf(bg)
+            }
+
+            diff > 0 -> {
+                // Vazn ortdi. Semirish bo'lsa yashil, ozish bo'lsa qizil.
+                val color = if (isGainGoal) greenColor else redColor
+                val bg = if (isGainGoal) greenBg else redBg
+                bind.tvWeightDiff.text = "+$diffFormatted kg"
+                bind.tvWeightDiff.setTextColor(color)
+                bind.ivDiffArrow.setImageResource(R.drawable.trending)
+                bind.ivDiffArrow.imageTintList = android.content.res.ColorStateList.valueOf(color)
+                bind.layoutWeightDiff.backgroundTintList =
+                    android.content.res.ColorStateList.valueOf(bg)
+            }
+
+            else -> {
+                bind.tvWeightDiff.text = "0.0 kg"
+                bind.tvWeightDiff.setTextColor(android.graphics.Color.GRAY)
+                bind.ivDiffArrow.setImageResource(R.drawable.trending)
+                bind.ivDiffArrow.imageTintList =
+                    android.content.res.ColorStateList.valueOf(android.graphics.Color.GRAY)
+                bind.layoutWeightDiff.backgroundTintList =
+                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#10808080"))
+            }
+        }
         updateBmi(bind, state)
     }
 
     private fun updateBmi(bind: FragmentNatijaBinding, state: NatijaUiState) {
         val bmi = state.bmi
         val category = state.bmiCategory
-        
+
         if (bmi == null || bmi <= 0) {
             bind.cardBmi.isVisible = false
             return
         }
-        
+
         bind.cardBmi.isVisible = true
         bind.tvBmiValue.text = String.format("%.2f", bmi)
-        
+
         val statusText = when (category) {
             BmiCategory.UNDERWEIGHT -> "Kam vazn"
             BmiCategory.HEALTHY -> "Sog'lom"
@@ -211,7 +249,7 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
             BmiCategory.OBESE -> "Semizlik"
             else -> ""
         }
-        
+
         val color = when (category) {
             BmiCategory.UNDERWEIGHT -> Color.parseColor("#2196F3")
             BmiCategory.HEALTHY -> Color.parseColor("#4CAF50")
@@ -219,12 +257,12 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
             BmiCategory.OBESE -> Color.parseColor("#F44336")
             else -> Color.GRAY
         }
-        
+
         bind.btnBmiInfo.setOnClickListener {
-             if (bmi > 0) {
-                 val sheet = BmiInfoBottomSheetFragment.newInstance(bmi, category)
-                 sheet.show(parentFragmentManager, "bmi_info")
-             }
+            if (bmi > 0) {
+                val sheet = BmiInfoBottomSheetFragment.newInstance(bmi, category)
+                sheet.show(parentFragmentManager, "bmi_info")
+            }
         }
 
         bind.tvBmiStatus.text = statusText
@@ -233,30 +271,33 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
         // Marker Position
         bind.layoutBmiScale.post {
             val width = bind.layoutBmiScale.width
-            
+
             val percentage = when {
                 bmi < 18.5 -> {
                     // Underweight: 0.0 -> 0.33
                     val ratio = ((bmi - 10.0) / (18.5 - 10.0)).coerceIn(0.0, 1.0)
                     0.0 + ratio * 0.33
                 }
+
                 bmi < 25.0 -> {
                     // Healthy: 0.33 -> 0.66
                     val ratio = ((bmi - 18.5) / (25.0 - 18.5)).coerceIn(0.0, 1.0)
                     0.33 + ratio * 0.33
                 }
+
                 bmi < 30.0 -> {
                     // Overweight: 0.66 -> 0.83 (Yellow Zone)
                     val ratio = ((bmi - 25.0) / (30.0 - 25.0)).coerceIn(0.0, 1.0)
                     0.66 + ratio * 0.17
                 }
+
                 else -> {
                     // Obese: 0.83 -> 1.0
                     val ratio = ((bmi - 30.0) / (45.0 - 30.0)).coerceIn(0.0, 1.0)
                     0.83 + ratio * 0.17
                 }
             }
-            
+
             val x = (width * percentage).toFloat()
             bind.viewBmiMarker.translationX = x
         }

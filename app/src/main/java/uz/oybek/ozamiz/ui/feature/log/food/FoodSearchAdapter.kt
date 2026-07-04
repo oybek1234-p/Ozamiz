@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.databinding.ItemFoodSearchResultBinding
+import uz.oybek.ozamiz.R
 import kotlin.math.roundToInt
 
 class FoodSearchAdapter(
@@ -33,22 +34,22 @@ class FoodSearchAdapter(
             binding.textViewFoodName.text = item.name
             
             val defaultServing = item.servingSizes.firstOrNull()
-            binding.textViewFoodServing.text = if (defaultServing != null) {
-                "${defaultServing.description} (${defaultServing.grams.roundToInt()} g)"
-            } else {
-                "100 g"
-            }
-            
             val weight = defaultServing?.grams ?: 100.0
             val calories = (item.caloriesPer100g * weight / 100).roundToInt()
-            val carbs = (item.carbsPer100g * weight / 100)
-            val protein = (item.proteinPer100g * weight / 100)
-            val fat = (item.fatPer100g * weight / 100)
 
-            binding.textViewCalories.text = "$calories kkal"
-            binding.textViewCarbs.text = String.format("C: %.1f g", carbs)
-            binding.textViewProtein.text = String.format("P: %.1f g", protein)
-            binding.textViewFat.text = String.format("F: %.1f g", fat)
+            binding.textViewFoodServing.text = if (defaultServing != null) {
+                binding.root.context.getString(
+                    R.string.food_search_details_format,
+                    calories,
+                    defaultServing.description.lowercase(),
+                    defaultServing.grams.roundToInt()
+                )
+            } else {
+                binding.root.context.getString(
+                    R.string.food_search_details_default_format,
+                    calories
+                )
+            }
 
             binding.imageViewVerified.isVisible = item.isVerified
 

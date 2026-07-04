@@ -25,16 +25,20 @@
             app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge">
 
-            <ImageButton
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnNewChat"
+                style="@style/TextAppearance.AppCompat.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Yangi"
+                android:textAllCaps="false"
                 android:layout_gravity="end"
                 android:layout_marginEnd="12dp"
                 android:background="?selectableItemBackgroundBorderless"
                 android:padding="8dp"
-                android:src="@drawable/add_ic"
-                app:tint="?attr/colorPrimary" />
+                app:iconGravity="textEnd"
+                app:icon="@drawable/add_ic"
+                app:iconTint="?attr/colorOnSurface" />
 
         </com.google.android.material.appbar.MaterialToolbar>
 

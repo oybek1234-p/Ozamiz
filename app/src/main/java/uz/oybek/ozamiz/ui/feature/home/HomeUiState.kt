@@ -13,7 +13,7 @@ import java.util.Date
 
 
 data class HomeUiState(
-    val isInitialLoading: Boolean = true,
+    val isInitialLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val selectedDate: Date = Date(),
     val datesForScroller: List<Date> = emptyList(),
@@ -55,6 +55,7 @@ data class HomeUiState(
     val motivationalMessage: String? = null,
     val todayAiMenu: String? = null,
     val dailyAiDietitianAdvice: String? = null,
+    val isDietologAdviceDismissed: Boolean = false,
 
     val aiMealRecommendation: AiMealRecommendation? = null,
     val nextMealTypeName: String? = null,
@@ -63,5 +64,7 @@ data class HomeUiState(
 
     val lastFoodTimestamp: Long? = null,
     val waterStatusMessage: String = "Suv ichishni boshlang 💧",
-    val exerciseStatusMessage: String = "Harakatni boshlang 🔥"
+    val exerciseStatusMessage: String = "Harakatni boshlang 🔥",
+    val isWaterAdding: Boolean = false,
+    val paymentChecking: Boolean = false
 )

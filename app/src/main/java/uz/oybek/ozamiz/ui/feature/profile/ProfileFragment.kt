@@ -117,6 +117,23 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
         setupPaymentCheckListener()
         observeViewModel(bind)
+     //   observeCashbackProgress(bind)
+    }
+
+    private fun observeCashbackProgress(bind: FragmentProfileBinding) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.cashbackProgress.collect { days ->
+                    bind.progressCashback.progress = days
+
+                    if (days >= 24) {
+                        bind.textCashbackStatus.text = getString(R.string.cashback_success)
+                    } else {
+                        bind.textCashbackStatus.text = getString(R.string.cashback_status_format, days)
+                    }
+                }
+            }
+        }
     }
 
     private fun setupPaymentCheckListener() {
@@ -160,22 +177,23 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         val level = LevelManager.getCurrentLevel(user.scorePoints)
                         bind.textProfileLevelEmoji.text = level.emoji
                         bind.textProfileLevelName.text = level.name
-                        bind.textProfilePoints.text = "${user.scorePoints} ball"
+                        bind.textProfilePoints.text = getString(R.string.text_profile_points_format, user.scorePoints)
                         
                         bind.buttonLogout.isVisible = true
 
+                        val isPremiumActive = user.premium && !user.premiumExpired()
+
                         when {
-                            user.premium && !user.premiumExpired() -> {
+                            isPremiumActive -> {
                                 bind.premiumActiveC.isVisible = true
                                 bind.premiumView.isVisible = false
-                                bind.premiumExpireDate.text =
-                                    "Premium ${user.getPremiumExpireDate()} gacha amal qiladi"
+                                bind.premiumExpireDate.text = getString(R.string.premium_expiry_date_format, user.getPremiumExpireDate())
                             }
 
                             user.paymentChecking -> {
                                 bind.premiumActiveC.isVisible = true
                                 bind.premiumView.isVisible = false
-                                bind.premiumExpireDate.text = "Premium tekshirilmoqda..."
+                                bind.premiumExpireDate.text = getString(R.string.premium_checking)
                             }
 
                             else -> {
@@ -186,7 +204,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         bind.sectionAdminPremiumUsers.isVisible = user.admin
                     } else {
                         bind.textViewUserName.text = getString(R.string.default_user_name)
-                        bind.imageViewUserAvatar.setImageResource(R.drawable.ic_profile)
+                        bind.imageViewUserAvatar.setImageResource(R.drawable.user_photo_placeholder)
                         bind.buttonLogout.isVisible = false
                         bind.premiumActiveC.isVisible = false
                         bind.premiumView.isVisible = false
@@ -198,7 +216,8 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     }
 
     private fun openAppInPlayStore() {
-        val appPackageName = requireActivity().packageName
+        val context = context ?: return
+        val appPackageName = context.packageName
         try {
             startActivity(
                 Intent(

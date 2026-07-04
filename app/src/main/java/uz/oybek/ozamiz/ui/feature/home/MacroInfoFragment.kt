@@ -7,13 +7,21 @@ import android.widget.TextView
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentMacroInfoBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.food.DietController
+import kotlin.math.roundToInt
 
 class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
 
     private var macroType: String = MACRO_PROTEIN
+    private var consumedAmount: Int = 0
+    private var targetAmount: Int = 0
 
     companion object {
         const val ARG_MACRO_TYPE = "macro_type"
+        const val ARG_CONSUMED = "macro_consumed"
+        const val ARG_TARGET = "macro_target"
+
         const val MACRO_PROTEIN = "protein"
         const val MACRO_FAT = "fat"
         const val MACRO_CARBS = "carbs"
@@ -22,8 +30,10 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.getString(ARG_MACRO_TYPE)?.let {
-            macroType = it
+        arguments?.let {
+            macroType = it.getString(ARG_MACRO_TYPE, MACRO_PROTEIN)
+            consumedAmount = it.getInt(ARG_CONSUMED, 0)
+            targetAmount = it.getInt(ARG_TARGET, 0)
         }
     }
 
@@ -42,21 +52,77 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
 
     private fun setupUI(bind: FragmentMacroInfoBinding) {
         hideExtraSections(bind)
+        val user = UserRepository.user
+        val targetCals = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
+        val macros = if (user.goal == "gain_weight") {
+            DietController.calculateMacrosByPercent(targetCals, proteinPercent = 0.25, fatPercent = 0.25, carbPercent = 0.50)
+        } else {
+            DietController.calculateMacrosByPercent(targetCals, proteinPercent = 0.35, fatPercent = 0.25, carbPercent = 0.40)
+        }
+        val targetProtein = if (user.targetProtein > 0) user.targetProtein else macros.protein
+        val targetFat = if (user.targetFat > 0) user.targetFat else macros.fat
+        val targetCarbs = if (user.targetCarbs > 0) user.targetCarbs else macros.carbs
+        val tdee = DietController.calculateTDEE(user).roundToInt()
+
+        val isExceeded = consumedAmount >= targetAmount && targetAmount > 0
+        if (isExceeded) {
+            bind.cardLimitWarning.visibility = android.view.View.VISIBLE
+            bind.textWarningTitle.text = when (macroType) {
+                MACRO_CALORIES -> "Bugunga yetarli, ortiqcha ovqat semirishga olib keladi."
+                MACRO_PROTEIN -> "Oqsil limitiga yetdingiz!"
+                MACRO_FAT -> "Yog' limitiga yetdingiz!"
+                MACRO_CARBS -> "Uglevodlar limitiga yetdingiz!"
+                else -> "Limit to'ldi!"
+            }
+            bind.textWarningDescription.text = when (macroType) {
+                MACRO_CALORIES -> {
+                    val diff = consumedAmount - targetAmount
+                    val diffText = if (diff > 0) "$diff kal oshdi." else "limit to'ldi."
+                    "Faqat suv, choy yoki yengil sabazavotli salat bilan cheklaning, $diffText"
+                }
+                MACRO_PROTEIN -> {
+                    val diff = consumedAmount - targetAmount
+                    val diffTxt = if (diff > 0) "$diff gr oshdi." else "norma to'ldi."
+                    "Bugungi oqsil normangiz oshgan. Kundalik me'yordan $diffTxt\n\n✔️ Yeyish mumkin bo'lgan yeguliklar: Sabzavotli salatlar, mevalar hamda kam oqsilli yengil yeguliklar.\n\n❌ Cheklash shart bo'lgan taomlar: Tovuq go'shti, tuxum oqi, mol go'shti, baliq, tvorog va protein kokteyllari."
+                }
+                MACRO_FAT -> {
+                    val diff = consumedAmount - targetAmount
+                    val diffTxt = if (diff > 0) "$diff gr oshdi." else "norma to'ldi."
+                    "Bugungi sog'lom yog' normangiz oshgan. Jigarga yuklamani oshirmaslik uchun yog'li ovqatlardan tiyiling. Kundalik me'yordan $diffTxt\n\n✔️ Yeyish mumkin bo'lgan yeguliklar: Qaynatilgan sabzavotlar, pishgan tuxum oqi, teftellar (yog'siz), tolqon va shakarsiz mevalar.\n\n❌ Cheklash shart bo'lgan taomlar: Yong'oq, pista, pista yog'i, sariyog', pishloq, fastfud hamda yog'li go'shtlar."
+                }
+                MACRO_CARBS -> {
+                    val diff = consumedAmount - targetAmount
+                    val diffTxt = if (diff > 0) "$diff gr oshdi." else "norma to'ldi."
+                    "Bugungi kunlik uglevod limitini oshirib yubordingiz. Qondagi insulin darajasini barqaror ushlash uchun uglevodlarni cheklash tavsiya etiladi. Kundalik me'yordan $diffTxt\n\n✔️ Yeyish mumkin bo'lgan yeguliklar: Tuxum, qaynatilgan tovuq filesi, baliq, tvorog va ko'k salatlar (oqsil va tola).\n\n❌ Cheklash shart bo'lgan taomlar: Guruch, grechika, kartoshka, non, shirinliklar, mevalar hamda har qanday xamirli taomlar."
+                }
+                else -> ""
+            }
+        } else {
+            bind.cardLimitWarning.visibility = android.view.View.GONE
+        }
+
         when (macroType) {
-            MACRO_PROTEIN -> setupProteinInfo(bind)
-            MACRO_FAT -> setupFatInfo(bind)
-            MACRO_CARBS -> setupCarbsInfo(bind)
-            MACRO_CALORIES -> setupCaloriesInfo(bind)
+            MACRO_PROTEIN -> setupProteinInfo(bind, targetProtein, user.goal == "gain_weight")
+            MACRO_FAT -> setupFatInfo(bind, targetFat, user.goal == "gain_weight")
+            MACRO_CARBS -> setupCarbsInfo(bind, targetCarbs, user.goal == "gain_weight")
+            MACRO_CALORIES -> setupCaloriesInfo(bind, targetCals, tdee, user.goal == "gain_weight")
         }
     }
 
-    private fun setupCaloriesInfo(bind: FragmentMacroInfoBinding) {
-        bind.toolbar.title = "Kaloriya (Calories)"
+    private fun setupCaloriesInfo(bind: FragmentMacroInfoBinding, targetCals: Int, tdee: Int, isGainWeight: Boolean) {
+        bind.toolbar.title = "Kaloriya"
 
-        bind.textMacroDescription.text =
-            "Kaloriya — bu oziq-ovqatlardan oladigan energiyamiz o'lchovi. Insonning ozishi yoki semirishi yig'ilgan kaloriyalar balansiga bog'liq.\n\n" +
-            "⚡ Vazn tashlash: Kunlik sarflaydiganingizdan kamroq energiya qabul qilishingiz kerak (kaloriya defitsiti).\n\n" +
-            "⚖️ Me'yor: Har bir insonning o'z maqsadi (ozish / saqlash / orttirish) asosida individual kunlik ehtiyoj belgilanadi."
+        if (isGainWeight) {
+            val diff = (targetCals - tdee).coerceAtLeast(100)
+            val massGrams = (diff / 7.7).roundToInt()
+            bind.textMacroDescription.text =
+                "Sizning tanangiz kuniga ${tdee} kaloriya energiya sarflaydi. Sog'lom vazn orttirish uchun esa kuniga ${targetCals} kaloriya iste'mol qilish tavsiya etiladi. Bu degani siz kuniga ${diff} kaloriya ortiqcha (surplus) qilyapsiz. Ushbu qo'shimcha energiya hisobiga tanangiz yangi to'qimalarni hamda muskullarni shakllantirish uchun yetarli resursga ega bo'ladi va kuniga taxminan ${massGrams} gramm vazn to'play boshlaydi."
+        } else {
+            val diff = (tdee - targetCals).coerceAtLeast(100)
+            val fatGrams = (diff / 7.7).roundToInt()
+            bind.textMacroDescription.text =
+                "Sizning tanangiz kuniga ${tdee} kaloriya energiya sarflaydi. Sog'lom ozish uchun esa kuniga ${targetCals} kaloriya iste'mol qilish tavsiya etiladi. Bu degani siz kuniga ${diff} kaloriya defitsit qilyapsiz. Ushbu defitsit hisobiga tanangiz yetishmayotgan energiyani o'z zaxirasidagi yog'lardan olishga majbur bo'ladi va kuniga taxminan ${fatGrams} gramm yog' yo'qota boshlaydi."
+        }
     }
 
     private fun hideExtraSections(bind: FragmentMacroInfoBinding) {
@@ -69,31 +135,52 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
         bind.textAboutTitle.visibility = android.view.View.GONE
     }
 
-    private fun setupProteinInfo(bind: FragmentMacroInfoBinding) {
-        bind.toolbar.title = "Oqsil (Protein)"
+    private fun setupProteinInfo(bind: FragmentMacroInfoBinding, targetProtein: Int, isGainWeight: Boolean) {
+        bind.toolbar.title = "Oqsil"
 
-        bind.textMacroDescription.text =
-            "Oqsil — tananing asosiy qurilish materiali. U muskullarni tiklash, immunitet tizimini mustahkamlash va to'yimlilik hissini oshirishda muhim rol o'ynaydi.\n\n" +
-                    "🍗 Qaysi ovqatlarda ko'p: Go'sht (tovuq, mol go'shti), baliq, tuxum, tvorog, sut mahsulotlari, loviya va yasmiq.\n\n" +
-                    "⚖️ Qancha yeyish kerak: Kuniga har 1 kg vazningiz uchun 1.5-2 gramm oqsil iste'mol qilish tavsiya etiladi. Masalan, 70 kg vaznli odam uchun 105-140 gramm oqsil kerak."
+        if (isGainWeight) {
+            bind.textMacroDescription.text =
+                "Sizning kunlik oqsil me'yoringiz: ${targetProtein} gramm.\n\n" +
+                "Oqsil — tananing asosiy qurilish materialidir. Vazn oshirish va yangi muskul to'qimalarini muvaffaqiyatli barpo etishda oqsil birinchi darajali ahamiyatga ega.\n\n" +
+                "🍗 Qaysi ovqatlarda ko'p: Go'sht (tovuq, mol go'shti), baliq, tuxum, tvorog, sut mahsulotlari, loviya va yasmiq."
+        } else {
+            bind.textMacroDescription.text =
+                "Sizning kunlik oqsil me'yoringiz: ${targetProtein} gramm.\n\n" +
+                "Oqsil — tananing asosiy qurilish materialidir. Ayniqsa vazn tashlash jarayonida muskullarni saqlab qolish va uzoq vaqt to'q yurish uchun u juda muhim. Oqsil hazm bo'lishiga tana juda ko'p energiya yo'qotadi, bu esa ortiqcha yog'larni yoqishga yanada yordam beradi.\n\n" +
+                "🍗 Qaysi ovqatlarda ko'p: Go'sht (tovuq, mol go'shti), baliq, tuxum, tvorog, sut mahsulotlari, loviya va yasmiq."
+        }
     }
 
-    private fun setupFatInfo(bind: FragmentMacroInfoBinding) {
-        bind.toolbar.title = "Yog' (Fat)"
+    private fun setupFatInfo(bind: FragmentMacroInfoBinding, targetFat: Int, isGainWeight: Boolean) {
+        bind.toolbar.title = "Yog'"
 
-        bind.textMacroDescription.text =
-            "Yog' — tananing eng katta energiya manbai. Sog'lom yog'lar gormonlar ishlab chiqarish, vitaminlarni so'rish va miya faoliyati uchun o'ta zarur.\n\n" +
-                    "🥑 Qaysi ovqatlarda ko'p: Yong'oqlar, pista, avokado, zaytun yog'i, yog'li baliq (salmon) va tuxum sarig'i.\n\n" +
-                    "⚖️ Qancha yeyish kerak: Kunlik kaloriyaning 25-30% qismini sog'lom yog'lar tashkil qilishi kerak. Odatda bu kuniga 50-70 gramm atrofida bo'ladi."
+        if (isGainWeight) {
+            bind.textMacroDescription.text =
+                "Sizning kunlik yog' me'yoringiz: ${targetFat} gramm.\n\n" +
+                "Yog'lar — yuqori kaloriyali sog'lom energiya manbai hisoblanib, gormonlar sintezi va sog'lom vazn oshirish jarayonini jadallashtirish uchun zarurdir.\n\n" +
+                "🥑 Qaysi ovqatlarda ko'p: Yong'oqlar, pista, avokado, zaytun yog'i, yog'li baliq va tuxum sarig'i."
+        } else {
+            bind.textMacroDescription.text =
+                "Sizning kunlik yog' me'yoringiz: ${targetFat} gramm.\n\n" +
+                "Yog'lar — gormonal barqarorlik, teri go'zalligi va hujayralar tiklanishi uchun zarurdir. Ozish jarayonida sog'lom yog'larni yetarli miqdorda yeyish tanaga ortiqcha zaxira yog'larni erkinroq safarbar qilishiga (yoqishiga) ishora bo'ladi.\n\n" +
+                "🥑 Qaysi ovqatlarda ko'p: Yong'oqlar, pista, avokado, zaytun yog'i, yog'li baliq va tuxum sarig'i."
+        }
     }
 
-    private fun setupCarbsInfo(bind: FragmentMacroInfoBinding) {
-        bind.toolbar.title = "Uglevodlar (Carbs)"
+    private fun setupCarbsInfo(bind: FragmentMacroInfoBinding, targetCarbs: Int, isGainWeight: Boolean) {
+        bind.toolbar.title = "Uglevodlar"
 
-        bind.textMacroDescription.text =
-            "Uglevodlar — tananing asosiy energiya manbai. Miya va muskullar ishlashi uchun uglevodlar zarur. Murakkab uglevodlar sekin hazm bo'ladi va uzoq vaqt energiya beradi.\n\n" +
-                    "🍚 Qaysi ovqatlarda ko'p: Guruch, grechixa, suli yormasi (ovsyanka), kartoshka, mevalar va sabzavotlar.\n\n" +
-                    "⚖️ Qancha yeyish kerak: Kunlik kaloriyaning 45-55% qismini uglevodlar tashkil qilishi tavsiya etiladi. Murakkab uglevodlarga ko'proq urg'u bering."
+        if (isGainWeight) {
+            bind.textMacroDescription.text =
+                "Sizning kunlik uglevod me'yoringiz: ${targetCarbs} gramm.\n\n" +
+                "Uglevodlar — og'ir mashg'ulotlar uchun yetarli kuch-quvvat beradi. Vazn va muskul massasini oshirish rejimida murakkab uglevodlar hisobiga doimiy energiya va tiklanish ta'minlanadi.\n\n" +
+                "🍚 Qaysi ovqatlarda ko'p: Guruch, grechixa, suli yormasi, kartoshka, mevalar va sabzavotlar."
+        } else {
+            bind.textMacroDescription.text =
+                "Sizning kunlik uglevod me'yoringiz: ${targetCarbs} gramm.\n\n" +
+                "Uglevodlar — tananing asosiy quvvat manbai. Ozish jarayonida murakkab uglevodlarga e'tibor qaratsangiz, insulin darajasining keskin sakrashidan saqlanasiz va tanangiz faqat yog' yoqish rejimida ishlashda davom etadi.\n\n" +
+                "🍚 Qaysi ovqatlarda ko'p: Guruch, grechixa, suli yormasi, kartoshka, mevalar va sabzavotlar."
+        }
     }
 
     private fun populateFoods(foods: List<FoodItem>, bind: FragmentMacroInfoBinding) {

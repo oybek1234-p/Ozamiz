@@ -4,22 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
     android:clickable="true"
     android:focusable="true"
+    android:layout_marginBottom="@dimen/dimen_4"
     android:foreground="?selectableItemBackground"
     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
     app:cardCornerRadius="20dp"
     app:cardElevation="0dp"
     app:strokeColor="?attr/colorOutlineVariant"
-    app:strokeWidth="1dp">
+    app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="82dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:minHeight="82dp"
         android:padding="@dimen/dimen_12">
 
         <FrameLayout
@@ -37,10 +37,10 @@
                 android:layout_gravity="center"
                 app:indicatorColor="?attr/colorPrimary"
                 app:indicatorSize="52dp"
+                app:indicatorTrackGapSize="0dp"
                 app:trackColor="?attr/colorSurfaceContainerHigh"
                 app:trackCornerRadius="4dp"
                 app:trackThickness="4dp"
-                app:indicatorTrackGapSize="0dp"
                 tools:progress="60" />
 
             <com.google.android.material.imageview.ShapeableImageView
@@ -48,9 +48,10 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:scaleType="centerInside"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                tools:src="@drawable/breakfast_ic" />
+                android:padding="@dimen/dimen_4"
+                android:layout_margin="@dimen/dimen_4"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/breakfast_simple" />
         </FrameLayout>
 
         <LinearLayout
@@ -91,49 +92,24 @@
                     android:textSize="13sp"
                     tools:text="450 kkal yeyildi" />
 
-                <TextView
-                    android:id="@+id/text_meal_last_food"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:ellipsize="end"
-                    android:fontFamily="@font/roboto_medium"
-                    android:maxLines="1"
-                    android:textColor="?attr/colorPrimary"
-                    android:textSize="13sp"
-                    android:visibility="gone"
-                    tools:text="Osh"
-                    tools:visibility="visible" />
             </LinearLayout>
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/btn_camera_meal"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/round_lay"
-            android:backgroundTint="?attr/colorSurfaceContainerHighest"
-            android:padding="8dp"
-            android:src="@drawable/camera_ic"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_add_meal"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/colorOnSurface" />
-
-        <ImageView
+        <ImageButton
             android:id="@+id/btn_add_meal"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="4dp"
-            android:background="@drawable/round_lay"
-            android:backgroundTint="?attr/colorSurfaceContainerHighest"
-            android:padding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:iconTint="?colorOnSurface"
+            app:icon="@drawable/add_ic"
+            android:padding="@dimen/dimen_12"
             android:src="@drawable/add_ic"
+            android:backgroundTint="?colorSurfaceContainer"
+            app:iconGravity="textEnd"
+            android:background="@drawable/oval_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="?attr/colorOnSurface" />
+            app:tint="?colorOnSurface" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

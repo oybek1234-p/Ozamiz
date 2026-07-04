@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:padding="@dimen/dimen_8">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgUserAvatar"
@@ -63,15 +63,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_post_type_tag"
-                        android:paddingHorizontal="8dp"
-                        android:paddingVertical="2dp"
-                        android:textColor="#594A00"
-                        android:textSize="11sp"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="1dp"
+                        android:textColor="#2E7D32"
+                        android:textSize="9sp"
                         android:fontFamily="@font/roboto_bold"
                         android:visibility="gone"
                         tools:visibility="visible"
                         tools:text="PREMIUM"
-                        tools:backgroundTint="#FFD700" />
+                        tools:backgroundTint="#E8F5E9" />
 
                 </LinearLayout>
 
@@ -80,10 +80,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Profilni ko'rish"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="?attr/colorOutline"
                     android:fontFamily="@font/roboto_medium"
-                    android:textSize="13sp"
-                    android:layout_marginTop="2dp"
+                    android:textSize="11sp"
                     android:background="?attr/selectableItemBackground"
                     android:paddingVertical="2dp"
                     android:paddingEnd="16dp" />
@@ -104,20 +103,17 @@
 
         </LinearLayout>
 
-        <!-- Main Image/Photos -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Single Image (Food, etc.) -->
             <ImageView
                 android:id="@+id/imgFoodPhoto"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
+                android:layout_height="280dp"
                 android:scaleType="centerCrop"
                 tools:src="@drawable/placeholder_food" />
 
-            <!-- Comparison Images (Weight progress) -->
             <LinearLayout
                 android:id="@+id/layoutPhotoComparison"
                 android:layout_width="match_parent"
@@ -184,7 +180,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="@dimen/dimen_12">
 
             <!-- Food Name & Calories -->
             <LinearLayout
@@ -201,23 +197,6 @@
                     android:textSize="16sp"
                     tools:text="Tovuqli pishiriq" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/tvFoodCalories"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="14sp"
-                        android:fontFamily="@font/roboto_medium"
-                        tools:text="350 kkal" />
-
-                </LinearLayout>
 
                 <TextView
                     android:id="@+id/tvComment"
@@ -228,14 +207,31 @@
                     android:textSize="14sp"
                     tools:text="O'zim tayyorladim, juda mazali chiqdi!" />
 
-                <TextView
-                    android:id="@+id/tvTime"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:textColor="?attr/colorOutline"
-                    android:textSize="12sp"
-                    tools:text="2 soat oldin" />
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvFoodCalories"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp"
+                        android:fontFamily="@font/roboto_medium"
+                        tools:text="350 kkal - 24 oq, 24 ug, 10 yog'" />
+
+                    <TextView
+                        android:id="@+id/tvTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="?attr/colorOutline"
+                        android:textSize="12sp"
+                        tools:text="2 soat oldin" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Likes & Views -->
@@ -243,8 +239,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:orientation="horizontal">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
                 <LinearLayout
                     android:id="@+id/btnLike"
@@ -254,7 +255,7 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="4dp"
-                    android:paddingEnd="16dp">
+                    android:paddingEnd="12dp">
 
                     <ImageView
                         android:id="@+id/imgLike"
@@ -270,49 +271,18 @@
                         android:layout_marginStart="6dp"
                         android:fontFamily="@font/roboto_medium"
                         android:textColor="?attr/colorOnSurface"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         tools:text="12" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/btnComment"
+                    android:id="@+id/layoutViews"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingVertical="4dp"
-                    android:paddingHorizontal="16dp"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:id="@+id/imgComment"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:srcCompat="@drawable/comment_ic"
-                        app:tint="?attr/colorOnSurfaceVariant" />
-
-                    <TextView
-                        android:id="@+id/tvCommentsCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:fontFamily="@font/roboto_medium"
-                        android:textColor="?attr/colorOnSurfaceVariant"
-                        android:textSize="14sp"
-                        tools:text="5" />
-                </LinearLayout>
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:paddingStart="8dp">
 
                     <ImageView
                         android:layout_width="20dp"
@@ -335,7 +305,7 @@
         
         <View
             android:layout_width="match_parent"
-            android:layout_height="8dp"
+            android:layout_height="2dp"
             android:background="?attr/colorSurfaceVariant" />
             
     </LinearLayout>

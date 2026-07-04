@@ -11,7 +11,7 @@ sealed class MealTime(
     data object Breakfast : MealTime(
         id = "breakfast",
         nameRes = R.string.breakfast,
-        iconRes = R.drawable.breakfast_ic
+        iconRes = R.drawable.bread
     )
 
     data object Lunch : MealTime(

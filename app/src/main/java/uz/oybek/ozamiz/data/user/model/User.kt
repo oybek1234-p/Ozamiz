@@ -1,10 +1,10 @@
 package uz.oybek.ozamiz.data.user.model
 
-import uz.oybek.ozamiz.data.streak.StreakInfo
 import androidx.annotation.Keep
 import kotlinx.serialization.Transient
+import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.model.info.UserActivityLevel
-import java.util.Date
+import uz.oybek.ozamiz.data.utils.DateUtils
 
 @Keep
 data class User(
@@ -12,13 +12,12 @@ data class User(
     var name: String = "",
     var phoneNumber: String = "",
     var gmail: String = "",
-    var lastSeenTime: Long = 0L,
+    var lastSeenTime: Any? = null,
     var unreadMessages: Int = 0,
     var premium: Boolean = false,
     var premiumDate: Long = 0L,
-    @get:com.google.firebase.database.PropertyName("isPremiumYearly")
-    @set:com.google.firebase.database.PropertyName("isPremiumYearly")
     var isPremiumYearly: Boolean = false,
+    var isMonthlyPremium: Boolean = false,
     var gender: Int = -1,
     var region: String = " ",
     var age: Int = -1,
@@ -37,7 +36,7 @@ data class User(
     var streakInfo: StreakInfo? = null,
     var lastWeightLogTimestamp: Long = 0L,
     var avatarUrl: String? = null,
-    var registerDate: Date? = null,
+    var registerDate: Any? = null,
     var paymentChecking: Boolean = false,
     var paymentCheckPhotoUrl: String? = null,
     var admin: Boolean = false,
@@ -55,6 +54,7 @@ data class User(
         premium = false,
         premiumDate = 0L,
         isPremiumYearly = false,
+        isMonthlyPremium = false,
         gender = -1,
         region = "",
         age = -1,
@@ -84,6 +84,10 @@ data class User(
 
     @Transient
     val valid: Boolean get() = uid.isNotEmpty()
+
+    @get:com.google.firebase.database.Exclude
+    val registerDateLong: Long?
+        get() = registerDate?.let { DateUtils.toLongTimestamp(it) }
 }
 
 fun User.admin() = this.admin

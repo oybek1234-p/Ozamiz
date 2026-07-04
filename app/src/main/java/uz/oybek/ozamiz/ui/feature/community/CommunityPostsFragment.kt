@@ -45,7 +45,6 @@ class CommunityPostsFragment : BaseFragment<FragmentCommunityPostsBinding>() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { group, checkedIds ->
             val filter = when (checkedIds.firstOrNull()) {
                 R.id.chipAll -> ALL
-                R.id.chipFood -> FOOD
                 R.id.chipOzganlar -> WEIGHT_LOSS
                 else -> ALL
             }

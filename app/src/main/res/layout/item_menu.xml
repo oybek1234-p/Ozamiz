@@ -93,7 +93,7 @@
                 android:minLines="2"
                 android:gravity="center"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 tools:text="O'rtacha qovurilgan go'sht va sabzavotlar" />
         </LinearLayout>
     </LinearLayout>

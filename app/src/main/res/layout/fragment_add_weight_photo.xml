@@ -98,15 +98,6 @@
                                     android:textColor="?attr/colorOnSurfaceVariant"
                                     android:textSize="14sp" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="4dp"
-                                    android:text="(Ixtiyoriy)"
-                                    android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="14sp"
-                                    android:alpha="0.6" />
-
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 

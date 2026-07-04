@@ -23,7 +23,7 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipPoints"
-                style="@style/Widget.Material3.Chip.Filter"
+                style="@style/WidgetAppChipChoice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ballar"
@@ -31,14 +31,14 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipActive"
-                style="@style/Widget.Material3.Chip.Filter"
+                style="@style/WidgetAppChipChoice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Faollar" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipRecent"
-                style="@style/Widget.Material3.Chip.Filter"
+                style="@style/WidgetAppChipChoice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Yaqinda" />

@@ -5,15 +5,15 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.firebase.crashlytics.crashlytics
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ServerValue
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.tasks.await
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import uz.oybek.ozamiz.data.ai.Dietolog
 import uz.oybek.ozamiz.data.firebase.FirebaseConstants
 import uz.oybek.ozamiz.data.firebase.FirebasePagingSource
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
@@ -21,15 +21,14 @@ import uz.oybek.ozamiz.data.firebase.currentUserId
 import uz.oybek.ozamiz.data.firebase.generateKey
 import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
 
+
 object FoodLogRepository {
 
     fun foodLogsPaged(date: Date): Flow<PagingData<FoodLog>> {
-        currentUserId ?: return emptyFlow()
         val date = date.dateApiFormat()
         val query = FirebasePaths
             .foodLogsReference(currentUserId!!, date)
@@ -58,7 +57,7 @@ object FoodLogRepository {
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val logs = snapshot.children.mapNotNull { it.getValue(FoodLog::class.java) }
-                    .reversed() // Show newest first
+                    .reversed()
                 trySend(logs)
             }
 
@@ -75,7 +74,7 @@ object FoodLogRepository {
         val dateStr = date.dateApiFormat()
         val query = FirebasePaths
             .foodLogsReference(userId, dateStr)
-            
+
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val logs = snapshot.children.mapNotNull { it.getValue(FoodLog::class.java) }
@@ -110,7 +109,7 @@ object FoodLogRepository {
     }
 
     suspend fun add(image: String?, foodLog: FoodLog, date: Date): Boolean {
-        currentUserId ?: return false
+        currentUserId
         try {
             val dateStr = date.dateApiFormat()
             val reference = FirebasePaths.foodLogsReference(currentUserId!!, dateStr)
@@ -135,15 +134,19 @@ object FoodLogRepository {
             com.google.firebase.Firebase.crashlytics.recordException(e)
             return false
         }
-        
+
         DailySummaryRepository.updateSummary(
             date = date,
             caloriesDelta = foodLog.calories,
             proteinDelta = foodLog.protein ?: 0.0,
             carbsDelta = foodLog.carbs ?: 0.0,
-            fatDelta = foodLog.fat ?: 0.0
+            fatDelta = foodLog.fat ?: 0.0,
+            mealsDelta = 1
         )
+
+        Dietolog.onFoodLogAdded(foodLog)
         return true
+
     }
 
     suspend fun update(
@@ -210,7 +213,8 @@ object FoodLogRepository {
                     caloriesDelta = -oldLog.calories,
                     proteinDelta = -(oldLog.protein ?: 0.0),
                     carbsDelta = -(oldLog.carbs ?: 0.0),
-                    fatDelta = -(oldLog.fat ?: 0.0)
+                    fatDelta = -(oldLog.fat ?: 0.0),
+                    mealsDelta = -1
                 )
             }
             true

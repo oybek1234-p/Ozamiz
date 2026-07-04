@@ -504,7 +504,111 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_plateRuleFragment"
+            app:destination="@id/plateRuleFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_breakfastGuideFragment"
+            app:destination="@id/breakfastGuideFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_lunchGuideFragment"
+            app:destination="@id/lunchGuideFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_dinnerGuideFragment"
+            app:destination="@id/dinnerGuideFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_snacksGuideFragment"
+            app:destination="@id/snacksGuideFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_proteinGuideFragment"
+            app:destination="@id/proteinGuideFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_carbsGuideFragment"
+            app:destination="@id/carbsGuideFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_menuListFragment_to_lipidsGuideFragment"
+            app:destination="@id/lipidsGuideFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/plateRuleFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.PlateRuleFragment"
+        android:label="Tarelka qoidasi"
+        tools:layout="@layout/fragment_plate_rule" />
+
+    <fragment
+        android:id="@+id/breakfastGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.BreakfastGuideFragment"
+        android:label="Ertalabki choy"
+        tools:layout="@layout/fragment_breakfast_guide" />
+
+    <fragment
+        android:id="@+id/lunchGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.LunchGuideFragment"
+        android:label="Tushlik"
+        tools:layout="@layout/fragment_lunch_guide" />
+
+    <fragment
+        android:id="@+id/dinnerGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.DinnerGuideFragment"
+        android:label="Kechki ovqat"
+        tools:layout="@layout/fragment_dinner_guide" />
+
+    <fragment
+        android:id="@+id/snacksGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.SnacksGuideFragment"
+        android:label="Perekuslar"
+        tools:layout="@layout/fragment_snacks_guide" />
+
+    <fragment
+        android:id="@+id/proteinGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.ProteinGuideFragment"
+        android:label="Oqsilli taomlar"
+        tools:layout="@layout/fragment_protein_guide" />
+
+    <fragment
+        android:id="@+id/carbsGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.CarbsGuideFragment"
+        android:label="Uglevodli taomlar"
+        tools:layout="@layout/fragment_carbs_guide" />
+
+    <fragment
+        android:id="@+id/lipidsGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.LipidsGuideFragment"
+        android:label="Yog\'li taomlar"
+        tools:layout="@layout/fragment_lipids_guide" />
 
     <fragment
         android:id="@+id/addMenuFragment"
@@ -615,11 +719,6 @@
         android:label="LevelFragment"
         tools:layout="@layout/fragment_level" />
 
-    <dialog
-        android:id="@+id/dailyLimitFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.log.food.DailyLimitFragment"
-        android:label="DailyLimitFragment"
-        tools:layout="@layout/fragment_daily_limit" />
 
     <fragment
         android:id="@+id/mealTipsFragment"

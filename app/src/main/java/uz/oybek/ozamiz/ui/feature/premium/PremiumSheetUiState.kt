@@ -1,6 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.premium
 
-import uz.oybek.ozamiz.data.config.ConfigRepository
+import uz.oybek.ozamiz.data.premium.PremiumRepository
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.utils.DataWrapper.Success
 
@@ -42,7 +42,7 @@ class PremiumSheetViewModel : ViewModel() {
         val isPaymentChecking = user.paymentChecking
 
         viewModelScope.launch {
-            val result = ConfigRepository.getPremiumPrices()
+            val result = PremiumRepository.getPremiumPrices()
             if (result is Success) {
                 val (monthly, yearly) = result.data
                 _uiState.postValue(

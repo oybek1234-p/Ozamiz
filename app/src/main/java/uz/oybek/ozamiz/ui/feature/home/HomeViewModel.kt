@@ -1,17 +1,11 @@
 package uz.oybek.ozamiz.ui.feature.home
 
-import uz.oybek.ozamiz.data.ai.AiEventType.APP_OPENED
-import uz.oybek.ozamiz.data.ai.AiEventType.CALORIE_LIMIT_REACHED
-import uz.oybek.ozamiz.data.ai.AiEventType.MACRO_EXCEEDED
-import uz.oybek.ozamiz.data.ai.Dietolog
-import uz.oybek.ozamiz.data.community.AchievementPostHelper
-import uz.oybek.ozamiz.data.streak.StreakInfo
-
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -22,59 +16,53 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.AppConstants
-import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.ai.AiMenuRepository
-
+import uz.oybek.ozamiz.data.ai.Dietolog
+import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
 import uz.oybek.ozamiz.data.food.DietController
-
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.logs.DailySummaryRepository
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.logs.WaterLogRepository
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
+import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.DailySummary
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.logs.model.UserExercise
 import uz.oybek.ozamiz.data.logs.model.WaterLog
+import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.data.user.UserRepository
-import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.utils.dateApiFormat
+import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
 import uz.oybek.ozamiz.ui.utils.DailyTipUtil
 import java.util.Date
 import kotlin.math.roundToInt
-import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
-import uz.oybek.ozamiz.data.user.local.user
 
 class HomeViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        HomeUiState(isInitialLoading = true)
+        HomeUiState(isInitialLoading = false)
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
-
-    private val _foodJustAddedEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1)
-    val foodJustAddedEvent = _foodJustAddedEvent.asSharedFlow()
 
     private val _showRateAppEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
     val showRateAppEvent = _showRateAppEvent.asSharedFlow()
 
-    private val _showAppOnboardingEvent =
-        kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1)
-    val showAppOnboardingEvent = _showAppOnboardingEvent.asSharedFlow()
-
-
-
-
-
-    private val _showStreakSheetEvent = kotlinx.coroutines.flow.MutableSharedFlow<StreakInfo>()
+    private val _showStreakSheetEvent = kotlinx.coroutines.flow.MutableSharedFlow<Pair<StreakInfo, Boolean>>()
     val showStreakSheetEvent = _showStreakSheetEvent.asSharedFlow()
+
+    private val _showWaterLimitEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
+    val showWaterLimitEvent = _showWaterLimitEvent.asSharedFlow()
+
+    private val _showWeightLogEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
+    val showWeightLogEvent = _showWeightLogEvent.asSharedFlow()
 
     private val glassVolume = AppConstants.Water.GLASS_VOLUME_ML
     private var previousWaterAmount = 0
@@ -87,16 +75,16 @@ class HomeViewModel : ViewModel() {
     private var isWaterAdditionPending = false
     private var isExerciseAdditionPending = false
     private var dataCollectionJob: Job? = null
+    private var lastRecGateKey: String? = null
+    private var cachedRecommendedExercises: List<UserExercise> = emptyList()
 
     private var summaryJob: Job? = null
 
     init {
         observeAiMenu()
-        viewModelScope.launch {
-            Dietolog.sendUserEventAsync(APP_OPENED)
-        }
         observeAiDietitianAdvice()
         val initialUser = UserRepository.user
+
         val initialDates = DateUtils.generateDatesForScroller()
         val initialSelectedDate = DateUtils.getStartOfDay(Date())
 
@@ -111,25 +99,38 @@ class HomeViewModel : ViewModel() {
                 )
             val macros = DietController.calculateMacrosByPercent(targetCals)
 
-                val pTarget = if (initialUser.targetProtein > 0) initialUser.targetProtein else macros.protein
-                val fTarget = if (initialUser.targetFat > 0) initialUser.targetFat else macros.fat
-                val cTarget = if (initialUser.targetCarbs > 0) initialUser.targetCarbs else macros.carbs
+            val pTarget =
+                if (initialUser.targetProtein > 0) initialUser.targetProtein else macros.protein
+            val fTarget = if (initialUser.targetFat > 0) initialUser.targetFat else macros.fat
+            val cTarget = if (initialUser.targetCarbs > 0) initialUser.targetCarbs else macros.carbs
 
-                _uiState.update {
-                    it.copy(
-                        isInitialLoading = false,
-                        datesForScroller = initialDates,
-                        selectedDate = initialSelectedDate,
-                        caloriesTarget = targetCals,
-                        waterTarget = targetWater,
-                        proteinTarget = pTarget,
-                        fatTarget = fTarget,
-                        carbsTarget = cTarget,
-                        caloriesRemaining = targetCals,
-                        userPoints = initialUser.scorePoints,
-                        streakInfo = initialUser.streakInfo
-                    )
-                }
+            cachedRecommendedExercises = UserExercise.getExercisesList(initialUser.gender).take(4)
+
+            val todayStr = DateUtils.getFormattedDateString(initialSelectedDate, "yyyy-MM-dd")
+            val cache = LocalPreferencesRepository.getTodayCache(todayStr)
+
+            _uiState.update {
+                it.copy(
+                    isInitialLoading = false,
+                    datesForScroller = initialDates,
+                    selectedDate = initialSelectedDate,
+                    caloriesTarget = targetCals,
+                    waterTarget = targetWater,
+                    proteinTarget = pTarget,
+                    fatTarget = fTarget,
+                    carbsTarget = cTarget,
+                    caloriesRemaining = if (cache != null) targetCals - cache.calories else targetCals,
+                    caloriesConsumed = cache?.calories ?: 0,
+                    waterConsumed = cache?.water ?: 0,
+                    exerciseBurnt = cache?.exercise ?: 0,
+                    proteinConsumed = cache?.protein ?: 0,
+                    fatConsumed = cache?.fat ?: 0,
+                    carbsConsumed = cache?.carbs ?: 0,
+                    userPoints = initialUser.scorePoints,
+                    streakInfo = initialUser.streakInfo,
+                    paymentChecking = initialUser.paymentChecking
+                )
+            }
         } else {
             _uiState.update {
                 it.copy(
@@ -139,7 +140,6 @@ class HomeViewModel : ViewModel() {
             }
         }
         initDailyTip()
-
 
         UserRepository.observeCurrentUser { user ->
             if (user != null && user.valid) {
@@ -162,6 +162,8 @@ class HomeViewModel : ViewModel() {
                 val fTarget = if (user.targetFat > 0) user.targetFat else macros.fat
                 val cTarget = if (user.targetCarbs > 0) user.targetCarbs else macros.carbs
 
+                cachedRecommendedExercises = UserExercise.getExercisesList(user.gender).take(4)
+
                 _uiState.update {
                     it.copy(
                         streakInfo = user.streakInfo,
@@ -172,6 +174,7 @@ class HomeViewModel : ViewModel() {
                         proteinTarget = pTarget,
                         fatTarget = fTarget,
                         carbsTarget = cTarget,
+                        paymentChecking = user.paymentChecking,
                         isInitialLoading = false
                     )
                 }
@@ -205,9 +208,11 @@ class HomeViewModel : ViewModel() {
                 isFirstLoadCompleted = false
             }
         }
+        loadAiMealRecommendation(_uiState.value.selectedDate)
+        checkWeightLog()
+    }
 
-
-
+    private fun checkWeightLog() {
         WeightLogRepository.getLogsFlow(user.uid).onEach { result ->
             if (result is DataWrapper.Success) {
                 val logs = result.data.sortedBy { it.timestampLong }
@@ -221,56 +226,79 @@ class HomeViewModel : ViewModel() {
                 _uiState.update { it.copy(showWeightLogCard = showWeightProgress) }
             }
         }.launchIn(viewModelScope)
-
-        loadAiMealRecommendations(_uiState.value.selectedDate)
     }
 
-    private var lastFetchedMealTypeForRecommendations: String? = null
-
-    private fun loadAiMealRecommendations(date: Date) {
+    private fun loadAiMealRecommendation(date: Date) {
         if (!DateUtils.isSameDay(date, Date())) {
-             _uiState.update { it.copy(aiMealRecommendation = null, nextMealTypeName = null) }
-             return
-        }
-
-        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-        var mealType = when {
-            hour < 10 -> "Nonushta"
-            hour < 14 -> "Tushlik"
-            else -> "Kechki ovqat"
-        }
-
-        val eatenMealTypes = _uiState.value.dailyFoodLogs.map { it.mealType.lowercase() }
-        
-        if (mealType == "Nonushta" && eatenMealTypes.contains("nonushta")) {
-            mealType = "Tushlik"
-        }
-        if (mealType == "Tushlik" && eatenMealTypes.contains("tushlik")) {
-            mealType = "Kechki ovqat"
-        }
-
-        if (mealType == lastFetchedMealTypeForRecommendations && _uiState.value.aiMealRecommendation != null) {
+            _uiState.update {
+                it.copy(
+                    aiMealRecommendation = null,
+                    nextMealTypeName = null
+                )
+            }
             return
         }
 
-        val dateStr = DateUtils.getFormattedDateString(date, "yyyy-MM-dd")
-        val dismissedKey = "ai_rec_closed_${dateStr}_$mealType"
-        if (LocalPreferencesRepository.getAiMealCache(dismissedKey) == "true") {
-             _uiState.update { it.copy(aiMealRecommendation = null, nextMealTypeName = null, isAiMealDismissed = true) }
-             return
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val mealTimeId = when {
+            hour < 10 -> "breakfast"
+            hour < 14 -> "lunch"
+            else -> "dinner"
+        }
+        val targetCals = _uiState.value.caloriesTarget
+        val netCalories = _uiState.value.caloriesConsumed
+        val isExceeded = targetCals > 0 && netCalories >= targetCals
+        val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
+        val gateKey = "${todayStr}_${mealTimeId}_exceeded_${isExceeded}"
+
+        val dismissedKey = LocalPreferencesRepository.getDismissedMealRecommendation()
+        val isDismissed = dismissedKey == "${todayStr}_${mealTimeId}"
+
+        if (isDismissed) {
+            _uiState.update {
+                it.copy(
+                    isAiMealDismissed = true,
+                    isAiMealLoading = false
+                )
+            }
         }
 
-        _uiState.update { it.copy(isAiMealLoading = true, nextMealTypeName = mealType, isAiMealDismissed = false) }
+        if (lastRecGateKey == gateKey && _uiState.value.aiMealRecommendation != null) {
+            return
+        }
+        lastRecGateKey = gateKey
+
+        val isFirstLoad = _uiState.value.aiMealRecommendation == null
+        if (isFirstLoad && !isDismissed) {
+            _uiState.update { it.copy(isAiMealLoading = true) }
+        }
         viewModelScope.launch {
-            val user = UserRepository.user
-            val remainingCalories = _uiState.value.caloriesRemaining
-            val goal = user.goal
-            val eatenFoods = _uiState.value.dailyFoodLogs.map { it.description }
-            
-            val result = Dietolog.getAndCacheMealRecommendations(mealType, remainingCalories, goal, eatenFoods)
-            if (result != null && result.isNotEmpty()) {
-                _uiState.update { it.copy(aiMealRecommendation = result.firstOrNull(), isAiMealLoading = false) }
-                lastFetchedMealTypeForRecommendations = mealType
+            val result = Dietolog.getMealRecommendations()
+            if (result != null) {
+                val recommendedMealName = result.first
+                val recommendation = result.second
+
+                val currentRec = _uiState.value.aiMealRecommendation
+                val currentTitle = _uiState.value.nextMealTypeName
+
+                if ((isDismissed || _uiState.value.isAiMealDismissed) && currentTitle == recommendedMealName) {
+                    _uiState.update { it.copy(isAiMealLoading = false) }
+                    return@launch
+                }
+
+                if (currentRec != null && currentTitle == recommendedMealName) {
+                    _uiState.update { it.copy(isAiMealLoading = false) }
+                    return@launch
+                }
+
+                _uiState.update {
+                    it.copy(
+                        aiMealRecommendation = recommendation,
+                        nextMealTypeName = recommendedMealName,
+                        isAiMealLoading = false,
+                        isAiMealDismissed = if (isDismissed) true else (if (currentTitle != recommendedMealName) false else it.isAiMealDismissed)
+                    )
+                }
             } else {
                 _uiState.update { it.copy(isAiMealLoading = false) }
             }
@@ -278,14 +306,19 @@ class HomeViewModel : ViewModel() {
     }
 
     fun onDismissAiRecommendations() {
-        val dateString = DateUtils.getFormattedDateString(_uiState.value.selectedDate, "yyyy-MM-dd")
-        val mealType = _uiState.value.nextMealTypeName ?: return
-        val cacheKey = "ai_rec_closed_${dateString}_$mealType"
-        LocalPreferencesRepository.setAiMealCache(cacheKey, "true")
+        val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val mealTimeId = when {
+            hour < 10 -> "breakfast"
+            hour < 14 -> "lunch"
+            else -> "dinner"
+        }
+        LocalPreferencesRepository.setDismissedMealRecommendation("${todayStr}_${mealTimeId}")
         _uiState.update { it.copy(isAiMealDismissed = true) }
     }
 
     private fun checkUserAchievements(user: User) {
+
     }
 
     private fun startLoadingData(date: Date) {
@@ -297,19 +330,39 @@ class HomeViewModel : ViewModel() {
                     _uiState.update { it.copy(isRefreshing = false, isInitialLoading = false) }
                 }
             }
-            val summaryFlow = DailyLogRepository.observeDailySummary(date)
-            val exerciseFlow = ExerciseLogRepository.getLogs(date)
-            val foodFlow = FoodLogRepository.getAllLogs(date)
+            try {
+                val summaryFlow = DailyLogRepository.observeDailySummary(date)
+                val exerciseFlow = ExerciseLogRepository.getLogs(date)
+                val foodFlow = FoodLogRepository.getAllLogs(date)
 
-            combine(
-                summaryFlow,
-                exerciseFlow,
-                foodFlow
-            ) { summaryWrapper, exercises, foods ->
-                Triple(summaryWrapper, exercises, foods)
-            }.collect { (summaryWrapper, exercises, foods) ->
+                // Load initial data for all streams at once in parallel
+                val summaryDeferred = async { summaryFlow.first() }
+                val exerciseDeferred = async { exerciseFlow.first() }
+                val foodDeferred = async { foodFlow.first() }
+
+                val summaryWrapper = summaryDeferred.await()
+                val exercises = exerciseDeferred.await()
+                val foods = foodDeferred.await()
+
                 timeoutJob.cancel()
                 processStateUpdate(date, user, summaryWrapper, exercises, foods)
+
+                // Subscribe to future database updates, skipping the duplicate first emission
+                var skipCount = 0
+                combine(
+                    summaryFlow,
+                    exerciseFlow,
+                    foodFlow
+                ) { s, e, f -> Triple(s, e, f) }
+                    .collect { (s, e, f) ->
+                        if (skipCount < 1) {
+                            skipCount++
+                        } else {
+                            processStateUpdate(date, user, s, e, f)
+                        }
+                    }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -328,7 +381,10 @@ class HomeViewModel : ViewModel() {
         when (summaryWrapper) {
             is DataWrapper.Success -> {
                 val summary = summaryWrapper.data
-                val targetCals = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
+                val targetCals =
+                    if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(
+                        user
+                    )
                 val macros = DietController.calculateMacrosByPercent(targetCals)
 
                 val currentWater = summary.consumedWaterMl
@@ -394,9 +450,7 @@ class HomeViewModel : ViewModel() {
                             log.timestamp as? Long ?: 0L
                         },
                         dailyFoodLogs = foodLogs,
-                        recommendedExercises = if (exerciseLogs.isEmpty()) UserExercise.getExercisesList(
-                            user.gender
-                        ).take(4) else emptyList(),
+                        recommendedExercises = if (exerciseLogs.isEmpty()) cachedRecommendedExercises else emptyList(),
                         isProteinExceeded = summary.consumedProtein > macros.protein + 50,
                         isCarbsExceeded = summary.consumedCarbs > macros.carbs + 70,
                         isFatExceeded = summary.consumedFat > macros.fat + 30,
@@ -406,51 +460,29 @@ class HomeViewModel : ViewModel() {
                             (it.timestamp as? Number)?.toLong() ?: 0L
                         },
                         waterStatusMessage = waterStatus,
-                        exerciseStatusMessage = exerciseStatus
+                        exerciseStatusMessage = exerciseStatus,
+                        isDietologAdviceDismissed = if (foodJustAddedEvent) false else it.isDietologAdviceDismissed,
+                        isAiMealDismissed = if (foodJustAddedEvent) false else it.isAiMealDismissed
+                    )
+                }
+                if (DateUtils.isSameDay(date, Date())) {
+                    val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
+                    LocalPreferencesRepository.saveTodayCache(
+                        dateStr = todayStr,
+                        calories = currentFoodCalories,
+                        water = currentWater,
+                        exercise = currentExerciseBurnt,
+                        protein = summary.consumedProtein.roundToInt(),
+                        fat = summary.consumedFat.roundToInt(),
+                        carbs = summary.consumedCarbs.roundToInt()
                     )
                 }
 
-                if (isFoodAdditionPending && foodJustAddedEvent) {
-                    viewModelScope.launch {
-                        _foodJustAddedEvent.emit(Unit)
-                    }
-                    isFoodAdditionPending = false
-
-                    if (netCalories >= targetCals) {
-                        Dietolog.sendUserEventAsync(CALORIE_LIMIT_REACHED, "Yegan kaloriyasi: $netCalories, Limit: $targetCals")
-                    }
-
-                    val pTarget = if (user.targetProtein > 0) user.targetProtein else macros.protein
-                    val fTarget = if (user.targetFat > 0) user.targetFat else macros.fat
-                    val cTarget = if (user.targetCarbs > 0) user.targetCarbs else macros.carbs
-                    val exceededMacros = mutableListOf<String>()
-                    if (summary.consumedProtein > pTarget + 20) exceededMacros.add("Oqsil: ${summary.consumedProtein.roundToInt()}/${pTarget}")
-                    if (summary.consumedFat > fTarget + 20) exceededMacros.add("Yog': ${summary.consumedFat.roundToInt()}/${fTarget}")
-                    if (summary.consumedCarbs > cTarget + 20) exceededMacros.add("Uglevod: ${summary.consumedCarbs.roundToInt()}/${cTarget}")
-                    if (exceededMacros.isNotEmpty()) {
-                        Dietolog.sendUserEventAsync(MACRO_EXCEEDED, exceededMacros.joinToString(", "))
-                    }
-                }
-
                 if (isWaterAdditionPending && waterJustAddedEvent) {
-                    val waterTarget = user.targetWaterMl
-                    if (waterTarget in 1..currentWater) {
-                        AchievementPostHelper.onWaterGoalReached(
-                            currentWater,
-                            waterTarget
-                        )
-                    }
                     isWaterAdditionPending = false
                 }
 
                 if (isExerciseAdditionPending && exerciseJustAddedEvent) {
-                    val exerciseTarget = AppConstants.Exercise.DEFAULT_TARGET_CALORIES
-                    if (exerciseTarget > 0 && currentExerciseBurnt >= exerciseTarget) {
-                        AchievementPostHelper.onExerciseGoalReached(
-                            currentExerciseBurnt,
-                            exerciseTarget
-                        )
-                    }
                     isExerciseAdditionPending = false
                 }
 
@@ -459,7 +491,7 @@ class HomeViewModel : ViewModel() {
                 previousExerciseBurnt = currentExerciseBurnt
                 isFirstLoadCompleted = true
 
-                loadAiMealRecommendations(date)
+                loadAiMealRecommendation(date)
             }
 
             is DataWrapper.Error -> {
@@ -468,18 +500,26 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+
     fun onFoodAdded() {
         isFoodAdditionPending = true
-        StreakRepository.updateStreak { streakInfo ->
-            viewModelScope.launch {
-                _showStreakSheetEvent.emit(streakInfo)
-            }
-        }
-        refresh()
+        LocalPreferencesRepository.setFirstLogAdded(true)
+        triggerStreakUpdateIfNeeded()
+        refresh(showIndicator = false)
     }
 
-    fun consumeFoodAddedEvent() {
-        _foodJustAddedEvent.resetReplayCache()
+    private fun triggerStreakUpdateIfNeeded() {
+        StreakRepository.updateStreak { streakInfo, returnedAfterManyDays ->
+            viewModelScope.launch {
+                _showStreakSheetEvent.emit(Pair(streakInfo, returnedAfterManyDays))
+            }
+        }
+    }
+
+    suspend fun getTodayWaterLogsCountSync(): Int {
+        val dailyLogsWrapper = DailyLogRepository.observeDailyLogs(_uiState.value.selectedDate).first()
+        val dailyLogs = (dailyLogsWrapper as? DataWrapper.Success)?.data ?: DailyLogs()
+        return dailyLogs.waterLogs?.size ?: 0
     }
 
     private fun calculateGlasses(current: Int, old: Int): List<WaterGlassState> {
@@ -503,61 +543,89 @@ class HomeViewModel : ViewModel() {
         previousWaterAmount = 0
         previousFoodCalories = 0
         isFirstLoadCompleted = false
-        _uiState.update { it.copy(selectedDate = date, isInitialLoading = true) }
+        _uiState.update { it.copy(selectedDate = date, isInitialLoading = false) }
         startLoadingData(date)
-        loadAiMealRecommendations(date)
+        loadAiMealRecommendation(date)
     }
 
-    fun refresh() {
-        _uiState.update { it.copy(isRefreshing = true) }
+    fun refresh(showIndicator: Boolean = true) {
+        if (showIndicator) {
+            _uiState.update { it.copy(isRefreshing = true) }
+        }
         startLoadingData(_uiState.value.selectedDate)
     }
 
     fun addWater(amount: Int) {
-        val date = uiState.value.selectedDate
-        val pointsToAdd = if (amount >= 250) (amount * 5) / 250 else 5
-
-        if (pointsToAdd > 0) {
-            val currentPoints = _uiState.value.userPoints
-            _uiState.update {
-                it.copy(
-                    userPoints = currentPoints + pointsToAdd,
-                    pointsJustAdded = pointsToAdd
-                )
-            }
+        val currentWater = _uiState.value.waterConsumed
+        if (currentWater + amount > 4000) {
+            return
         }
 
-        isWaterAdditionPending = true
         viewModelScope.launch {
-            WaterLogRepository.add(WaterLog(amountMl = amount), date)
-            StreakRepository.updateStreak { streakInfo ->
-                viewModelScope.launch {
-                    _showStreakSheetEvent.emit(streakInfo)
+            if (!isUserPremium && getTodayWaterLogsCountSync() >= 5) {
+                _showWaterLimitEvent.emit(Unit)
+                return@launch
+            }
+
+            val pointsToAdd = if (amount >= 250) (amount * 5) / 250 else 5
+
+            _uiState.update { 
+                it.copy(
+                    waterConsumed = currentWater + amount,
+                    isWaterAdding = true
+                ) 
+            }
+            if (DateUtils.isSameDay(uiState.value.selectedDate, Date())) {
+                val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
+                val oldCache = LocalPreferencesRepository.getTodayCache(todayStr)
+                if (oldCache != null) {
+                    LocalPreferencesRepository.saveTodayCache(
+                        dateStr = todayStr,
+                        calories = oldCache.calories,
+                        water = currentWater + amount,
+                        exercise = oldCache.exercise,
+                        protein = oldCache.protein,
+                        fat = oldCache.fat,
+                        carbs = oldCache.carbs
+                    )
                 }
             }
+
+            delay(1500)
+
+            val date = uiState.value.selectedDate
+            WaterLogRepository.add(WaterLog(amountMl = amount), date)
+            triggerStreakUpdateIfNeeded()
             if (pointsToAdd > 0) {
                 UserRepository.addPoints(pointsToAdd)
             }
-            refresh()
+            if (pointsToAdd > 0) {
+                val currentPoints = _uiState.value.userPoints
+                _uiState.update {
+                    it.copy(
+                        userPoints = currentPoints + pointsToAdd,
+                        pointsJustAdded = pointsToAdd
+                    )
+                }
+            }
+            refresh(showIndicator = false)
+            _uiState.update { it.copy(isWaterAdding = false) }
         }
     }
 
     fun onExerciseAdded() {
         isExerciseAdditionPending = true
-        StreakRepository.updateStreak { streakInfo ->
-            viewModelScope.launch {
-                _showStreakSheetEvent.emit(streakInfo)
-            }
-        }
-        refresh()
+        triggerStreakUpdateIfNeeded()
+        refresh(showIndicator = false)
     }
 
     // Local Preferences Abstraction
     fun isHomeTourSeen() = LocalPreferencesRepository.isHomeTourSeen()
     fun setHomeTourSeen(seen: Boolean) = LocalPreferencesRepository.setHomeTourSeen(seen)
     fun getPersistentDate(key: String) = LocalPreferencesRepository.getPersistentDateStr(key)
-    fun savePersistentDate(key: String, date: String) = LocalPreferencesRepository.savePersistentDateStr(key, date)
-    
+    fun savePersistentDate(key: String, date: String) =
+        LocalPreferencesRepository.savePersistentDateStr(key, date)
+
     val isUserPremium: Boolean
         get() = UserRepository.user.isPremiumOrTrial()
 
@@ -584,37 +652,10 @@ class HomeViewModel : ViewModel() {
     }
 
     fun onHomeEntered() {
-        val lastDismissedDate = LocalPreferencesRepository.getLastDismissedDate()
-        val isDismissedToday = lastDismissedDate == Date().dateApiFormat()
-        if (!isDismissedToday && !_uiState.value.isTipVisible) {
-            _uiState.update { it.copy(isTipVisible = true) }
+        viewModelScope.launch {
+            Dietolog.checkAppOpenedAdvice()
+            loadAiMealRecommendation(_uiState.value.selectedDate)
         }
-        checkAppOnboarding()
-    }
-
-    private fun checkAppOnboarding() {
-        val isFirst = LocalPreferencesRepository.isFirstRegistration()
-        val step = LocalPreferencesRepository.getAppOnboardingStep()
-    }
-
-    fun onAppOnboardingPresented() {
-        LocalPreferencesRepository.setAppOnboardingStep(1)
-        _showAppOnboardingEvent.resetReplayCache()
-    }
-
-    fun onAppOnboardingComplete() {
-        LocalPreferencesRepository.setAppOnboardingStep(2)
-    }
-
-    fun onTipDismissed() {
-        _uiState.update { it.copy(isTipVisible = false) }
-        LocalPreferencesRepository.setLastDismissedDate(Date().dateApiFormat())
-        refreshTip()
-    }
-
-    fun onTipUnderstood() {
-        refreshTip()
-        _uiState.update { it.copy(isTipVisible = true) }
     }
 
     private fun refreshTip() {
@@ -625,10 +666,19 @@ class HomeViewModel : ViewModel() {
         _uiState.update { it.copy(dailyTip = tip) }
     }
 
+    fun onDismissDietologAdvice() {
+        _uiState.update { it.copy(isDietologAdviceDismissed = true) }
+    }
+
     private fun observeAiDietitianAdvice() {
         Dietolog.latestMessage
             .onEach { advice ->
-                _uiState.update { it.copy(dailyAiDietitianAdvice = advice) }
+                _uiState.update {
+                    it.copy(
+                        dailyAiDietitianAdvice = advice,
+                        isDietologAdviceDismissed = false
+                    )
+                }
             }
             .launchIn(viewModelScope)
     }

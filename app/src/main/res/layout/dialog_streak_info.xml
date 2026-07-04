@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/bg_bottom_sheet_rounded"
     android:fillViewport="true">
 
@@ -50,13 +50,28 @@
             android:layout_gravity="center">
 
             <com.airbnb.lottie.LottieAnimationView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:id="@+id/lottie_streak_fire"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:layout_gravity="center"
                 app:lottie_autoPlay="true"
                 app:lottie_rawRes="@raw/fire_streak"
                 app:lottie_repeatMode="restart" />
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/text_streak_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/roboto_bold"
+            android:gravity="center"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="20sp"
+            android:visibility="gone"
+            tools:text="Birinchi qadam bajarildi!"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -85,11 +100,23 @@
                 android:textSize="22sp" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/text_streak_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/roboto_regular"
+            android:gravity="center"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            android:text="Ketma-ketlikni saqlab qolish uchun har kuni ovqat qo'shib boring.\nAgar bir kun o'tkazib yuborsangiz ketma-ketlik buziladi." />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="@dimen/dimen_18"
             android:orientation="horizontal"
             android:weightSum="2">
 
@@ -97,12 +124,13 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="?colorSurfaceContainerLowest"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+
+                >
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -120,11 +148,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_regular"
+                            android:fontFamily="@font/roboto_medium"
                             android:letterSpacing="0.04"
-                            android:text="FAOL KUNLAR"
-                            android:textAllCaps="true"
-                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:text="Faol kunlar"
+                            android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp" />
 
                         <TextView
@@ -144,12 +171,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="?colorSurfaceContainerLowest"
+          >
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -169,8 +196,8 @@
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_regular"
                             android:letterSpacing="0.04"
-                            android:text="ENG YAXSHI"
-                            android:textAllCaps="true"
+                            android:text="Ketma ket"
+
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="15sp" />
 
@@ -193,12 +220,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeWidth="0dp">
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="?colorSurfaceContainerLowest">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -216,11 +243,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto_regular"
+                        android:fontFamily="@font/roboto_medium"
                         android:letterSpacing="0.04"
-                        android:text="JAMI FAOL HAFTALAR"
-                        android:textAllCaps="true"
-                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:text="Faol kunlar"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="15sp" />
 
                     <TextView
@@ -233,42 +259,52 @@
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="22sp" />
                 </LinearLayout>
-
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_calendar"
-                    app:tint="?attr/colorPrimary" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Top Streak Users Header -->
-        <TextView
+        <LinearLayout
+            android:id="@+id/layout_top_users_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="32dp"
-            android:fontFamily="@font/roboto_bold"
-            android:text="Top odamlar"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="18sp" />
+            android:orientation="vertical">
 
-        <ProgressBar
-            android:id="@+id/progress_top_users"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="@dimen/dimen_18"
+                android:fontFamily="@font/roboto_bold"
+                android:text="Top odamlar"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_top_users"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:clipToPadding="false"
-            android:paddingHorizontal="24dp"
-            android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/item_top_streak_user" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="140dp">
+
+                <ProgressBar
+                    android:id="@+id/progress_top_users"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_top_users"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="12dp"
+                    android:clipChildren="false"
+                    android:clipToOutline="false"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="@dimen/dimen_4"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/item_top_streak_user" />
+            </FrameLayout>
+        </LinearLayout>
 
         <!-- Continue Button -->
         <com.google.android.material.button.MaterialButton

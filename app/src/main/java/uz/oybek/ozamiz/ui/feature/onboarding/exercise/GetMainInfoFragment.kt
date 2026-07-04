@@ -173,9 +173,7 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             showToast("Iltimos, harakat darajasini tanlang")
             return
         }
-        if (isNewUser && LocalUser.user.registerDate == null) {
-            LocalUser.user.registerDate = Date()
-        }
+
 
         viewModel.saveUserInfoAndGeneratePlan(
             name = name,

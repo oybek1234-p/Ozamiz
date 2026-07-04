@@ -75,12 +75,16 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
             val weightStr = bind.editTextWeight.text.toString()
             
             if (weightStr.isEmpty()) {
-                showToast("Vazningizni kiriting")
+                showToast(getString(R.string.error_invalid_weight))
                 return@setOnClickListener
             }
             
-            viewModel.saveWeightPhotoLog(weightStr)
-            hideSoftInput(requireActivity())
+            if (_uiState().selectedImageUri == null) {
+                showPhotoPromptSheet(weightStr)
+            } else {
+                viewModel.saveWeightPhotoLog(weightStr)
+                hideSoftInput(requireActivity())
+            }
         }
 
         observeViewModel(bind)
@@ -128,7 +132,7 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
                     bind.progressBarSaveWeightPhoto.isVisible = state.isLoading
                     bind.buttonSaveWeightPhoto.isEnabled = !state.isLoading
                     bind.buttonSaveWeightPhoto.text =
-                        if (state.isLoading) "" else "Natijani saqlash"
+                        if (state.isLoading) "" else getString(R.string.save)
 
                     if (state.selectedImageUri != null) {
                         bind.layoutAddImagePlaceholder.isVisible = false
@@ -150,7 +154,7 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
                     }
 
                     if (state.logAddedSuccessfully) {
-                        showToast("Ma'lumotlar muvaffaqiyatli saqlandi!")
+                        showToast(getString(R.string.info_saved_success))
                         if (isAdded && findNavController().currentDestination?.id == R.id.addWeightPhotoFragment) {
                             closeFragment()
                         }
@@ -159,5 +163,26 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
                 }
             }
         }
+    }
+
+    private fun _uiState() = viewModel.uiState.value
+
+    private fun showPhotoPromptSheet(weightStr: String) {
+        hideSoftInput(requireActivity())
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
+        val sheetBinding = uz.oybek.ozamiz.databinding.BottomSheetWeightPhotoPromptBinding.inflate(layoutInflater)
+        dialog.setContentView(sheetBinding.root)
+
+        sheetBinding.btnUploadPhoto.setOnClickListener {
+            dialog.dismiss()
+            showImageSourceChooser()
+        }
+
+        sheetBinding.btnSkipPhoto.setOnClickListener {
+            dialog.dismiss()
+            viewModel.saveWeightPhotoLog(weightStr)
+        }
+
+        dialog.show()
     }
 }

@@ -25,4 +25,12 @@ enum class UserActivityLevel(
         "Doimiy jismoniy ish",
         1.725
     );
+
+    companion object {
+        fun fromString(value: String?): UserActivityLevel {
+            if (value.isNullOrBlank()) return SEDENTARY
+            val normalized = value.trim().uppercase()
+            return entries.find { it.name == normalized } ?: SEDENTARY
+        }
+    }
 }

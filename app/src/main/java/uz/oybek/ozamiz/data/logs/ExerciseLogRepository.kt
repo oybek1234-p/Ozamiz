@@ -1,8 +1,5 @@
 package uz.oybek.ozamiz.data.logs
 
-import uz.oybek.ozamiz.data.ai.AiEventType.EXERCISE_ADDED
-import uz.oybek.ozamiz.data.ai.Dietolog
-
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -32,10 +29,6 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
                 date = date,
                 exerciseDelta = log.caloriesBurned
             )
-            Dietolog.sendUserEventAsync(
-                EXERCISE_ADDED, 
-                "${log.durationMin} minut ${log.exerciseType}"
-            )
         }
         return success
     }
@@ -43,9 +36,10 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
     suspend fun delete(logId: String, date: Date, targetUid: String? = null): Boolean {
         val userId = targetUid ?: currentUserId ?: return false
         val dateStr = date.dateApiFormat()
-        
+
         val oldLog = try {
-            getReference(userId, dateStr).child(logId).get().await().getValue(ExerciseLog::class.java)
+            getReference(userId, dateStr).child(logId).get().await()
+                .getValue(ExerciseLog::class.java)
         } catch (e: Exception) {
             null
         }
@@ -93,18 +87,20 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
         awaitClose { query.removeEventListener(listener) }
     }
 
-    fun getLogsFlow(userId: String, dateStr: String): Flow<DataWrapper<List<ExerciseLog>>> = callbackFlow {
-        val query = getReference(userId, dateStr)
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val logs = snapshot.children.mapNotNull { it.getValue(ExerciseLog::class.java) }
-                trySend(DataWrapper.Success(logs))
+    fun getLogsFlow(userId: String, dateStr: String): Flow<DataWrapper<List<ExerciseLog>>> =
+        callbackFlow {
+            val query = getReference(userId, dateStr)
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val logs = snapshot.children.mapNotNull { it.getValue(ExerciseLog::class.java) }
+                    trySend(DataWrapper.Success(logs))
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(DataWrapper.Error())
+                }
             }
-            override fun onCancelled(error: DatabaseError) {
-                trySend(DataWrapper.Error())
-            }
+            query.addValueEventListener(listener)
+            awaitClose { query.removeEventListener(listener) }
         }
-        query.addValueEventListener(listener)
-        awaitClose { query.removeEventListener(listener) }
-    }
 }

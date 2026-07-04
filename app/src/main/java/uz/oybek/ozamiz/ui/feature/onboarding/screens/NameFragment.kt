@@ -15,7 +15,8 @@ class NameFragment
             button.setOnClickListener {
                 val inputName =
                     textInput.editText?.text.toString().trim()
-                if (inputName.isBlank()) {
+
+                if (inputName.length < 4) {
                     textInput.error = getString(R.string.name_error)
                     return@setOnClickListener
                 } else {

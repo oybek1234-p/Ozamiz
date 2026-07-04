@@ -4,11 +4,6 @@ import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.google.firebase.firestore.Query
-import uz.oybek.ozamiz.data.firebase.firestore
-import kotlinx.coroutines.tasks.await
-import uz.oybek.ozamiz.data.firebase.userMenusCollection
-import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
 
@@ -16,8 +11,6 @@ object AiMenuRepository {
     private const val PREFS_NAME = "ai_menu_prefs"
     private const val KEY_MENU_TEXT = "menu_text"
     private const val KEY_MENU_DATE = "menu_date"
-
-    private const val COLLECTION_USER_MENUS = "user_menus"
 
     private val _currentMenu = MutableStateFlow<String?>(null)
     val currentMenu: StateFlow<String?> = _currentMenu.asStateFlow()
@@ -46,40 +39,10 @@ object AiMenuRepository {
             .putString(KEY_MENU_DATE, today)
             .apply()
         _currentMenu.value = text
-
-        // Save to Firestore
-        try {
-            val userId = user.uid
-            if (userId.isNotEmpty()) {
-                val menuData = mapOf(
-                    "menuText" to text,
-                    "date" to today,
-                    "timestamp" to System.currentTimeMillis()
-                )
-                firestore.userMenusCollection(userId)
-                    .document(today)
-                    .set(menuData)
-                    .await()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     suspend fun getLastMenus(limit: Int = 3): List<String> {
-        val userId = user.uid
-        if (userId.isEmpty()) return emptyList()
-
-        return try {
-            firestore.userMenusCollection(userId)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(limit.toLong())
-                .get()
-                .await()
-                .mapNotNull { it.getString("menuText") }
-        } catch (e: Exception) {
-            emptyList()
-        }
+        return emptyList()
     }
 
     fun clearMenu(context: Context) {

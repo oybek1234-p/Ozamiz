@@ -5,7 +5,7 @@ import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.PostType.FOOD
 import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
 import uz.oybek.ozamiz.data.food.SavedFoodRepository
-import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
+import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysisResult
 
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -23,14 +23,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
-import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
+import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
+import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.logs.DailyLogRepository
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
+import uz.oybek.ozamiz.data.streak.StreakRepository
 
 data class AnalyzeResultState(
     val result: FoodAnalysis? = null,
@@ -114,6 +115,7 @@ class AnalyzeResultViewModel : ViewModel() {
             if (success) {
                 loadedLogId = log.logId
                 loadedLogDate = targetDate
+                StreakRepository.updateStreak()
 
                 val score = result.result?.healthScore ?: 0
                 val pointsDelta = when {
@@ -127,7 +129,8 @@ class AnalyzeResultViewModel : ViewModel() {
                     UserRepository.addPoints(pointsDelta)
                 }
 
-                val shouldShare = score >= 9 || (!result.photoUrl.isNullOrBlank() && result.photoUrl != "null")
+                val shouldShare =
+                    score >= 9 || (!result.photoUrl.isNullOrBlank() && result.photoUrl != "null")
                 if (shouldShare) {
                     val user = UserRepository.user
                     val userId = Firebase.auth.currentUser?.uid
@@ -156,6 +159,9 @@ class AnalyzeResultViewModel : ViewModel() {
                             },
                             foodName = result.result.name,
                             calories = result.result.calories,
+                            protein = result.result.protein,
+                            fat = result.result.fat,
+                            carbs = result.result.carbs,
                             healthScore = score,
                             userScore = user.scorePoints,
                             verified = true,
@@ -292,7 +298,7 @@ class AnalyzeResultViewModel : ViewModel() {
         val logId = loadedLogId ?: return
         val date = loadedLogDate ?: return
         val postId = loadedCommunityPostId
-        
+
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
             val success = FoodLogRepository.delete(logId, date, loadedUserId)
@@ -383,6 +389,7 @@ class AnalyzeResultViewModel : ViewModel() {
             val saveJob = async {
                 val success = FoodLogRepository.add(result.photoUrl, log, targetDate)
                 if (success) {
+                    StreakRepository.updateStreak()
                     val score = result.result?.healthScore ?: 0
                     val pointsDelta = when {
                         score >= 8 -> 10
@@ -410,9 +417,12 @@ class AnalyzeResultViewModel : ViewModel() {
                             photoUrl = result.photoUrl.orEmpty(),
                             photos = listOf(result.photoUrl.orEmpty()),
                             title = result.result!!.name,
-                            description = result.result.pros?.joinToString("\n") { "✅ $it" } ?: "",
+                            description = result.result.advice ?: "",
                             foodName = result.result.name,
                             calories = result.result.calories,
+                            protein = result.result.protein,
+                            fat = result.result.fat,
+                            carbs = result.result.carbs,
                             healthScore = result.result.healthScore ?: 0,
                             userScore = user.scorePoints,
                             verified = true,

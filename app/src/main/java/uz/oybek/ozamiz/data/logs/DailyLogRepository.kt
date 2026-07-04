@@ -13,6 +13,7 @@ import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.DailySummary
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.dateApiFormat
+import kotlinx.coroutines.tasks.await
 import java.util.Date
 
 object DailyLogRepository {
@@ -101,5 +102,30 @@ object DailyLogRepository {
             consumedCarbs = consumedCarbs,
             consumedFat = consumedFat
         )
+    }
+
+    suspend fun getDailyLogsSync(date: Date): DailyLogs? {
+        val userId = currentUserId ?: return null
+        return try {
+            val formattedDate = date.dateApiFormat()
+            val snapshot = FirebasePaths.userLogsReference(userId).child(formattedDate).get().await()
+            snapshot.getValueSafe(DailyLogs::class.java)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    suspend fun getDailySummarySync(date: Date): DailySummary {
+        val userId = currentUserId ?: return DailySummary()
+        return try {
+            val formattedDate = date.dateApiFormat()
+            val snapshot = FirebasePaths.userLogsReference(userId).child(formattedDate).get().await()
+            val dailyLogs = snapshot.getValueSafe(DailyLogs::class.java)
+            calculateSummary(dailyLogs)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            DailySummary()
+        }
     }
 }

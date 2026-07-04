@@ -15,9 +15,9 @@ import com.bumptech.glide.Glide
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzer
-import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
-import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysisResult
+import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
+import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysis
+import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysisResult
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
 import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
@@ -164,60 +164,6 @@ class AnalyzeResultFragment : Fragment() {
                         }
                     }
 
-                    val pros = analysisResult.pros
-                    if (!pros.isNullOrEmpty()) {
-                        binding.layoutPros.isVisible = true
-                        binding.containerPros.removeAllViews()
-                        pros.forEach { pro ->
-                            val tv = android.widget.TextView(requireContext()).apply {
-                                text = "• $pro"
-                                setTextAppearance(R.style.Headline2_16)
-                                setTextColor(
-                                    com.google.android.material.color.MaterialColors.getColor(
-                                        binding.root,
-                                        com.google.android.material.R.attr.colorOnSurfaceVariant
-                                    )
-                                )
-                                layoutParams = android.widget.LinearLayout.LayoutParams(
-                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                                ).apply {
-                                    topMargin = 16
-                                }
-                            }
-                            binding.containerPros.addView(tv)
-                        }
-                    } else {
-                        binding.layoutPros.isVisible = false
-                    }
-
-                    val cons = analysisResult.cons
-                    if (!cons.isNullOrEmpty()) {
-                        binding.layoutCons.isVisible = true
-                        binding.containerCons.removeAllViews()
-                        cons.forEach { con ->
-                            val tv = android.widget.TextView(requireContext()).apply {
-                                text = "• $con"
-                                setTextAppearance(R.style.Headline2_16)
-                                setTextColor(
-                                    com.google.android.material.color.MaterialColors.getColor(
-                                        binding.root,
-                                        com.google.android.material.R.attr.colorOnSurfaceVariant
-                                    )
-                                )
-                                layoutParams = android.widget.LinearLayout.LayoutParams(
-                                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
-                                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-                                ).apply {
-                                    topMargin = 16
-                                }
-                            }
-                            binding.containerCons.addView(tv)
-                        }
-                    } else {
-                        binding.layoutCons.isVisible = false
-                    }
-
                     val adviceText = analysisResult.advice
                     if (!adviceText.isNullOrBlank()) {
                         binding.layoutAdvice.isVisible = true
@@ -226,15 +172,15 @@ class AnalyzeResultFragment : Fragment() {
                         binding.layoutAdvice.isVisible = false
                     }
 
-                    binding.cardAiHealth.isVisible = !pros.isNullOrEmpty() || !cons.isNullOrEmpty() || !adviceText.isNullOrBlank()
+                    binding.cardAiHealth.isVisible = !adviceText.isNullOrBlank()
 
                     binding.buttonSaveToLog.isVisible = !state.isRecallMode
                     binding.buttonSaveToLog.text = "Saqlash"
                     binding.buttonSaveToLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
                     
                     binding.buttonReLog.isVisible = !state.isRecallMode
-                    binding.buttonReLog.text = "Qayta kiritish"
-                    binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.close_ic)
+                    binding.buttonReLog.text = "Bekor qilish"
+                    binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
                     binding.buttonDelete.isVisible =
                         state.isRecallMode && arguments?.getString("logId") != null
                 }

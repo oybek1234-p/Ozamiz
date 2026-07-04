@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navHost: NavHostFragment
 
     private lateinit var binding: ActivityMainBinding
+    private var systemInsets: WindowInsetsCompat? = null
 
     private fun handleSignOut() {
         if (UserRepository.user.valid.not()) return
@@ -78,10 +79,14 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var signOut: Runnable? = null
+        var isAppReady = false
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition {
+            !isAppReady
+        }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -97,10 +102,12 @@ class MainActivity : AppCompatActivity() {
             )
 
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+                systemInsets = insets
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
                 v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
 
                 binding.bottomNavView.setPadding(0, 0, 0, systemBars.bottom)
+                updateContainerPadding()
                 insets
             }
         }
@@ -112,19 +119,21 @@ class MainActivity : AppCompatActivity() {
         if (user.valid && firebaseUser == null) {
             UserRepository.signOut()
             graph.setStartDestination(R.id.authFragment)
+            isAppReady = true
         } else if (user.valid) {
-            checkRegisterDate()
             if (user.name.isEmpty()) {
                 graph.setStartDestination(R.id.onboarding)
+                isAppReady = true
             }
         } else {
             graph.setStartDestination(R.id.authFragment)
+            isAppReady = true
         }
         navHost.navController.graph = graph
-        
-        // Bottom Navigation Chat Badge Logic
+
+        checkAndShowAppReview()
+
         binding.bottomNavView.post {
-            // Initial check on launch
             if (LocalPreferencesRepository.getHasUnreadChat()) {
                 val badge = binding.bottomNavView.getOrCreateBadge(R.id.aiChatFragment)
                 badge.isVisible = true
@@ -146,7 +155,7 @@ class MainActivity : AppCompatActivity() {
 
         // Catch new messages dynamically
         lifecycleScope.launch {
-            Dietolog.latestMessage.collect { advice ->
+            Dietolog.newMessagesEvent.collect { advice ->
                 if (!advice.isNullOrBlank() && navController.currentDestination?.id != R.id.aiChatFragment) {
                     binding.bottomNavView.post {
                         val badge = binding.bottomNavView.getOrCreateBadge(R.id.aiChatFragment)
@@ -159,15 +168,12 @@ class MainActivity : AppCompatActivity() {
 
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
+        
+        // Reschedule notifications for the day
+        uz.oybek.ozamiz.data.motivation.MotivationAlarmScheduler.rescheduleToday(this)
     }
 
-    private fun checkRegisterDate() {
-        if (LocalUser.user.registerDate == null) {
-            UserRepository.updateUser {
-                it.registerDate = Calendar.getInstance().time
-            }
-        }
-    }
+
 
     private fun initUser() {
         LocalUser.getUser()
@@ -314,6 +320,7 @@ class MainActivity : AppCompatActivity() {
     fun showBottomSheet(show: Boolean, animate: Boolean,justInvisible: Boolean = false) {
         if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return
         bottomNavShown = show
+        updateContainerPadding()
         if (show.not() && justInvisible) {
             binding.bottomNavView.isInvisible = false
             return
@@ -344,11 +351,27 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun checkAndShowAppReview() {
+        val firstLaunchTime = LocalPreferencesRepository.getFirstLaunchTime()
+        val appReviewShown = LocalPreferencesRepository.isAppReviewShown()
+        
+        if (!appReviewShown) {
+            val threeDaysInMillis = 3 * 24 * 60 * 60 * 1000L
+            val currentTime = System.currentTimeMillis()
+            
+            if (currentTime - firstLaunchTime >= threeDaysInMillis) {
+                requestAppReview()
+                LocalPreferencesRepository.setAppReviewShown(true)
+            }
+        }
+    }
+
     fun requestAppReview() {
         try {
             val manager = com.google.android.play.core.review.ReviewManagerFactory.create(this)
             val request = manager.requestReviewFlow()
             request.addOnCompleteListener { task ->
+                if (isFinishing || isDestroyed) return@addOnCompleteListener
                 if (task.isSuccessful) {
                     val reviewInfo = task.result
                     manager.launchReviewFlow(this, reviewInfo)
@@ -356,6 +379,17 @@ class MainActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             handleException(e)
+        }
+    }
+
+    fun updateContainerPadding() {
+        val insets = systemInsets ?: return
+        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        val show = bottomNavShown
+        if (show) {
+            binding.container.setPadding(0, 0, 0, 0)
+        } else {
+            binding.container.setPadding(0, 0, 0, systemBars.bottom)
         }
     }
 }

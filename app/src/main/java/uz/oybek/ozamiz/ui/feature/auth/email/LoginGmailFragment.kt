@@ -28,10 +28,6 @@ class LoginGmailFragment :
         return LoginGmailFragmentBinding.inflate(inflater)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     private var loading = MutableLiveData(false)
 
     override fun onResume() {

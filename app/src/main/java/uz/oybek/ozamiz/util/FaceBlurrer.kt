@@ -4,6 +4,10 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
+import android.graphics.RectF
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.BlurMaskFilter
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -38,46 +42,60 @@ object FaceBlurrer {
         val width = rect.width()
         val height = rect.height()
         
-        // Expand the rect by 20% to cover the whole head, not just facial features
-        val expandX = (width * 0.2f).toInt()
-        val expandY = (height * 0.2f).toInt()
+        // Shrink the rect slightly (by 10% on each side) to keep it strictly inside the face boundaries
+        val shrinkX = (width * 0.10f).toInt()
+        val shrinkY = (height * 0.10f).toInt()
         
-        val left = (rect.left - expandX).coerceAtLeast(0)
-        val top = (rect.top - expandY).coerceAtLeast(0)
-        val right = (rect.right + expandX).coerceAtMost(bitmap.width)
-        val bottom = (rect.bottom + expandY).coerceAtMost(bitmap.height)
+        val left = (rect.left + shrinkX).coerceAtLeast(0)
+        val top = (rect.top + shrinkY).coerceAtLeast(0)
+        val right = (rect.right - shrinkX).coerceAtMost(bitmap.width)
+        val bottom = (rect.bottom - shrinkY).coerceAtMost(bitmap.height)
         
-        val newWidth = right - left
-        val newHeight = bottom - top
+        val faceWidth = right - left
+        val faceHeight = bottom - top
         
-        if (newWidth <= 0 || newHeight <= 0) return
+        if (faceWidth <= 5 || faceHeight <= 5) return
 
-        // Dynamic pixel block size based on the width to guarantee heavy obfuscation
-        val pixelSize = maxOf(newWidth / 6, 30)
-        
-        val canvas = Canvas(bitmap)
-        val paint = Paint().apply {
-            style = Paint.Style.FILL
-        }
+        try {
+            // 1. Extract the face region
+            val faceBitmap = Bitmap.createBitmap(bitmap, left, top, faceWidth, faceHeight)
+            
+            // 2. Perform extreme downscale to completely obfuscate details while keeping color tones
+            val scaleSize = 10
+            val scaledDown = Bitmap.createScaledBitmap(faceBitmap, scaleSize, scaleSize, true)
+            // Scale back up with bilinear filtering for a super soft, smooth blur (no pixelated blocks)
+            val blurredFace = Bitmap.createScaledBitmap(scaledDown, faceWidth, faceHeight, true)
+            
+            faceBitmap.recycle()
+            scaledDown.recycle()
 
-        for (y in top until bottom step pixelSize) {
-            for (x in left until right step pixelSize) {
-                val sampleX = x.coerceIn(0, bitmap.width - 1)
-                val sampleY = y.coerceIn(0, bitmap.height - 1)
-                
-                paint.color = try { bitmap.getPixel(sampleX, sampleY) } catch (e: Exception) { 0 }
-                
-                val blockRight = (x + pixelSize).coerceAtMost(right)
-                val blockBottom = (y + pixelSize).coerceAtMost(bottom)
-                
-                canvas.drawRect(
-                    x.toFloat(), 
-                    y.toFloat(), 
-                    blockRight.toFloat(), 
-                    blockBottom.toFloat(), 
-                    paint
-                )
+            // 3. Create a temporary result bitmap to apply the feathered oval mask
+            val resultBitmap = Bitmap.createBitmap(faceWidth, faceHeight, Bitmap.Config.ARGB_8888)
+            val tempCanvas = Canvas(resultBitmap)
+            
+            // Draw the blurred face first
+            tempCanvas.drawBitmap(blurredFace, 0f, 0f, null)
+            
+            // Draw an oval mask with DST_IN to clip the blurred image into an oval shape.
+            // Using BlurMaskFilter.Blur.INNER feathers the boundary inwards, keeping the outside strictly transparent (0 alpha).
+            val maskPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
+                val blurRadius = (faceWidth * 0.20f).coerceAtLeast(1f)
+                maskFilter = BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.INNER)
             }
+            
+            val ovalRect = RectF(0f, 0f, faceWidth.toFloat(), faceHeight.toFloat())
+            tempCanvas.drawOval(ovalRect, maskPaint)
+            
+            // 4. Draw the feathered, blurred oval onto the original bitmap canvas
+            val canvas = Canvas(bitmap)
+            canvas.drawBitmap(resultBitmap, left.toFloat(), top.toFloat(), null)
+            
+            // Clean up temporary bitmaps
+            blurredFace.recycle()
+            resultBitmap.recycle()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

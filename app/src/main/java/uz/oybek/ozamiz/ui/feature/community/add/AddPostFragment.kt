@@ -93,7 +93,13 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
             file
         )
         tempImageUri = uri
-        cameraLauncher.launch(uri)
+        try {
+            cameraLauncher.launch(uri)
+        } catch (e: SecurityException) {
+            Toast.makeText(requireContext(), "Kamera ruxsati berilmadi", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Kamerani ochib bo'lmadi", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun updateImagesUI() {

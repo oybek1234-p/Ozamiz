@@ -1,20 +1,72 @@
-Starting a Gradle Daemon, 1 incompatible Daemon could not be reused, use --status for details
+Configuration on demand is an incubating feature.
+Reusing configuration cache.
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:generateSafeArgsDebug UP-TO-DATE
+> Task :app:injectCrashlyticsVersionControlInfoDebug UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:injectCrashlyticsMappingFileIdDebug UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:dataBindingTriggerDebug UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:kaptGenerateStubsDebugKotlin
+> Task :app:kaptDebugKotlin UP-TO-DATE
+> Task :app:compileDebugKotlin
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/ai/local/AiChatDatabase.kt:23:18 'fun fallbackToDestructiveMigration(): RoomDatabase.Builder<AiChatDatabase>' is deprecated. Replace by overloaded version with parameter to indicate if all tables should be dropped or not.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/food/SavedFoodRepository.kt:19:13 Condition is always 'false'.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/DailyLogRepository.kt:25:17 Condition is always 'false'.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/DailyLogRepository.kt:57:17 Condition is always 'false'.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/DailySummaryRepository.kt:22:13 Condition is always 'false'.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/ExerciseLogRepository.kt:67:13 Condition is always 'false'.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/utils/DateUtils.kt:15:13 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/base/BaseAdapter.kt:51:63 'val adapterPosition: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/base/BaseAdapter.kt:56:67 'val adapterPosition: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/base/SelectableAdapter.kt:56:40 'val adapterPosition: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/ai/AiChatFragment.kt:48:71 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:16:8 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:41:32 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:52:56 'fun getSignInCredentialFromIntent(p0: Intent?): SignInCredential' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:93:60 'fun getSignInCredentialFromIntent(p0: Intent?): SignInCredential' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:116:27 'fun beginSignIn(p0: BeginSignInRequest): Task<BeginSignInResult!>' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:162:25 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:163:13 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:163:32 'class GoogleIdTokenRequestOptions : AbstractSafeParcelable' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/community/CommunityUsersAdapter.kt:37:32 'val adapterPosition: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/home/DailyTipDetailsBottomSheet.kt:24:26 'fun <T : Parcelable!> getParcelable(p0: String?): T?' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/home/DateScrollerAdapter.kt:24:51 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/log/photo/AddWeightPhotoUiState.kt:97:17 'when' is exhaustive so 'else' is redundant here.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/log/photo/WeightPhotoLogAdapter.kt:22:49 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/log/voice/VoiceRecorderBottomSheet.kt:117:88 'constructor(): MediaRecorder' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/detail/MenuDetailFragment.kt:34:23 'fun <T : Parcelable!> getParcelable(p0: String?): T?' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/list/MenuAdapter.kt:43:55 'val adapterPosition: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/NatijaViewModel.kt:82:21 'when' is exhaustive so 'else' is redundant here.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryAdapter.kt:20:57 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryAdapter.kt:21:56 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryViewModel.kt:47:21 'when' is exhaustive so 'else' is redundant here.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryViewModel.kt:65:17 'when' is exhaustive so 'else' is redundant here.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/ExerciseType.kt:9:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to field.
+- To opt in to applying to both value parameter and field, add '-Xannotation-default-target=param-property' to your compiler arguments.
+- To keep applying to the value parameter only, use the '@param:' annotation target.
 
-FAILURE: Build failed with an exception.
+See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/ExerciseTypeAdapter.kt:19:24 'val adapterPosition: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/ExerciseTypeAdapter.kt:20:41 'val adapterPosition: Int' is deprecated. Deprecated in Java.
+w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/screens/plan/PlanFragment.kt:17:9 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
 
-* What went wrong:
-Unable to start the daemon process.
-This problem might be caused by incorrect configuration of the daemon.
-For example, an unrecognized jvm option is used.For more details on the daemon, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html in the Gradle documentation.
-Process command line: C:\Program Files (x86)\Java\jre1.8.0_451\bin\java.exe -XX:+HeapDumpOnOutOfMemoryError -XX:+UseParallelGC -XX:MaxMetaspaceSize=1024m -Xmx2g -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp D:\Android Studio\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\gradle-daemon-main-8.13.jar -javaagent:D:\Android Studio\.gradle\wrapper\dists\gradle-8.13-bin\5xuhj0ry160q40clulazy9h7d\gradle-8.13\lib\agents\gradle-instrumentation-agent-8.13.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.13
-Please read the following process output to find out more:
------------------------
-Error occurred during initialization of VM
-Could not reserve enough space for 2097152KB object heap
-
-
-* Try:
-> Run with --stacktrace option to get the stack trace.
-> Run with --info or --debug option to get more log output.
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
+BUILD SUCCESSFUL in 36s
+23 actionable tasks: 2 executed, 21 up-to-date
+Configuration cache entry reused.

@@ -11,7 +11,7 @@
         android:scrollbars="none"
         android:paddingHorizontal="16dp"
         android:paddingTop="8dp"
-        android:paddingBottom="4dp">
+        android:paddingBottom="8dp">
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chipGroupFilter"
@@ -22,25 +22,20 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipAll"
-                style="@style/Widget.Material3.Chip.Filter"
+                style="@style/WidgetAppChipChoice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Hammasi"
                 android:checked="true" />
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipFood"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ovqatlar" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/chipOzganlar"
-                style="@style/Widget.Material3.Chip.Filter"
+                style="@style/WidgetAppChipChoice"
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
-                android:text="Ozganlar" />
+                android:text="Natija" />
 
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>
@@ -48,8 +43,7 @@
     <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:dividerColor="?attr/colorOutlineVariant"
-        android:layout_marginTop="4dp" />
+        app:dividerColor="?attr/colorOutlineVariant" />
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"

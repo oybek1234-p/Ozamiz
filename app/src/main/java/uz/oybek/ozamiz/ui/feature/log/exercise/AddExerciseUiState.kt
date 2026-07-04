@@ -64,7 +64,7 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
         if (duration == null || duration <= 0) {
             return
         }
-        _uiState.value = AddExerciseUiState.Success(exercise.name)
+        _uiState.value = AddExerciseUiState.Saving
         viewModelScope.launch {
             val caloriesBurned = exercise.getCalories(duration)
             val exerciseLog = ExerciseLog(
@@ -73,9 +73,28 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
                 caloriesBurned = caloriesBurned
             )
             val points = (caloriesBurned / 10).coerceAtLeast(1)
-            ExerciseLogRepository.add(exerciseLog, selectedDate)
-            // Streak updated via onExerciseAdded() in HomeViewModel after navigation
-            UserRepository.addPoints(points)
+            val success = ExerciseLogRepository.add(exerciseLog, selectedDate)
+            if (success) {
+                UserRepository.addPoints(points)
+                if (uz.oybek.ozamiz.data.utils.DateUtils.isSameDay(selectedDate, Date())) {
+                    val todayStr = uz.oybek.ozamiz.data.utils.DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
+                    val oldCache = uz.oybek.ozamiz.data.config.LocalPreferencesRepository.getTodayCache(todayStr)
+                    if (oldCache != null) {
+                        uz.oybek.ozamiz.data.config.LocalPreferencesRepository.saveTodayCache(
+                            dateStr = todayStr,
+                            calories = oldCache.calories,
+                            water = oldCache.water,
+                            exercise = oldCache.exercise + caloriesBurned,
+                            protein = oldCache.protein,
+                            fat = oldCache.fat,
+                            carbs = oldCache.carbs
+                        )
+                    }
+                }
+                _uiState.value = AddExerciseUiState.Success(exercise.name)
+            } else {
+                _uiState.value = AddExerciseUiState.Error("Saqlashda xatolik yuz berdi")
+            }
         }
     }
 }

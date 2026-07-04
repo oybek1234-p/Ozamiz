@@ -7,8 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -21,14 +22,14 @@ import com.google.android.material.chip.Chip
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
-import uz.oybek.ozamiz.data.food.analyzer.model.FoodAnalysis
-import uz.oybek.ozamiz.data.food.model.FoodDatabase
+import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.model.MealTime
+import uz.oybek.ozamiz.data.food.model.FoodDatabase
+import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FoodAnalyzingLoaderBinding
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
+import uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.showToast
@@ -37,14 +38,11 @@ import java.util.Date
 class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private val viewModel: LogFoodViewModel by viewModels()
-    private val homeViewModel: HomeViewModel by activityViewModels()
 
     private var meal: String = ""
     private var logDate: Date = Date()
     private var loadingSheet: BottomSheetDialog? = null
     private var loadingShown = false
-    private var tourOverlay: uz.oybek.ozamiz.ui.utils.GuidedTourOverlay? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -52,7 +50,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             logDate = Date(argument.timestamp)
             meal = argument.meal
             if (argument.openCamera) {
-                checkOnlyPremium {
+                checkAiLimitsAndRun {
                     launchCamera()
                 }
             }
@@ -71,30 +69,29 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         initTodayLogs(logDate)
         setupPremiumListener()
         initFoodCamera()
-        viewLifecycleOwner.lifecycleScope.launch {
-            kotlinx.coroutines.delay(500)
-            checkAppOnboardingAutoPrompt()
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    navigateToHome()
+                }
+            }
+        )
+
+        arguments?.let {
+            val argument = getArgument(it)
+            if (argument.openEditText) {
+                TextInputBottomSheet().show(parentFragmentManager, TextInputBottomSheet.TAG)
+            }
         }
     }
 
-    private fun checkAppOnboardingAutoPrompt() {
-        if (viewModel.isFoodTourSeen()) return
-        viewModel.setFoodTourSeen(true)
-
-        tourOverlay = uz.oybek.ozamiz.ui.utils.GuidedTourOverlay(requireContext())
-        tourOverlay?.showFor(
-            activity = requireActivity(),
-            targetView = binding.buttonQuickCamera,
-            title = "Sun'iy Intellekt Kamerasi",
-            text = "Ovqatingizni kiritish yoqimsiz jarayon emas! Shunchaki rasmga oling. Sun'iy intellekt taomingiz qanday ekanini o'zi aniqlab, undagi jami kaloriya, oqsil, yog' va uglevodlarni soniyalarda aniq hisoblab beradi. Ozingiz qidirib yurishga vaqt sarflamaysiz!",
-            buttonText = "Ajoyib, Rasmga olish",
-            onNext = { checkOnlyPremium { launchCamera() } }
-        )
+    private fun navigateToHome() {
+        findNavController().popBackStack(R.id.home, false)
     }
 
     override fun onDestroyView() {
-        tourOverlay?.removeImmediately()
-        tourOverlay = null
         loadingSheet?.dismiss()
         loadingSheet = null
         super.onDestroyView()
@@ -126,7 +123,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             }
         }
     }
-
+    
     private fun setupPremiumListener() {
         setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
             if (bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION) == "go_to_payment") {
@@ -146,43 +143,136 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         }
     }
 
-    private fun checkPremium(action: () -> Unit) {
-        if (viewModel.isUserPremiumOrTrial) {
-            action()
-        } else {
-            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+    private fun checkAiLimitsAndRun(action: () -> Unit) {
+        lifecycleScope.launch {
+            if (viewModel.paymentChecking) {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+                return@launch
+            }
+            if (!viewModel.isUserPremium && viewModel.getDailyCalorieLimitReached()) {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+                return@launch
+            }
+            val totalCount = viewModel.getTodayFoodLogsCountSync()
+            if (!viewModel.isUserPremium && totalCount >= 5) {
+                showDailyLimitWarning()
+                return@launch
+            }
+            when (viewModel.checkAiLimitStatus()) {
+                LogFoodViewModel.AiLimitStatus.TRIAL_EXPIRED -> {
+                    PremiumBottomSheetDialog().show(
+                        parentFragmentManager,
+                        PremiumBottomSheetDialog.TAG
+                    )
+                }
+
+                LogFoodViewModel.AiLimitStatus.DAILY_LIMIT_REACHED -> {
+                    showAiLimitWarning()
+                }
+
+                LogFoodViewModel.AiLimitStatus.ALLOWED -> {
+                    action()
+                }
+            }
         }
     }
 
-    private fun checkOnlyPremium(action: () -> Unit) {
-        if (viewModel.isUserPremium) {
-            action()
-        } else {
+    private fun checkDailyLimitAndRun(action: () -> Unit) {
+        lifecycleScope.launch {
+            if (viewModel.paymentChecking) {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+                return@launch
+            }
+            if (!viewModel.isUserPremium && viewModel.getDailyCalorieLimitReached()) {
+                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+                return@launch
+            }
+            val totalCount = viewModel.getTodayFoodLogsCountSync()
+            if (!viewModel.isUserPremium && totalCount >= 5) {
+                showDailyLimitWarning()
+            } else {
+                action()
+            }
+        }
+    }
+
+    private fun showDailyLimitWarning() {
+        showCustomLimitWarning(R.string.daily_food_limit_title, R.string.daily_food_limit_msg)
+    }
+
+    private fun showAiLimitWarning() {
+        showCustomLimitWarning(R.string.ai_food_limit_title, R.string.ai_food_limit_msg)
+    }
+
+    private fun showCustomLimitWarning(titleResId: Int, messageResId: Int) {
+        val dialog = android.app.Dialog(requireContext())
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
+        val view = android.view.LayoutInflater.from(requireContext()).inflate(
+            R.layout.dialog_limit_warning,
+            null
+        )
+        dialog.setContentView(view)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val tvTitle = view.findViewById<android.widget.TextView>(R.id.tv_title)
+        val tvMessage = view.findViewById<android.widget.TextView>(R.id.tv_message)
+        val btnPositive =
+            view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_positive)
+        val btnNegative =
+            view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_negative)
+        val btnSearchList =
+            view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_search_list)
+
+        btnPositive.setOnClickListener {
+            dialog.dismiss()
             PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
         }
+        btnSearchList.setOnClickListener {
+            dialog.dismiss()
+            findNavController().navigate(
+                R.id.action_logFoodFragment_to_searchFoodFragment,
+                Bundle().apply {
+                    putString("mealType", viewModel.state.value.meal)
+                    putLong("timestamp", logDate.time)
+                }
+            )
+        }
+        btnNegative.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+        dialog.window?.setLayout(
+            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun initTextInput() {
         setFragmentResultListener(TextInputBottomSheet.REQUEST_KEY) { _, bundle ->
             bundle.getString(TextInputBottomSheet.RESULT_TEXT)?.let { text ->
-                viewModel.updateDescription(text)
-                viewModel.analyze()
+                checkAiLimitsAndRun {
+                    viewModel.updateDescription(text)
+                    viewModel.analyze()
+                }
             }
         }
     }
 
     private fun setupUI(bind: FragmentLogFoodBinding) = with(bind) {
-        toolbarLogFood.setNavigationOnClickListener { closeFragment() }
-        toolbarLogFood.title = "Ovqat kiritish"
+        toolbarLogFood.setNavigationOnClickListener { navigateToHome() }
+        toolbarLogFood.title = "Dietolog tahlili"
 
-        historyButton.setOnSafeClickListener {
-            arguments?.let {
-                val argument = getArgument(it)
-                navigate(R.id.action_logFoodFragment_to_dailyFoodLogsFragment, Bundle().apply {
-                    putLong(TIMESTAMP, argument.timestamp)
-                })
-            }
-        }
+        val showPremiumBadges = !viewModel.isUserPremiumOrTrial
+        badgeCameraPremium.isVisible = showPremiumBadges
+        badgeTextPremium.isVisible = showPremiumBadges
+
+        val totalFoods = FoodDatabase.allFoods.size
+        textViewSearchListTitle.text = getString(
+            R.string.log_food_search_list_count_format,
+            getString(R.string.log_food_search_list_title),
+            totalFoods
+        )
 
         if (chipGroupMealType.childCount == 0) {
             MealTime.mealTypes.forEach { type ->
@@ -200,10 +290,10 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         }
 
         buttonQuickCamera.setOnSafeClickListener {
-            checkPremium { launchCamera() }
+            checkAiLimitsAndRun { launchCamera() }
         }
         buttonShowTextInput.setOnSafeClickListener {
-            checkPremium {
+            checkAiLimitsAndRun {
                 TextInputBottomSheet().show(
                     parentFragmentManager,
                     TextInputBottomSheet.TAG
@@ -211,56 +301,32 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             }
         }
         buttonSearchList.setOnSafeClickListener {
-            checkPremium {
-                findNavController().navigate(
-                    R.id.action_logFoodFragment_to_searchFoodFragment,
-                    Bundle().apply {
-                        putString("mealType", viewModel.state.value.meal)
-                        putLong("timestamp", logDate.time)
-                    })
-            }
+            findNavController().navigate(
+                R.id.action_logFoodFragment_to_searchFoodFragment,
+                Bundle().apply {
+                    putString("mealType", viewModel.state.value.meal)
+                    putLong("timestamp", logDate.time)
+                })
         }
 
-        if (chipGroupSuggestions.childCount == 0) {
-            FoodDatabase.allFoods.take(10).forEach { food ->
-                (layoutInflater.inflate(
-                    R.layout.item_suggestion_chip,
-                    chipGroupSuggestions,
-                    false
-                ) as Chip).apply {
-                    text = food.name
-                    setOnClickListener {
-                        FoodSelectionBottomSheet(
-                            foodItem = food,
-                            mealType = viewModel.state.value.meal,
-                            onLogAdded = { log ->
-                                viewModel.logFood(log, logDate)
-                                homeViewModel.onFoodAdded()
-                                showToast("Qo'shildi!")
-                            }
-                        ).show(parentFragmentManager, FoodSelectionBottomSheet.TAG)
-                    }
-                    chipGroupSuggestions.addView(this)
-                }
-            }
-        }
+
     }
 
     private fun initTodayLogs(date: Date) {
-        val adapter = uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter { foodLog ->
-            checkPremium {
-                navigate(R.id.analyzeResultFragment, Bundle().apply {
-                    putString("logId", foodLog.logId)
-                    putLong("timestamp", date.time)
-                })
-            }
-        }
+        val adapter = RecentLogsAdapter({ foodLog ->
+            navigate(R.id.analyzeResultFragment, Bundle().apply {
+                putString("logId", foodLog.logId)
+                putLong("timestamp", date.time)
+            })
+        }, { foodLog ->
+            showDeleteConfirmation(foodLog, date)
+        })
         binding.recyclerRecentLogs.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.getLatestLogs(date, 2).collectLatest { logs ->
+                    viewModel.getLatestLogs(date, 100).collectLatest { logs ->
                         binding.layoutRecentHistory.isVisible = logs.isNotEmpty()
                         adapter.submitList(logs)
                     }
@@ -272,6 +338,17 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 }
             }
         }
+    }
+
+    private fun showDeleteConfirmation(foodLog: FoodLog, date: Date) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.confirm_delete_title)
+            .setMessage(getString(R.string.confirm_delete_message_generic, foodLog.description))
+            .setPositiveButton(R.string.yes_delete) { _, _ ->
+                viewModel.deleteFoodLog(foodLog, date)
+            }
+            .setNegativeButton(R.string.no, null)
+            .show()
     }
 
     private fun showLoading(state: LogFoodState) {
@@ -347,9 +424,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     private fun navigateToResult(result: FoodAnalysis) {
-        if (LocalPreferencesRepository.getAppOnboardingStep() == 1) {
-            homeViewModel.onAppOnboardingComplete()
-        }
         navigate(R.id.analyzeResultFragment, Bundle().apply {
             putInt("id", result.id)
             putLong("timestamp", logDate.time)
@@ -402,17 +476,20 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         data class Argument(
             val timestamp: Long = System.currentTimeMillis(),
             val meal: String = MealTime.Breakfast.id,
-            val openCamera: Boolean = false
+            val openCamera: Boolean = false,
+            val openEditText: Boolean = false
         )
 
         const val TIMESTAMP = "timestamp"
         const val OPEN_CAMERA = "openCamera"
+        const val OPEN_EDIT_TEXT = "openEditText"
 
         fun getArgument(arguments: Bundle): Argument {
             return Argument(
                 arguments.getLong(TIMESTAMP),
                 arguments.getString("meal", MealTime.Breakfast.id),
-                arguments.getBoolean(OPEN_CAMERA, false)
+                arguments.getBoolean(OPEN_CAMERA, false),
+                arguments.getBoolean(OPEN_EDIT_TEXT, false)
             )
         }
 
@@ -420,7 +497,8 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             navController: NavController,
             timeStamp: Long = System.currentTimeMillis(),
             meal: String = MealTime.Breakfast.id,
-            openCamera: Boolean = false
+            openCamera: Boolean = false,
+            openEditText: Boolean = false
         ) {
             navController.navigate(
                 R.id.logFoodFragment,
@@ -428,6 +506,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                     putLong(TIMESTAMP, timeStamp)
                     putString("meal", meal)
                     putBoolean(OPEN_CAMERA, openCamera)
+                    putBoolean(OPEN_EDIT_TEXT, openEditText)
                 },
                 animNavOptions
             )

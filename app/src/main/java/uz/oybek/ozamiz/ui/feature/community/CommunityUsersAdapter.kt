@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.community
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -10,6 +11,8 @@ import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.points.LevelManager
 import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.data.utils.formatLastSeen
 import uz.oybek.ozamiz.databinding.ItemCommunityUserBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -41,6 +44,7 @@ class CommunityUsersAdapter(
             }
         }
 
+        @SuppressLint("SetTextI18n")
         fun bind(user: User) {
             binding.tvName.text = user.name.ifBlank { "Ismsiz foydalanuvchi" }
             binding.imgPremium.isVisible = user.premium
@@ -57,21 +61,6 @@ class CommunityUsersAdapter(
                 .into(binding.imgAvatar)
         }
 
-        private fun formatLastSeen(timestamp: Long): String {
-            if (timestamp == 0L) return ""
-            val now = System.currentTimeMillis()
-            val diff = now - timestamp
-
-            return when {
-                diff < 60000 -> "yaqinda"
-                diff < 3600000 -> "${diff / 60000}m oldin"
-                diff < 86400000 -> "${diff / 3600000}s oldin"
-                else -> {
-                    val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                    sdf.format(timestamp)
-                }
-            }
-        }
     }
 
     class UserDiffCallback : DiffUtil.ItemCallback<User>() {

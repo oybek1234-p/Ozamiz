@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:backgroundTint="?colorSurfaceContainerLowest"
-    android:background="@drawable/round_lay">
+    android:background="@drawable/round_lay"
+    android:backgroundTint="?colorSurfaceContainerLowest">
 
     <ImageView
         android:id="@+id/back_view"
@@ -18,25 +17,38 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/textView5"
         style="@style/Headline2_16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tekshiryapmiz..."
+        android:text="Hisoblayabmiz..."
         android:textColor="?colorOnSurface"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimationView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/back_view"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/bouncing_fruits"
+        app:lottie_repeatMode="restart" />
+
 
     <LinearLayout
         android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_12"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingBottom="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/back_view">
+        app:layout_constraintTop_toBottomOf="@+id/textView5">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image_request"
@@ -52,17 +64,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="@dimen/dimen_12"
             android:ellipsize="end"
             android:gravity="center"
-            android:lines="4" />
-
-        <ProgressBar
-            android:id="@+id/lottie_view"
-            android:layout_width="@dimen/dimen_48"
-            android:layout_height="@dimen/dimen_48"
-            android:layout_marginTop="24dp"
-            android:indeterminateTint="?colorPrimary" />
-
+            android:lines="4"
+            android:visibility="gone" />
 
     </LinearLayout>
 

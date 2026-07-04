@@ -8,7 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import uz.oybek.ozamiz.data.food.analyzer.model.AnalyzedIngredient
+import uz.oybek.ozamiz.data.ai.analyzer.model.AnalyzedIngredient
 import uz.oybek.ozamiz.databinding.DialogEditIngredientBinding
 
 class EditIngredientBottomSheet : BottomSheetDialogFragment() {

@@ -46,10 +46,6 @@ class DailyTipDetailsBottomSheet : BottomSheetDialogFragment() {
             binding.textDetailBenefit.text = item.benefits
         }
 
-        binding.btnCloseDetails.setOnClickListener {
-            viewModel.onTipUnderstood()
-            dismiss()
-        }
     }
 
     override fun onDestroyView() {

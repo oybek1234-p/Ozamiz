@@ -99,9 +99,7 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
                     dbUser.phoneNumber = userToUpdate.phoneNumber
                     dbUser.activityLevel = userToUpdate.activityLevel
                     dbUser.region = userToUpdate.region
-                    if (dbUser.registerDate == null) {
-                        dbUser.registerDate = userToUpdate.registerDate
-                    }
+
                 }
                 _navigationEvent.postValue(GetInfoNavigationEvent.NavigateToHome)
             } catch (e: Exception) {

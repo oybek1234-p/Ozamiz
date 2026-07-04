@@ -64,4 +64,8 @@
         android:id="@+id/planFragment"
         android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.plan.PlanFragment"
         android:label="PlanFragment" />
+    <fragment
+        android:id="@+id/phoneOnboardFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.PhoneOnboardFragment"
+        android:label="PhoneOnboardFragment" />
 </navigation>

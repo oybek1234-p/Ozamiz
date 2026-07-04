@@ -9,12 +9,14 @@
 
         <ImageView
             android:id="@+id/photo"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_marginBottom="@dimen/dimen_24"
             android:scaleType="centerCrop"
-            android:src="@drawable/splash_photo"
+            android:src="@drawable/splash_icon"
             app:layout_constraintBottom_toTopOf="@+id/linearLayout7"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <uz.oybek.ozamiz.ui.base.MyToolBar

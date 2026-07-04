@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
@@ -59,21 +60,28 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
         (view.parent as? View)?.setBackgroundColor(android.graphics.Color.TRANSPARENT)
 
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
+            if (state.paymentChecking) {
+                binding.progressLoader.isVisible = false
+                binding.layoutPlans.alpha = 0f
+                showState(true)
+                return@observe
+            }
+
             val loaded = state.monthlyPrice > 0L
             binding.progressLoader.isVisible = !loaded
             binding.layoutPlans.alpha = if (loaded) 1f else 0f
 
             if (!loaded) return@observe
-            
+
             val monthlyPrice = state.monthlyPrice
             val yearlyPrice = state.yearlyPrice
             val isMonthly = state.selectedPrice == monthlyPrice
             val context = requireContext()
-            
+
             val primaryColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, android.graphics.Color.GREEN)
             val outlineColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, android.graphics.Color.LTGRAY)
             val surfaceColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerLowest, android.graphics.Color.WHITE)
-            
+
             // Monthly Card
             binding.cardMonthly.strokeWidth = if (isMonthly) 2.dpToPx() else 1.dpToPx()
             binding.cardMonthly.strokeColor = if (isMonthly) primaryColor else outlineColor
@@ -87,7 +95,7 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             binding.radioYearly.isChecked = !isMonthly
             binding.textMonthlyPrice.text = "${NumberFormattingUtils.formatPrice(monthlyPrice)} sum"
             binding.textYearlyPrice.text = "${NumberFormattingUtils.formatPrice(yearlyPrice)} sum"
-            
+
             val yearlyMonthlyEquivalent = yearlyPrice / 12
             binding.textYearlyMonthlyEquivalent.text = "${NumberFormattingUtils.formatPrice(yearlyMonthlyEquivalent)} sum / oy"
 
@@ -118,9 +126,17 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        binding.buttonClose.setOnClickListener {
-            dismiss()
+        binding.btnRefundTerms.setOnClickListener {
+            showRefundTerms()
         }
+    }
+
+    private fun showRefundTerms() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Pulni qaytarish shartlari")
+            .setMessage("Shart 1 oyda 24 kun davomida har kuni 2 mahal ovqat qoshsangiz oy oxirida pulingingiz 100% ozingizga qaytarib beriladi, bu faqat oylik obuna uchungina o'tadi.")
+            .setPositiveButton("Tushunarli", null)
+            .show()
     }
 
 

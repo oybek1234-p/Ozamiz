@@ -53,7 +53,7 @@ object DietController {
 
     fun calculateTDEE(user: User): Double {
         val bmr = calculateBMR(user)
-        val activityLevel = UserActivityLevel.valueOf(user.activityLevel)
+        val activityLevel = UserActivityLevel.fromString(user.activityLevel)
         return bmr * activityLevel.multiplier
     }
 

@@ -16,7 +16,8 @@ import java.util.Date
 import java.util.Locale
 
 class RecentLogsAdapter(
-    private val onItemClick: (FoodLog) -> Unit
+    private val onItemClick: (FoodLog) -> Unit,
+    private val onDeleteClick: (FoodLog) -> Unit
 ) : ListAdapter<FoodLog, RecentLogsAdapter.FoodLogViewHolder>(FOOD_LOG_DIFF_CALLBACK) {
 
     private var savedFoodIds: Set<String> = emptySet()
@@ -48,6 +49,11 @@ class RecentLogsAdapter(
             itemView.setOnClickListener {
                 if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
                     getItem(bindingAdapterPosition)?.let { log -> onItemClick(log) }
+                }
+            }
+            binding.btnDeleteFood.setOnClickListener {
+                if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                    getItem(bindingAdapterPosition)?.let { log -> onDeleteClick(log) }
                 }
             }
         }

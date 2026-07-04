@@ -31,29 +31,29 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:indicatorColor="@color/green"
-            app:indicatorSize="54dp"
+            app:indicatorSize="42dp"
             app:trackColor="?attr/colorSurfaceContainerHigh"
-            app:trackCornerRadius="4dp"
+            app:trackCornerRadius="3dp"
             app:trackThickness="3dp"
             tools:progress="60" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_date"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-            app:cardCornerRadius="22dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeColor="?attr/colorOutlineVariant"
             app:strokeWidth="0dp">
 
             <TextView
                 android:id="@+id/textView_day_of_month"
-                style="@style/TextAppearance.Material3.TitleSmall"
+                style="@style/TextAppearance.Material3.LabelMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

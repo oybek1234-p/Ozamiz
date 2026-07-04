@@ -54,7 +54,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="Vaznim Premium"
+                    android:text="Premium"
                     android:textColor="?colorOnSurface"
                     android:textSize="24sp" />
 
@@ -64,9 +64,9 @@
                 android:id="@+id/layout_benefits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="12dp"
                 app:cardBackgroundColor="?colorSurfaceContainer"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
 
@@ -74,15 +74,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="20dp">
+                    android:padding="16dp">
 
-                    <!-- Benefits Item 1 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingVertical="8dp">
+                        android:paddingVertical="6dp">
 
                         <ImageView
                             android:layout_width="20dp"
@@ -95,79 +94,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="AI ovqat tahlili"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <!-- Benefits Item 2 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingVertical="8dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/check_ic"
-                            app:tint="?colorPrimary" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:text="AI dietolog maslahat beradi"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <!-- Benefits Item 3 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingVertical="8dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/check_ic"
-                            app:tint="?colorPrimary" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:text="Suv va mashq kuzatuvi"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-
-                    <!-- Benefits Item 4 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingVertical="8dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/check_ic"
-                            app:tint="?colorPrimary" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:text="Darsliklar to'liq ochiladi"
+                            android:text="@string/premium_sheet_benefit_dietologist"
                             android:textColor="?colorOnSurface"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -177,7 +104,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:paddingVertical="8dp">
+                        android:paddingVertical="6dp">
 
                         <ImageView
                             android:layout_width="20dp"
@@ -190,7 +117,30 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
                             android:layout_weight="1"
-                            android:text="Haftalik tahlil va hisobotlar"
+                            android:text="@string/premium_sheet_benefit_analysis"
+                            android:textColor="?colorOnSurface"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingVertical="6dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/check_ic"
+                            app:tint="?colorPrimary" />
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_weight="1"
+                            android:text="@string/premium_sheet_benefit_recommendations"
                             android:textColor="?colorOnSurface"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -219,7 +169,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="Kutilmoqda..."
+                    android:text="24 soat ichida chekni tekshirib, premiumga o'tkazamiz"
                     android:textColor="?colorOnSurface"
                     android:textSize="18sp" />
             </LinearLayout>
@@ -313,6 +263,37 @@
                                     android:text="— sum"
                                     android:textColor="?colorPrimary"
                                     android:textSize="16sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:visibility="gone"
+                                android:background="?colorSurfaceContainerLow"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="20dp"
+                                android:paddingVertical="12dp"
+                                android:gravity="center_vertical">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="1 oyda 25kun  har kuni 3 mahal ovqat kiritsangiz, pulingiz 100% qaytariladi!"
+                                    android:textColor="?colorPrimary"
+                                    android:textSize="12sp"
+                                    android:fontFamily="@font/roboto_medium" />
+
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btn_refund_terms"
+                                    style="@style/Widget.Material3.Button.TextButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Shartlar"
+                                    android:textSize="12sp"
+                                    android:minWidth="0dp"
+                                    android:paddingHorizontal="8dp"
+                                    android:textColor="?colorOnSurfaceVariant" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -471,13 +452,6 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_close"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="54dp"
-                    android:text="@string/tushunarli"
-                    app:cornerRadius="16dp" />
             </LinearLayout>
 
         </LinearLayout>

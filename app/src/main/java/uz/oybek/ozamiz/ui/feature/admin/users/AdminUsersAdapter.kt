@@ -10,6 +10,7 @@ import com.bumptech.glide.request.RequestOptions
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.ItemAdminUserBinding
 import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.utils.formatLastSeen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,13 +59,7 @@ class AdminUsersAdapter(private val onUserClicked: (User) -> Unit) :
             val format = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
             return format.format(date)
         }
-        
-        private fun formatLastSeen(time: Long): String {
-            if (time == 0L) return "Online"
-            val date = Date(time)
-            val format = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-            return "Oxirgi faollik: " + format.format(date)
-        }
+
     }
 
     class UserDiffCallback : DiffUtil.ItemCallback<User>() {

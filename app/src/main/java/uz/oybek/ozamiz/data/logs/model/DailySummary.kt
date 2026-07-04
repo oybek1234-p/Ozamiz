@@ -10,7 +10,8 @@ data class DailySummary(
     val consumedProtein: Double = 0.0,
     val consumedCarbs: Double = 0.0,
     val consumedFat: Double = 0.0,
+    val mealsCount: Int = 0,
     val timestamp: Long = 0L
 ) {
-    constructor() : this(0, 0, 0, 0.0, 0.0, 0.0, 0L)
+    constructor() : this(0, 0, 0, 0.0, 0.0, 0.0, 0, 0L)
 }

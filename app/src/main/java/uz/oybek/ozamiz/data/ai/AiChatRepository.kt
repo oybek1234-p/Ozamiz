@@ -7,24 +7,28 @@ import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import uz.oybek.ozamiz.data.food.analyzer.FoodAnalyzerConfig
-import uz.oybek.ozamiz.data.utils.DataWrapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import uz.oybek.ozamiz.data.logs.model.DailyLogs
-import uz.oybek.ozamiz.data.logs.model.DailySummary
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.data.ai.model.ChatMessage
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.firebase.firestore
 import uz.oybek.ozamiz.data.firebase.aiChatsCollection
+import uz.oybek.ozamiz.data.firebase.firestore
+import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzerConfig
 import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.utils.DataWrapper
 
 object AiChatRepository {
 
-    suspend fun saveMessageToFirestore(chatId: String, text: String, isUser: Boolean, timestamp: Long): Any? = withContext(Dispatchers.IO) {
+    private var chatHistory = mutableListOf<Content>()
+
+    suspend fun saveMessageToFirestore(
+        chatId: String,
+        text: String,
+        isUser: Boolean,
+        timestamp: Long
+    ): Any? = withContext(Dispatchers.IO) {
         try {
             val chatRef = firestore.aiChatsCollection.document(chatId)
             val msgRef = chatRef.collection(FirebasePaths.Firestore.MESSAGES).document()
@@ -37,29 +41,30 @@ object AiChatRepository {
                 ),
                 SetOptions.merge()
             ).await()
-            msgRef.set(mapOf(
-                ChatMessage::id.name to msgRef.id,
-                ChatMessage::text.name to text,
-                ChatMessage::isUser.name to isUser,
-                ChatMessage::timestamp.name to timestamp
-            )).await()
-            
+            msgRef.set(
+                mapOf(
+                    ChatMessage::id.name to msgRef.id,
+                    ChatMessage::text.name to text,
+                    ChatMessage::isUser.name to isUser,
+                    ChatMessage::timestamp.name to timestamp
+                )
+            ).await()
+
             chatRef.update("lastModified", timestamp).await()
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 
-    private val model by lazy {
+    private fun getModel(systemInstructionText: String) =
         Firebase.ai.generativeModel(
             modelName = FoodAnalyzerConfig.MODEL_NAME,
             generationConfig = generationConfig {
                 temperature = 0.7f
                 topK = 40
                 topP = 0.95f
-            }
+            },
+            systemInstruction = content { text(systemInstructionText) }
         )
-    }
-
-    private var chatHistory = mutableListOf<Content>()
 
     fun clearHistory() {
         chatHistory.clear()
@@ -69,62 +74,32 @@ object AiChatRepository {
         chatHistory.clear()
         messages.forEach { msg ->
             val role = if (msg.isUser) "user" else "model"
-            // To prevent empty strings from throwing exception
-            val safeText = if (msg.text.isBlank()) "..." else msg.text
+            val safeText = msg.text.ifBlank { "..." }
             chatHistory.add(content(role = role) { text(safeText) })
         }
     }
 
-    suspend fun sendMessage(
-        message: String,
-        systemInstruction: String
-    ): DataWrapper<String> = withContext(Dispatchers.IO) {
-        try {
-            ensureHistory(systemInstruction)
-
-            val userContent = content(role = "user") { text(message) }
-            val chat = model.startChat(chatHistory)
-            val response = chat.sendMessage(userContent)
-            
-            val responseText = response.text ?: return@withContext DataWrapper.Error("AI javob bera olmadi")
-            
-            chatHistory.add(userContent)
-            chatHistory.add(content(role = "model") { text(responseText) })
-            
-            DataWrapper.Success(responseText)
-        } catch (e: Exception) {
-            DataWrapper.Error(e.localizedMessage ?: "Xatolik yuz berdi")
-        }
-    }
-
     fun sendMessageStream(
-        message: String,
-        systemInstruction: String
+        userMessage: String
     ): Flow<DataWrapper<String>> = flow {
         try {
-            ensureHistory(systemInstruction)
-            val userContent = content(role = "user") { text(message) }
-            val chat = model.startChat(chatHistory)
+            val systemPrompt = AiPromptBuilder.buildSystemPrompt()
+            val userContent = content(role = "user") { text(userMessage) }
+            val modelInstance = getModel(systemPrompt)
+            val chat = modelInstance.startChat(chatHistory)
             val stream = chat.sendMessageStream(userContent)
-            
+
             var fullResponse = ""
             stream.collect { chunk ->
                 val chunkText = chunk.text ?: ""
                 fullResponse += chunkText
                 emit(DataWrapper.Success(fullResponse))
             }
-            
+
             chatHistory.add(userContent)
             chatHistory.add(content(role = "model") { text(fullResponse) })
         } catch (e: Exception) {
             emit(DataWrapper.Error(e.localizedMessage ?: "Xatolik yuz berdi"))
-        }
-    }
-
-    private fun ensureHistory(systemInstruction: String) {
-        if (chatHistory.isEmpty()) {
-            chatHistory.add(content(role = "user") { text(systemInstruction) })
-            chatHistory.add(content(role = "model") { text("Tushunarlu. Men tayyorman!") })
         }
     }
 }

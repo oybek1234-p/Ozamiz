@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.home
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -15,6 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import android.graphics.Typeface
 
 class DateScrollerAdapter(
     private val onDateSelected: (Date) -> Unit
@@ -121,7 +123,13 @@ class DateScrollerAdapter(
         private val onPrimary = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0)
         private val surfaceLow = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow, 0)
         private val onSurface = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0)
+        private val onSurfaceVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant, 0)
+        private val surfaceVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceVariant, Color.parseColor("#E5E5E5"))
+        private val surface = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurface, 0)
         private val outlineVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, 0)
+        
+        private val secondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondaryContainer, 0)
+        private val onSecondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSecondaryContainer, 0)
         
         private val greenColor = ContextCompat.getColor(context, R.color.green)
         private val yellowColor = com.google.android.material.color.MaterialColors.getColor(context, R.attr.customYellow, android.graphics.Color.YELLOW)
@@ -130,26 +138,29 @@ class DateScrollerAdapter(
             val isSelected = isSameDay(date, selectedDate)
             val isToday = isSameDay(date, Date())
 
+            binding.textViewDayOfWeek.visibility = android.view.View.GONE
             binding.textViewDayOfWeek.text =
                 dayFormat.format(date).replaceFirstChar { it.uppercase() }
             binding.textViewDayOfMonth.text = dateFormat.format(date)
 
             updateProgress(date)
-            
+
             // Selection Logic
             if (isSelected) {
                 binding.cardDate.setCardBackgroundColor(primaryColor)
-                binding.textViewDayOfWeek.setTextColor(primaryColor)
+                binding.textViewDayOfWeek.setTextColor(onPrimary)
+                binding.textViewDayOfWeek.typeface = Typeface.DEFAULT_BOLD
                 binding.textViewDayOfMonth.setTextColor(onPrimary)
                 binding.cardDate.strokeWidth = 0
             } else {
                 binding.cardDate.setCardBackgroundColor(surfaceLow)
-                binding.textViewDayOfWeek.setTextColor(onSurface)
-                binding.textViewDayOfMonth.setTextColor(onSurface)
+                binding.textViewDayOfWeek.setTextColor(onSurfaceVariant)
+                binding.textViewDayOfWeek.typeface = Typeface.DEFAULT
+                binding.textViewDayOfMonth.setTextColor(onSurfaceVariant)
                 // If today, maybe a border? Or just the progress ring is enough distinction
                 if (isToday) {
                     binding.cardDate.strokeWidth = 2
-                    binding.cardDate.strokeColor = primaryColor
+                    binding.cardDate.strokeColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, 0)
                 } else {
                     binding.cardDate.strokeWidth = 0
                 }
@@ -161,9 +172,18 @@ class DateScrollerAdapter(
             val summary = dailySummaries[dateKey]
             val consumed = summary?.consumedCalories ?: 0
             val max = if (targetCalories > 0) targetCalories else 1
-            val progress = (consumed.toFloat() / max * 100).toInt()
-            val isExceeded = consumed > targetCalories
-            val isCompleted = consumed == targetCalories || (!isExceeded && consumed >= targetCalories * 0.95)
+            var progress = (consumed.toFloat() / max * 100).toInt()
+            
+            val todayMidnight = getMidnight(Date())
+            val currentMidnight = getMidnight(date)
+            val isPast = currentMidnight.before(todayMidnight)
+            val isExceeded = consumed > targetCalories + 100
+
+            if (isPast && progress >= 50 && !isExceeded) {
+                progress = 100
+            }
+            
+            val isCompleted = consumed >= targetCalories - 100 && consumed <= targetCalories + 100 || (isPast && progress == 100 && !isExceeded)
 
             binding.progressRing.max = 100
             binding.progressRing.setProgressCompat(if (isExceeded) 100 else progress, true)

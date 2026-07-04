@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.core.widget.doAfterTextChanged
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAdminUsersListBinding
@@ -37,6 +38,9 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
     private fun setupFilters(bind: FragmentAdminUsersListBinding) {
         bind.chipPremiumOnly.setOnCheckedChangeListener { _, isChecked ->
             viewModel.togglePremiumFilter(isChecked)
+        }
+        bind.editTextSearch.doAfterTextChanged { text ->
+            viewModel.setSearchQuery(text?.toString().orEmpty())
         }
     }
 

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.points.LevelManager
+import uz.oybek.ozamiz.data.utils.formatLastSeen
 import uz.oybek.ozamiz.databinding.FragmentCommunityProfileBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 
@@ -86,13 +87,14 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
 
     private fun setupScrollListener(bind: FragmentCommunityProfileBinding, userId: String) {
         // The layout has a NestedScrollView that contains the ConstraintLayout
-        bind.root.findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScrollView)?.let { scrollView ->
-            scrollView.setOnScrollChangeListener { v: androidx.core.widget.NestedScrollView, _, scrollY, _, _ ->
-                if (scrollY == v.getChildAt(0).measuredHeight - v.measuredHeight) {
-                    loadMorePosts(userId)
+        bind.root.findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScrollView)
+            ?.let { scrollView ->
+                scrollView.setOnScrollChangeListener { v: androidx.core.widget.NestedScrollView, _, scrollY, _, _ ->
+                    if (scrollY == v.getChildAt(0).measuredHeight - v.measuredHeight) {
+                        loadMorePosts(userId)
+                    }
                 }
-            }
-        } ?: run {
+            } ?: run {
             // Fallback if ID is different or not found
             (bind.rvProfilePosts.parent?.parent as? androidx.core.widget.NestedScrollView)?.setOnScrollChangeListener { v: androidx.core.widget.NestedScrollView, _, scrollY, _, _ ->
                 if (scrollY == v.getChildAt(0).measuredHeight - v.measuredHeight) {
@@ -102,7 +104,11 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
         }
     }
 
-    private fun loadInitialData(bind: FragmentCommunityProfileBinding, userId: String, initialUserName: String) {
+    private fun loadInitialData(
+        bind: FragmentCommunityProfileBinding,
+        userId: String,
+        initialUserName: String
+    ) {
         viewLifecycleOwner.lifecycleScope.launch {
             bind.progressLoading.isVisible = true
             bind.layoutStats.isVisible = false
@@ -119,40 +125,29 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
                     val targetWeight = user.targetWeight
                     val streakInfo = user.streakInfo
                     val lastSeenTime = user.lastSeenTime
-                    
+
                     bind.tvUserNameProfile.text = name.ifEmpty { initialUserName }
                     bind.tvStreak.text = "${streakInfo?.activeDays ?: 0} kun"
                     bind.tvCardStreak.text = "${streakInfo?.activeDays ?: 0} kun"
                     bind.tvPoints.text = "$points ball"
-                    
-                    if (lastSeenTime > 0) {
-                        val diff = System.currentTimeMillis() - lastSeenTime
-                        val hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(diff)
-                        val days = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(diff)
-                        val timeStr = when {
-                            days > 0 -> "$days ${requireContext().getString(R.string.kun_oldin)}"
-                            hours > 0 -> "$hours ${requireContext().getString(R.string.sohat_oldin)}"
-                            else -> requireContext().getString(R.string.yaqinda)
-                        }
-                        bind.tvLastActive.text = "Onlayn: $timeStr"
-                        bind.tvLastActive.isVisible = true
-                    } else {
-                        bind.tvLastActive.isVisible = false
-                    }
-                    
-                fun Double.fmt(): String = if (this % 1.0 == 0.0) this.toInt().toString() else String.format(java.util.Locale.US, "%.1f", this)
-                
-                bind.tvStartWeight.text = if (startWeight > 0) "${startWeight.fmt()} kg" else "--"
-                bind.tvCurrentWeight.text = if (weight > 0) "${weight.fmt()} kg" else "--"
-                bind.tvTargetWeight.text = if (targetWeight != null) "${targetWeight.fmt()} kg" else "--"
 
-                if (startWeight > weight && weight > 0) {
-                    val lost = startWeight - weight
-                    bind.tvOuterWeightLoss.text = "${lost.fmt()} kilogram ozildi"
-                    bind.tvOuterWeightLoss.isVisible = true
-                } else {
-                    bind.tvOuterWeightLoss.isVisible = false
-                }
+                    bind.tvLastActive.text = formatLastSeen(lastSeenTime)
+                    fun Double.fmt(): String = if (this % 1.0 == 0.0) this.toInt()
+                        .toString() else String.format(java.util.Locale.US, "%.1f", this)
+
+                    bind.tvStartWeight.text =
+                        if (startWeight > 0) "${startWeight.fmt()} kg" else "--"
+                    bind.tvCurrentWeight.text = if (weight > 0) "${weight.fmt()} kg" else "--"
+                    bind.tvTargetWeight.text =
+                        if (targetWeight != null) "${targetWeight.fmt()} kg" else "--"
+
+                    if (startWeight > weight && weight > 0) {
+                        val lost = startWeight - weight
+                        bind.tvOuterWeightLoss.text = "${lost.fmt()} kilogram ozildi"
+                        bind.tvOuterWeightLoss.isVisible = true
+                    } else {
+                        bind.tvOuterWeightLoss.isVisible = false
+                    }
 
                     val level = LevelManager.getCurrentLevel(points)
                     bind.tvProfileLevel.text = "${level.emoji} ${level.name}"

@@ -16,9 +16,6 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             app:title="Email orqali kirish" />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -28,10 +25,7 @@
             android:layout_marginHorizontal="@dimen/dimen_24"
             android:layout_marginTop="@dimen/dimen_24"
             app:helperText="Misol: foydalanuvchi@gmail.com"
-            app:hintEnabled="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView">
+            app:hintEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -49,10 +43,7 @@
             android:layout_marginTop="@dimen/dimen_24"
             app:helperText="Parol kamida 6 ta belgidan iborat"
             app:hintEnabled="false"
-            app:passwordToggleEnabled="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView">
+            app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -68,15 +59,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/dimen_24"
-            android:layout_marginBottom="160dp"
             android:enabled="true"
             android:text="@string/davom_etish"
             app:icon="@drawable/arrow_right"
-            app:iconGravity="textEnd"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:iconGravity="textEnd" />
 
         <TextView
             android:id="@+id/boglanish_button"

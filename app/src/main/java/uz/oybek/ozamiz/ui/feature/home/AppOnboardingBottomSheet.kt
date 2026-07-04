@@ -1,38 +1,53 @@
 package uz.oybek.ozamiz.ui.feature.home
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import uz.oybek.ozamiz.databinding.BottomSheetAppOnboardingBinding
 
 class AppOnboardingBottomSheet(
-    private val onComplete: () -> Unit
+    private val text: String,
+    private val buttonText: String,
+    private val title: String = "Xush kelibsiz! ✨",
+    private val onButtonClick: () -> Unit,
+    private val onLaterClick: (() -> Unit)? = null
 ) : BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetAppOnboardingBinding? = null
     private val binding get() = _binding!!
 
-    private var currentPage = 0
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, uz.oybek.ozamiz.R.style.BottomSheetDialogTheme)
+        isCancelable = true
+    }
 
-    private val pages = listOf(
-        OnboardingPage(
-            "👋",
-            "Xush kelibsiz!",
-            "Ozamiz ilovasiga xush kelibsiz. Bu yerda siz sog'lom ozish va ovqatlanishni o'rganasiz."
-        ),
-        OnboardingPage(
-            "⚖️",
-            "Kaloriya nima?",
-            "Kaloriya - bu ovqatdan oladigan quvvatingiz. Ozish uchun siz sarflagandan ko'ra kamroq kaloriya yeyishingiz kerak."
-        ),
-        OnboardingPage(
-            "🚀",
-            "Qanday boshlash kerak?",
-            "Yegan har bir ovqatingizni kiritib boring. Buning uchun 'Plus' tugmasini bosing va nima yeganingizni yozing."
-        )
-    )
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as com.google.android.material.bottomsheet.BottomSheetDialog
+        dialog.setOnShowListener {
+            val bottomSheet = dialog.findViewById<View>(
+                com.google.android.material.R.id.design_bottom_sheet
+            )
+            bottomSheet?.let { sheet ->
+                val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+                behavior.skipCollapsed = true
+                behavior.peekHeight = com.google.android.material.bottomsheet.BottomSheetBehavior.PEEK_HEIGHT_AUTO
+
+                ViewCompat.setOnApplyWindowInsetsListener(sheet) { v, insets ->
+                    val navigationBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+                    v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, navigationBars.bottom)
+                    insets
+                }
+            }
+        }
+        return dialog
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,37 +60,28 @@ class AppOnboardingBottomSheet(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        updatePage()
+
+        binding.textEmoji.text = "✨"
+        binding.textTitle.text = title
+        binding.textDescription.text = text
+        binding.btnNext.text = buttonText
 
         binding.btnNext.setOnClickListener {
-            if (currentPage < pages.size - 1) {
-                currentPage++
-                updatePage()
-            } else {
-                onComplete()
-                dismiss()
-            }
+            onButtonClick()
+            dismiss()
         }
-    }
 
-    private fun updatePage() {
-        val page = pages[currentPage]
-        binding.textEmoji.text = page.emoji
-        binding.textTitle.text = page.title
-        binding.textDescription.text = page.description
-        binding.btnNext.text = if (currentPage == pages.size - 1) "Boshlash" else "Davom etish"
+        binding.btnLater.visibility = if (onLaterClick != null) View.VISIBLE else View.GONE
+        binding.btnLater.setOnClickListener {
+            onLaterClick?.invoke()
+            dismiss()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-    data class OnboardingPage(
-        val emoji: String,
-        val title: String,
-        val description: String
-    )
 
     companion object {
         const val TAG = "AppOnboardingBottomSheet"

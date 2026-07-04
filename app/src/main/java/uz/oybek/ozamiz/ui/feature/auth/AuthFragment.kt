@@ -180,7 +180,7 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
             toolbar.setUpBackButton(this@AuthFragment)
             toolbar.isVisible = false
 
-            Glide.with(requireContext()).load(R.drawable.splash_photo).into(photo)
+            Glide.with(requireContext()).load(R.drawable.splash_icon).into(photo)
             gmailButton.setOnClickListener {
                 loginGoogle()
             }

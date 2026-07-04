@@ -1,33 +1,25 @@
 package uz.oybek.ozamiz.ui.feature.streak
 
-import uz.oybek.ozamiz.data.user.UserRepository
-import uz.oybek.ozamiz.data.user.model.UserSortType.TOP_STREAK
-
 import android.app.Dialog
 import android.os.Build
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.databinding.DialogStreakInfoBinding
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
-import java.util.Locale
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
-import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.user.model.UserSortType.TOP_STREAK
+import uz.oybek.ozamiz.databinding.DialogStreakInfoBinding
 
 class StreakInfoSheet : BottomSheetDialogFragment() {
 
@@ -40,18 +32,27 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         const val TAG = "StreakInfoSheet"
         private const val ARG_STREAK_INFO = "streak_info_arg"
 
-        fun newInstance(streakInfo: StreakInfo, isNewAction: Boolean = false): StreakInfoSheet {
+        fun newInstance(
+            streakInfo: StreakInfo,
+            isNewAction: Boolean = false,
+            returnedAfterManyDays: Boolean = false
+        ): StreakInfoSheet {
             val fragment = StreakInfoSheet()
-            fragment.arguments = androidx.core.os.bundleOf(
+            fragment.arguments = bundleOf(
                 ARG_STREAK_INFO to streakInfo,
-                "is_new_action" to isNewAction
+                "is_new_action" to isNewAction,
+                "returned_after_many_days" to returnedAfterManyDays
             )
             return fragment
         }
 
-        fun show(fragmentManager: androidx.fragment.app.FragmentManager, isNewAction: Boolean = false) {
+        fun show(
+            fragmentManager: androidx.fragment.app.FragmentManager,
+            isNewAction: Boolean = false,
+            returnedAfterManyDays: Boolean = false
+        ) {
             val streakInfo = UserRepository.user.streakInfo ?: return
-            newInstance(streakInfo, isNewAction).show(fragmentManager, TAG)
+            newInstance(streakInfo, isNewAction, returnedAfterManyDays).show(fragmentManager, TAG)
         }
     }
 
@@ -74,11 +75,17 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
             val bottomSheet = dialog.findViewById<FrameLayout>(
                 com.google.android.material.R.id.design_bottom_sheet
             )
-            bottomSheet?.let {
-                val behavior = BottomSheetBehavior.from(it)
+            bottomSheet?.let { sheet ->
+                val behavior = BottomSheetBehavior.from(sheet)
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
                 behavior.skipCollapsed = true
                 behavior.peekHeight = BottomSheetBehavior.PEEK_HEIGHT_AUTO
+
+                androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(sheet) { v, insets ->
+                    val navigationBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars())
+                    v.setPadding(v.paddingLeft, v.paddingTop, v.paddingRight, navigationBars.bottom)
+                    insets
+                }
             }
         }
         return dialog
@@ -101,9 +108,10 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         }
 
         val isNewAction = arguments?.getBoolean("is_new_action", false) ?: false
+        val returnedAfterManyDays = arguments?.getBoolean("returned_after_many_days", false) ?: false
 
         streakInfo?.let { info ->
-            setupViews(info)
+            setupViews(info, isNewAction, returnedAfterManyDays)
             if (isNewAction) {
                 animateStreakIncrement()
             }
@@ -121,13 +129,14 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
     private fun setupTopUsersList() {
         val topUsersAdapter = TopStreakUsersAdapter { user ->
             dismiss()
-            val bundle = bundleOf("userId" to user.uid, "userName" to user.name.ifBlank { "Foydalanuvchi" })
+            val bundle =
+                bundleOf("userId" to user.uid, "userName" to user.name.ifBlank { "Foydalanuvchi" })
             findNavController(this).navigate(R.id.communityProfileFragment, bundle)
         }
         binding.recyclerTopUsers.apply {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
-                requireContext(), 
-                androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, 
+                requireContext(),
+                androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
                 false
             )
             adapter = topUsersAdapter
@@ -149,7 +158,8 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
             binding.recyclerTopUsers.visibility = View.VISIBLE
 
             result.onSuccess { list ->
-                adapter.submitList(list.filter { (it.streakInfo?.currentStreak ?: 0) >= 0 }.take(10))
+                adapter.submitList(list.filter { (it.streakInfo?.currentStreak ?: 0) >= 0 }
+                    .take(10))
             }.onFailure {
                 // Ignore gracefully
             }
@@ -159,30 +169,31 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
     private fun animateStreakIncrement() {
         val finalStreak = streakInfo?.currentStreak ?: return
         if (finalStreak <= 0) return
-        
+
         val startStreak = finalStreak - 1
-        binding.textStreakMainCount.text = startStreak.toString()
-        
-        binding.textStreakMainCount.postDelayed({
+        _binding?.textStreakMainCount?.text = startStreak.toString()
+
+        _binding?.textStreakMainCount?.postDelayed({
+            if (_binding == null) return@postDelayed
             android.animation.ValueAnimator.ofInt(startStreak, finalStreak).apply {
                 duration = 1000
                 addUpdateListener { animator ->
-                    binding.textStreakMainCount.text = animator.animatedValue.toString()
+                    _binding?.textStreakMainCount?.text = animator.animatedValue.toString()
                 }
                 addListener(object : android.animation.AnimatorListenerAdapter() {
                     override fun onAnimationStart(animation: android.animation.Animator) {
-                        binding.textStreakMainCount.animate()
-                            .scaleX(1.3f)
-                            .scaleY(1.3f)
-                            .setDuration(500)
-                            .withEndAction {
-                                binding.textStreakMainCount.animate()
-                                    .scaleX(1.0f)
-                                    .scaleY(1.0f)
-                                    .setDuration(500)
-                                    .start()
+                        _binding?.textStreakMainCount?.animate()
+                            ?.scaleX(1.3f)
+                            ?.scaleY(1.3f)
+                            ?.setDuration(500)
+                            ?.withEndAction {
+                                _binding?.textStreakMainCount?.animate()
+                                    ?.scaleX(1.0f)
+                                    ?.scaleY(1.0f)
+                                    ?.setDuration(500)
+                                    ?.start()
                             }
-                            .start()
+                            ?.start()
                     }
                 })
                 start()
@@ -190,19 +201,38 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         }, 500)
     }
 
-    private fun setupViews(info: StreakInfo) {
-        // Main Count
+    private fun setupViews(info: StreakInfo, isNewAction: Boolean, returnedAfterManyDays: Boolean) {
         binding.textStreakMainCount.text = info.currentStreak.toString()
-        
-        // Best Streak
+
         binding.textBestStreak.text = info.bestStreak.toString()
 
-        // Active Days
         binding.textTotalActiveDays.text = info.activeDays.toString()
 
-        // Active Weeks - kamida 1 hafta
         val weeks = maxOf(1, (info.activeDays + 6) / 7)
         binding.textActiveWeeks.text = "$weeks Hafta"
+
+        if (isNewAction) {
+            binding.textStreakSubtitle.visibility = View.VISIBLE
+            if (returnedAfterManyDays) {
+                binding.textStreakSubtitle.text = "Qaytganingiz bilan tabriklayman!"
+            } else {
+                binding.textStreakSubtitle.text = "Birinchi qadam bajarildi!"
+            }
+        } else {
+            binding.textStreakSubtitle.visibility = View.GONE
+        }
+
+        binding.layoutTopUsersContainer.visibility = View.GONE
+
+        val isActive = uz.oybek.ozamiz.data.streak.StreakManager.isStreakActive(info)
+        if (isActive) {
+            binding.lottieStreakFire.alpha = 1.0f
+            binding.lottieStreakFire.playAnimation()
+            animateFire(binding.lottieStreakFire)
+        } else {
+            binding.lottieStreakFire.alpha = 0.3f
+            binding.lottieStreakFire.pauseAnimation()
+        }
     }
 
     private fun animateFire(view: View, scale: Float = 1.05f) {
@@ -216,7 +246,7 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
                     .scaleY(1.0f)
                     .setDuration(1000)
                     .withEndAction {
-                         if (_binding != null) animateFire(view, scale)
+                        if (_binding != null) animateFire(view, scale)
                     }
                     .start()
             }

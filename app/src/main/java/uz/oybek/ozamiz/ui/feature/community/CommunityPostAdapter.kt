@@ -59,8 +59,9 @@ class CommunityPostAdapter(
             binding.tvPremiumStatus.isVisible = post.isPremiumUser && showPremiumBadge
             if (post.isPremiumUser && showPremiumBadge) {
                 binding.tvPremiumStatus.text = "PREMIUM"
+                binding.tvPremiumStatus.setTextColor(android.graphics.Color.parseColor("#2E7D32"))
                 binding.tvPremiumStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#FFD700")
+                    android.graphics.Color.parseColor("#E8F5E9")
                 )
             }
 
@@ -68,14 +69,17 @@ class CommunityPostAdapter(
             val isFoodPost = post.type == FOOD
             binding.tvFoodCalories.isVisible = isFoodPost && post.calories > 0
             if (isFoodPost) {
+                val p = post.protein?.toInt() ?: 0
+                val c = post.carbs?.toInt() ?: 0
+                val f = post.fat?.toInt() ?: 0
                 binding.tvFoodName.text = post.foodName.ifBlank { post.title }
-                binding.tvFoodCalories.text = "${post.calories} kkal"
+                binding.tvFoodCalories.text = "${post.calories} kkal - $p oq, $c ug, $f yog'"
             } else {
                 binding.tvFoodName.text = post.title
             }
 
-            binding.tvLikesCount.text = post.likesCount.toString()
-            binding.tvViewsCount.text = "${post.viewsCount} ko'rdi"
+            binding.layoutViews.isVisible = post.viewsCount > 0
+            binding.tvViewsCount.text = post.viewsCount.toString()
 
             var description = if (post.description.isNotEmpty()) post.description else post.comment
             if (isFoodPost && description != null) {
@@ -131,12 +135,13 @@ class CommunityPostAdapter(
             fun updateLikeUI(liked: Boolean, count: Int) {
                 if (liked) {
                     binding.imgLike.setImageResource(R.drawable.like_active_ic)
-                    binding.imgLike.setColorFilter(binding.root.context.getColor(R.color.red))
+                    binding.imgLike.setColorFilter(binding.root.context.getColor(R.color.likeColor))
                 } else {
                     binding.imgLike.setImageResource(R.drawable.like_ic)
                     binding.imgLike.setColorFilter(binding.root.context.getColor(R.color.grey))
                 }
                 binding.tvLikesCount.text = count.toString()
+                binding.tvLikesCount.isVisible = count > 0
             }
 
             updateLikeUI(isLiked, currentLikes)
@@ -146,6 +151,22 @@ class CommunityPostAdapter(
                 isLiked = !isLiked
                 currentLikes = if (isLiked) currentLikes + 1 else currentLikes - 1
                 updateLikeUI(isLiked, currentLikes)
+                
+                binding.imgLike.scaleX = 0.8f
+                binding.imgLike.scaleY = 0.8f
+                binding.imgLike.animate()
+                    .scaleX(1.2f)
+                    .scaleY(1.2f)
+                    .setDuration(150)
+                    .withEndAction {
+                        binding.imgLike.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(100)
+                            .start()
+                    }
+                    .start()
+
                 onLikeClick(post.id)
             }
 

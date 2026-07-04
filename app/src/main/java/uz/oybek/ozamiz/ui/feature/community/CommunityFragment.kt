@@ -13,10 +13,18 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentCommunityBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
+import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.WEIGHT_LOSS
+import uz.oybek.ozamiz.data.user.model.UserSortType
 
 class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
-    private val viewModel: CommunityViewModel by viewModels()
+    private val postsViewModel: CommunityViewModel by viewModels()
+    private val usersViewModel: CommunityUsersViewModel by viewModels()
+
+    private lateinit var postsAdapter: CommunityPostAdapter
+    private lateinit var usersAdapter: CommunityUsersAdapter
+    private var lastSelectedChipId: Int = R.id.chipAll
 
     init {
         showBottomSheet = true
@@ -31,8 +39,27 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
     override fun viewCreated(bind: FragmentCommunityBinding) {
         setupToolbar()
-        setupViewPager()
+        setupRecyclerViews()
+        setupSwipeRefresh()
+        setupFilters()
+        restoreFilterState()
+        observeViewModel()
         observeNotifications()
+    }
+
+    private fun restoreFilterState() {
+        val chipToCheck = lastSelectedChipId
+        if (chipToCheck != binding.chipGroupFilter.checkedChipId) {
+            binding.chipGroupFilter.check(chipToCheck)
+        }
+        val isUsers = chipToCheck == R.id.chipUsers
+        binding.rvPosts.isVisible = !isUsers
+        binding.rvUsers.isVisible = isUsers
+        if (isUsers) {
+            usersAdapter.submitList(usersViewModel.state.value.users)
+        } else {
+            postsAdapter.submitList(postsViewModel.state.value.posts)
+        }
     }
 
     private fun setupToolbar() {
@@ -44,35 +71,165 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
         }
     }
 
-    private fun setupViewPager() {
-        val adapter = CommunityTabAdapter(this)
-        binding.viewPager.adapter = adapter
-
-        com.google.android.material.tabs.TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> "Postlar"
-                1 -> "Foydalanuvchilar"
-                else -> null
+    private fun setupRecyclerViews() {
+        postsAdapter = CommunityPostAdapter(
+            onLikeClick = { postId -> postsViewModel.toggleLike(postId) },
+            onUserClick = { userId, userName ->
+                val bundle = Bundle().apply {
+                    putString("userId", userId)
+                    putString("userName", userName)
+                }
+                findNavController().navigate(
+                    R.id.action_communityFragment_to_communityProfileFragment,
+                    bundle
+                )
+            },
+            onViewed = { postId -> postsViewModel.markViewed(postId) },
+            onDeleteClick = { post ->
+                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                    .setTitle("O'chirish")
+                    .setMessage("Haqiqatan ham ushbu postni o'chirmoqchimisiz?")
+                    .setPositiveButton("Ha") { _, _ ->
+                        postsViewModel.deletePost(post.id)
+                    }
+                    .setNegativeButton("Yo'q", null)
+                    .show()
             }
-        }.attach()
+        )
+        binding.rvPosts.adapter = postsAdapter
+        binding.rvPosts.layoutManager = LinearLayoutManager(requireContext())
+
+        binding.rvPosts.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+
+                if (!postsViewModel.state.value.isLoading && !postsViewModel.state.value.isPaging && !postsViewModel.state.value.hasReachedEnd) {
+                    if (totalItemCount <= lastVisibleItem + 2) {
+                        postsViewModel.loadPosts()
+                    }
+                }
+            }
+        })
+
+        usersAdapter = CommunityUsersAdapter { user ->
+            val bundle = Bundle().apply {
+                putString("userId", user.uid)
+                putString("userName", user.name)
+            }
+            findNavController().navigate(
+                R.id.action_communityFragment_to_communityProfileFragment,
+                bundle
+            )
+        }
+        binding.rvUsers.adapter = usersAdapter
+        binding.rvUsers.layoutManager = LinearLayoutManager(requireContext())
+
+        binding.rvUsers.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+
+                if (!usersViewModel.state.value.isLoading && !usersViewModel.state.value.isPaging && !usersViewModel.state.value.hasReachedEnd) {
+                    if (totalItemCount <= lastVisibleItem + 2) {
+                        usersViewModel.loadUsers()
+                    }
+                }
+            }
+        })
     }
 
-    private fun observeNotifications() {
-        viewModel.observeUnReadMessages { count ->
-            binding.tvNotificationBadge.isVisible = count > 0
-            binding.tvNotificationBadge.text = count.toString()
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            val checkedId = binding.chipGroupFilter.checkedChipId
+            if (checkedId == R.id.chipUsers) {
+                usersViewModel.refresh()
+            } else {
+                postsViewModel.refresh()
+            }
         }
     }
 
-    private inner class CommunityTabAdapter(fragment: androidx.fragment.app.Fragment) : 
-        androidx.viewpager2.adapter.FragmentStateAdapter(fragment) {
-        override fun getItemCount(): Int = 2
-        override fun createFragment(position: Int): androidx.fragment.app.Fragment {
-            return when (position) {
-                0 -> CommunityPostsFragment()
-                1 -> CommunityUsersFragment()
-                else -> throw IllegalStateException("Invalid position")
+    private fun setupFilters() {
+        binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
+            if (checkedId == lastSelectedChipId) return@setOnCheckedStateChangeListener
+            lastSelectedChipId = checkedId
+            
+            binding.rvPosts.isVisible = checkedId != R.id.chipUsers
+            binding.rvUsers.isVisible = checkedId == R.id.chipUsers
+
+            when (checkedId) {
+                R.id.chipAll -> {
+                    postsViewModel.setFilter(ALL)
+                    val postsState = postsViewModel.state.value
+                    binding.swipeRefresh.isRefreshing = postsState.isLoading
+                    binding.progressBar.isVisible = postsState.isPaging
+                    binding.tvEmpty.isVisible = !postsState.isLoading && postsState.posts.isEmpty()
+                    binding.tvEmpty.text = getString(R.string.community_empty_posts)
+                }
+                R.id.chipOzganlar -> {
+                    postsViewModel.setFilter(WEIGHT_LOSS)
+                    val postsState = postsViewModel.state.value
+                    binding.swipeRefresh.isRefreshing = postsState.isLoading
+                    binding.progressBar.isVisible = postsState.isPaging
+                    binding.tvEmpty.isVisible = !postsState.isLoading && postsState.posts.isEmpty()
+                    binding.tvEmpty.text = getString(R.string.community_empty_posts)
+                }
+                R.id.chipUsers -> {
+                    usersViewModel.setSortBy(UserSortType.RECENT_ACTIVITY)
+                    val usersState = usersViewModel.state.value
+                    binding.swipeRefresh.isRefreshing = usersState.isLoading
+                    binding.progressBar.isVisible = usersState.isPaging
+                    binding.tvEmpty.isVisible = !usersState.isLoading && usersState.users.isEmpty()
+                    binding.tvEmpty.text = getString(R.string.community_empty_users)
+                }
             }
+        }
+    }
+
+    private fun observeViewModel() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            postsViewModel.state.collect { state ->
+                val isPostFilter = binding.chipGroupFilter.checkedChipId != R.id.chipUsers
+                if (isPostFilter) {
+                    binding.swipeRefresh.isRefreshing = state.isLoading
+                    binding.progressBar.isVisible = state.isPaging
+                    postsAdapter.submitList(state.posts)
+                    binding.tvEmpty.isVisible = !state.isLoading && state.posts.isEmpty()
+                    binding.tvEmpty.text = getString(R.string.community_empty_posts)
+                }
+                state.error?.let {
+                    android.widget.Toast.makeText(requireContext(), it, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            usersViewModel.state.collect { state ->
+                val isUserFilter = binding.chipGroupFilter.checkedChipId == R.id.chipUsers
+                if (isUserFilter) {
+                    binding.swipeRefresh.isRefreshing = state.isLoading
+                    binding.progressBar.isVisible = state.isPaging
+                    usersAdapter.submitList(state.users)
+                    binding.tvEmpty.isVisible = !state.isLoading && state.users.isEmpty()
+                    binding.tvEmpty.text = getString(R.string.community_empty_users)
+                }
+                state.error?.let {
+                    android.widget.Toast.makeText(requireContext(), it, android.widget.Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun observeNotifications() {
+        postsViewModel.observeUnReadMessages { count ->
+            binding.tvNotificationBadge.isVisible = count > 0
+            binding.tvNotificationBadge.text = count.toString()
         }
     }
 }

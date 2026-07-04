@@ -4,6 +4,8 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.streak.StreakInfo
 
 // --- Firebase Instances ---
 val firestore get() = com.google.firebase.firestore.FirebaseFirestore.getInstance()
@@ -56,9 +58,86 @@ inline fun <reified T> QuerySnapshot.toObjectsList(): List<T> {
  * Extension to safely map a DocumentSnapshot to an object, returning null if it fails.
  */
 inline fun <reified T> DocumentSnapshot.toObjectSafe(): T? {
+    if (T::class.java == User::class.java) {
+        return this.toUserSafe() as? T
+    }
     return try {
-        toObject(T::class.java)
+        val obj = toObject(T::class.java)
+        android.util.Log.d("FirestoreExtensions", "Successfully parsed ${T::class.java.simpleName} for document: $id")
+        obj
+    } catch (e: Exception) {
+        android.util.Log.e("FirestoreExtensions", "Error parsing ${T::class.java.simpleName} for document: $id. Data: $data", e)
+        null
+    }
+}
+
+fun DocumentSnapshot.toUserSafe(): User {
+    val u = User()
+    u.uid = id
+    u.name = getString("name") ?: ""
+    u.phoneNumber = getString("phoneNumber") ?: ""
+    u.gmail = getString("gmail") ?: ""
+    u.lastSeenTime = getLong("lastSeenTime") ?: 0L
+    u.unreadMessages = getLong("unreadMessages")?.toInt() ?: getDouble("unreadMessages")?.toInt() ?: 0
+    u.premium = getBoolean("premium") ?: false
+    u.premiumDate = getLong("premiumDate") ?: 0L
+    u.isPremiumYearly = getBoolean("isPremiumYearly") ?: false
+    u.isMonthlyPremium = getBoolean("isMonthlyPremium") ?: false
+    u.gender = getLong("gender")?.toInt() ?: getDouble("gender")?.toInt() ?: -1
+    u.region = getString("region") ?: " "
+    u.age = getLong("age")?.toInt() ?: getDouble("age")?.toInt() ?: -1
+    u.height = getLong("height")?.toInt() ?: getDouble("height")?.toInt() ?: -1
+    u.weight = getDouble("weight") ?: getLong("weight")?.toDouble() ?: -1.0
+    u.targetWeight = getDouble("targetWeight") ?: getLong("targetWeight")?.toDouble()
+    u.startWeight = getDouble("startWeight") ?: getLong("startWeight")?.toDouble()
+    u.goal = getString("goal") ?: ""
+    u.activityLevel = getString("activityLevel") ?: "LIGHTLY_ACTIVE"
+    u.targetCalories = getLong("targetCalories")?.toInt() ?: getDouble("targetCalories")?.toInt() ?: 0
+    u.targetProtein = getLong("targetProtein")?.toInt() ?: getDouble("targetProtein")?.toInt() ?: 0
+    u.targetFat = getLong("targetFat")?.toInt() ?: getDouble("targetFat")?.toInt() ?: 0
+    u.targetCarbs = getLong("targetCarbs")?.toInt() ?: getDouble("targetCarbs")?.toInt() ?: 0
+    u.targetWaterMl = getLong("targetWaterMl")?.toInt() ?: getDouble("targetWaterMl")?.toInt() ?: 2500
+    u.avatarUrl = getString("avatarUrl")
+    u.registerDate = get("registerDate")
+    u.paymentChecking = getBoolean("paymentChecking") ?: false
+    u.paymentCheckPhotoUrl = getString("paymentCheckPhotoUrl")
+    u.admin = getBoolean("admin") ?: false
+    u.scorePoints = getLong("scorePoints")?.toInt() ?: getDouble("scorePoints")?.toInt() ?: 0
+    u.lastTaskDate = getString("lastTaskDate")
+
+    u.problems = try {
+        (get("problems") as? List<*>)?.mapNotNull { it?.toString() }
     } catch (e: Exception) {
         null
     }
+
+    u.completedTaskIds = try {
+        (get("completedTaskIds") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+    } catch (e: Exception) {
+        emptyList()
+    }
+
+    u.streakInfo = try {
+        val streakMap = get("streakInfo") as? Map<*, *>
+        if (streakMap != null) {
+            val lastActionDate = streakMap["lastActionDate"] as? String ?: ""
+            val currentStreak = (streakMap["currentStreak"] as? Number)?.toInt() ?: 0
+            val bestStreak = (streakMap["bestStreak"] as? Number)?.toInt() ?: 0
+            val activeDays = (streakMap["activeDays"] as? Number)?.toInt() ?: 0
+            val streakGoal = (streakMap["streakGoal"] as? Number)?.toInt() ?: 7
+            val activityHistory = (streakMap["activityHistory"] as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+            StreakInfo(
+                lastActionDate = lastActionDate,
+                currentStreak = currentStreak,
+                bestStreak = bestStreak,
+                activeDays = activeDays,
+                streakGoal = streakGoal,
+                activityHistory = activityHistory
+            )
+        } else null
+    } catch (e: Exception) {
+        null
+    }
+
+    return u
 }

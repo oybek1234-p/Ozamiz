@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@drawable/arrow_back"
-        app:title="Foydalanuvchi ma'lumoti" />
+        app:title="@string/admin_user_details_title" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -24,7 +24,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Profile Overview -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,7 +55,7 @@
                     android:layout_marginTop="4dp"
                     android:textColor="?attr/colorOnSurfaceVariant"
                     tools:text="example@gmail.com" />
-                    
+
                 <TextView
                     android:id="@+id/textView_phone"
                     style="@style/TextAppearance.Material3.BodyMedium"
@@ -67,23 +66,13 @@
                     tools:text="+998901234567" />
 
                 <TextView
-                    android:id="@+id/textView_streak"
-                    style="@style/TextAppearance.Material3.BodyMedium"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="?attr/colorPrimary"
-                    android:textStyle="bold"
-                    tools:text="Streak: 5 kun" />
-
-                <TextView
-                    android:id="@+id/textView_last_seen"
+                    android:id="@+id/textView_uid"
                     style="@style/TextAppearance.Material3.BodySmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="2dp"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:text="Oxirgi faollik: Bugun" />
+                    tools:text="UID: 1234567890abcdef" />
             </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider
@@ -91,131 +80,58 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="16dp" />
 
-            <!-- Vertical Action Buttons -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_weight_logs"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Vazn tarixi" />
+                android:text="@string/admin_btn_weight_logs" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_recent_food_logs"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Oxirgi qilingan loglar" />
+                android:text="@string/admin_btn_food_logs" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_delete_profile"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/admin_delete_profile"
+                android:textColor="?attr/colorError" />
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="24dp" />
+                android:layout_marginVertical="16dp" />
 
-            <!-- Edit Profile Section -->
+            <TextView
+                style="@style/TextAppearance.Material3.TitleMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="@string/admin_all_fields_title"
+                android:textColor="?attr/colorOnSurface" />
+
             <LinearLayout
+                android:id="@+id/layout_fields_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                
-                <TextView
-                    style="@style/TextAppearance.Material3.TitleMedium"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:text="Shaxsiy ma'lumotlar"
-                    android:textColor="?attr/colorOnSurface" />
-                    
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_toggle_edit"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tahrirlash" />
-            </LinearLayout>
+                android:orientation="vertical" />
 
-            <!-- Edit Form -->
-            <LinearLayout
-                android:id="@+id/layout_edit_form"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_save_all"
+                style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:text="@string/admin_save_changes"
                 android:visibility="gone"
-                tools:visibility="visible">
-
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/switch_premium"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="Premium statusi" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:hint="Joriy vazn (kg)">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/editText_weight"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberDecimal" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="Maqsadli vazn (kg)">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/editText_target_weight"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberDecimal" />
-                </com.google.android.material.textfield.TextInputLayout>
-                
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="Bo'y (sm)">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/editText_height"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number" />
-                </com.google.android.material.textfield.TextInputLayout>
-                
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:hint="Yosh">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/editText_age"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_save"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Saqlash" />
-            </LinearLayout>
+                tools:visibility="visible" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

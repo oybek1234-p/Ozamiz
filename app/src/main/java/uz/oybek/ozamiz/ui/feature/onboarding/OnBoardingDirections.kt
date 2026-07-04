@@ -18,6 +18,7 @@ object OnBoardingDirections {
     val screensNavList: List<OnBoardingDirection> = listOf(
         OnBoardingDirection.SingleScreen(R.id.genderFragment),
         OnBoardingDirection.SingleScreen(R.id.nameFragment),
+        OnBoardingDirection.SingleScreen(R.id.phoneOnboardFragment),
         OnBoardingDirection.SingleScreen(R.id.goalOnboardFragment),
         OnBoardingDirection.SingleScreen(R.id.ageFragment),
         OnBoardingDirection.SingleScreen(R.id.heightFragment),

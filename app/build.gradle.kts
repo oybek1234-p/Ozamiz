@@ -23,8 +23,8 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 79
-        versionName = "5"
+        versionCode = 86
+        versionName = "7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "ru", "uz"))
@@ -32,6 +32,8 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources =false
             ndk {
                 abiFilters.add("arm64-v8a")
             }
@@ -113,6 +115,10 @@ dependencies {
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("com.google.mlkit:face-detection:16.1.7")
     implementation("com.github.deano2390:MaterialShowcaseView:1.3.4")
+    val room_version = "2.8.4"
+    implementation("androidx.room:room-runtime:$room_version")
+    kapt("androidx.room:room-compiler:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

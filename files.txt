@@ -214,7 +214,7 @@ app/src/main/java/uz/oybek/ozamiz/data/community/CommunityPostRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/community/CommunityShareHelper.kt
 app/src/main/java/uz/oybek/ozamiz/data/community/model/CommunityPost.kt
 app/src/main/java/uz/oybek/ozamiz/data/community/model/CommunityPostFilter.kt
-app/src/main/java/uz/oybek/ozamiz/data/config/ConfigRepository.kt
+app/src/main/java/uz/oybek/ozamiz/data/config/PremiumRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/firebase/FirebaseConstants.kt
 app/src/main/java/uz/oybek/ozamiz/data/firebase/FirebasePaths.kt
 app/src/main/java/uz/oybek/ozamiz/data/firebase/FirebaseUtils.kt

@@ -11,54 +11,52 @@ import java.util.Calendar
 
 object MotivationAlarmScheduler {
 
-    private val ALARM_HOURS = intArrayOf(8, 10, 13, 16, 19)
-    private val ALARM_MINUTES = intArrayOf(0, 0, 0, 0, 0)
+    private val ALARM_HOURS = intArrayOf(8, 10, 13, 16, 19, 21)
+    private val ALARM_TYPES = arrayOf("breakfast", "tip", "lunch", "tip", "dinner", "praise")
 
-    fun scheduleAll(context: Context, force: Boolean = false) {
-        val prefs = context.getSharedPreferences("motivation_prefs", Context.MODE_PRIVATE)
-        val lastScheduled = prefs.getLong("last_scheduled_time", 0)
-        
-        if (!force && System.currentTimeMillis() - lastScheduled < 12 * 60 * 60 * 1000L) {
-            return
-        }
-        prefs.edit().putLong("last_scheduled_time", System.currentTimeMillis()).apply()
-
+    fun rescheduleToday(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        
+        for (i in 0..10) {
+            val intent = Intent(context, MotivationAlarmReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(
+                context, 100 + i, intent, 
+                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+            )
+            pendingIntent?.let {
+                alarmManager.cancel(it)
+                it.cancel()
+            }
+        }
 
+        val calendar = Calendar.getInstance()
+        val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+
+        // Only schedule for the remaining part of today
         for (i in ALARM_HOURS.indices) {
-            val calendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, ALARM_HOURS[i])
-                set(Calendar.MINUTE, ALARM_MINUTES[i])
+            val scheduledHour = ALARM_HOURS[i]
+            if (scheduledHour <= currentHour) continue
+
+            val targetTime = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, scheduledHour)
+                set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
 
-            if (calendar.timeInMillis <= System.currentTimeMillis()) {
-                calendar.add(Calendar.DAY_OF_YEAR, 1)
+            val intent = Intent(context, MotivationAlarmReceiver::class.java).apply {
+                putExtra("ALARM_TYPE", ALARM_TYPES[i])
             }
+            val pendingIntent = PendingIntent.getBroadcast(
+                context, 100 + i, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
-            scheduleAlarm(context, alarmManager, calendar.timeInMillis, 100 + i)
+            scheduleAlarm(context, alarmManager, targetTime.timeInMillis, pendingIntent)
         }
     }
 
-    /**
-     * TEST: 1 minutdan keyin notification keladi.
-     */
-    fun scheduleTestIn1Minute(context: Context) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val triggerTime = System.currentTimeMillis() + 60 * 1000L
-        scheduleAlarm(context, alarmManager, triggerTime, 999)
-    }
-
-    private fun scheduleAlarm(context: Context, alarmManager: AlarmManager, triggerTime: Long, requestCode: Int) {
-        val intent = Intent(context, MotivationAlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
+    private fun scheduleAlarm(context: Context, alarmManager: AlarmManager, triggerTime: Long, pendingIntent: PendingIntent) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 // Android 12+ - check exact alarm permission
@@ -84,8 +82,8 @@ object MotivationAlarmScheduler {
             putStringArrayListExtra("EXCEEDED_TYPES", ArrayList(exceededTypes))
         }
 
-        // 1 minute later for testing (was 1 hour)
-        val triggerTime = System.currentTimeMillis() + 60 * 1000L
+        // 1 hour later (was 1 minute for testing)
+        val triggerTime = System.currentTimeMillis() + 60 * 60 * 1000L
         val requestCode = 200 // Different from motivation alarms
 
         val pendingIntent = PendingIntent.getBroadcast(

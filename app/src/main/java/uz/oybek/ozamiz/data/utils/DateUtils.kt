@@ -34,6 +34,15 @@ object DateUtils {
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 
+    fun getCurrentTime(): String {
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+        val second = calendar.get(Calendar.SECOND)
+        val formattedTime = String.format("%02d:%02d:%02d", hour, minute, second)
+        return formattedTime
+    }
+
     fun generateDatesForScroller(): List<Date> {
         val calendar = Calendar.getInstance()
         return (-3..3).map { dayOffset ->
@@ -45,12 +54,26 @@ object DateUtils {
 
     fun toLongTimestamp(ts: Any?): Long {
         return when (ts) {
-            is Long -> ts
+            null -> System.currentTimeMillis()
+            is Number -> ts.toLong()
             is com.google.firebase.Timestamp -> ts.toDate().time
-            is java.util.Date -> ts.time
+            is Date -> ts.time
             is Map<*, *> -> {
-                (ts["timestampLong"] as? Long) ?: (ts["seconds"] as? Long)?.let { it * 1000 } ?: System.currentTimeMillis()
+                val timestampLong = ts["timestampLong"]
+                val seconds = ts["seconds"]
+                val nanoseconds = ts["nanoseconds"]
+                when {
+                    timestampLong is Number -> timestampLong.toLong()
+                    seconds is Number -> {
+                        val secs = seconds.toLong()
+                        val nanos = (nanoseconds as? Number)?.toLong() ?: 0L
+                        secs * 1000 + nanos / 1000000
+                    }
+
+                    else -> System.currentTimeMillis()
+                }
             }
+
             else -> System.currentTimeMillis()
         }
     }
@@ -65,3 +88,19 @@ fun Date.dateApiFormat(): String =
         this,
         DateUtils.YYYY_MM_DD
     )
+
+fun formatLastSeen(lastSeen: Any?): String {
+    val timestamp = DateUtils.toLongTimestamp(lastSeen)
+    val now = System.currentTimeMillis()
+    val diff = now - timestamp
+
+    return when {
+        diff < 60000 -> "yaqinda"
+        diff < 3600000 -> "${diff / 60000}m oldin"
+        diff < 86400000 -> "${diff / 3600000}s oldin"
+        else -> {
+            val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+            sdf.format(timestamp)
+        }
+    }
+}
