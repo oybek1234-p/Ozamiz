@@ -52,7 +52,6 @@ class VoiceRecorderBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun setupUI() {
-        binding.buttonCancelRecording.setOnClickListener { dismiss() }
         binding.buttonAnalyze.setOnClickListener { stopAndAnalyze() }
     }
 
@@ -64,8 +63,6 @@ class VoiceRecorderBottomSheet : BottomSheetDialogFragment() {
                 binding.lottieRecordingIndicator.isVisible = state is VoiceUiState.Recording
 
                 if (state is VoiceUiState.Recording) {
-                    binding.textViewRecordStatus.text = getString(R.string.voice_listening)
-                    binding.buttonAnalyze.text = getString(R.string.voice_analyze)
                     binding.lottieRecordingIndicator.playAnimation()
                     startTimer()
                 } else {
@@ -81,7 +78,9 @@ class VoiceRecorderBottomSheet : BottomSheetDialogFragment() {
                     dismiss()
                 }
                 if (state is VoiceUiState.Error) {
-                    showToast(state.message)
+                    val resId = resources.getIdentifier(state.message, "string", requireContext().packageName)
+                    val message = if (resId != 0) getString(resId) else state.message
+                    showToast(message)
                     dismiss()
                 }
             }
@@ -124,7 +123,8 @@ class VoiceRecorderBottomSheet : BottomSheetDialogFragment() {
                 }
             viewModel.onRecordStarted()
         } catch (e: Exception) {
-            showToast("Mikrofon xatosi: ${e.message}")
+            val message = getString(R.string.log_food_mic_error, e.message ?: "")
+            showToast(message)
             dismiss()
         }
     }

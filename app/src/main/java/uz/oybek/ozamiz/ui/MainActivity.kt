@@ -1,7 +1,5 @@
 package uz.oybek.ozamiz.ui
 
-import uz.oybek.ozamiz.data.ai.Dietolog
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentSender
@@ -11,19 +9,21 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -33,22 +33,30 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.play.core.review.ReviewManagerFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
+import uz.oybek.ozamiz.data.config.AppPreference
+import uz.oybek.ozamiz.data.level.Level
+import uz.oybek.ozamiz.data.level.LevelRepository
+import uz.oybek.ozamiz.data.level.PointsRepository
+import uz.oybek.ozamiz.data.motivation.NotificationSchedular
 import uz.oybek.ozamiz.data.user.UserRepository
-import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.CompanyLinks
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
+import uz.oybek.ozamiz.databinding.DialogLevelUpBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
 import uz.oybek.ozamiz.databinding.SupportSheetBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.showToast
 import uz.oybek.ozamiz.ui.utils.visibleOrGone
 import uz.oybek.ozamiz.util.PhoneUtils
 import uz.oybek.ozamiz.util.handleException
-import java.util.Calendar
-import androidx.core.view.isInvisible
 
 class MainActivity : AppCompatActivity() {
 
@@ -59,7 +67,6 @@ class MainActivity : AppCompatActivity() {
     private var systemInsets: WindowInsetsCompat? = null
 
     private fun handleSignOut() {
-        if (UserRepository.user.valid.not()) return
         UserRepository.signOut()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
@@ -82,6 +89,18 @@ class MainActivity : AppCompatActivity() {
         var isAppReady = false
     }
 
+    private fun initInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            systemInsets = insets
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
+
+            binding.bottomNavView.setPadding(0, 0, 0, systemBars.bottom)
+            updateContainerPadding()
+            insets
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         splashScreen.setKeepOnScreenCondition {
@@ -91,6 +110,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+        initInsets()
+
         setContentView(binding.root)
         initUser()
 
@@ -101,22 +122,32 @@ class MainActivity : AppCompatActivity() {
                 navigationBarView = binding.bottomNavView, navController = navController
             )
 
-            ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-                systemInsets = insets
-                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-
-                binding.bottomNavView.setPadding(0, 0, 0, systemBars.bottom)
-                updateContainerPadding()
-                insets
-            }
         }
         val inflater = navHost.navController.navInflater
         val graph = inflater.inflate(R.navigation.main_navigation)
-        val user = LocalUser.user
-        val firebaseUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
 
-        if (user.valid && firebaseUser == null) {
+        checkCurrentUser(graph)
+        navHost.navController.graph = graph
+
+        checkAndShowAppReview()
+        initChatBadgeObserving()
+        initUpdateManager(updateLauncher)
+        initInternetConnectivity()
+        observeLevelUp()
+        NotificationSchedular.rescheduleToday(this)
+    }
+
+    private fun observeLevelUp() {
+        lifecycleScope.launch {
+            PointsRepository.newLevelUnlockedFlow.collect {
+                delay(1000)
+                showLevelUpDialog(it)
+            }
+        }
+    }
+
+    private fun checkCurrentUser(graph: NavGraph) {
+        if (user.valid.not()) {
             UserRepository.signOut()
             graph.setStartDestination(R.id.authFragment)
             isAppReady = true
@@ -129,34 +160,12 @@ class MainActivity : AppCompatActivity() {
             graph.setStartDestination(R.id.authFragment)
             isAppReady = true
         }
-        navHost.navController.graph = graph
+    }
 
-        checkAndShowAppReview()
-
-        binding.bottomNavView.post {
-            if (LocalPreferencesRepository.getHasUnreadChat()) {
-                val badge = binding.bottomNavView.getOrCreateBadge(R.id.aiChatFragment)
-                badge.isVisible = true
-                badge.number = 1
-            }
-
-            // Listen for destination changes to clear badge
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                if (destination.id == R.id.aiChatFragment) {
-                    val badge = binding.bottomNavView.getBadge(R.id.aiChatFragment)
-                    if (badge != null) {
-                        badge.isVisible = false
-                        badge.clearNumber()
-                    }
-                    LocalPreferencesRepository.setHasUnreadChat(false)
-                }
-            }
-        }
-
-        // Catch new messages dynamically
+    private fun initChatBadgeObserving() {
         lifecycleScope.launch {
-            Dietolog.newMessagesEvent.collect { advice ->
-                if (!advice.isNullOrBlank() && navController.currentDestination?.id != R.id.aiChatFragment) {
+            AiChatRepository.newMessagesEvent.collect { advice ->
+                if (advice.isNotBlank() && navController.currentDestination?.id != R.id.aiChatFragment) {
                     binding.bottomNavView.post {
                         val badge = binding.bottomNavView.getOrCreateBadge(R.id.aiChatFragment)
                         badge.isVisible = true
@@ -165,24 +174,34 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-        initUpdateManager(updateLauncher)
-        initInternetConnectivity()
-        
-        // Reschedule notifications for the day
-        uz.oybek.ozamiz.data.motivation.MotivationAlarmScheduler.rescheduleToday(this)
+        binding.bottomNavView.post {
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                if (destination.id == R.id.aiChatFragment) {
+                    val badge = binding.bottomNavView.getBadge(R.id.aiChatFragment)
+                    if (badge != null) {
+                        badge.isVisible = false
+                        badge.clearNumber()
+                    }
+                }
+            }
+        }
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        UserRepository.updateLastSeen()
+    }
 
     private fun initUser() {
         LocalUser.getUser()
         if (LocalUser.user.valid) {
-            UserRepository.updateLastSeen()
-            UserRepository.observeCurrentUser { }
-            lifecycleScope.launch(Dispatchers.IO) {
-                UserRepository.refreshUser()
+            UserRepository.observeCurrentUser {
+                if (it == null || it.valid.not()) {
+                    signOut?.run()
+                }
             }
+
+            NotificationSchedular.rescheduleToday(this)
         }
     }
 
@@ -195,12 +214,12 @@ class MainActivity : AppCompatActivity() {
         bindingDialog.apply {
             callview.setOnClickListener {
                 dialog.dismiss()
-                PhoneUtils.openPhoneCall(CompanyLinks.Companion.PHONE_NUMBER)
+                PhoneUtils.openPhoneCall(CompanyLinks.PHONE_NUMBER)
             }
             requestButton.setOnClickListener {
                 dialog.dismiss()
-                CompanyLinks.Companion.openLink(
-                    this@MainActivity, CompanyLinks.Companion.TELEGRAM
+                CompanyLinks.openLink(
+                    this@MainActivity, CompanyLinks.TELEGRAM
                 )
             }
         }
@@ -224,20 +243,20 @@ class MainActivity : AppCompatActivity() {
                     appUpdateManager.completeUpdate()
                 }
             }
-
             appUpdateManager.registerListener(listener)
 
             appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
                 if (isDestroyed || isFinishing) return@addOnSuccessListener
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
-                        AppUpdateType.FLEXIBLE
+                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(
+                        AppUpdateType.IMMEDIATE
                     )
                 ) {
                     try {
                         appUpdateManager.startUpdateFlowForResult(
                             appUpdateInfo,
                             launcher,
-                            AppUpdateOptions.newBuilder(AppUpdateType.FLEXIBLE).build()
+                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
                         )
                     } catch (e: IntentSender.SendIntentException) {
                         handleException(e)
@@ -304,7 +323,11 @@ class MainActivity : AppCompatActivity() {
     private val internetBottomSheet: BottomSheetDialog by lazy {
         BottomSheetDialog(this).apply {
             val dialogBinding =
-                NoInternetDialogBinding.inflate(LayoutInflater.from(this@MainActivity), null, false)
+                NoInternetDialogBinding.inflate(
+                    LayoutInflater.from(
+                        this@MainActivity
+                    ), null, false
+                )
             setContentView(dialogBinding.root)
             dialogBinding.button.setOnClickListener {
                 dismiss()
@@ -317,7 +340,7 @@ class MainActivity : AppCompatActivity() {
     private var bottomNavShown = true
 
     private val decelerateInterpolator = DecelerateInterpolator(1.5f)
-    fun showBottomSheet(show: Boolean, animate: Boolean,justInvisible: Boolean = false) {
+    fun showBottomSheet(show: Boolean, animate: Boolean, justInvisible: Boolean = false) {
         if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return
         bottomNavShown = show
         updateContainerPadding()
@@ -352,23 +375,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkAndShowAppReview() {
-        val firstLaunchTime = LocalPreferencesRepository.getFirstLaunchTime()
-        val appReviewShown = LocalPreferencesRepository.isAppReviewShown()
-        
-        if (!appReviewShown) {
-            val threeDaysInMillis = 3 * 24 * 60 * 60 * 1000L
-            val currentTime = System.currentTimeMillis()
-            
-            if (currentTime - firstLaunchTime >= threeDaysInMillis) {
-                requestAppReview()
-                LocalPreferencesRepository.setAppReviewShown(true)
-            }
+        if (AppPreference.isAppReviewShown
+                .not() && (user.streakInfo?.bestStreak ?: 0) > 3
+        ) {
+            requestAppReview()
+            AppPreference.isAppReviewShown = true
         }
     }
 
     fun requestAppReview() {
         try {
-            val manager = com.google.android.play.core.review.ReviewManagerFactory.create(this)
+            val manager = ReviewManagerFactory.create(this)
             val request = manager.requestReviewFlow()
             request.addOnCompleteListener { task ->
                 if (isFinishing || isDestroyed) return@addOnCompleteListener
@@ -391,5 +408,23 @@ class MainActivity : AppCompatActivity() {
         } else {
             binding.container.setPadding(0, 0, 0, systemBars.bottom)
         }
+    }
+
+    private fun showLevelUpDialog(level: Level) {
+        val binding = DialogLevelUpBinding.inflate(layoutInflater).apply {
+            textLevelEmoji.text = level.emoji
+            textLevelName.text = level.name
+            textLevelMotivation.text = level.motivationText
+        }
+        val dialog = AlertDialog.Builder(
+            this,
+            R.style.RoundedCornersDialog
+        ).apply {
+            setView(binding.root)
+        }.create()
+        binding.btnLevelUpOk.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 }

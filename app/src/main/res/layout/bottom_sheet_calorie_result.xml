@@ -62,34 +62,26 @@
                 app:drawableTint="?colorOnSurfaceVariant" />
 
             <LinearLayout
+                android:id="@+id/layout_food_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:background="?selectableItemBackground"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="4dp">
 
                 <TextView
                     android:id="@+id/textView_food_name"
                     style="@style/Title4_24"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:ellipsize="end"
                     android:fontFamily="@font/roboto_bold"
                     android:gravity="center"
                     android:maxLines="2"
                     android:textColor="?colorOnSurface"
                     tools:text="Caesar Salad" />
-
-                <ImageView
-                    android:id="@+id/btn_edit_name"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginStart="8dp"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:padding="4dp"
-                    android:src="@drawable/edit"
-                    app:tint="?colorOnSurfaceVariant" />
 
             </LinearLayout>
 
@@ -102,22 +94,80 @@
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?selectableItemBackground"
                 app:strokeColor="?colorOutlineVariant"
-                app:strokeWidth="1dp">
+                app:strokeWidth="0dp">
 
                 <LinearLayout
+                    android:id="@+id/loading_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/animation"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        app:lottie_autoPlay="true"
+                        app:lottie_rawRes="@raw/bouncing_fruits"
+                        app:lottie_repeatCount="100"
+                        app:lottie_repeatMode="restart" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/loading_text"
+                            style="@style/Title3_17"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/analyzing"
+                            android:textColor="?colorOnSurface" />
+
+                        <TextView
+                            style="@style/Text2_15"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/learning_benefits_calories"
+                            android:textColor="?colorOnSurface" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/calorie_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="@dimen/dimen_18"
-                    android:paddingVertical="@dimen/dimen_12">
+                    android:paddingVertical="@dimen/dimen_12"
+                    android:visibility="invisible">
 
-                    <ImageView
+                    <FrameLayout
                         android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/fire_ic"
-                        app:tint="?colorOnSurface" />
+                        android:layout_height="28dp">
+
+                        <ImageView
+                            android:id="@+id/imageView_fire"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/fire_ic"
+                            app:tint="?colorOnSurface" />
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lottie_loading_calories"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_rawRes="@raw/food_anim" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -127,10 +177,11 @@
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/textView_calories_label"
                             style="@style/Caption2_12"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Kaloriya"
+                            android:text="@string/kaloriya"
                             android:textColor="?colorOnSurfaceVariant" />
 
                         <LinearLayout
@@ -148,15 +199,6 @@
                                 android:textColor="?colorOnSurface"
                                 tools:text="330" />
 
-                            <ImageView
-                                android:id="@+id/btn_edit_calories"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_marginStart="8dp"
-                                android:background="?selectableItemBackgroundBorderless"
-                                android:padding="2dp"
-                                android:src="@drawable/edit"
-                                app:tint="?colorOnSurfaceVariant" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -201,27 +243,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:background="@drawable/round_lay"
+                android:backgroundTint="?colorSurfaceContainerLowest"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                 app:cardCornerRadius="16dp"
-                app:strokeWidth="0dp"
-                app:cardElevation="1dp"
-                android:background="@drawable/round_lay"
-                android:backgroundTint="?colorSurfaceContainerLowest">
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:id="@+id/layout_advice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/dimen_12"
+                    android:padding="@dimen/dimen_18"
                     android:visibility="gone"
                     tools:visibility="visible">
+
+                    <TextView
+                        style="@style/Text2_15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ai_dietolog"
+                        android:textColor="?colorOnSurfaceVariant" />
 
                     <TextView
                         android:id="@+id/textView_advice"
                         style="@style/Headline2_16"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dimen_8"
                         android:textColor="?colorOnSurface"
                         tools:text="Bu ovqatni kamroq miqdorda va kechqurun yemaslik maslahat beriladi." />
                 </LinearLayout>
@@ -232,6 +282,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
+        android:id="@+id/layout_bottom_actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -256,27 +307,43 @@
             app:strokeColor="?colorError"
             tools:visibility="gone" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_re_log_full"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="?colorPrimary"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/retry_or_cancel"
+            android:textColor="?colorSurface"
+            android:visibility="gone"
+            app:icon="@drawable/add_ic"
+            app:iconGravity="textStart"
+            tools:visibility="visible" />
+
         <LinearLayout
+            android:id="@+id/layout_horizontal_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:baselineAligned="false"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_re_log"
-                style="@style/Widget.Material3.Button.TonalButton"
+                style="@style/Widget.Material3.Button.ElevatedButton"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_marginEnd="6dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/roboto_medium"
-                android:text="Qayta qo'shish"
+                android:text="@string/cancel"
                 android:visibility="gone"
-                app:icon="@drawable/add_ic"
+                app:icon="@drawable/arrow_back"
                 app:iconGravity="textStart"
                 tools:visibility="visible" />
 
             <FrameLayout
+                android:id="@+id/layout_save_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
@@ -291,6 +358,7 @@
                     android:fontFamily="@font/roboto_medium"
                     android:text="@string/save"
                     android:textColor="?colorSurface"
+                    app:icon="@drawable/check_ic"
                     app:iconGravity="textStart" />
 
                 <ProgressBar
@@ -303,7 +371,6 @@
                     android:visibility="gone" />
 
             </FrameLayout>
-
         </LinearLayout>
     </LinearLayout>
 

@@ -1,0 +1,86 @@
+Configuration on demand is an incubating feature.
+Reusing configuration cache.
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests
+> Task :app:injectCrashlyticsVersionControlInfoDebug FROM-CACHE
+> Task :app:generateDebugResValues FROM-CACHE
+> Task :app:processDebugGoogleServices FROM-CACHE
+> Task :app:generateDebugResources FROM-CACHE
+> Task :app:dataBindingTriggerDebug
+> Task :app:dataBindingMergeDependencyArtifactsDebug
+> Task :app:generateSafeArgsDebug FROM-CACHE
+> Task :app:injectCrashlyticsMappingFileIdDebug
+> Task :app:extractDeepLinksDebug FROM-CACHE
+> Task :app:mapDebugSourceSetPaths
+> Task :app:checkDebugAarMetadata
+> Task :app:processDebugMainManifest FROM-CACHE
+> Task :app:processDebugManifest FROM-CACHE
+> Task :app:processDebugManifestForPackage FROM-CACHE
+> Task :app:packageDebugResources FROM-CACHE
+> Task :app:parseDebugLocalResources FROM-CACHE
+> Task :app:mergeDebugResources FROM-CACHE
+> Task :app:dataBindingGenBaseClassesDebug FROM-CACHE
+> Task :app:processDebugResources
+> Task :app:kaptGenerateStubsDebugKotlin
+
+> Task :app:kaptDebugKotlin FAILED
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\LoginGmailFragmentBindingImpl.java:8: error: cannot find symbol
+public class LoginGmailFragmentBindingImpl extends LoginGmailFragmentBinding  {
+                                                   ^
+  symbol: class LoginGmailFragmentBinding
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\LoginGmailFragmentBindingImpl.java:11: error: IncludedLayouts has protected access in ViewDataBinding
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+                                                             ^
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\SupportSheetBindingImpl.java:8: error: cannot find symbol
+public class SupportSheetBindingImpl extends SupportSheetBinding  {
+                                             ^
+  symbol: class SupportSheetBinding
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\SupportSheetBindingImpl.java:11: error: IncludedLayouts has protected access in ViewDataBinding
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+                                                             ^
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\RejectInfoSheetBindingImpl.java:8: error: cannot find symbol
+public class RejectInfoSheetBindingImpl extends RejectInfoSheetBinding  {
+                                                ^
+  symbol: class RejectInfoSheetBinding
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\RejectInfoSheetBindingImpl.java:11: error: IncludedLayouts has protected access in ViewDataBinding
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+                                                             ^
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\FragmentAuthBindingImpl.java:8: error: cannot find symbol
+public class FragmentAuthBindingImpl extends FragmentAuthBinding  {
+                                             ^
+  symbol: class FragmentAuthBinding
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\FragmentAuthBindingImpl.java:11: error: IncludedLayouts has protected access in ViewDataBinding
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+                                                             ^
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\PaymentCheckFragmentBindingImpl.java:8: error: cannot find symbol
+public class PaymentCheckFragmentBindingImpl extends PaymentCheckFragmentBinding  {
+                                                     ^
+  symbol: class PaymentCheckFragmentBinding
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\PaymentCheckFragmentBindingImpl.java:11: error: IncludedLayouts has protected access in ViewDataBinding
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+                                                             ^
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\ItemPremiumFeatureBindingImpl.java:8: error: cannot find symbol
+public class ItemPremiumFeatureBindingImpl extends ItemPremiumFeatureBinding  {
+                                                   ^
+  symbol: class ItemPremiumFeatureBinding
+C:\Users\User\AndroidStudioProjects\Ozamiz\app\build\generated\source\kapt\debug\uz\oybek\ozamiz\databinding\ItemPremiumFeatureBindingImpl.java:11: error: IncludedLayouts has protected access in ViewDataBinding
+    private static final androidx.databinding.ViewDataBinding.IncludedLayouts sIncludes;
+                                                             ^
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:kaptDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.gradle.internal.KaptWithoutKotlincTask$KaptExecutionWorkAction
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 19s
+22 actionable tasks: 9 executed, 13 from cache
+Configuration cache entry reused.

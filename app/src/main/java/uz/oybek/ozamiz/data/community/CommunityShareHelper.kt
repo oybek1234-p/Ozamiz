@@ -9,6 +9,7 @@ import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.PostType
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 
 object CommunityShareHelper {
 
@@ -38,7 +39,7 @@ object CommunityShareHelper {
                 verified = true,
                 isVisible = true,
                 type = PostType.FOOD,
-                isPremiumUser = user.premium
+                isPremiumUser = PremiumUtils.isPremium(user)
             )
             CommunityPostRepository.addPost(post)
         }

@@ -21,7 +21,7 @@
         style="@style/Headline2_16"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hisoblayabmiz..."
+        android:text="@string/log_food_analyzing"
         android:textColor="?colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

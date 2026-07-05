@@ -10,10 +10,9 @@ import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.persistentCacheSettings
-import uz.oybek.ozamiz.data.ai.AiMenuRepository
 import uz.oybek.ozamiz.data.firebase.database
 import uz.oybek.ozamiz.data.firebase.firestore
-import uz.oybek.ozamiz.data.motivation.MotivationAlarmScheduler
+import uz.oybek.ozamiz.data.motivation.NotificationSchedular
 import uz.oybek.ozamiz.data.motivation.MotivationNotificationManager
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.util.handleException
@@ -26,8 +25,6 @@ class Application : Application() {
         super.onCreate()
         appContext = this
 
-        LocalUser.getUser()
-        AiMenuRepository.init(this)
         initFirebase()
 
         try {
@@ -48,7 +45,6 @@ class Application : Application() {
     private fun initFirebase() {
         FirebaseApp.initializeApp(this)
         
-        // Notification kanalini yaratish
         MotivationNotificationManager(this).createNotificationChannel()
 
         val settings = firestoreSettings {
@@ -57,9 +53,6 @@ class Application : Application() {
         firestore.firestoreSettings = settings
         runCatching {
             database.setPersistenceEnabled(true)
-        }
-        runCatching {
-            MotivationAlarmScheduler.rescheduleToday(this)
         }
     }
 }

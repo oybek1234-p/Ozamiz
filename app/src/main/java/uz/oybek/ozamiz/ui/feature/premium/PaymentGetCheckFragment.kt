@@ -18,6 +18,13 @@ import uz.oybek.ozamiz.ui.utils.showToast
 
 class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
 
+    companion object {
+        const val REQUEST_KEY = "payment_check_submitted"
+        const val RESULT_SUBMITTED = "submitted"
+        const val ARG_PRICE = "price"
+        const val ARG_IS_YEARLY = "is_yearly"
+    }
+
     private var selectedCheckUri: Uri? = null
     private val viewModel: PaymentGetCheckViewModel by viewModels()
 
@@ -32,8 +39,8 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
         }
 
     override fun viewCreated(bind: PaymentCheckFragmentBinding) {
-        val price = arguments?.getLong("price", 0L) ?: 0L
-        val isYearly = arguments?.getBoolean("is_yearly", false) ?: false
+        val price = arguments?.getLong(ARG_PRICE, 0L) ?: 0L
+        val isYearly = arguments?.getBoolean(ARG_IS_YEARLY, false) ?: false
         if (price > 0L) {
             viewModel.initData(price, isYearly)
         }
@@ -54,7 +61,7 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
                 }
                 state.successMessage?.let {
                     showToast(it)
-                    setFragmentResult("payment_check_submitted", androidx.core.os.bundleOf("submitted" to true))
+                    setFragmentResult(REQUEST_KEY, androidx.core.os.bundleOf(RESULT_SUBMITTED to true))
                     closeFragment()
                     viewModel.clearSuccess()
                 }

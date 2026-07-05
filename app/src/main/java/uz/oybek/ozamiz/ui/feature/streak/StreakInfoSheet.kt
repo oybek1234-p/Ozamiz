@@ -211,17 +211,6 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         val weeks = maxOf(1, (info.activeDays + 6) / 7)
         binding.textActiveWeeks.text = "$weeks Hafta"
 
-        if (isNewAction) {
-            binding.textStreakSubtitle.visibility = View.VISIBLE
-            if (returnedAfterManyDays) {
-                binding.textStreakSubtitle.text = "Qaytganingiz bilan tabriklayman!"
-            } else {
-                binding.textStreakSubtitle.text = "Birinchi qadam bajarildi!"
-            }
-        } else {
-            binding.textStreakSubtitle.visibility = View.GONE
-        }
-
         binding.layoutTopUsersContainer.visibility = View.GONE
 
         val isActive = uz.oybek.ozamiz.data.streak.StreakManager.isStreakActive(info)

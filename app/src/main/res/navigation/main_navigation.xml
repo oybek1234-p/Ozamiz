@@ -352,7 +352,16 @@
         android:id="@+id/savedFoodsFragment"
         android:name="uz.oybek.ozamiz.ui.feature.log.food.SavedFoodsFragment"
         android:label="Saqlanganlar"
-        tools:layout="@layout/fragment_saved_foods" />
+        tools:layout="@layout/fragment_saved_foods">
+        <argument
+            android:name="mealType"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="timestamp"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </fragment>
 
     <fragment
         android:id="@+id/searchFoodFragment"

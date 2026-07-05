@@ -3,7 +3,7 @@ package uz.oybek.ozamiz.ui.feature.level
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import uz.oybek.ozamiz.data.points.model.Level
+import uz.oybek.ozamiz.data.level.Level
 import uz.oybek.ozamiz.databinding.ItemLevelBinding
 
 class LevelAdapter(
@@ -39,13 +39,8 @@ class LevelAdapter(
         with(holder.binding) {
             textItemEmoji.text = level.emoji
             textItemLevelName.text = level.name
-
-            if (level.requiredPoints == 0) {
-                textItemRequiredPoints.text = "Boshlang'ich"
-            } else {
-                textItemRequiredPoints.text = "${level.requiredPoints} ball"
-            }
-
+            textItemRequiredPoints.text = level.requiredPoints.toString() + " ball"
+            textItemStatus.text = level.motivationText
             val primaryColor = com.google.android.material.color.MaterialColors.getColor(
                 root, androidx.appcompat.R.attr.colorPrimary
             )
@@ -66,21 +61,6 @@ class LevelAdapter(
                     if (isCompleted) android.view.View.VISIBLE else android.view.View.GONE
                 textItemRequiredPoints.setTextColor(primaryColor)
 
-                if (isCurrentLevel) {
-                    textItemStatus.visibility = android.view.View.VISIBLE
-                    textItemStatus.text = "Hozirgi bosqich"
-                    textItemStatus.setTextColor(primaryColor)
-
-                    cardItemLevel.strokeWidth = 4
-                    cardItemLevel.strokeColor = primaryColor
-                    cardItemLevel.setCardBackgroundColor(
-                        com.google.android.material.color.MaterialColors.getColor(
-                            root, com.google.android.material.R.attr.colorPrimaryContainer
-                        )
-                    )
-                } else {
-                    textItemStatus.visibility = android.view.View.VISIBLE
-                    textItemStatus.text = "Tugallangan"
                     textItemStatus.setTextColor(
                         com.google.android.material.color.MaterialColors.getColor(
                             root, com.google.android.material.R.attr.colorOnSurfaceVariant
@@ -93,11 +73,10 @@ class LevelAdapter(
                             root, com.google.android.material.R.attr.colorSurfaceContainerLowest
                         )
                     )
-                }
+
             } else {
                 imgLevelLock.visibility = android.view.View.VISIBLE
                 imgLevelCheck.visibility = android.view.View.GONE
-                textItemStatus.visibility = android.view.View.GONE
 
                 textItemRequiredPoints.setTextColor(colorOnSurface)
 

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.logs.model.AdminGenericLog
 import uz.oybek.ozamiz.databinding.ItemAdminFoodLogBinding
 import java.text.SimpleDateFormat
 import java.util.Date

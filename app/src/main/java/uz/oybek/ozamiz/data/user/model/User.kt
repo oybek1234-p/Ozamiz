@@ -40,9 +40,7 @@ data class User(
     var paymentChecking: Boolean = false,
     var paymentCheckPhotoUrl: String? = null,
     var admin: Boolean = false,
-    var scorePoints: Int = 0,
-    var lastTaskDate: String? = null,
-    var completedTaskIds: List<String> = emptyList(),
+    var scorePoints: Int = 0
 ) {
     constructor() : this(
         uid = "",
@@ -77,9 +75,7 @@ data class User(
         paymentChecking = false,
         paymentCheckPhotoUrl = null,
         admin = false,
-        scorePoints = 0,
-        lastTaskDate = null,
-        completedTaskIds = emptyList()
+        scorePoints = 0
     )
 
     @Transient
@@ -88,6 +84,13 @@ data class User(
     @get:com.google.firebase.database.Exclude
     val registerDateLong: Long?
         get() = registerDate?.let { DateUtils.toLongTimestamp(it) }
+
 }
 
 fun User.admin() = this.admin
+
+fun User.daysFromRegister(): Int {
+    val registerDate = registerDateLong ?: return 0
+    return DateUtils.daysBetween(registerDate, System.currentTimeMillis())
+
+}

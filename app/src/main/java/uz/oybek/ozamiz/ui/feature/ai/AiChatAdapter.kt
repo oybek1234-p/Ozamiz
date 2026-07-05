@@ -1,18 +1,18 @@
 package uz.oybek.ozamiz.ui.feature.ai
 
+import android.animation.ObjectAnimator
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import uz.oybek.ozamiz.data.ai.model.ChatMessage
+import uz.oybek.ozamiz.data.ai.aiChat.ChatMessage
 import uz.oybek.ozamiz.databinding.ItemChatMessageBinding
 import uz.oybek.ozamiz.databinding.ItemChatThinkingBinding
 import uz.oybek.ozamiz.ui.utils.MarkdownUtils
 
 class AiChatAdapter(
-    private val onRecreateClick: () -> Unit, private val onSaveMenuClick: (String) -> Unit
 ) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback) {
 
     companion object {
@@ -55,9 +55,7 @@ class AiChatAdapter(
             )
 
             else -> MessageViewHolder(
-                ItemChatMessageBinding.inflate(inflater, parent, false),
-                onRecreateClick,
-                onSaveMenuClick
+                ItemChatMessageBinding.inflate(inflater, parent, false)
             )
         }
     }
@@ -91,13 +89,10 @@ class AiChatAdapter(
     }
 
     class MessageViewHolder(
-        private val binding: ItemChatMessageBinding,
-        private val onRecreateClick: () -> Unit,
-        private val onSaveMenuClick: (String) -> Unit
+        private val binding: ItemChatMessageBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(message: ChatMessage) {
-            // Animatsiya holatini standart holatga qaytaramiz (recycling muammosi bo'lmasligi uchun)
             binding.userMessageLayout.apply {
                 alpha = 1f
                 scaleX = 1f
@@ -161,19 +156,22 @@ class AiChatAdapter(
                 dot.translationY = 0f
                 dot.alpha = 0.3f
 
-                val jumpAnim = android.animation.ObjectAnimator.ofFloat(dot, "translationY", 0f, -10f, 0f).apply {
-                    duration = 800
-                    startDelay = index * 200L
-                    repeatCount = android.animation.ValueAnimator.INFINITE
-                    repeatMode = android.animation.ValueAnimator.RESTART
-                }
+                val jumpAnim =
+                    ObjectAnimator.ofFloat(dot, "translationY", 0f, -10f, 0f)
+                        .apply {
+                            duration = 800
+                            startDelay = index * 200L
+                            repeatCount = android.animation.ValueAnimator.INFINITE
+                            repeatMode = android.animation.ValueAnimator.RESTART
+                        }
 
-                val fadeAnim = android.animation.ObjectAnimator.ofFloat(dot, "alpha", 0.3f, 1f, 0.3f).apply {
-                    duration = 800
-                    startDelay = index * 200L
-                    repeatCount = android.animation.ValueAnimator.INFINITE
-                    repeatMode = android.animation.ValueAnimator.RESTART
-                }
+                val fadeAnim =
+                    ObjectAnimator.ofFloat(dot, "alpha", 0.3f, 1f, 0.3f).apply {
+                        duration = 800
+                        startDelay = index * 200L
+                        repeatCount = android.animation.ValueAnimator.INFINITE
+                        repeatMode = android.animation.ValueAnimator.RESTART
+                    }
 
                 jumpAnim.start()
                 fadeAnim.start()

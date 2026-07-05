@@ -23,6 +23,11 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
         FragmentSavedFoodsBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentSavedFoodsBinding) {
+        val mealType = arguments?.getString("mealType") ?: ""
+        val timestamp = arguments?.getLong("timestamp") ?: 0L
+        if (mealType.isNotBlank() && timestamp > 0L) {
+            viewModel.setDateAndMeal(Date(timestamp), mealType)
+        }
         setupUI(bind)
         observeData()
     }
@@ -31,26 +36,25 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
         bind.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
-        bind.toolbar.title = "Sevimlilar"
-
         adapter = SavedFoodAdapter(
             onItemClick = { foodLog ->
                 navigate(
                     R.id.analyzeResultFragment,
                     Bundle().apply {
-                        putString("description", foodLog.description)
-                        putDouble("calories", foodLog.calories.toDouble())
-                        putDouble("protein", foodLog.protein ?: 0.0)
-                        putDouble("fat", foodLog.fat ?: 0.0)
-                        putDouble("carbs", foodLog.carbs ?: 0.0)
-                        putString("photoUrl", foodLog.photoUrl)
-                        putString("mealType", foodLog.mealType)
-                        putBoolean("isFromFavorite", true)
+                        putString(AnalyzeResultFragment.KEY_DESCRIPTION, foodLog.description)
+                        putDouble(AnalyzeResultFragment.KEY_CALORIES, foodLog.calories.toDouble())
+                        putDouble(AnalyzeResultFragment.KEY_PROTEIN, foodLog.protein ?: 0.0)
+                        putDouble(AnalyzeResultFragment.KEY_FAT, foodLog.fat ?: 0.0)
+                        putDouble(AnalyzeResultFragment.KEY_CARBS, foodLog.carbs ?: 0.0)
+                        putString(AnalyzeResultFragment.KEY_PHOTO_URL, foodLog.photoUrl)
+                        putString(AnalyzeResultFragment.KEY_MEAL_TYPE, arguments?.getString("mealType") ?: foodLog.mealType)
+                        putBoolean(AnalyzeResultFragment.KEY_IS_FROM_FAVORITE, true)
+                        putLong(AnalyzeResultFragment.KEY_TIMESTAMP, arguments?.getLong("timestamp") ?: System.currentTimeMillis())
                     }
                 )
             },
             onAddButtonClick = { foodLog ->
-                viewModel.logSavedFood(foodLog)
+                viewModel.relogFood(foodLog)
             },
             onDeleteButtonClick = { foodLog ->
                 viewModel.removeFavorite(foodLog)

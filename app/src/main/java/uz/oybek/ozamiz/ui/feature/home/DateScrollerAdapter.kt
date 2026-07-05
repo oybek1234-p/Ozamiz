@@ -1,47 +1,46 @@
 package uz.oybek.ozamiz.ui.feature.home
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.color.MaterialColors
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.model.DailySummary
+import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.utils.dateApiFormat
+import uz.oybek.ozamiz.data.utils.toCalendar
 import uz.oybek.ozamiz.databinding.ItemDateScrollerBinding
-import java.text.SimpleDateFormat
+import uz.oybek.ozamiz.ui.utils.VaznimColors
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
-import android.graphics.Typeface
 
 class DateScrollerAdapter(
     private val onDateSelected: (Date) -> Unit
 ) : ListAdapter<Date, DateScrollerAdapter.DateViewHolder>(DateDiffCallback()) {
 
-    private var selectedDate: Date = getMidnight(Date())
-    private val dayFormat = SimpleDateFormat("E", Locale("uz", "UZ"))
-    private val dateFormat = SimpleDateFormat("d", Locale.getDefault())
-    
+    private var selectedDate: Date = DateUtils.getStartOfDay(Date())
+
     var dailySummaries: Map<String, DailySummary> = emptyMap()
     var targetCalories: Int = 2000
-
+    
     companion object {
         private const val PAYLOAD_PROGRESS = "PAYLOAD_PROGRESS"
+        private const val PAYLOAD_PROGRESS_SILENT = "PAYLOAD_PROGRESS_SILENT"
     }
 
-    fun updateData(summaries: Map<String, DailySummary>, target: Int) {
+    fun updateData(summaries: Map<String, DailySummary>, target: Int, animate: Boolean = true) {
         val oldSummaries = this.dailySummaries
         val oldTarget = this.targetCalories
 
         this.dailySummaries = summaries
         this.targetCalories = target
 
+        val payload = if (animate) PAYLOAD_PROGRESS else PAYLOAD_PROGRESS_SILENT
+
         if (oldTarget != target) {
-            notifyItemRangeChanged(0, itemCount, PAYLOAD_PROGRESS)
+            notifyItemRangeChanged(0, itemCount, payload)
             return
         }
 
@@ -51,10 +50,8 @@ class DateScrollerAdapter(
             val oldSum = oldSummaries[dateKey]
             val newSum = summaries[dateKey]
 
-            // We only care if the consumed calories or target changed effectively
-            // But since target check is above, just check summary equality or specific field
             if (oldSum != newSum) {
-                notifyItemChanged(i, PAYLOAD_PROGRESS)
+                notifyItemChanged(i, payload)
             }
         }
     }
@@ -76,36 +73,22 @@ class DateScrollerAdapter(
     }
 
     override fun onBindViewHolder(holder: DateViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.contains(PAYLOAD_PROGRESS)) {
-            holder.updateProgress(getItem(position))
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
+        when {
+            payloads.contains(PAYLOAD_PROGRESS) -> holder.updateProgress(getItem(position), true)
+            payloads.contains(PAYLOAD_PROGRESS_SILENT) -> holder.updateProgress(getItem(position), false)
+            else -> super.onBindViewHolder(holder, position, payloads)
         }
     }
 
     fun setSelectedDate(date: Date) {
-        val normalizedNewDate = getMidnight(date)
-        if (!isSameDay(selectedDate, normalizedNewDate)) {
-            val oldPosition = currentList.indexOfFirst { isSameDay(it, selectedDate) }
-            val newPosition = currentList.indexOfFirst { isSameDay(it, normalizedNewDate) }
+        val normalizedNewDate = DateUtils.getStartOfDay(date)
+        if (!DateUtils.isSameDay(selectedDate, normalizedNewDate)) {
+            val oldPosition = currentList.indexOfFirst { DateUtils.isSameDay(it, selectedDate) }
+            val newPosition = currentList.indexOfFirst { DateUtils.isSameDay(it, normalizedNewDate) }
             selectedDate = normalizedNewDate
             if (oldPosition != -1) notifyItemChanged(oldPosition)
             if (newPosition != -1) notifyItemChanged(newPosition)
         }
-    }
-
-    private fun getMidnight(date: Date): Date {
-        return Calendar.getInstance().apply {
-            time = date
-            set(Calendar.HOUR_OF_DAY, 0);
-            set(Calendar.MINUTE, 0);
-            set(Calendar.SECOND, 0);
-            set(Calendar.MILLISECOND, 0)
-        }.time
-    }
-
-    private fun isSameDay(date1: Date, date2: Date): Boolean {
-        return getMidnight(date1).time == getMidnight(date2).time
     }
 
     inner class DateViewHolder(private val binding: ItemDateScrollerBinding) :
@@ -118,97 +101,66 @@ class DateScrollerAdapter(
             }
         }
 
-        private val context = binding.root.context
-        private val primaryColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, 0)
-        private val onPrimary = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnPrimary, 0)
-        private val surfaceLow = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerLow, 0)
-        private val onSurface = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0)
-        private val onSurfaceVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurfaceVariant, 0)
-        private val surfaceVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceVariant, Color.parseColor("#E5E5E5"))
-        private val surface = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurface, 0)
-        private val outlineVariant = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, 0)
+        private val primaryColor = VaznimColors.getPrimary()
+        private val onPrimary = VaznimColors.getOnPrimary()
+        private val surfaceLow = VaznimColors.getSurfaceLow()
+        private val onSurfaceVariant = VaznimColors.getOnSurfaceVariant()
         
-        private val secondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSecondaryContainer, 0)
-        private val onSecondaryContainer = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSecondaryContainer, 0)
-        
-        private val greenColor = ContextCompat.getColor(context, R.color.green)
-        private val yellowColor = com.google.android.material.color.MaterialColors.getColor(context, R.attr.customYellow, android.graphics.Color.YELLOW)
+        private val greenColor = VaznimColors.getGreen()
+        private val yellowColor = VaznimColors.getYellow()
 
         fun bind(date: Date) {
-            val isSelected = isSameDay(date, selectedDate)
-            val isToday = isSameDay(date, Date())
+            val isSelected = DateUtils.isSameDay(date, selectedDate)
+            val isToday = DateUtils.isSameDay(date, Date())
 
-            binding.textViewDayOfWeek.visibility = android.view.View.GONE
-            binding.textViewDayOfWeek.text =
-                dayFormat.format(date).replaceFirstChar { it.uppercase() }
-            binding.textViewDayOfMonth.text = dateFormat.format(date)
+            binding.textViewDayOfMonth.text = date.toCalendar().get(Calendar.DAY_OF_MONTH).toString()
 
-            updateProgress(date)
+            updateProgress(date, false)
 
-            // Selection Logic
             if (isSelected) {
                 binding.cardDate.setCardBackgroundColor(primaryColor)
-                binding.textViewDayOfWeek.setTextColor(onPrimary)
-                binding.textViewDayOfWeek.typeface = Typeface.DEFAULT_BOLD
                 binding.textViewDayOfMonth.setTextColor(onPrimary)
                 binding.cardDate.strokeWidth = 0
             } else {
                 binding.cardDate.setCardBackgroundColor(surfaceLow)
-                binding.textViewDayOfWeek.setTextColor(onSurfaceVariant)
-                binding.textViewDayOfWeek.typeface = Typeface.DEFAULT
                 binding.textViewDayOfMonth.setTextColor(onSurfaceVariant)
-                // If today, maybe a border? Or just the progress ring is enough distinction
                 if (isToday) {
                     binding.cardDate.strokeWidth = 2
-                    binding.cardDate.strokeColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, 0)
+                    binding.cardDate.strokeColor = primaryColor
                 } else {
                     binding.cardDate.strokeWidth = 0
                 }
             }
         }
 
-        fun updateProgress(date: Date) {
-            val dateKey = date.dateApiFormat()
-            val summary = dailySummaries[dateKey]
+        fun updateProgress(date: Date, animate: Boolean) {
+            val summary = dailySummaries[date.dateApiFormat()]
             val consumed = summary?.consumedCalories ?: 0
-            val max = if (targetCalories > 0) targetCalories else 1
-            var progress = (consumed.toFloat() / max * 100).toInt()
+            val target = targetCalories
             
-            val todayMidnight = getMidnight(Date())
-            val currentMidnight = getMidnight(date)
-            val isPast = currentMidnight.before(todayMidnight)
-            val isExceeded = consumed > targetCalories + 100
-
-            if (isPast && progress >= 50 && !isExceeded) {
-                progress = 100
-            }
-            
-            val isCompleted = consumed >= targetCalories - 100 && consumed <= targetCalories + 100 || (isPast && progress == 100 && !isExceeded)
+            val progress = if (target > 0) (consumed * 100 / target) else 0
+            val isExceeded = consumed > target + 100
+            val isCompleted = consumed >= target - 100 && consumed <= target + 100
 
             binding.progressRing.max = 100
-            binding.progressRing.setProgressCompat(if (isExceeded) 100 else progress, true)
+            binding.progressRing.setProgressCompat(if (isExceeded) 100 else progress, animate)
             
             val ringColor = when {
                 isExceeded -> yellowColor
                 isCompleted -> greenColor
-                else -> outlineVariant
+                progress > 0 -> primaryColor
+                else -> VaznimColors.getOutline()
             }
             
             binding.progressRing.setIndicatorColor(ringColor)
-            binding.progressRing.trackColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerHigh, 0)
+            binding.progressRing.trackColor = VaznimColors.getSurfaceContainerHigh()
         }
     }
 
     class DateDiffCallback : DiffUtil.ItemCallback<Date>() {
         override fun areItemsTheSame(oldItem: Date, newItem: Date): Boolean =
-            getMidnight(oldItem) == getMidnight(newItem)
+            DateUtils.isSameDay(oldItem, newItem)
 
         override fun areContentsTheSame(oldItem: Date, newItem: Date): Boolean = oldItem == newItem
-        private fun getMidnight(date: Date): Date = Calendar.getInstance().apply {
-            time = date; set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(
-            Calendar.SECOND,
-            0
-        ); set(Calendar.MILLISECOND, 0)
-        }.time
     }
 }

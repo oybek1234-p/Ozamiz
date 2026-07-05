@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.firestore
 import uz.oybek.ozamiz.data.firebase.generateKey
@@ -85,6 +86,23 @@ object WeightLogRepository {
 
             awaitClose { registration.remove() }
         })
+    }
+
+    fun needShowWeightLog(userId: String): Flow<Boolean> {
+        return getLogsFlow(userId).map { result ->
+            if (result is DataWrapper.Success) {
+                val logs = result.data.sortedBy { it.timestampLong }
+                if (logs.isNotEmpty()) {
+                    val lastLog = logs.last()
+                    val oneWeekMs = 7L * 24 * 60 * 60 * 1000
+                    System.currentTimeMillis() - lastLog.timestampLong > oneWeekMs
+                } else {
+                    true
+                }
+            } else {
+                true
+            }
+        }
     }
 
     suspend fun hasAny(userId: String): Boolean {

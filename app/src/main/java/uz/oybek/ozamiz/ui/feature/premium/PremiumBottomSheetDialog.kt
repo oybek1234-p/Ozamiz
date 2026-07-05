@@ -29,6 +29,9 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
         const val TAG = "PremiumBottomSheetDialog"
         const val REQUEST_KEY = "PremiumBottomSheetRequestKey"
         const val RESULT_ACTION = "PremiumResultAction"
+        const val KEY_SELECTED_PRICE = "selected_price"
+        const val KEY_IS_YEARLY = "is_yearly"
+        const val ACTION_GO_TO_PAYMENT = "go_to_payment"
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -119,9 +122,9 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
                 return@setOnClickListener
             }
             setFragmentResult(REQUEST_KEY, bundleOf(
-                RESULT_ACTION to "go_to_payment",
-                "selected_price" to selectedPrice,
-                "is_yearly" to (selectedPrice == viewModel.uiState.value?.yearlyPrice)
+                RESULT_ACTION to ACTION_GO_TO_PAYMENT,
+                KEY_SELECTED_PRICE to selectedPrice,
+                KEY_IS_YEARLY to (selectedPrice == viewModel.uiState.value?.yearlyPrice)
             ))
             dismiss()
         }

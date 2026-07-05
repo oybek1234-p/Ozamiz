@@ -26,9 +26,6 @@ class TextInputBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        arguments?.getString(ARG_TITLE)?.let { binding.textTitle.text = it }
-        arguments?.getString(ARG_PLACEHOLDER)?.let { binding.inputQuickDescription.hint = it }
-
         binding.inputQuickDescription.requestFocus()
 
         binding.buttonAnalyzeAndSave.setOnClickListener {

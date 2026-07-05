@@ -6,20 +6,37 @@
     android:layout_height="wrap_content"
     android:background="@drawable/round_lay"
     android:orientation="vertical"
+    android:backgroundTint="?colorSurfaceContainerLowest"
     android:padding="24dp">
 
-    <ImageView
-        android:id="@+id/button_cancel_recording"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
-        android:padding="@dimen/dimen_8"
-        android:src="@drawable/close_ic"
-        app:tint="?colorOnSurfaceVariant" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_recording_indicator"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_colorFilter="?colorSurfaceVariant"
+            app:lottie_rawRes="@raw/recording_lottie" />
+
+        <TextView
+            android:id="@+id/textView_timer"
+            style="@style/Text1_14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:text="00:00"
+            android:textColor="?colorOnSurfaceVariant"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/textView_record_status"
@@ -31,27 +48,6 @@
             android:text="@string/recording_speak_now"
             android:textColor="?colorOnSurface" />
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/lottie_recording_indicator"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_rawRes="@raw/recording_lottie" />
-
-        <TextView
-            android:id="@+id/textView_timer"
-            style="@style/Title3_17"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/roboto_bold"
-            android:text="00:00"
-            android:textColor="?colorOnSurface"
-            android:visibility="visible" />
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -64,7 +60,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:enabled="true"
-
+                app:iconGravity="textStart"
+                app:icon="@drawable/check_ic"
                 android:text="@string/stop_and_analyze" />
 
             <ProgressBar

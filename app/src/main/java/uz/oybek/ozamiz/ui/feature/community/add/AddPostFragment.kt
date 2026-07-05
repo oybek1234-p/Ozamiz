@@ -17,6 +17,7 @@ import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.PostType
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 import java.util.Date
 
 class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
@@ -133,7 +134,7 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
                 verified = false,
                 isVisible = false,
                 type = PostType.MANUAL,
-                isPremiumUser = user.premium
+                isPremiumUser = PremiumUtils.isPremium(user)
             )
 
             val result = viewModel.uploadPost(post, selectedImages)

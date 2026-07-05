@@ -1,0 +1,185 @@
+On branch master
+Your branch is ahead of 'origin/master' by 18 commits.
+  (use "git push" to publish your local commits)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	deleted:    app/release/app-release.aab
+	new file:   app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/BreakfastGuideFragment.kt
+	new file:   app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/DinnerGuideFragment.kt
+	new file:   app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/LunchGuideFragment.kt
+	new file:   app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/PlateRuleFragment.kt
+	new file:   app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/SnacksGuideFragment.kt
+	new file:   app/src/main/res/drawable/apple_simple.png
+	new file:   app/src/main/res/drawable/bread.png
+	new file:   app/src/main/res/drawable/breakfast_simple.png
+	new file:   app/src/main/res/drawable/dinner_simple.png
+	new file:   app/src/main/res/drawable/egg.png
+	new file:   app/src/main/res/drawable/lunch_simple.png
+	new file:   app/src/main/res/drawable/splash_icon.png
+	new file:   app/src/main/res/layout/fragment_breakfast_guide.xml
+	new file:   app/src/main/res/layout/fragment_dinner_guide.xml
+	new file:   app/src/main/res/layout/fragment_lunch_guide.xml
+	new file:   app/src/main/res/layout/fragment_plate_rule.xml
+	new file:   app/src/main/res/layout/fragment_snacks_guide.xml
+	new file:   app/src/main/res/raw/bouncing_fruits.json
+	new file:   app/src/main/res/raw/gift_box.json
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .idea/kotlinc.xml
+	modified:   app/build.gradle.kts
+	modified:   app/src/main/AndroidManifest.xml
+	modified:   app/src/main/java/uz/oybek/ozamiz/Application.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/ai/AiChatRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/ai/AiMenuRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/ai/Dietolog.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/ai/model/AiMealRecommendation.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/community/CommunityShareHelper.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/community/model/CommunityPost.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/config/LocalPreferencesRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/firebase/FirebasePaths.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/firebase/FirebaseUtils.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/firebase/FirestoreExtensions.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/food/DietController.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/food/analyzer/FoodAnalyzer.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/food/analyzer/FoodAnalyzerConfig.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/food/analyzer/GeminiSpeechRecognizer.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/food/model/MealTime.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/logs/DailyLogRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/logs/DailySummaryRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/logs/ExerciseLogRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/logs/FoodLogRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/logs/model/DailySummary.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/menu/MenuRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/motivation/MotivationAlarmReceiver.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/motivation/NotificationSchedular.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/motivation/MotivationRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/streak/StreakManager.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/streak/StreakRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/user/UserRepository.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/user/model/User.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/user/model/info/UserActivityLevel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/data/utils/DateUtils.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/MainActivity.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/admin/users/AdminUserDetailsFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/admin/users/AdminUserDetailsViewModel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/admin/users/AdminUsersListFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/admin/users/AdminUsersListViewModel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/ai/AiChatAdapter.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/ai/AiChatFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/ai/AiChatViewModel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/email/LoginGmailFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/community/CommunityPostAdapter.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/community/add/AddPostFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/home/AppOnboardingBottomSheet.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/home/DailyTipDetailsBottomSheet.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/home/DateScrollerAdapter.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/home/HomeFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/home/HomeUiState.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/home/HomeViewModel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/home/MacroInfoFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/log/exercise/AddExerciseUiState.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/log/food/AnalyzeResultFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/log/food/AnalyzeResultViewModel.kt
+	deleted:    app/src/main/java/uz/oybek/ozamiz/ui/feature/log/food/DailyLimitFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/log/food/LogFoodFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/log/food/LogFoodViewModel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/log/food/SearchFoodFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/log/food/history/RecentLogsAdapter.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/list/MenuListFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/list/MenuListViewModel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/OnBoardingDirections.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/GetInfoNavigationEvent.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/GetMainInfoFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/screens/NameFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/premium/PremiumBottomSheetDialog.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/premium/PremiumUtil.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/profile/ProfileFragment.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/profile/ProfileViewModel.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/ui/feature/streak/StreakInfoSheet.kt
+	modified:   app/src/main/java/uz/oybek/ozamiz/util/FaceBlurrer.kt
+	modified:   app/src/main/res/color/chip_meal_type_background.xml
+	modified:   app/src/main/res/drawable/apple_simple.png
+	modified:   app/src/main/res/drawable/bread.png
+	modified:   app/src/main/res/drawable/breakfast_simple.png
+	modified:   app/src/main/res/drawable/dinner_simple.png
+	modified:   app/src/main/res/drawable/egg.png
+	modified:   app/src/main/res/drawable/fat_ic.png
+	modified:   app/src/main/res/drawable/lunch_simple.png
+	modified:   app/src/main/res/layout/bottom_sheet_app_onboarding.xml
+	modified:   app/src/main/res/layout/bottom_sheet_calorie_result.xml
+	modified:   app/src/main/res/layout/bottom_sheet_log_food_text_input.xml
+	modified:   app/src/main/res/layout/dialog_streak_info.xml
+	modified:   app/src/main/res/layout/food_analyzing_loader.xml
+	modified:   app/src/main/res/layout/fragment_add_weight_photo.xml
+	modified:   app/src/main/res/layout/fragment_admin_user_details.xml
+	modified:   app/src/main/res/layout/fragment_admin_users_list.xml
+	modified:   app/src/main/res/layout/fragment_ai_chat.xml
+	modified:   app/src/main/res/layout/fragment_auth.xml
+	modified:   app/src/main/res/layout/fragment_breakfast_guide.xml
+	modified:   app/src/main/res/layout/fragment_community_profile.xml
+	deleted:    app/src/main/res/layout/fragment_daily_limit.xml
+	modified:   app/src/main/res/layout/fragment_dinner_guide.xml
+	modified:   app/src/main/res/layout/fragment_home.xml
+	modified:   app/src/main/res/layout/fragment_log_food.xml
+	modified:   app/src/main/res/layout/fragment_lunch_guide.xml
+	modified:   app/src/main/res/layout/fragment_macro_info.xml
+	modified:   app/src/main/res/layout/fragment_menu_list.xml
+	modified:   app/src/main/res/layout/fragment_natija.xml
+	modified:   app/src/main/res/layout/fragment_plate_rule.xml
+	modified:   app/src/main/res/layout/fragment_profile.xml
+	modified:   app/src/main/res/layout/fragment_snacks_guide.xml
+	modified:   app/src/main/res/layout/home_main_progress.xml
+	modified:   app/src/main/res/layout/item_chat_message.xml
+	modified:   app/src/main/res/layout/item_community_post.xml
+	modified:   app/src/main/res/layout/item_date_scroller.xml
+	modified:   app/src/main/res/layout/item_food_search_result.xml
+	modified:   app/src/main/res/layout/item_home_meal_card.xml
+	modified:   app/src/main/res/layout/item_menu.xml
+	modified:   app/src/main/res/layout/item_profile_section.xml
+	modified:   app/src/main/res/layout/item_todays_food.xml
+	modified:   app/src/main/res/layout/item_top_streak_user.xml
+	modified:   app/src/main/res/layout/premium_sheet.xml
+	modified:   app/src/main/res/layout/support_sheet.xml
+	modified:   app/src/main/res/navigation/main_navigation.xml
+	modified:   app/src/main/res/navigation/onboarding_nav.xml
+	modified:   app/src/main/res/values-night/themes.xml
+	modified:   app/src/main/res/values/colors.xml
+	modified:   app/src/main/res/values/strings.xml
+	modified:   app/src/main/res/values/themes.xml
+	modified:   build_log.txt
+	modified:   build_output.txt
+	modified:   diff.txt
+	modified:   gradle.properties
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	.kotlin/errors/errors-1782739876427.log
+	.kotlin/errors/errors-1783070187927.log
+	.kotlin/errors/errors-1783070207045.log
+	.kotlin/sessions/
+	app/release/
+	app/src/main/java/uz/oybek/ozamiz/data/ai/AiPromptBuilder.kt
+	app/src/main/java/uz/oybek/ozamiz/data/ai/DietologAnswers.kt
+	app/src/main/java/uz/oybek/ozamiz/data/ai/local/
+	app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/CarbsGuideFragment.kt
+	app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/LipidsGuideFragment.kt
+	app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/ProteinGuideFragment.kt
+	app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/screens/PhoneOnboardFragment.kt
+	app/src/main/java/uz/oybek/ozamiz/ui/feature/streak/StreakViewModel.kt
+	app/src/main/res/layout/dialog_limit_warning.xml
+	app/src/main/res/layout/fragment_carbs_guide.xml
+	app/src/main/res/layout/fragment_lipids_guide.xml
+	app/src/main/res/layout/fragment_phone_onboard.xml
+	app/src/main/res/layout/fragment_protein_guide.xml
+	build_error.txt
+	build_result.txt
+	clean_build_err.txt
+	compile.log
+	git_user_history.txt
+	menu_diff.txt
+	status.txt
+

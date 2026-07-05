@@ -1,7 +1,5 @@
 package uz.oybek.ozamiz.ui.feature.log.photo
 
-import uz.oybek.ozamiz.data.logs.model.WeightLog
-
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -9,17 +7,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.logs.model.WeightLog
+import uz.oybek.ozamiz.data.utils.formatToLogPhotoDateTime
 import uz.oybek.ozamiz.databinding.ItemWeightPhotoLogBinding
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 class WeightPhotoLogAdapter(
     private val onItemClick: (WeightLog) -> Unit
 ) : ListAdapter<WeightLog, WeightPhotoLogAdapter.ViewHolder>(WeightPhotoLogDiffCallback()) {
-
-    private val dateFormat =
-        SimpleDateFormat("dd-MMMM, yyyy HH:mm", Locale("uz", "UZ")) // Adjust locale if needed
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemWeightPhotoLogBinding.inflate(
@@ -45,11 +40,11 @@ class WeightPhotoLogAdapter(
 
         fun bind(log: WeightLog) {
             binding.textViewLogWeight.text = String.format(Locale.US, "%.1f kg", log.weightKg)
-            binding.textViewLogDate.text = dateFormat.format(Date(log.timestampLong))
+            binding.textViewLogDate.text = log.timestampLong.formatToLogPhotoDateTime()
 
             Glide.with(itemView.context)
                 .load(log.photoUrl)
-                .placeholder(R.drawable.woman_placeholder) // Placeholder
+                .placeholder(R.drawable.woman_placeholder)
                 .error(R.drawable.woman_placeholder)       // Error placeholder
                 .into(binding.imageViewLogPhoto)
         }

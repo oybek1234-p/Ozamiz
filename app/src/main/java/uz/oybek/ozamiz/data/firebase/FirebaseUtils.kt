@@ -1,9 +1,10 @@
 package uz.oybek.ozamiz.data.firebase
 
-import com.google.firebase.database.DataSnapshot
 import android.util.Log
-import uz.oybek.ozamiz.data.user.model.User
+import com.google.firebase.database.DataSnapshot
 import uz.oybek.ozamiz.data.streak.StreakInfo
+import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.user.model.User
 
 fun <T> DataSnapshot.getValueSafe(type: Class<T>, default: T? = null): T? {
     if (type == User::class.java) {
@@ -11,10 +12,8 @@ fun <T> DataSnapshot.getValueSafe(type: Class<T>, default: T? = null): T? {
     }
     return try {
         val value = getValue(type)
-        Log.d("FirebaseUtils", "Successfully parsed ${type.simpleName} for key: $key")
         value
     } catch (e: Exception) {
-        Log.e("FirebaseUtils", "Error parsing ${type.simpleName} for key: $key. Raw value: ${this.value}", e)
         default
     }
 }
@@ -51,7 +50,6 @@ fun DataSnapshot.toUserSafe(): User {
     u.paymentCheckPhotoUrl = child("paymentCheckPhotoUrl").value as? String
     u.admin = child("admin").value as? Boolean ?: false
     u.scorePoints = (child("scorePoints").value as? Number)?.toInt() ?: 0
-    u.lastTaskDate = child("lastTaskDate").value as? String
 
     u.problems = try {
         val problemsChild = child("problems")
@@ -62,14 +60,6 @@ fun DataSnapshot.toUserSafe(): User {
         null
     }
 
-    u.completedTaskIds = try {
-        val completedChild = child("completedTaskIds")
-        if (completedChild.exists()) {
-            completedChild.children.mapNotNull { it.value?.toString() }
-        } else emptyList()
-    } catch (e: java.lang.Exception) {
-        emptyList()
-    }
     u.streakInfo = try {
         val streakChild = child("streakInfo")
         if (streakChild.exists()) {
@@ -78,7 +68,8 @@ fun DataSnapshot.toUserSafe(): User {
             val bestStreak = (streakChild.child("bestStreak").value as? Number)?.toInt() ?: 0
             val activeDays = (streakChild.child("activeDays").value as? Number)?.toInt() ?: 0
             val streakGoal = (streakChild.child("streakGoal").value as? Number)?.toInt() ?: 7
-            val activityHistory = streakChild.child("activityHistory").children.mapNotNull { it.value?.toString() }
+            val activityHistory =
+                streakChild.child("activityHistory").children.mapNotNull { it.value?.toString() }
             StreakInfo(
                 lastActionDate = lastActionDate,
                 currentStreak = currentStreak,
@@ -96,6 +87,6 @@ fun DataSnapshot.toUserSafe(): User {
 }
 
 val currentUserId: String
-    get() = auth.currentUser?.uid ?: ""
+    get() = user.uid
 
 fun generateKey() = System.currentTimeMillis().toString()

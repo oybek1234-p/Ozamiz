@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.logs.DailySummaryRepository
+import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
@@ -57,7 +57,7 @@ class ProfileViewModel : ViewModel() {
         val endOfMonth = DateUtils.getStartOfDay(calendar.time)
 
         viewModelScope.launch {
-            DailySummaryRepository.observeSummaries(startOfMonth, endOfMonth).collect { summaries ->
+            LogRepository.observeSummaries(startOfMonth, endOfMonth).collect { summaries ->
                 val activeDays = summaries.values.count { it.mealsCount >= 2 }
                 _cashbackProgress.value = activeDays
             }

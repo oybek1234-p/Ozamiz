@@ -9,13 +9,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.points.LevelManager
+import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.utils.formatLastSeen
 import uz.oybek.ozamiz.databinding.ItemCommunityUserBinding
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class CommunityUsersAdapter(
     private val onUserClick: (User) -> Unit
@@ -49,7 +46,7 @@ class CommunityUsersAdapter(
             binding.tvName.text = user.name.ifBlank { "Ismsiz foydalanuvchi" }
             binding.imgPremium.isVisible = user.premium
 
-            val level = LevelManager.getCurrentLevel(user.scorePoints)
+            val level = LevelRepository.getCurrentLevel(user.scorePoints)
             binding.tvLevel.text = "${level.emoji} ${level.name} • ${user.scorePoints} ball"
 
             binding.tvLastSeen.text = formatLastSeen(user.lastSeenTime)

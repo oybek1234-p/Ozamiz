@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_item_level"
     android:layout_width="match_parent"
+    android:layout_marginEnd="@dimen/dimen_8"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    app:cardCornerRadius="24dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="20dp"
     app:cardElevation="0dp"
     app:strokeWidth="1dp"
     app:strokeColor="?colorOutlineVariant"
@@ -15,13 +16,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp">
+        android:padding="16dp">
 
+        <!-- Emoji uchun zamonaviy va ixcham konteyner -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/card_emoji_container"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            app:cardCornerRadius="16dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="14dp"
             app:cardElevation="0dp"
             app:strokeWidth="0dp"
             app:cardBackgroundColor="?colorSurfaceContainerHigh"
@@ -34,37 +36,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="28sp"
-                tools:text="🔥" />
+                android:textSize="24sp"
+                tools:text="🌱" />
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Daraja nomi -->
         <TextView
             android:id="@+id/text_item_level_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="12dp"
             android:fontFamily="@font/roboto_bold"
             android:textColor="?colorOnSurface"
-            android:textSize="17sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/layout_status"
             app:layout_constraintStart_toEndOf="@id/card_emoji_container"
             app:layout_constraintTop_toTopOf="@id/card_emoji_container"
-            tools:text="Iroda" />
+            tools:text="Boshlovchi" />
 
         <TextView
             android:id="@+id/text_item_status"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:fontFamily="@font/roboto_regular"
             android:textColor="?colorOnSurfaceVariant"
-            android:textSize="13sp"
-            app:layout_constraintBottom_toBottomOf="@id/card_emoji_container"
+            android:textSize="12sp"
+            android:ellipsize="end"
+            android:maxLines="2"
             app:layout_constraintEnd_toEndOf="@id/text_item_level_name"
             app:layout_constraintStart_toStartOf="@id/text_item_level_name"
             app:layout_constraintTop_toBottomOf="@id/text_item_level_name"
-            tools:text="Hozirgi bosqich" />
+            tools:text="Birinchi qadamni tashladingiz, endi orqaga qaytish yo'q!" />
 
+        <!-- O'ng tomondagi ball va ikonka qismi -->
         <LinearLayout
             android:id="@+id/layout_status"
             android:layout_width="wrap_content"
@@ -80,28 +86,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_medium"
+                android:textColor="?colorOnSurfaceVariant"
                 android:textSize="13sp"
-                tools:text="500 ball" />
+                tools:text="100 ball" />
 
-            <ImageView
-                android:id="@+id/img_level_lock"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="4dp"
-                android:src="@drawable/lock_ic"
-                android:visibility="gone"
-                app:tint="?colorOutline"
-                tools:visibility="visible" />
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
 
-            <ImageView
-                android:id="@+id/img_level_check"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="4dp"
-                android:src="@drawable/check_circle_ic"
-                android:visibility="gone"
-                app:tint="?colorPrimary"
-                tools:visibility="visible" />
+                <ImageView
+                    android:id="@+id/img_level_lock"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/lock_ic"
+                    android:visibility="gone"
+                    app:tint="?colorOutline"
+                    tools:visibility="visible" />
+
+                <ImageView
+                    android:id="@+id/img_level_check"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/check_circle_ic"
+                    android:visibility="gone"
+                    app:tint="?colorPrimary"
+                    tools:visibility="gone" />
+
+            </FrameLayout>
 
         </LinearLayout>
 

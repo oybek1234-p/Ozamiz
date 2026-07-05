@@ -1,37 +1,31 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
-import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
-import uz.oybek.ozamiz.data.utils.DateUtils
-
 import android.net.Uri
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.firebase.uploader.ImageCompressor
+import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
-import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysis
-import uz.oybek.ozamiz.data.food.model.MealTime
-import uz.oybek.ozamiz.data.logs.model.FoodLog
+import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.SavedFoodRepository
+import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.first
-import uz.oybek.ozamiz.data.logs.DailyLogRepository
-import uz.oybek.ozamiz.data.logs.model.DailyLogs
-import uz.oybek.ozamiz.data.user.UserRepository
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
-import uz.oybek.ozamiz.ui.feature.premium.isPremiumOrTrial
+import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.streak.StreakRepository
+import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.user.model.daysFromRegister
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import java.util.Date
 
 data class LogFoodState(
@@ -42,7 +36,9 @@ data class LogFoodState(
     val result: FoodAnalysis? = null,
     val editing: FoodLog? = null,
     val uploadUrl: String? = null,
-    val date: Date = Date()
+    val date: Date = Date(),
+    val logs: List<FoodLog> = emptyList(),
+    val savedFoodIds: Set<String> = emptySet()
 )
 
 sealed interface LogEvent {
@@ -55,9 +51,6 @@ sealed interface LogEvent {
         val data: FoodAnalysis
     ) : LogEvent
 
-    data class ClarificationNeeded(
-        val data: FoodAnalysis
-    ) : LogEvent
 
     data class Message(val text: String) : LogEvent
 }
@@ -74,76 +67,71 @@ class LogFoodViewModel() : ViewModel() {
     val loadingFoodIds = _loadingFoodIds.asStateFlow()
 
     val savedFoods = SavedFoodRepository.getSavedFoods()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
-    val savedFoodIds = savedFoods.map { it.map { food -> food.logId }.toSet() }
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     private var analyzeJob: Job? = null
+    private var logsJob: Job? = null
+
+    fun setDateAndMeal(date: Date, meal: String) {
+        _state.update { it.copy(date = date, meal = meal) }
+        observeLogsAndFavorites(date)
+    }
+
+    private fun observeLogsAndFavorites(date: Date) {
+        logsJob?.cancel()
+        logsJob = viewModelScope.launch {
+            launch {
+                combine(
+                    FoodLogRepository.getAllLogs(date),
+                    _state.map { it.meal }.distinctUntilChanged()
+                ) { allLogs, mealId ->
+                    allLogs.filter { it.mealType == mealId }
+                }.collect { filteredLogs ->
+                    _state.update { it.copy(logs = filteredLogs) }
+                }
+            }
+
+            launch {
+                SavedFoodRepository.getSavedFoods()
+                    .map { it.map { food -> food.description.lowercase().trim() }.toSet() }
+                    .collect { descriptions ->
+                        _state.update { it.copy(savedFoodIds = descriptions) }
+                    }
+            }
+        }
+    }
 
     fun updateMeal(meal: String) {
         _state.update { it.copy(meal = meal) }
     }
 
-    fun logFood(foodLog: FoodLog, date: Date) {
-        viewModelScope.launch {
-            FoodLogRepository.add(image = null, foodLog = foodLog, date = date)
-            StreakRepository.updateStreak()
-        }
-    }
-
     fun deleteFoodLog(foodLog: FoodLog, date: Date) {
         viewModelScope.launch {
             FoodLogRepository.delete(foodLog.logId, date)
-            _event.send(LogEvent.Message("O'chirildi"))
-        }
-    }
-
-    fun reLogFood(foodLog: FoodLog) {
-        viewModelScope.launch {
-            if (!isUserPremium && getTodayFoodLogsCountSync() >= 5) {
-                _event.send(LogEvent.Message("Kunlik me'yor (5 ta) to'ldi!"))
-                return@launch
-            }
-            val duplicate = foodLog.copy(logId = "", timestamp = System.currentTimeMillis())
-            FoodLogRepository.add(null, duplicate, state.value.date)
-            StreakRepository.updateStreak()
-            _event.send(LogEvent.Message("Qayta qo'shildi!"))
-        }
-    }
-
-    fun toggleFavorite(foodLog: FoodLog) {
-        viewModelScope.launch {
-            val isSaved = SavedFoodRepository.isFoodSaved(foodLog.logId)
-            if (isSaved) {
-                SavedFoodRepository.removeSavedFood(foodLog.logId)
-                _event.send(LogEvent.Message("Sevimlilardan olib tashlandi"))
-            } else {
-                SavedFoodRepository.saveFood(foodLog)
-                _event.send(LogEvent.Message("Sevimlilarga qo'shildi!"))
-            }
         }
     }
 
     fun removeFavorite(foodLog: FoodLog) {
         viewModelScope.launch {
             SavedFoodRepository.removeSavedFood(foodLog.logId)
-            _event.send(LogEvent.Message("Sevimlilardan olib tashlandi"))
         }
     }
 
-    fun logSavedFood(foodLog: FoodLog) {
+    fun relogFood(foodLog: FoodLog) {
         viewModelScope.launch {
-            if (!isUserPremium && getTodayFoodLogsCountSync() >= 5) {
-                _event.send(LogEvent.Message("Kunlik me'yor (5 ta) to'ldi!"))
-                return@launch
-            }
             _loadingFoodIds.update { it + foodLog.logId }
-            val log = foodLog.copy(logId = "", timestamp = System.currentTimeMillis(), mealType = state.value.meal)
+            val log = foodLog.copy(
+                logId = "",
+                timestamp = System.currentTimeMillis(),
+                mealType = state.value.meal
+            )
             FoodLogRepository.add(null, log, state.value.date)
             StreakRepository.updateStreak()
             _loadingFoodIds.update { it - foodLog.logId }
-            _event.send(LogEvent.Message("Qo'shildi!"))
         }
     }
 
@@ -156,44 +144,6 @@ class LogFoodViewModel() : ViewModel() {
         analyze()
     }
 
-    private suspend fun getDailyStats(date: Date): Triple<Int, Int, Int> {
-        val dailyLogsWrapper = DailyLogRepository.observeDailyLogs(date).first()
-        val dailyLogs = (dailyLogsWrapper as? DataWrapper.Success)?.data ?: DailyLogs()
-        val consumed = dailyLogs.foodLogs?.values?.sumOf { it.calories } ?: 0
-        val water = dailyLogs.waterLogs?.values?.sumOf { it.amountMl } ?: 0
-        val burned = dailyLogs.exerciseLogs?.values?.sumOf { it.caloriesBurned } ?: 0
-        return Triple(consumed, water, burned)
-    }
-
-    fun submitAnswer(answer: String) {
-        val currentAnalysis = state.value.result ?: return
-        viewModelScope.launch {
-            _state.update { it.copy(isAnalyzing = true) }
-            val history = FoodAnalyzer.getHistory(currentAnalysis.id)
-            if (history.isEmpty()) {
-                _state.update { it.copy(isAnalyzing = false) }
-                _event.send(LogEvent.Error.AnalyzeError)
-                return@launch
-            }
-
-            val answerContent = com.google.firebase.ai.type.content(role = "user") { text(answer) }
-            val result = FoodAnalyzer.analyze(history + answerContent)
-            
-            _state.update { it.copy(result = result, isAnalyzing = false) }
-
-            if (result != null) {
-                result.photoUrl = currentAnalysis.photoUrl
-                result.mealType = currentAnalysis.mealType
-                FoodAnalyzer.updateCachedResult(result.id, currentAnalysis.photoUrl, currentAnalysis.mealType)
-
-                if (result.result?.isAmbiguous == true) _event.send(LogEvent.ClarificationNeeded(result))
-                else _event.send(LogEvent.Analyzed(result))
-            } else {
-                _event.send(LogEvent.Error.AnalyzeError)
-            }
-        }
-    }
-
     fun analyze() {
         analyzeJob?.cancel()
         analyzeJob = viewModelScope.launch {
@@ -202,33 +152,24 @@ class LogFoodViewModel() : ViewModel() {
                 _event.send(LogEvent.Error.EmptyInput)
                 return@launch
             }
-
             _state.update { it.copy(isAnalyzing = true) }
-            val compressed = currentState.image?.let { ImageCompressor.compressImageFile(it) }
-            val (consumed, water, burned) = getDailyStats(currentState.date)
-            val target = UserRepository.user.targetCalories
-
-            val initialContent = FoodAnalyzer.createInitialContent(
-                compressed?.toUri(), currentState.description, currentState.meal,
-                consumed, water, burned, target
+            val result = FoodAnalyzer.analyze(
+                description = state.value.description,
+                meal = state.value.meal,
+                image = state.value.image
             )
+            if (user.premium.not()) {
+                launch {
+                    AppPreference.incrementFoodLogLimitCount()
+                }
+            }
+            result?.photoUrl = state.value.uploadUrl
+            result?.mealType = state.value.meal
 
-            val result = FoodAnalyzer.analyze(listOf(initialContent))
             _state.update { it.copy(result = result, isAnalyzing = false) }
 
             if (result != null) {
-                result.photoUrl = currentState.image?.toString()
-                result.mealType = currentState.meal
-                FoodAnalyzer.updateCachedResult(result.id, currentState.image?.toString(), currentState.meal)
-
-                if (!isUserPremium) {
-                    val todayStr = DateUtils.getFormattedDateString(currentState.date, "yyyy-MM-dd")
-                    LocalPreferencesRepository.addAiLoggedDate(todayStr)
-                    LocalPreferencesRepository.incrementDailyAiLogCount(todayStr)
-                }
-                
-                if (result.result?.isAmbiguous == true) _event.send(LogEvent.ClarificationNeeded(result))
-                else _event.send(LogEvent.Analyzed(result))
+                _event.send(LogEvent.Analyzed(result))
             } else {
                 _event.send(LogEvent.Error.AnalyzeError)
             }
@@ -239,24 +180,20 @@ class LogFoodViewModel() : ViewModel() {
         analyzeJob?.cancel()
         analyzeJob = viewModelScope.launch {
             _state.update { it.copy(isAnalyzing = true) }
-            val (consumed, water, burned) = getDailyStats(state.value.date)
-            val target = UserRepository.user.targetCalories
 
-            val result = FoodAnalyzer.analyzeAudio(audioUri, state.value.meal, consumed, water, burned, target)
-            _state.update { it.copy(result = result, isAnalyzing = false) }
-            
-            if (result != null) {
-                result.mealType = state.value.meal
-                FoodAnalyzer.updateCachedResult(result.id, null, state.value.meal)
-
-                if (!isUserPremium) {
-                    val todayStr = DateUtils.getFormattedDateString(state.value.date, "yyyy-MM-dd")
-                    LocalPreferencesRepository.addAiLoggedDate(todayStr)
-                    LocalPreferencesRepository.incrementDailyAiLogCount(todayStr)
+            val result = FoodAnalyzer.analyzeAudio(
+                audioUri,
+                state.value.meal
+            )
+            if (user.premium.not()) {
+                launch {
+                    AppPreference.incrementFoodLogLimitCount()
                 }
-                
-                if (result.result?.isAmbiguous == true) _event.send(LogEvent.ClarificationNeeded(result))
-                else _event.send(LogEvent.Analyzed(result))
+            }
+            _state.update { it.copy(result = result, isAnalyzing = false) }
+
+            if (result != null) {
+                _event.send(LogEvent.Analyzed(result))
             } else {
                 _event.send(LogEvent.Error.AnalyzeError)
             }
@@ -268,63 +205,22 @@ class LogFoodViewModel() : ViewModel() {
         _state.update { it.copy(isAnalyzing = false) }
     }
 
-    val isUserPremium: Boolean
-        get() = UserRepository.user.isPremium()
-
-    val isUserPremiumOrTrial: Boolean
-        get() = UserRepository.user.isPremiumOrTrial()
-
-    val paymentChecking: Boolean
-        get() = UserRepository.user.paymentChecking
-
-    fun isFoodTourSeen(): Boolean {
-        return LocalPreferencesRepository.isFoodTourSeen()
-    }
-
-    fun setFoodTourSeen(seen: Boolean) {
-        LocalPreferencesRepository.setFoodTourSeen(seen)
-    }
-
-    fun getManualAiUsageCount(): Int {
-        return UserRepository.getManualAiUsageCount()
-    }
-
-    fun incrementManualAiUsageCount() {
-        UserRepository.incrementManualAiUsageCount()
-    }
-
-    fun getLatestLogs(date: Date, limit: Int = 2) = FoodLogRepository.getLatestLogs(date, limit)
-
-    enum class AiLimitStatus {
-        ALLOWED,
-        DAILY_LIMIT_REACHED,
-        TRIAL_EXPIRED
-    }
-
-    fun checkAiLimitStatus(): AiLimitStatus {
-        if (isUserPremium) return AiLimitStatus.ALLOWED
-        val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
-        val loggedDates = LocalPreferencesRepository.getAiLoggedDates()
-        if (loggedDates.size >= 3 && !loggedDates.contains(todayStr)) {
-            return AiLimitStatus.TRIAL_EXPIRED
+    fun toggleFavorite(foodLog: FoodLog) {
+        viewModelScope.launch {
+            val isSaved = SavedFoodRepository.isFoodSaved(foodLog.description)
+            if (isSaved) {
+                SavedFoodRepository.removeSavedFood(foodLog.description)
+            } else {
+                val toSave = foodLog.copy(logId = "")
+                SavedFoodRepository.saveFood(toSave)
+            }
         }
-        val dailyAiCount = LocalPreferencesRepository.getDailyAiLogCount(todayStr)
-        if (dailyAiCount >= 3) {
-            return AiLimitStatus.DAILY_LIMIT_REACHED
-        }
-        return AiLimitStatus.ALLOWED
     }
 
-    suspend fun getDailyCalorieLimitReached(): Boolean {
-        if (isUserPremium) return false
-        val (consumed, _, burned) = getDailyStats(state.value.date)
-        val target = UserRepository.user.targetCalories
-        return target > 0 && (consumed - burned) >= target
-    }
-
-    suspend fun getTodayFoodLogsCountSync(): Int {
-        val dailyLogsWrapper = DailyLogRepository.observeDailyLogs(state.value.date).first()
-        val dailyLogs = (dailyLogsWrapper as? DataWrapper.Success)?.data ?: DailyLogs()
-        return dailyLogs.foodLogs?.size ?: 0
+    fun canAddLog(): Boolean {
+        if (user.isPremium()) return true
+        if (user.daysFromRegister() <= 3 && AppPreference.getFoodLogLimitCount() <= 3)
+            return true
+        return false
     }
 }

@@ -46,21 +46,13 @@
                 app:tint="?attr/colorSurfaceVariant" />
 
             <TextView
-                style="@style/Headline3_15"
+                style="@style/Text1_16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Hali hech narsa saqlamadingiz"
+                android:text="Saqlangan ovqatlar shu yerda turadi"
                 android:textColor="?colorOnSurface" />
 
-            <TextView
-                style="@style/Caption2_12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="Sevimlilaringizni shu yerda ko'rishingiz mumkin"
-                android:textColor="?colorOnSurfaceVariant" />
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

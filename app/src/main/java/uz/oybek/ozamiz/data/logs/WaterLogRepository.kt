@@ -18,7 +18,7 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
     override suspend fun add(log: WaterLog, date: Date): Boolean {
         val success = super.add(log, date)
         if (success) {
-            DailySummaryRepository.updateSummary(
+            LogRepository.updateSummary(
                 date = date,
                 waterDelta = log.amountMl
             )
@@ -27,8 +27,9 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
     }
 
     suspend fun delete(logId: String, date: Date, targetUid: String? = null): Boolean {
-        // Need to fetch old log to know amount
-        val userId = targetUid ?: currentUserId ?: return false
+        // Need to fetch old log to know points
+        val userId = targetUid ?: currentUserId
+        if (userId.isBlank()) return false
         val dateStr = date.dateApiFormat()
         val oldLog = try {
             getReference(userId, dateStr).child(logId).get().await().getValue(WaterLog::class.java)
@@ -45,7 +46,7 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
         }
 
         if (success && oldLog != null) {
-            DailySummaryRepository.updateSummary(
+            LogRepository.updateSummary(
                 date = date,
                 targetUid = userId,
                 waterDelta = -oldLog.amountMl

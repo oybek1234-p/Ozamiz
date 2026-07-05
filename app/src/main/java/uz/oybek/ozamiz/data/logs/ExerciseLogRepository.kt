@@ -25,7 +25,7 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
     override suspend fun add(log: ExerciseLog, date: Date): Boolean {
         val success = super.add(log, date)
         if (success) {
-            DailySummaryRepository.updateSummary(
+            LogRepository.updateSummary(
                 date = date,
                 exerciseDelta = log.caloriesBurned
             )
@@ -34,7 +34,8 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
     }
 
     suspend fun delete(logId: String, date: Date, targetUid: String? = null): Boolean {
-        val userId = targetUid ?: currentUserId ?: return false
+        val userId = targetUid ?: currentUserId
+        if (userId.isBlank()) return false
         val dateStr = date.dateApiFormat()
 
         val oldLog = try {
@@ -53,7 +54,7 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
         }
 
         if (success && oldLog != null) {
-            DailySummaryRepository.updateSummary(
+            LogRepository.updateSummary(
                 date = date,
                 targetUid = userId,
                 exerciseDelta = -oldLog.caloriesBurned
@@ -64,7 +65,8 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
 
     fun getLogs(date: Date): Flow<List<ExerciseLog>> = callbackFlow {
         val userId = currentUserId
-        if (userId == null) {
+        if (userId.isBlank()) {
+            trySend(emptyList())
             close()
             return@callbackFlow
         }
@@ -89,6 +91,11 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
 
     fun getLogsFlow(userId: String, dateStr: String): Flow<DataWrapper<List<ExerciseLog>>> =
         callbackFlow {
+            if (userId.isBlank()) {
+                trySend(DataWrapper.Error())
+                close()
+                return@callbackFlow
+            }
             val query = getReference(userId, dateStr)
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

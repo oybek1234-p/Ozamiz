@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.appContext
+import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
@@ -64,7 +65,7 @@ object AchievementPostHelper {
             photos = photos,
             verified = true,
             isVisible = true,
-            isPremiumUser = user.premium
+            isPremiumUser = PremiumUtils.isPremium(user)
         )
     }
 

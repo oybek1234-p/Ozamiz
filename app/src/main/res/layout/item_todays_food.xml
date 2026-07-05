@@ -77,6 +77,18 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/btn_like_food"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
+        android:padding="6dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_heart_outline"
+        app:tint="?colorOnSurfaceVariant" />
+
+    <ImageView
         android:id="@+id/btn_delete_food"
         android:layout_width="32dp"
         android:layout_height="32dp"

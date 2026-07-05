@@ -6,9 +6,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
+import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
@@ -17,20 +19,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysis
 import uz.oybek.ozamiz.data.food.model.MealTime
-import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.databinding.FoodAnalyzingLoaderBinding
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter
+import uz.oybek.ozamiz.ui.feature.log.voice.VoiceRecorderBottomSheet
+import uz.oybek.ozamiz.ui.feature.premium.PaymentGetCheckFragment
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.showToast
 import java.util.Date
@@ -41,19 +44,14 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private var meal: String = ""
     private var logDate: Date = Date()
-    private var loadingSheet: BottomSheetDialog? = null
-    private var loadingShown = false
+    private var recentLogsAdapter: RecentLogsAdapter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             val argument = getArgument(it)
             logDate = Date(argument.timestamp)
             meal = argument.meal
-            if (argument.openCamera) {
-                checkAiLimitsAndRun {
-                    launchCamera()
-                }
-            }
         }
     }
 
@@ -62,11 +60,10 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     override fun viewCreated(bind: FragmentLogFoodBinding) {
         setupUI(bind)
-        observeData()
+        observeUiState()
         initTextInput()
-        setMeal(meal)
-        viewModel.updateMeal(meal)
-        initTodayLogs(logDate)
+        initVoiceInput()
+        viewModel.setDateAndMeal(logDate, meal)
         setupPremiumListener()
         initFoodCamera()
 
@@ -92,8 +89,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     override fun onDestroyView() {
-        loadingSheet?.dismiss()
-        loadingSheet = null
+        recentLogsAdapter = null
         super.onDestroyView()
     }
 
@@ -102,7 +98,11 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             when (bundle.getString(FoodCameraFragment.RESULT_ACTION)) {
                 FoodCameraFragment.ACTION_PHOTO -> {
                     bundle.getString(FoodCameraFragment.RESULT_URI)?.let { uriString ->
-                        viewModel.analyzePhoto(image = Uri.parse(uriString))
+                        navigateToResult(
+                            imageUri = Uri.parse(uriString),
+                            description = "",
+                            meal = viewModel.state.value.meal
+                        )
                     }
                 }
 
@@ -111,149 +111,76 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 }
 
                 FoodCameraFragment.ACTION_LIST -> {
-                    val bundleList = Bundle().apply {
-                        putString("mealType", viewModel.state.value.meal)
-                        putLong("timestamp", logDate.time)
-                    }
-                    findNavController().navigate(
-                        R.id.action_logFoodFragment_to_searchFoodFragment,
-                        bundleList
+                    SearchFoodFragment.navigate(
+                        findNavController(),
+                        viewModel.state.value.meal,
+                        logDate.time
                     )
                 }
             }
         }
     }
-    
+
     private fun setupPremiumListener() {
         setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
-            if (bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION) == "go_to_payment") {
-                val price = bundle.getLong("selected_price", 29000L)
-                val isYearly = bundle.getBoolean("is_yearly", false)
+            if (bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION) == PremiumBottomSheetDialog.ACTION_GO_TO_PAYMENT) {
+                val price = bundle.getLong(PremiumBottomSheetDialog.KEY_SELECTED_PRICE, 29000L)
+                val isYearly = bundle.getBoolean(PremiumBottomSheetDialog.KEY_IS_YEARLY, false)
                 val args = Bundle().apply {
-                    putLong("price", price)
-                    putBoolean("is_yearly", isYearly)
+                    putLong(PaymentGetCheckFragment.ARG_PRICE, price)
+                    putBoolean(PaymentGetCheckFragment.ARG_IS_YEARLY, isYearly)
                 }
                 findNavController().navigate(R.id.paymentGetCheckFragment, args)
             }
         }
-        setFragmentResultListener("payment_check_submitted") { _, bundle ->
-            if (bundle.getBoolean("submitted")) {
+        setFragmentResultListener(PaymentGetCheckFragment.REQUEST_KEY) { _, bundle ->
+            if (bundle.getBoolean(PaymentGetCheckFragment.RESULT_SUBMITTED)) {
                 PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
             }
         }
     }
 
-    private fun checkAiLimitsAndRun(action: () -> Unit) {
-        lifecycleScope.launch {
-            if (viewModel.paymentChecking) {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-                return@launch
-            }
-            if (!viewModel.isUserPremium && viewModel.getDailyCalorieLimitReached()) {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-                return@launch
-            }
-            val totalCount = viewModel.getTodayFoodLogsCountSync()
-            if (!viewModel.isUserPremium && totalCount >= 5) {
-                showDailyLimitWarning()
-                return@launch
-            }
-            when (viewModel.checkAiLimitStatus()) {
-                LogFoodViewModel.AiLimitStatus.TRIAL_EXPIRED -> {
-                    PremiumBottomSheetDialog().show(
-                        parentFragmentManager,
-                        PremiumBottomSheetDialog.TAG
-                    )
-                }
-
-                LogFoodViewModel.AiLimitStatus.DAILY_LIMIT_REACHED -> {
-                    showAiLimitWarning()
-                }
-
-                LogFoodViewModel.AiLimitStatus.ALLOWED -> {
-                    action()
-                }
-            }
-        }
+    private fun showPremiumSheet() {
+        PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
     }
 
-    private fun checkDailyLimitAndRun(action: () -> Unit) {
+    private fun checkPremiumAndRun(
+        action: () -> Unit
+    ) {
         lifecycleScope.launch {
-            if (viewModel.paymentChecking) {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-                return@launch
-            }
-            if (!viewModel.isUserPremium && viewModel.getDailyCalorieLimitReached()) {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-                return@launch
-            }
-            val totalCount = viewModel.getTodayFoodLogsCountSync()
-            if (!viewModel.isUserPremium && totalCount >= 5) {
-                showDailyLimitWarning()
-            } else {
+            if (viewModel.canAddLog()) {
                 action()
+            } else {
+                showPremiumSheet()
             }
         }
-    }
-
-    private fun showDailyLimitWarning() {
-        showCustomLimitWarning(R.string.daily_food_limit_title, R.string.daily_food_limit_msg)
-    }
-
-    private fun showAiLimitWarning() {
-        showCustomLimitWarning(R.string.ai_food_limit_title, R.string.ai_food_limit_msg)
-    }
-
-    private fun showCustomLimitWarning(titleResId: Int, messageResId: Int) {
-        val dialog = android.app.Dialog(requireContext())
-        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE)
-        val view = android.view.LayoutInflater.from(requireContext()).inflate(
-            R.layout.dialog_limit_warning,
-            null
-        )
-        dialog.setContentView(view)
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        val tvTitle = view.findViewById<android.widget.TextView>(R.id.tv_title)
-        val tvMessage = view.findViewById<android.widget.TextView>(R.id.tv_message)
-        val btnPositive =
-            view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_positive)
-        val btnNegative =
-            view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_negative)
-        val btnSearchList =
-            view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_search_list)
-
-        btnPositive.setOnClickListener {
-            dialog.dismiss()
-            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-        }
-        btnSearchList.setOnClickListener {
-            dialog.dismiss()
-            findNavController().navigate(
-                R.id.action_logFoodFragment_to_searchFoodFragment,
-                Bundle().apply {
-                    putString("mealType", viewModel.state.value.meal)
-                    putLong("timestamp", logDate.time)
-                }
-            )
-        }
-        btnNegative.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-        dialog.window?.setLayout(
-            android.view.ViewGroup.LayoutParams.MATCH_PARENT,
-            android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-        )
     }
 
     private fun initTextInput() {
         setFragmentResultListener(TextInputBottomSheet.REQUEST_KEY) { _, bundle ->
             bundle.getString(TextInputBottomSheet.RESULT_TEXT)?.let { text ->
-                checkAiLimitsAndRun {
+                checkPremiumAndRun {
                     viewModel.updateDescription(text)
-                    viewModel.analyze()
+                    navigateToResult(
+                        imageUri = null,
+                        description = text,
+                        meal = viewModel.state.value.meal
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initVoiceInput() {
+        setFragmentResultListener(VoiceRecorderBottomSheet.REQUEST_KEY) { _, bundle ->
+            bundle.getString(VoiceRecorderBottomSheet.RESULT_URI)?.let { uriString ->
+                checkPremiumAndRun {
+                    navigateToResult(
+                        imageUri = null,
+                        description = "",
+                        meal = viewModel.state.value.meal,
+                        audioUri = Uri.parse(uriString)
+                    )
                 }
             }
         }
@@ -261,20 +188,19 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private fun setupUI(bind: FragmentLogFoodBinding) = with(bind) {
         toolbarLogFood.setNavigationOnClickListener { navigateToHome() }
-        toolbarLogFood.title = "Dietolog tahlili"
+        toolbarLogFood.title = getString(R.string.log_food_toolbar_title)
 
-        val showPremiumBadges = !viewModel.isUserPremiumOrTrial
+        val showPremiumBadges = user.isPremium().not()
         badgeCameraPremium.isVisible = showPremiumBadges
         badgeTextPremium.isVisible = showPremiumBadges
+        badgeVoicePremium.isVisible = showPremiumBadges
 
-        val totalFoods = FoodDatabase.allFoods.size
         textViewSearchListTitle.text = getString(
             R.string.log_food_search_list_count_format,
-            getString(R.string.log_food_search_list_title),
-            totalFoods
+            getString(R.string.log_food_search_list_title)
         )
 
-        if (chipGroupMealType.childCount == 0) {
+        if (chipGroupMealType.isEmpty()) {
             MealTime.mealTypes.forEach { type ->
                 (layoutInflater.inflate(
                     R.layout.item_meal_type_selectable,
@@ -288,57 +214,55 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 }
             }
         }
-
         buttonQuickCamera.setOnSafeClickListener {
-            checkAiLimitsAndRun { launchCamera() }
+            checkPremiumAndRun { launchCamera() }
         }
         buttonShowTextInput.setOnSafeClickListener {
-            checkAiLimitsAndRun {
-                TextInputBottomSheet().show(
+            checkPremiumAndRun {
+                TextInputBottomSheet.newInstance(
+                    title = getString(R.string.log_food_text_title),
+                    placeholder = getString(R.string.food_description_hint)
+                ).show(
                     parentFragmentManager,
                     TextInputBottomSheet.TAG
                 )
             }
         }
-        buttonSearchList.setOnSafeClickListener {
-            findNavController().navigate(
-                R.id.action_logFoodFragment_to_searchFoodFragment,
-                Bundle().apply {
-                    putString("mealType", viewModel.state.value.meal)
-                    putLong("timestamp", logDate.time)
-                })
-        }
-
-
-    }
-
-    private fun initTodayLogs(date: Date) {
-        val adapter = RecentLogsAdapter({ foodLog ->
-            navigate(R.id.analyzeResultFragment, Bundle().apply {
-                putString("logId", foodLog.logId)
-                putLong("timestamp", date.time)
-            })
-        }, { foodLog ->
-            showDeleteConfirmation(foodLog, date)
-        })
-        binding.recyclerRecentLogs.adapter = adapter
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.getLatestLogs(date, 100).collectLatest { logs ->
-                        binding.layoutRecentHistory.isVisible = logs.isNotEmpty()
-                        adapter.submitList(logs)
-                    }
-                }
-                launch {
-                    viewModel.savedFoodIds.collectLatest { ids ->
-                        adapter.setSavedFoodIds(ids)
-                    }
-                }
+        buttonVoiceInput.setOnSafeClickListener {
+            checkPremiumAndRun {
+                VoiceRecorderBottomSheet().show(
+                    parentFragmentManager,
+                    VoiceRecorderBottomSheet.TAG
+                )
             }
         }
+        buttonSavedFoods.setOnSafeClickListener {
+            val bundle = Bundle().apply {
+                putString("mealType", viewModel.state.value.meal)
+                putLong("timestamp", logDate.time)
+            }
+            navigate(R.id.savedFoodsFragment, bundle)
+        }
+        buttonSearchList.setOnSafeClickListener {
+            SearchFoodFragment.navigate(
+                findNavController(),
+                viewModel.state.value.meal,
+                logDate.time
+            )
+        }
+        recentLogsAdapter = RecentLogsAdapter({ foodLog ->
+            navigate(R.id.analyzeResultFragment, Bundle().apply {
+                putString(AnalyzeResultFragment.KEY_LOG_ID, foodLog.logId)
+                putLong(AnalyzeResultFragment.KEY_TIMESTAMP, logDate.time)
+            })
+        }, { foodLog ->
+            showDeleteConfirmation(foodLog, logDate)
+        }, { foodLog ->
+            viewModel.toggleFavorite(foodLog)
+        })
+        recyclerRecentLogs.adapter = recentLogsAdapter
     }
+
 
     private fun showDeleteConfirmation(foodLog: FoodLog, date: Date) {
         AlertDialog.Builder(requireContext())
@@ -351,69 +275,33 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             .show()
     }
 
-    private fun showLoading(state: LogFoodState) {
-        val show = state.isAnalyzing
-        if (loadingShown == show) return
-        loadingShown = show
-
-        if (!show) {
-            loadingSheet?.dismiss()
-            loadingSheet = null
-            return
-        }
-
-        val sheet = BottomSheetDialog(requireContext())
-        val loadBinding = FoodAnalyzingLoaderBinding.inflate(layoutInflater).apply {
-            backView.setOnClickListener {
-                viewModel.cancelAnalyze()
-                sheet.dismiss()
-            }
-            if (state.image != null) {
-                imageRequest.isVisible = true
-                textRequest.isVisible = false
-                imageRequest.setImageURI(state.image)
-            } else if (state.description.isNotBlank()) {
-                imageRequest.isVisible = false
-                textRequest.isVisible = true
-                textRequest.text = state.description
-            }
-        }
-        loadingSheet = sheet
-        sheet.setContentView(loadBinding.root)
-        sheet.setOnDismissListener { loadingShown = false }
-        sheet.show()
-    }
-
     private fun setMeal(mealType: String) {
         binding.chipGroupMealType.findViewWithTag<Chip>(mealType)?.let {
             if (!it.isChecked) it.isChecked = true
         }
     }
 
-    private fun observeData() {
+    private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.state.collectLatest { showLoading(it) }
+                    viewModel.state.map { it.meal }.distinctUntilChanged().collect { mealType ->
+                        setMeal(mealType)
+                    }
                 }
                 launch {
-                    viewModel.event.collectLatest { event ->
+                    viewModel.state.map { it.logs to it.savedFoodIds }.distinctUntilChanged()
+                        .collect { (logs, savedIds) ->
+                            binding.layoutRecentHistory.isVisible = logs.isNotEmpty()
+                            recentLogsAdapter?.submitList(logs)
+                            recentLogsAdapter?.setSavedFoodIds(savedIds)
+                        }
+                }
+                launch {
+                    viewModel.event.collect { event ->
                         when (event) {
                             LogEvent.Error.EmptyInput -> showToast(getString(R.string.log_input_empty))
-                            is LogEvent.ClarificationNeeded -> {
-                                val analysis = event.data
-                                val question = analysis.result?.question
-                                val options = analysis.result?.options ?: emptyList()
-                                if (question != null) {
-                                    ClarificationBottomSheet(
-                                        question,
-                                        options
-                                    ) { viewModel.submitAnswer(it) }
-                                        .show(parentFragmentManager, "clarification_sheet")
-                                }
-                            }
-
-                            is LogEvent.Analyzed -> navigateToResult(event.data)
+                            is LogEvent.Analyzed -> {} // Handled by immediate navigation
                             is LogEvent.Message -> showToast(event.text)
                             else -> {}
                         }
@@ -423,10 +311,18 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         }
     }
 
-    private fun navigateToResult(result: FoodAnalysis) {
+    private fun navigateToResult(
+        imageUri: Uri?,
+        description: String,
+        meal: String,
+        audioUri: Uri? = null
+    ) {
         navigate(R.id.analyzeResultFragment, Bundle().apply {
-            putInt("id", result.id)
-            putLong("timestamp", logDate.time)
+            imageUri?.let { putString(AnalyzeResultFragment.KEY_IMAGE_URI, it.toString()) }
+            audioUri?.let { putString(AnalyzeResultFragment.KEY_AUDIO_URI, it.toString()) }
+            putString(AnalyzeResultFragment.KEY_PENDING_DESCRIPTION, description)
+            putString(AnalyzeResultFragment.KEY_MEAL_TYPE, meal)
+            putLong(AnalyzeResultFragment.KEY_TIMESTAMP, logDate.time)
         })
     }
 
@@ -439,16 +335,16 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             if (!shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
                 showSettingsDialog()
             } else {
-                showToast("Rasmga olish uchun kamera ruxsati zarur")
+                showToast(getString(R.string.log_food_camera_permission_denied))
             }
         }
     }
 
     private fun showSettingsDialog() {
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Kamera ruxsati")
-            .setMessage("Ilova ovqatni rasmga olishi uchun kamera ruxsati kerak. Sozlamalarga o'tib, unga ruxsat bering.")
-            .setPositiveButton("Sozlamalar") { _, _ ->
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.log_food_camera_permission_title)
+            .setMessage(R.string.log_food_camera_permission_msg)
+            .setPositiveButton(R.string.log_food_camera_permission_settings) { _, _ ->
                 val intent =
                     android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                         .apply {
@@ -456,7 +352,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         }
                 startActivity(intent)
             }
-            .setNegativeButton("Bekor qilish", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
 
@@ -481,13 +377,14 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         )
 
         const val TIMESTAMP = "timestamp"
+        const val MEAL = "meal"
         const val OPEN_CAMERA = "openCamera"
         const val OPEN_EDIT_TEXT = "openEditText"
 
         fun getArgument(arguments: Bundle): Argument {
             return Argument(
                 arguments.getLong(TIMESTAMP),
-                arguments.getString("meal", MealTime.Breakfast.id),
+                arguments.getString(MEAL, MealTime.Breakfast.id),
                 arguments.getBoolean(OPEN_CAMERA, false),
                 arguments.getBoolean(OPEN_EDIT_TEXT, false)
             )
@@ -504,7 +401,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 R.id.logFoodFragment,
                 Bundle().apply {
                     putLong(TIMESTAMP, timeStamp)
-                    putString("meal", meal)
+                    putString(MEAL, meal)
                     putBoolean(OPEN_CAMERA, openCamera)
                     putBoolean(OPEN_EDIT_TEXT, openEditText)
                 },

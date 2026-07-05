@@ -5,22 +5,16 @@ import android.view.ViewGroup
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.utils.formatToPlanDate
 import uz.oybek.ozamiz.databinding.FragmentPlanBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlanFragment : OnBoardingChildFragment<FragmentPlanBinding>() {
-
-    val dateFormat = SimpleDateFormat(
-        "dd-MMMM",
-        Locale("uz")
-    )
 
     override fun viewCreated(bind: FragmentPlanBinding) {
         val user = LocalUser.user
         val estimatedDate = DietController.calculateEstimatedGoalDate()
-        val dateStr = dateFormat.format(estimatedDate)
+        val dateStr = estimatedDate.formatToPlanDate()
         val targetWeight = user.targetWeight ?: 0.0
         bind.tvPlanTitle.text = getString(
             R.string.plan_estimated_title,

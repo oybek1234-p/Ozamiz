@@ -4,11 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
@@ -16,17 +20,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
-import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.food.model.FoodDatabase
+import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showKeyboard
-import android.view.animation.OvershootInterpolator
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import java.util.Date
 
 class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
@@ -47,8 +48,8 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            mealType = it.getString("mealType", "")
-            timestamp = it.getLong("timestamp", System.currentTimeMillis())
+            mealType = it.getString(ARG_MEAL_TYPE, "")
+            timestamp = it.getLong(ARG_TIMESTAMP, System.currentTimeMillis())
         }
     }
 
@@ -86,9 +87,11 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             viewModel.state.collectLatest { state ->
                 adapter.submitList(state.searchResults)
                 bind.progressSearch.isVisible = state.isSearching
-                bind.layoutEmptyState.isVisible = !state.isSearching && state.searchResults.isEmpty() && state.query.isNotBlank()
-                
-                val showCount = !state.isSearching && (state.query.isNotBlank() || state.searchResults.isNotEmpty())
+                bind.layoutEmptyState.isVisible =
+                    !state.isSearching && state.searchResults.isEmpty() && state.query.isNotBlank()
+
+                val showCount =
+                    !state.isSearching && (state.query.isNotBlank() || state.searchResults.isNotEmpty())
                 bind.textViewSearchResultsCount.isVisible = showCount
                 if (showCount) {
                     val count = if (state.query.isBlank()) {
@@ -96,7 +99,8 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
                     } else {
                         state.searchResults.size
                     }
-                    bind.textViewSearchResultsCount.text = bind.root.context.getString(R.string.search_foods_count_format, count)
+                    bind.textViewSearchResultsCount.text =
+                        bind.root.context.getString(R.string.search_foods_count_format, count)
                 }
             }
         }
@@ -104,15 +108,16 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private fun directAdd(foodItem: FoodItem, button: MaterialButton, progress: View) {
         animateClick(button)
-        
+
         viewLifecycleOwner.lifecycleScope.launch {
             button.isEnabled = false
             button.setIconResource(R.drawable.check_ic)
             progress.isVisible = true
-            
+
             val defaultServing = foodItem.servingSizes.firstOrNull()
             val weight = defaultServing?.grams ?: 100.0
-            val quantityDescription = if (defaultServing != null) "1 ${defaultServing.description}" else "100 g"
+            val quantityDescription =
+                if (defaultServing != null) "1 ${defaultServing.description}" else "100 g"
 
             val calories = (foodItem.caloriesPer100g * weight / 100).toInt()
             val protein = (foodItem.proteinPer100g * weight / 100)
@@ -131,11 +136,10 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             )
 
             viewModel.logFood(log, Date(timestamp))
-            homeViewModel.onFoodAdded()
             Snackbar.make(binding.root, "${foodItem.name} qo'shildi!", Snackbar.LENGTH_SHORT).show()
-            
+
             delay(200)
-            
+
             progress.isVisible = false
             button.setIconResource(R.drawable.add_ic)
             button.isEnabled = true
@@ -173,11 +177,30 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             mealType = mealType,
             onLogAdded = { log ->
                 viewModel.logFood(log, Date(timestamp))
-                homeViewModel.onFoodAdded()
                 Snackbar.make(binding.root, "Qo'shildi!", Snackbar.LENGTH_SHORT).show()
                 binding.inputSearchFood.setText("")
                 hideSoftInput(requireActivity())
             }
         ).show(parentFragmentManager, FoodSelectionBottomSheet.TAG)
+    }
+
+    companion object {
+        const val ARG_MEAL_TYPE = "mealType"
+        const val ARG_TIMESTAMP = "timestamp"
+
+        fun navigate(
+            navController: NavController,
+            mealType: String,
+            timestamp: Long
+        ) {
+            val bundle = Bundle().apply {
+                putString(ARG_MEAL_TYPE, mealType)
+                putLong(ARG_TIMESTAMP, timestamp)
+            }
+            navController.navigate(
+                R.id.action_logFoodFragment_to_searchFoodFragment,
+                bundle
+            )
+        }
     }
 }

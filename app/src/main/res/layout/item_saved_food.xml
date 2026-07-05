@@ -26,13 +26,14 @@
             app:shapeAppearanceOverlay="@style/RadiusImageView12" />
 
         <LinearLayout
+            android:id="@+id/layout_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_delete_saved"
             app:layout_constraintStart_toEndOf="@id/imageView_saved_food"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -59,10 +60,10 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btn_add_saved"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             app:cardBackgroundColor="?attr/colorPrimary"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -70,16 +71,16 @@
 
             <ImageView
                 android:id="@+id/img_add_icon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:src="@drawable/add_ic"
                 app:tint="?attr/colorOnPrimary" />
 
             <ProgressBar
                 android:id="@+id/progress_add"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:indeterminateTint="?attr/colorOnPrimary"
                 android:visibility="gone" />
@@ -87,9 +88,11 @@
 
         <ImageView
             android:id="@+id/btn_delete_saved"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="8dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="12dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:padding="6dp"
             android:src="@drawable/delete_ic"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btn_add_saved"

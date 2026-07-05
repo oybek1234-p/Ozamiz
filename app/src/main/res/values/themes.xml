@@ -1,18 +1,15 @@
 <resources>
     <style name="Base.Ozamiz" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Backgrounds & Status Bar -->
         <item name="backgroundColor">@color/md_theme_light_surfaceContainer</item>
         <item name="android:windowBackground">@color/md_theme_light_surfaceContainer</item>
         <item name="android:statusBarColor">@color/md_theme_light_surfaceContainer</item>
         <item name="android:windowLightStatusBar">true</item>
 
-        <!-- Primary Colors -->
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_light_onPrimaryContainer</item>
 
-        <!-- Secondary Colors -->
         <item name="colorSecondary">@color/md_theme_light_secondary</item>
         <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
         <item name="colorSecondaryContainer">@color/md_theme_light_secondaryContainer</item>

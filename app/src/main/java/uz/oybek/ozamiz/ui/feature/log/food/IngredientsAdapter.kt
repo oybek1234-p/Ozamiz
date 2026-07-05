@@ -23,7 +23,7 @@ class IngredientsAdapter(
     inner class ViewHolder(private val binding: ItemAnalyzedIngredientBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: String) {
             binding.textViewIngredientName.text = item
-            // Hide calories and amount since we only have ingredient names now
+            // Hide calories and points since we only have ingredient names now
             binding.textViewIngredientCalories.text = ""
             binding.textViewIngredientAmount.text = ""
         }

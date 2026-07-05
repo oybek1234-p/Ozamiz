@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurfaceContainer"
-    android:orientation="vertical"
     android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context=".ui.feature.profile.ProfileFragment">
 
     <androidx.core.widget.NestedScrollView
@@ -38,28 +38,42 @@
                     android:orientation="vertical"
                     android:padding="24dp">
 
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/imageView_user_avatar"
-                        android:layout_width="100dp"
-                        android:layout_height="100dp"
-                        android:scaleType="centerCrop"
-                        android:padding="4dp"
-                        app:strokeWidth="2dp"
-                        app:strokeColor="?attr/colorOnSurfaceVariant"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                        tools:src="@drawable/user_photo_placeholder" />
-
-
-                    <com.google.android.material.button.MaterialButton
+                    <FrameLayout
                         android:layout_width="wrap_content"
-                        android:layout_marginTop="@dimen/dimen_8"
-                        android:layout_height="wrap_content"
-                        app:icon="@drawable/add_ic"
-                        app:iconGravity="textEnd"
-                        style="@style/Widget.Material3.Button.ElevatedButton"
-                        android:id="@+id/btn_edit_avatar"
-                        android:text="Rasm qo'shish"
-                        />
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/imageView_user_avatar"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp"
+                            android:padding="4dp"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                            app:strokeColor="?attr/colorOnSurfaceVariant"
+                            app:strokeWidth="2dp"
+                            tools:src="@drawable/user_photo_placeholder" />
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btn_edit_avatar"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="bottom|end"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/colorPrimary"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="0dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/add_ic"
+                                app:tint="?attr/colorOnPrimary" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </FrameLayout>
+
                     <TextView
                         android:id="@+id/textView_user_name"
                         style="@style/TextAppearance.Material3.TitleLarge"
@@ -70,85 +84,82 @@
                         android:textColor="?colorOnSurface"
                         tools:text="Ali Valiyev" />
 
-                    <!-- Level Badge -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_user_level"
+                    <TextView
+                        android:id="@+id/premiumStatusText"
+                        style="@style/TextAppearance.Material3.LabelLarge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dimen_12"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="0dp"
-                        android:clickable="true"
-                        android:focusable="true"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="Premium"
+                        android:textColor="?colorPrimary"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
 
-                        android:foreground="?selectableItemBackground">
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp">
+            <!-- Level Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_user_level"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
 
-                            <TextView
-                                android:id="@+id/text_profile_level_emoji"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:textSize="16sp"
-                                tools:text="🔥" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                            <TextView
-                                android:id="@+id/text_profile_level_name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="6dp"
-                                android:fontFamily="@font/roboto_medium"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="14sp"
-                                tools:text="Irodali" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="4dp"
-                                android:text="•"
-                                android:textColor="?attr/colorPrimary"
-                                android:alpha="0.5" />
-
-                            <TextView
-                                android:id="@+id/text_profile_points"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="4dp"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="14sp"
-                                tools:text="120 ball" />
-
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
+                    <TextView
+                        android:id="@+id/text_profile_level_emoji"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="12dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:gravity="center"
+                        android:textSize="20sp"
+                        tools:text="🔥" />
 
                     <LinearLayout
-                        android:layout_marginTop="@dimen/dimen_12"
-                        android:id="@+id/premium_active_c"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:visibility="gone"
-                        tools:visibility="visible">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/premiumExpireDate"
-                            style="@style/TextAppearance.Material3.LabelLarge"
+                            android:id="@+id/text_profile_level_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textColor="?colorPrimary"
-                            tools:text="Premium 25.02.2026 gacha" />
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            tools:text="Irodali" />
 
+                        <TextView
+                            android:id="@+id/text_profile_points"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp"
+                            tools:text="120 ball" />
                     </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:rotation="180"
+                        android:src="@drawable/arrow_back"
+                        app:tint="?attr/colorOnSurfaceVariant" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -186,7 +197,7 @@
                                 android:layout_height="28dp"
                                 android:src="@drawable/star_ic"
                                 app:tint="#FFFFFF" />
-                            
+
                             <TextView
                                 style="@style/TextAppearance.Material3.TitleMedium"
                                 android:layout_width="0dp"
@@ -239,6 +250,7 @@
                                     android:text="Rasmli ovqat tahlili"
                                     android:textColor="#FFFFFF" />
                             </LinearLayout>
+
                             <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
@@ -340,10 +352,10 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:visibility="gone"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:visibility="gone">
 
                     <TextView
                         style="@style/TextAppearance.Material3.TitleMedium"
@@ -366,15 +378,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
+                        android:max="24"
                         app:indicatorColor="?attr/colorPrimary"
-                        app:trackStopIndicatorSize="0dp"
+                        app:indicatorTrackGapSize="0dp"
                         app:trackColor="?attr/colorSurfaceContainerHighest"
                         app:trackCornerRadius="4dp"
                         app:trackStopIndicatorPadding="0dp"
-                        app:indicatorTrackGapSize="0dp"
+                        app:trackStopIndicatorSize="0dp"
                         app:trackThickness="8dp"
-                        tools:progress="60"
-                        android:max="24" />
+                        tools:progress="60" />
 
                     <TextView
                         android:id="@+id/text_cashback_status"
@@ -423,9 +435,6 @@
             </com.google.android.material.card.MaterialCardView>
 
 
-
-
-
             <!-- MENU BO'LIMI 2: Yordam -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -457,9 +466,6 @@
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-
-
 
 
             <!-- Admin bo'limi (Hidden) -->

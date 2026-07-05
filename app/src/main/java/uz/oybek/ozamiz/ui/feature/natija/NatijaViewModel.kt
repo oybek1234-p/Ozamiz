@@ -11,7 +11,6 @@ import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.logs.DailySummaryRepository
 import java.util.Date
 
 data class NatijaUiState(

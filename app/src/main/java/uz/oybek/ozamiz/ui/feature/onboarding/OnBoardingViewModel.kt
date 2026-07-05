@@ -1,6 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.onboarding
 
-import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
+import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.data.user.UserRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
@@ -59,7 +59,6 @@ class OnBoardingViewModel : ViewModel() {
     }
 
     fun finishOnboarding() {
-        LocalPreferencesRepository.setFirstRegistration(true)
         UserRepository.updateUser {}
     }
 }

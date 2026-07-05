@@ -73,7 +73,6 @@
                         android:layout_marginTop="12dp"
                         android:orientation="vertical">
 
-                        <!-- Option: Camera -->
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/button_quick_camera"
                             android:layout_width="match_parent"
@@ -81,7 +80,7 @@
                             android:layout_marginBottom="12dp"
                             android:clickable="true"
                             android:focusable="true"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardBackgroundColor="?attr/colorPrimary"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="0dp"
                             app:strokeWidth="0dp">
@@ -97,7 +96,7 @@
                                     android:layout_width="24dp"
                                     android:layout_height="24dp"
                                     android:src="@drawable/camera_ic"
-                                    app:tint="?attr/colorOnSurface" />
+                                    app:tint="?attr/colorOnPrimary" />
 
                                 <TextView
                                     android:layout_width="0dp"
@@ -105,8 +104,8 @@
                                     android:layout_marginStart="16dp"
                                     android:layout_weight="1"
                                     android:fontFamily="@font/roboto_medium"
-                                    android:text="Ovqatni rasmga olish"
-                                    android:textColor="?attr/colorOnSurface"
+                                    android:text="@string/log_food_camera_title"
+                                    android:textColor="?attr/colorOnPrimary"
                                     android:textSize="16sp" />
 
                                 <com.google.android.material.card.MaterialCardView
@@ -135,7 +134,7 @@
                                     android:layout_height="20dp"
                                     android:rotation="180"
                                     android:src="@drawable/arrow_back"
-                                    app:tint="?attr/colorOnSurfaceVariant" />
+                                    app:tint="?attr/colorOnPrimary" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
@@ -171,7 +170,7 @@
                                     android:layout_marginStart="16dp"
                                     android:layout_weight="1"
                                     android:fontFamily="@font/roboto_medium"
-                                    android:text="Ovqat haqida yozing"
+                                    android:text="@string/log_food_text_title"
                                     android:textColor="?attr/colorOnSurface"
                                     android:textSize="16sp" />
 
@@ -205,7 +204,116 @@
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Option: Search List -->
+                        <!-- Option: Voice -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/button_voice_input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="16dp">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/mic_ic"
+                                    app:tint="?attr/colorOnSurface" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="@string/log_food_voice_title"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="16sp" />
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:id="@+id/badge_voice_premium"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="12dp"
+                                    app:cardBackgroundColor="@color/yellow"
+                                    app:cardCornerRadius="6dp"
+                                    app:strokeWidth="0dp"
+                                    android:visibility="gone"
+                                    tools:visibility="visible">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:paddingHorizontal="6dp"
+                                        android:paddingVertical="2dp"
+                                        android:text="PREMIUM"
+                                        android:textColor="#002111"
+                                        android:textSize="10sp"
+                                        android:fontFamily="@font/roboto_bold" />
+                                </com.google.android.material.card.MaterialCardView>
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:rotation="180"
+                                    android:src="@drawable/arrow_back"
+                                    app:tint="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/button_saved_foods"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardCornerRadius="16dp"
+                            app:strokeWidth="0dp"
+                            app:cardElevation="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="16dp">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_heart_outline"
+                                    app:tint="?attr/colorOnSurface" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="@string/saved_foods_title"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="16sp" />
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:rotation="180"
+                                    android:src="@drawable/arrow_back"
+                                    app:tint="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/button_search_list"
                             android:layout_width="match_parent"
@@ -249,6 +357,7 @@
                                     app:tint="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
+
                     </LinearLayout>
                 </LinearLayout>
 
@@ -268,7 +377,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="24dp"
                         android:layout_marginBottom="12dp"
-                        android:text="Oxirgi qo'shilganlar"
+                        android:text="@string/log_food_recent_history"
                         android:textColor="?colorOnSurface" />
 
                     <androidx.recyclerview.widget.RecyclerView

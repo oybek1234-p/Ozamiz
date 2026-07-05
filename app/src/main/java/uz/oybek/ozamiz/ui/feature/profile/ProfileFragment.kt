@@ -1,14 +1,14 @@
 package uz.oybek.ozamiz.ui.feature.profile
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,13 +18,12 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.databinding.FragmentProfileBinding
 import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
 import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.premium.getPremiumExpireDate
-import uz.oybek.ozamiz.ui.feature.premium.premiumExpired
-import uz.oybek.ozamiz.data.points.LevelManager
+import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
@@ -33,34 +32,30 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     init {
         showBottomSheet = true
     }
-    
+
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
     ): FragmentProfileBinding {
-        Thread.currentThread().stackTrace
         return FragmentProfileBinding.inflate(inflater, container, false)
     }
 
-    private val pickImageLauncher = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { viewModel.updateAvatar(it) }
-    }
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { viewModel.updateAvatar(it) }
+        }
 
     override fun viewCreated(bind: FragmentProfileBinding) {
         bind.btnEditAvatar.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
         setupSection(
-            bind.sectionMyInfo,
-            R.drawable.person_filled,
-            getString(R.string.my_information)
+            bind.sectionMyInfo, R.drawable.person_filled, getString(R.string.my_information)
         ) {
             findNavController().navigate(R.id.getMainInfoFragment)
         }
 
         setupSection(
-            bind.sectionCalorieSettings,
-            R.drawable.calculate_ic,
-            "Hisoblagich"
+            bind.sectionCalorieSettings, R.drawable.calculate_ic, getString(R.string.hisoblagich)
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
                 navigate(R.id.action_profileFragment_to_calorieSettingsFragment)
@@ -77,7 +72,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
 
         setupSection(
-            bind.sectionAdminPremiumUsersContent, R.drawable.admin_ic, "Premium Tekshiruv"
+            bind.sectionAdminPremiumUsersContent,
+            R.drawable.admin_ic,
+            getString(R.string.premium_tekshiruv)
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
                 navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
@@ -85,14 +82,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
 
         setupSection(
-            bind.sectionAdminAllUsers, R.drawable.group_ic, "Admin: Foydalanuvchilar"
+            bind.sectionAdminAllUsers, R.drawable.group_ic, getString(R.string.foydalanuvchilar)
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
                 navigate(R.id.action_profileFragment_to_adminUsersListFragment)
             }
         }
         setupSection(
-            bind.sectionAdminPosts, R.drawable.post_ic, "Admin: Postlar"
+            bind.sectionAdminPosts, R.drawable.post_ic, getString(R.string.postlar)
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
                 navigate(R.id.action_profileFragment_to_adminPostManagerFragment)
@@ -103,11 +100,17 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
 
         bind.premiumButton.setOnClickListener {
-            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(childFragmentManager, uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG)
+            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(
+                childFragmentManager,
+                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG
+            )
         }
-        
+
         bind.premiumView.setOnClickListener {
-            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(childFragmentManager, uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG)
+            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(
+                childFragmentManager,
+                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG
+            )
         }
 
         bind.cardUserLevel.setOnClickListener {
@@ -117,7 +120,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
         setupPaymentCheckListener()
         observeViewModel(bind)
-     //   observeCashbackProgress(bind)
     }
 
     private fun observeCashbackProgress(bind: FragmentProfileBinding) {
@@ -129,7 +131,8 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                     if (days >= 24) {
                         bind.textCashbackStatus.text = getString(R.string.cashback_success)
                     } else {
-                        bind.textCashbackStatus.text = getString(R.string.cashback_status_format, days)
+                        bind.textCashbackStatus.text =
+                            getString(R.string.cashback_status_format, days)
                     }
                 }
             }
@@ -141,12 +144,15 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.REQUEST_KEY,
             viewLifecycleOwner
         ) { _, bundle ->
-            val result = bundle.getString(uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.RESULT_ACTION)
+            val result =
+                bundle.getString(uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.RESULT_ACTION)
             if (result == "go_to_payment") {
                 val price = bundle.getLong("selected_price", 29000L)
                 val isYearly = bundle.getBoolean("is_yearly", false)
                 val args = androidx.core.os.bundleOf("price" to price, "is_yearly" to isYearly)
-                findNavController().navigate(R.id.action_profileFragment_to_paymentGetCheckFragment, args)
+                findNavController().navigate(
+                    R.id.action_profileFragment_to_paymentGetCheckFragment, args
+                )
             }
         }
     }
@@ -159,8 +165,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         binding.root.setOnClickListener { onClick() }
     }
 
-
-    @SuppressLint("SetTextI18n")
     private fun observeViewModel(bind: FragmentProfileBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -173,31 +177,32 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                             .placeholder(R.drawable.user_photo_placeholder)
                             .apply(RequestOptions.circleCropTransform())
                             .into(bind.imageViewUserAvatar)
-                        
-                        val level = LevelManager.getCurrentLevel(user.scorePoints)
+
+                        val level = LevelRepository.getCurrentLevel(user.scorePoints, true)
                         bind.textProfileLevelEmoji.text = level.emoji
                         bind.textProfileLevelName.text = level.name
-                        bind.textProfilePoints.text = getString(R.string.text_profile_points_format, user.scorePoints)
-                        
+                        bind.textProfilePoints.text =
+                            getString(R.string.text_profile_points_format, user.scorePoints)
+
+                        bind.cardUserLevel.isVisible = true
                         bind.buttonLogout.isVisible = true
 
-                        val isPremiumActive = user.premium && !user.premiumExpired()
+                        val isPremiumActive = PremiumUtils.isPremium(user)
 
                         when {
                             isPremiumActive -> {
-                                bind.premiumActiveC.isVisible = true
+                                bind.premiumStatusText.isVisible = true
                                 bind.premiumView.isVisible = false
-                                bind.premiumExpireDate.text = getString(R.string.premium_expiry_date_format, user.getPremiumExpireDate())
                             }
 
                             user.paymentChecking -> {
-                                bind.premiumActiveC.isVisible = true
+                                bind.premiumStatusText.isVisible = true
+                                bind.premiumStatusText.text = getString(R.string.premium_checking)
                                 bind.premiumView.isVisible = false
-                                bind.premiumExpireDate.text = getString(R.string.premium_checking)
                             }
 
                             else -> {
-                                bind.premiumActiveC.isVisible = false
+                                bind.premiumStatusText.isVisible = false
                                 bind.premiumView.isVisible = true
                             }
                         }
@@ -205,8 +210,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                     } else {
                         bind.textViewUserName.text = getString(R.string.default_user_name)
                         bind.imageViewUserAvatar.setImageResource(R.drawable.user_photo_placeholder)
+                        bind.cardUserLevel.isVisible = false
                         bind.buttonLogout.isVisible = false
-                        bind.premiumActiveC.isVisible = false
+                        bind.premiumStatusText.isVisible = false
                         bind.premiumView.isVisible = false
                         bind.sectionAdminPremiumUsers.isVisible = false
                     }
@@ -221,7 +227,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         try {
             startActivity(
                 Intent(
-                    Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")
+                    Intent.ACTION_VIEW, "market://details?id=$appPackageName".toUri()
                 )
             )
         } catch (anfe: ActivityNotFoundException) {
@@ -241,8 +247,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             .setPositiveButton(R.string.logout) { _, _ ->
                 MainActivity.signOut?.run()
             }.setNegativeButton(
-                R.string.cancel,
-                null
+                R.string.cancel, null
             ).show()
     }
 }

@@ -1,7 +1,5 @@
 package uz.oybek.ozamiz.ui.feature.log.exercise
 
-import uz.oybek.ozamiz.data.user.UserRepository
-
 import android.app.Application
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
@@ -11,9 +9,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.level.PointsEvent
+import uz.oybek.ozamiz.data.level.PointsRepository
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.UserExercise
+import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
 import java.util.Date
 
@@ -72,25 +73,9 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
                 durationMin = duration,
                 caloriesBurned = caloriesBurned
             )
-            val points = (caloriesBurned / 10).coerceAtLeast(1)
             val success = ExerciseLogRepository.add(exerciseLog, selectedDate)
             if (success) {
-                UserRepository.addPoints(points)
-                if (uz.oybek.ozamiz.data.utils.DateUtils.isSameDay(selectedDate, Date())) {
-                    val todayStr = uz.oybek.ozamiz.data.utils.DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
-                    val oldCache = uz.oybek.ozamiz.data.config.LocalPreferencesRepository.getTodayCache(todayStr)
-                    if (oldCache != null) {
-                        uz.oybek.ozamiz.data.config.LocalPreferencesRepository.saveTodayCache(
-                            dateStr = todayStr,
-                            calories = oldCache.calories,
-                            water = oldCache.water,
-                            exercise = oldCache.exercise + caloriesBurned,
-                            protein = oldCache.protein,
-                            fat = oldCache.fat,
-                            carbs = oldCache.carbs
-                        )
-                    }
-                }
+                PointsRepository.onEvent(PointsEvent.Exercise(caloriesBurned))
                 _uiState.value = AddExerciseUiState.Success(exercise.name)
             } else {
                 _uiState.value = AddExerciseUiState.Error("Saqlashda xatolik yuz berdi")

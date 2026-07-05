@@ -252,13 +252,13 @@ app/src/main/java/uz/oybek/ozamiz/data/menu/MenuRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/menu/model/Menu.kt
 app/src/main/java/uz/oybek/ozamiz/data/menu/model/MenuCategory.kt
 app/src/main/java/uz/oybek/ozamiz/data/motivation/MotivationAlarmReceiver.kt
-app/src/main/java/uz/oybek/ozamiz/data/motivation/MotivationAlarmScheduler.kt
+app/src/main/java/uz/oybek/ozamiz/data/motivation/NotificationSchedular.kt
 app/src/main/java/uz/oybek/ozamiz/data/motivation/MotivationNotificationManager.kt
 app/src/main/java/uz/oybek/ozamiz/data/motivation/MotivationRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/motivation/NutrientWarningReceiver.kt
 app/src/main/java/uz/oybek/ozamiz/data/notification/NotificationRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/notification/model/NotificationModel.kt
-app/src/main/java/uz/oybek/ozamiz/data/points/LevelManager.kt
+app/src/main/java/uz/oybek/ozamiz/data/points/LevelRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/points/PointsRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/points/TaskRepository.kt
 app/src/main/java/uz/oybek/ozamiz/data/points/model/Level.kt

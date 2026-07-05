@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.model.FoodLog
+import uz.oybek.ozamiz.data.utils.formatToHhMm
 import uz.oybek.ozamiz.databinding.ItemTodaysFoodBinding
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,8 +36,6 @@ class TodaysFoodAdapter(
     inner class FoodLogViewHolder(private val binding: ItemTodaysFoodBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
         init {
             itemView.setOnClickListener {
                 getItem(bindingAdapterPosition)?.let { log -> onItemClick(log) }
@@ -50,7 +49,7 @@ class TodaysFoodAdapter(
 
             val timestamp = foodLog.timestamp as? Long
             if (timestamp != null) {
-                binding.textViewTimestamp.text = timeFormat.format(Date(timestamp))
+                binding.textViewTimestamp.text = timestamp.formatToHhMm()
                 binding.textViewTimestamp.visibility = View.VISIBLE
             } else {
                 binding.textViewTimestamp.visibility = View.GONE

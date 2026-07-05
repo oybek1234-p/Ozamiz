@@ -13,7 +13,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import uz.oybek.ozamiz.data.ai.Dietolog
+import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
 import uz.oybek.ozamiz.data.firebase.FirebaseConstants
 import uz.oybek.ozamiz.data.firebase.FirebasePagingSource
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
@@ -29,9 +29,13 @@ import java.util.Date
 object FoodLogRepository {
 
     fun foodLogsPaged(date: Date): Flow<PagingData<FoodLog>> {
-        val date = date.dateApiFormat()
+        val userId = currentUserId
+        if (userId.isBlank()) {
+            return kotlinx.coroutines.flow.flowOf(PagingData.empty())
+        }
+        val dateStr = date.dateApiFormat()
         val query = FirebasePaths
-            .foodLogsReference(currentUserId!!, date)
+            .foodLogsReference(userId, dateStr)
             .orderByChild(FirebaseConstants.TIMESTAMP)
         return Pager(
             PagingConfig(
@@ -48,6 +52,11 @@ object FoodLogRepository {
 
     fun getLatestLogs(date: Date, limit: Int = 2): Flow<List<FoodLog>> = callbackFlow {
         val userId = currentUserId
+        if (userId.isBlank()) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
         val dateStr = date.dateApiFormat()
         val query = FirebasePaths
             .foodLogsReference(userId, dateStr)
@@ -70,31 +79,42 @@ object FoodLogRepository {
     }
 
     fun getAllLogs(date: Date): Flow<List<FoodLog>> = callbackFlow {
-        val userId = currentUserId
-        val dateStr = date.dateApiFormat()
-        val query = FirebasePaths
-            .foodLogsReference(userId, dateStr)
-
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val logs = snapshot.children.mapNotNull { it.getValue(FoodLog::class.java) }
-                trySend(logs)
+        try {
+            val userId = currentUserId
+            if (userId.isBlank()) {
+                trySend(emptyList())
+                close()
+                return@callbackFlow
             }
+            val dateStr = date.dateApiFormat()
+            val query = FirebasePaths
+                .foodLogsReference(userId, dateStr)
 
-            override fun onCancelled(error: DatabaseError) {
-                if (error.code == DatabaseError.PERMISSION_DENIED) {
-                    close()
-                } else {
-                    close(error.toException())
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val logs = snapshot.children.mapNotNull { it.getValue(FoodLog::class.java) }
+                    trySend(logs)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    if (error.code == DatabaseError.PERMISSION_DENIED) {
+                        close()
+                    } else {
+                        close(error.toException())
+                    }
                 }
             }
+            query.addValueEventListener(listener)
+            awaitClose { query.removeEventListener(listener) }
+        } catch (e: Exception) {
+            com.google.firebase.Firebase.crashlytics.recordException(e)
+            close(e)
         }
-        query.addValueEventListener(listener)
-        awaitClose { query.removeEventListener(listener) }
     }
 
     suspend fun getFoodLog(logId: String, date: Date, uid: String? = null): FoodLog? {
-        val userId = uid ?: currentUserId ?: return null
+        val userId = uid ?: currentUserId
+        if (userId.isBlank()) return null
         val dateStr = date.dateApiFormat()
         return try {
             FirebasePaths.foodLogsReference(userId, dateStr)
@@ -109,17 +129,18 @@ object FoodLogRepository {
     }
 
     suspend fun add(image: String?, foodLog: FoodLog, date: Date): Boolean {
-        currentUserId
+        val userId = currentUserId
+        if (userId.isBlank()) return false
         try {
             val dateStr = date.dateApiFormat()
-            val reference = FirebasePaths.foodLogsReference(currentUserId!!, dateStr)
+            val reference = FirebasePaths.foodLogsReference(userId, dateStr)
             foodLog.logId = generateKey()
             reference
                 .child(foodLog.logId)
                 .setValue(foodLog)
                 .await()
 
-            val uploadImageUrl = if (image != null)
+            val uploadImageUrl = if (image != null && !image.startsWith("http"))
                 ImageUploader.uploadImage(
                     image.toUri(),
                     ImagePaths.ANALYZE_FOOD
@@ -129,13 +150,18 @@ object FoodLogRepository {
                 reference.child(foodLog.logId)
                     .child(FoodLog::photoUrl.name)
                     .setValue(uploadImageUrl)
+            } else if (image != null && image.startsWith("http")) {
+                foodLog.photoUrl = image
+                reference.child(foodLog.logId)
+                    .child(FoodLog::photoUrl.name)
+                    .setValue(image)
             }
         } catch (e: Exception) {
             com.google.firebase.Firebase.crashlytics.recordException(e)
             return false
         }
 
-        DailySummaryRepository.updateSummary(
+        LogRepository.updateSummary(
             date = date,
             caloriesDelta = foodLog.calories,
             proteinDelta = foodLog.protein ?: 0.0,
@@ -144,7 +170,7 @@ object FoodLogRepository {
             mealsDelta = 1
         )
 
-        Dietolog.onFoodLogAdded(foodLog)
+        AiChatRepository.onFoodLogAdded(foodLog)
         return true
 
     }
@@ -155,8 +181,8 @@ object FoodLogRepository {
         date: Date,
         targetUid: String? = null
     ): Boolean {
-        val userId = targetUid ?: currentUserId ?: return false
-        if (logId.isEmpty()) return false
+        val userId = targetUid ?: currentUserId
+        if (userId.isBlank() || logId.isEmpty()) return false
         val dateStr = date.dateApiFormat()
         val reference =
             FirebasePaths.foodLogsReference(userId, dateStr)
@@ -174,7 +200,7 @@ object FoodLogRepository {
             val carbDelta = (updated.carbs ?: 0.0) - (oldLog?.carbs ?: 0.0)
             val fatDelta = (updated.fat ?: 0.0) - (oldLog?.fat ?: 0.0)
 
-            DailySummaryRepository.updateSummary(
+            LogRepository.updateSummary(
                 date = date,
                 targetUid = userId,
                 caloriesDelta = calDelta,
@@ -194,8 +220,8 @@ object FoodLogRepository {
         date: Date,
         targetUid: String? = null
     ): Boolean {
-        val userId = targetUid ?: currentUserId ?: return false
-        if (logId.isEmpty()) return false
+        val userId = targetUid ?: currentUserId
+        if (userId.isBlank() || logId.isEmpty()) return false
         val dateStr = date.dateApiFormat()
         val reference =
             FirebasePaths.foodLogsReference(userId, dateStr)
@@ -207,7 +233,7 @@ object FoodLogRepository {
                 .await()
 
             if (oldLog != null) {
-                DailySummaryRepository.updateSummary(
+                LogRepository.updateSummary(
                     date = date,
                     targetUid = userId,
                     caloriesDelta = -oldLog.calories,

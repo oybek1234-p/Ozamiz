@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center"
-    android:elevation="1dp"
+    android:elevation="0dp"
     android:orientation="vertical"
     android:paddingVertical="12dp"
     android:paddingHorizontal="8dp"
@@ -35,14 +35,6 @@
             android:layout_height="wrap_content"
             android:textColor="?colorOnSurface"
             tools:text="8g" />
-
-        <ImageView
-            android:id="@+id/btn_edit_macro"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginStart="4dp"
-            android:src="@drawable/edit"
-            app:tint="?colorOnSurfaceVariant" />
 
     </LinearLayout>
 

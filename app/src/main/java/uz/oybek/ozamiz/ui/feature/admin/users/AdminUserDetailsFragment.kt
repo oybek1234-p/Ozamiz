@@ -137,9 +137,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
             Triple(User::paymentCheckPhotoUrl.name, user.paymentCheckPhotoUrl, FieldType.STRING),
             Triple(User::admin.name, user.admin, FieldType.BOOLEAN),
             Triple(User::scorePoints.name, user.scorePoints, FieldType.INT),
-            Triple(User::lastTaskDate.name, user.lastTaskDate, FieldType.STRING),
             Triple(User::problems.name, user.problems, FieldType.LIST_STRING),
-            Triple(User::completedTaskIds.name, user.completedTaskIds, FieldType.LIST_STRING),
         )
 
         val inflater = LayoutInflater.from(requireContext())

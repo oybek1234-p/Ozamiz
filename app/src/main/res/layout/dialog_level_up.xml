@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="320dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_rounded"
     android:orientation="vertical">
@@ -38,7 +38,7 @@
                 android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:letterSpacing="0.1"
-                android:text="YANGI DARAJA!"
+                android:text="Yangi daraja!"
                 android:textColor="?colorPrimary"
                 android:textSize="13sp" />
 
@@ -67,13 +67,13 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_level_up_ok"
                 style="@style/FilledButton"
+                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
                 android:layout_marginTop="28dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Ajoyib! 🎉"
-                android:textSize="17sp"
-                app:cornerRadius="16dp" />
+                android:text="Olish"
+                app:icon="@drawable/check_ic"
+                app:iconGravity="textStart"
+                app:iconPadding="@dimen/dimen_4" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

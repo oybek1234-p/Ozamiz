@@ -48,7 +48,7 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:padding="@dimen/dimen_4"
+                android:padding="@dimen/dimen_2"
                 android:layout_margin="@dimen/dimen_4"
                 android:scaleType="centerCrop"
                 tools:src="@drawable/breakfast_simple" />

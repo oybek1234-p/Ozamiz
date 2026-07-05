@@ -52,3 +52,39 @@ inline fun Fragment.launchWhenStarted(crossinline block: suspend () -> Unit) {
         }
     }
 }
+
+fun Fragment.toast(message: String) {
+    activity?.let {
+        uz.oybek.ozamiz.ui.utils.showToast(message, it)
+    }
+}
+
+fun android.content.Context.triggerVibration(durationMs: Long = 50) {
+    try {
+        val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            (getSystemService(android.content.Context.VIBRATOR_MANAGER_SERVICE) as? android.os.VibratorManager)?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+        }
+        if (vibrator?.hasVibrator() == true) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                vibrator.vibrate(
+                    android.os.VibrationEffect.createOneShot(
+                        durationMs,
+                        android.os.VibrationEffect.DEFAULT_AMPLITUDE
+                    )
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(durationMs)
+            }
+        }
+    } catch (_: Exception) {
+    }
+}
+
+fun Fragment.triggerVibration(durationMs: Long = 50) {
+    context?.triggerVibration(durationMs)
+}
+

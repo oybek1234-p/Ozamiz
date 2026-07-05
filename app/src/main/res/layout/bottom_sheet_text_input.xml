@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:backgroundTint="?colorSurfaceContainerLowest"
     android:background="@drawable/bg_bottom_sheet_top_rounded"
     android:orientation="vertical"
     android:padding="24dp">
@@ -23,8 +24,9 @@
         android:layout_marginTop="16dp"
         android:backgroundTint="?attr/colorPrimary"
         android:fontFamily="@font/roboto_regular"
-        android:hint="Masalan: 1 kosa palov, 2 ta choy"
+        android:hint="Masalan: 1 kosa palov, 2 ta bo'lak non"
         android:imeOptions="actionDone"
+        android:textColorHint="?colorOnSurfaceVariant"
         android:inputType="textCapSentences"
         android:textColor="?attr/colorOnSurface"
         android:textSize="18sp" />
@@ -35,6 +37,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        app:iconPadding="@dimen/dimen_8"
+        app:icon="@drawable/check_ic"
+        app:iconGravity="textStart"
         android:text="Tahlil qilish"
         app:cornerRadius="12dp" />
 

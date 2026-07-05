@@ -4,8 +4,8 @@ import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
-import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.streak.StreakInfo
+import uz.oybek.ozamiz.data.user.model.User
 
 // --- Firebase Instances ---
 val firestore get() = com.google.firebase.firestore.FirebaseFirestore.getInstance()
@@ -41,7 +41,8 @@ fun FirebaseFirestore.userWeightLogsCollection(userId: String): CollectionRefere
 }
 
 fun FirebaseFirestore.userMenusCollection(userId: String): CollectionReference {
-    return collection(FirebasePaths.Firestore.USER_MENUS).document(userId).collection(FirebasePaths.Firestore.DAILY_MENUS)
+    return collection(FirebasePaths.Firestore.USER_MENUS).document(userId)
+        .collection(FirebasePaths.Firestore.DAILY_MENUS)
 }
 
 // --- Mapping Extensions ---
@@ -63,10 +64,8 @@ inline fun <reified T> DocumentSnapshot.toObjectSafe(): T? {
     }
     return try {
         val obj = toObject(T::class.java)
-        android.util.Log.d("FirestoreExtensions", "Successfully parsed ${T::class.java.simpleName} for document: $id")
         obj
     } catch (e: Exception) {
-        android.util.Log.e("FirestoreExtensions", "Error parsing ${T::class.java.simpleName} for document: $id. Data: $data", e)
         null
     }
 }
@@ -78,7 +77,8 @@ fun DocumentSnapshot.toUserSafe(): User {
     u.phoneNumber = getString("phoneNumber") ?: ""
     u.gmail = getString("gmail") ?: ""
     u.lastSeenTime = getLong("lastSeenTime") ?: 0L
-    u.unreadMessages = getLong("unreadMessages")?.toInt() ?: getDouble("unreadMessages")?.toInt() ?: 0
+    u.unreadMessages =
+        getLong("unreadMessages")?.toInt() ?: getDouble("unreadMessages")?.toInt() ?: 0
     u.premium = getBoolean("premium") ?: false
     u.premiumDate = getLong("premiumDate") ?: 0L
     u.isPremiumYearly = getBoolean("isPremiumYearly") ?: false
@@ -92,31 +92,25 @@ fun DocumentSnapshot.toUserSafe(): User {
     u.startWeight = getDouble("startWeight") ?: getLong("startWeight")?.toDouble()
     u.goal = getString("goal") ?: ""
     u.activityLevel = getString("activityLevel") ?: "LIGHTLY_ACTIVE"
-    u.targetCalories = getLong("targetCalories")?.toInt() ?: getDouble("targetCalories")?.toInt() ?: 0
+    u.targetCalories =
+        getLong("targetCalories")?.toInt() ?: getDouble("targetCalories")?.toInt() ?: 0
     u.targetProtein = getLong("targetProtein")?.toInt() ?: getDouble("targetProtein")?.toInt() ?: 0
     u.targetFat = getLong("targetFat")?.toInt() ?: getDouble("targetFat")?.toInt() ?: 0
     u.targetCarbs = getLong("targetCarbs")?.toInt() ?: getDouble("targetCarbs")?.toInt() ?: 0
-    u.targetWaterMl = getLong("targetWaterMl")?.toInt() ?: getDouble("targetWaterMl")?.toInt() ?: 2500
+    u.targetWaterMl =
+        getLong("targetWaterMl")?.toInt() ?: getDouble("targetWaterMl")?.toInt() ?: 2500
     u.avatarUrl = getString("avatarUrl")
     u.registerDate = get("registerDate")
     u.paymentChecking = getBoolean("paymentChecking") ?: false
     u.paymentCheckPhotoUrl = getString("paymentCheckPhotoUrl")
     u.admin = getBoolean("admin") ?: false
     u.scorePoints = getLong("scorePoints")?.toInt() ?: getDouble("scorePoints")?.toInt() ?: 0
-    u.lastTaskDate = getString("lastTaskDate")
 
     u.problems = try {
         (get("problems") as? List<*>)?.mapNotNull { it?.toString() }
     } catch (e: Exception) {
         null
     }
-
-    u.completedTaskIds = try {
-        (get("completedTaskIds") as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
-    } catch (e: Exception) {
-        emptyList()
-    }
-
     u.streakInfo = try {
         val streakMap = get("streakInfo") as? Map<*, *>
         if (streakMap != null) {
@@ -125,7 +119,9 @@ fun DocumentSnapshot.toUserSafe(): User {
             val bestStreak = (streakMap["bestStreak"] as? Number)?.toInt() ?: 0
             val activeDays = (streakMap["activeDays"] as? Number)?.toInt() ?: 0
             val streakGoal = (streakMap["streakGoal"] as? Number)?.toInt() ?: 7
-            val activityHistory = (streakMap["activityHistory"] as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+            val activityHistory =
+                (streakMap["activityHistory"] as? List<*>)?.mapNotNull { it?.toString() }
+                    ?: emptyList()
             StreakInfo(
                 lastActionDate = lastActionDate,
                 currentStreak = currentStreak,

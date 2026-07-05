@@ -12,8 +12,8 @@ import com.google.firebase.firestore.toObjects
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
-import uz.oybek.ozamiz.data.config.LocalPreferencesRepository
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.firebase.database
@@ -29,9 +29,7 @@ import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.util.handleException
 import uz.oybek.ozamiz.util.returnResult
-import java.util.Date
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 object UserRepository {
 
@@ -39,7 +37,20 @@ object UserRepository {
 
     init {
         LocalUser.getUser()
+        checkRegisterDateError()
     }
+
+    private fun checkRegisterDateError() {
+        if (DateUtils.toLongTimestamp(user.registerDate) < 500000) {
+            updateUser {
+                it.registerDate = ServerValue.TIMESTAMP
+            }
+            LocalUser.update {
+                registerDate = System.currentTimeMillis()
+            }
+        }
+    }
+
 
     suspend fun uploadPremiumCheckData(
         userId: String, checkImageUri: Uri, isYearly: Boolean
@@ -82,16 +93,6 @@ object UserRepository {
     private val publicUsersCollection get() = firestore.publicUsersCollection
 
     val user: User get() = LocalUser.user
-
-    fun getManualAiUsageCount(): Int {
-        val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
-        return LocalPreferencesRepository.getManualAiUsageCount(todayStr)
-    }
-
-    fun incrementManualAiUsageCount() {
-        val todayStr = DateUtils.getFormattedDateString(Date(), "yyyy-MM-dd")
-        LocalPreferencesRepository.incrementManualAiUsageCount(todayStr)
-    }
 
     private var isObserving = false
     private var userListener: ValueEventListener? = null
@@ -176,7 +177,6 @@ object UserRepository {
             DataWrapper.Error("")
         }
     }
-
 
     fun setUnreadNotificationsZero() {
         if (user.valid) {
@@ -309,21 +309,11 @@ object UserRepository {
     }
 
 
-    private suspend fun loadUser(id: String) = suspendCoroutine { sus ->
+    private suspend fun loadUser(id: String) = suspendCancellableCoroutine { sus ->
         val reference = usersReference.child(id)
         reference.get().addOnSuccessListener {
             val loadedUser = it.getValueSafe(User::class.java)
-            val userWithIntegrity = loadedUser?.copy(
-                streakInfo = loadedUser.streakInfo ?: StreakInfo(),
-                registerDate = loadedUser.registerDateLong ?: System.currentTimeMillis(),
-                startWeight = loadedUser.startWeight,
-                paymentChecking = loadedUser.paymentChecking,
-                paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
-                premium = loadedUser.premium,
-                premiumDate = loadedUser.premiumDate,
-                admin = loadedUser.admin
-            )
-            sus.resume(userWithIntegrity)
+            sus.resume(loadedUser)
         }.addOnFailureListener {
             sus.resume(null)
         }
@@ -334,7 +324,6 @@ object UserRepository {
     fun observeCurrentUser(result: (user: User?) -> Unit) {
         userListeners.add(result)
 
-        // Call immediately if local data is available
         if (user.valid) {
             result.invoke(user)
         }
@@ -353,56 +342,14 @@ object UserRepository {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val loadedUser = snapshot.getValueSafe(User::class.java) ?: return
-                val userWithIntegrity = loadedUser.copy(
-                    streakInfo = loadedUser.streakInfo ?: StreakInfo(),
-                    registerDate = loadedUser.registerDateLong ?: System.currentTimeMillis(),
-                    startWeight = loadedUser.startWeight,
-                    paymentChecking = loadedUser.paymentChecking,
-                    paymentCheckPhotoUrl = loadedUser.paymentCheckPhotoUrl,
-                    premium = loadedUser.premium,
-                    premiumDate = loadedUser.premiumDate,
-                    admin = loadedUser.admin
-                )
-                if (userWithIntegrity.valid) {
-                    LocalUser.user = userWithIntegrity
+                if (loadedUser.valid) {
+                    LocalUser.user = loadedUser
                     LocalUser.saveUser()
                 }
-                userListeners.forEach { it.invoke(userWithIntegrity) }
+                userListeners.forEach { it.invoke(loadedUser) }
             }
         }
         reference.addValueEventListener(userListener!!)
-    }
-
-
-    fun addPoints(amount: Int) {
-        if (user.valid.not() || amount == 0) return
-        val ref = usersReference.child(user.uid).child(User::scorePoints.name)
-        val publicDocRef = publicUsersCollection.document(user.uid)
-
-        ref.runTransaction(object : com.google.firebase.database.Transaction.Handler {
-            override fun doTransaction(currentData: com.google.firebase.database.MutableData): com.google.firebase.database.Transaction.Result {
-                val current = currentData.getValue(Int::class.java) ?: 0
-                currentData.value = maxOf(0, current + amount)
-                return com.google.firebase.database.Transaction.success(currentData)
-            }
-
-            override fun onComplete(
-                error: com.google.firebase.database.DatabaseError?,
-                committed: Boolean,
-                snapshot: com.google.firebase.database.DataSnapshot?
-            ) {
-                if (committed && error == null) {
-                    val newTotal = snapshot?.getValue(Int::class.java) ?: maxOf(
-                        0, LocalUser.user.scorePoints + amount
-                    )
-                    LocalUser.user.scorePoints = newTotal
-                    LocalUser.saveUser()
-
-                    // Sync with public_users
-                    publicDocRef.update(User::scorePoints.name, newTotal)
-                }
-            }
-        })
     }
 
     fun incrementUnreadMessages(userId: String) {

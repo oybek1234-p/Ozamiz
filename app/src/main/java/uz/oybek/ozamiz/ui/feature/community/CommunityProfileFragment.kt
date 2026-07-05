@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.community
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.community.model.CommunityPost
-import uz.oybek.ozamiz.data.points.LevelManager
+import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.data.utils.formatLastSeen
 import uz.oybek.ozamiz.databinding.FragmentCommunityProfileBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -104,6 +105,7 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun loadInitialData(
         bind: FragmentCommunityProfileBinding,
         userId: String,
@@ -149,8 +151,8 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
                         bind.tvOuterWeightLoss.isVisible = false
                     }
 
-                    val level = LevelManager.getCurrentLevel(points)
-                    bind.tvProfileLevel.text = "${level.emoji} ${level.name}"
+                    val level = LevelRepository.getCurrentLevel(points)
+                    bind.tvProfileLevel.text = "${level?.emoji} ${level?.name}"
 
                     com.bumptech.glide.Glide.with(this@CommunityProfileFragment)
                         .load(avatarUrl)

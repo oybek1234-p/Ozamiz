@@ -14,37 +14,16 @@ class MotivationAlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            MotivationAlarmScheduler.rescheduleToday(context)
+            NotificationSchedular.rescheduleToday(context)
             return
         }
 
         val type = intent?.getStringExtra("ALARM_TYPE") ?: return
-        
-        CoroutineScope(Dispatchers.IO).launch {
-            val shouldShow = when (type) {
-                "breakfast" -> checkMealNotLogged("Breakfast")
-                "lunch" -> checkMealNotLogged("Lunch")
-                "dinner" -> checkMealNotLogged("Dinner")
-                "praise" -> checkAllMealsLogged()
-                else -> true // Tips always show
-            }
 
-            if (shouldShow) {
-                val message = MotivationRepository.getMessageForType(type)
-                val notificationManager = MotivationNotificationManager(context)
-                notificationManager.showMotivationNotification(message)
-            }
-        }
-    }
+        NotificationSchedular.rescheduleToday(context)
 
-    private suspend fun checkMealNotLogged(mealType: String): Boolean {
-        val logs = FoodLogRepository.getAllLogs(Date()).first()
-        return logs.none { it.mealType.equals(mealType, ignoreCase = true) }
-    }
-
-    private suspend fun checkAllMealsLogged(): Boolean {
-        val logs = FoodLogRepository.getAllLogs(Date()).first()
-        val types = logs.map { it.mealType.lowercase() }.toSet()
-        return types.contains("breakfast") && types.contains("lunch") && types.contains("dinner")
+        val message = MotivationRepository.getMessageForType(type)
+        val notificationManager = MotivationNotificationManager(context)
+        notificationManager.showMotivationNotification(message)
     }
 }

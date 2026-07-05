@@ -1,30 +1,29 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
-import androidx.fragment.app.Fragment
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
+import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysisResult
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
-import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysis
-import uz.oybek.ozamiz.data.ai.analyzer.model.FoodAnalysisResult
+import uz.oybek.ozamiz.data.utils.formatToHhMmA
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
-import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 class AnalyzeResultFragment : Fragment() {
 
@@ -32,26 +31,34 @@ class AnalyzeResultFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: AnalyzeResultViewModel by viewModels()
-    private val homeViewModel: HomeViewModel by activityViewModels()
     private lateinit var ingredientsAdapter: IngredientsAdapter
     private var hasPlayedConfetti = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            val logId = it.getString("logId")
-            val userId = it.getString("userId")
+            val logId = it.getString(KEY_LOG_ID)
+            val userId = it.getString(KEY_USER_ID)
+            val timestamp = it.getLong(KEY_TIMESTAMP, -1L)
+            if (timestamp != -1L) {
+                viewModel.setLogDate(Date(timestamp))
+            }
             if (logId != null) {
-                val timestamp = it.getLong("timestamp")
                 viewModel.loadLog(logId, Date(timestamp), userId)
             } else {
-                val id = it.getInt("id", -1)
-                val timestamp = it.getLong("timestamp", -1L)
+                val id = it.getInt(KEY_ID, -1)
                 if (id != -1) {
-                    if (timestamp != -1L) {
-                        viewModel.setLogDate(Date(timestamp))
-                    }
                     viewModel.setResult(FoodAnalyzer.getLastAnalyzed(id))
+                } else {
+                    val imageUri = it.getString(KEY_IMAGE_URI)?.toUri()
+                    val audioUri = it.getString(KEY_AUDIO_URI)?.toUri()
+                    val description = it.getString(KEY_PENDING_DESCRIPTION) ?: ""
+                    val meal = it.getString(KEY_MEAL_TYPE) ?: ""
+                    if (audioUri != null) {
+                        viewModel.analyzeAudio(audioUri, meal, Date(timestamp))
+                    } else {
+                        viewModel.startAnalyze(imageUri, description, meal, Date(timestamp))
+                    }
                 }
             }
         }
@@ -66,26 +73,79 @@ class AnalyzeResultFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.toolbar.inflateMenu(R.menu.menu_analyze_result)
+        binding.toolbar.setOnMenuItemClickListener { menuItem ->
+            if (menuItem.itemId == R.id.action_favorite) {
+                viewModel.toggleFavorite()
+                true
+            } else {
+                false
+            }
+        }
         setupListeners()
         setupUI()
-        checkOnboardingBounce()
-        if (arguments?.getBoolean("isFromFavorite") == true) {
+
+        if (arguments?.getBoolean(KEY_IS_FROM_FAVORITE) == true) {
             val args = requireArguments()
             val analysis = FoodAnalysis(
-                id = args.getString("description").hashCode(),
-                photoUrl = args.getString("photoUrl")?.takeIf { it != "null" },
+                id = args.getString(KEY_DESCRIPTION).hashCode(),
+                photoUrl = args.getString(KEY_PHOTO_URL)?.takeIf { it != "null" },
                 result = FoodAnalysisResult(
-                    name = args.getString("description") ?: "",
-                    calories = args.getDouble("calories").toInt(),
-                    protein = args.getDouble("protein"),
-                    fat = args.getDouble("fat"),
-                    carbs = args.getDouble("carbs"),
-                    healthScore = 0,
-                    aiInsight = ""
+                    name = args.getString(KEY_DESCRIPTION) ?: "",
+                    calories = args.getDouble(KEY_CALORIES).toInt(),
+                    protein = args.getDouble(KEY_PROTEIN),
+                    fat = args.getDouble(KEY_FAT),
+                    carbs = args.getDouble(KEY_CARBS),
+                    healthScore = 0
                 ),
-                mealType = args.getString("mealType") ?: ""
+                mealType = args.getString(KEY_MEAL_TYPE) ?: ""
             )
             viewModel.setRecallResult(analysis)
+        }
+    }
+
+    private fun showAnalyzing(isAnalyzing: Boolean) {
+        val wasAnalyzing = binding.lottieLoadingCalories.isVisible && !isAnalyzing
+
+        binding.layoutMacros.isVisible = !isAnalyzing
+
+        binding.lottieLoadingCalories.isVisible = isAnalyzing
+        binding.imageViewFire.isVisible = !isAnalyzing
+
+        val favoriteItem = binding.toolbar.menu.findItem(R.id.action_favorite)
+        favoriteItem?.isVisible = !isAnalyzing && viewModel.state.value.result != null
+
+        if (isAnalyzing) {
+            binding.layoutBottomActions.visibility = View.VISIBLE
+            binding.buttonSaveToLog.isVisible = false
+            binding.layoutSaveContainer.isVisible = false
+            binding.buttonReLog.isVisible = true
+            binding.buttonReLog.text = getString(R.string.cancel)
+            binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
+            
+            binding.calorieCard.isVisible = false
+            binding.loadingCard.isVisible = true
+            binding.cardAiHealth.isVisible = false
+        } else {
+            binding.calorieCard.isVisible = true
+            binding.loadingCard.isVisible = false
+            binding.cardAiHealth.isVisible = true
+            
+            val state = viewModel.state.value
+            binding.buttonSaveToLog.isVisible = !state.isRecallMode
+            binding.layoutSaveContainer.isVisible = !state.isRecallMode
+            binding.buttonReLog.isVisible = !state.isRecallMode
+            binding.buttonReLog.text = getString(R.string.cancel)
+            binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
+
+            if (wasAnalyzing) {
+                binding.layoutBottomActions.alpha = 0f
+                binding.layoutBottomActions.visibility = View.VISIBLE
+                binding.layoutBottomActions.animate().alpha(1f).setDuration(500).start()
+            } else {
+                binding.layoutBottomActions.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -93,97 +153,145 @@ class AnalyzeResultFragment : Fragment() {
         binding.progressBarButton.isVisible = show
         binding.buttonSaveToLog.isEnabled = !show
         binding.buttonReLog.isEnabled = !show
+        binding.buttonReLogFull.isEnabled = !show
         binding.buttonDelete.isEnabled = !show
 
         binding.buttonSaveToLog.text = if (show) "" else getString(R.string.save)
-        binding.buttonReLog.text = if (show) "" else "Qayta qo'shish"
-        binding.buttonReLog.icon =
-            if (show) null else ContextCompat.getDrawable(requireContext(), R.drawable.add_ic)
+
+        // Use a standard alpha animation for appearing/disappearing
+        if (show) {
+            binding.buttonSaveToLog.animate().alpha(0f).setDuration(200).start()
+            binding.buttonReLog.animate().alpha(0f).setDuration(200).start()
+            binding.buttonDelete.animate().alpha(0f).setDuration(200).start()
+        } else {
+            binding.buttonSaveToLog.animate().alpha(1f).setDuration(500).start()
+            binding.buttonReLog.animate().alpha(1f).setDuration(500).start()
+            binding.buttonDelete.animate().alpha(1f).setDuration(500).start()
+        }
 
         binding.nestedScrollView.alpha = if (show) 0.5f else 1.0f
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setupUI() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.resultLive.collect { state ->
-                state?.run {
-                    showLoading(isLoading)
-                    val analysisResult = result?.result ?: return@run
+            viewModel.state.collect { state ->
+                showAnalyzing(state.isAnalyzing)
 
-                    if (analysisResult.isAmbiguous && analysisResult.question != null) {
-                        val existingSheet =
-                            parentFragmentManager.findFragmentByTag("clarification_sheet")
-                        if (existingSheet == null && !isLoading) {
-                            ClarificationBottomSheet(
-                                question = analysisResult.question,
-                                options = analysisResult.options ?: emptyList()
-                            ) { selectedOption ->
-                                viewModel.submitAnswer(selectedOption)
-                            }.show(parentFragmentManager, "clarification_sheet")
-                        }
-                    }
-
-                    updateMacrosAndCalorie(analysisResult)
-                    val photoUrl = result.photoUrl
-                    if (!photoUrl.isNullOrEmpty() && photoUrl != "null") {
-                        Glide
-                            .with(this@AnalyzeResultFragment)
-                            .load(photoUrl)
-                            .placeholder(R.drawable.placeholder_food)
-                            .into(binding.imageViewFoodPhoto)
-
-                        binding.imageViewFoodPhoto.setOnClickListener {
-                            uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
-                                photoUrl
-                            )
-                                .show(parentFragmentManager, "full_image")
-                        }
-                    } else {
-                        binding.imageViewFoodPhoto.isVisible = false
-                    }
-                    binding.textViewFoodName.text = analysisResult.name
-
-                    val dateFormat = SimpleDateFormat("h:mm a", Locale.getDefault())
-                    binding.textViewTimestamp.text =
-                        dateFormat.format(Date(analysisResult.timestamp))
-
-                    ingredientsAdapter =
-                        IngredientsAdapter(
-                            ingredients = analysisResult.ingredients ?: emptyList()
-                        )
-
-                    if (!hasPlayedConfetti) {
-                        val score = analysisResult.healthScore ?: 0
-                        val isFirstMeal = viewModel.isAppOnboardingStepOne()
-
-                        if (score == 10 || isFirstMeal) {
-                            hasPlayedConfetti = true
-                            binding.confettiAnimation.isVisible = true
-                            binding.confettiAnimation.playAnimation()
-                        }
-                    }
-
-                    val adviceText = analysisResult.advice
-                    if (!adviceText.isNullOrBlank()) {
-                        binding.layoutAdvice.isVisible = true
-                        binding.textViewAdvice.text = adviceText
-                    } else {
-                        binding.layoutAdvice.isVisible = false
-                    }
-
-                    binding.cardAiHealth.isVisible = !adviceText.isNullOrBlank()
-
-                    binding.buttonSaveToLog.isVisible = !state.isRecallMode
-                    binding.buttonSaveToLog.text = "Saqlash"
-                    binding.buttonSaveToLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
+                // Handle pending states (Voice input or Image preview)
+                if (state.isAnalyzing) {
+                    binding.loadingText.text = getString(R.string.analyzing)
                     
-                    binding.buttonReLog.isVisible = !state.isRecallMode
-                    binding.buttonReLog.text = "Bekor qilish"
-                    binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
-                    binding.buttonDelete.isVisible =
-                        state.isRecallMode && arguments?.getString("logId") != null
+                    if (!state.pendingDescription.isNullOrBlank()) {
+                        binding.textViewFoodName.text = if (state.pendingDescription == "pending_description_voice") {
+                            getString(R.string.voice_input_pending)
+                        } else {
+                            state.pendingDescription
+                        }
+                        binding.layoutFoodName.isVisible = true
+                    }
+                    
+                    if (state.pendingImageUri != null) {
+                        binding.imageViewFoodPhoto.isVisible = true
+                        Glide.with(this@AnalyzeResultFragment)
+                            .load(state.pendingImageUri)
+                            .into(binding.imageViewFoodPhoto)
+                    }
+                    return@collect
                 }
+
+                showLoading(state.isLoading)
+                val analysisResult = state.result?.result ?: run {
+                    // If no result and not analyzing, but we have a pending description (e.g. error state or initial)
+                    if (!state.pendingDescription.isNullOrBlank()) {
+                        binding.textViewFoodName.text = if (state.pendingDescription == "pending_description_voice") {
+                            getString(R.string.voice_input_pending)
+                        } else {
+                            state.pendingDescription
+                        }
+                        binding.layoutFoodName.isVisible = true
+                    }
+                    return@collect
+                }
+
+                updateMacrosAndCalorie(analysisResult)
+                val photoUrl = state.result.photoUrl
+                if (!photoUrl.isNullOrEmpty() && photoUrl != "null") {
+                    binding.imageViewFoodPhoto.isVisible = true
+                    Glide
+                        .with(this@AnalyzeResultFragment)
+                        .load(photoUrl)
+                        .placeholder(R.drawable.placeholder_food)
+                        .into(binding.imageViewFoodPhoto)
+
+                    binding.imageViewFoodPhoto.setOnClickListener {
+                        uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
+                            photoUrl
+                        )
+                            .show(parentFragmentManager, "full_image")
+                    }
+                } else if (state.pendingImageUri != null) {
+                    // Fallback to local image if upload/result photoUrl is not yet available
+                    binding.imageViewFoodPhoto.isVisible = true
+                    Glide.with(this@AnalyzeResultFragment)
+                        .load(state.pendingImageUri)
+                        .into(binding.imageViewFoodPhoto)
+                } else {
+                    binding.imageViewFoodPhoto.isVisible = false
+                }
+                binding.textViewFoodName.text = analysisResult.name
+                binding.layoutFoodName.isVisible = true
+
+                binding.textViewTimestamp.text = Date(analysisResult.timestamp).formatToHhMmA()
+
+                ingredientsAdapter =
+                    IngredientsAdapter(
+                        ingredients = analysisResult.ingredients ?: emptyList()
+                    )
+
+                if (!hasPlayedConfetti) {
+                    val score = analysisResult.healthScore ?: 0
+
+                    if (score == 10) {
+                        hasPlayedConfetti = true
+                        binding.confettiAnimation.isVisible = true
+                        binding.confettiAnimation.playAnimation()
+                    }
+                }
+
+                val adviceText = analysisResult.advice
+                if (!adviceText.isNullOrBlank()) {
+                    binding.layoutAdvice.isVisible = true
+                    binding.textViewAdvice.text = adviceText
+                } else {
+                    binding.layoutAdvice.isVisible = false
+                }
+
+                binding.cardAiHealth.isVisible = !adviceText.isNullOrBlank()
+
+                val favoriteItem = binding.toolbar.menu.findItem(R.id.action_favorite)
+                favoriteItem?.isVisible = true && !state.isAnalyzing
+                if (favoriteItem != null && state.result != null) {
+                    favoriteItem.setIcon(
+                        if (state.isSaved) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
+                    )
+                }
+
+                binding.buttonSaveToLog.isVisible = !state.isRecallMode
+                binding.layoutSaveContainer.isVisible = !state.isRecallMode
+                binding.buttonSaveToLog.text = getString(R.string.save)
+                binding.buttonSaveToLog.icon =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
+
+                binding.buttonReLog.isVisible = !state.isRecallMode
+                binding.buttonReLog.text = getString(R.string.cancel)
+                binding.buttonReLog.icon = ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.arrow_back
+                )
+
+                binding.buttonReLogFull.isVisible = state.isRecallMode
+                binding.buttonDelete.isVisible =
+                    state.isRecallMode && arguments?.getString(KEY_LOG_ID) != null
             }
         }
 
@@ -191,45 +299,27 @@ class AnalyzeResultFragment : Fragment() {
             viewModel.event.collect { event ->
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
-                        checkCompleteOnboarding()
-                        homeViewModel.onFoodAdded()
                         findNavController().popBackStack(R.id.home, false)
                     }
 
-                    is AnalyzeResultEvent.ShowTips -> {
-                        checkCompleteOnboarding()
-                        homeViewModel.onFoodAdded()
-                        val bundle = Bundle().apply {
-                            putStringArray("tips", event.tips.toTypedArray())
-                        }
-                        findNavController().navigate(R.id.action_analyzeResultFragment_to_mealTipsFragment, bundle)
-                    }
 
                     is AnalyzeResultEvent.Failure -> {
+                        val resId = resources.getIdentifier(
+                            event.message,
+                            "string",
+                            requireContext().packageName
+                        )
+                        val message = if (resId != 0) getString(resId) else event.message
                         android.widget.Toast.makeText(
                             requireContext(),
-                            event.message,
+                            message,
                             android.widget.Toast.LENGTH_SHORT
                         ).show()
                     }
 
-                    is AnalyzeResultEvent.PromptShare -> {
-                        val bottomSheet = uz.oybek.ozamiz.ui.feature.community.SharePostBottomSheet(
-                            foodName = event.name,
-                            photoUrl = event.photoUrl,
-                            calories = event.calories,
-                            onShare = {
-                                viewModel.saveFood(shouldShare = true)
-                            },
-                            onCancel = {
-                                viewModel.saveFood(shouldShare = false)
-                            }
-                        )
-                        bottomSheet.show(parentFragmentManager, "SharePostBottomSheet")
-                    }
+                    is AnalyzeResultEvent.PromptShare -> {}
 
                     is AnalyzeResultEvent.LimitExceeded -> {
-                        homeViewModel.onFoodAdded()
                         findNavController().popBackStack(R.id.home, false)
                     }
                 }
@@ -237,13 +327,8 @@ class AnalyzeResultFragment : Fragment() {
         }
     }
 
-    private fun checkCompleteOnboarding() {
-        if (viewModel.isAppOnboardingStepOne()) {
-            viewModel.setAppOnboardingStep(2)
-        }
-    }
-
     private fun updateMacrosAndCalorie(result: FoodAnalysisResult) {
+        binding.textViewFoodName.text = result.name
         val totalCalories = result.calories
         binding.textViewCalories.text = totalCalories.toString()
 
@@ -265,6 +350,7 @@ class AnalyzeResultFragment : Fragment() {
     }
 
 
+    @SuppressLint("SetTextI18n")
     private fun bindMacro(
         layout: ItemMacroDisplayBinding,
         name: String,
@@ -272,33 +358,35 @@ class AnalyzeResultFragment : Fragment() {
     ) {
         layout.textViewMacroName.text = name
         val totalValue = (value ?: 0.0)
-        layout.textViewMacroValue.text = "${totalValue.toInt()}gr"
+        layout.textViewMacroValue.text = getString(R.string.gram_format, totalValue.toInt())
     }
 
     private fun setupListeners() {
         binding.buttonSaveToLog.setOnSafeClickListener {
-            findNavController().popBackStack(R.id.home, false)
+            viewModel.onSaveClick()
         }
 
         binding.buttonReLog.setOnSafeClickListener {
-            viewModel.deleteLog {
-                findNavController().popBackStack()
-            }
+            findNavController().popBackStack()
+        }
+
+        binding.buttonReLogFull.setOnSafeClickListener {
+            viewModel.reLog()
         }
 
 
         binding.buttonDelete.setOnSafeClickListener {
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("O'chirish")
-                .setMessage("Haqiqatan ham bu yozuvni o'chirmoqchimisiz?")
-                .setPositiveButton("Ha") { _, _ ->
+                .setTitle(R.string.confirm_delete_title)
+                .setMessage(R.string.confirm_delete_log_message)
+                .setPositiveButton(R.string.yes) { _, _ ->
                     viewModel.deleteLog { success ->
                         if (success) {
                             findNavController().popBackStack()
                         }
                     }
                 }
-                .setNegativeButton("Yo'q", null)
+                .setNegativeButton(R.string.no, null)
                 .show()
         }
         binding.toolbar.setNavigationOnClickListener {
@@ -328,35 +416,33 @@ class AnalyzeResultFragment : Fragment() {
             val currentName = binding.textViewFoodName.text.toString()
             showEditNameDialog(currentName)
         }
-        binding.btnEditName.setOnClickListener(nameEditListener)
-        binding.textViewFoodName.setOnClickListener(nameEditListener)
+        binding.layoutFoodName.setOnClickListener(nameEditListener)
 
 
         val editCaloriesListener = View.OnClickListener {
             val currentCalories = binding.textViewCalories.text.toString().toDoubleOrNull() ?: 0.0
-            showEditNumberDialog("Kaloriyani o'zgartirish", currentCalories) { newValue ->
+            showEditNumberDialog(getString(R.string.edit_calories_title), currentCalories) { newValue ->
                 viewModel.updateCalories(newValue)
             }
         }
         binding.cardCalorieBanner.setOnClickListener(editCaloriesListener)
-        binding.textViewCalories.setOnClickListener(editCaloriesListener)
 
 
         binding.layoutProtein.root.setOnClickListener {
             val currentVal = viewModel.resultLive.value?.result?.result?.protein ?: 0.0
-            showEditNumberDialog("Oqsilni o'zgartirish (gr)", currentVal) { newValue ->
+            showEditNumberDialog(getString(R.string.edit_protein_title), currentVal) { newValue ->
                 viewModel.updateProtein(newValue)
             }
         }
         binding.layoutCarbs.root.setOnClickListener {
             val currentVal = viewModel.resultLive.value?.result?.result?.carbs ?: 0.0
-            showEditNumberDialog("Uglevodni o'zgartirish (gr)", currentVal) { newValue ->
+            showEditNumberDialog(getString(R.string.edit_carbs_title), currentVal) { newValue ->
                 viewModel.updateCarbs(newValue)
             }
         }
         binding.layoutFats.root.setOnClickListener {
             val currentVal = viewModel.resultLive.value?.result?.result?.fat ?: 0.0
-            showEditNumberDialog("Yog'ni o'zgartirish (gr)", currentVal) { newValue ->
+            showEditNumberDialog(getString(R.string.edit_fat_title), currentVal) { newValue ->
                 viewModel.updateFat(newValue)
             }
         }
@@ -365,7 +451,7 @@ class AnalyzeResultFragment : Fragment() {
     private fun showEditNameDialog(currentName: String) {
         val input = android.widget.EditText(requireContext())
         input.setText(currentName)
-        input.hint = "Ovqat nomi"
+        input.hint = getString(R.string.food_name_hint)
 
         val container = android.widget.FrameLayout(requireContext())
         val params = android.widget.FrameLayout.LayoutParams(
@@ -378,15 +464,15 @@ class AnalyzeResultFragment : Fragment() {
         container.addView(input)
 
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Nomni o'zgartirish")
+            .setTitle(R.string.edit_food_title)
             .setView(container)
-            .setPositiveButton("Saqlash") { _, _ ->
+            .setPositiveButton(R.string.save) { _, _ ->
                 val newName = input.text.toString()
                 if (newName.isNotBlank() && newName != currentName) {
                     viewModel.updateLog(newName)
                 }
             }
-            .setNegativeButton("Bekor qilish", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -413,24 +499,17 @@ class AnalyzeResultFragment : Fragment() {
         input.layoutParams = params
         container.addView(input)
 
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+       AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setView(container)
-            .setPositiveButton("Saqlash") { _, _ ->
+            .setPositiveButton(R.string.save) { _, _ ->
                 val newValue = input.text.toString().toDoubleOrNull()
                 if (newValue != null) {
                     onSave(newValue)
                 }
             }
-            .setNegativeButton("Bekor qilish", null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
-    }
-
-
-    private fun checkOnboardingBounce() {
-        if (viewModel.isAppOnboardingStepOne()) {
-            startSaveButtonBounce()
-        }
     }
 
     private fun startSaveButtonBounce() {
@@ -455,5 +534,23 @@ class AnalyzeResultFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val KEY_IMAGE_URI = "imageUri"
+        const val KEY_AUDIO_URI = "audioUri"
+        const val KEY_PENDING_DESCRIPTION = "pendingDescription"
+        const val KEY_LOG_ID = "logId"
+        const val KEY_USER_ID = "userId"
+        const val KEY_TIMESTAMP = "timestamp"
+        const val KEY_ID = "id"
+        const val KEY_IS_FROM_FAVORITE = "isFromFavorite"
+        const val KEY_DESCRIPTION = "description"
+        const val KEY_CALORIES = "calories"
+        const val KEY_PROTEIN = "protein"
+        const val KEY_FAT = "fat"
+        const val KEY_CARBS = "carbs"
+        const val KEY_PHOTO_URL = "photoUrl"
+        const val KEY_MEAL_TYPE = "mealType"
     }
 }

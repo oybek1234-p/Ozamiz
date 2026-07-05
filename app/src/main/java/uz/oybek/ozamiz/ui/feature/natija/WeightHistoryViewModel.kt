@@ -15,7 +15,8 @@ import uz.oybek.ozamiz.data.utils.DataWrapper
 data class WeightHistoryUiState(
     val isLoading: Boolean = false,
     val logs: List<WeightLog> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val needShowWeightLog: Boolean = false
 )
 
 class WeightHistoryViewModel : ViewModel() {
@@ -32,15 +33,14 @@ class WeightHistoryViewModel : ViewModel() {
         viewModelScope.launch {
             WeightLogRepository.getLogsFlow(user.uid).collect { result ->
                 when (result) {
-                        is DataWrapper.Success -> {
-                            val sortedLogs = result.data
-                                .filter { it.weightKg > 0 }
-                                .sortByRecent { it.timestamp }
-                            
-                            _uiState.update { 
-                                it.copy(isLoading = false, logs = sortedLogs) 
-                            }
+                    is DataWrapper.Success -> {
+                        val sortedLogs = result.data
+                            .filter { it.weightKg > 0 }
+                            .sortByRecent { it.timestamp }
+                        _uiState.update {
+                            it.copy(isLoading = false, logs = sortedLogs)
                         }
+                    }
                     is DataWrapper.Error -> {
                         _uiState.update { it.copy(isLoading = false, error = result.error) }
                     }
@@ -48,20 +48,24 @@ class WeightHistoryViewModel : ViewModel() {
                 }
             }
         }
+
+        viewModelScope.launch {
+            WeightLogRepository.needShowWeightLog(user.uid).collect { needShow ->
+                _uiState.update { it.copy(needShowWeightLog = needShow) }
+            }
+        }
     }
+
     fun deleteLog(log: WeightLog) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             when (val result = WeightLogRepository.deleteLog(log)) {
                 is DataWrapper.Success -> {
-                    // Refresh data is automatic via Flow, but we can update state if needed
-                    // For now, let loading be handled by flow collection
-                     _uiState.update { it.copy(isLoading = false) }
+                    _uiState.update { it.copy(isLoading = false) }
                 }
                 is DataWrapper.Error -> {
                     _uiState.update { it.copy(isLoading = false, error = result.error) }
                 }
-
                 else -> {}
             }
         }

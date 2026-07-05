@@ -25,10 +25,10 @@
             android:id="@+id/card_current_level"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
+            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="32dp"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="24dp"
             app:cardElevation="4dp"
             app:strokeWidth="0dp"
             app:cardBackgroundColor="?colorSurfaceContainerLowest">
@@ -36,73 +36,74 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="24dp"
-                android:paddingVertical="32dp">
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="24dp">
 
                 <TextView
                     android:id="@+id/text_current_emoji"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="80sp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:textSize="54sp"
+                    android:gravity="center"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:text="🔥" />
+                    tools:text="🌱" />
 
                 <TextView
                     android:id="@+id/text_current_level_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="16dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:textColor="?colorOnPrimaryContainer"
-                    android:textSize="28sp"
-                    app:layout_constraintTop_toBottomOf="@id/text_current_emoji"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="22sp"
+                    app:layout_constraintTop_toTopOf="@+id/text_current_emoji"
+                    app:layout_constraintBottom_toTopOf="@id/text_current_points"
+                    app:layout_constraintStart_toEndOf="@id/text_current_emoji"
                     app:layout_constraintEnd_toEndOf="parent"
-                    tools:text="Iroda" />
+                    tools:text="Boshlovchi" />
 
                 <TextView
                     android:id="@+id/text_current_points"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/roboto_bold"
+                    android:fontFamily="@font/roboto_medium"
                     android:textColor="?colorPrimary"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     app:layout_constraintTop_toBottomOf="@id/text_current_level_name"
+                    app:layout_constraintBottom_toBottomOf="@+id/text_current_emoji"
+                    app:layout_constraintStart_toStartOf="@id/text_current_level_name"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:text="350 ball" />
+
+                <!-- Daraja Haqida Ma'lumot (Description / Motivation Text) -->
+                <TextView
+                    android:id="@+id/text_current_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="14sp"
+                    android:lineSpacingMultiplier="1.2"
+                    app:layout_constraintTop_toBottomOf="@id/text_current_emoji"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    tools:text="500 ball" />
+                    tools:text="Birinchi qadamni tashladingiz, endi orqaga qaytish yo'q!" />
 
                 <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/progress_to_next_level"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    app:trackCornerRadius="8dp"
-                    app:trackThickness="12dp"
-                    app:indicatorTrackGapSize="0dp"
                     app:trackStopIndicatorSize="0dp"
-                    app:trackStopIndicatorPadding="0dp"
-                    app:trackColor="?colorSurfaceContainerHighest"
+                    android:layout_marginTop="16dp"
+                    app:trackCornerRadius="6dp"
+                    app:trackThickness="10dp"
+                    app:indicatorTrackGapSize="0dp"
+                    app:trackColor="?colorSurfaceContainerHigh"
                     app:indicatorColor="?colorPrimary"
-                    app:layout_constraintTop_toBottomOf="@id/text_current_points"
+                    app:layout_constraintTop_toBottomOf="@id/text_current_description"
                     tools:progress="60" />
-
-                <TextView
-                    android:id="@+id/text_next_level_points"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?colorOnSurfaceVariant"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    app:layout_constraintTop_toBottomOf="@id/progress_to_next_level"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:text="Keyingi darajaga 400 ball qoldi" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -111,22 +112,23 @@
             android:id="@+id/text_all_levels_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
+            android:layout_marginStart="20dp"
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/roboto_bold"
-            android:text="Barcha bosqichlar"
+            android:text="Keyingi bosqich"
             android:textColor="?colorOnSurface"
-            android:textSize="18sp" />
+            android:textSize="16sp" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_levels"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:clipToPadding="false"
         android:paddingHorizontal="16dp"
-        android:paddingBottom="24dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/item_level" />
 

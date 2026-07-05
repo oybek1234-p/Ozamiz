@@ -17,9 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.SimpleItemAnimator
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.combine
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAiChatBinding
+import uz.oybek.ozamiz.databinding.ItemSuggestionChipBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.utils.toDp
@@ -57,8 +57,6 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         observeState(bind)
         handleInitialArguments()
         setupPremiumListener()
-
-        // Boshlang'ich holatda tugma kichik va shaffofroq bo'ladi
         bind.sendButton.scaleX = 0.85f
         bind.sendButton.scaleY = 0.85f
         bind.sendButton.alpha = 0.5f
@@ -82,14 +80,11 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     }
 
     private fun checkPremium(action: () -> Unit) {
-        if (viewModel.isUserPremium) {
+        if (viewModel.canSendMessage()) {
             action()
+            return
         } else {
-            if (viewModel.getDailyAiMessageCount() >= AiChatViewModel.FREE_DAILY_MESSAGE_LIMIT) {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-            } else {
-                action()
-            }
+            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
         }
     }
 
@@ -130,13 +125,9 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
             binding.toolbar.setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
-            if (viewModel.isUserPremium) {
-                viewModel.run {
-                    startNewChat()
-                    sendMessage(prompt, isInitialContext = true) {}
-                }
-            } else {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+            viewModel.run {
+                startNewChat()
+                sendMessage(prompt) {}
             }
             arguments?.remove("initialPrompt")
         } else {
@@ -145,32 +136,21 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     }
 
     private fun setupRecyclerViews(bind: FragmentAiChatBinding) {
-        chatAdapter = AiChatAdapter(
-            onRecreateClick = {
-                checkPremium {
-                    viewModel.sendMessage("Boshqa menyu bering.")
-                }
-            },
-            onSaveMenuClick = { text ->
-                viewModel.saveMenu(text)
-                com.google.android.material.snackbar.Snackbar.make(
-                    bind.root,
-                    "Menyu muvaffaqiyatli saqlandi!",
-                    com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
-                ).show()
-            }
-        )
+        chatAdapter = AiChatAdapter()
         bind.chatRecyclerView.apply {
             adapter = chatAdapter
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 stackFromEnd = true
             }
-            // Lag bo'lmasligi uchun faqat update (change) animatsiyasi o'chiriladi
             (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         }
     }
 
-    private fun updateSendButtonState(bind: FragmentAiChatBinding, hasText: Boolean, isLoading: Boolean) {
+    private fun updateSendButtonState(
+        bind: FragmentAiChatBinding,
+        hasText: Boolean,
+        isLoading: Boolean
+    ) {
         val shouldBeActive = hasText && !isLoading
         bind.sendButton.isEnabled = shouldBeActive
 
@@ -220,6 +200,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                 val hasText = !s.isNullOrBlank()
                 updateSendButtonState(bind, hasText, viewModel.isLoading.value)
             }
+
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
 
@@ -259,15 +240,18 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.messages.collect { messages ->
-                        val layoutManager = bind.chatRecyclerView.layoutManager as? LinearLayoutManager
+                        val layoutManager =
+                            bind.chatRecyclerView.layoutManager as? LinearLayoutManager
                         val lastVisibleItem = layoutManager?.findLastVisibleItemPosition() ?: -1
                         val itemCount = chatAdapter.itemCount
-                        val shouldScrollToBottom = lastVisibleItem >= itemCount - 3 || lastVisibleItem == -1
+                        val shouldScrollToBottom =
+                            lastVisibleItem >= itemCount - 3 || lastVisibleItem == -1
 
                         chatAdapter.submitList(messages) {
                             if (messages.isNotEmpty() && shouldScrollToBottom) {
                                 val lastIndex = messages.size - 1
-                                val lastViewHolder = bind.chatRecyclerView.findViewHolderForAdapterPosition(lastIndex)
+                                val lastViewHolder =
+                                    bind.chatRecyclerView.findViewHolderForAdapterPosition(lastIndex)
                                 if (lastViewHolder != null) {
                                     val topOfLastItem = lastViewHolder.itemView.top
                                     val minTopMargin = toDp(16f, requireContext())
@@ -279,7 +263,6 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                                 }
                             }
                         }
-                        bind.chatRecyclerView.isVisible = messages.isNotEmpty()
                     }
                 }
 
@@ -291,41 +274,39 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                 }
 
                 launch {
-                    combine(
-                        viewModel.showQuestions,
-                        viewModel.suggestedQuestions
-                    ) { show, questions ->
-                        show to questions
-                    }.collect { (show, questions) ->
-                        bind.quickQuestionsScroll.isVisible = show && questions.isNotEmpty()
-                        if (show) {
+                    viewModel.suggestedQuestions.collect { questions ->
+                        bind.quickQuestionsScroll.isVisible = questions.isNotEmpty()
+                        if (questions.isNotEmpty()) {
                             if (questions != currentChipsQuestions) {
                                 currentChipsQuestions = questions
                                 bind.chipGroupQuestions.removeAllViews()
                                 questions.forEach { question ->
-                                    val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                                        text = question
-                                        isClickable = true
-                                        isFocusable = true
-                                        setOnClickListener {
-                                            checkPremium {
-                                                viewModel.sendMessage(question)
-                                                bind.chatRecyclerView.postDelayed({
-                                                    val smoothScroller = object : LinearSmoothScroller(requireContext()) {
-                                                        override fun getVerticalSnapPreference(): Int {
-                                                            return SNAP_TO_START
+                                    val chip =
+                                        ItemSuggestionChipBinding.inflate(layoutInflater).apply {
+                                            textView.text = question
+                                            root.setOnClickListener {
+                                                checkPremium {
+                                                    viewModel.sendMessage(question)
+                                                    bind.chatRecyclerView.postDelayed({
+                                                        val smoothScroller = object :
+                                                            LinearSmoothScroller(requireContext()) {
+                                                            override fun getVerticalSnapPreference(): Int {
+                                                                return SNAP_TO_START
+                                                            }
                                                         }
-                                                    }
-                                                    val lastPos = chatAdapter.itemCount - 1
-                                                    if (lastPos >= 0) {
-                                                        smoothScroller.targetPosition = lastPos
-                                                        bind.chatRecyclerView.layoutManager?.startSmoothScroll(smoothScroller)
-                                                    }
-                                                }, 100)
+                                                        val lastPos = chatAdapter.itemCount - 1
+                                                        if (lastPos >= 0) {
+                                                            smoothScroller.targetPosition =
+                                                                lastPos
+                                                            bind.chatRecyclerView.layoutManager?.startSmoothScroll(
+                                                                smoothScroller
+                                                            )
+                                                        }
+                                                    }, 100)
+                                                }
                                             }
                                         }
-                                    }
-                                    bind.chipGroupQuestions.addView(chip)
+                                    bind.chipGroupQuestions.addView(chip.root)
                                 }
                             }
                         } else {

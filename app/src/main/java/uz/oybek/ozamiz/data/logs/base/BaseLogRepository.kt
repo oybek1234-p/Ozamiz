@@ -27,7 +27,8 @@ abstract class BaseLogRepository<T : LogItem> {
      * Add a new log entry
      */
     open suspend fun add(log: T, date: Date): Boolean {
-        val userId = currentUserId ?: return false
+        val userId = currentUserId
+        if (userId.isBlank()) return false
         val dateStr = date.dateApiFormat()
         val reference = getReference(userId, dateStr)
         val logId = assignLogId(log)
@@ -43,8 +44,8 @@ abstract class BaseLogRepository<T : LogItem> {
      * Delete an existing log entry
      */
     open suspend fun delete(logId: String, date: Date): Boolean {
-        val userId = currentUserId ?: return false
-        if (logId.isEmpty()) return false
+        val userId = currentUserId
+        if (userId.isBlank() || logId.isEmpty()) return false
         val dateStr = date.dateApiFormat()
         return try {
             getReference(userId, dateStr).child(logId).removeValue().await()

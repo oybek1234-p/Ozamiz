@@ -8,7 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
-import uz.oybek.ozamiz.data.ai.analyzer.model.AnalyzedIngredient
+import uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient
 import uz.oybek.ozamiz.databinding.DialogEditIngredientBinding
 
 class EditIngredientBottomSheet : BottomSheetDialogFragment() {
@@ -58,7 +58,7 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
         binding.editTextIngredientName.setText(item.name)
         binding.editTextIngredientCalories.setText(item.calories?.toString() ?: "")
         
-        // Agar amount va unit bo'lsa, ularni nomiga qo'shib ko'rsatish yoki alohida (dizaynga qarab)
+        // Agar points va unit bo'lsa, ularni nomiga qo'shib ko'rsatish yoki alohida (dizaynga qarab)
         // Hozircha name o'zida hammasini tahrirlashga ruxsat beramiz
         
         binding.buttonSave.setOnClickListener {

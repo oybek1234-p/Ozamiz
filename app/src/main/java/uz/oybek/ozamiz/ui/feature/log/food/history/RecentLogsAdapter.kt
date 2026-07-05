@@ -3,21 +3,19 @@ package uz.oybek.ozamiz.ui.feature.log.food.history
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.model.FoodLog
+import uz.oybek.ozamiz.data.utils.formatToHhMm
 import uz.oybek.ozamiz.databinding.ItemTodaysFoodBinding
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class RecentLogsAdapter(
     private val onItemClick: (FoodLog) -> Unit,
-    private val onDeleteClick: (FoodLog) -> Unit
+    private val onDeleteClick: (FoodLog) -> Unit,
+    private val onLikeClick: (FoodLog) -> Unit
 ) : ListAdapter<FoodLog, RecentLogsAdapter.FoodLogViewHolder>(FOOD_LOG_DIFF_CALLBACK) {
 
     private var savedFoodIds: Set<String> = emptySet()
@@ -43,8 +41,6 @@ class RecentLogsAdapter(
     inner class FoodLogViewHolder(private val binding: ItemTodaysFoodBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-
         init {
             itemView.setOnClickListener {
                 if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
@@ -56,6 +52,11 @@ class RecentLogsAdapter(
                     getItem(bindingAdapterPosition)?.let { log -> onDeleteClick(log) }
                 }
             }
+            binding.btnLikeFood.setOnClickListener {
+                if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
+                    getItem(bindingAdapterPosition)?.let { log -> onLikeClick(log) }
+                }
+            }
         }
 
         fun bind(foodLog: FoodLog) {
@@ -65,7 +66,7 @@ class RecentLogsAdapter(
 
             val timestamp = (foodLog.timestamp as? Number)?.toLong()
             if (timestamp != null) {
-                binding.textViewTimestamp.text = timeFormat.format(Date(timestamp))
+                binding.textViewTimestamp.text = timestamp.formatToHhMm()
                 binding.textViewTimestamp.visibility = View.VISIBLE
             } else {
                 binding.textViewTimestamp.visibility = View.GONE
@@ -80,6 +81,15 @@ class RecentLogsAdapter(
             } else {
                 binding.imageViewFood.visibility = View.GONE
             }
+
+            val isLiked = savedFoodIds.contains(foodLog.description.lowercase().trim())
+            binding.btnLikeFood.setImageResource(
+                if (isLiked) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
+            )
+            binding.btnLikeFood.imageTintList = android.content.res.ColorStateList.valueOf(
+                if (isLiked) itemView.context.getColor(R.color.likeColor)
+                else itemView.context.getColor(R.color.iconColor)
+            )
         }
     }
 

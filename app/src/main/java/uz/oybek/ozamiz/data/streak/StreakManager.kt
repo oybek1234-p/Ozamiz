@@ -36,100 +36,58 @@ object StreakManager {
     fun updateUserStreakOnAction(currentUser: User): StreakUpdateResult {
         val today = LocalDate.now()
         val todayStr = today.format(dateFormatter)
+        val currentStreakInfo = currentUser.streakInfo ?: StreakInfo()
 
-        var currentStreakInfo = currentUser.streakInfo ?: StreakInfo()
-        val oldCurrentStreak = currentStreakInfo.currentStreak
-        val oldBestStreak = currentStreakInfo.bestStreak
-        val oldLastActionDateStr = currentStreakInfo.lastActionDate
-        val activityHistory = currentStreakInfo.activityHistory.toMutableList()
-
-        var lastActionDateLD: LocalDate? = null
-        var isVeryFirstActionEver = false
-
-        if (oldLastActionDateStr.isNotBlank()) {
-            lastActionDateLD = try {
-                LocalDate.parse(oldLastActionDateStr, dateFormatter)
-            } catch (e: Exception) {
-                today.minusDays(100)
-            }
-        } else {
-            isVeryFirstActionEver = true
-            lastActionDateLD = today.minusDays(100)
+        if (currentStreakInfo.lastActionDate == todayStr) {
+            return StreakUpdateResult(currentUser, isFirstActionToday = false)
         }
+
+        val lastActionDateLD = currentStreakInfo.lastActionDate.takeIf { it.isNotBlank() }
+            ?.let { LocalDate.parse(it, dateFormatter) }
+
+        val daysDiff = if (lastActionDateLD != null)
+            ChronoUnit.DAYS.between(lastActionDateLD, today) else Long.MAX_VALUE
 
         var streakContinued = false
-        var streakBrokenAndReset = false
+        var streakBroken = false
         var streakStartedNew = false
-        var newBestStreakAchieved = false
-        var isFirstActionToday = false
         var returnedAfterManyDays = false
-        
-        if (!activityHistory.contains(todayStr)) {
-            activityHistory.add(todayStr)
-            if (activityHistory.size > 60) {
-                 activityHistory.removeAt(0)
+
+        val newStreakInfo = when {
+            daysDiff == 1L -> {
+                streakContinued = true
+                currentStreakInfo.copy(
+                    currentStreak = currentStreakInfo.currentStreak + 1,
+                    activeDays = currentStreakInfo.activeDays + 1,
+                    lastActionDate = todayStr
+                )
+            }
+            else -> {
+                if (currentStreakInfo.currentStreak > 0) streakBroken = true
+                if (daysDiff >= 4L) returnedAfterManyDays = true
+
+                streakStartedNew = true
+                currentStreakInfo.copy(
+                    currentStreak = 1,
+                    activeDays = currentStreakInfo.activeDays + 1,
+                    lastActionDate = todayStr
+                )
             }
         }
 
-        if (lastActionDateLD == today) {
-            isFirstActionToday = false
-            currentStreakInfo = currentStreakInfo.copy(activityHistory = activityHistory)
-        } else {
-            isFirstActionToday = true
-            
-            val daysDiff = ChronoUnit.DAYS.between(lastActionDateLD, today)
-            
-            when {
-                daysDiff == 1L -> {
-                    currentStreakInfo = currentStreakInfo.copy(
-                        currentStreak = currentStreakInfo.currentStreak + 1,
-                        activeDays = currentStreakInfo.activeDays + 1,
-                        lastActionDate = todayStr,
-                        activityHistory = activityHistory
-                    )
-                    streakContinued = true
-                }
-                daysDiff in 2..3L -> {
-                    currentStreakInfo = currentStreakInfo.copy(
-                        currentStreak = currentStreakInfo.currentStreak + 1,
-                        activeDays = currentStreakInfo.activeDays + 1,
-                        lastActionDate = todayStr,
-                        activityHistory = activityHistory
-                    )
-                    streakContinued = true
-                }
-                else -> {
-                     if (oldCurrentStreak > 0 && !isVeryFirstActionEver) {
-                        streakBrokenAndReset = true
-                    }
-                    if (!isVeryFirstActionEver && daysDiff >= 4L) {
-                        returnedAfterManyDays = true
-                    }
-                    currentStreakInfo = currentStreakInfo.copy(
-                        currentStreak = 1,
-                        activeDays = currentStreakInfo.activeDays + 1,
-                        lastActionDate = todayStr,
-                        activityHistory = activityHistory
-                    )
-                    streakStartedNew = true
-                }
-            }
-            
-             if (currentStreakInfo.currentStreak > oldBestStreak) {
-                currentStreakInfo = currentStreakInfo.copy(bestStreak = currentStreakInfo.currentStreak)
-                newBestStreakAchieved = true
-            }
-        }
+        val newBestStreakAchieved = newStreakInfo.currentStreak > newStreakInfo.bestStreak
+        val finalStreakInfo = if (newBestStreakAchieved) {
+            newStreakInfo.copy(bestStreak = newStreakInfo.currentStreak)
+        } else newStreakInfo
 
-        val updatedUser = currentUser.copy(streakInfo = currentStreakInfo)
         return StreakUpdateResult(
-            updatedUser,
-            streakContinued,
-            streakBrokenAndReset,
-            streakStartedNew,
-            newBestStreakAchieved,
-            isFirstActionToday,
-            returnedAfterManyDays
+            updatedUser = currentUser.copy(streakInfo = finalStreakInfo),
+            streakContinued = streakContinued,
+            streakBrokenAndReset = streakBroken,
+            streakStartedNew = streakStartedNew,
+            newBestStreakAchieved = newBestStreakAchieved,
+            isFirstActionToday = true,
+            returnedAfterManyDays = returnedAfterManyDays
         )
     }
 }

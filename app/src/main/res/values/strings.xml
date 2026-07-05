@@ -10,8 +10,8 @@
     <string name="audio_transcription_in_progress">Tekshiryapman ...</string>
     <string name="input_via_voice_hint">Ovoz orqali</string>
     <string name="bugungi_tavsiyalar">Bugungi tavsiyalar</string>
-    <string name="stop_and_analyze">To\'xtatish</string>
-    <string name="recording_speak_now">Gapiring...</string>
+    <string name="stop_and_analyze">Tahlil qilish</string>
+    <string name="recording_speak_now">Sizni eshityapman, gapiring</string>
     <string name="voice_listening">Eshityapman</string>
     <string name="voice_analyze">Tahlil qilish</string>
     <string name="voice_checking">Tekshiryapmiz</string>
@@ -151,7 +151,7 @@
     <string name="add_meal_description">Ovqat qo\'shish uchun + tugmasini bosing</string>
     <string name="food_list_button">Ovqatlar Ro\'yxati</string>
     <string name="water_intake_title">Suv ichish tezroq ozdiradi</string>
-    <string name="target_water_format">Ichish kerak: %.1f ml</string>
+    <string name="target_water_format">Ichish kerak: %s ml</string>
     <string name="consumed_water_format">%1$d millilitr</string>
     <string name="water_benefits_link">Suv ichish foydalari haqida</string>
     <string name="exercise_title">Harakatlar</string>
@@ -241,9 +241,9 @@
     <string name="macro_carbs">⚡️ Energiya (Uglevod)</string>
     <string name="macro_fat">🛡️ Himoya (Yog\')</string>
 
-    <string name="water_liters_format">%.1f litr ichildi</string>
-    <string name="water_goal_format">Kuniga %.1f litr suv iching</string>
-    <string name="water_consumed_format">%%: %.1f litr</string>
+    <string name="water_liters_format">%1$s litr ichildi</string>
+    <string name="water_goal_format">Kuniga %1$s litr suv iching</string>
+    <string name="water_consumed_format">%1$s litr</string>
 
     <string name="carbs_hint">Uglevod</string>
     <string name="log_food_title_format">%s</string>
@@ -260,7 +260,16 @@
     <string name="analyze_and_save">Taxlil qilish</string>
     <string name="error_photo_required">Iltimos, rasm yuklang</string>
     <string name="error_description_required">Ovqat haqida ma\'lumot kiriting</string>
-    <string name="analyzing">Taxlil qilinmoqda…</string>
+    <string name="analyzing">Tahlil qilinmoqda…</string>
+    <string name="learning_benefits_calories">Foydasi, kaloriyasini o\'rganyapmiz</string>
+    <string name="edit_calories_title">Kaloriyani o\'zgartirish</string>
+    <string name="edit_protein_title">Oqsilni o\'zgartirish (gr)</string>
+    <string name="edit_carbs_title">Uglevodni o\'zgartirish (gr)</string>
+    <string name="edit_fat_title">Yog\'ni o\'zgartirish (gr)</string>
+    <string name="gram_format">%1$d gr</string>
+    <string name="confirm_delete_log_message">Haqiqatan ham bu yozuvni o\'chirmoqchimisiz?</string>
+    <string name="yes">Ha</string>
+    <string name="voice_input_pending">Ovozli kiritish...</string>
     <string name="saving">Saqlanmoqda…</string>
     <string name="save_changes">O\'zgarishlarni saqlash</string>
     <string name="analysis_result_title">AI Taxmin Natijasi</string>
@@ -290,6 +299,7 @@
     <string name="got_it">Tushunarli</string>
     <string name="estimated_macros">Makronutrientlar</string>
     <string name="recognized_ingredients">Tarkibi</string>
+    <string name="saved_foods_title">Saqlangan</string>
     <string name="retry_or_cancel">Qayta kiritish</string>
     <string name="save_to_log">Saqlash</string>
     <string name="recommendations_warnings">Tavsiya</string>
@@ -369,7 +379,7 @@
     <string name="height_cm_hint_asterisk">Bo\'yingiz (sm)</string>
     <string name="weight_kg_hint_asterisk">Vazningiz (kg)</string>
     <string name="ideal_weight_range_info">Siz uchun ideal vazn diapazoni:</string>
-    <string name="ideal_weight_range_format">%.1f kg - %.1f kg</string>
+    <string name="ideal_weight_range_format">%s kg - %s kg</string>
     <string name="target_weight_kg_hint_optional">Maqsad vazningiz (kg)</string>
     <string name="your_weight_goal_asterisk">Vazn maqsadingiz</string>
     <string name="your_activity_level_asterisk">Faollik darajangiz</string>
@@ -610,7 +620,6 @@
     <string name="hamjamiyat">Boshqalar</string>
     <string name="ai_rec_format">%1$s:\n%2$s</string>
     <string name="premium_rec_request">Kunlik Sun\'iy Intellekt taom tavsiyalarini ko\'rish uchun Premiumga o\'ting</string>
-    <string name="new_user_welcome_message">Ilovaga xush kelibsiz! Ozamiz – bu shunchaki kaloriya hisoblagich emas, balki sizning sog\'lom turmush tarzingizdagi yo\'lboshchingiz. \n\nMaqsadga erishish uchun har kuni yegan ovqatlaringizni, ichgan suvingizni va jismoniy faolligingizni ilovaga kiritib boring. Biz buni tahlil qilib, sizga to\'g\'ri yo\'l ko\'rsatamiz. \n\nOldin kaloriya sanab ko\'rganmisiz yoki bu siz uchun birinchi marta?</string>
     <string name="ai_menu_title">Taomnoma</string>
 
     <string name="cashback_title">Pulingizni qaytaramiz agar:</string>
@@ -852,7 +861,7 @@
     <string name="fats_variant_5_title">Trans-yog\'lardan va Qovurmalardan qochish</string>
     <string name="fats_variant_5_desc">Ko‘chadagi qovurilgan somsalar, chuchvara, bo‘g‘irsoqlar, margarin bilan tayyorlangan qatlama va pishiriqlardan butunlay saqlaning.</string>
 
-    <string name="phone_onboard_title">Ilova bo\'yicha tushunmovchiliklar bo\'lsa bog\'lanish uchun</string>
+    <string name="phone_onboard_title">Bog\'lanish uchun</string>
     <string name="phone_onboard_hint">Telefon raqamingiz</string>
     <string name="phone_onboard_skip">O\'tkazib yuborish</string>
     <string name="phone_onboard_save">Saqlash</string>
@@ -906,8 +915,25 @@
     <string name="food_search_details_format">%1$d kkal %2$s(%3$d gr)</string>
     <string name="food_search_details_default_format">%1$d kkal 100 gr</string>
     <string name="search_foods_count_format">%1$d ta ovqat topildi</string>
+    <string name="log_food_camera_title">Ovqatni rasmga olish</string>
+    <string name="log_food_text_title">Yozish</string>
+    <string name="log_food_voice_title">Gapirish </string>
+    <string name="log_food_recent_history">Oxirgi qo\'shilganlar</string>
+    <string name="log_food_toolbar_title">Dietolog ovqatni tekshiradi</string>
+    <string name="log_food_analyzing">Hisoblayapmiz...</string>
     <string name="log_food_search_list_title">Ovqatlar ro\'yxati</string>
-    <string name="log_food_search_list_count_format">%1$s (%2$d ta ovqat)</string>
+    <string name="log_food_search_list_count_format">%1$s</string>
+    <string name="log_food_delete_success">O\'chirildi</string>
+    <string name="log_food_relog_success">Qayta qo\'shildi!</string>
+    <string name="log_food_favorite_added">Sevimlilarga qo\'shildi!</string>
+    <string name="log_food_favorite_removed">Sevimlilardan olib tashlandi</string>
+    <string name="log_food_added_success">Qo\'shildi!</string>
+    <string name="log_food_daily_limit_reached">Kunlik me\'yor (5 ta) to\'ldi!</string>
+    <string name="log_food_mic_error">Mikrofon xatosi: %1$s</string>
+    <string name="log_food_camera_permission_denied">Rasmga olish uchun kamera ruxsati zarur</string>
+    <string name="log_food_camera_permission_title">Kamera ruxsati</string>
+    <string name="log_food_camera_permission_msg">Ilova ovqatni rasmga olishi uchun kamera ruxsati kerak. Sozlamalarga o\'tib, unga ruxsat bering.</string>
+    <string name="log_food_camera_permission_settings">Sozlamalar</string>
     <string name="community_empty_posts">Hozircha postlar yo\'q</string>
     <string name="community_empty_users">Foydalanuvchilar topilmadi</string>
     <string name="weight_photo_prompt_title">Iltimos, rasmingizni yuklang</string>
@@ -929,5 +955,31 @@
     <string name="admin_gender_female">Ayol</string>
     <string name="admin_gender_unknown">Belgilanmagan</string>
     <string name="admin_online">Online</string>
-
+    <string name="onboarding_step_1">Assalomu alaykum %1$s! Ozish uchun har bir ovqatingizni menga kiritib borishingiz kerak, ozishning siri bu to\'g\'ri ovqatlanishda, birinchi ovqatingizni kiriting</string>
+    <string name="onboarding_step_2">%1$s, sizda yana %2$d kaloriya ovqat yesangiz bo\'ladi, har bir yeganingizni qo\'shib boring, me\'yordan oshirmaslikka harakat qiling.</string>
+    <string name="fat_burnt_today">Bugun %1$d gr yog\' yoqdingiz.</string>
+    <string name="calories_exceeded_title">Bugunga yetarli, ortiqcha ovqat semirtiradi</string>
+    <string name="calories_exceeded_subtitle">Suv, choy, yengil sabzavotli salat yeyishingiz mumkin, %1$s</string>
+    <string name="calories_oshdi_format">%1$d kal oshdi.</string>
+    <string name="calories_limit_toldi">limit to\'ldi.</string>
+    <string name="calories_remaining_label_oshdi">oshdi</string>
+    <string name="calories_remaining_label_qoldi">qoldi</string>
+    <string name="calories_eaten_format">%1$d yeyildi</string>
+    <string name="meal_remaining_format">%1$d qoldi</string>
+    <string name="water_bajarildi">Bajarildi</string>
+    <string name="exercise_bajarildi">Bajarildi</string>
+    <string name="exercise_remaining_format">%1$d qoldi</string>
+    <string name="fat_burn_title">Yog\' yoqish</string>
+    <string name="add_btn">Qo\'shish</string>
+    <string name="tushundim_btn">Tushundim</string>
+    <string name="ajoyib_title">Ajoyib!</string>
+    <string name="share_result_title">Ajoyib natija! 🌟</string>
+    <string name="share_result_description">Sizning bugungi ovqatingiz juda foydali ekan. Uni boshqa foydalanuvchilar bilan ulashmoqchimisiz?</string>
+    <string name="share_privacy_note">Shaxsiy ma\'lumotlaringiz (yosh, vazn, rasm) sir saqlanadi. Faqat ovqat nomi va kaloriyasi ko\'rinadi.</string>
+    <string name="share_action_share">Ulashish</string>
+    <string name="share_action_cancel">Faqat saqlash</string>
+    <string name="hisoblagich">Hisoblagich</string>
+    <string name="premium_tekshiruv">Premium Tekshiruv</string>
+    <string name="foydalanuvchilar">Foydalanuvchilar</string>
+    <string name="postlar">Postlar</string>
 </resources>

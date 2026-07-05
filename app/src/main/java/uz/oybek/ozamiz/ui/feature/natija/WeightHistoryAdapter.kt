@@ -8,17 +8,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.data.logs.model.WeightLog
+import uz.oybek.ozamiz.data.utils.formatToDdMmm
+import uz.oybek.ozamiz.data.utils.formatToHhMm
 import uz.oybek.ozamiz.databinding.ItemWeightHistoryBinding
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class WeightHistoryAdapter(
     private val onDeleteClick: (WeightLog) -> Unit
 ) : ListAdapter<WeightLog, WeightHistoryAdapter.ViewHolder>(DiffCallback()) {
-
-    private val dateFormat = SimpleDateFormat("dd MMM", Locale("uz"))
-    private val timeFormat = SimpleDateFormat("HH:mm", Locale("uz"))
 
     class ViewHolder(val binding: ItemWeightHistoryBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -41,29 +37,33 @@ class WeightHistoryAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val log = getItem(position)
-        // Calculate change looking at next item (which is previous in time since list is desc)
         val olderLog = if (position < itemCount - 1) getItem(position + 1) else null
 
         holder.binding.apply {
-            val date = Date(log.timestampLong)
-            tvHistoryDate.text = dateFormat.format(date)
-            tvHistoryTime.text = timeFormat.format(date)
-            
+            val dateLong = log.timestampLong
+            tvHistoryDate.text = dateLong.formatToDdMmm()
+            tvHistoryTime.text = dateLong.formatToHhMm()
+
             tvHistoryWeight.text = "${String.format("%.1f", log.weightKg)} kg"
-            
+
             // Change
             if (olderLog != null) {
                 val change = log.weightKg - olderLog.weightKg
-                val changeText = if (change > 0) "+${String.format("%.1f", change)}" else String.format("%.1f", change)
+                val changeText =
+                    if (change > 0) "+${String.format("%.1f", change)}" else String.format(
+                        "%.1f",
+                        change
+                    )
                 tvHistoryChange.text = changeText
-                
-                val color = if (change <= 0) Color.parseColor("#4CAF50") else Color.parseColor("#F44336")
+
+                val color =
+                    if (change <= 0) Color.parseColor("#4CAF50") else Color.parseColor("#F44336")
                 tvHistoryChange.setTextColor(color)
                 tvHistoryChange.isVisible = true
             } else {
                 tvHistoryChange.isVisible = false
             }
-            
+
             // Photo
             if (log.photoUrl.isNotEmpty()) {
                 imgHistoryPhoto.isVisible = true
@@ -75,7 +75,7 @@ class WeightHistoryAdapter(
             } else {
                 imgHistoryPhoto.isVisible = false
             }
-            
+
             // Delete
             btnDelete.setOnClickListener {
                 onDeleteClick(log)

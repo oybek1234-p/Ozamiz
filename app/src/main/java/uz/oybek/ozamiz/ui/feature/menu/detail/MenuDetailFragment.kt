@@ -46,7 +46,6 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.deleteSuccess.collect {
-                Toast.makeText(context, "O'chirildi", Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
         }
