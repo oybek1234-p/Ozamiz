@@ -101,13 +101,13 @@ class DateScrollerAdapter(
             }
         }
 
-        private val primaryColor = VaznimColors.getPrimary()
-        private val onPrimary = VaznimColors.getOnPrimary()
-        private val surfaceLow = VaznimColors.getSurfaceLow()
-        private val onSurfaceVariant = VaznimColors.getOnSurfaceVariant()
+        private val primaryColor = VaznimColors.getPrimary(binding.root.context)
+        private val onPrimary = VaznimColors.getOnPrimary(binding.root.context)
+        private val surfaceLow = VaznimColors.getSurfaceLow(binding.root.context)
+        private val onSurfaceVariant = VaznimColors.getOnSurfaceVariant(binding.root.context)
         
-        private val greenColor = VaznimColors.getGreen()
-        private val yellowColor = VaznimColors.getYellow()
+        private val greenColor = VaznimColors.getGreen(binding.root.context)
+        private val yellowColor = VaznimColors.getYellow(binding.root.context)
 
         fun bind(date: Date) {
             val isSelected = DateUtils.isSameDay(date, selectedDate)
@@ -149,11 +149,11 @@ class DateScrollerAdapter(
                 isExceeded -> yellowColor
                 isCompleted -> greenColor
                 progress > 0 -> primaryColor
-                else -> VaznimColors.getOutline()
+                else -> VaznimColors.getOutline(binding.root.context)
             }
             
             binding.progressRing.setIndicatorColor(ringColor)
-            binding.progressRing.trackColor = VaznimColors.getSurfaceContainerHigh()
+            binding.progressRing.trackColor = VaznimColors.getSurfaceContainerHigh(binding.root.context)
         }
     }
 

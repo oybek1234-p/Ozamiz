@@ -63,6 +63,16 @@
     <color name="md_theme_light_surfaceContainerHigh">#F1F1F1</color>
     <color name="md_theme_light_surfaceContainerHighest">#E6E6E6</color>
 
+    <!-- Vaznim Semantic Colors -->
+    <color name="vaznim_primary">@color/md_theme_light_primary</color>
+    <color name="vaznim_on_primary">@color/md_theme_light_onPrimary</color>
+    <color name="vaznim_surface_low">@color/md_theme_light_surfaceContainerLow</color>
+    <color name="vaznim_outline">@color/md_theme_light_outline</color>
+    <color name="vaznim_track">@color/md_theme_light_surfaceContainerHigh</color>
+    <color name="vaznim_on_surface">@color/md_theme_light_onSurface</color>
+    <color name="vaznim_on_surface_variant">@color/md_theme_light_onSurfaceVariant</color>
+    <color name="vaznim_surface_container_high">@color/md_theme_light_surfaceContainerHigh</color>
+
     <!-- Dark Theme Colors -->
     <color name="md_theme_dark_primary">#7ADB9E</color>
     <color name="md_theme_dark_onPrimary">#003920</color>

@@ -251,9 +251,9 @@ class AnalyzeResultFragment : Fragment() {
                         isVisible = true
                         binding.ballCount.setTextColor(
                             when (analysisResult.healthScore) {
-                                in 0..3 -> VaznimColors.getOnSurface()
-                                in 4..5 -> VaznimColors.getOrange()
-                                else -> VaznimColors.getGreen()
+                                in 0..3 -> VaznimColors.getOnSurface(requireContext())
+                                in 4..5 -> VaznimColors.getOrange(requireContext())
+                                else -> VaznimColors.getGreen(requireContext())
                             }
                         )
                         binding.ballCount.text = analysisResult.healthScore.toString() + " ball"

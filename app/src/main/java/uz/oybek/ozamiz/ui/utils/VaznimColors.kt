@@ -5,20 +5,20 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
 
 object VaznimColors {
-    private fun getColor(resId: Int): Int = ContextCompat.getColor(appContext, resId)
+    private fun getColor(context: android.content.Context, resId: Int): Int = ContextCompat.getColor(context, resId)
 
-    fun getPrimary(): Int = getColor(R.color.md_theme_light_primary)
-    fun getOnPrimary(): Int = getColor(R.color.md_theme_light_onPrimary)
-    fun getSurfaceLow(): Int = getColor(R.color.md_theme_light_surfaceContainerLow)
-    fun getOutline(): Int = getColor(R.color.md_theme_light_outline)
-    fun getGray(): Int = getColor(R.color.grey)
-    fun getOrange(): Int = getColor(R.color.orange)
-    fun getYellow(): Int = getColor(R.color.yellow)
-    fun getGreen(): Int = getColor(R.color.green)
+    fun getPrimary(context: android.content.Context): Int = getColor(context, R.color.vaznim_primary)
+    fun getOnPrimary(context: android.content.Context): Int = getColor(context, R.color.vaznim_on_primary)
+    fun getSurfaceLow(context: android.content.Context): Int = getColor(context, R.color.vaznim_surface_low)
+    fun getOutline(context: android.content.Context): Int = getColor(context, R.color.vaznim_outline)
+    fun getGray(context: android.content.Context): Int = getColor(context, R.color.grey)
+    fun getOrange(context: android.content.Context): Int = getColor(context, R.color.orange)
+    fun getYellow(context: android.content.Context): Int = getColor(context, R.color.yellow)
+    fun getGreen(context: android.content.Context): Int = getColor(context, R.color.green)
 
-    fun getRed(): Int = getColor(R.color.red)
-    fun getTrack(): Int = getColor(R.color.md_theme_light_surfaceContainerHigh)
-    fun getOnSurface(): Int = getColor(R.color.md_theme_light_onSurface)
-    fun getOnSurfaceVariant(): Int = getColor(R.color.md_theme_light_onSurfaceVariant)
-    fun getSurfaceContainerHigh(): Int = getColor(R.color.md_theme_light_surfaceContainerHigh)
+    fun getRed(context: android.content.Context): Int = getColor(context, R.color.red)
+    fun getTrack(context: android.content.Context): Int = getColor(context, R.color.vaznim_track)
+    fun getOnSurface(context: android.content.Context): Int = getColor(context, R.color.vaznim_on_surface)
+    fun getOnSurfaceVariant(context: android.content.Context): Int = getColor(context, R.color.vaznim_on_surface_variant)
+    fun getSurfaceContainerHigh(context: android.content.Context): Int = getColor(context, R.color.vaznim_surface_container_high)
 }

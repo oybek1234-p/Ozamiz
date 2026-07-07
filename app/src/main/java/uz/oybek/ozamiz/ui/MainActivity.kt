@@ -66,6 +66,24 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var systemInsets: WindowInsetsCompat? = null
+    private var topInsetPaddingEnabled = true
+
+    fun setTopInsetPaddingEnabled(enabled: Boolean) {
+        if (topInsetPaddingEnabled == enabled) return
+        topInsetPaddingEnabled = enabled
+        updateContainerPadding()
+    }
+
+    private fun updateRootPadding() {
+        val insets = systemInsets ?: return
+        val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        binding.root.setPadding(
+            systemBars.left,
+            0,
+            systemBars.right,
+            0
+        )
+    }
 
     private fun handleSignOut() {
         UserAuthRepository.signOut()
@@ -93,10 +111,8 @@ class MainActivity : AppCompatActivity() {
     private fun initInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             systemInsets = insets
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0)
-
-            binding.bottomNavView.setPadding(0, 0, 0, systemBars.bottom)
+            updateRootPadding()
+            binding.bottomNavView.setPadding(0, 0, 0, insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom)
             updateContainerPadding()
             insets
         }
@@ -404,11 +420,12 @@ class MainActivity : AppCompatActivity() {
         val insets = systemInsets ?: return
         val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
         val show = bottomNavShown
-        if (show) {
-            binding.container.setPadding(0, 0, 0, 0)
-        } else {
-            binding.container.setPadding(0, 0, 0, systemBars.bottom)
-        }
+        binding.container.setPadding(
+            0,
+            if (topInsetPaddingEnabled) systemBars.top else 0,
+            0,
+            if (show) 0 else systemBars.bottom
+        )
     }
 
     private fun showLevelUpDialog(level: Level) {

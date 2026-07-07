@@ -44,6 +44,7 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
 
     override fun onResume() {
         super.onResume()
+        mainActivity()?.setTopInsetPaddingEnabled(false)
         savedSystemBarStyle = applySystemBarStyle(
             statusBarColor = Color.BLACK,
             navigationBarColor = Color.BLACK,
@@ -53,6 +54,7 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
     }
 
     override fun onPause() {
+        mainActivity()?.setTopInsetPaddingEnabled(true)
         savedSystemBarStyle?.let { restoreSystemBarStyle(it) }
         savedSystemBarStyle = null
         super.onPause()

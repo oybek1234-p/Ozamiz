@@ -478,11 +478,12 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun updateCalorieAndMacros(state: HomeUiState) = binding.apply {
         val useAnimation = true
-        val cPrimary = VaznimColors.getPrimary()
-        val cYellow = VaznimColors.getYellow()
-        val cGreen = VaznimColors.getGreen()
-        val cTrack = VaznimColors.getTrack()
-        val cOnSurface = VaznimColors.getOnSurface()
+        val context = requireContext()
+        val cPrimary = VaznimColors.getPrimary(context)
+        val cYellow = VaznimColors.getYellow(context)
+        val cGreen = VaznimColors.getGreen(context)
+        val cTrack = VaznimColors.getTrack(context)
+        val cOnSurface = VaznimColors.getOnSurface(context)
 
         mainProgress.apply {
             textCaloriesRemainingLabel.text = if (state.caloriesRemaining < 0) {
@@ -603,11 +604,12 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun updateMeals(state: HomeUiState) = binding.apply {
         val animate = animateProgress
+        val context = requireContext()
         val mealCalories = state.dailyFoodLogs.groupBy { it.mealType }
             .mapValues { it.value.sumOf { f -> f.calories } }
         val target = state.caloriesTarget.toFloat()
-        val cPrimary = VaznimColors.getPrimary()
-        val cOnSurfaceVariant = VaznimColors.getOnSurfaceVariant()
+        val cPrimary = VaznimColors.getPrimary(context)
+        val cOnSurfaceVariant = VaznimColors.getOnSurfaceVariant(context)
         val meals = listOf(
             Triple(
                 cardBreakfast, MealTime.Breakfast.id, (target * 0.3f).toInt()
@@ -645,12 +647,12 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             getString(R.string.water_consumed_format, litersStr)
         }
         textCurrentWaterLiters.setTextColor(
-            if (isWaterCompleted) VaznimColors.getGreen() else VaznimColors.getOnSurface()
+            if (isWaterCompleted) VaznimColors.getGreen(context) else VaznimColors.getOnSurface(context)
         )
 
         if (isWaterCompleted) {
             val drawable = ContextCompat.getDrawable(context, R.drawable.check_ic)
-            drawable?.setTint(VaznimColors.getGreen())
+            drawable?.setTint(VaznimColors.getGreen(context))
             textCurrentWaterLiters.setCompoundDrawablesRelativeWithIntrinsicBounds(
                 drawable, null, null, null
             )
@@ -671,10 +673,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun updateExercise(state: HomeUiState) = binding.apply {
         val context = requireContext()
-        val cPrimary = VaznimColors.getPrimary()
-        val cGreen = VaznimColors.getGreen()
-        val cTrack = VaznimColors.getTrack()
-        val cOnSurface = VaznimColors.getOnSurface()
+        val cPrimary = VaznimColors.getPrimary(context)
+        val cGreen = VaznimColors.getGreen(context)
+        val cTrack = VaznimColors.getTrack(context)
+        val cOnSurface = VaznimColors.getOnSurface(context)
 
         progressExercise.max = state.exerciseTarget
         progressExercise.setProgressCompat(state.exerciseBurnt, true)

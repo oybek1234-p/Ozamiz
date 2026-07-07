@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Night versions of generic colors -->
+    <color name="vaznim_primary">@color/md_theme_dark_primary</color>
+    <color name="vaznim_on_primary">@color/md_theme_dark_onPrimary</color>
+    <color name="vaznim_surface_low">@color/md_theme_dark_surfaceContainerLow</color>
+    <color name="vaznim_outline">@color/md_theme_dark_outline</color>
+    <color name="vaznim_track">@color/md_theme_dark_surfaceContainerHigh</color>
+    <color name="vaznim_on_surface">@color/md_theme_dark_onSurface</color>
+    <color name="vaznim_on_surface_variant">@color/md_theme_dark_onSurfaceVariant</color>
+    <color name="vaznim_surface_container_high">@color/md_theme_dark_surfaceContainerHigh</color>
+
+    <!-- Specific night colors -->
+    <color name="green">#7ADB9E</color>
+    <color name="yellow">#FFE082</color>
+</resources>
