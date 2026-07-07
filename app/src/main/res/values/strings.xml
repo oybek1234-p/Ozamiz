@@ -912,10 +912,12 @@
     <string name="ai_food_limit_msg">Bugungi dietolog orqali ovqat tahlili 3 marta limiti to\'ldi. Cheksiz tahlillar uchun Premiumga o\'ting.</string>
     <string name="daily_water_limit_title">Kunlik suv limiti to\'ldi</string>
     <string name="daily_water_limit_msg">Bir kunda 5 martagacha suv qo\'shishingiz mumkin, ko\'proq qo\'shish uchun Premium obunani faollashtiring</string>
-    <string name="food_search_details_format">%1$d kkal %2$s(%3$d gr)</string>
+    <string name="food_search_details_format">%2$s %1$d kkal </string>
     <string name="food_search_details_default_format">%1$d kkal 100 gr</string>
     <string name="search_foods_count_format">%1$d ta ovqat topildi</string>
     <string name="log_food_camera_title">Ovqatni rasmga olish</string>
+    <string name="log_food_camera_instruction">Ovqatni ko\'rsating</string>
+    <string name="log_food_camera_list">Ro\'yxat</string>
     <string name="log_food_text_title">Yozish</string>
     <string name="log_food_voice_title">Gapirish </string>
     <string name="log_food_recent_history">Oxirgi qo\'shilganlar</string>
@@ -955,8 +957,11 @@
     <string name="admin_gender_female">Ayol</string>
     <string name="admin_gender_unknown">Belgilanmagan</string>
     <string name="admin_online">Online</string>
-    <string name="onboarding_step_1">Assalomu alaykum %1$s! Ozish uchun har bir ovqatingizni menga kiritib borishingiz kerak, ozishning siri bu to\'g\'ri ovqatlanishda, birinchi ovqatingizni kiriting</string>
-    <string name="onboarding_step_2">%1$s, sizda yana %2$d kaloriya ovqat yesangiz bo\'ladi, har bir yeganingizni qo\'shib boring, me\'yordan oshirmaslikka harakat qiling.</string>
+
+    <string name="onboarding_step_1_ozish">Assalomu alaykum %1$s! Ozishning siri — to\'g\'ri ovqatlanishda. Keling, ortiqcha vazndan xalos bo\'lish uchun birinchi taomingizni kiriting:</string>
+    <string name="onboarding_step_1_semirish">Assalomu alaykum %1$s! Sog\'lom vazn yig\'ishning siri — to\'g\'ri ovqatlanishda. Go\'zal qomatga erishish uchun birinchi taomingizni kiriting:</string>
+    <string name="onboarding_step_2">%1$s, sizda yana %2$d kaloriya limit bor. Me\'yorni buzmaslik uchun har bir yegan taomingizni kiritib boring.</string>
+
     <string name="fat_burnt_today">Bugun %1$d gr yog\' yoqdingiz.</string>
     <string name="calories_exceeded_title">Bugunga yetarli, ortiqcha ovqat semirtiradi</string>
     <string name="calories_exceeded_subtitle">Suv, choy, yengil sabzavotli salat yeyishingiz mumkin, %1$s</string>
@@ -982,4 +987,5 @@
     <string name="premium_tekshiruv">Premium Tekshiruv</string>
     <string name="foydalanuvchilar">Foydalanuvchilar</string>
     <string name="postlar">Postlar</string>
+    <string name="sog_liq_bahosi">Sog\'liq bahosi</string>
 </resources>

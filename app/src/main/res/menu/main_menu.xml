@@ -1,37 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/home"
-        android:title="Asosiy"
+    <item
+        android:id="@+id/home"
         android:icon="@drawable/calculate_ic"
-        />
-
-    <item android:id="@+id/communityFragment"
-        android:title="@string/hamjamiyat"
-        android:icon="@drawable/people_ic"
-        />
-
-    <item android:id="@+id/aiChatFragment"
-        android:title="@string/ai_chatbot_title"
+        android:title="Asosiy" />
+    <item
+        android:id="@+id/aiChatFragment"
         android:icon="@drawable/chat_ic"
-        />
-
-    <item android:id="@+id/natijaFragment2"
-        android:title="@string/natija_title"
-        android:visible="true"
-        android:icon="@drawable/progress_ic"
-        />
-
-    <item android:id="@+id/menuListFragment"
-        android:title="Menyular"
-        android:icon="@drawable/food_ic"
-        />
-
+        android:title="@string/ai_chatbot_title" />
 
 
     <item
-        android:icon="@drawable/profile_ic"
-        android:title="Profil"
+        android:id="@+id/natijaFragment2"
+        android:icon="@drawable/progress_ic"
+        android:title="@string/natija_title"
+        android:visible="true" />
+    <item
+        android:id="@+id/communityFragment"
+        android:icon="@drawable/people_ic"
+        android:title="@string/hamjamiyat" />
+
+    <item
+        android:id="@+id/menuListFragment"
+        android:icon="@drawable/food_ic"
+        android:title="Menyular"
+        android:visible="false" />
+
+
+    <item
         android:id="@+id/profileFragment"
-        />
+        android:icon="@drawable/profile_ic"
+        android:title="Profil" />
 </menu>

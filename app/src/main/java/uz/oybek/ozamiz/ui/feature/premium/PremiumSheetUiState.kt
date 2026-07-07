@@ -1,7 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.premium
 
 import uz.oybek.ozamiz.data.premium.PremiumRepository
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.utils.DataWrapper.Success
 
 import androidx.lifecycle.LiveData
@@ -23,7 +23,7 @@ class PremiumSheetViewModel : ViewModel() {
 
     private val _uiState = MutableLiveData(
         PremiumSheetUiState(
-            paymentChecking = UserRepository.user.paymentChecking
+            paymentChecking = UserProfileRepository.user.paymentChecking
         )
     )
     val uiState: LiveData<PremiumSheetUiState> = _uiState
@@ -38,7 +38,7 @@ class PremiumSheetViewModel : ViewModel() {
 
     private fun loadPremiumPrices() {
         _uiState.value = _uiState.value?.copy(isLoading = true)
-        val user = UserRepository.user
+        val user = UserProfileRepository.user
         val isPaymentChecking = user.paymentChecking
 
         viewModelScope.launch {

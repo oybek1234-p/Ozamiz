@@ -64,14 +64,13 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_post_type_tag"
                         android:paddingHorizontal="6dp"
+                        android:backgroundTint="?colorPrimary"
                         android:paddingVertical="1dp"
-                        android:textColor="#2E7D32"
+                        android:textColor="?colorOnPrimary"
                         android:textSize="9sp"
                         android:fontFamily="@font/roboto_bold"
-                        android:visibility="gone"
-                        tools:visibility="visible"
-                        tools:text="PREMIUM"
-                        tools:backgroundTint="#E8F5E9" />
+
+                        android:text="Premium" />
 
                 </LinearLayout>
 

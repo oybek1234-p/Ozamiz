@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.CommunityPostFilter
 import uz.oybek.ozamiz.data.notification.model.NotificationModel.Companion.TYPE_LIKE
@@ -128,7 +128,7 @@ class CommunityViewModel : ViewModel() {
 
     fun deletePost(postId: String) {
         viewModelScope.launch {
-            val isAdmin = UserRepository.user.admin
+            val isAdmin = UserProfileRepository.user.admin
             val result = if (isAdmin) {
                 CommunityPostRepository.adminDeletePost(postId)
             } else {
@@ -146,7 +146,7 @@ class CommunityViewModel : ViewModel() {
     }
 
     fun markViewed(postId: String) {
-        val userId = UserRepository.user.uid
+        val userId = UserProfileRepository.user.uid
         if (userId.isEmpty()) return
         viewModelScope.launch {
             CommunityPostRepository.markViewed(postId, userId)
@@ -154,6 +154,6 @@ class CommunityViewModel : ViewModel() {
     }
 
     fun observeUnReadMessages(action: (Int) -> Unit) {
-        UserRepository.observeUnReadMessages(action)
+        UserProfileRepository.observeUnReadMessages(action)
     }
 }

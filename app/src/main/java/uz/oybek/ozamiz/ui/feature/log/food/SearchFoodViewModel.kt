@@ -23,7 +23,6 @@ data class SearchFoodState(
     val mealType: String = ""
 )
 
-
 class SearchFoodViewModel : ViewModel() {
 
     private val _state = MutableStateFlow(SearchFoodState())
@@ -68,7 +67,8 @@ class SearchFoodViewModel : ViewModel() {
             FoodLogRepository.add(
                 image = null,
                 foodLog = foodLog,
-                date = date
+                date = date,
+                shouldShare = false
             )
             StreakRepository.updateStreak()
             CommunityShareHelper.shareFoodLogIfNeeded(foodLog)

@@ -1,80 +1,94 @@
 package uz.oybek.ozamiz.data.firebase
 
-import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 
-
+/**
+ * Ozamiz ilovasi uchun yagona Firebase manbasi.
+ * Hech qayerda "document()", "collection()" yoki "child()" ga 
+ * to'g'ridan-to'g'ri string berib murojaat qilinmasligi kerak.
+ */
 object FirebasePaths {
 
-    private val root: DatabaseReference = database.reference
-
     object Database {
-        const val PATH_USERS = "users"
-        const val PATH_LOGS = "logs"
-        const val FOOD_LOGS = "foodLogs"
-        const val WATER_LOGS = "waterLogs"
-        const val EXERCISE_LOGS = "exerciseLogs"
-        const val WEIGHT_LOGS = "weightLogs"
-        const val SAVED_FOODS = "savedFoods" //deprecated
+        private const val USERS = "users"
+        private const val LOGS = "logs"
+        private const val FOOD = "foodLogs"
+        private const val WATER = "waterLogs"
+        private const val EXERCISE = "exerciseLogs"
+        private const val WEIGHT = "weightLogs"
+        private const val SUMMARIES = "daily_summaries"
+        private const val SAVED_FOODS = "savedFoods"
+        private const val PAYMENT_CARD = "paymentCard"
+
+        fun users() = database.getReference(USERS)
+        fun user(uid: String) = users().child(uid)
+
+        fun logs(uid: String) = database.getReference(LOGS).child(uid)
+        fun dailyLogs(uid: String, date: String) = logs(uid).child(date)
+
+        fun foodLogs(uid: String, date: String) = dailyLogs(uid, date).child(FOOD)
+        fun waterLogs(uid: String, date: String) = dailyLogs(uid, date).child(WATER)
+        fun exerciseLogs(uid: String, date: String) = dailyLogs(uid, date).child(EXERCISE)
+        fun weightLogs(uid: String, date: String) = dailyLogs(uid, date).child(WEIGHT)
+
+        fun savedFoods(uid: String) = user(uid).child(SAVED_FOODS)
+        fun summaries(uid: String) = database.getReference(SUMMARIES).child(uid)
+        fun summary(uid: String, date: String) = summaries(uid).child(date)
+        fun paymentCard() = database.getReference(PAYMENT_CARD)
+
+        fun unreadMessages(uid: String) = user(uid).child("unreadMessages")
     }
 
     object Firestore {
-        const val COMMUNITY_POSTS = "communityPosts"
-        const val PUBLIC_USERS = "public_users"
-        const val AI_CHATS = "aiChat"
-        const val NOTIFICATIONS = "notifications"
-        const val MENUS = "menus"
-        const val MENU_CATEGORIES = "menu_categories"
-        const val USERS = "users"
-        const val USER_MENUS = "user_menus"
-        const val DAILY_MENUS = "daily_menus"
-        const val MESSAGES = "messages"
+        private const val USERs = "users"
+        private const val POSTS = "communityPosts"
+        private const val PUBLIC_USERS = "public_users"
+        private const val AI_CHATS = "aiChat"
+        private const val MESSAGES = "messages"
+        private const val NOTIFICATIONS = "notifications"
+        private const val MENUS = "menus"
+        private const val MENU_CATS = "menu_categories"
+        private const val WEIGHT_LOGS = "weightLogs"
+
+        fun posts() = firestore.collection(POSTS)
+        fun post(postId: String) = posts().document(postId)
+
+        fun publicUsers() = firestore.collection(PUBLIC_USERS)
+        fun publicUser(uid: String) = publicUsers().document(uid)
+
+        fun users() = firestore.collection(USERs)
+        fun user(uid: String) = users().document(uid)
+
+        fun aiChats() = firestore.collection(AI_CHATS)
+        fun aiChat(chatId: String) = aiChats().document(chatId)
+        fun aiMessages(chatId: String) = aiChat(chatId).collection(MESSAGES)
+
+        fun notifications() = firestore.collection(NOTIFICATIONS)
+        fun notification(id: String) = notifications().document(id)
+
+        fun weightLogs(uid: String) = user(uid).collection(WEIGHT_LOGS)
+
+        fun menus() = firestore.collection(MENUS)
+        fun menuCategories() = firestore.collection(MENU_CATS)
     }
 
     object Storage {
-        const val WEIGHT_PHOTOS = "weightLog"
-        const val FOOD_PHOTOS = "loggedFood"
-    }
+        private val root = FirebaseStorage.getInstance().reference
 
-    fun userReference(userId: String): DatabaseReference {
-        return root.child(Database.PATH_USERS).child(userId)
-    }
+        fun avatars(uid: String) = root.child("user_avatars/$uid")
+        fun weightLogs(uid: String) = root.child("weightLog/$uid")
+        fun paymentChecks(uid: String) = root.child("payment_checks/$uid")
+        fun foodLogs(uid: String) = root.child("loggedFood/$uid")
+        fun communityPosts(uid: String) = root.child("community_posts/$uid")
 
-    fun userLogsReference(userId: String): DatabaseReference {
-        return root.child(Database.PATH_LOGS).child(userId)
-    }
+        fun avatar(uid: String): StorageReference = avatars(uid)
+        fun foodPhoto(uid: String, fileName: String): StorageReference =
+            foodLogs(uid).child(fileName)
 
-    fun foodLogsReference(userId: String, date: String): DatabaseReference {
-        return userLogsReference(userId)
-            .child(date)
-            .child(Database.FOOD_LOGS)
-    }
+        fun weightPhoto(uid: String, fileName: String): StorageReference =
+            weightLogs(uid).child(fileName)
 
-    fun exerciseLogsReference(userId: String, date: String): DatabaseReference {
-        return userLogsReference(userId)
-            .child(date)
-            .child(Database.EXERCISE_LOGS)
+        fun paymentCheck(uid: String): StorageReference = paymentChecks(uid)
     }
-
-    fun waterLogsReference(userId: String, date: String): DatabaseReference {
-        return userLogsReference(userId)
-            .child(date)
-            .child(Database.WATER_LOGS)
-    }
-
-    fun weightLogsReference(userId: String, date: String): DatabaseReference {
-        return userLogsReference(userId).child(date).child(Database.WEIGHT_LOGS)
-    }
-
-    fun savedFoodsReference(userId: String): DatabaseReference {
-        return userReference(userId).child(Database.SAVED_FOODS)
-    }
-
-    fun userDailySummariesReference(userId: String): DatabaseReference {
-        return root.child("daily_summaries").child(userId)
-    }
-
-    fun dailySummaryReference(userId: String, date: String): DatabaseReference {
-        return userDailySummariesReference(userId).child(date)
-    }
-
 }

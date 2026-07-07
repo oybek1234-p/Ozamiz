@@ -1,7 +1,5 @@
 package uz.oybek.ozamiz.ui.feature.log.photo
 
-import uz.oybek.ozamiz.data.community.AchievementPostHelper
-
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -12,10 +10,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.community.AchievementPostHelper
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.utils.DataWrapper
 
 data class AddWeightPhotoUiState(
@@ -59,32 +57,19 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
                 is DataWrapper.Success -> {
                     val newLog = result.data
                     val previousWeight = LocalUser.user.weight
-                    val newWeight = weightKg
                     val newAvatarUrl = newLog.photoUrl
 
-                    LocalUser.update {
-                        lastWeightLogTimestamp = System.currentTimeMillis()
-                        weight = newWeight
-                        if (newAvatarUrl.isNotEmpty()) {
-                            avatarUrl = newAvatarUrl
-                        }
-
-                        if (startWeight == null || startWeight == -1.0) {
-                            startWeight = newWeight
-                        }
+                    UserProfileRepository.updateLastWeightLogTimestamp(System.currentTimeMillis())
+                    UserProfileRepository.updateWeight(weightKg)
+                    if (newAvatarUrl.isNotEmpty()) {
+                        UserProfileRepository.updateAvatarUrl(newAvatarUrl)
+                    }
+                    if (LocalUser.user.startWeight == null || LocalUser.user.startWeight == -1.0) {
+                        UserProfileRepository.updateStartWeight(weightKg)
                     }
 
-                    UserRepository.updateUser { userToUpdate ->
-                        userToUpdate.lastWeightLogTimestamp = LocalUser.user.lastWeightLogTimestamp
-                        userToUpdate.weight = LocalUser.user.weight
-                        userToUpdate.startWeight = LocalUser.user.startWeight
-                        if (newAvatarUrl.isNotEmpty()) {
-                            userToUpdate.avatarUrl = newAvatarUrl
-                        }
-                    }
-
-                    if (previousWeight > 0.0 && previousWeight != newWeight) {
-                        AchievementPostHelper.onWeightDropped(previousWeight, newWeight)
+                    if (previousWeight > 0.0 && previousWeight != weightKg) {
+                        AchievementPostHelper.onWeightDropped(previousWeight, weightKg)
                     }
 
                     _uiState.update { it.copy(isLoading = false, logAddedSuccessfully = true) }
@@ -94,9 +79,6 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
                     _uiState.update { it.copy(isLoading = false, error = result.error) }
                 }
 
-                else -> {
-                    _uiState.update { it.copy(isLoading = false, error = "Noma'lum xatolik") }
-                }
             }
         }
     }

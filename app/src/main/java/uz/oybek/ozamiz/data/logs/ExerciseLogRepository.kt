@@ -19,7 +19,7 @@ import java.util.Date
 object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
 
     override fun getReference(userId: String, date: String): DatabaseReference {
-        return FirebasePaths.exerciseLogsReference(userId, date)
+        return FirebasePaths.Database.exerciseLogs(userId, date)
     }
 
     override suspend fun add(log: ExerciseLog, date: Date): Boolean {

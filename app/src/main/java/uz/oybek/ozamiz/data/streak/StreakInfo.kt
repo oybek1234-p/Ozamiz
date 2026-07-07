@@ -7,15 +7,13 @@ data class StreakInfo constructor(
     val currentStreak: Int = 0,
     val bestStreak: Int = 0,
     val activeDays: Int = 0,
-    val streakGoal: Int = 7,
-    val activityHistory: List<String> = emptyList()
+    val streakGoal: Int = 7
 ) : Serializable {
     constructor() : this(
         lastActionDate = "",
         currentStreak = 0,
         bestStreak = 0,
         activeDays = 0,
-        streakGoal = 7,
-        activityHistory = emptyList()
+        streakGoal = 7
     )
 }

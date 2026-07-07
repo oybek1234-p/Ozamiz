@@ -159,7 +159,8 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
         oneTapClient = Identity.getSignInClient(requireActivity())
 
         val clientId = getString(R.string.your_web_client_id)
-        signInRequest = BeginSignInRequest.builder().setGoogleIdTokenRequestOptions(
+        signInRequest = BeginSignInRequest.builder()
+            .setGoogleIdTokenRequestOptions(
             BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                 .setSupported(true)
                 .setServerClientId(clientId)
@@ -188,14 +189,18 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
                 when (it) {
                     is SendState.Input -> {
                         progressBar.isVisible = false
-                        gmailButton.isVisible = true
-                        emailButton.isVisible = true
+                        gmailButton.isEnabled = true
+                        emailButton.isEnabled = true
+                        gmailButton.alpha = 1f
+                        emailButton.alpha = 1f
                     }
 
                     is SendState.Sending -> {
                         progressBar.isVisible = true
-                        gmailButton.visibility = View.INVISIBLE
-                        emailButton.visibility = View.INVISIBLE
+                        gmailButton.isEnabled = false
+                        emailButton.isEnabled = false
+                        gmailButton.alpha = 0.5f
+                        emailButton.alpha = 0.5f
                     }
 
                     else -> {}

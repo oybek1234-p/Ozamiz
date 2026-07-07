@@ -1,12 +1,10 @@
 package uz.oybek.ozamiz.ui.feature.onboarding
 
-import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.food.DietController
-import uz.oybek.ozamiz.data.user.UserRepository
-import uz.oybek.ozamiz.data.user.local.LocalUser
-
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import uz.oybek.ozamiz.data.food.DietController
+import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.utils.postVal
 
 class OnBoardingViewModel : ViewModel() {
@@ -18,14 +16,12 @@ class OnBoardingViewModel : ViewModel() {
 
     init {
         updateProgress()
+        UserProfileRepository.onboardingStarted = true
     }
 
     fun updateTargetWeight(targetWeight: Double) {
-        LocalUser.update {
-            this.targetWeight = targetWeight
-            DietController.updateTargetValues(this)
-        }
-        UserRepository.updateUser {}
+        user.targetWeight = targetWeight
+        DietController.updateTargetValues(user)
     }
 
     fun moveBack() {
@@ -59,6 +55,7 @@ class OnBoardingViewModel : ViewModel() {
     }
 
     fun finishOnboarding() {
-        UserRepository.updateUser {}
+        UserProfileRepository.updateUser()
+        UserProfileRepository.onboardingStarted = false
     }
 }

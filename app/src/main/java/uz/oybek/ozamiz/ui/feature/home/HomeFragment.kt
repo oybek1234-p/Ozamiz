@@ -120,7 +120,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun checkOnboarding() {
-        if (user.streakInfo != null && user.streakInfo?.currentStreak == 0) {
+        runCatching {
             if (!viewModel.isFirstLogAdded()) {
                 showAppOnboarding()
             } else if (!viewModel.isSecondOnboardingSheetSeen()) {
@@ -136,11 +136,15 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
         viewModel.setSecondOnboardingSheetSeen(false)
         val name = user.name
-        val greetingText = getString(R.string.onboarding_step_1, name)
+        val greetingText = getString(
+            if (user.goal == "gain_weight")
+                R.string.onboarding_step_1_semirish else R.string.onboarding_step_1_ozish,
+            name
+        )
 
         onboardingSheet = AppOnboardingBottomSheet(
             text = greetingText,
-            buttonText = getString(R.string.add_btn),
+            buttonText = getString(R.string.add_food_title),
             onButtonClick = {
                 LogFoodFragment.navigate(
                     navController = findNavController(),

@@ -50,6 +50,7 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
                         putString(AnalyzeResultFragment.KEY_MEAL_TYPE, arguments?.getString("mealType") ?: foodLog.mealType)
                         putBoolean(AnalyzeResultFragment.KEY_IS_FROM_FAVORITE, true)
                         putLong(AnalyzeResultFragment.KEY_TIMESTAMP, arguments?.getLong("timestamp") ?: System.currentTimeMillis())
+                        putString(AnalyzeResultFragment.KEY_LOG_ID, foodLog.logId)
                     }
                 )
             },

@@ -21,6 +21,7 @@ class RecentLogsAdapter(
     private var savedFoodIds: Set<String> = emptySet()
 
     fun setSavedFoodIds(ids: Set<String>) {
+        if (savedFoodIds == ids) return
         savedFoodIds = ids
         notifyDataSetChanged()
     }

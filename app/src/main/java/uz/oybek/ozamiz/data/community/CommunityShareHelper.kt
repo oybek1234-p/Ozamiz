@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.PostType
 import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 
 object CommunityShareHelper {
@@ -17,7 +17,7 @@ object CommunityShareHelper {
         val score = foodLog.healthLevel ?: 0
         if (score < 9) return
 
-        val user = UserRepository.user
+        val user = UserProfileRepository.user
         val userId = Firebase.auth.currentUser?.uid ?: return
 
         CoroutineScope(Dispatchers.IO).launch {

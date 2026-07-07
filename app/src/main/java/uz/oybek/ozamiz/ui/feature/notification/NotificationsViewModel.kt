@@ -1,6 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.notification
 
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,6 +30,6 @@ class NotificationsViewModel : ViewModel() {
     }
 
     fun markAllAsRead() {
-        UserRepository.setUnreadNotificationsZero()
+        UserProfileRepository.setUnreadNotificationsZero()
     }
 }

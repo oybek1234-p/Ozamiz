@@ -24,12 +24,12 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 86
-        versionName = "7"
-
+        versionCode = 89
+        versionName = "9"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "ru", "uz"))
     }
+
     buildTypes {
         debug {
             isDebuggable = true

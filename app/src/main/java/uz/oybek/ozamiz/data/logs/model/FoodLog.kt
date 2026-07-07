@@ -1,7 +1,6 @@
 package uz.oybek.ozamiz.data.logs.model
 
 import androidx.annotation.Keep
-import com.google.firebase.database.ServerValue
 import uz.oybek.ozamiz.data.logs.base.LogItem
 
 @Keep
@@ -17,7 +16,7 @@ data class FoodLog(
     var aiInsights: String? = null,
     var aiGenerated: Boolean = true,
     var healthLevel: Int? = null,
-    var timestamp: Any = ServerValue.TIMESTAMP
+    var timestamp: Any = System.currentTimeMillis()
 ) : LogItem {
     constructor() : this(
         "",

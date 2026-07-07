@@ -44,7 +44,8 @@ import uz.oybek.ozamiz.data.level.Level
 import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.data.level.PointsRepository
 import uz.oybek.ozamiz.data.motivation.NotificationSchedular
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserAuthRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.CompanyLinks
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     private var systemInsets: WindowInsetsCompat? = null
 
     private fun handleSignOut() {
-        UserRepository.signOut()
+        UserAuthRepository.signOut()
         startActivity(Intent(this, MainActivity::class.java))
         finish()
     }
@@ -148,7 +149,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkCurrentUser(graph: NavGraph) {
         if (user.valid.not()) {
-            UserRepository.signOut()
+            UserAuthRepository.signOut()
             graph.setStartDestination(R.id.authFragment)
             isAppReady = true
         } else if (user.valid) {
@@ -189,13 +190,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        UserRepository.updateLastSeen()
+        UserProfileRepository.updateLastSeen()
     }
 
     private fun initUser() {
         LocalUser.getUser()
         if (LocalUser.user.valid) {
-            UserRepository.observeCurrentUser {
+            UserProfileRepository.observeCurrentUser {
                 if (it == null || it.valid.not()) {
                     signOut?.run()
                 }

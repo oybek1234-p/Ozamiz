@@ -61,7 +61,7 @@ class AppOnboardingBottomSheet(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.textEmoji.text = "✨"
+        binding.textEmoji.text = "\uD83D\uDE0A"
         binding.textTitle.text = title
         binding.textDescription.text = text
         binding.btnNext.text = buttonText

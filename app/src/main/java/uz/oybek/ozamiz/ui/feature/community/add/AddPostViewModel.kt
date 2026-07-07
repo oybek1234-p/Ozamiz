@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
+import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.util.returnResult
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
 
@@ -13,8 +14,8 @@ class AddPostViewModel : ViewModel() {
         return returnResult {
             val uploadedUrls = mutableListOf<String>()
             imageUris.forEachIndexed { index, uri ->
-                val path = "community_posts/${post.userId}/${System.currentTimeMillis()}_$index"
-                val url = ImageUploader.uploadImage(uri, path)
+                val folder = FirebasePaths.Storage.communityPosts(post.userId).child("${System.currentTimeMillis()}_$index")
+                val url = ImageUploader.uploadImage(uri, folder)
                 if (url != null) {
                     uploadedUrls.add(url)
                 }

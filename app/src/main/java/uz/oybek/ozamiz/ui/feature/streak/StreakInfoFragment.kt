@@ -14,7 +14,6 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
-import java.time.temporal.ChronoUnit
 
 class StreakInfoFragment : BaseFragment<FragmentStreakInfoBinding>() {
 
@@ -64,10 +63,6 @@ class StreakInfoFragment : BaseFragment<FragmentStreakInfoBinding>() {
 
         // Active Days
         bind.textTotalActiveDays.text = info.activeDays.toString()
-        
-        // Active Weeks - calculate from activity history
-        val activeWeeks = calculateActiveWeeks(info.activityHistory)
-        bind.textActiveWeeks.text = activeWeeks.toString()
 
         // Weekly Progress
         setupWeeklyProgress(info, bind)
@@ -79,10 +74,10 @@ class StreakInfoFragment : BaseFragment<FragmentStreakInfoBinding>() {
         // Update motivational text based on streak
         updateMotivationalText(info.currentStreak, bind)
     }
-    
+
     private fun calculateActiveWeeks(activityHistory: List<String>): Int {
         if (activityHistory.isEmpty()) return 0
-        
+
         val weeks = mutableSetOf<String>()
         activityHistory.forEach { dateStr ->
             try {
@@ -109,7 +104,6 @@ class StreakInfoFragment : BaseFragment<FragmentStreakInfoBinding>() {
     }
 
     private fun setupWeeklyProgress(info: StreakInfo, bind: FragmentStreakInfoBinding) {
-        val historySet = info.activityHistory.toSet()
         val today = LocalDate.now()
         val monday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
 
@@ -128,7 +122,6 @@ class StreakInfoFragment : BaseFragment<FragmentStreakInfoBinding>() {
         for (i in 0 until 7) {
             val dateToCheck = monday.plusDays(i.toLong())
             val dateStr = dateToCheck.format(DateTimeFormatter.ISO_LOCAL_DATE)
-            val isActive = historySet.contains(dateStr)
             val isToday = dateToCheck.isEqual(today)
 
             val dayRoot: View = dayViews[i].root
@@ -137,14 +130,16 @@ class StreakInfoFragment : BaseFragment<FragmentStreakInfoBinding>() {
             textCircle.text = daysOfWeekParam[i]
 
             when {
-                isActive -> {
-                    textCircle.setBackgroundResource(R.drawable.bg_circle_filled)
-                    textCircle.setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-                }
                 isToday -> {
                     textCircle.setBackgroundResource(R.drawable.bg_circle_today)
-                    textCircle.setTextColor(ContextCompat.getColor(requireContext(), R.color.yellow))
+                    textCircle.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.yellow
+                        )
+                    )
                 }
+
                 else -> {
                     textCircle.setBackgroundResource(R.drawable.bg_circle_outline)
                     textCircle.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey))

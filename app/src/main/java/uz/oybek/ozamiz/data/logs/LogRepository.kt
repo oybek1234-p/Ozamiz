@@ -1,6 +1,5 @@
 package uz.oybek.ozamiz.data.logs
 
-import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.MutableData
@@ -9,8 +8,10 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
+import uz.oybek.ozamiz.data.firebase.crashlytics
 import uz.oybek.ozamiz.data.firebase.currentUserId
 import uz.oybek.ozamiz.data.firebase.getValueSafe
 import uz.oybek.ozamiz.data.logs.model.AdminGenericLog
@@ -19,6 +20,7 @@ import uz.oybek.ozamiz.data.logs.model.DailySummary
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
+import kotlin.coroutines.resume
 
 object LogRepository {
 
@@ -32,9 +34,7 @@ object LogRepository {
             }
 
             val formattedDate = date.dateApiFormat()
-            val reference = FirebasePaths
-                .userLogsReference(userId)
-                .child(formattedDate)
+            val reference = FirebasePaths.Database.dailyLogs(userId, formattedDate)
 
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -63,9 +63,7 @@ object LogRepository {
             }
 
             val formattedDate = date.dateApiFormat()
-            val reference = FirebasePaths
-                .userLogsReference(userId)
-                .child(formattedDate)
+            val reference = FirebasePaths.Database.dailyLogs(userId, formattedDate)
 
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -87,7 +85,7 @@ object LogRepository {
             close()
             return@callbackFlow
         }
-        val reference = FirebasePaths.userLogsReference(userId).limitToLast(10)
+        val reference = FirebasePaths.Database.logs(userId).limitToLast(10)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val allLogs = mutableListOf<AdminGenericLog>()
@@ -181,7 +179,7 @@ object LogRepository {
         if (userId.isBlank()) return null
         return try {
             val formattedDate = date.dateApiFormat()
-            val snapshot = FirebasePaths.userLogsReference(userId).child(formattedDate).get().await()
+            val snapshot = FirebasePaths.Database.dailyLogs(userId, formattedDate).get().await()
             snapshot.getValueSafe(DailyLogs::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -194,7 +192,7 @@ object LogRepository {
         if (userId.isBlank()) return DailySummary()
         return try {
             val formattedDate = date.dateApiFormat()
-            val snapshot = FirebasePaths.userLogsReference(userId).child(formattedDate).get().await()
+            val snapshot = FirebasePaths.Database.dailyLogs(userId, formattedDate).get().await()
             val dailyLogs = snapshot.getValueSafe(DailyLogs::class.java)
             calculateSummary(dailyLogs)
         } catch (e: Exception) {
@@ -203,43 +201,44 @@ object LogRepository {
         }
     }
 
-    fun observeSummaries(startDate: Date, endDate: Date): Flow<Map<String, DailySummary>> = callbackFlow {
-        val userId = currentUserId
-        if (userId.isBlank()) {
-            trySend(emptyMap())
-            close()
-            return@callbackFlow
-        }
-
-        val startStr = startDate.dateApiFormat()
-        val endStr = endDate.dateApiFormat()
-
-        val query = FirebasePaths.userDailySummariesReference(userId)
-            .orderByKey()
-            .startAt(startStr)
-            .endAt(endStr)
-
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val map = mutableMapOf<String, DailySummary>()
-                for (child in snapshot.children) {
-                    val summary = child.getValue(DailySummary::class.java)
-                    if (summary != null) {
-                        map[child.key ?: ""] = summary
-                    }
-                }
-                trySend(map)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
+    fun observeSummaries(startDate: Date, endDate: Date): Flow<Map<String, DailySummary>> =
+        callbackFlow {
+            val userId = currentUserId
+            if (userId.isBlank()) {
                 trySend(emptyMap())
+                close()
+                return@callbackFlow
             }
-        }
-        query.addValueEventListener(listener)
-        awaitClose { query.removeEventListener(listener) }
-    }
 
-    fun updateSummary(
+            val startStr = startDate.dateApiFormat()
+            val endStr = endDate.dateApiFormat()
+
+            val query = FirebasePaths.Database.summaries(userId)
+                .orderByKey()
+                .startAt(startStr)
+                .endAt(endStr)
+
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val map = mutableMapOf<String, DailySummary>()
+                    for (child in snapshot.children) {
+                        val summary = child.getValue(DailySummary::class.java)
+                        if (summary != null) {
+                            map[child.key ?: ""] = summary
+                        }
+                    }
+                    trySend(map)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    trySend(emptyMap())
+                }
+            }
+            query.addValueEventListener(listener)
+            awaitClose { query.removeEventListener(listener) }
+        }
+
+    suspend fun updateSummary(
         date: Date,
         targetUid: String? = null,
         caloriesDelta: Int = 0,
@@ -249,11 +248,14 @@ object LogRepository {
         carbsDelta: Double = 0.0,
         fatDelta: Double = 0.0,
         mealsDelta: Int = 0
-    ) {
+    ) = suspendCancellableCoroutine {
         val userId = targetUid ?: currentUserId
-        if (userId.isBlank()) return
+        if (userId.isBlank()) {
+            it.resume(Unit)
+            return@suspendCancellableCoroutine
+        }
         val dateStr = date.dateApiFormat()
-        val ref = FirebasePaths.dailySummaryReference(userId, dateStr)
+        val ref = FirebasePaths.Database.summary(userId, dateStr)
 
         ref.runTransaction(object : Transaction.Handler {
             override fun doTransaction(currentData: MutableData): Transaction.Result {
@@ -277,8 +279,9 @@ object LogRepository {
                 committed: Boolean,
                 currentData: DataSnapshot?
             ) {
+                it.resume(Unit)
                 if (error != null) {
-                    com.google.firebase.Firebase.crashlytics.recordException(error.toException())
+                    crashlytics.recordException(error.toException())
                 }
             }
         })

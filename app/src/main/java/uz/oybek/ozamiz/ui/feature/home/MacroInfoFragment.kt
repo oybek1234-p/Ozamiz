@@ -7,7 +7,7 @@ import android.widget.TextView
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentMacroInfoBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.food.DietController
 import kotlin.math.roundToInt
 
@@ -52,7 +52,7 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
 
     private fun setupUI(bind: FragmentMacroInfoBinding) {
         hideExtraSections(bind)
-        val user = UserRepository.user
+        val user = UserProfileRepository.user
         val targetCals = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
         val macros = if (user.goal == "gain_weight") {
             DietController.calculateMacrosByPercent(targetCals, proteinPercent = 0.25, fatPercent = 0.25, carbPercent = 0.50)

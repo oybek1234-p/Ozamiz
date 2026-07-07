@@ -9,7 +9,6 @@ import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -25,7 +24,6 @@ import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import java.util.Date
@@ -33,7 +31,6 @@ import java.util.Date
 class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private val viewModel: SearchFoodViewModel by viewModels()
-    private val homeViewModel: HomeViewModel by activityViewModels()
 
     private val adapter by lazy {
         FoodSearchAdapter(

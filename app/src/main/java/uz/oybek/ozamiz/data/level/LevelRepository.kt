@@ -31,7 +31,7 @@ object LevelRepository {
             name = "Chiniqqan",
             emoji = "🏃",
             requiredPoints = 1000,
-            motivationText = "Tanamiz chiniqib, vaqt o'tishi bilan microfilm yangi kuch to‘plamoqda!"
+            motivationText = "Tanangiz chiniqib, vaqt o'tishi bilan yangi kuch to‘plamoqda!"
         ),
         Level(
             name = "Barqaror",

@@ -45,8 +45,8 @@ object NotificationSchedular {
                 if (type == MotivationAlarmType.INACTIVITY) {
                     add(Calendar.DAY_OF_YEAR, 1)
                 } else {
-                    set(Calendar.HOUR_OF_DAY, type.hour)
-                    set(Calendar.MINUTE, 0)
+                    set(Calendar.HOUR_OF_DAY, 11)
+                    set(Calendar.MINUTE, 25)
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
                     if (before(calendar)) {

@@ -22,6 +22,7 @@ import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.utils.formatToHhMmA
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
+import uz.oybek.ozamiz.ui.utils.VaznimColors
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Date
 
@@ -122,22 +123,26 @@ class AnalyzeResultFragment : Fragment() {
             binding.layoutSaveContainer.isVisible = false
             binding.buttonReLog.isVisible = true
             binding.buttonReLog.text = getString(R.string.cancel)
-            binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
-            
+            binding.buttonReLog.icon =
+                ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
+
             binding.calorieCard.isVisible = false
+            binding.healthBall.isVisible = false
             binding.loadingCard.isVisible = true
             binding.cardAiHealth.isVisible = false
         } else {
             binding.calorieCard.isVisible = true
             binding.loadingCard.isVisible = false
             binding.cardAiHealth.isVisible = true
-            
+            binding.healthBall.isVisible = true
+
             val state = viewModel.state.value
             binding.buttonSaveToLog.isVisible = !state.isRecallMode
             binding.layoutSaveContainer.isVisible = !state.isRecallMode
             binding.buttonReLog.isVisible = !state.isRecallMode
             binding.buttonReLog.text = getString(R.string.cancel)
-            binding.buttonReLog.icon = ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
+            binding.buttonReLog.icon =
+                ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
 
             if (wasAnalyzing) {
                 binding.layoutBottomActions.alpha = 0f
@@ -158,7 +163,6 @@ class AnalyzeResultFragment : Fragment() {
 
         binding.buttonSaveToLog.text = if (show) "" else getString(R.string.save)
 
-        // Use a standard alpha animation for appearing/disappearing
         if (show) {
             binding.buttonSaveToLog.animate().alpha(0f).setDuration(200).start()
             binding.buttonReLog.animate().alpha(0f).setDuration(200).start()
@@ -180,16 +184,17 @@ class AnalyzeResultFragment : Fragment() {
                 // Handle pending states (Voice input or Image preview)
                 if (state.isAnalyzing) {
                     binding.loadingText.text = getString(R.string.analyzing)
-                    
+
                     if (!state.pendingDescription.isNullOrBlank()) {
-                        binding.textViewFoodName.text = if (state.pendingDescription == "pending_description_voice") {
-                            getString(R.string.voice_input_pending)
-                        } else {
-                            state.pendingDescription
-                        }
+                        binding.textViewFoodName.text =
+                            if (state.pendingDescription == "pending_description_voice") {
+                                getString(R.string.voice_input_pending)
+                            } else {
+                                state.pendingDescription
+                            }
                         binding.layoutFoodName.isVisible = true
                     }
-                    
+
                     if (state.pendingImageUri != null) {
                         binding.imageViewFoodPhoto.isVisible = true
                         Glide.with(this@AnalyzeResultFragment)
@@ -203,11 +208,12 @@ class AnalyzeResultFragment : Fragment() {
                 val analysisResult = state.result?.result ?: run {
                     // If no result and not analyzing, but we have a pending description (e.g. error state or initial)
                     if (!state.pendingDescription.isNullOrBlank()) {
-                        binding.textViewFoodName.text = if (state.pendingDescription == "pending_description_voice") {
-                            getString(R.string.voice_input_pending)
-                        } else {
-                            state.pendingDescription
-                        }
+                        binding.textViewFoodName.text =
+                            if (state.pendingDescription == "pending_description_voice") {
+                                getString(R.string.voice_input_pending)
+                            } else {
+                                state.pendingDescription
+                            }
                         binding.layoutFoodName.isVisible = true
                     }
                     return@collect
@@ -230,7 +236,6 @@ class AnalyzeResultFragment : Fragment() {
                             .show(parentFragmentManager, "full_image")
                     }
                 } else if (state.pendingImageUri != null) {
-                    // Fallback to local image if upload/result photoUrl is not yet available
                     binding.imageViewFoodPhoto.isVisible = true
                     Glide.with(this@AnalyzeResultFragment)
                         .load(state.pendingImageUri)
@@ -241,6 +246,19 @@ class AnalyzeResultFragment : Fragment() {
                 binding.textViewFoodName.text = analysisResult.name
                 binding.layoutFoodName.isVisible = true
 
+                binding.healthBall.apply {
+                    if (analysisResult.healthScore != null) {
+                        isVisible = true
+                        binding.ballCount.setTextColor(
+                            when (analysisResult.healthScore) {
+                                in 0..3 -> VaznimColors.getOnSurface()
+                                in 4..5 -> VaznimColors.getOrange()
+                                else -> VaznimColors.getGreen()
+                            }
+                        )
+                        binding.ballCount.text = analysisResult.healthScore.toString() + " ball"
+                    }
+                }
                 binding.textViewTimestamp.text = Date(analysisResult.timestamp).formatToHhMmA()
 
                 ingredientsAdapter =
@@ -421,7 +439,10 @@ class AnalyzeResultFragment : Fragment() {
 
         val editCaloriesListener = View.OnClickListener {
             val currentCalories = binding.textViewCalories.text.toString().toDoubleOrNull() ?: 0.0
-            showEditNumberDialog(getString(R.string.edit_calories_title), currentCalories) { newValue ->
+            showEditNumberDialog(
+                getString(R.string.edit_calories_title),
+                currentCalories
+            ) { newValue ->
                 viewModel.updateCalories(newValue)
             }
         }
@@ -499,7 +520,7 @@ class AnalyzeResultFragment : Fragment() {
         input.layoutParams = params
         container.addView(input)
 
-       AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setView(container)
             .setPositiveButton(R.string.save) { _, _ ->

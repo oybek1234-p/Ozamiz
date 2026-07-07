@@ -27,7 +27,7 @@ import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.logs.model.WaterLog
 import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
@@ -55,7 +55,6 @@ class HomeViewModel : ViewModel() {
     private var dataCollectionJob: Job? = null
 
     init {
-        val startTime = System.currentTimeMillis()
         val initialDates = DateUtils.generateDatesForScroller()
         val initialSelectedDate = DateUtils.getStartOfDay(Date())
         _uiState.update {
@@ -64,7 +63,7 @@ class HomeViewModel : ViewModel() {
                 selectedDate = initialSelectedDate
             )
         }
-        UserRepository.observeCurrentUser { user ->
+        UserProfileRepository.observeCurrentUser { user ->
             if (user != null && user.valid) {
                 _uiState.update { state ->
                     state.copy(
@@ -102,15 +101,12 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun checkWeightLog() {
-        val startTime = System.currentTimeMillis()
         WeightLogRepository.needShowWeightLog(user.uid).onEach { needShow ->
             _uiState.update { it.copy(showWeightLogCard = needShow) }
         }.launchIn(viewModelScope)
-        Log.d("HomePerf", "HomeViewModel.checkWeightLog execution time: ${System.currentTimeMillis() - startTime} ms")
     }
 
     private fun startLoadingData(date: Date) {
-        val startTime = System.currentTimeMillis()
         dataCollectionJob?.cancel()
         dataCollectionJob = viewModelScope.launch {
             try {
@@ -126,7 +122,6 @@ class HomeViewModel : ViewModel() {
                 e.printStackTrace()
             }
         }
-        Log.d("HomePerf", "HomeViewModel.startLoadingData execution time: ${System.currentTimeMillis() - startTime} ms")
     }
 
     private fun processStateUpdate(
@@ -135,10 +130,8 @@ class HomeViewModel : ViewModel() {
         exerciseLogs: List<ExerciseLog>,
         foodLogs: List<FoodLog>
     ) {
-        val startTime = System.currentTimeMillis()
         if (!user.valid) {
             _uiState.update { it.copy(isInitialLoading = false, isRefreshing = false) }
-            Log.d("HomePerf", "HomeViewModel.processStateUpdate (invalid user) execution time: ${System.currentTimeMillis() - startTime} ms")
             return
         }
         when (summaryWrapper) {
@@ -177,7 +170,6 @@ class HomeViewModel : ViewModel() {
                 _uiState.update { it.copy(isInitialLoading = false, isRefreshing = false) }
             }
         }
-        Log.d("HomePerf", "HomeViewModel.processStateUpdate execution time: ${System.currentTimeMillis() - startTime} ms")
     }
 
     fun onDateSelected(date: Date) {

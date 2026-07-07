@@ -3,35 +3,29 @@ package uz.oybek.ozamiz.ui.feature.log.food
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.Firebase
-import com.google.firebase.auth.auth
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.applicationScope
+import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysisResult
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
-import uz.oybek.ozamiz.data.community.model.CommunityPost
-import uz.oybek.ozamiz.data.community.model.PostType.FOOD
 import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
-import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
+import uz.oybek.ozamiz.data.firebase.uploader.ImageCompressor
 import uz.oybek.ozamiz.data.food.SavedFoodRepository
 import uz.oybek.ozamiz.data.level.PointsEvent
 import uz.oybek.ozamiz.data.level.PointsRepository
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.streak.StreakRepository
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
-import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import java.util.Date
 
@@ -89,23 +83,23 @@ class AnalyzeResultViewModel : ViewModel() {
             )
         }
         viewModelScope.launch(Dispatchers.IO) {
-            val uploadedUrl: String? = if (imageUri != null) {
-                ImageUploader.uploadImage(imageUri, ImagePaths.ANALYZE_FOOD)
-            } else null
-
+            val uri = imageUri?.let {
+                ImageCompressor.compressImageToUri(
+                    it, 512, 512
+                )
+            }
             val result = FoodAnalyzer.analyze(
-                description = description, meal = meal, image = imageUri
+                description = description, meal = meal, image = uri
             )
-
             if (result != null) {
-                if (uploadedUrl != null) result.photoUrl = uploadedUrl
+                result.photoUrl = uri?.toString()
                 result.mealType = meal
                 if (user.isPremium().not()) {
                     AppPreference.incrementFoodLogLimitCount()
                 }
             }
 
-            val streak = UserRepository.user.streakInfo?.currentStreak ?: 0
+            val streak = UserProfileRepository.user.streakInfo?.currentStreak ?: 0
             liveResult.update {
                 it.copy(
                     result = result,
@@ -136,8 +130,7 @@ class AnalyzeResultViewModel : ViewModel() {
                     AppPreference.incrementFoodLogLimitCount()
                 }
             }
-
-            val streak = UserRepository.user.streakInfo?.currentStreak ?: 0
+            val streak = UserProfileRepository.user.streakInfo?.currentStreak ?: 0
             liveResult.update {
                 it.copy(
                     result = result,
@@ -151,7 +144,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun setResult(result: FoodAnalysis?) {
-        val streak = UserRepository.user.streakInfo?.currentStreak ?: 0
+        val streak = UserProfileRepository.user.streakInfo?.currentStreak ?: 0
         liveResult.update {
             it.copy(
                 result = result, currentStreak = streak
@@ -253,8 +246,11 @@ class AnalyzeResultViewModel : ViewModel() {
         )
         viewModelScope.launch {
             liveResult.update { it.copy(isLoading = true) }
-            val targetDate = loadedLogDate ?: java.util.Date()
-            FoodLogRepository.add(currentResult.photoUrl, log, targetDate)
+            val targetDate = loadedLogDate ?: Date()
+            FoodLogRepository.add(
+                currentResult.photoUrl, log,
+                targetDate, shouldShare = false
+            )
             liveResult.update { it.copy(isLoading = false) }
             _event.send(AnalyzeResultEvent.Saved)
         }
@@ -290,7 +286,6 @@ class AnalyzeResultViewModel : ViewModel() {
             val analysis = FoodAnalyzer.analyze(
                 description = prompt, meal = currentResult.mealType, image = null
             )
-
             if (analysis != null) {
                 analysis.photoUrl = currentResult.photoUrl
                 analysis.mealType = currentResult.mealType
@@ -319,61 +314,19 @@ class AnalyzeResultViewModel : ViewModel() {
         if (liveResult.value.isLoading) return
         val result = liveResult.value.result ?: return
         liveResult.update { it.copy(isLoading = true) }
-        val shouldShare = (result.result?.healthScore ?: 0) > 7
+        val shouldShare = (result.result?.healthScore ?: 0) > 7 || result.photoUrl != null
 
-        CoroutineScope(Dispatchers.IO).launch {
+        applicationScope.launch {
             val log = result.toFoodLog()
             val targetDate = loadedLogDate ?: LogFragment.currentDate
 
-            val saveJob = async {
-                val success = FoodLogRepository.add(result.photoUrl, log, targetDate)
-                if (success) {
-                    StreakRepository.updateStreak()
-                    PointsRepository.onEvent(PointsEvent.AddFood(result.result?.healthScore ?: 0))
-                }
-                success
-            }
-
-            val shareJob = if (shouldShare) {
-                async {
-                    val user = UserRepository.user
-                    val userId = Firebase.auth.currentUser?.uid
-                    if (userId != null) {
-                        val post = CommunityPost(
-                            userId = userId,
-                            userName = user.name.ifBlank { "Foydalanuvchi" },
-                            userAvatarUrl = user.avatarUrl,
-                            photoUrl = result.photoUrl.orEmpty(),
-                            photos = listOf(result.photoUrl.orEmpty()),
-                            title = result.result!!.name,
-                            description = "",
-                            foodName = result.result.name,
-                            calories = result.result.calories,
-                            protein = result.result.protein,
-                            fat = result.result.fat,
-                            carbs = result.result.carbs,
-                            healthScore = result.result.healthScore ?: 0,
-                            userScore = user.scorePoints,
-                            verified = true,
-                            isVisible = true,
-                            type = FOOD,
-                            isPremiumUser = PremiumUtils.isPremium(user)
-                        )
-                        CommunityPostRepository.addPost(post)
-                    }
-                }
-            } else null
-
-            val saveSuccess = saveJob.await()
-            shareJob?.await()
-
-            if (!saveSuccess) {
-                liveResult.update { it.copy(isLoading = false) }
-                _event.send(AnalyzeResultEvent.Failure("error_saving_log"))
-                return@launch
+            FoodLogRepository.add(result.photoUrl, log, targetDate, shouldShare)
+            launch {
+                StreakRepository.updateStreak()
+                AiChatRepository.onFoodLogAdded(log)
+                PointsRepository.onEvent(PointsEvent.AddFood(result.result?.healthScore ?: 0))
             }
             liveResult.update { it.copy(isLoading = false) }
-
             _event.send(AnalyzeResultEvent.Saved)
         }
     }
@@ -386,37 +339,6 @@ class AnalyzeResultViewModel : ViewModel() {
             val updatedLog = currentResult.toFoodLog()
             updatedLog.logId = logId
             FoodLogRepository.update(logId, updatedLog, date, loadedUserId)
-        }
-    }
-
-    fun submitAnswer(answer: String) {
-        if (liveResult.value.isLoading) return
-        val currentAnalysis = liveResult.value.result ?: return
-        viewModelScope.launch {
-            liveResult.update { it.copy(isLoading = true) }
-            val originalName = currentAnalysis.result?.name ?: ""
-            val combinedDescription = buildString {
-                append(originalName)
-                if (isNotEmpty() && answer.isNotBlank()) {
-                    append(" ($answer)")
-                } else {
-                    append(answer)
-                }
-            }
-            val newAnalysis = FoodAnalyzer.analyze(
-                description = combinedDescription, meal = currentAnalysis.mealType, image = null
-            )
-            if (newAnalysis != null) {
-                newAnalysis.photoUrl = currentAnalysis.photoUrl
-                newAnalysis.mealType = currentAnalysis.mealType
-                FoodAnalyzer.updateCachedResult(
-                    newAnalysis.id, currentAnalysis.photoUrl, currentAnalysis.mealType
-                )
-
-                liveResult.update { it.copy(result = newAnalysis, isLoading = false) }
-            } else {
-                liveResult.update { it.copy(isLoading = false, isError = true) }
-            }
         }
     }
 

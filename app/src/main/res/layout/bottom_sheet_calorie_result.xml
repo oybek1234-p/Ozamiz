@@ -91,12 +91,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?selectableItemBackground"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
                 app:strokeColor="?colorOutlineVariant"
                 app:strokeWidth="0dp">
 
@@ -276,6 +276,57 @@
                         tools:text="Bu ovqatni kamroq miqdorda va kechqurun yemaslik maslahat beriladi." />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:id="@+id/health_ball"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/round_lay"
+                android:layout_marginTop="@dimen/dimen_12"
+                android:backgroundTint="?colorSurfaceContainerLowest"
+                android:gravity="center"
+                android:paddingVertical="@dimen/dimen_12"
+                android:paddingHorizontal="@dimen/dimen_8"
+                android:orientation="horizontal">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/ballanimation"
+                    android:layout_width="40dp"
+                    android:visibility="gone"
+                    android:layout_height="40dp"
+                    app:lottie_autoPlay="true"
+                    app:lottie_rawRes="@raw/bouncing_fruits"
+                    app:lottie_repeatCount="100"
+                    app:lottie_repeatMode="restart" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:paddingEnd="@dimen/dimen_18"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Headline3_15"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="@dimen/dimen_12"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sog_liq_bahosi"
+                        android:textColor="?colorOnSurface" />
+
+
+                    <TextView
+                        android:id="@+id/ball_count"
+                        style="@style/Headline3_15"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="5 ball"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurface" />
+
+
+                </LinearLayout>
+            </LinearLayout>
 
 
         </LinearLayout>

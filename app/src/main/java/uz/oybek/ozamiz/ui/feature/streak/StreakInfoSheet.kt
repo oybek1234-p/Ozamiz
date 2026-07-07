@@ -16,7 +16,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.AdminRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.user.model.UserSortType.TOP_STREAK
 import uz.oybek.ozamiz.databinding.DialogStreakInfoBinding
@@ -51,7 +52,7 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
             isNewAction: Boolean = false,
             returnedAfterManyDays: Boolean = false
         ) {
-            val streakInfo = UserRepository.user.streakInfo ?: return
+            val streakInfo = UserProfileRepository.user.streakInfo ?: return
             newInstance(streakInfo, isNewAction, returnedAfterManyDays).show(fragmentManager, TAG)
         }
     }
@@ -150,7 +151,7 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         binding.recyclerTopUsers.visibility = View.GONE
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val result = UserRepository.getUsers(
+            val result = AdminRepository.getUsers(
                 limit = 10,
                 sortBy = TOP_STREAK
             )

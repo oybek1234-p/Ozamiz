@@ -3,7 +3,8 @@ package uz.oybek.ozamiz.data.level
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.user.UserRepository.updateUser
+import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.user.model.User
 
 object PointsRepository {
 
@@ -13,26 +14,22 @@ object PointsRepository {
 
     fun onEvent(event: PointsEvent) {
         val earnedPoints = event.calculatePoints()
+        val oldPoints = UserProfileRepository.user.scorePoints
+        val newPoints = oldPoints + earnedPoints
 
-        updateUser { user ->
-            val oldPoints = user.scorePoints
-            val newPoints = oldPoints + earnedPoints
+        UserProfileRepository.updateScorePoints(newPoints)
 
-            user.scorePoints = newPoints
+        val oldLevel = LevelRepository.getCurrentLevel(oldPoints)
+        val newLevel = LevelRepository.getCurrentLevel(newPoints)
 
-            val oldLevel = LevelRepository.getCurrentLevel(oldPoints)
-            val newLevel = LevelRepository.getCurrentLevel(newPoints)
-
-            if (newLevel.requiredPoints > oldLevel.requiredPoints) {
-                MainScope().launch {
-                    newLevelUnlockedFlow.emit(newLevel)
-                }
+        if (newLevel.requiredPoints > oldLevel.requiredPoints) {
+            MainScope().launch {
+                newLevelUnlockedFlow.emit(newLevel)
             }
         }
     }
 }
 
-// Har bir hodisa uchun alohida parametrlar bilan sealed class
 sealed class PointsEvent {
 
     // Suv balini foizda hisoblash: 2500 ml (2.5L) -> 20 ball. 250 ml -> 2 ball.
@@ -63,7 +60,6 @@ sealed class PointsEvent {
         }
     }
 
-    // Boshqa statsionar ballik hodisalar
     object StreakUp : PointsEvent() {
         override fun calculatePoints(): Int = 20
     }

@@ -76,12 +76,10 @@ object DietController {
     fun updateTargetValues(user: User) {
         val targetCals = calculateTargetCalories(user)
         user.targetCalories = targetCals
-        
+
         val macros = if (user.goal == "gain_weight") {
-            // High carb, moderate protein for bulking
             calculateMacrosByPercent(targetCals, proteinPercent = 0.25, fatPercent = 0.25, carbPercent = 0.50)
         } else {
-            // Higher protein for cutting
             calculateMacrosByPercent(targetCals, proteinPercent = 0.35, fatPercent = 0.25, carbPercent = 0.40)
         }
         

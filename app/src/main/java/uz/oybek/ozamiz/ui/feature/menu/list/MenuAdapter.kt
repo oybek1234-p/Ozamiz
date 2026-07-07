@@ -13,7 +13,7 @@ import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import jp.wasabeef.glide.transformations.BlurTransformation
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuAdapter(
@@ -39,7 +39,7 @@ class MenuAdapter(
             binding.textCalories.text =
                 binding.root.context.getString(R.string.calories_format, item.calories)
 
-            val isPremiumUser = UserRepository.user.isPremium()
+            val isPremiumUser = UserProfileRepository.user.isPremium()
             val isPremiumRequired = !isPremiumUser && adapterPosition >= 6
 
             if (item.imageUrl != null) {

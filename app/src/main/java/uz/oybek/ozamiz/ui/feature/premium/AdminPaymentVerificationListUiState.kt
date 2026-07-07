@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.data.user.AdminRepository
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.user.UserRepository
 
 data class AdminPaymentVerificationListUiState(
     val isLoading: Boolean = true,
@@ -29,7 +29,7 @@ class AdminPaymentVerificationListViewModel : ViewModel() {
     fun loadPendingVerifications() {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            when (val result = UserRepository.getPendingPremiumUsers()) {
+            when (val result = AdminRepository.getPendingPremiumUsers()) {
                 is DataWrapper.Success -> {
                     _uiState.update {
                         it.copy(isLoading = false, pendingUsers = result.data)

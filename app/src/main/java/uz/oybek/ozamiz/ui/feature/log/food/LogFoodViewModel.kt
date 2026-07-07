@@ -44,7 +44,6 @@ data class LogFoodState(
 sealed interface LogEvent {
     sealed class Error : LogEvent {
         object EmptyInput : Error()
-        object AnalyzeError : Error()
     }
 
     data class Analyzed(
@@ -89,7 +88,11 @@ class LogFoodViewModel() : ViewModel() {
                     FoodLogRepository.getAllLogs(date),
                     _state.map { it.meal }.distinctUntilChanged()
                 ) { allLogs, mealId ->
-                    allLogs.filter { it.mealType == mealId }
+                    allLogs
+                        .filter { it.mealType == mealId }
+                        .sortedByDescending { log ->
+                            (log.timestamp as? Number)?.toLong() ?: 0L
+                        }
                 }.collect { filteredLogs ->
                     _state.update { it.copy(logs = filteredLogs) }
                 }
@@ -129,7 +132,7 @@ class LogFoodViewModel() : ViewModel() {
                 timestamp = System.currentTimeMillis(),
                 mealType = state.value.meal
             )
-            FoodLogRepository.add(null, log, state.value.date)
+            FoodLogRepository.add(null, log, state.value.date, shouldShare = false)
             StreakRepository.updateStreak()
             _loadingFoodIds.update { it - foodLog.logId }
         }
@@ -137,72 +140,6 @@ class LogFoodViewModel() : ViewModel() {
 
     fun updateDescription(text: String?) {
         _state.update { it.copy(description = text.toString()) }
-    }
-
-    fun analyzePhoto(image: Uri) {
-        _state.update { it.copy(image = image) }
-        analyze()
-    }
-
-    fun analyze() {
-        analyzeJob?.cancel()
-        analyzeJob = viewModelScope.launch {
-            val currentState = state.value
-            if (currentState.description.isBlank() && currentState.image == null) {
-                _event.send(LogEvent.Error.EmptyInput)
-                return@launch
-            }
-            _state.update { it.copy(isAnalyzing = true) }
-            val result = FoodAnalyzer.analyze(
-                description = state.value.description,
-                meal = state.value.meal,
-                image = state.value.image
-            )
-            if (user.premium.not()) {
-                launch {
-                    AppPreference.incrementFoodLogLimitCount()
-                }
-            }
-            result?.photoUrl = state.value.uploadUrl
-            result?.mealType = state.value.meal
-
-            _state.update { it.copy(result = result, isAnalyzing = false) }
-
-            if (result != null) {
-                _event.send(LogEvent.Analyzed(result))
-            } else {
-                _event.send(LogEvent.Error.AnalyzeError)
-            }
-        }
-    }
-
-    fun analyzeAudio(audioUri: Uri) {
-        analyzeJob?.cancel()
-        analyzeJob = viewModelScope.launch {
-            _state.update { it.copy(isAnalyzing = true) }
-
-            val result = FoodAnalyzer.analyzeAudio(
-                audioUri,
-                state.value.meal
-            )
-            if (user.premium.not()) {
-                launch {
-                    AppPreference.incrementFoodLogLimitCount()
-                }
-            }
-            _state.update { it.copy(result = result, isAnalyzing = false) }
-
-            if (result != null) {
-                _event.send(LogEvent.Analyzed(result))
-            } else {
-                _event.send(LogEvent.Error.AnalyzeError)
-            }
-        }
-    }
-
-    fun cancelAnalyze() {
-        analyzeJob?.cancel()
-        _state.update { it.copy(isAnalyzing = false) }
     }
 
     fun toggleFavorite(foodLog: FoodLog) {

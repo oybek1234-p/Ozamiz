@@ -126,7 +126,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                 findNavController().popBackStack()
             }
             viewModel.run {
-                startNewChat()
+                startNewChat(true)
                 sendMessage(prompt) {}
             }
             arguments?.remove("initialPrompt")
@@ -230,7 +230,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
 
         bind.btnNewChat.setOnClickListener {
             checkPremium {
-                viewModel.startNewChat()
+                viewModel.startNewChat(true)
             }
         }
     }

@@ -41,8 +41,7 @@ class FoodSearchAdapter(
                 binding.root.context.getString(
                     R.string.food_search_details_format,
                     calories,
-                    defaultServing.description.lowercase(),
-                    defaultServing.grams.roundToInt()
+                    defaultServing.description
                 )
             } else {
                 binding.root.context.getString(

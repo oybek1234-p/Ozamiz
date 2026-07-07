@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
+import uz.oybek.ozamiz.data.user.AdminRepository
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.user.UserRepository
 
 data class AdminPaymentVerificationDetailUiState(
     val isLoading: Boolean = true,
@@ -29,19 +29,15 @@ class AdminPaymentVerificationDetailViewModel : ViewModel() {
     fun loadUserDetails(userId: String) {
         _uiState.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
-            // Fetch all users and find the one with the matching ID.
-            // In a real app with many users, you'd fetch a single user by ID.
-            UserRepository.loadAllUsers(viewModelScope) { users ->
-                val foundUser = users.find { it.uid == userId && it.paymentChecking }
-                if (foundUser != null) {
-                    currentUserData = foundUser
-                    _uiState.update {
-                        it.copy(isLoading = false, user = foundUser)
-                    }
-                } else {
-                    _uiState.update {
-                        it.copy(isLoading = false, errorMessage = "Foydalanuvchi topilmadi yoki tekshiruvda emas.")
-                    }
+            val foundUser = AdminRepository.getAdminUser(userId)
+            if (foundUser != null && foundUser.paymentChecking) {
+                currentUserData = foundUser
+                _uiState.update {
+                    it.copy(isLoading = false, user = foundUser)
+                }
+            } else {
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = "Foydalanuvchi topilmadi yoki tekshiruvda emas.")
                 }
             }
         }
@@ -53,7 +49,7 @@ class AdminPaymentVerificationDetailViewModel : ViewModel() {
 
         viewModelScope.launch {
             // Approve/Reject Logic
-            UserRepository.setPremium(userToVerify.uid, approve, approve, userToVerify.isPremiumYearly)
+            AdminRepository.setPremium(userToVerify.uid, approve, approve, userToVerify.isPremiumYearly)
 
             if (!approve && !userToVerify.paymentCheckPhotoUrl.isNullOrEmpty()) {
                 ImageUploader.deleteImage(userToVerify.paymentCheckPhotoUrl)

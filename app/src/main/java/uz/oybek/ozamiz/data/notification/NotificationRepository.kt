@@ -4,7 +4,7 @@ import com.google.firebase.firestore.Query
 import uz.oybek.ozamiz.data.firebase.firestore
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.notification.model.NotificationModel
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 
 import uz.oybek.ozamiz.data.firebase.notificationsCollection
 
@@ -19,7 +19,7 @@ object NotificationRepository {
             notification.id = docRef.id
             docRef.set(notification).await()
 
-            UserRepository.incrementUnreadMessages(notification.toUserId)
+            UserProfileRepository.incrementUnreadMessages(notification.toUserId)
         }
     }
 

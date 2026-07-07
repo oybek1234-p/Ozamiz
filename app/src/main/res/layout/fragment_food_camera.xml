@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black">
+    android:background="@android:color/black"
+    android:keepScreenOn="true">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
@@ -21,13 +22,13 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="120dp"
         android:fontFamily="@font/roboto_bold"
-        android:text="Ovqatni ko'rsating"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
         android:shadowColor="#80000000"
         android:shadowDx="2"
         android:shadowDy="2"
-        android:shadowRadius="4"/>
+        android:shadowRadius="4"
+        android:text="@string/log_food_camera_instruction"
+        android:textColor="@android:color/white"
+        android:textSize="24sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +45,7 @@
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_weight="1"
-            android:text="Yozish"
+            android:text="@string/log_food_text_title"
             android:textColor="@android:color/white"
             app:icon="@drawable/edit"
             app:iconPadding="8dp"
@@ -56,6 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:backgroundTint="@android:color/white"
+            android:contentDescription="@string/log_food_camera_title"
             android:src="@drawable/camera_ic"
             app:fabCustomSize="80dp"
             app:maxImageSize="40dp"
@@ -67,7 +69,7 @@
             android:layout_width="0dp"
             android:layout_height="64dp"
             android:layout_weight="1"
-            android:text="Ro'yxat"
+            android:text="@string/log_food_camera_list"
             android:textColor="@android:color/white"
             app:icon="@drawable/ic_search"
             app:iconPadding="8dp"
@@ -81,6 +83,7 @@
         android:layout_height="48dp"
         android:layout_margin="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/cancel"
         android:src="@drawable/arrow_back"
         app:tint="@android:color/white" />
 

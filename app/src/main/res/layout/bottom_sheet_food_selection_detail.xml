@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://tools.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bottom_sheet_background"
@@ -12,91 +12,106 @@
         android:layout_width="40dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/round_lay"
         android:backgroundTint="?attr/colorOutlineVariant" />
-
-    <TextView
-        android:id="@+id/text_view_food_name_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/roboto_bold"
-        android:textColor="?attr/colorOnSurface"
-        android:textSize="22sp"
-        tools:text="Osh (Palov)" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="0dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/text_view_calories_detail"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/roboto_bold"
-                    android:textColor="?attr/colorPrimary"
-                    android:textSize="24sp"
-                    tools:text="450 kkal" />
-            </LinearLayout>
-
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginVertical="16dp" />
-
-            <include android:id="@+id/row_calories" layout="@layout/item_nutrition_row" />
-            <include android:id="@+id/row_carbs" layout="@layout/item_nutrition_row" />
-            <include android:id="@+id/row_protein" layout="@layout/item_nutrition_row" />
-            <include android:id="@+id/row_fat" layout="@layout/item_nutrition_row" />
-
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/text_view_food_name_detail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="?attr/colorOnSurface"
+            style="@style/Title3_17"
+            android:text="Osh" />
+
+        <TextView
+            android:id="@+id/text_view_calories_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="?attr/colorOnSurface"
+            style="@style/Title3_17"
+            android:text="450 kkal" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="16dp"
+        android:background="?attr/colorOutlineVariant" />
+
+    <include android:id="@+id/row_calories" layout="@layout/item_nutrition_row" />
+    <include android:id="@+id/row_carbs" layout="@layout/item_nutrition_row" />
+    <include android:id="@+id/row_protein" layout="@layout/item_nutrition_row" />
+    <include android:id="@+id/row_fat" layout="@layout/item_nutrition_row" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="16dp"
+        android:background="?attr/colorOutlineVariant" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Miqdor kiritish va +/- tugmalari (TextInputLayout bilan bir xil chiziqda) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_minus"
+                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginEnd="4dp"
+                app:icon="@android:drawable/ic_input_delete" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Miqdori"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_quantity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:text="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_plus"
+                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="4dp"
+                app:icon="@android:drawable/ic_input_add" />
+        </LinearLayout>
+
+        <!-- O'lchov birligi -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:hint="Miqdori"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_text_quantity"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:text="1" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.5"
             android:layout_marginStart="8dp"
-            android:hint="O'lchov birligi"
+            android:hint="Birlik"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
             <AutoCompleteTextView
@@ -107,16 +122,15 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_log_food"
-        android:layout_width="match_parent"
         style="@style/FilledButton"
-        android:layout_height="64dp"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
         android:layout_marginTop="24dp"
-        android:text="Qo'shish"
         android:fontFamily="@font/roboto_bold"
-        android:textSize="18sp"
-        app:cornerRadius="32dp" />
+        android:text="Qo'shish"
+        android:textSize="16sp"
+        app:cornerRadius="12dp" />
 
 </LinearLayout>

@@ -9,13 +9,12 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
-import uz.oybek.ozamiz.data.firebase.firestore
+import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.generateKey
-import uz.oybek.ozamiz.data.firebase.uploader.ImagePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.firebase.userWeightLogsCollection
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.util.handleException
 import java.util.concurrent.TimeUnit
@@ -31,8 +30,10 @@ object WeightLogRepository {
         shouldBlur: Boolean = false
     ): DataWrapper<WeightLog> {
         val uploadedUrl = if (photoUri != null) {
-            ImageUploader.uploadImage(photoUri, ImagePaths.weightLog, shouldBlurFaces = shouldBlur)
-                .toString()
+            ImageUploader.uploadImage(
+                photoUri,
+                FirebasePaths.Storage.weightLogs(userId), shouldBlurFaces = shouldBlur
+            ) ?: ""
         } else {
             ""
         }
@@ -50,7 +51,7 @@ object WeightLogRepository {
         )
 
         return try {
-            firestore.userWeightLogsCollection(userId)
+            FirebasePaths.Firestore.weightLogs(userId)
                 .document(logId)
                 .set(newLog)
                 .await()
@@ -64,7 +65,7 @@ object WeightLogRepository {
     fun getLogsFlow(userId: String): Flow<DataWrapper<List<WeightLog>>> = flow {
         if (userId.isEmpty()) return@flow
         emitAll(callbackFlow {
-            val registration = firestore.userWeightLogsCollection(userId)
+            val registration = FirebasePaths.Firestore.weightLogs(userId)
                 .orderBy(WeightLog::timestamp.name, Query.Direction.DESCENDING)
                 .addSnapshotListener { snapshot, error ->
                     if (error != null) {
@@ -89,6 +90,7 @@ object WeightLogRepository {
     }
 
     fun needShowWeightLog(userId: String): Flow<Boolean> {
+        val hasStreak = (user.streakInfo?.currentStreak ?: 0) > 1
         return getLogsFlow(userId).map { result ->
             if (result is DataWrapper.Success) {
                 val logs = result.data.sortedBy { it.timestampLong }
@@ -97,17 +99,17 @@ object WeightLogRepository {
                     val oneWeekMs = 7L * 24 * 60 * 60 * 1000
                     System.currentTimeMillis() - lastLog.timestampLong > oneWeekMs
                 } else {
-                    true
+                    hasStreak
                 }
             } else {
-                true
+                hasStreak
             }
         }
     }
 
     suspend fun hasAny(userId: String): Boolean {
         return try {
-            val snapshot = firestore.userWeightLogsCollection(userId)
+            val snapshot = FirebasePaths.Firestore.weightLogs(userId)
                 .limit(1)
                 .get()
                 .await()
@@ -131,7 +133,7 @@ object WeightLogRepository {
 
     suspend fun deleteLog(log: WeightLog): DataWrapper<Unit> {
         return try {
-            firestore.userWeightLogsCollection(log.userId)
+            FirebasePaths.Firestore.weightLogs(log.userId)
                 .document(log.logId)
                 .delete()
                 .await()

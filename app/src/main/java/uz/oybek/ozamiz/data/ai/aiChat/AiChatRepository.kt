@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -21,16 +22,16 @@ import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.ai.AiPromptBuilder
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatDatabase
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatMessageEntity
+import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.firebase.aiChatsCollection
-import uz.oybek.ozamiz.data.firebase.firestore
 import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.logs.model.DailySummary
 import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.data.user.UserRepository.user
+import uz.oybek.ozamiz.data.user.UserProfileRepository.user
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import java.util.Calendar
 import java.util.Date
 
@@ -47,6 +48,10 @@ object AiChatRepository {
 
     private val aiChatDao by lazy {
         AiChatDatabase.getDatabase(appContext).aiChatDao()
+    }
+
+    suspend fun getCachedMessages(): List<AiChatMessageEntity>? {
+        return aiChatDao.getMessagesForDateFlow(DateUtils.todayString()).firstOrNull()
     }
 
     private fun getModel(systemInstructionText: String) = Firebase.ai.generativeModel(
@@ -110,6 +115,7 @@ object AiChatRepository {
             if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
                 val parsedMessage = DietologAnswers.calorieLimitExceededMessages.random()
                 saveCachedMessage(parsedMessage, false, tag)
+                _newMessagesEvent.emit(parsedMessage)
                 return true
             }
         }
@@ -124,6 +130,7 @@ object AiChatRepository {
             if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
                 val warning = DietologAnswers.lowProteinHighCarbFatMessages.random()
                 saveCachedMessage(warning, false, tag)
+                _newMessagesEvent.emit(warning)
                 return true
             }
         }
@@ -138,6 +145,7 @@ object AiChatRepository {
             if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
                 val parsedMessage = DietologAnswers.fatExceededMessages.random()
                 saveCachedMessage(parsedMessage, false, tag)
+                _newMessagesEvent.emit(parsedMessage)
                 return true
             }
         }
@@ -146,6 +154,7 @@ object AiChatRepository {
             if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
                 val parsedMessage = DietologAnswers.carbExceededMessages.random()
                 saveCachedMessage(parsedMessage, false, tag)
+                _newMessagesEvent.emit(parsedMessage)
                 return true
             }
         }
@@ -154,6 +163,7 @@ object AiChatRepository {
             if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
                 val parsedMessage = DietologAnswers.proteinExceededMessages.random()
                 saveCachedMessage(parsedMessage, false, tag)
+                _newMessagesEvent.emit(parsedMessage)
                 return true
             }
         }
@@ -164,12 +174,14 @@ object AiChatRepository {
         chatId: String, text: String, isUser: Boolean, timestamp: Long
     ): Any? = withContext(Dispatchers.IO) {
         try {
-            val chatRef = firestore.aiChatsCollection.document(chatId)
-            val msgRef = chatRef.collection(FirebasePaths.Firestore.MESSAGES).document()
+            val chatRef = FirebasePaths.Firestore.aiChat(chatId)
+            val msgRef = FirebasePaths.Firestore.aiMessages(chatId).document()
 
             chatRef.set(
                 mapOf(
-                    "userId" to user.uid, "userName" to user.name, "lastModified" to timestamp
+                    "userId" to user.uid,
+                    "userName" to user.name,
+                    "lastModified" to timestamp
                 ), SetOptions.merge()
             ).await()
             msgRef.set(
@@ -245,9 +257,12 @@ object AiChatRepository {
 
             if (suggestedShownCount < 3) {
                 _suggestedReplies.value = parsedQuestions
-                suggestedShownCount ++
+                suggestedShownCount++
             }
             if (chatId != null) {
+                if (user.isPremium().not()) {
+                    AppPreference.incrementDietologMessageCount()
+                }
                 saveMessageToFirestore(chatId, finalParsed, false, System.currentTimeMillis())
             }
         } catch (e: Exception) {

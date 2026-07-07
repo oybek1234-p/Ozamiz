@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.AdminRepository
 
 class AdminUserDetailsViewModel : ViewModel() {
 
@@ -25,7 +25,7 @@ class AdminUserDetailsViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val loadedUser = UserRepository.getAdminUser(userId)
+                val loadedUser = AdminRepository.getAdminUser(userId)
                 _user.value = loadedUser
             } catch (e: Exception) {
             } finally {
@@ -39,7 +39,7 @@ class AdminUserDetailsViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                UserRepository.updateAdminUser(userId, updates)
+                AdminRepository.updateAdminUser(userId, updates)
                 loadUser(userId)
             } catch (e: Exception) {
                 android.util.Log.e("AdminUserDetailsVM", "saveAllFields error for user $userId", e)
@@ -57,7 +57,7 @@ class AdminUserDetailsViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                UserRepository.deleteUserAdmin(userId)
+                AdminRepository.deleteUserAdmin(userId)
                 onSuccess()
             } catch (e: Exception) {
                 android.util.Log.e("AdminUserDetailsVM", "deleteUser error for user $userId", e)

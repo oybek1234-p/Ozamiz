@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.premium.PaymentInfo
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
 
@@ -60,7 +60,7 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
         _uiState.value =
             _uiState.value?.copy(isLoading = true, errorMessage = null, successMessage = null)
         viewModelScope.launch {
-            val result = UserRepository.uploadPremiumCheckData(
+            val result = UserProfileRepository.uploadPremiumCheckData(
                 userId,
                 checkImageUri,
                 _uiState.value?.isYearly ?: false

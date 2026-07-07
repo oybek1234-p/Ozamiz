@@ -20,8 +20,6 @@ class MotivationAlarmReceiver : BroadcastReceiver() {
 
         val type = intent?.getStringExtra("ALARM_TYPE") ?: return
 
-        NotificationSchedular.rescheduleToday(context)
-
         val message = MotivationRepository.getMessageForType(type)
         val notificationManager = MotivationNotificationManager(context)
         notificationManager.showMotivationNotification(message)

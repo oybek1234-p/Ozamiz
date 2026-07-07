@@ -6,8 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.food.DietController
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.info.Gender
 
@@ -82,24 +83,23 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
                 // Centralized calculation for calories, macros, and water
                 DietController.updateTargetValues(userToUpdate)
 
-                UserRepository.updateUser { dbUser ->
-                    dbUser.name = userToUpdate.name
-                    dbUser.gender = userToUpdate.gender
-                    dbUser.age = userToUpdate.age
-                    dbUser.height = userToUpdate.height
-                    dbUser.weight = userToUpdate.weight
-                    dbUser.targetWeight = userToUpdate.targetWeight
-                    dbUser.startWeight = userToUpdate.startWeight
-                    dbUser.problems = userToUpdate.problems
-                    dbUser.targetCalories = userToUpdate.targetCalories
-                    dbUser.targetProtein = userToUpdate.targetProtein
-                    dbUser.targetFat = userToUpdate.targetFat
-                    dbUser.targetCarbs = userToUpdate.targetCarbs
-                    dbUser.targetWaterMl = userToUpdate.targetWaterMl
-                    dbUser.phoneNumber = userToUpdate.phoneNumber
-                    dbUser.activityLevel = userToUpdate.activityLevel
-                    dbUser.region = userToUpdate.region
-
+                UserProfileRepository.updateUser {
+                    this.name = userToUpdate.name
+                    this.gender = userToUpdate.gender
+                    this.age = userToUpdate.age
+                    this.height = userToUpdate.height
+                    this.weight = userToUpdate.weight
+                    this.targetWeight = userToUpdate.targetWeight
+                    this.startWeight = userToUpdate.startWeight
+                    this.problems = userToUpdate.problems
+                    this.targetCalories = userToUpdate.targetCalories
+                    this.targetProtein = userToUpdate.targetProtein
+                    this.targetFat = userToUpdate.targetFat
+                    this.targetCarbs = userToUpdate.targetCarbs
+                    this.targetWaterMl = userToUpdate.targetWaterMl
+                    this.phoneNumber = userToUpdate.phoneNumber
+                    this.activityLevel = userToUpdate.activityLevel
+                    this.region = userToUpdate.region
                 }
                 _navigationEvent.postValue(GetInfoNavigationEvent.NavigateToHome)
             } catch (e: Exception) {

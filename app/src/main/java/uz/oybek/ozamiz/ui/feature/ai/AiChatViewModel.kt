@@ -14,11 +14,12 @@ import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
 import uz.oybek.ozamiz.data.ai.aiChat.ChatMessage
 import uz.oybek.ozamiz.data.ai.aiChat.DietologAnswers
 import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.ui.utils.showToast
 import java.util.Date
 
 class AiChatViewModel : ViewModel() {
@@ -57,7 +58,7 @@ class AiChatViewModel : ViewModel() {
     }
 
     init {
-        UserRepository.setUnreadNotificationsZero()
+        UserProfileRepository.setUnreadNotificationsZero()
     }
 
     private fun startNewChatSession() {
@@ -67,18 +68,49 @@ class AiChatViewModel : ViewModel() {
     }
 
     init {
-        startNewChat()
+        startNewChat(false)
+        observeNewMessages()
     }
-    
-    fun startNewChat() {
+
+    private fun observeNewMessages() {
+        viewModelScope.launch {
+            AiChatRepository.newMessagesEvent.collect {
+                val message = ChatMessage(
+                    text = it,
+                    isUser = false,
+                    isThinking = false
+                )
+                _messages.value += message
+            }
+        }
+    }
+
+    fun startNewChat(clearHistory: Boolean) {
         startNewChatSession()
         viewModelScope.launch {
-            AiChatRepository.clearHistory()
-            _messages.value += ChatMessage(
-                text = DietologAnswers.getInitialGreeting(),
-                isUser = false,
-                isThinking = false
-            )
+            if (clearHistory) {
+                _messages.emit(emptyList())
+                AiChatRepository.clearHistory()
+            }
+            launch {
+                val cached = AiChatRepository.getCachedMessages()
+                if (cached.isNullOrEmpty().not()) {
+                    _messages.value = cached.map {
+                        ChatMessage(
+                            text = it.text,
+                            isUser = it.isUser,
+                            isThinking = false
+                        )
+                    }
+                } else {
+                    _messages.value += ChatMessage(
+                        text = DietologAnswers.getInitialGreeting(),
+                        isUser = false,
+                        isThinking = false
+                    )
+                }
+            }
+
         }
     }
 
@@ -102,9 +134,7 @@ class AiChatViewModel : ViewModel() {
             ).collect { result ->
                 if (result is DataWrapper.Success) {
                     _isLoading.value = false
-                    if (UserRepository.user.isPremium().not()) {
-                        AppPreference.incrementDietologMessageCount()
-                    }
+
                     val displayedText = result.data
                     val currentList = _messages.value.toMutableList()
                     val lastMsg = currentList.lastOrNull()

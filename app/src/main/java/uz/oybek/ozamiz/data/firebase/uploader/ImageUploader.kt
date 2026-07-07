@@ -5,12 +5,12 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import java.io.File
 import java.io.FileOutputStream
@@ -24,8 +24,7 @@ object ImageUploader {
 
     suspend fun uploadImage(
         uri: Uri,
-        path: String,
-        userId: String = LocalUser.user.uid,
+        folderRef: StorageReference,
         shouldBlurFaces: Boolean = false
     ): String? = withContext(Dispatchers.IO) {
         val originalFile = fromUri(uri) ?: return@withContext null
@@ -50,16 +49,11 @@ object ImageUploader {
         val byteArray = compressedFile?.readBytes() ?: return@withContext null
         try {
             val fileName = "${UUID.randomUUID()}.$IMAGE_EXTENSION"
-            var imageRef = Firebase.storage.reference
-                .child(path)
-            if (path != ImagePaths.main) {
-                imageRef = imageRef.child(userId)
-            }
+            val imageRef = folderRef.child(fileName)
             
             if (originalFile.exists()) originalFile.delete()
             if (fileToCompress != originalFile && fileToCompress.exists()) fileToCompress.delete()
             
-            imageRef = imageRef.child(fileName)
             val uploadTask = imageRef.putBytes(byteArray).await()
             val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
             downloadUrl

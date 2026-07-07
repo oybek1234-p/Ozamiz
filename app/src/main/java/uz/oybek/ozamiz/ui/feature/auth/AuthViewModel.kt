@@ -6,7 +6,7 @@ import com.google.firebase.auth.AuthCredential
 import uz.oybek.ozamiz.data.auth.AuthRepository
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserAuthRepository
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.ui.utils.postVal
 
@@ -70,6 +70,6 @@ class AuthViewModel : ViewModel() {
     }
 
     suspend fun authFirebaseUser(): User {
-        return UserRepository.authFirebaseUser()
+        return UserAuthRepository.authFirebaseUser()
     }
 }

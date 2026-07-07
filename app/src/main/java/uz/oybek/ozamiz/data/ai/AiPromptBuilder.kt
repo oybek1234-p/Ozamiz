@@ -8,16 +8,25 @@ object AiPromptBuilder {
 
     const val MODEL_NAME = "gemini-flash-lite-latest"
 
+    private fun getFormattedCurrentDateTime(): String {
+        return java.text.SimpleDateFormat("HH:mm (XXX)", java.util.Locale.getDefault())
+            .format(java.util.Date())
+    }
+
+    private suspend fun getGroupedFoodLogs(): String {
+        val logs = LogRepository.getDailyLogsSync(LogFragment.currentDate)?.foodLogs?.values
+        if (logs.isNullOrEmpty()) return "Hali hech narsa yeyilmagan"
+
+        return logs.groupBy { it.mealType }
+            .map { (mealType, list) ->
+                "- $mealType: ${list.joinToString(", ") { it.description }}"
+            }.joinToString("\n")
+    }
+
     suspend fun buildDietologInstruction(needReplies: Boolean): String {
         val currentDate = LogFragment.currentDate
-        val dailyLogs = LogRepository.getDailyLogsSync(currentDate)
         val dailySummary = LogRepository.getDailySummarySync(currentDate)
-
-        val timeFormat = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-            .format(java.util.Date())
-        val tzFormat = java.text.SimpleDateFormat("XXX", java.util.Locale.getDefault())
-            .format(java.util.Date())
-        val currentTime = "$timeFormat (GMT$tzFormat)"
+        val currentDateTime = getFormattedCurrentDateTime()
 
         val genderText = if (user.gender == 1) "Ayol" else "Erkak"
         val userContext = """
@@ -36,10 +45,6 @@ object AiPromptBuilder {
             - Maqsadli Vazni: ${user.targetWeight ?: "Kiritilmagan"} kg
         """.trimIndent()
 
-        val foodNames = dailyLogs?.foodLogs?.values?.map { it.description } ?: emptyList()
-        val foodsJoined =
-            if (foodNames.isEmpty()) "Hali hech narsa yeyilmagan" else foodNames.joinToString(", ")
-
         val dailyContext = """
             BUGUNGI HOLAT (Daily Info):
             - Kaloriya: ${dailySummary.consumedCalories} / ${user.targetCalories} kkal.
@@ -48,8 +53,9 @@ object AiPromptBuilder {
             - Uglevod: ${dailySummary.consumedCarbs}g / ${user.targetCarbs}g.
             - Yog': ${dailySummary.consumedFat}g / ${user.targetFat}g.
             - Jismoniy faollikda yoqilgan kaloriya: ${dailySummary.burnedCalories} kkal.
-            - BUGUN YEGANLARI (Faqat nomlari): $foodsJoined
-            - Hozirgi vaqt $currentTime.
+            - BUGUN YEGANLARI (Vaqt bo'yicha guruhlangan):
+            ${getGroupedFoodLogs()}
+            - Hozirgi sana va vaqt: $currentDateTime.
         """.trimIndent()
 
         return """
@@ -60,7 +66,7 @@ object AiPromptBuilder {
             $dailyContext
             Asosan userga javob qaytarishga qarat.
             QAT'IY QOIDALAR (BUZISH TAQIQLANADI):
-            1. Javob juda qisqa va lo'nda bo'lishi shart (maksimal 1-5 tagacha qisqa gap)
+            1. Javob juda qisqa va lo'nda bo'lishi shart (maksimal 1-3 tagacha qisqa gap)
             2. Har doim o'zbek tilida (lotin yozuvida) javob ber.
             3. Matnda mutlaqo Markdown belgilarini (*, **, #, `) ishlatma. Faqat toza matn qaytar. AI belgilari ko'rinmasligi kerak.
             4. Hech qanday "1, 2, 3" deb ro'yxat tuzma, faqat bitta yaxlit matn shaklida javob ber.
@@ -80,10 +86,10 @@ object AiPromptBuilder {
         """.trimIndent()
     }
 
-
     suspend fun buildFoodInstruction(): String {
         val currentDate = LogFragment.currentDate
         val dailySummary = LogRepository.getDailySummarySync(currentDate)
+        val currentDateTime = getFormattedCurrentDateTime()
 
         val genderText = if (user.gender == 1) "Ayol" else "Erkak"
         val userContext = """
@@ -104,16 +110,18 @@ object AiPromptBuilder {
 
         val dailyContext = """
             BUGUNGI HOLAT (Daily Info):
-            - Kaloriya: ${dailySummary.consumedCalories} / ${user.targetCalories} kkal.
-            - Suv: ${dailySummary.consumedWaterMl} / ${user.targetWaterMl} ml.
-            - Oqsil: ${dailySummary.consumedProtein}g / ${user.targetProtein}g.
-            - Uglevod: ${dailySummary.consumedCarbs}g / ${user.targetCarbs}g.
-            - Yog': ${dailySummary.consumedFat}g / ${user.targetFat}g.
+            - Kaloriya: ${dailySummary.consumedCalories} .
+            - Suv: ${dailySummary.consumedWaterMl}.
+            - Oqsil: ${dailySummary.consumedProtein}g .
+            - Uglevod: ${dailySummary.consumedCarbs}g 
+            - Yog': ${dailySummary.consumedFat}g .
             - Jismoniy faollikda yoqilgan kaloriya: ${dailySummary.burnedCalories} kkal.
+            - BUGUN YEGANLARI (Vaqt bo'yicha guruhlangan):
+            - Hozirgi sana va vaqt: $currentDateTime.
         """.trimIndent()
 
         return """
-            Siz tajribali AI Diyetolog va Nutritsiologsiz. Sening isming Ozamiz. O'zbekistonliklar uchun Vaznim ilovasining maxsus dietolog-trener va psixologisan. Foydalanuvchi yuborgan ovqat rasmi yoki tavsifini tahlil qilib, unga sog'lom ozishda yordam berasiz.
+            Siz tajribali Diyetolog.Foydalanuvchi yuborgan ovqat rasmi yoki tavsifini tahlil qil.
 
             ${userContext}
 
@@ -136,25 +144,21 @@ object AiPromptBuilder {
             - "healthScore": 1 dan 10 gacha (1 - juda zararli, 10 - o'ta sog'lom).
             - "advice":  qoidaga qara
 
-            ADICE UCHUN QAT'IY QOIDALAR (BUZISH TAQIQLANADI):
+            ADVICE UCHUN QAT'IY QOIDALAR (BUZISH TAQIQLANADI):
             1. Javob juda qisqa va lo'nda bo'lishi shart (maksimal 1-5 tagacha qisqa gap)
             2. Har doim o'zbek tilida (lotin yozuvida) javob ber.
             3. Matnda mutlaqo Markdown belgilarini (*, **, #, `) ishlatma. Faqat toza matn qaytar. AI belgilari ko'rinmasligi kerak.
-            4. Hech qanday "1, 2, 3" deb ro'yxat tuzma, faqat bitta yaxlit matn shaklida javob ber.
             5. Hurmat qil, sizlab gapir!, vaziyatga qarab kam holatlarda emoji qosh
             5. Ismi bilan har doim chaqirma, bazida faqat, bazida opa, oka, yoki umuman yozma.
-            6. TAQIQLAR: Ilmiy so'zlarni (protein, uglevod) ishlatmang, xalq tushunadigan so'zlarni asil holicha ishlating (go'sht, oqsil, sariyog').
+            6. TAQIQLAR: Ilmiy so'zlarni (protein, uglevod) ishlatmang, xalq tushunadigan so'zlarni asil holicha ishlating (go'sht, sariyog').
             7. Sen Vaznim kaloriya hisoblaydigan ilova dietologisan.
-            8. O'zbeklar kam yeydigan ovqatlarni aytma
-            9. Suv kop ichgansiz dema
+            8. O'zbeklar kam yeydigan, qimmat, ololmaydigan ovqatlarni aytma.
+            9. Asosan shu ovqat haqida gapir, foydasi, zarari, tavsiya(balki)
+            10. Buni uzi yetarli emas, kam, kam yebsiz dema kam ekan dema!!!Eslab qol!
+            12. Agar faqat kaloriya oshib ketsa ogoxlantir!
+      
          
         """.trimIndent()
-    }
-
-    fun buildDietologPrompt(
-        message: String
-    ) {
-
     }
 
     fun buildFoodAnalyzerPrompt(
@@ -169,12 +173,11 @@ object AiPromptBuilder {
             }
             append(" Vaqti: $mealTime")
             if (photo) {
-                append("Rasmni tahlil qil")
+                append(" Rasmni tahlil qil")
             }
             if (audio) {
-                append("Audioni tahlil qil")
+                append(" Audioni tahlil qil")
             }
-
         }.toString()
     }
 }

@@ -21,7 +21,7 @@ import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.WeightLog
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.utils.sortByRecent
@@ -43,7 +43,7 @@ object AchievementPostHelper {
     }
 
     private fun isUserVerified(): Boolean {
-        val user = UserRepository.user
+        val user = UserProfileRepository.user
         return user.valid && !user.uid.isNullOrBlank()
     }
 
@@ -54,7 +54,7 @@ object AchievementPostHelper {
         photos: List<String> = emptyList()
     ): CommunityPost? {
         val uid = auth.currentUser?.uid ?: return null
-        val user = UserRepository.user
+        val user = UserProfileRepository.user
         return CommunityPost(
             userId = uid,
             userName = user.name.ifBlank { "Foydalanuvchi" },

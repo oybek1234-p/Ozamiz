@@ -10,6 +10,9 @@ import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.firestore.firestoreSettings
 import com.google.firebase.firestore.persistentCacheSettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import uz.oybek.ozamiz.data.firebase.database
 import uz.oybek.ozamiz.data.firebase.firestore
 import uz.oybek.ozamiz.data.motivation.NotificationSchedular
@@ -18,6 +21,8 @@ import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.util.handleException
 
 lateinit var appContext: Context
+
+val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 class Application : Application() {
 

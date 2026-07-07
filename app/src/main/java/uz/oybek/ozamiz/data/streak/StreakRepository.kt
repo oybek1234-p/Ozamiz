@@ -4,7 +4,8 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.user.UserRepository
+import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 
 object StreakRepository {
 
@@ -16,16 +17,14 @@ object StreakRepository {
     }
 
     fun updateStreak() {
-        val currentUser = UserRepository.user
+        val currentUser = UserProfileRepository.user
         if (!currentUser.valid) return
 
         val result = StreakManager.updateUserStreakOnAction(currentUser)
 
         try {
             if (result.streakContinued || result.streakBrokenAndReset || result.streakStartedNew || result.isFirstActionToday) {
-                UserRepository.updateUser { user ->
-                    user.streakInfo = result.updatedUser.streakInfo
-                }
+                UserProfileRepository.updateStreakInfo(result.updatedUser.streakInfo)
 
                 if (result.streakContinued || result.isFirstActionToday) {
                     MainScope().launch {

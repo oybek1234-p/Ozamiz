@@ -1,6 +1,5 @@
 package uz.oybek.ozamiz.ui.utils
 
-import android.graphics.Color
 import androidx.core.content.ContextCompat
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
@@ -16,6 +15,8 @@ object VaznimColors {
     fun getOrange(): Int = getColor(R.color.orange)
     fun getYellow(): Int = getColor(R.color.yellow)
     fun getGreen(): Int = getColor(R.color.green)
+
+    fun getRed(): Int = getColor(R.color.red)
     fun getTrack(): Int = getColor(R.color.md_theme_light_surfaceContainerHigh)
     fun getOnSurface(): Int = getColor(R.color.md_theme_light_onSurface)
     fun getOnSurfaceVariant(): Int = getColor(R.color.md_theme_light_onSurfaceVariant)

@@ -56,6 +56,19 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
             findNavController().navigate(R.id.action_adminUsersListFragment_to_adminUserDetailsFragment, bundle)
         }
         bind.recyclerUsers.adapter = adapter
+        
+        bind.recyclerUsers.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val layoutManager = recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
+                val totalItemCount = layoutManager.itemCount
+                val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+
+                if (lastVisibleItemPosition + 5 >= totalItemCount) {
+                    viewModel.loadNextPage()
+                }
+            }
+        })
     }
 
     private fun observeViewModel(bind: FragmentAdminUsersListBinding) {

@@ -4,8 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
@@ -16,51 +14,47 @@ class CameraOverlayView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val backgroundPaint = Paint().apply {
-        color = Color.parseColor("#77000000")
-        isAntiAlias = true
+    private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = OVERLAY_COLOR
     }
 
-    private val transparentPaint = Paint().apply {
-        color = Color.TRANSPARENT
-        xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-        isAntiAlias = true
-    }
-
-    private val strokePaint = Paint().apply {
+    private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         style = Paint.Style.STROKE
-        strokeWidth = 2f * resources.displayMetrics.density
-        isAntiAlias = true
+        strokeWidth = STROKE_WIDTH_DP * resources.displayMetrics.density
     }
 
-    private val rectF = RectF()
-    private val cornerRadius = 24f * resources.displayMetrics.density
+    private val cutoutRect = RectF()
+    private val cornerRadius = CORNER_RADIUS_DP * resources.displayMetrics.density
+    private val verticalOffset = VERTICAL_OFFSET_DP * resources.displayMetrics.density
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val width = width.toFloat()
-        val height = height.toFloat()
+        val viewWidth = width.toFloat()
+        val viewHeight = height.toFloat()
+        if (viewWidth <= 0f || viewHeight <= 0f) return
 
-        val rectWidth = width * 0.85f
-        val rectHeight = rectWidth
+        val cutoutSize = viewWidth * CUTOUT_WIDTH_RATIO
+        val left = (viewWidth - cutoutSize) / 2f
+        val top = (viewHeight - cutoutSize) / 2f - verticalOffset
+        val right = left + cutoutSize
+        val bottom = top + cutoutSize
 
-        val left = (width - rectWidth) / 2
-        val top = (height - rectHeight) / 2 - 40f * resources.displayMetrics.density
-        val right = left + rectWidth
-        val bottom = top + rectHeight
+        cutoutRect.set(left, top, right, bottom)
 
-        rectF.set(left, top, right, bottom)
-
-        canvas.drawRect(0f, 0f, width, height, backgroundPaint)
-
-        canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, transparentPaint)
-
-        canvas.drawRoundRect(rectF, cornerRadius, cornerRadius, strokePaint)
+        canvas.drawRect(0f, 0f, viewWidth, top, backgroundPaint)
+        canvas.drawRect(0f, bottom, viewWidth, viewHeight, backgroundPaint)
+        canvas.drawRect(0f, top, left, bottom, backgroundPaint)
+        canvas.drawRect(right, top, viewWidth, bottom, backgroundPaint)
+        canvas.drawRoundRect(cutoutRect, cornerRadius, cornerRadius, strokePaint)
     }
 
-    init {
-        setLayerType(LAYER_TYPE_SOFTWARE, null)
+    companion object {
+        private const val OVERLAY_COLOR = 0x77000000.toInt()
+        private const val CUTOUT_WIDTH_RATIO = 0.85f
+        private const val CORNER_RADIUS_DP = 24f
+        private const val STROKE_WIDTH_DP = 2f
+        private const val VERTICAL_OFFSET_DP = 40f
     }
 }

@@ -12,7 +12,7 @@ import java.util.Date
 object WaterLogRepository : BaseLogRepository<WaterLog>() {
 
     override fun getReference(userId: String, date: String): DatabaseReference {
-        return FirebasePaths.waterLogsReference(userId, date)
+        return FirebasePaths.Database.waterLogs(userId, date)
     }
 
     override suspend fun add(log: WaterLog, date: Date): Boolean {

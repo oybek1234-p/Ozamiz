@@ -13,24 +13,21 @@ class MotivationNotificationManager(private val context: Context) {
     companion object {
         const val CHANNEL_ID = "motivation_channel_v2"
         const val CHANNEL_NAME = "Eslatmalar"
-        const val NOTIFICATION_ID = 1001
     }
 
     fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_HIGH // Changed to HIGH
-            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
-                description = "Channel for daily motivation messages"
-                lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
-            }
-            val notificationManager: NotificationManager =
-                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+        val importance = NotificationManager.IMPORTANCE_HIGH // Changed to HIGH
+        val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
+            description = "Channel for daily motivation messages"
+            lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
         }
+        val notificationManager: NotificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     fun showMotivationNotification(message: String) {
-        // Only show if permission is granted (handled by NotificationManagerCompat mostly, but good to check)
+        createNotificationChannel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (androidx.core.content.ContextCompat.checkSelfPermission(
                     context,
@@ -50,11 +47,11 @@ class MotivationNotificationManager(private val context: Context) {
         )
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.food_ic) // Ensure this resource exists
+            .setSmallIcon(R.drawable.food_ic)
             .setContentTitle(context.getString(R.string.app_name))
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // Changed to HIGH
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)

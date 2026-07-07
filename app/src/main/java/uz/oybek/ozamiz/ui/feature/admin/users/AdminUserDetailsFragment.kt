@@ -16,11 +16,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.databinding.FragmentAdminUserDetailsBinding
-import uz.oybek.ozamiz.databinding.ItemAdminUserFieldBinding
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.databinding.FragmentAdminUserDetailsBinding
+import uz.oybek.ozamiz.databinding.ItemAdminUserFieldBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -79,7 +79,10 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
         bind.buttonRecentFoodLogs.setOnClickListener {
             argUserId?.let { userId ->
                 val bundle = androidx.core.os.bundleOf("userId" to userId)
-                findNavController().navigate(R.id.action_adminUserDetailsFragment_to_adminFoodLogsFragment, bundle)
+                findNavController().navigate(
+                    R.id.action_adminUserDetailsFragment_to_adminFoodLogsFragment,
+                    bundle
+                )
             }
         }
 
@@ -124,13 +127,36 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
             Triple(User::targetFat.name, user.targetFat, FieldType.INT),
             Triple(User::targetCarbs.name, user.targetCarbs, FieldType.INT),
             Triple(User::targetWaterMl.name, user.targetWaterMl, FieldType.INT),
-            Triple("${streakPrefix}${StreakInfo::currentStreak.name}", streak.currentStreak, FieldType.INT),
-            Triple("${streakPrefix}${StreakInfo::bestStreak.name}", streak.bestStreak, FieldType.INT),
-            Triple("${streakPrefix}${StreakInfo::activeDays.name}", streak.activeDays, FieldType.INT),
-            Triple("${streakPrefix}${StreakInfo::streakGoal.name}", streak.streakGoal, FieldType.INT),
-            Triple("${streakPrefix}${StreakInfo::lastActionDate.name}", streak.lastActionDate, FieldType.STRING),
-            Triple("${streakPrefix}${StreakInfo::activityHistory.name}", streak.activityHistory, FieldType.LIST_STRING),
-            Triple(User::lastWeightLogTimestamp.name, user.lastWeightLogTimestamp, FieldType.DATE_LONG),
+            Triple(
+                "${streakPrefix}${StreakInfo::currentStreak.name}",
+                streak.currentStreak,
+                FieldType.INT
+            ),
+            Triple(
+                "${streakPrefix}${StreakInfo::bestStreak.name}",
+                streak.bestStreak,
+                FieldType.INT
+            ),
+            Triple(
+                "${streakPrefix}${StreakInfo::activeDays.name}",
+                streak.activeDays,
+                FieldType.INT
+            ),
+            Triple(
+                "${streakPrefix}${StreakInfo::streakGoal.name}",
+                streak.streakGoal,
+                FieldType.INT
+            ),
+            Triple(
+                "${streakPrefix}${StreakInfo::lastActionDate.name}",
+                streak.lastActionDate,
+                FieldType.STRING
+            ),
+            Triple(
+                User::lastWeightLogTimestamp.name,
+                user.lastWeightLogTimestamp,
+                FieldType.DATE_LONG
+            ),
             Triple(User::avatarUrl.name, user.avatarUrl, FieldType.STRING),
             Triple(User::registerDate.name, user.registerDate, FieldType.DATE_LONG),
             Triple(User::paymentChecking.name, user.paymentChecking, FieldType.BOOLEAN),
@@ -143,7 +169,8 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
         val inflater = LayoutInflater.from(requireContext())
 
         for ((fieldName, value, type) in fields) {
-            val itemBinding = ItemAdminUserFieldBinding.inflate(inflater, bind.layoutFieldsContainer, false)
+            val itemBinding =
+                ItemAdminUserFieldBinding.inflate(inflater, bind.layoutFieldsContainer, false)
             itemBinding.textFieldName.text = fieldName
 
             when (type) {
@@ -154,6 +181,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                     itemBinding.checkboxFieldValue.isChecked = value as? Boolean ?: false
                     itemBinding.checkboxFieldValue.text = getString(R.string.admin_field_enabled)
                 }
+
                 FieldType.DATE_LONG -> {
                     val longVal = extractDateLong(value)
                     val formatted = formatDateReadable(longVal)
@@ -163,6 +191,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                     itemBinding.editTextField.inputType = InputType.TYPE_CLASS_NUMBER
                     itemBinding.editTextField.setText(if (longVal != 0L) longVal.toString() else "")
                 }
+
                 FieldType.LIST_STRING -> {
                     val listVal = extractListString(value)
                     itemBinding.textFieldValue.text = if (listVal.isNullOrEmpty()) {
@@ -173,29 +202,38 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                     itemBinding.checkboxFieldValue.isVisible = false
                     itemBinding.inputLayoutField.isVisible = false
                 }
+
                 FieldType.INT -> {
-                    itemBinding.textFieldValue.text = formatIntDisplay(fieldName, value as? Int ?: 0)
+                    itemBinding.textFieldValue.text =
+                        formatIntDisplay(fieldName, value as? Int ?: 0)
                     itemBinding.checkboxFieldValue.isVisible = false
                     itemBinding.inputLayoutField.isVisible = true
-                    itemBinding.editTextField.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
+                    itemBinding.editTextField.inputType =
+                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
                     itemBinding.editTextField.setText((value as? Int ?: 0).toString())
                 }
+
                 FieldType.DOUBLE -> {
                     val dVal = value as? Double
-                    itemBinding.textFieldValue.text = dVal?.toString() ?: getString(R.string.admin_field_not_set)
+                    itemBinding.textFieldValue.text =
+                        dVal?.toString() ?: getString(R.string.admin_field_not_set)
                     itemBinding.checkboxFieldValue.isVisible = false
                     itemBinding.inputLayoutField.isVisible = true
-                    itemBinding.editTextField.inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+                    itemBinding.editTextField.inputType =
+                        InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
                     itemBinding.editTextField.setText(dVal?.toString() ?: "")
                 }
+
                 FieldType.STRING -> {
                     val sVal = value?.toString() ?: ""
-                    itemBinding.textFieldValue.text = sVal.ifEmpty { getString(R.string.admin_field_not_set) }
+                    itemBinding.textFieldValue.text =
+                        sVal.ifEmpty { getString(R.string.admin_field_not_set) }
                     itemBinding.checkboxFieldValue.isVisible = false
                     itemBinding.inputLayoutField.isVisible = true
                     itemBinding.editTextField.inputType = InputType.TYPE_CLASS_TEXT
                     itemBinding.editTextField.setText(sVal)
                 }
+
                 FieldType.LONG -> {
                     val lVal = value as? Long ?: 0L
                     itemBinding.textFieldValue.text = lVal.toString()
@@ -258,6 +296,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                         updates[holder.fieldName] = newVal
                     }
                 }
+
                 FieldType.INT -> {
                     val text = holder.binding.editTextField.text.toString()
                     val newVal = text.toIntOrNull()
@@ -266,6 +305,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                         updates[holder.fieldName] = newVal
                     }
                 }
+
                 FieldType.DOUBLE -> {
                     val text = holder.binding.editTextField.text.toString()
                     val newVal = if (text.isEmpty()) null else text.toDoubleOrNull()
@@ -274,6 +314,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                         updates[holder.fieldName] = newVal
                     }
                 }
+
                 FieldType.STRING -> {
                     val text = holder.binding.editTextField.text.toString()
                     val newVal = text.ifEmpty { null }
@@ -282,6 +323,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                         updates[holder.fieldName] = newVal
                     }
                 }
+
                 FieldType.LONG -> {
                     val text = holder.binding.editTextField.text.toString()
                     val newVal = text.toLongOrNull()
@@ -290,6 +332,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                         updates[holder.fieldName] = newVal
                     }
                 }
+
                 FieldType.DATE_LONG -> {
                     val text = holder.binding.editTextField.text.toString()
                     val newVal = text.toLongOrNull()
@@ -298,6 +341,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                         updates[holder.fieldName] = newVal
                     }
                 }
+
                 FieldType.LIST_STRING -> {
                 }
             }
@@ -351,12 +395,20 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                                         userId,
                                         onSuccess = {
                                             dialog.dismiss()
-                                            Toast.makeText(context, R.string.profile_deleted_success, Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                R.string.profile_deleted_success,
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                             findNavController().navigateUp()
                                         },
                                         onError = { exp ->
                                             dialog.dismiss()
-                                            Toast.makeText(context, "Error: ${exp.message}", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                "Error: ${exp.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     )
                                 }
@@ -375,9 +427,12 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                 launch {
                     viewModel.user.collect { user ->
                         if (user != null) {
-                            bind.textViewName.text = user.name.ifEmpty { getString(R.string.admin_field_unknown) }
-                            bind.textViewGmail.text = user.gmail.ifEmpty { getString(R.string.admin_field_not_set) }
-                            bind.textViewPhone.text = user.phoneNumber.ifEmpty { getString(R.string.admin_field_not_set) }
+                            bind.textViewName.text =
+                                user.name.ifEmpty { getString(R.string.admin_field_unknown) }
+                            bind.textViewGmail.text =
+                                user.gmail.ifEmpty { getString(R.string.admin_field_not_set) }
+                            bind.textViewPhone.text =
+                                user.phoneNumber.ifEmpty { getString(R.string.admin_field_not_set) }
                             bind.textViewUid.text = getString(R.string.admin_user_uid, user.uid)
 
                             Glide.with(this@AdminUserDetailsFragment)
