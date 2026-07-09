@@ -205,19 +205,11 @@
                                 android:layout_marginStart="10dp"
                                 android:layout_weight="1"
                                 android:fontFamily="@font/roboto_bold"
-                                android:text="Premium"
+                                android:text="Shaxsiy ozish rejasi"
                                 android:textColor="#FFFFFF"
                                 android:textSize="18sp" />
 
                         </LinearLayout>
-
-                        <TextView
-                            style="@style/Text1_14"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="3 kun bepul ishlatib ko'rish imkoniyati mavjud"
-                            android:textColor="#CCFFFFFF" />
 
                         <View
                             android:layout_width="match_parent"
@@ -243,11 +235,11 @@
                                     app:tint="#FFFFFF" />
 
                                 <TextView
-                                    style="@style/TextAppearance.Material3.BodyMedium"
+                                    style="@style/Text1_16"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
-                                    android:text="Rasmli ovqat tahlili"
+                                    android:text="Shaxsiy dietolog"
                                     android:textColor="#FFFFFF" />
                             </LinearLayout>
 
@@ -265,11 +257,11 @@
                                     app:tint="#FFFFFF" />
 
                                 <TextView
-                                    style="@style/TextAppearance.Material3.BodyMedium"
+                                    style="@style/Text1_16"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
-                                    android:text="Shaxsiy dietlog"
+                                    android:text="Oson ozish"
                                     android:textColor="#FFFFFF" />
                             </LinearLayout>
 
@@ -288,11 +280,11 @@
                                     app:tint="#FFFFFF" />
 
                                 <TextView
-                                    style="@style/TextAppearance.Material3.BodyMedium"
+                                    style="@style/Text1_16"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"
-                                    android:text="Ovqat haqida batafsil bilib oling"
+                                    android:text="Ovqat foydasi va zararlari"
                                     android:textColor="#FFFFFF" />
                             </LinearLayout>
 
@@ -310,7 +302,7 @@
                                     app:tint="#FFFFFF" />
 
                                 <TextView
-                                    style="@style/TextAppearance.Material3.BodyMedium"
+                                    style="@style/Text1_16"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginStart="8dp"

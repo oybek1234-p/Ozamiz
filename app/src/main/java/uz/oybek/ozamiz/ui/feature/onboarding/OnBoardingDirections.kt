@@ -25,6 +25,9 @@ object OnBoardingDirections {
         OnBoardingDirection.SingleScreen(R.id.activityLevelFragment),
         OnBoardingDirection.SingleScreen(R.id.weightFragment),
         OnBoardingDirection.SingleScreen(R.id.targetWeightFragment),
+        OnBoardingDirection.SingleScreen(R.id.photosOnboardFragment),
+        OnBoardingDirection.SingleScreen(R.id.calorieInfoFragment),
+        OnBoardingDirection.SingleScreen(R.id.seeEffectFragment),
         OnBoardingDirection.SingleScreen(R.id.planFragment)
     )
 }

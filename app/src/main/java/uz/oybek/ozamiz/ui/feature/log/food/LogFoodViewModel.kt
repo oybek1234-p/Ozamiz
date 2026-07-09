@@ -156,8 +156,8 @@ class LogFoodViewModel() : ViewModel() {
 
     fun canAddLog(): Boolean {
         if (user.isPremium()) return true
-        if (user.daysFromRegister() <= 3 && AppPreference.getFoodLogLimitCount() <= 3)
-            return true
+//        if (user.daysFromRegister() <= 3 && AppPreference.getFoodLogLimitCount() <= 3)
+//            return true
         return false
     }
 }

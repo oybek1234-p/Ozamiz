@@ -29,7 +29,6 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.databinding.DialogLimitWarningBinding
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter
@@ -44,7 +43,6 @@ import java.util.Date
 class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private val viewModel: LogFoodViewModel by viewModels()
-
     private lateinit var fragmentArgs: Argument
     private var logDate: Date = Date()
 
@@ -147,7 +145,9 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 putLong(ARG_TIMESTAMP, logDate.time)
             })
         }
-        buttonSearchList.setOnSafeClickListener { navigateToSearchFood() }
+        buttonSearchList.setOnSafeClickListener {
+            checkPremiumAndRun { navigateToSearchFood() }
+        }
     }
 
     private fun setupRecentLogsList() {
@@ -175,10 +175,8 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         )
                     }
                 }
-
                 FoodCameraFragment.ACTION_WRITE -> showTextInputSheet()
-
-                FoodCameraFragment.ACTION_LIST -> navigateToSearchFood()
+                FoodCameraFragment.ACTION_LIST -> checkPremiumAndRun { navigateToSearchFood() }
             }
         }
 
@@ -219,15 +217,6 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 )
             }
         }
-
-        setFragmentResultListener(PaymentGetCheckFragment.REQUEST_KEY) { _, bundle ->
-            if (bundle.getBoolean(PaymentGetCheckFragment.RESULT_SUBMITTED)) {
-                PremiumBottomSheetDialog().show(
-                    parentFragmentManager,
-                    PremiumBottomSheetDialog.TAG
-                )
-            }
-        }
     }
 
     private fun observeUiState() {
@@ -245,28 +234,15 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         .distinctUntilChanged()
                         .collect { (logs, savedIds) ->
                             binding.layoutRecentHistory.isVisible = logs.isNotEmpty()
-                            recentLogsAdapter()?.apply {
+                            (binding.recyclerRecentLogs.adapter as? RecentLogsAdapter)?.apply {
                                 submitList(logs)
                                 setSavedFoodIds(savedIds)
                             }
                         }
                 }
-                launch {
-                    viewModel.event.collect { event ->
-                        when (event) {
-                            LogEvent.Error.EmptyInput ->
-                                showToast(getString(R.string.log_input_empty))
-                            is LogEvent.Message -> showToast(event.text)
-                            else -> Unit
-                        }
-                    }
-                }
             }
         }
     }
-
-    private fun recentLogsAdapter(): RecentLogsAdapter? =
-        binding.recyclerRecentLogs.adapter as? RecentLogsAdapter
 
     private fun currentMeal(): String = viewModel.state.value.meal
 
@@ -286,24 +262,11 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     private fun checkPremiumAndRun(action: () -> Unit) {
-        if (viewModel.canAddLog()) {
+        if (user.isPremium()) {
             action()
         } else {
-            showLimitWarning()
-        }
-    }
-
-    private fun showLimitWarning() {
-        val dialogBinding = DialogLimitWarningBinding.inflate(layoutInflater)
-        val dialog = AlertDialog.Builder(requireContext(), R.style.RoundedCornersDialog)
-            .setView(dialogBinding.root)
-            .setCancelable(true)
-            .create()
-        dialogBinding.btnPositive.setOnClickListener {
-            dialog.dismiss()
             PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
         }
-        dialog.show()
     }
 
     private fun showDeleteConfirmation(foodLog: FoodLog) {

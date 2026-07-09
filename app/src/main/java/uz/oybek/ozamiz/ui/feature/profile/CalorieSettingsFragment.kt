@@ -16,6 +16,7 @@ import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
 import com.google.android.material.color.MaterialColors
 import kotlin.math.roundToInt
+
 class CalorieSettingsFragment : BaseFragment<FragmentCalorieSettingsBinding>() {
 
     private val viewModel: ProfileViewModel by activityViewModels()
@@ -32,7 +33,7 @@ class CalorieSettingsFragment : BaseFragment<FragmentCalorieSettingsBinding>() {
 
         val user = viewModel.user
         val targetCals = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
-        
+
         bind.editCalories.setText(targetCals.toString())
         bind.editProtein.setText(user.targetProtein.toString())
         bind.editFat.setText(user.targetFat.toString())
@@ -83,7 +84,7 @@ class CalorieSettingsFragment : BaseFragment<FragmentCalorieSettingsBinding>() {
     private fun updateInputs(bind: FragmentCalorieSettingsBinding, goal: String) {
         val user = viewModel.user.copy(goal = goal)
         DietController.updateTargetValues(user)
-        
+
         bind.editCalories.setText(user.targetCalories.toString())
         bind.editProtein.setText(user.targetProtein.toString())
         bind.editFat.setText(user.targetFat.toString())

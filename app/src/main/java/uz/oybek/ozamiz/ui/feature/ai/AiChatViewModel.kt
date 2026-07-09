@@ -25,7 +25,7 @@ import java.util.Date
 class AiChatViewModel : ViewModel() {
 
     companion object {
-        const val FREE_MESSAGE_LIMIT = 5
+        const val FREE_MESSAGE_LIMIT = 0
     }
 
     private val todayStr = Date().dateApiFormat()

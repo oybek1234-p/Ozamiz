@@ -479,6 +479,7 @@
     <string name="_35000_sum">35000 sum</string>
     <string name="sotib_olish">Sotib olish</string>
     <string name="premiumga_o_tish">Premiumga o\'tish</string>
+    <string name="premium_overlay_text">Barcha variantlarni ko\'rish uchun Premium obuna bo\'ling</string>
 
 
     <string name="premium_tekshirilmoqda">Premium tekshirilmoqda...</string>
@@ -903,9 +904,9 @@
     <string name="user_search_empty">Qidiruv bo\'yicha foydalanuvchilar topilmadi</string>
     <string name="daily_food_limit_title">Kunlik me\'yor to\'ldi</string>
     <string name="daily_food_limit_msg">Bir kunda 5 martagacha rasmli/yozma ovqat qo\'shishingiz mumkin, ko\'proq qo\'shish uchun Premium sotib oling</string>
-    <string name="premium_sheet_benefit_dietologist">Shaxsiy dietolog, har kuni yordam beradi</string>
-    <string name="premium_sheet_benefit_analysis">Rasm va matn orqali ovqatni tahlil qilish</string>
-    <string name="premium_sheet_benefit_recommendations">Kunlik tavsiyalar</string>
+    <string name="premium_sheet_benefit_dietologist">Shaxsiy dietolog, ozishga har kuni yordam beradi</string>
+    <string name="premium_sheet_benefit_analysis">Oson ozish</string>
+    <string name="premium_sheet_benefit_recommendations">Kunlik foydali tavsiyalar</string>
     <string name="ai_chat_limit_title">Suhbat limiti tugadi</string>
     <string name="ai_chat_limit_msg">AI dietolog bilan bugungi suhbat limiti (5 ta xabar) tugadi. Suhbatni davom ettirish uchun Premium obunani faollashtiring.</string>
     <string name="ai_food_limit_title">Dietolog limiti to\'ldi</string>
@@ -967,8 +968,8 @@
     <string name="calories_exceeded_subtitle">Suv, choy, yengil sabzavotli salat yeyishingiz mumkin, %1$s</string>
     <string name="calories_oshdi_format">%1$d kal oshdi.</string>
     <string name="calories_limit_toldi">limit to\'ldi.</string>
-    <string name="calories_remaining_label_oshdi">oshdi</string>
-    <string name="calories_remaining_label_qoldi">qoldi</string>
+    <string name="calories_remaining_label_oshdi">kaloriya me\'yordan oshdi</string>
+    <string name="calories_remaining_label_qoldi">kaloriya yeyishingiz mumkin</string>
     <string name="calories_eaten_format">%1$d yeyildi</string>
     <string name="meal_remaining_format">%1$d qoldi</string>
     <string name="water_bajarildi">Bajarildi</string>

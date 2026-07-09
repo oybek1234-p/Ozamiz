@@ -8,59 +8,38 @@
     android:orientation="vertical"
     android:padding="24dp">
 
-    <ImageView
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center"
-        android:src="@drawable/info_ic"
-        app:tint="@color/yellow" />
+    <!-- Profil yoki kichik chiziqcha (Bottom Sheet uchun indicator) -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="?attr/colorOutlineVariant" />
 
-    <TextView
-        android:id="@+id/text_overage_amount"
+    <!-- Dinamik kartalar shu yerga joylashadi -->
+    <LinearLayout
+        android:id="@+id/dynamic_cards_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:orientation="vertical" />
+
+    <!-- Asosiy amaliy maslahat -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:fontFamily="@font/roboto_medium"
-        android:gravity="center"
-        android:textColor="@color/yellow"
-        android:textSize="18sp"
-        tools:text="Siz kunlik me'yordan asosan 140 kaloriya ortiqcha yedingiz." />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/roboto_bold"
-        android:text="Endi nima bo'ladi?"
+        android:text="Bugun uchun tavsiya:"
         android:textColor="?attr/colorOnSurface"
-        android:textSize="16sp" />
+        android:textSize="15sp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:fontFamily="@font/roboto_regular"
         android:lineSpacingExtra="4dp"
-        android:text="Agar kaloriya me'yordan doimo oshsa, bu vazn yo'qotishni sekinlashtiradi yoki qisman vazn ortishiga olib kelishi mumkin."
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:textSize="14sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:fontFamily="@font/roboto_bold"
-        android:text="Tavsiyalar"
-        android:textColor="?attr/colorOnSurface"
-        android:textSize="16sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/roboto_regular"
-        android:lineSpacingExtra="4dp"
-        android:text="• Bugun ko'proq suv ichishga harakat qiling.\n• Kamida 20 daqiqa yengil piyoda yuring.\n• Kuning qolgan qismida faqat yengil oziq-ovqatlarni (masalan: qatiq, sabzavotlar, mevalar yoki tovuq go'shti) iste'mol qiling."
+        android:text="• 20-30 daqiqa toza havoda piyoda yuring.\n• Kun davomida toza suv ichishni unutmang."
         android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="14sp" />
 
@@ -68,9 +47,9 @@
         android:id="@+id/btn_got_it"
         style="@style/FilledButton"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="52dp"
         android:layout_marginTop="24dp"
-        android:text="Tushunarli"
-        app:cornerRadius="28dp" />
+        android:text="Yaxshi, tushundim"
+        app:cornerRadius="16dp" />
 
 </LinearLayout>

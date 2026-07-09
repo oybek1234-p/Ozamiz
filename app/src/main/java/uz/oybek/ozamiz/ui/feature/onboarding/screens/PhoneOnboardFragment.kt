@@ -17,9 +17,6 @@ class PhoneOnboardFragment : OnBoardingChildFragment<FragmentPhoneOnboardBinding
                 }
                 moveToNextScreen()
             }
-            buttonSkip.setOnClickListener {
-                moveToNextScreen()
-            }
         }
     }
 

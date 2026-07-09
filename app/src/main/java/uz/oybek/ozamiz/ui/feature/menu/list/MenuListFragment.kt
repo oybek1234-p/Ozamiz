@@ -2,11 +2,11 @@ package uz.oybek.ozamiz.ui.feature.menu.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentMenuListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
 
@@ -21,30 +21,60 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
 
     override fun viewCreated(bind: FragmentMenuListBinding) {
         setupListeners(bind)
+        setupPaymentCheckListener()
+    }
+
+    private fun checkPremiumAndNavigate(actionId: Int) {
+        val user = uz.oybek.ozamiz.data.user.local.LocalUser.user
+        if (user.isPremium()) {
+            navigate(actionId)
+        } else {
+            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(
+                childFragmentManager,
+                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG
+            )
+        }
+    }
+
+    private fun setupPaymentCheckListener() {
+        childFragmentManager.setFragmentResultListener(
+            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.REQUEST_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val result = bundle.getString(uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.RESULT_ACTION)
+            if (result == "go_to_payment") {
+                val price = bundle.getLong("selected_price", 29000L)
+                val isYearly = bundle.getBoolean("is_yearly", false)
+                val args = androidx.core.os.bundleOf("price" to price, "is_yearly" to isYearly)
+                findNavController().navigate(
+                    R.id.paymentGetCheckFragment,
+                    args
+                )
+            }
+        }
     }
 
     private fun setupListeners(bind: FragmentMenuListBinding) {
         bind.itemBreakfast.setOnClickListener {
-            navigate(R.id.action_menuListFragment_to_breakfastGuideFragment)
+            checkPremiumAndNavigate(R.id.action_menuListFragment_to_breakfastGuideFragment)
         }
         bind.itemLunch.setOnClickListener {
-            navigate(R.id.action_menuListFragment_to_lunchGuideFragment)
+            checkPremiumAndNavigate(R.id.action_menuListFragment_to_lunchGuideFragment)
         }
         bind.itemDinner.setOnClickListener {
-            navigate(R.id.action_menuListFragment_to_dinnerGuideFragment)
+            checkPremiumAndNavigate(R.id.action_menuListFragment_to_dinnerGuideFragment)
         }
         bind.itemSnacks.setOnClickListener {
-            navigate(R.id.action_menuListFragment_to_snacksGuideFragment)
+            checkPremiumAndNavigate(R.id.action_menuListFragment_to_snacksGuideFragment)
         }
         bind.itemProtein.setOnClickListener {
-            navigate(R.id.action_menuListFragment_to_proteinGuideFragment)
+            checkPremiumAndNavigate(R.id.action_menuListFragment_to_proteinGuideFragment)
         }
-
         bind.itemCarbs.setOnClickListener {
-            navigate(R.id.action_menuListFragment_to_carbsGuideFragment)
+            checkPremiumAndNavigate(R.id.action_menuListFragment_to_carbsGuideFragment)
         }
         bind.itemLipids.setOnClickListener {
-            navigate(R.id.action_menuListFragment_to_lipidsGuideFragment)
+            checkPremiumAndNavigate(R.id.action_menuListFragment_to_lipidsGuideFragment)
         }
     }
 }

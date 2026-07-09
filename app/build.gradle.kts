@@ -24,8 +24,8 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 89
-        versionName = "9"
+        versionCode = 91
+        versionName = "9.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "ru", "uz"))
     }

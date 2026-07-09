@@ -25,7 +25,7 @@
         android:id="@+id/menuListFragment"
         android:icon="@drawable/food_ic"
         android:title="Menyular"
-        android:visible="false" />
+        android:visible="true" />
 
 
     <item

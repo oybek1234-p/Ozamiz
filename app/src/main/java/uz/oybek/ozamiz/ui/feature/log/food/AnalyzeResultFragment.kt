@@ -110,7 +110,6 @@ class AnalyzeResultFragment : Fragment() {
         val wasAnalyzing = binding.lottieLoadingCalories.isVisible && !isAnalyzing
 
         binding.layoutMacros.isVisible = !isAnalyzing
-
         binding.lottieLoadingCalories.isVisible = isAnalyzing
         binding.imageViewFire.isVisible = !isAnalyzing
 
@@ -181,7 +180,6 @@ class AnalyzeResultFragment : Fragment() {
             viewModel.state.collect { state ->
                 showAnalyzing(state.isAnalyzing)
 
-                // Handle pending states (Voice input or Image preview)
                 if (state.isAnalyzing) {
                     binding.loadingText.text = getString(R.string.analyzing)
 
@@ -206,7 +204,6 @@ class AnalyzeResultFragment : Fragment() {
 
                 showLoading(state.isLoading)
                 val analysisResult = state.result?.result ?: run {
-                    // If no result and not analyzing, but we have a pending description (e.g. error state or initial)
                     if (!state.pendingDescription.isNullOrBlank()) {
                         binding.textViewFoodName.text =
                             if (state.pendingDescription == "pending_description_voice") {
@@ -320,7 +317,6 @@ class AnalyzeResultFragment : Fragment() {
                         findNavController().popBackStack(R.id.home, false)
                     }
 
-
                     is AnalyzeResultEvent.Failure -> {
                         val resId = resources.getIdentifier(
                             event.message,
@@ -338,6 +334,11 @@ class AnalyzeResultFragment : Fragment() {
                     is AnalyzeResultEvent.PromptShare -> {}
 
                     is AnalyzeResultEvent.LimitExceeded -> {
+                        val bundle = Bundle().apply {
+                            putStringArrayList("exceeded_types", ArrayList(event.exceededTypes))
+                            putSerializable("overages", HashMap(event.overages))
+                        }
+                        parentFragmentManager.setFragmentResult("limit_exceeded_result", bundle)
                         findNavController().popBackStack(R.id.home, false)
                     }
                 }
@@ -367,7 +368,6 @@ class AnalyzeResultFragment : Fragment() {
         )
     }
 
-
     @SuppressLint("SetTextI18n")
     private fun bindMacro(
         layout: ItemMacroDisplayBinding,
@@ -391,7 +391,6 @@ class AnalyzeResultFragment : Fragment() {
         binding.buttonReLogFull.setOnSafeClickListener {
             viewModel.reLog()
         }
-
 
         binding.buttonDelete.setOnSafeClickListener {
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
@@ -436,7 +435,6 @@ class AnalyzeResultFragment : Fragment() {
         }
         binding.layoutFoodName.setOnClickListener(nameEditListener)
 
-
         val editCaloriesListener = View.OnClickListener {
             val currentCalories = binding.textViewCalories.text.toString().toDoubleOrNull() ?: 0.0
             showEditNumberDialog(
@@ -447,7 +445,6 @@ class AnalyzeResultFragment : Fragment() {
             }
         }
         binding.cardCalorieBanner.setOnClickListener(editCaloriesListener)
-
 
         binding.layoutProtein.root.setOnClickListener {
             val currentVal = viewModel.resultLive.value?.result?.result?.protein ?: 0.0
@@ -531,25 +528,6 @@ class AnalyzeResultFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
-    }
-
-    private fun startSaveButtonBounce() {
-        if (_binding == null || !isAdded || view == null) return
-        val btn = binding.buttonSaveToLog
-        if (!btn.isVisible) return
-
-        btn.animate().scaleX(0.9f).scaleY(0.9f).setDuration(300).withEndAction {
-            if (_binding == null || !isAdded) return@withEndAction
-            btn.animate().scaleX(1.05f).scaleY(1.05f).setDuration(300).withEndAction {
-                if (_binding == null || !isAdded) return@withEndAction
-                btn.animate().scaleX(1f).scaleY(1f).setDuration(300).withEndAction {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        kotlinx.coroutines.delay(500)
-                        startSaveButtonBounce()
-                    }
-                }.start()
-            }.start()
-        }.start()
     }
 
     override fun onDestroyView() {

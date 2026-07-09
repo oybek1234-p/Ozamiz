@@ -145,6 +145,7 @@
                 <include
                     android:id="@+id/main_progress"
                     layout="@layout/home_main_progress" />
+
                 <LinearLayout
                     android:id="@+id/layout_meal_cards"
                     android:layout_width="match_parent"

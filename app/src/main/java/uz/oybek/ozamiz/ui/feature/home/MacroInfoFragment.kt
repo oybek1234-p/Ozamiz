@@ -67,35 +67,13 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
         val isExceeded = consumedAmount >= targetAmount && targetAmount > 0
         if (isExceeded) {
             bind.cardLimitWarning.visibility = android.view.View.VISIBLE
-            bind.textWarningTitle.text = when (macroType) {
-                MACRO_CALORIES -> "Bugunga yetarli, ortiqcha ovqat semirishga olib keladi."
-                MACRO_PROTEIN -> "Oqsil limitiga yetdingiz!"
-                MACRO_FAT -> "Yog' limitiga yetdingiz!"
-                MACRO_CARBS -> "Uglevodlar limitiga yetdingiz!"
-                else -> "Limit to'ldi!"
-            }
+            bind.textWarningTitle.text = "Limitga yetdingiz"
             bind.textWarningDescription.text = when (macroType) {
-                MACRO_CALORIES -> {
-                    val diff = consumedAmount - targetAmount
-                    val diffText = if (diff > 0) "$diff kal oshdi." else "limit to'ldi."
-                    "Faqat suv, choy yoki yengil sabazavotli salat bilan cheklaning, $diffText"
-                }
-                MACRO_PROTEIN -> {
-                    val diff = consumedAmount - targetAmount
-                    val diffTxt = if (diff > 0) "$diff gr oshdi." else "norma to'ldi."
-                    "Bugungi oqsil normangiz oshgan. Kundalik me'yordan $diffTxt\n\n✔️ Yeyish mumkin bo'lgan yeguliklar: Sabzavotli salatlar, mevalar hamda kam oqsilli yengil yeguliklar.\n\n❌ Cheklash shart bo'lgan taomlar: Tovuq go'shti, tuxum oqi, mol go'shti, baliq, tvorog va protein kokteyllari."
-                }
-                MACRO_FAT -> {
-                    val diff = consumedAmount - targetAmount
-                    val diffTxt = if (diff > 0) "$diff gr oshdi." else "norma to'ldi."
-                    "Bugungi sog'lom yog' normangiz oshgan. Jigarga yuklamani oshirmaslik uchun yog'li ovqatlardan tiyiling. Kundalik me'yordan $diffTxt\n\n✔️ Yeyish mumkin bo'lgan yeguliklar: Qaynatilgan sabzavotlar, pishgan tuxum oqi, teftellar (yog'siz), tolqon va shakarsiz mevalar.\n\n❌ Cheklash shart bo'lgan taomlar: Yong'oq, pista, pista yog'i, sariyog', pishloq, fastfud hamda yog'li go'shtlar."
-                }
-                MACRO_CARBS -> {
-                    val diff = consumedAmount - targetAmount
-                    val diffTxt = if (diff > 0) "$diff gr oshdi." else "norma to'ldi."
-                    "Bugungi kunlik uglevod limitini oshirib yubordingiz. Qondagi insulin darajasini barqaror ushlash uchun uglevodlarni cheklash tavsiya etiladi. Kundalik me'yordan $diffTxt\n\n✔️ Yeyish mumkin bo'lgan yeguliklar: Tuxum, qaynatilgan tovuq filesi, baliq, tvorog va ko'k salatlar (oqsil va tola).\n\n❌ Cheklash shart bo'lgan taomlar: Guruch, grechika, kartoshka, non, shirinliklar, mevalar hamda har qanday xamirli taomlar."
-                }
-                else -> ""
+                MACRO_CALORIES -> "Kunlik kaloriya me'yorini bajardingiz."
+                MACRO_PROTEIN -> "Bugungi oqsil me'yorini to'liq bajardingiz."
+                MACRO_FAT -> "Bugungi yog' me'yorini to'liq bajardingiz."
+                MACRO_CARBS -> "Bugungi uglevod me'yorini to'liq bajardingiz."
+                else -> "Belgilangan limit bajarildi."
             }
         } else {
             bind.cardLimitWarning.visibility = android.view.View.GONE
@@ -141,13 +119,13 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
         if (isGainWeight) {
             bind.textMacroDescription.text =
                 "Sizning kunlik oqsil me'yoringiz: ${targetProtein} gramm.\n\n" +
-                "Oqsil — tananing asosiy qurilish materialidir. Vazn oshirish va yangi muskul to'qimalarini muvaffaqiyatli barpo etishda oqsil birinchi darajali ahamiyatga ega.\n\n" +
-                "🍗 Qaysi ovqatlarda ko'p: Go'sht (tovuq, mol go'shti), baliq, tuxum, tvorog, sut mahsulotlari, loviya va yasmiq."
+                        "Oqsil — tananing asosiy qurilish materialidir. Vazn oshirish va yangi muskul to'qimalarini muvaffaqiyatli barpo etishda oqsil birinchi darajali ahamiyatga ega.\n\n" +
+                        "🍗 Qaysi ovqatlarda ko'p: Go'sht (tovuq, mol go'shti), baliq, tuxum, tvorog, sut mahsulotlari, loviya va yasmiq."
         } else {
             bind.textMacroDescription.text =
                 "Sizning kunlik oqsil me'yoringiz: ${targetProtein} gramm.\n\n" +
-                "Oqsil — tananing asosiy qurilish materialidir. Ayniqsa vazn tashlash jarayonida muskullarni saqlab qolish va uzoq vaqt to'q yurish uchun u juda muhim. Oqsil hazm bo'lishiga tana juda ko'p energiya yo'qotadi, bu esa ortiqcha yog'larni yoqishga yanada yordam beradi.\n\n" +
-                "🍗 Qaysi ovqatlarda ko'p: Go'sht (tovuq, mol go'shti), baliq, tuxum, tvorog, sut mahsulotlari, loviya va yasmiq."
+                        "Oqsil — tananing asosiy qurilish materialidir. Ayniqsa vazn tashlash jarayonida muskullarni saqlab qolish va uzoq vaqt to'q yurish uchun u juda muhim. Oqsil hazm bo'lishiga tana juda ko'p energiya yo'qotadi, bu esa ortiqcha yog'larni yoqishga yanada yordam beradi.\n\n" +
+                        "🍗 Qaysi ovqatlarda ko'p: Go'sht (tovuq, mol go'shti), baliq, tuxum, tvorog, sut mahsulotlari, loviya va yasmiq."
         }
     }
 
@@ -157,13 +135,13 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
         if (isGainWeight) {
             bind.textMacroDescription.text =
                 "Sizning kunlik yog' me'yoringiz: ${targetFat} gramm.\n\n" +
-                "Yog'lar — yuqori kaloriyali sog'lom energiya manbai hisoblanib, gormonlar sintezi va sog'lom vazn oshirish jarayonini jadallashtirish uchun zarurdir.\n\n" +
-                "🥑 Qaysi ovqatlarda ko'p: Yong'oqlar, pista, avokado, zaytun yog'i, yog'li baliq va tuxum sarig'i."
+                        "Yog'lar — yuqori kaloriyali sog'lom energiya manbai hisoblanib, gormonlar sintezi va sog'lom vazn oshirish jarayonini jadallashtirish uchun zarurdir.\n\n" +
+                        "🥑 Qaysi ovqatlarda ko'p: Yong'oqlar, pista, avokado, zaytun yog'i, yog'li baliq va tuxum sarig'i."
         } else {
             bind.textMacroDescription.text =
                 "Sizning kunlik yog' me'yoringiz: ${targetFat} gramm.\n\n" +
-                "Yog'lar — gormonal barqarorlik, teri go'zalligi va hujayralar tiklanishi uchun zarurdir. Ozish jarayonida sog'lom yog'larni yetarli miqdorda yeyish tanaga ortiqcha zaxira yog'larni erkinroq safarbar qilishiga (yoqishiga) ishora bo'ladi.\n\n" +
-                "🥑 Qaysi ovqatlarda ko'p: Yong'oqlar, pista, avokado, zaytun yog'i, yog'li baliq va tuxum sarig'i."
+                        "Yog'lar — gormonal barqarorlik, teri go'zalligi va hujayralar tiklanishi uchun zarurdir. Ozish jarayonida sog'lom yog'larni yetarli miqdorda yeyish tanaga ortiqcha zaxira yog'larni erkinroq safarbar qilishiga (yoqishiga) ishora bo'ladi.\n\n" +
+                        "🥑 Qaysi ovqatlarda ko'p: Yong'oqlar, pista, avokado, zaytun yog'i, yog'li baliq va tuxum sarig'i."
         }
     }
 
@@ -173,27 +151,13 @@ class MacroInfoFragment : BaseFragment<FragmentMacroInfoBinding>() {
         if (isGainWeight) {
             bind.textMacroDescription.text =
                 "Sizning kunlik uglevod me'yoringiz: ${targetCarbs} gramm.\n\n" +
-                "Uglevodlar — og'ir mashg'ulotlar uchun yetarli kuch-quvvat beradi. Vazn va muskul massasini oshirish rejimida murakkab uglevodlar hisobiga doimiy energiya va tiklanish ta'minlanadi.\n\n" +
-                "🍚 Qaysi ovqatlarda ko'p: Guruch, grechixa, suli yormasi, kartoshka, mevalar va sabzavotlar."
+                        "Uglevodlar — og'ir mashg'ulotlar uchun yetarli kuch-quvvat beradi. Vazn va muskul massasini oshirish rejimida murakkab uglevodlar hisobiga doimiy energiya va tiklanish ta'minlanadi.\n\n" +
+                        "🍚 Qaysi ovqatlarda ko'p: Guruch, grechixa, suli yormasi, kartoshka, mevalar va sabzavotlar."
         } else {
             bind.textMacroDescription.text =
                 "Sizning kunlik uglevod me'yoringiz: ${targetCarbs} gramm.\n\n" +
-                "Uglevodlar — tananing asosiy quvvat manbai. Ozish jarayonida murakkab uglevodlarga e'tibor qaratsangiz, insulin darajasining keskin sakrashidan saqlanasiz va tanangiz faqat yog' yoqish rejimida ishlashda davom etadi.\n\n" +
-                "🍚 Qaysi ovqatlarda ko'p: Guruch, grechixa, suli yormasi, kartoshka, mevalar va sabzavotlar."
+                        "Uglevodlar — tananing asosiy quvvat manbai. Ozish jarayonida murakkab uglevodlarga e'tibor qaratsangiz, insulin darajasining keskin sakrashidan saqlanasiz va tanangiz faqat yog' yoqish rejimida ishlashda davom etadi.\n\n" +
+                        "🍚 Qaysi ovqatlarda ko'p: Guruch, grechixa, suli yormasi, kartoshka, mevalar va sabzavotlar."
         }
     }
-
-    private fun populateFoods(foods: List<FoodItem>, bind: FragmentMacroInfoBinding) {
-        bind.foodsContainer.removeAllViews()
-        val inflater = LayoutInflater.from(requireContext())
-
-        foods.forEach { food ->
-            val itemView = inflater.inflate(R.layout.item_macro_food, bind.foodsContainer, false)
-            itemView.findViewById<TextView>(R.id.text_food_name).text = food.name
-            itemView.findViewById<TextView>(R.id.text_food_amount).text = food.amount
-            bind.foodsContainer.addView(itemView)
-        }
-    }
-
-    data class FoodItem(val name: String, val amount: String)
 }

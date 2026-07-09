@@ -22,6 +22,7 @@ import uz.oybek.ozamiz.data.food.SavedFoodRepository
 import uz.oybek.ozamiz.data.level.PointsEvent
 import uz.oybek.ozamiz.data.level.PointsRepository
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
+import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
@@ -35,7 +36,6 @@ data class AnalyzeResultState(
     val isAnalyzing: Boolean = false,
     val isError: Boolean = false,
     val currentStreak: Int = 0,
-
     val isSaved: Boolean = false,
     val isRecallMode: Boolean = false,
     val pendingImageUri: Uri? = null,
@@ -45,15 +45,13 @@ data class AnalyzeResultState(
 sealed interface AnalyzeResultEvent {
     object Saved : AnalyzeResultEvent
     data class Failure(val message: String) : AnalyzeResultEvent
-    data class LimitExceeded(val exceededTypes: List<String>) : AnalyzeResultEvent
+    data class LimitExceeded(val exceededTypes: List<String>, val overages: Map<String, Int>) : AnalyzeResultEvent
     data class PromptShare(
         val name: String,
         val photoUrl: String,
         val calories: Int,
         val exceededTypes: List<String>? = null
     ) : AnalyzeResultEvent
-
-
 }
 
 class AnalyzeResultViewModel : ViewModel() {
@@ -61,7 +59,6 @@ class AnalyzeResultViewModel : ViewModel() {
     private val _state = MutableStateFlow(AnalyzeResultState())
     val state: StateFlow<AnalyzeResultState> = _state
 
-    private val liveResult = _state
     val resultLive: StateFlow<AnalyzeResultState?> = _state
 
     private val _event = Channel<AnalyzeResultEvent>()
@@ -72,10 +69,9 @@ class AnalyzeResultViewModel : ViewModel() {
     private var loadedUserId: String? = null
     private var loadedCommunityPostId: String? = null
 
-
     fun startAnalyze(imageUri: Uri?, description: String, meal: String, date: Date) {
         loadedLogDate = date
-        liveResult.update {
+        _state.update {
             it.copy(
                 isAnalyzing = true,
                 pendingImageUri = imageUri,
@@ -100,7 +96,7 @@ class AnalyzeResultViewModel : ViewModel() {
             }
 
             val streak = UserProfileRepository.user.streakInfo?.currentStreak ?: 0
-            liveResult.update {
+            _state.update {
                 it.copy(
                     result = result,
                     isAnalyzing = false,
@@ -114,7 +110,7 @@ class AnalyzeResultViewModel : ViewModel() {
 
     fun analyzeAudio(audioUri: Uri, meal: String, date: Date) {
         loadedLogDate = date
-        liveResult.update {
+        _state.update {
             it.copy(
                 isAnalyzing = true,
                 pendingDescription = "pending_description_voice"
@@ -131,7 +127,7 @@ class AnalyzeResultViewModel : ViewModel() {
                 }
             }
             val streak = UserProfileRepository.user.streakInfo?.currentStreak ?: 0
-            liveResult.update {
+            _state.update {
                 it.copy(
                     result = result,
                     isAnalyzing = false,
@@ -145,7 +141,7 @@ class AnalyzeResultViewModel : ViewModel() {
 
     fun setResult(result: FoodAnalysis?) {
         val streak = UserProfileRepository.user.streakInfo?.currentStreak ?: 0
-        liveResult.update {
+        _state.update {
             it.copy(
                 result = result, currentStreak = streak
             )
@@ -154,7 +150,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun setRecallResult(result: FoodAnalysis) {
-        liveResult.update {
+        _state.update {
             it.copy(
                 result = result, isRecallMode = true
             )
@@ -173,7 +169,7 @@ class AnalyzeResultViewModel : ViewModel() {
         loadedLogId = logId
         loadedUserId = userId
         viewModelScope.launch {
-            liveResult.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true) }
             val streak = user.streakInfo?.currentStreak ?: 0
             val log = FoodLogRepository.getFoodLog(logId, date, userId)
             if (log != null) {
@@ -193,7 +189,7 @@ class AnalyzeResultViewModel : ViewModel() {
                     ),
                     mealType = log.mealType
                 )
-                liveResult.update {
+                _state.update {
                     it.copy(
                         result = analysis,
                         isLoading = false,
@@ -202,7 +198,7 @@ class AnalyzeResultViewModel : ViewModel() {
                     )
                 }
             } else {
-                liveResult.update {
+                _state.update {
                     it.copy(
                         isError = true, isLoading = false, isRecallMode = false
                     )
@@ -214,18 +210,18 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     private fun checkIfSaved() {
-        val currentResult = liveResult.value.result ?: return
+        val currentResult = _state.value.result ?: return
         viewModelScope.launch {
             val isSaved = SavedFoodRepository.isFoodSavedByDescription(
                 currentResult.result?.name ?: ""
             )
-            liveResult.update { it.copy(isSaved = isSaved) }
+            _state.update { it.copy(isSaved = isSaved) }
         }
     }
 
     fun toggleFavorite() {
-        if (liveResult.value.isLoading) return
-        val currentResult = liveResult.value.result ?: return
+        if (_state.value.isLoading) return
+        val currentResult = _state.value.result ?: return
         val foodLog = currentResult.toFoodLog()
         viewModelScope.launch {
             val isSaved = SavedFoodRepository.isFoodSavedByDescription(foodLog.description)
@@ -239,49 +235,100 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun reLog() {
-        if (liveResult.value.isLoading) return
-        val currentResult = liveResult.value.result ?: return
+        if (_state.value.isLoading) return
+        val currentResult = _state.value.result ?: return
         val log = currentResult.toFoodLog().copy(
             logId = "", timestamp = System.currentTimeMillis()
         )
         viewModelScope.launch {
-            liveResult.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true) }
             val targetDate = loadedLogDate ?: Date()
             FoodLogRepository.add(
                 currentResult.photoUrl, log,
-                targetDate, shouldShare = false
+                targetDate,
+                false
             )
-            liveResult.update { it.copy(isLoading = false) }
+            _state.update { it.copy(isLoading = false) }
             _event.send(AnalyzeResultEvent.Saved)
         }
     }
 
+    fun saveFood() {
+        if (_state.value.isLoading) return
+        val result = _state.value.result ?: return
+        _state.update { it.copy(isLoading = true) }
+        val shouldShare = (result.result?.healthScore ?: 0) > 7 || result.photoUrl != null
+
+        applicationScope.launch {
+            val log = result.toFoodLog()
+            val targetDate = loadedLogDate ?: LogFragment.currentDate
+
+            val dailySummary = LogRepository.getDailySummarySync(targetDate)
+            val user = UserProfileRepository.user
+
+            val exceededTypes = mutableListOf<String>()
+            val overages = mutableMapOf<String, Int>()
+
+            val totalCalories = dailySummary.consumedCalories + log.calories
+            if (user.targetCalories > 0 && totalCalories > user.targetCalories) {
+                exceededTypes.add("kaloriya")
+                overages["kaloriya"] = totalCalories - user.targetCalories
+            }
+
+            val totalProtein = dailySummary.consumedProtein + (log.protein ?: 0.0)
+            if (user.targetProtein > 0 && totalProtein > user.targetProtein) {
+                exceededTypes.add("oqsil")
+                overages["oqsil"] = (totalProtein - user.targetProtein).toInt()
+            }
+
+            val totalFat = dailySummary.consumedFat + (log.fat ?: 0.0)
+            if (user.targetFat > 0 && totalFat > user.targetFat) {
+                exceededTypes.add("yog'")
+                overages["yog'"] = (totalFat - user.targetFat).toInt()
+            }
+
+            val totalCarbs = dailySummary.consumedCarbs + (log.carbs ?: 0.0)
+            if (user.targetCarbs > 0 && totalCarbs > user.targetCarbs) {
+                exceededTypes.add("uglevod")
+                overages["uglevod"] = (totalCarbs - user.targetCarbs).toInt()
+            }
+
+            FoodLogRepository.add(result.photoUrl, log, targetDate, shouldShare)
+            launch {
+                StreakRepository.updateStreak()
+                AiChatRepository.onFoodLogAdded(log)
+                PointsRepository.onEvent(PointsEvent.AddFood(result.result?.healthScore ?: 0))
+            }
+            _state.update { it.copy(isLoading = false) }
+
+            if (exceededTypes.isNotEmpty()) {
+                _event.send(AnalyzeResultEvent.LimitExceeded(exceededTypes, overages))
+            } else {
+                _event.send(AnalyzeResultEvent.Saved)
+            }
+        }
+    }
+
     fun deleteLog(onComplete: (Boolean) -> Unit) {
-        if (liveResult.value.isLoading) return
+        if (_state.value.isLoading) return
         val logId = loadedLogId ?: return
         val date = loadedLogDate ?: return
-        val postId = loadedCommunityPostId
-
         viewModelScope.launch {
-            liveResult.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true) }
             val success = FoodLogRepository.delete(logId, date, loadedUserId)
-            if (success && postId != null) {
-                CommunityPostRepository.deletePost(postId)
-            }
-            liveResult.update { it.copy(isLoading = false) }
+            _state.update { it.copy(isLoading = false) }
             onComplete(success)
         }
     }
 
-
     fun updateLog(newDescription: String) {
-        if (liveResult.value.isLoading) return
-        val currentResult = liveResult.value.result ?: return
+        if (_state.value.isLoading) return
+        val currentResult = _state.value.result ?: return
         val logId = loadedLogId
         val date = loadedLogDate
 
         viewModelScope.launch {
-            liveResult.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true) }
             val prompt = "$newDescription. (Do not ask questions, provide best possible estimate)"
             val analysis = FoodAnalyzer.analyze(
                 description = prompt, meal = currentResult.mealType, image = null
@@ -293,46 +340,25 @@ class AnalyzeResultViewModel : ViewModel() {
                     analysis.id, currentResult.photoUrl, currentResult.mealType
                 )
 
-                liveResult.update { it.copy(result = analysis, isLoading = false) }
+                _state.update { it.copy(result = analysis, isLoading = false) }
                 if (logId != null && date != null) {
                     val updatedLog = analysis.toFoodLog()
                     updatedLog.logId = logId
                     FoodLogRepository.update(logId, updatedLog, date, loadedUserId)
                 }
             } else {
-                liveResult.update { it.copy(isLoading = false, isError = true) }
+                _state.update { it.copy(isLoading = false, isError = true) }
             }
         }
     }
 
     fun onSaveClick() {
-        if (liveResult.value.isLoading) return
+        if (_state.value.isLoading) return
         saveFood()
     }
 
-    fun saveFood() {
-        if (liveResult.value.isLoading) return
-        val result = liveResult.value.result ?: return
-        liveResult.update { it.copy(isLoading = true) }
-        val shouldShare = (result.result?.healthScore ?: 0) > 7 || result.photoUrl != null
-
-        applicationScope.launch {
-            val log = result.toFoodLog()
-            val targetDate = loadedLogDate ?: LogFragment.currentDate
-
-            FoodLogRepository.add(result.photoUrl, log, targetDate, shouldShare)
-            launch {
-                StreakRepository.updateStreak()
-                AiChatRepository.onFoodLogAdded(log)
-                PointsRepository.onEvent(PointsEvent.AddFood(result.result?.healthScore ?: 0))
-            }
-            liveResult.update { it.copy(isLoading = false) }
-            _event.send(AnalyzeResultEvent.Saved)
-        }
-    }
-
     private fun syncLogUpdate() {
-        val currentResult = liveResult.value.result ?: return
+        val currentResult = _state.value.result ?: return
         val logId = loadedLogId ?: return
         val date = loadedLogDate ?: return
         viewModelScope.launch {
@@ -343,7 +369,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun updateCalories(calories: Double) {
-        liveResult.update { state ->
+        _state.update { state ->
             val currentResult = state.result ?: return@update state
             val analysis = currentResult.result ?: return@update state
             state.copy(
@@ -356,7 +382,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun updateProtein(protein: Double) {
-        liveResult.update { state ->
+        _state.update { state ->
             val currentResult = state.result ?: return@update state
             val analysis = currentResult.result ?: return@update state
             state.copy(
@@ -369,7 +395,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun updateFat(fat: Double) {
-        liveResult.update { state ->
+        _state.update { state ->
             val currentResult = state.result ?: return@update state
             val analysis = currentResult.result ?: return@update state
             state.copy(
@@ -382,7 +408,7 @@ class AnalyzeResultViewModel : ViewModel() {
     }
 
     fun updateCarbs(carbs: Double) {
-        liveResult.update { state ->
+        _state.update { state ->
             val currentResult = state.result ?: return@update state
             val analysis = currentResult.result ?: return@update state
             state.copy(
@@ -393,6 +419,4 @@ class AnalyzeResultViewModel : ViewModel() {
         }
         syncLogUpdate()
     }
-
-
 }
