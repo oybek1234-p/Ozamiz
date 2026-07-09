@@ -2,4 +2,9 @@
 <resources>
     <attr name="customGreen" format="color" />
     <attr name="customYellow" format="color" />
+    <attr name="colorSurfaceContainerLowest" format="color" />
+    <attr name="colorSurfaceContainerLow" format="color" />
+    <attr name="colorSurfaceContainer" format="color" />
+    <attr name="colorSurfaceContainerHigh" format="color" />
+    <attr name="colorSurfaceContainerHighest" format="color" />
 </resources>

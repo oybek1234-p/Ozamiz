@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/dimen_12"
-    app:cardBackgroundColor="?colorSurfaceContainerLowest"
+    app:cardBackgroundColor="?colorSurfaceContainerLow"
     app:strokeColor="?colorOutlineVariant"
     app:strokeWidth="2dp">
 

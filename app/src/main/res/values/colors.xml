@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Legacy Colors (Preserved) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="grey">#808080</color>
@@ -9,8 +8,8 @@
     <color name="likeColor">#E91E63</color>
     <color name="yellow">#FFB116</color>
     <color name="yellowDark">#B07700</color>
-    <color name="green">#006D42</color> <!-- Updated to match new Primary -->
-    <color name="rejected">#BA1A1A</color> <!-- Updated to match Error -->
+    <color name="green">#006D42</color>
+    <color name="rejected">#BA1A1A</color>
 
     <color name="grey_alpha_50">#808080</color>
     <color name="green_alpha_10">#E0F2F1</color>
@@ -25,13 +24,10 @@
     <color name="orange">#FF9800</color>
     <color name="orange_alpha_10">#FFF3E0</color>
 
-    <!-- NEW MATERIAL 3 PRO HEALTH THEME (Deep Green) -->
-    <!-- Seed: #006D42 -->
-
-    <!-- Light Theme Colors -->
+    <!-- CLEAN MATERIAL 3 LIGHT THEME -->
     <color name="md_theme_light_primary">#006D42</color>
     <color name="md_theme_light_onPrimary">#FFFFFF</color>
-    <color name="md_theme_light_primaryContainer">#96F7B8</color>
+    <color name="md_theme_light_primaryContainer">#E8F5E9</color>
     <color name="md_theme_light_onPrimaryContainer">#002111</color>
 
     <color name="md_theme_light_secondary">#4F6353</color>
@@ -39,73 +35,33 @@
     <color name="md_theme_light_secondaryContainer">#D2E8D4</color>
     <color name="md_theme_light_onSecondaryContainer">#0D1F13</color>
 
-    <color name="md_theme_light_tertiary">#3A646F</color>
-    <color name="md_theme_light_onTertiary">#FFFFFF</color>
-    <color name="md_theme_light_tertiaryContainer">#BEEAF7</color>
-    <color name="md_theme_light_onTertiaryContainer">#001F25</color>
-
     <color name="md_theme_light_error">#BA1A1A</color>
     <color name="md_theme_light_errorContainer">#FFDAD6</color>
     <color name="md_theme_light_onError">#FFFFFF</color>
     <color name="md_theme_light_onErrorContainer">#410002</color>
 
-    <color name="md_theme_light_background">#E8EAE8</color>
+    <!-- Background and Surface - Clean White and Gray -->
+    <color name="md_theme_light_background">#F8F9FA</color>
     <color name="md_theme_light_onBackground">#191C1A</color>
-    <color name="md_theme_light_surface">#FBFDF9</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
     <color name="md_theme_light_onSurface">#191C1A</color>
-    <color name="md_theme_light_surfaceVariant">#DBE5DD</color>
-    <color name="md_theme_light_onSurfaceVariant">#404943</color>
-    <color name="md_theme_light_outline">#707973</color>
+    <color name="md_theme_light_surfaceVariant">#F1F3F4</color>
+    <color name="md_theme_light_onSurfaceVariant">#5F6368</color>
+    <color name="md_theme_light_outline">#DADCE0</color>
 
+    <!-- Containers -->
     <color name="md_theme_light_surfaceContainerLowest">#FFFFFF</color>
-    <color name="md_theme_light_surfaceContainerLow">#F8F8F8</color>
-    <color name="md_theme_light_surfaceContainer">#EBEBEB</color>
-    <color name="md_theme_light_surfaceContainerHigh">#F1F1F1</color>
-    <color name="md_theme_light_surfaceContainerHighest">#E6E6E6</color>
+    <color name="md_theme_light_surfaceContainerLow">#F8F9FA</color>
+    <color name="md_theme_light_surfaceContainer">#F1F3F4</color>
+    <color name="md_theme_light_surfaceContainerHigh">#E8EAED</color>
+    <color name="md_theme_light_surfaceContainerHighest">#E0E2E4</color>
 
-    <!-- Vaznim Semantic Colors -->
     <color name="vaznim_primary">@color/md_theme_light_primary</color>
     <color name="vaznim_on_primary">@color/md_theme_light_onPrimary</color>
-    <color name="vaznim_surface_low">@color/md_theme_light_surfaceContainerLow</color>
+    <color name="vaznim_surface_low">@color/md_theme_light_surfaceContainerLowest</color>
     <color name="vaznim_outline">@color/md_theme_light_outline</color>
     <color name="vaznim_track">@color/md_theme_light_surfaceContainerHigh</color>
     <color name="vaznim_on_surface">@color/md_theme_light_onSurface</color>
     <color name="vaznim_on_surface_variant">@color/md_theme_light_onSurfaceVariant</color>
     <color name="vaznim_surface_container_high">@color/md_theme_light_surfaceContainerHigh</color>
-
-    <!-- Dark Theme Colors -->
-    <color name="md_theme_dark_primary">#7ADB9E</color>
-    <color name="md_theme_dark_onPrimary">#003920</color>
-    <color name="md_theme_dark_primaryContainer">#005330</color>
-    <color name="md_theme_dark_onPrimaryContainer">#96F7B8</color>
-
-    <color name="md_theme_dark_secondary">#B6CCB8</color>
-    <color name="md_theme_dark_onSecondary">#223527</color>
-    <color name="md_theme_dark_secondaryContainer">#384B3D</color>
-    <color name="md_theme_dark_onSecondaryContainer">#D2E8D4</color>
-
-    <color name="md_theme_dark_tertiary">#A2CEDF</color>
-    <color name="md_theme_dark_onTertiary">#00363F</color>
-    <color name="md_theme_dark_tertiaryContainer">#204D57</color>
-    <color name="md_theme_dark_onTertiaryContainer">#BEEAF7</color>
-
-    <color name="md_theme_dark_error">#FFB4AB</color>
-    <color name="md_theme_dark_errorContainer">#93000A</color>
-    <color name="md_theme_dark_onError">#690005</color>
-    <color name="md_theme_dark_onErrorContainer">#FFDAD6</color>
-
-    <color name="md_theme_dark_background">#191C1A</color>
-    <color name="md_theme_dark_onBackground">#E1E3DF</color>
-    <color name="md_theme_dark_surface">#191C1A</color>
-    <color name="md_theme_dark_onSurface">#E1E3DF</color>
-    <color name="md_theme_dark_surfaceVariant">#404943</color>
-    <color name="md_theme_dark_onSurfaceVariant">#BFC9C1</color>
-    <color name="md_theme_dark_outline">#8A938C</color>
-
-    <color name="md_theme_dark_surfaceContainerLowest">#0C0F0D</color>
-    <color name="md_theme_dark_surfaceContainerLow">#191C1A</color>
-    <color name="md_theme_dark_surfaceContainer">#1D201E</color>
-    <color name="md_theme_dark_surfaceContainerHigh">#272B28</color>
-    <color name="md_theme_dark_surfaceContainerHighest">#323632</color>
-
 </resources>

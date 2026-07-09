@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.menu.add
 
 import android.net.Uri
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -96,7 +97,7 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
             bind.chipGroupCategories.removeAllViews()
             state.categories.forEach { category ->
                 bind.chipGroupCategories.addView(
-                    Chip(requireContext()).apply {
+                    Chip(ContextThemeWrapper(requireContext(), com.google.android.material.R.style.Widget_Material3_Chip_Filter)).apply {
                         text = category.name
                         tag = category.id
                         isCheckable = true

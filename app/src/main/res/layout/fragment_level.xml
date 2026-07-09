@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurface">
+    android:background="?colorSurfaceContainerLowest">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?colorSurface"
+        android:layout_height="match_parent"
+    android:background="?colorSurfaceContainerLowest">
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -31,7 +31,7 @@
             app:cardCornerRadius="24dp"
             app:cardElevation="4dp"
             app:strokeWidth="0dp"
-            app:cardBackgroundColor="?colorSurfaceContainerLowest">
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLow">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

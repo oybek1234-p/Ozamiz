@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="?colorSurfaceContainer"
+    android:background="?attr/colorSurfaceContainerLowest"
     android:layout_height="match_parent">
 
     <TextView
@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_48"
         android:text="@string/what_gender"
-        android:textColor="?colorOnSurface"
+        android:textColor="?attr/colorOnSurface"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +45,7 @@
             app:cardCornerRadius="@dimen/dimen_12"
             >
             <LinearLayout
-                android:background="?colorSurfaceContainerLowest"
+                android:background="?attr/colorSurfaceContainerLowest"
                 android:padding="@dimen/dimen_12"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

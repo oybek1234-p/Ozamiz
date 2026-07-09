@@ -74,7 +74,7 @@ object FirebasePaths {
     }
 
     object Storage {
-        private val root = FirebaseStorage.getInstance().reference
+        val root = FirebaseStorage.getInstance().reference
 
         fun avatars(uid: String) = root.child("user_avatars/$uid")
         fun weightLogs(uid: String) = root.child("weightLog/$uid")

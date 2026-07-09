@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurface">
+    android:background="?colorSurfaceContainerLowest">
 
     <!-- Header -->
     <LinearLayout
@@ -13,8 +13,9 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:elevation="4dp"
-        android:background="?colorSurfaceContainer"
+        android:elevation="0dp"
+        android:background="?colorSurfaceContainerLowest"
+        android:fitsSystemWindows="true"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton

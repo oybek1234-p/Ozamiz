@@ -18,6 +18,10 @@ class LipidsGuideFragment : BaseFragment<FragmentLipidsGuideBinding>() {
             findNavController().navigateUp()
         }
 
+        bind.btnSeeReadyMenus.setOnClickListener {
+            findNavController().navigate(LipidsGuideFragmentDirections.actionLipidsGuideFragmentToReadyMenusFragment())
+        }
+
         val isPremium = uz.oybek.ozamiz.data.user.local.LocalUser.user.premium
         if (!isPremium) {
             bind.premiumOverlay.visibility = android.view.View.VISIBLE

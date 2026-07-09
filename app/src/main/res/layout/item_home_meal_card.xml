@@ -6,12 +6,10 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
-    android:layout_marginBottom="@dimen/dimen_4"
     android:foreground="?selectableItemBackground"
     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="0dp"
-    app:strokeColor="?attr/colorOutlineVariant"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="2dp"
     app:strokeWidth="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,13 +17,13 @@
         android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:minHeight="82dp"
-        android:padding="@dimen/dimen_12">
+        android:minHeight="88dp"
+        android:padding="16dp">
 
         <FrameLayout
             android:id="@+id/layout_progress_container"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -36,21 +34,19 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 app:indicatorColor="?attr/colorPrimary"
-                app:indicatorSize="52dp"
+                app:indicatorSize="56dp"
                 app:indicatorTrackGapSize="0dp"
                 app:trackColor="?attr/colorSurfaceContainerHigh"
                 app:trackCornerRadius="4dp"
-                app:trackThickness="4dp"
+                app:trackThickness="5dp"
                 tools:progress="60" />
 
-            <com.google.android.material.imageview.ShapeableImageView
+            <ImageView
                 android:id="@+id/img_meal_icon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:padding="@dimen/dimen_2"
-                android:layout_margin="@dimen/dimen_4"
-                android:scaleType="centerCrop"
+                android:scaleType="centerInside"
                 tools:src="@drawable/breakfast_simple" />
         </FrameLayout>
 
@@ -59,7 +55,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_add_meal"
@@ -73,43 +69,35 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_bold"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="17sp"
+                android:textSize="18sp"
                 tools:text="Ertalabki" />
 
-            <LinearLayout
-                android:id="@+id/layout_calories"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/text_meal_calories"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:orientation="vertical">
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="14sp"
+                tools:text="450 kkal yeyildi" />
 
-                <TextView
-                    android:id="@+id/text_meal_calories"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="13sp"
-                    tools:text="450 kkal yeyildi" />
-
-            </LinearLayout>
         </LinearLayout>
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_add_meal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:iconTint="?colorOnSurface"
+            style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="0dp"
             app:icon="@drawable/add_ic"
-            android:padding="@dimen/dimen_12"
-            android:src="@drawable/add_ic"
-            android:backgroundTint="?colorSurfaceContainer"
-            app:iconGravity="textEnd"
-            android:background="@drawable/oval_back"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?colorOnSurface" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
+

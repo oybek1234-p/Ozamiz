@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainer">
+    android:background="?attr/colorSurfaceContainerLowest">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appbar"
@@ -80,7 +80,7 @@
                     android:fontFamily="@font/roboto_bold"
                     android:gravity="center"
                     android:maxLines="2"
-                    android:textColor="?colorOnSurface"
+                    android:textColor="?attr/colorOnSurface"
                     tools:text="Caesar Salad" />
 
             </LinearLayout>
@@ -94,7 +94,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?selectableItemBackground"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="?colorOutlineVariant"
@@ -127,14 +127,14 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/analyzing"
-                            android:textColor="?colorOnSurface" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             style="@style/Text2_15"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/learning_benefits_calories"
-                            android:textColor="?colorOnSurface" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -157,7 +157,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:src="@drawable/fire_ic"
-                            app:tint="?colorOnSurface" />
+                            app:tint="?attr/colorOnSurface" />
 
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/lottie_loading_calories"
@@ -196,7 +196,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
+                                android:textColor="?attr/colorOnSurface"
                                 tools:text="330" />
 
                         </LinearLayout>
@@ -244,8 +244,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="@drawable/round_lay"
-                android:backgroundTint="?colorSurfaceContainerLowest"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                android:backgroundTint="?attr/colorSurfaceContainerLow"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="0dp">
@@ -272,7 +272,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dimen_8"
-                        android:textColor="?colorOnSurface"
+                        android:textColor="?attr/colorOnSurface"
                         tools:text="Bu ovqatni kamroq miqdorda va kechqurun yemaslik maslahat beriladi." />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -283,7 +283,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/round_lay"
                 android:layout_marginTop="@dimen/dimen_12"
-                android:backgroundTint="?colorSurfaceContainerLowest"
+                android:backgroundTint="?attr/colorSurfaceContainerLow"
                 android:gravity="center"
                 android:paddingVertical="@dimen/dimen_12"
                 android:paddingHorizontal="@dimen/dimen_8"
@@ -312,7 +312,7 @@
                         android:layout_marginStart="@dimen/dimen_12"
                         android:layout_height="wrap_content"
                         android:text="@string/sog_liq_bahosi"
-                        android:textColor="?colorOnSurface" />
+                        android:textColor="?attr/colorOnSurface" />
 
 
                     <TextView
@@ -322,7 +322,7 @@
                         android:layout_height="wrap_content"
                         android:text="5 ball"
                         android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface" />
+                        android:textColor="?attr/colorOnSurface" />
 
 
                 </LinearLayout>
@@ -337,7 +337,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?colorSurfaceContainer"
+        android:background="?attr/colorSurfaceContainer"
         android:elevation="16dp"
         android:orientation="vertical"
         android:padding="16dp">
@@ -358,7 +358,7 @@
             app:strokeColor="?colorError"
             tools:visibility="gone" />
 
-        <com.google.android.material.button.MaterialButton
+            <com.google.android.material.button.MaterialButton
             android:id="@+id/button_re_log_full"
             style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
@@ -367,7 +367,7 @@
             android:backgroundTint="?colorPrimary"
             android:fontFamily="@font/roboto_medium"
             android:text="@string/retry_or_cancel"
-            android:textColor="?colorSurface"
+            android:textColor="?attr/colorSurface"
             android:visibility="gone"
             app:icon="@drawable/add_ic"
             app:iconGravity="textStart"
@@ -391,6 +391,7 @@
                 android:visibility="gone"
                 app:icon="@drawable/arrow_back"
                 app:iconGravity="textStart"
+                app:backgroundTint="?attr/colorSurfaceContainerLow"
                 tools:visibility="visible" />
 
             <FrameLayout
@@ -408,7 +409,7 @@
                     android:backgroundTint="?colorPrimary"
                     android:fontFamily="@font/roboto_medium"
                     android:text="@string/save"
-                    android:textColor="?colorSurface"
+                    android:textColor="?attr/colorSurface"
                     app:icon="@drawable/check_ic"
                     app:iconGravity="textStart" />
 
@@ -418,7 +419,7 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center"
                     android:elevation="4dp"
-                    android:indeterminateTint="?colorSurface"
+                    android:indeterminateTint="?attr/colorSurface"
                     android:visibility="gone" />
 
             </FrameLayout>

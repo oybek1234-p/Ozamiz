@@ -617,7 +617,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             card.progressMeal.setIndicatorColor(cPrimary)
 
             val hideCalories = consumed >= max || state.caloriesConsumed >= state.caloriesTarget
-            card.layoutCalories.isVisible = !hideCalories
+
             if (!hideCalories) {
                 card.textMealCalories.text =
                     getString(R.string.meal_remaining_format, max - consumed)
