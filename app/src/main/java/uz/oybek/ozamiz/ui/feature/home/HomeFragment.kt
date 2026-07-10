@@ -84,6 +84,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         initWater()
         initExercise()
         initWeightLogListener()
+        initMealRecommendation()
         observeUiState()
         observeStreakUpdate()
         checkNotificationPermission()
@@ -332,6 +333,13 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    private fun initMealRecommendation() = binding.apply {
+        btnMealRecommendation.setOnSafeClickListener {
+            MealRecommendationBottomSheet.newInstance()
+                .show(childFragmentManager, MealRecommendationBottomSheet.TAG)
+        }
+    }
+
     private fun observeUiState() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -413,6 +421,15 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 launch {
                     viewModel.showWeightLogEvent.collect {
                         navigate(R.id.photoUploadInfoFragment)
+                    }
+                }
+                launch {
+                    viewModel.showDailyAnalysisEvent.collect { data ->
+                        DailyAnalysisBottomSheet.newInstance(
+                            foodCount = data.foodCount,
+                            points = data.points,
+                            waterMl = data.waterMl
+                        ).show(childFragmentManager, DailyAnalysisBottomSheet.TAG)
                     }
                 }
                 launch {

@@ -28,7 +28,6 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     var showBottomSheet = false
 
-
     fun navigate(@IdRes resId: Int, args: Bundle? = null) {
         var navController: NavController? = null
         try {

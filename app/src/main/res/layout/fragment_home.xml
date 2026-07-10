@@ -171,6 +171,22 @@
                         layout="@layout/item_home_meal_card" />
                 </LinearLayout>
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_meal_recommendation"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Ovqatlanish tavsiyasi"
+                    android:textColor="?colorPrimary"
+                    android:fontFamily="@font/roboto_medium"
+                    app:icon="@drawable/arrow_back"
+                    app:iconGravity="textEnd"
+                    app:iconPadding="8dp"
+                    app:iconSize="16dp"
+                    android:rotationY="180" />
+
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_water"
                     android:layout_width="match_parent"

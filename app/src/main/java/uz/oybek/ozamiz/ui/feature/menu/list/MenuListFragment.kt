@@ -2,10 +2,13 @@ package uz.oybek.ozamiz.ui.feature.menu.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.databinding.FragmentMenuListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
@@ -25,27 +28,27 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
     }
 
     private fun checkPremiumAndNavigate(actionId: Int) {
-        val user = uz.oybek.ozamiz.data.user.local.LocalUser.user
+        val user = LocalUser.user
         if (user.isPremium()) {
             navigate(actionId)
         } else {
-            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(
+            PremiumBottomSheetDialog().show(
                 childFragmentManager,
-                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG
+                PremiumBottomSheetDialog.TAG
             )
         }
     }
 
     private fun setupPaymentCheckListener() {
         childFragmentManager.setFragmentResultListener(
-            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.REQUEST_KEY,
+            PremiumBottomSheetDialog.REQUEST_KEY,
             viewLifecycleOwner
         ) { _, bundle ->
-            val result = bundle.getString(uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.RESULT_ACTION)
+            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
             if (result == "go_to_payment") {
                 val price = bundle.getLong("selected_price", 29000L)
                 val isYearly = bundle.getBoolean("is_yearly", false)
-                val args = androidx.core.os.bundleOf("price" to price, "is_yearly" to isYearly)
+                val args = bundleOf("price" to price, "is_yearly" to isYearly)
                 findNavController().navigate(
                     R.id.paymentGetCheckFragment,
                     args

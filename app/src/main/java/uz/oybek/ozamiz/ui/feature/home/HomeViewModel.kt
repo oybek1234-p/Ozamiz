@@ -52,6 +52,15 @@ class HomeViewModel : ViewModel() {
     private val _showWeightLogEvent = kotlinx.coroutines.flow.MutableSharedFlow<Unit>()
     val showWeightLogEvent = _showWeightLogEvent.asSharedFlow()
 
+    private val _showDailyAnalysisEvent = kotlinx.coroutines.flow.MutableSharedFlow<DailyAnalysisData>()
+    val showDailyAnalysisEvent = _showDailyAnalysisEvent.asSharedFlow()
+
+    data class DailyAnalysisData(
+        val foodCount: Int,
+        val points: Int,
+        val waterMl: Int
+    )
+
     private var dataCollectionJob: Job? = null
 
     init {
@@ -164,10 +173,32 @@ class HomeViewModel : ViewModel() {
                         dailyFoodLogs = foodLogs
                     )
                 }
+                checkDailyAnalysis(summary, foodLogs)
             }
 
             is DataWrapper.Error -> {
                 _uiState.update { it.copy(isInitialLoading = false, isRefreshing = false) }
+            }
+        }
+    }
+
+    private fun checkDailyAnalysis(summary: DailySummary, foodLogs: List<FoodLog>) {
+        val targetCals = user.targetCalories
+        if (targetCals <= 0) return
+        
+        val progress = summary.consumedCalories.toFloat() / targetCals
+        val todayStr = DateUtils.todayString()
+        
+        if (progress >= 0.8f && AppPreference.lastDailyAnalysisDate != todayStr && uiState.value.selectedDate.isToday()) {
+            viewModelScope.launch {
+                AppPreference.lastDailyAnalysisDate = todayStr
+                _showDailyAnalysisEvent.emit(
+                    DailyAnalysisData(
+                        foodCount = foodLogs.size,
+                        points = 10,
+                        waterMl = summary.consumedWaterMl
+                    )
+                )
             }
         }
     }

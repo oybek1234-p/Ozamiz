@@ -22,7 +22,8 @@ data class AppSettings(
     val isAppReviewShown: Boolean = false,
     val dietologMessageCount: Int = 0,
     val foodLogLimitDate: String = "",
-    val foodLogLimitCount: Int = 0
+    val foodLogLimitCount: Int = 0,
+    val lastDailyAnalysisDate: String = ""
 )
 
 object AppSettingsSerializer : Serializer<AppSettings> {
@@ -68,6 +69,10 @@ object AppPreference {
     var isAppReviewShown: Boolean
         get() = current.isAppReviewShown
         set(value) = runBlocking { update { it.copy(isAppReviewShown = value) } }
+
+    var lastDailyAnalysisDate: String
+        get() = current.lastDailyAnalysisDate
+        set(value) = runBlocking { update { it.copy(lastDailyAnalysisDate = value) } }
 
     suspend fun incrementDietologMessageCount() {
         update { s ->
