@@ -17,5 +17,18 @@ class LunchGuideFragment : BaseFragment<FragmentLunchGuideBinding>() {
         bind.btnBack.setOnClickListener {
             findNavController().navigateUp()
         }
+
+        val isPremium = uz.oybek.ozamiz.data.user.local.LocalUser.user.premium
+        if (!isPremium) {
+            bind.premiumOverlay.visibility = android.view.View.VISIBLE
+            bind.btnGetPremium.setOnClickListener {
+                findNavController().navigate(uz.oybek.ozamiz.R.id.paymentGetCheckFragment)
+            }
+        } else {
+            bind.premiumOverlay.visibility = android.view.View.GONE
+        }
+        bind.btnSeeReadyMenus.setOnClickListener {
+            findNavController().navigate(LunchGuideFragmentDirections.actionLunchGuideFragmentToReadyMenusFragment())
+        }
     }
 }

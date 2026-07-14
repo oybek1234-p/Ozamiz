@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainer">
+    android:background="?attr/colorSurfaceContainerLowest">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/rootCoordinatorLayout"
@@ -147,7 +147,7 @@
                             android:clickable="true"
                             android:focusable="true"
                             app:strokeWidth="0dp"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="0dp">
 
@@ -212,7 +212,7 @@
                             android:layout_marginBottom="12dp"
                             android:clickable="true"
                             android:focusable="true"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="0dp"
                             app:strokeWidth="0dp">
@@ -277,7 +277,7 @@
                             android:layout_marginBottom="12dp"
                             android:clickable="true"
                             android:focusable="true"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                             app:cardCornerRadius="16dp"
                             app:strokeWidth="0dp"
                             app:cardElevation="0dp">
@@ -320,7 +320,7 @@
                             android:layout_height="wrap_content"
                             android:clickable="true"
                             android:focusable="true"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                             app:cardCornerRadius="16dp"
                             app:strokeWidth="0dp"
                             app:cardElevation="0dp">

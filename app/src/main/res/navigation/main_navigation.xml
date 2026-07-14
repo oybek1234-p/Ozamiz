@@ -502,10 +502,23 @@
         android:name="uz.oybek.ozamiz.ui.feature.onboarding.exercise.GetMainInfoFragment"
         android:label="GetMainInfoFragment" />
     <fragment
+        android:id="@+id/readyMenusFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.list.ReadyMenusFragment"
+        android:label="Tayyor menyular"
+        tools:layout="@layout/fragment_ready_menus" />
+
+    <fragment
         android:id="@+id/menuListFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.list.MenuListFragment"
         android:label="MenuListFragment"
         tools:layout="@layout/fragment_menu_list">
+        <action
+            android:id="@+id/action_menuListFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
         <action
             android:id="@+id/action_menuListFragment_to_addMenuFragment"
             app:destination="@id/addMenuFragment"
@@ -588,43 +601,99 @@
         android:id="@+id/breakfastGuideFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.BreakfastGuideFragment"
         android:label="Ertalabki choy"
-        tools:layout="@layout/fragment_breakfast_guide" />
+        tools:layout="@layout/fragment_breakfast_guide">
+        <action
+            android:id="@+id/action_breakfastGuideFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/lunchGuideFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.LunchGuideFragment"
         android:label="Tushlik"
-        tools:layout="@layout/fragment_lunch_guide" />
+        tools:layout="@layout/fragment_lunch_guide" >
+        <action
+            android:id="@+id/action_lunchGuideFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/dinnerGuideFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.DinnerGuideFragment"
         android:label="Kechki ovqat"
-        tools:layout="@layout/fragment_dinner_guide" />
+        tools:layout="@layout/fragment_dinner_guide">
+        <action
+            android:id="@+id/action_dinnerGuideFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/snacksGuideFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.SnacksGuideFragment"
         android:label="Perekuslar"
-        tools:layout="@layout/fragment_snacks_guide" />
+        tools:layout="@layout/fragment_snacks_guide">
+        <action
+            android:id="@+id/action_snacksGuideFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/proteinGuideFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.ProteinGuideFragment"
         android:label="Oqsilli taomlar"
-        tools:layout="@layout/fragment_protein_guide" />
+        tools:layout="@layout/fragment_protein_guide">
+        <action
+            android:id="@+id/action_proteinGuideFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/carbsGuideFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.CarbsGuideFragment"
         android:label="Uglevodli taomlar"
-        tools:layout="@layout/fragment_carbs_guide" />
+        tools:layout="@layout/fragment_carbs_guide">
+        <action
+            android:id="@+id/action_carbsGuideFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/lipidsGuideFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.LipidsGuideFragment"
         android:label="Yog\'li taomlar"
-        tools:layout="@layout/fragment_lipids_guide" />
+        tools:layout="@layout/fragment_lipids_guide">
+        <action
+            android:id="@+id/action_lipidsGuideFragment_to_readyMenusFragment"
+            app:destination="@id/readyMenusFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
+    </fragment>
 
     <fragment
         android:id="@+id/addMenuFragment"

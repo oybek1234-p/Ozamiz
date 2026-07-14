@@ -27,5 +27,8 @@ class BreakfastGuideFragment : BaseFragment<FragmentBreakfastGuideBinding>() {
         } else {
             bind.premiumOverlay.visibility = android.view.View.GONE
         }
+        bind.btnSeeReadyMenus.setOnClickListener {
+            findNavController().navigate(BreakfastGuideFragmentDirections.actionBreakfastGuideFragmentToReadyMenusFragment())
+        }
     }
 }

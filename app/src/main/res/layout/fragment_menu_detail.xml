@@ -4,21 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurface">
+    android:background="?colorSurfaceContainerLowest">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="320dp"
-        android:background="?colorSurface"
+        android:background="?colorSurfaceContainerLowest"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsingToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentScrim="?attr/colorSurface"
-            app:statusBarScrim="?attr/colorSurface"
+            app:contentScrim="?attr/colorSurfaceContainerLowest"
+            app:statusBarScrim="?attr/colorSurfaceContainerLowest"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:titleEnabled="false">
 
@@ -70,7 +70,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_bottom_sheet_top_rounded"
         android:layout_marginTop="-24dp"
-        android:backgroundTint="?colorSurface"
+        android:backgroundTint="?colorSurfaceContainerLowest"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
