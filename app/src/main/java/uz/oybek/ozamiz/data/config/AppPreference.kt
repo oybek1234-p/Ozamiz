@@ -23,7 +23,12 @@ data class AppSettings(
     val dietologMessageCount: Int = 0,
     val foodLogLimitDate: String = "",
     val foodLogLimitCount: Int = 0,
-    val lastDailyAnalysisDate: String = ""
+    val lastDailyAnalysisDate: String = "",
+    val lastWaterBenefitsDate: String = "",
+    val lastWater60AnalysisDate: String = "",
+    val lastExerciseBenefitsDate: String = "",
+    val lastExercise50AnalysisDate: String = "",
+    val currentTaskId: String? = null,
 )
 
 object AppSettingsSerializer : Serializer<AppSettings> {
@@ -54,7 +59,13 @@ object AppPreference {
 
     val current: AppSettings get() = runBlocking { dataStore.data.first() }
 
-    private suspend fun update(block: (AppSettings) -> AppSettings) {
+    fun updateSync(block: (AppSettings) -> AppSettings) {
+        runBlocking {
+            dataStore.updateData { block(it) }
+        }
+    }
+
+    suspend fun update(block: (AppSettings) -> AppSettings) {
         dataStore.updateData { block(it) }
     }
 
@@ -73,6 +84,22 @@ object AppPreference {
     var lastDailyAnalysisDate: String
         get() = current.lastDailyAnalysisDate
         set(value) = runBlocking { update { it.copy(lastDailyAnalysisDate = value) } }
+
+    var lastWaterBenefitsDate: String
+        get() = current.lastWaterBenefitsDate
+        set(value) = runBlocking { update { it.copy(lastWaterBenefitsDate = value) } }
+
+    var lastWater60AnalysisDate: String
+        get() = current.lastWater60AnalysisDate
+        set(value) = runBlocking { update { it.copy(lastWater60AnalysisDate = value) } }
+
+    var lastExerciseBenefitsDate: String
+        get() = current.lastExerciseBenefitsDate
+        set(value) = runBlocking { update { it.copy(lastExerciseBenefitsDate = value) } }
+
+    var lastExercise50AnalysisDate: String
+        get() = current.lastExercise50AnalysisDate
+        set(value) = runBlocking { update { it.copy(lastExercise50AnalysisDate = value) } }
 
     suspend fun incrementDietologMessageCount() {
         update { s ->

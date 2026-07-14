@@ -68,7 +68,18 @@
 
         </LinearLayout>
 
-
+        <ImageView
+            android:id="@+id/btn_delete"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/delete_ic"
+            app:tint="?colorError"
+            android:contentDescription="@string/delete" />
 
     </LinearLayout>
 

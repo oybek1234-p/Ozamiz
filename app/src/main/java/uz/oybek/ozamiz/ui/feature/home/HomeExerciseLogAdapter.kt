@@ -9,10 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.UserExercise
+import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.databinding.ItemHomeExerciseLogBinding
 
 class HomeExerciseLogAdapter(
-    private val onItemClick: (ExerciseLog) -> Unit
+    private val onItemClick: (ExerciseLog) -> Unit,
+    private val onDeleteClick: (ExerciseLog) -> Unit
 ) : ListAdapter<ExerciseLog, HomeExerciseLogAdapter.ViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,6 +53,9 @@ class HomeExerciseLogAdapter(
             binding.textCalories.text = itemView.context.getString(
                 R.string.unit_kcal_burned, log.caloriesBurned
             ) + " · ${log.durationMin} min"
+            binding.btnDelete.setOnClickListener {
+                onDeleteClick(log)
+            }
         }
     }
 

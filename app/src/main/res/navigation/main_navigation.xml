@@ -263,6 +263,13 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_home_to_dailyAnalysisFragment"
+            app:destination="@id/dailyAnalysisFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
 
     </fragment>
 
@@ -755,6 +762,49 @@
             app:argType="string" />
         <argument
             android:name="mealName"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dailyAnalysisFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.home.DailyAnalysisFragment"
+        android:label="Kunlik tahlil"
+        tools:layout="@layout/fragment_daily_analysis">
+        <argument
+            android:name="food_count"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="healthy_food_count"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="points"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="water_ml"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <argument
+            android:name="has_exercise"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="has_protein"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="no_sweets"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="no_bread"
+            android:defaultValue="false"
+            app:argType="boolean" />
+        <argument
+            android:name="type"
+            android:defaultValue="DAILY"
             app:argType="string" />
     </fragment>
 

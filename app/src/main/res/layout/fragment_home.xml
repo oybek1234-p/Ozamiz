@@ -120,11 +120,17 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/contentScrollView"
@@ -145,6 +151,8 @@
                 <include
                     android:id="@+id/main_progress"
                     layout="@layout/home_main_progress" />
+
+
 
                 <LinearLayout
                     android:id="@+id/layout_meal_cards"
@@ -181,11 +189,16 @@
                     android:text="Ovqatlanish tavsiyasi"
                     android:textColor="?colorPrimary"
                     android:fontFamily="@font/roboto_medium"
-                    app:icon="@drawable/arrow_back"
+                    app:icon="@drawable/arrow_right"
                     app:iconGravity="textEnd"
                     app:iconPadding="8dp"
-                    app:iconSize="16dp"
-                    android:rotationY="180" />
+                    app:iconSize="16dp" />
+
+                <FrameLayout
+                    android:id="@+id/banner_ad_container_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:visibility="gone" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_water"
@@ -550,6 +563,8 @@
         </androidx.core.widget.NestedScrollView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    </LinearLayout>
+
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBarOverall"
         android:layout_width="wrap_content"
@@ -558,4 +573,15 @@
         android:indeterminate="true"
         android:visibility="gone"
         tools:visibility="visible" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/confeti_effect" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

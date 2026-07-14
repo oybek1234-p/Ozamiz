@@ -98,6 +98,23 @@
 
     <string name="search_workouts_hint">Workoutlarni qidirish...</string>
     <string name="search_no_results">Qidiruv natijasi topilmadi</string>
+
+    <string name="points_added_format">+%1$d bal</string>
+    <string name="reward_confirm_format">Olish +%1$d bal</string>
+    <string name="analysis_food_count_format">%1$d ta ovqat qo\'shildi</string>
+    <string name="analysis_water_text_format">%1$.1f litr suv metobolizmni tezlashtirdi</string>
+    <string name="analysis_points_format">+%1$d bal</string>
+    <string name="analysis_great">AJOYIB!</string>
+    <string name="analysis_healthy_food_format">%1$d ta sog\'lom ovqat yeyildi</string>
+    <string name="analysis_exercise_done">Bugun sport bilan shug\'ullandingiz</string>
+    <string name="analysis_protein_done">Oqsil miqdori me\'yorda bo\'ldi</string>
+    <string name="analysis_no_sweets_done">Shirinlik yemadingiz, ajoyib!</string>
+    <string name="analysis_no_bread_done">Xamirli ovqat yemaslikka erishdingiz</string>
+    <string name="daily_analysis_title">Bugungi maqsad bajarildi,\nshunday davom eting</string>
+    <string name="daily_analysis_btn">To\'xtamayman 💪</string>
+    <string name="water_benefits_content">1. Metabolizmni tezlashtiradi\n2. Terini yoshartiradi\n3. Charchoqni kamaytiradi\n4. Buyraklar faoliyatini yaxshilaydi</string>
+    <string name="water_60_title">Suv me\'yorining 60% bajarildi!</string>
+    <string name="water_60_subtitle">Ajoyib natija, oz qoldi! Suv ichishda davom eting.</string>
     <string name="remove_image">Rasmni olib tashlash</string>
     <string name="category_name_hint">Kategoriya nomi</string>
     <string name="order_hint">Tartib raqami</string>
@@ -784,7 +801,7 @@
     <string name="plate_rule_carbs_items">Grechka, jigarrang guruch, yasmiq, mosh va no\'xat.</string>
     <string name="plate_rule_carbs_important">Oq non va shirinliklar bu qismga umuman kirmaydi.</string>
     <string name="plate_rule_summary">Shu tartibda kuniga 3 mahal ovqatlansangiz, kaloriya taqchilligi o\'z-o\'zidan hosil bo\'ladi va vazn kamayadi.</string>
-    <string name="text_profile_points_format">%d ball</string>
+    <string name="text_profile_points_format">%d bal</string>
     <string name="premium_checking">Premium tekshirilmoqda...</string>
     <string name="cashback_success">Bizga aloqaga chiqing</string>
     <string name="cashback_status_format">%1$d kun</string>
@@ -988,5 +1005,75 @@
     <string name="premium_tekshiruv">Premium Tekshiruv</string>
     <string name="foydalanuvchilar">Foydalanuvchilar</string>
     <string name="postlar">Postlar</string>
-    <string name="sog_liq_bahosi">Sog\'liq bahosi</string>
+    <string name="water_benefit_hunger">Ochlikni aldaydi — kamroq ovqat yeysiz</string>
+    <string name="water_benefit_fat">Yog\' yoqishni tezlashtiradi</string>
+    <string name="water_benefit_skin">Terini yoshartiradi</string>
+    <string name="water_benefits_ajoyib">Ajoyib 💧</string>
+    <string name="water_60_ajoyib">Ajoyib 💪</string>
+    <string name="water_60_kam_water">KAM SUV ICHISH?</string>
+    <string name="water_60_title_dynamic">Bugun %1$.1f litr suv ozishni %2$.1fx tezlashtirdi</string>
+    <string name="berildi_text">Berildi</string>
+    <string name="bal_berildi">Bal berildi</string>
+    <string name="plus_5_ball">+5 bal</string>
+    <string name="sog_liq_bahosi">Sog\'liq bahosi\n</string>
+
+    <!-- Water benefits (4 items) -->
+    <string name="water_benefit_item_1">💧 Ochlikni aldaydi — kamroq ovqat yeysiz</string>
+    <string name="water_benefit_item_2">🔥 Yog\' yoqishni va metabolizmni tezlashtiradi</string>
+    <string name="water_benefit_item_3">✨ Terini tozalaydi, elastikligini oshiradi</string>
+    <string name="water_benefit_item_4">🧠 Miya faoliyatini va ish qobiliyatini yaxshilaydi</string>
+    <string name="water_benefits_title">Ajoyib! Suv ichish foydalari:</string>
+
+    <!-- Exercise benefits & 50% -->
+    <string name="exercise_benefits_title">Sport nafaqat ozish, balki sog\'liqdir</string>
+    <string name="exercise_benefit_item_1">⚡ Moddalar almashinuvini tezlashtiradi</string>
+    <string name="exercise_benefit_item_2">💪 Mushaklarni mustahkamlaydi va tonusda saqlaydi</string>
+    <string name="exercise_benefit_item_3">❤️ Yurak-qon tomir tizimini yaxshilaydi</string>
+    <string name="exercise_benefit_item_4">🔋 Uyquni yaxshilaydi va energiya bag\'ishlaydi</string>
+    <string name="exercise_benefits_ajoyib">Ajoyib 🏃</string>
+
+    <string name="exercise_50_title">Bugungi sport maqsadi yarmi bajarildi!</string>
+    <string name="exercise_50_ajoyib">Shunday davom etaman! 🔥</string>
+
+    <!-- Daily Calorie 4 items -->
+    <string name="food_benefit_item_1">🥗 Bugun me\'yorda ovqatlandingiz (kaloriya nazoratda)</string>
+    <string name="food_benefit_item_2">🍏 Sog\'lom ovqatlar ratsioningiz asosini tashkil qildi</string>
+    <string name="food_benefit_item_3">💧 Suv ichish orqali organizmni tetiklashtirdingiz</string>
+    <string name="food_benefit_item_4">🧬 To\'g\'ri oqsil balansini saqlab qoldingiz</string>
+    <string name="food_analysis_btn">Davom etaman 🚀</string>
+
+    <!-- 30 Comparable Foods for Exercise Congratulation -->
+    <string name="food_slice_bread">Bir bo\'lak non</string>
+    <string name="food_apple">Olma</string>
+    <string name="food_banana">Banan</string>
+    <string name="food_cola_glass">Bir stakan kola</string>
+    <string name="food_boiled_egg">Qaynatilgan tuxum</string>
+    <string name="food_somsa">Somsa</string>
+    <string name="food_hamburger">Gamburger</string>
+    <string name="food_fries">Kartoshka fri</string>
+    <string name="food_snickers">Snickers shokoladi</string>
+    <string name="food_pizza_slice">Bir bo\'lak pitsa</string>
+    <string name="food_plov_bowl">Bir kosa palov</string>
+    <string name="food_shashlik">Bir six shashlik</string>
+    <string name="food_manti">Manti</string>
+    <string name="food_milk_glass">Bir stakan sut</string>
+    <string name="food_honey_spoon">Bir qoshiq asal</string>
+    <string name="food_salad_plate">Bir tarela salat</string>
+    <string name="food_lagman_bowl">Bir kosa lag\'mon</string>
+    <string name="food_ice_cream">Muzqaymoq</string>
+    <string name="food_donut">Donut pishiriq</string>
+    <string name="food_cookie">Pechenye</string>
+    <string name="food_hot_dog">Hot-dog</string>
+    <string name="food_yogurt">Yogurt</string>
+    <string name="food_pasta_plate">Bir tarela makaron</string>
+    <string name="food_green_tea">Shakarli ko\'k choy</string>
+    <string name="food_kebab_100g">100g kabob</string>
+    <string name="food_cheese_slice">Bir bo\'lak pishloq</string>
+    <string name="food_almonds">Bir siqim bodom</string>
+    <string name="food_oatmeal">Suli bo\'tqasi</string>
+    <string name="food_shorva">Bir kosa sho\'rva</string>
+    <string name="food_lavash">Lavash</string>
+
+    <string name="exercise_calories_equal_format">Bugun mashg\'ulotlar davomida %1$d kkal sarfladingiz.Bu %2$s %3$s energiyasiga teng!</string>
 </resources>
+

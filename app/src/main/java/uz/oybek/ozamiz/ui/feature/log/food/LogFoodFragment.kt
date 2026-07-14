@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.local.user
@@ -60,7 +62,11 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fragmentArgs = arguments?.let { getArgument(it) } ?: Argument()
+        arguments?.let {
+            getArgument(it).let {
+                fragmentArgs = it
+            }
+        }
         logDate = Date(fragmentArgs.timestamp)
     }
 
@@ -101,6 +107,13 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             R.string.log_food_search_list_count_format,
             getString(R.string.log_food_search_list_title)
         )
+        if (!user.isPremium()) {
+            val bannerView =
+                AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_LOG_FOOD)
+            bannerAdContainerLogFood.removeAllViews()
+            bannerAdContainerLogFood.addView(bannerView)
+            bannerAdContainerLogFood.visibility = android.view.View.VISIBLE
+        }
 
         setupMealChips()
         setupActionButtons()
@@ -146,7 +159,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             })
         }
         buttonSearchList.setOnSafeClickListener {
-            checkPremiumAndRun { navigateToSearchFood() }
+            navigateToSearchFood()
         }
     }
 
@@ -175,30 +188,27 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                         )
                     }
                 }
+
                 FoodCameraFragment.ACTION_WRITE -> showTextInputSheet()
-                FoodCameraFragment.ACTION_LIST -> checkPremiumAndRun { navigateToSearchFood() }
+                FoodCameraFragment.ACTION_LIST -> navigateToSearchFood()
             }
         }
 
         setFragmentResultListener(TextInputBottomSheet.REQUEST_KEY) { _, bundle ->
             bundle.getString(TextInputBottomSheet.RESULT_TEXT)?.let { text ->
-                checkPremiumAndRun {
-                    viewModel.updateDescription(text)
-                    navigateToResult(imageUri = null, description = text, meal = currentMeal())
-                }
+                viewModel.updateDescription(text)
+                navigateToResult(imageUri = null, description = text, meal = currentMeal())
             }
         }
 
         setFragmentResultListener(VoiceRecorderBottomSheet.REQUEST_KEY) { _, bundle ->
             bundle.getString(VoiceRecorderBottomSheet.RESULT_URI)?.let { uriString ->
-                checkPremiumAndRun {
-                    navigateToResult(
-                        imageUri = null,
-                        description = "",
-                        meal = currentMeal(),
-                        audioUri = Uri.parse(uriString)
-                    )
-                }
+                navigateToResult(
+                    imageUri = null,
+                    description = "",
+                    meal = currentMeal(),
+                    audioUri = Uri.parse(uriString)
+                )
             }
         }
 
@@ -262,10 +272,17 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     private fun checkPremiumAndRun(action: () -> Unit) {
-        if (user.isPremium()) {
-            action()
-        } else {
-            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+        viewModel.canAddLog { can, limited ->
+            if (can) {
+                if (limited) {
+                    AdsManager.loadAndShowInterstitial(
+                        requireActivity(),
+                        AdsConfig.INTERSTITIAL_FOOD_ADD
+                    ) { action() }
+                } else {
+                    action()
+                }
+            }
         }
     }
 

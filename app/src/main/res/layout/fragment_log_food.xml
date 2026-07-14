@@ -380,8 +380,16 @@
                                     app:tint="?attr/colorOnSurfaceVariant" />
 
 
+
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
+
+                        <FrameLayout
+                            android:layout_marginTop="@dimen/dimen_12"
+                            android:id="@+id/banner_ad_container_log_food"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone" />
 
                     </LinearLayout>
                 </LinearLayout>

@@ -20,8 +20,12 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAiChatBinding
 import uz.oybek.ozamiz.databinding.ItemSuggestionChipBinding
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.utils.toDp
 
 class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
@@ -57,9 +61,18 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         observeState(bind)
         handleInitialArguments()
         setupPremiumListener()
+        initBannerAd(bind)
         bind.sendButton.scaleX = 0.85f
         bind.sendButton.scaleY = 0.85f
         bind.sendButton.alpha = 0.5f
+    }
+
+    private fun initBannerAd(bind: FragmentAiChatBinding) {
+        if (user.isPremium()) return
+        val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_DIETOLOG)
+        bind.bannerAdContainerDietolog.removeAllViews()
+        bind.bannerAdContainerDietolog.addView(bannerView)
+        bind.bannerAdContainerDietolog.visibility = android.view.View.VISIBLE
     }
 
     private fun setupPremiumListener() {

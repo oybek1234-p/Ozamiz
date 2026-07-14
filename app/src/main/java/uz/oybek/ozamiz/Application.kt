@@ -18,6 +18,7 @@ import uz.oybek.ozamiz.data.firebase.firestore
 import uz.oybek.ozamiz.data.motivation.NotificationSchedular
 import uz.oybek.ozamiz.data.motivation.MotivationNotificationManager
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.util.handleException
 
 lateinit var appContext: Context
@@ -31,6 +32,7 @@ class Application : Application() {
         appContext = this
 
         initFirebase()
+        AdsManager.initialize(this)
 
         try {
             FacebookSdk.fullyInitialize()

@@ -33,6 +33,8 @@ import uz.oybek.ozamiz.ui.feature.log.food.LogFoodFragment
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.ui.utils.VaznimColors
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.triggerVibration
@@ -90,12 +92,21 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         checkNotificationPermission()
         setupLimitExceededResultListener()
         setupPremiumResultListener()
+        initBannerAd(bind)
         if (animateProgress) {
             lifecycleScope.launch {
                 delay(200)
                 animateProgress = false
             }
         }
+    }
+
+    private fun initBannerAd(bind: FragmentHomeBinding) {
+        if (user.isPremium()) return
+        val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_HOME)
+        bind.bannerAdContainerHome.removeAllViews()
+        bind.bannerAdContainerHome.addView(bannerView)
+        bind.bannerAdContainerHome.visibility = android.view.View.VISIBLE
     }
 
     private fun checkPremiumAndNavigate(destinationId: Int) {
@@ -287,6 +298,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun initWater() = binding.apply {
+        cardWater.setOnSafeClickListener {
+            TodayWatersBottomSheet().show(childFragmentManager, TodayWatersBottomSheet.TAG)
+        }
         btnWater250.setOnSafeClickListener {
             viewModel.addWater(250)
             triggerVibration()
@@ -310,6 +324,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun initExercise() = binding.apply {
+        cardExercise.setOnSafeClickListener {
+            TodayExercisesBottomSheet().show(childFragmentManager, TodayExercisesBottomSheet.TAG)
+        }
         btnQuickWalk.setOnSafeClickListener {
             val args = Bundle().apply {
                 putString(KEY_EXERCISE_ID, UserExercise.PiyodaYurish.name)
@@ -425,13 +442,22 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 }
                 launch {
                     viewModel.showDailyAnalysisEvent.collect { data ->
-                        DailyAnalysisBottomSheet.newInstance(
+                        val args = DailyAnalysisFragment.createArgs(
                             foodCount = data.foodCount,
+                            healthyFoodCount = data.healthyFoodCount,
                             points = data.points,
-                            waterMl = data.waterMl
-                        ).show(childFragmentManager, DailyAnalysisBottomSheet.TAG)
+                            waterMl = data.waterMl,
+                            hasExercise = data.hasExercise,
+                            hasProteinGoal = data.hasProteinGoal,
+                            noSweets = data.noSweets,
+                            noBread = data.noBread,
+                            type = data.type,
+                            caloriesBurned = data.caloriesBurned
+                        )
+                        navigate(R.id.action_home_to_dailyAnalysisFragment, args)
                     }
                 }
+
                 launch {
                     viewModel.showRateAppEvent.collect {
                         delay(WEIGHT_LOG_DELAY)

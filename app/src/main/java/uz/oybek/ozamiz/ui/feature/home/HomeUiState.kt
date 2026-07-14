@@ -4,6 +4,7 @@ import uz.oybek.ozamiz.data.logs.model.DailySummary
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
+import uz.oybek.ozamiz.data.logs.model.WaterLog
 import java.util.Date
 
 data class HomeUiState(
@@ -28,6 +29,8 @@ data class HomeUiState(
     val fatConsumed: Int = 0,
     val fatTarget: Int = 0,
     val exerciseLogs: List<ExerciseLog> = emptyList(),
+    val waterLogs: List<WaterLog> = emptyList(),
     val showWeightLogCard: Boolean = false,
-    val userPoints: Int = 0
+    val userPoints: Int = 0,
+    val daysFromRegister: Int = 0
 )

@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.data.logs
 
 import com.google.firebase.database.DatabaseReference
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.currentUserId
@@ -53,5 +54,29 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
             )
         }
         return success
+    }
+
+    fun getLogs(date: Date): kotlinx.coroutines.flow.Flow<List<WaterLog>> = kotlinx.coroutines.flow.callbackFlow {
+        val userId = currentUserId
+        if (userId.isBlank()) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
+        }
+        val dateStr = date.dateApiFormat()
+        val query = getReference(userId, dateStr)
+
+        val listener = object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                val logs = snapshot.children.mapNotNull { it.getValue(WaterLog::class.java) }
+                trySend(logs)
+            }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                trySend(emptyList())
+            }
+        }
+        query.addValueEventListener(listener)
+        awaitClose { query.removeEventListener(listener) }
     }
 }

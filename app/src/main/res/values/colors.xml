@@ -108,4 +108,27 @@
     <color name="md_theme_dark_surfaceContainerHigh">#272B28</color>
     <color name="md_theme_dark_surfaceContainerHighest">#323632</color>
 
+    <!-- Analysis Achievement Colors -->
+    <color name="analysis_food_bg">#E8F5E9</color>
+    <color name="analysis_food_text">#2E7D32</color>
+    <color name="analysis_healthy_bg">#E3F2FD</color>
+    <color name="analysis_healthy_text">#1565C0</color>
+    <color name="analysis_water_bg">#F3F4F9</color>
+    <color name="analysis_water_text">#3F51B5</color>
+    <color name="analysis_exercise_bg">#FFF3E0</color>
+    <color name="analysis_exercise_text">#E65100</color>
+    <color name="analysis_protein_bg">#F3E5F5</color>
+    <color name="analysis_protein_text">#7B1FA2</color>
+    <color name="analysis_sweets_bg">#FCE4EC</color>
+    <color name="analysis_sweets_text">#C2185B</color>
+    <color name="analysis_bread_bg">#EFEBE9</color>
+    <color name="analysis_bread_text">#5D4037</color>
+
+    <color name="analysis_screen_header_bg">#064227</color>
+    <color name="analysis_card_bg">#FFFFFF</color>
+    <color name="analysis_text_accent">#006D42</color>
+    <color name="analysis_btn_bg">#006D42</color>
+    <color name="analysis_btn_text">#FFFFFF</color>
+    <color name="analysis_points_bg">#064227</color>
+    <color name="analysis_points_text">#FFFFFF</color>
 </resources>

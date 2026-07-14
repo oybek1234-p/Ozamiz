@@ -34,7 +34,6 @@
         <item name="colorOutline">@color/md_theme_light_outline</item>
         <item name="colorOutlineVariant">#C2C8C2</item>
 
-        <!-- Surface Containers -->
         <item name="colorSurfaceContainerLowest">@color/md_theme_light_surfaceContainerLowest</item>
         <item name="colorSurfaceContainerLow">@color/md_theme_light_surfaceContainerLow</item>
         <item name="colorSurfaceContainer">@color/md_theme_light_surfaceContainer</item>

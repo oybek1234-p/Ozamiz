@@ -4,15 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import uz.oybek.ozamiz.data.logs.model.ExerciseLog
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.databinding.BottomSheetTodayExercisesBinding
 
 class TodayExercisesBottomSheet : BottomSheetDialogFragment() {
 
     private var _binding: BottomSheetTodayExercisesBinding? = null
     private val binding get() = _binding!!
-    private var exerciseLogs: List<ExerciseLog> = emptyList()
+    private val viewModel: HomeViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as com.google.android.material.bottomsheet.BottomSheetDialog
@@ -35,29 +41,28 @@ class TodayExercisesBottomSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val groupedLogs = exerciseLogs.groupBy { it.exerciseType }
-            .map { (type, logs) ->
-                val totalDuration = logs.sumOf { it.durationMin }
-                val totalCalories = logs.sumOf { it.caloriesBurned }
-                ExerciseLog(
-                    exerciseType = type,
-                    durationMin = totalDuration,
-                    caloriesBurned = totalCalories
-                )
+        val adapter = HomeExerciseLogAdapter(
+            onItemClick = { },
+            onDeleteClick = { log ->
+                viewModel.deleteExerciseLog(log)
             }
-
-        val adapter = HomeExerciseLogAdapter { }.apply {
-            submitList(groupedLogs)
-        }
+        )
         binding.recyclerTodayExercises.adapter = adapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState
+                    .map { it.exerciseLogs }
+                    .distinctUntilChanged()
+                    .collect { logs ->
+                        adapter.submitList(logs)
+                    }
+            }
+        }
 
         binding.btnClose.setOnClickListener {
             dismiss()
         }
-    }
-
-    fun setLogs(logs: List<ExerciseLog>) {
-        this.exerciseLogs = logs
     }
 
     override fun onDestroyView() {
@@ -67,11 +72,5 @@ class TodayExercisesBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "TodayExercisesBottomSheet"
-
-        fun newInstance(logs: List<ExerciseLog>): TodayExercisesBottomSheet {
-            return TodayExercisesBottomSheet().apply {
-                setLogs(logs)
-            }
-        }
     }
 }

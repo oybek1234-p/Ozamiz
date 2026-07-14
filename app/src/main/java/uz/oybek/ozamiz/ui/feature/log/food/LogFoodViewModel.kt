@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
-import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.SavedFoodRepository
 import uz.oybek.ozamiz.data.food.model.MealTime
@@ -24,7 +23,6 @@ import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.user.model.daysFromRegister
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import java.util.Date
 
@@ -154,10 +152,17 @@ class LogFoodViewModel() : ViewModel() {
         }
     }
 
-    fun canAddLog(): Boolean {
-        if (user.isPremium()) return true
-//        if (user.daysFromRegister() <= 3 && AppPreference.getFoodLogLimitCount() <= 3)
-//            return true
-        return false
+    fun canAddLog(canAdd: (can: Boolean, limited: Boolean) -> Unit) {
+        if (user.isPremium()) {
+            canAdd.invoke(true, false)
+        } else {
+            if (AppPreference.getFoodLogLimitCount() <= 5 && (user.streakInfo?.bestStreak
+                    ?: 0) < 7
+            ) {
+                canAdd.invoke(true, true)
+            } else {
+                canAdd.invoke(false, true)
+            }
+        }
     }
 }

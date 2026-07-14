@@ -122,6 +122,8 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     implementation("androidx.datastore:datastore-preferences:1.1.2")
 
+    implementation("com.yandex.android:mobileads:8.1.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
