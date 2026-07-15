@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.menu.MenuCategories
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.utils.DataWrapper
@@ -75,7 +76,7 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
     }
 
     private var currentServings = 1
-    private var originalIngredients: String = ""
+    private var originalIngredients: List<String> = emptyList()
 
     private fun setupViews(bind: FragmentMenuDetailBinding, menu: Menu) {
         bind.textName.text = menu.name
@@ -90,38 +91,34 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         bind.textDifficultyValue.text = menu.difficulty
 
         // Populate Category Tags Chips
-        viewLifecycleOwner.lifecycleScope.launch {
-            uz.oybek.ozamiz.data.menu.MenuRepository.getCategories().collect { allCategories ->
-                bind.chipGroupCategoryTags.removeAllViews()
-                val matched = allCategories.filter { menu.categoryIds.contains(it.id) }
-                matched.forEach { cat ->
-                    val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                        text = cat.name
-                        isCheckable = false
-                        isClickable = false
-                    }
-                    bind.chipGroupCategoryTags.addView(chip)
-                }
+        val allCategories = MenuCategories.mainMeals + 
+            MenuCategories.methods + 
+            MenuCategories.diets + 
+            MenuCategories.ingredients
+        bind.chipGroupCategoryTags.removeAllViews()
+        val matched = allCategories.filter { menu.categoryIds.contains(it.id.name) }
+        matched.forEach { cat ->
+            val chip = com.google.android.material.chip.Chip(requireContext()).apply {
+                text = "${cat.emoji} ${cat.name}"
+                isCheckable = false
+                isClickable = false
             }
+            bind.chipGroupCategoryTags.addView(chip)
         }
 
         if (isMenu) {
-            bind.labelIngredients.visibility = if (menu.ingredients.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
+            bind.labelIngredients.visibility = if (menu.ingredients.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
             bind.textIngredients.visibility = bind.labelIngredients.visibility
             
-            originalIngredients = menu.ingredients ?: ""
+            originalIngredients = menu.ingredients
             currentServings = 1
-            bind.servingSelector.visibility = if (menu.ingredients.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
+            bind.servingSelector.visibility = if (menu.ingredients.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
             bind.textServingsCount.text = currentServings.toString()
             updateIngredientsText(bind)
 
-            bind.labelPreparationMethod.visibility = if (menu.preparationMethod.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
+            bind.labelPreparationMethod.visibility = if (menu.preparationMethod.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
             bind.textPreparationMethod.visibility = bind.labelPreparationMethod.visibility
-            bind.textPreparationMethod.text = menu.preparationMethod
-
-            bind.labelBenefits.visibility = if (menu.benefits.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
-            bind.textBenefits.visibility = bind.labelBenefits.visibility
-            bind.textBenefits.text = menu.benefits
+            bind.textPreparationMethod.text = menu.preparationMethod.mapIndexed { index, s -> "${index + 1}. $s" }.joinToString("\n\n")
 
             bind.labelAbout.visibility = android.view.View.GONE
             bind.textAbout.visibility = android.view.View.GONE
@@ -139,10 +136,6 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
             bind.labelRichIn.visibility = if (menu.richIn.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
             bind.textRichIn.visibility = bind.labelRichIn.visibility
             bind.textRichIn.text = menu.richIn
-
-            bind.labelBenefits.visibility = if (menu.benefits.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
-            bind.textBenefits.visibility = bind.labelBenefits.visibility
-            bind.textBenefits.text = menu.benefits
 
             bind.labelConsumptionTime.visibility = if (menu.consumptionTime.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
             bind.textConsumptionTime.visibility = bind.labelConsumptionTime.visibility
@@ -170,27 +163,29 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         bind.textIngredients.text = scaleIngredients(originalIngredients, currentServings)
     }
 
-    private fun scaleIngredients(text: String, multiplier: Int): String {
-        if (text.isBlank() || multiplier <= 1) return text
-        val lines = text.split("\n")
+    private fun scaleIngredients(ingredients: List<String>, multiplier: Int): String {
         val regex = Regex("(\\d+(?:\\.\\d+)?\\s*)(g|ml|mL|l|kg|tbsp|tsp|cup|dona|stakan|osh qoshiq|choy qoshiq|ta|\\))")
-        val scaledLines = lines.map { line ->
-            regex.replace(line) { matchResult ->
-                val numWithSpace = matchResult.groupValues[1]
-                val unit = matchResult.groupValues[2]
-                val numberPart = numWithSpace.trim()
-                val spacePart = numWithSpace.substring(numberPart.length)
-                val num = numberPart.toDoubleOrNull()
-                if (num != null) {
-                    val scaled = num * multiplier
-                    val formatted = if (scaled % 1.0 == 0.0) scaled.toInt().toString() else String.format(java.util.Locale.US, "%.1f", scaled)
-                    "$formatted$spacePart$unit"
-                } else {
-                    matchResult.value
+        return ingredients.joinToString("\n") { line ->
+            val scaledLine = if (multiplier <= 1) {
+                line
+            } else {
+                regex.replace(line) { matchResult ->
+                    val numWithSpace = matchResult.groupValues[1]
+                    val unit = matchResult.groupValues[2]
+                    val numberPart = numWithSpace.trim()
+                    val spacePart = numWithSpace.substring(numberPart.length)
+                    val num = numberPart.toDoubleOrNull()
+                    if (num != null) {
+                        val scaled = num * multiplier
+                        val formatted = if (scaled % 1.0 == 0.0) scaled.toInt().toString() else String.format(java.util.Locale.US, "%.1f", scaled)
+                        "$formatted$spacePart$unit"
+                    } else {
+                        matchResult.value
+                    }
                 }
             }
+            "• $scaledLine"
         }
-        return scaledLines.joinToString("\n")
     }
 
     private fun setupListeners(bind: FragmentMenuDetailBinding) {

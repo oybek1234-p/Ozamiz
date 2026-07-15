@@ -91,5 +91,6 @@ object FirebasePaths {
 
         fun paymentCheck(uid: String): StorageReference = paymentChecks(uid)
         fun categoryPhotos(categoryId: String): StorageReference = root.child("categories/$categoryId.jpg")
+        fun menuPhotos(menuId: String): StorageReference = root.child("menus/$menuId.jpg")
     }
 }

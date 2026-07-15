@@ -7,24 +7,21 @@
         android:title="Asosiy" />
 
     <item
-        android:id="@+id/aiChatFragment"
-        android:icon="@drawable/chat_ic"
-        android:title="@string/ai_chatbot_title" />
-
-    <item
         android:id="@+id/natijaFragment2"
         android:icon="@drawable/progress_ic"
         android:title="@string/natija_title"
         android:visible="true" />
-    <item
-        android:id="@+id/communityFragment"
-        android:icon="@drawable/people_ic"
-        android:title="@string/hamjamiyat" />
 
     <item
         android:id="@+id/menuListFragment"
         android:icon="@drawable/food_ic"
         android:title="Menyular"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/exercises"
+        android:icon="@drawable/fitness_ic"
+        android:title="Mashqlar"
         android:visible="true" />
 
     <item

@@ -52,6 +52,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp"
+            android:paddingBottom="100dp"
             android:clipToPadding="false">
             
             <!-- Image Picker -->
@@ -118,59 +119,27 @@
                     android:background="@drawable/round_lay"/>
             </FrameLayout>
             
-            <!-- Meal Time Categories -->
-            <LinearLayout
+            <!-- Categories Selector Section -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelectCategories"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:layout_height="56dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:text="@string/select_categories"
+                android:textColor="?attr/colorPrimary"
+                app:strokeColor="?attr/colorPrimary"
+                android:layout_marginBottom="12dp"
+                app:cornerRadius="12dp"
+                android:textAllCaps="false"/>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Kun tartibi (Meal Time)"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="14sp"/>
-
-                <TextView
-                    android:id="@+id/btnAddCategory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="+ Yangi kategoriya"
-                    android:textColor="?attr/colorPrimary"
-                    android:textStyle="bold"
-                    android:textSize="12sp"/>
-            </LinearLayout>
-
+            <!-- Selected Categories Display -->
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroupMealTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:chipSpacing="8dp"
-                app:singleSelection="false"/>
-
-            <!-- Diet Categories -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Parhezlar (Diets)"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="?colorOnSurface"
-                android:textSize="14sp"
-                android:layout_marginBottom="8dp"/>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroupDiets"
+                android:id="@+id/chipGroupSelectedCategories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:chipSpacing="8dp"
-                app:singleSelection="false"/>
-                
+                app:chipSpacing="8dp"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -191,7 +160,7 @@
                     android:id="@+id/radioMenu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Kompleks menu"
+                    android:text="@string/menu_type_tab"
                     android:checked="true"
                     android:layout_marginEnd="24dp"/>
 
@@ -199,7 +168,7 @@
                     android:id="@+id/radioFood"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Yagona mahsulot"/>
+                    android:text="@string/food_type_tab"/>
             </RadioGroup>
 
             <TextView
@@ -236,16 +205,23 @@
                     android:textSize="14sp"
                     android:layout_marginBottom="4dp"/>
 
-                <EditText
-                    android:id="@+id/editIngredients"
+                <LinearLayout
+                    android:id="@+id/containerIngredientsList"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:background="@drawable/round_lay_stroke"
-                    android:padding="12dp"
-                    android:gravity="top|start"
-                    android:hint="Masalan: 200g go'sht, piyoz, un..."
-                    android:inputType="textMultiLine"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddIngredient"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:text="@string/add_ingredient"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="16dp"
+                    app:cornerRadius="8dp"
+                    android:textAllCaps="false"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -256,16 +232,23 @@
                     android:textSize="14sp"
                     android:layout_marginBottom="4dp"/>
 
-                <EditText
-                    android:id="@+id/editPreparationMethod"
+                <LinearLayout
+                    android:id="@+id/containerStepsList"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
-                    android:background="@drawable/round_lay_stroke"
-                    android:padding="12dp"
-                    android:gravity="top|start"
-                    android:hint="Tayyorlash usuli..."
-                    android:inputType="textMultiLine"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddStep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:text="@string/add_step"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="16dp"
+                    app:cornerRadius="8dp"
+                    android:textAllCaps="false"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -414,26 +397,6 @@
                     android:layout_marginBottom="16dp"/>
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Foydali xususiyati"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="?colorOnSurface"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp"/>
-
-            <EditText
-                android:id="@+id/editBenefits"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:background="@drawable/round_lay_stroke"
-                android:padding="12dp"
-                android:gravity="top|start"
-                android:hint="Foydali xususiyatlari..."
-                android:inputType="textMultiLine"
-                android:layout_marginBottom="16dp"/>
-
             <EditText
                 android:id="@+id/editDescription"
                 android:layout_width="match_parent"
@@ -472,7 +435,8 @@
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
                         android:hint="0"
-                        android:inputType="numberDecimal"/>
+                        android:inputType="numberDecimal"
+                        android:imeOptions="actionNext"/>
                 </LinearLayout>
                 
                  <LinearLayout
@@ -553,8 +517,108 @@
                         android:padding="12dp"
                         android:hint="0"
                         android:inputType="numberDecimal"/>
+                 </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="8dp">
+                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/fiber_label"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
+                    <EditText
+                        android:id="@+id/editFiber"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:padding="12dp"
+                        android:hint="0"
+                        android:inputType="numberDecimal"/>
+                </LinearLayout>
+
+                 <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="8dp">
+                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sugar_label"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
+                    <EditText
+                        android:id="@+id/editSugar"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:padding="12dp"
+                        android:hint="0"
+                        android:inputType="numberDecimal"/>
                 </LinearLayout>
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:orientation="vertical"
+                    android:layout_marginEnd="8dp">
+                     <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/salt_label"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
+                    <EditText
+                        android:id="@+id/editSalt"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/round_lay_stroke"
+                        android:padding="12dp"
+                        android:hint="0"
+                        android:inputType="numberDecimal"
+                        android:imeOptions="actionDone"/>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.5"
+                    android:layout_marginStart="8dp"/>
+            </LinearLayout>
+
+            <!-- Keyboard Spacer -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

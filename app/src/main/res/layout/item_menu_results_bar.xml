@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp">
+
+    <!-- Header Actions Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="20dp"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnResultsBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/oval_back"
+            android:backgroundTint="?colorSurfaceContainerHigh"
+            android:src="@drawable/arrow_back"
+            android:contentDescription="Back to discovery"
+            android:padding="8dp"
+            app:tint="?colorOnSurface" />
+
+        <TextView
+            android:id="@+id/textResultsTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textSize="20sp"
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="?colorOnSurface"
+            tools:text="Retseptlar" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recvResultsSubfilters"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_menu_category_filter" />
+</LinearLayout>

@@ -665,7 +665,20 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_addMenuFragment_to_categorySelectionFragment"
+            app:destination="@id/categorySelectionFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/categorySelectionFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.add.CategorySelectionFragment"
+        android:label="CategorySelectionFragment"
+        tools:layout="@layout/fragment_category_select" />
 
     <fragment
         android:id="@+id/categoryListFragment"

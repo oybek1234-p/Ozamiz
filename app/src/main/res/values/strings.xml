@@ -148,7 +148,7 @@
     <string name="calories_hint">Kaloriya (kal)</string>
     <string name="preparation_hint">Tayyorlash (ixtiyoriy)</string>
     <string name="ingredient_hint">Masalliq %1$d</string>
-    <string name="add_ingredient">Qo\'shish +</string>
+    <string name="add_ingredient">Masalliq qo\'shish</string>
     <string name="save">Saqlash</string>
     <string name="error_enter_name">Nomini kiriting</string>
     <string name="error_select_image">Rasm tanlang</string>
@@ -1086,19 +1086,23 @@
     <string name="oson">Oson</string>
     <string name="ortacha">O\'rtacha</string>
     <string name="qiyin">Qiyin</string>
-    <string name="calorie_50_100">50-100 kkal</string>
-    <string name="calorie_100_200">100-200 kkal</string>
-    <string name="calorie_200_300">200-300 kkal</string>
-    <string name="calorie_300_400">300-400 kkal</string>
-    <string name="calorie_400_500">400-500 kkal</string>
-    <string name="calorie_500_600">500-600 kkal</string>
-
-    <string name="kashf_eting">Kashf eting (Taom turlari)</string>
-    <string name="usulni_tanlang">Usulni tanlang (Qiyinchilik)</string>
+    <string name="kashf_eting">Taom vaqtlari</string>
+    <string name="usulni_tanlang">Tayyorlash uslibi</string>
     <string name="parhezni_tanlang">Parhezni tanlang</string>
-    <string name="kaloriya_boyicha_retseptlar">Kaloriya bo\'yicha retseptlar</string>
+    <string name="kaloriya_boyicha_retseptlar">Kaloriya bo\'yicha</string>
     <string name="kun_tartibi">Kun tartibi</string>
     <string name="qiyinchilik_darajasi">Qiyinchilik darajasi</string>
     <string name="mashhur_kategoriyalar">Mashhur kategoriyalar</string>
+    <string name="masalliqlar_boyicha">Masalliqlar bo\'yicha</string>
+    <string name="add_menu">Taom qo\'shish</string>
+    <string name="fiber_label">Kletchatka (g)</string>
+    <string name="sugar_label">Shakar (g)</string>
+    <string name="salt_label">Tuz (g)</string>
+    <string name="select_categories">Kategoriyalarni tanlash</string>
+    <string name="add_step">Tayyorlash bosqichini qo\'shish</string>
+    <string name="menu_type_tab">Menyu</string>
+    <string name="food_type_tab">Ovqat</string>
+    <string name="select_categories_done">Tanlash</string>
+    <string name="categories_title">Kategoriyalar</string>
 </resources>
 
