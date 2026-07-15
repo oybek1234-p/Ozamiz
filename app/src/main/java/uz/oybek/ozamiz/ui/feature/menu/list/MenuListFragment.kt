@@ -109,7 +109,6 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
 
                     val uiItems = mutableListOf<MenuUiItem>()
 
-                    // 1. Popular Categories (Horizontal)
                     val allCategories = state.categories.map {
                         MenuFilterItem(id = it.id, name = it.name, imageUrl = it.imageUrl)
                     }
@@ -118,7 +117,6 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
                         uiItems.add(MenuUiItem.PopularCategoriesList(allCategories))
                     }
 
-                    // 2. Meal Time (Horizontal)
                     val mealCategories = state.categories.filter { it.meal }.map {
                         MenuFilterItem(id = it.id, name = it.name, imageUrl = it.imageUrl)
                     }
@@ -138,7 +136,6 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
                     uiItems.add(MenuUiItem.Header(R.string.qiyinchilik_darajasi))
                     uiItems.add(MenuUiItem.MethodList(difficultyFilters))
 
-                    // 4. Pick your diet (3-column Grid, 2 vertical rows)
                     val dietCategories = state.categories.filter { !it.meal }
                     if (dietCategories.isNotEmpty()) {
                         uiItems.add(MenuUiItem.Header(R.string.parhezni_tanlang))
@@ -152,7 +149,6 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
                         }
                     }
 
-                    // 5. Recipe ranges / calories (3-column Grid, 2 vertical rows)
                     uiItems.add(MenuUiItem.Header(R.string.kaloriya_boyicha_retseptlar))
                     getCalorieFilterItems().take(6).forEach { cal ->
                         uiItems.add(

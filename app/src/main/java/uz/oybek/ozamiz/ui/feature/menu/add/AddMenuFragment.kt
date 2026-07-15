@@ -47,7 +47,13 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
     private fun setupListeners(bind: FragmentAddMenuBinding) {
         bind.btnBack.setOnClickListener { findNavController().popBackStack() }
         bind.cardImagePicker.setOnClickListener { imagePickerLauncher.launch("image/*") }
-        bind.btnAddCategory.setOnClickListener { findNavController().navigate(R.id.categoryManagerFragment) }
+        bind.btnAddCategory.setOnClickListener {
+            findNavController().navigate(R.id.action_addMenuFragment_to_categoryListFragment)
+        }
+        
+        bind.btnAddDiet.setOnClickListener {
+            findNavController().navigate(R.id.action_addMenuFragment_to_categoryListFragment)
+        }
 
         bind.radioGroupType.setOnCheckedChangeListener { _, checkedId ->
             val isMenu = checkedId == R.id.radioMenu

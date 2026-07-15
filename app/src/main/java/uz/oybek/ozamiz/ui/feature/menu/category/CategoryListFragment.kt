@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.ui.feature.menu.category
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.viewModels
@@ -11,36 +10,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.menu.model.MenuCategory
-import uz.oybek.ozamiz.databinding.FragmentCategoryManagerBinding
+import uz.oybek.ozamiz.databinding.FragmentCategoryListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.isVisible
 import uz.oybek.ozamiz.ui.utils.loadPhoto
 import uz.oybek.ozamiz.ui.utils.toDp
 import android.net.Uri
 
-class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
+class CategoryListFragment : BaseFragment<FragmentCategoryListBinding>() {
 
     private val viewModel: CategoryManagerViewModel by viewModels()
     private lateinit var adapter: MenuCategoryAdapter
-    private var selectedImageUri: Uri? = null
     private var selectedEditImageUri: Uri? = null
     private var editDialogImageView: android.widget.ImageView? = null
-
-    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        if (uri != null) {
-            selectedImageUri = uri
-            binding.imageCategoryPreview.isVisible = true
-            binding.containerCategoryUploadInfo.isVisible = false
-            binding.imageCategoryPreview.loadPhoto(uri.toString())
-        }
-    }
 
     private val editImagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
@@ -52,17 +38,17 @@ class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): FragmentCategoryManagerBinding {
-        return FragmentCategoryManagerBinding.inflate(inflater, container, false)
+    ): FragmentCategoryListBinding {
+        return FragmentCategoryListBinding.inflate(inflater, container, false)
     }
 
-    override fun viewCreated(bind: FragmentCategoryManagerBinding) {
+    override fun viewCreated(bind: FragmentCategoryListBinding) {
         setupRecyclerView(bind)
         setupListeners(bind)
         observeState(bind)
     }
 
-    private fun setupRecyclerView(bind: FragmentCategoryManagerBinding) {
+    private fun setupRecyclerView(bind: FragmentCategoryListBinding) {
         adapter = MenuCategoryAdapter(
             onEditClick = { showEditDialog(it) },
             onDeleteClick = { showDeleteConfirmation(it) }
@@ -71,30 +57,17 @@ class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
         bind.recyclerCategories.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    private fun setupListeners(bind: FragmentCategoryManagerBinding) {
+    private fun setupListeners(bind: FragmentCategoryListBinding) {
         bind.btnBack.setOnClickListener {
             findNavController().popBackStack()
         }
 
-        bind.cardCategoryImagePicker.setOnClickListener {
-            imagePickerLauncher.launch("image/*")
-        }
-
-        bind.btnAdd.setOnClickListener {
-            val name = bind.editNewCategory.text.toString().trim()
-            val meal = !bind.checkIsSecondary.isChecked
-            if (name.isNotEmpty()) {
-                viewModel.addCategory(name, meal, selectedImageUri)
-                bind.editNewCategory.setText("")
-                bind.checkIsSecondary.isChecked = false
-                selectedImageUri = null
-                bind.imageCategoryPreview.isVisible = false
-                bind.containerCategoryUploadInfo.isVisible = true
-            }
+        bind.fabAdd.setOnClickListener {
+            navigate(R.id.action_categoryListFragment_to_categoryAddFragment)
         }
     }
 
-    private fun observeState(bind: FragmentCategoryManagerBinding) {
+    private fun observeState(bind: FragmentCategoryListBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
@@ -117,7 +90,6 @@ class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
             setPadding(context.toDp(20), context.toDp(10), context.toDp(20), context.toDp(10))
         }
 
-        // Add Image Picker inside custom dialog layout
         val pickerContainer = android.widget.FrameLayout(context).apply {
             layoutParams = android.widget.LinearLayout.LayoutParams(
                 android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
