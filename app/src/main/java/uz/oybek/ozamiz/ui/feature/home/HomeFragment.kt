@@ -14,11 +14,16 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import com.yandex.mobile.ads.banner.BannerAdEventListener
+import com.yandex.mobile.ads.common.AdRequestError
+import com.yandex.mobile.ads.common.ImpressionData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.model.UserExercise
 import uz.oybek.ozamiz.data.streak.StreakInfo
@@ -30,11 +35,10 @@ import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.food.LogFoodFragment
+import uz.oybek.ozamiz.ui.feature.log.exercise.ExerciseAchievementDialog
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet
-import uz.oybek.ozamiz.data.ads.AdsConfig
-import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.ui.utils.VaznimColors
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.triggerVibration
@@ -89,9 +93,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         initMealRecommendation()
         observeUiState()
         observeStreakUpdate()
+        observeExerciseAdded()
         checkNotificationPermission()
         setupLimitExceededResultListener()
         setupPremiumResultListener()
+        setupExerciseAddedResultListener()
         initBannerAd(bind)
         if (animateProgress) {
             lifecycleScope.launch {
@@ -103,10 +109,23 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun initBannerAd(bind: FragmentHomeBinding) {
         if (user.isPremium()) return
-        val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_HOME)
+        val bannerView = AdsManager.createBannerView(
+            requireContext(),
+            AdsConfig.BANNER_HOME,
+            object : BannerAdEventListener {
+                override fun onAdLoaded() {
+                    bind.bannerAdContainerHome.visibility = android.view.View.VISIBLE
+                }
+
+                override fun onAdFailedToLoad(error: AdRequestError) {
+                    bind.bannerAdContainerHome.visibility = android.view.View.GONE
+                }
+
+                override fun onAdClicked() {}
+                override fun onImpression(impressionData: ImpressionData?) {}
+            })
         bind.bannerAdContainerHome.removeAllViews()
         bind.bannerAdContainerHome.addView(bannerView)
-        bind.bannerAdContainerHome.visibility = android.view.View.VISIBLE
     }
 
     private fun checkPremiumAndNavigate(destinationId: Int) {
@@ -131,6 +150,22 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                     R.id.paymentGetCheckFragment,
                     args
                 )
+            }
+        }
+    }
+
+    private fun setupExerciseAddedResultListener() {
+        parentFragmentManager.setFragmentResultListener(
+            "exercise_added_request",
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val calories = bundle.getInt("caloriesBurned", 0)
+            if (calories > 0) {
+                val args = DailyAnalysisFragment.createArgs(
+                    type = DailyAnalysisFragment.TYPE_EXERCISE_50,
+                    caloriesBurned = calories
+                )
+                navigate(R.id.action_home_to_dailyAnalysisFragment, args)
             }
         }
     }
@@ -266,6 +301,26 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 }
                 navigate(R.id.action_home_to_macroInfoFragment, args)
             }
+        }
+        showLimitExercises.setOnSafeClickListener {
+            val currentState = viewModel.uiState.value
+            val excessCalories = (currentState.caloriesConsumed - currentState.caloriesTarget).coerceAtLeast(0)
+            if (excessCalories > 0) {
+                OverageExerciseBottomSheet.newInstance(excessCalories)
+                    .show(childFragmentManager, OverageExerciseBottomSheet.TAG)
+            }
+        }
+        btnHowFatBurned.setOnSafeClickListener {
+            InfoBottomSheet.newInstance(
+                getString(R.string.how_to_burn_fat_title),
+                getString(R.string.how_to_burn_fat_content)
+            ).show(childFragmentManager, InfoBottomSheet.TAG)
+        }
+        btnHungryWhatToEat.setOnSafeClickListener {
+            InfoBottomSheet.newInstance(
+                getString(R.string.hungry_what_to_eat_title),
+                getString(R.string.hungry_what_to_eat_content)
+            ).show(childFragmentManager, InfoBottomSheet.TAG)
         }
     }
 
@@ -530,33 +585,48 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             }
             textCaloriesRemainingCount.text = state.caloriesRemaining.absoluteValue.toString()
             textEatenCount.text = getString(R.string.calories_eaten_format, state.caloriesConsumed)
+            val effectiveConsumed = if (state.caloriesTarget > 0 && state.caloriesConsumed > state.caloriesTarget + 100) {
+                val net = state.caloriesConsumed - state.exerciseBurnt
+                if (net <= state.caloriesTarget) {
+                    state.caloriesTarget
+                } else {
+                    net
+                }
+            } else {
+                state.caloriesConsumed
+            }
+
             progressCaloriesCircular.max = state.caloriesTarget
             progressCaloriesCircular.setProgressCompat(
-                state.caloriesConsumed.absoluteValue.coerceAtMost(state.caloriesTarget),
+                effectiveConsumed.absoluteValue.coerceAtMost(state.caloriesTarget),
                 useAnimation
             )
             btnDetailedInfo.isVisible = true
 
             val reachedLimit =
-                state.caloriesTarget > 0 && state.caloriesConsumed >= state.caloriesTarget - 100
-            layoutCalorieText.isVisible = !reachedLimit
-            layoutLimitInfo.isVisible = reachedLimit
-            textLimitSubtitle.visibility = View.GONE
-            macrosContainer.isVisible = true
+                state.caloriesTarget > 0 && effectiveConsumed >= state.caloriesTarget - 100 && effectiveConsumed <= state.caloriesTarget + 100
+            val exceededLimit =
+                state.caloriesTarget > 0 && effectiveConsumed > state.caloriesTarget + 100
 
-            if (reachedLimit) {
-                textLimitTitle.text = "Limitga yetdingiz"
-            }
+            layoutCalorieText.isVisible = !reachedLimit && !exceededLimit
+            layoutLimitInfo.isVisible = reachedLimit || exceededLimit
+            textLimitSubtitle.visibility = View.GONE
+
+            layoutNormalProgress.isVisible = reachedLimit.not() && exceededLimit.not()
+            macrosContainer.isVisible = !reachedLimit && !exceededLimit
+            limitReached.isVisible = reachedLimit
+            limitExeed.isVisible = exceededLimit
+
 
             val calorieColor = when {
-                state.caloriesConsumed > state.caloriesTarget + 100 -> VaznimColors.getRed(context)
-                state.caloriesConsumed >= state.caloriesTarget - 100 && state.caloriesConsumed <= state.caloriesTarget + 100 -> cGreen
+                effectiveConsumed > state.caloriesTarget + 100 -> VaznimColors.getRed(context)
+                effectiveConsumed >= state.caloriesTarget - 100 && effectiveConsumed <= state.caloriesTarget + 100 -> cGreen
                 else -> cPrimary
             }
             progressCaloriesCircular.setIndicatorColor(calorieColor)
             progressCaloriesCircular.trackColor = cTrack
             textCaloriesRemainingCount.setTextColor(
-                if (state.caloriesConsumed > state.caloriesTarget + 100) VaznimColors.getRed(
+                if (effectiveConsumed > state.caloriesTarget + 100) VaznimColors.getRed(
                     context
                 ) else cOnSurface
             )
@@ -660,7 +730,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             card.progressMeal.setIndicatorColor(cPrimary)
 
             val hideCalories = consumed >= max || state.caloriesConsumed >= state.caloriesTarget
-
+            card.layoutCalories.isVisible = !hideCalories
             if (!hideCalories) {
                 card.textMealCalories.text =
                     getString(R.string.meal_remaining_format, max - consumed)
@@ -801,6 +871,18 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                         e.printStackTrace()
                     }
                 }
+            }
+        }
+    }
+
+    private fun observeExerciseAdded() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.exerciseAddedEvent.collect { calories ->
+                val args = DailyAnalysisFragment.createArgs(
+                    type = DailyAnalysisFragment.TYPE_EXERCISE_50,
+                    caloriesBurned = calories
+                )
+                navigate(R.id.action_home_to_dailyAnalysisFragment, args)
             }
         }
     }

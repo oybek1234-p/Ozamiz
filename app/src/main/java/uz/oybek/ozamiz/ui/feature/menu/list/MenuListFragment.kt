@@ -3,15 +3,21 @@ package uz.oybek.ozamiz.ui.feature.menu.list
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.databinding.FragmentMenuListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
+
+    private val viewModel: MenuListViewModel by viewModels()
+    private var multiViewAdapter: MenuMultiViewAdapter? = null
 
     init {
         showBottomSheet = true
@@ -23,61 +29,159 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
     ) = FragmentMenuListBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentMenuListBinding) {
+        setupRecyclerView(bind)
         setupListeners(bind)
-        setupPaymentCheckListener()
+        observeState(bind)
     }
 
-    private fun checkPremiumAndNavigate(actionId: Int) {
-        val user = LocalUser.user
-        if (user.isPremium()) {
-            navigate(actionId)
-        } else {
-            PremiumBottomSheetDialog().show(
-                childFragmentManager,
-                PremiumBottomSheetDialog.TAG
-            )
-        }
-    }
+    private fun setupRecyclerView(bind: FragmentMenuListBinding) {
+        multiViewAdapter = MenuMultiViewAdapter(
+            onPopularCategoryClick = { categoryId ->
+                val state = viewModel.uiState.value
+                val cat = state.categories.find { it.id == categoryId }
+                if (cat != null) {
+                    val filterType = if (cat.meal) MenuFilterType.MEAL.value else MenuFilterType.DIET.value
+                    val args = bundleOf("filterType" to filterType, "filterValue" to categoryId)
+                    navigate(R.id.action_menuListFragment_to_menuSearchResultsFragment, args)
+                }
+            },
+            onMealCategoryClick = { categoryId ->
+                val args = bundleOf("filterType" to MenuFilterType.MEAL.value, "filterValue" to categoryId)
+                navigate(R.id.action_menuListFragment_to_menuSearchResultsFragment, args)
+            },
+            onDifficultyClick = { difficultyId ->
+                val args = bundleOf("filterType" to MenuFilterType.DIFFICULTY.value, "filterValue" to difficultyId)
+                navigate(R.id.action_menuListFragment_to_menuSearchResultsFragment, args)
+            },
+            onDietCategoryClick = { dietId ->
+                val args = bundleOf("filterType" to MenuFilterType.DIET.value, "filterValue" to dietId)
+                navigate(R.id.action_menuListFragment_to_menuSearchResultsFragment, args)
+            },
+            onCalorieRangeClick = { range ->
+                if (range != null) {
+                    val calorieId = "${range.first}_${range.second}"
+                    val args = bundleOf("filterType" to MenuFilterType.CALORIE.value, "filterValue" to calorieId)
+                    navigate(R.id.action_menuListFragment_to_menuSearchResultsFragment, args)
+                }
+            },
+            onResultsSubfilterClick = {},
+            onResultsBackClick = {},
+            onMenuClick = { _, _ -> }
+        )
 
-    private fun setupPaymentCheckListener() {
-        childFragmentManager.setFragmentResultListener(
-            PremiumBottomSheetDialog.REQUEST_KEY,
-            viewLifecycleOwner
-        ) { _, bundle ->
-            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
-            if (result == "go_to_payment") {
-                val price = bundle.getLong("selected_price", 29000L)
-                val isYearly = bundle.getBoolean("is_yearly", false)
-                val args = bundleOf("price" to price, "is_yearly" to isYearly)
-                findNavController().navigate(
-                    R.id.paymentGetCheckFragment,
-                    args
-                )
+        val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(requireContext(), 12)
+        gridLayoutManager.spanSizeLookup = object : androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                val adapter = multiViewAdapter ?: return 12
+                if (position >= adapter.itemCount) return 12
+                return when (adapter.getItemViewType(position)) {
+                    0 -> 12 // Header -> span 12
+                    1 -> 12 // PopularCategoriesList -> span 12 (horizontal list item)
+                    2 -> 12 // MealTimeList -> span 12 (horizontal list item)
+                    3 -> 12 // MethodList -> span 12 (horizontal list item)
+                    4 -> 4  // DietItem -> span 4 (3 per row)
+                    5 -> 4  // CalorieItem -> span 4 (3 per row)
+                    else -> 12
+                }
             }
+        }
+
+        bind.recvMenuList.apply {
+            layoutManager = gridLayoutManager
+            adapter = multiViewAdapter
         }
     }
 
     private fun setupListeners(bind: FragmentMenuListBinding) {
-        bind.itemBreakfast.setOnClickListener {
-            checkPremiumAndNavigate(R.id.action_menuListFragment_to_breakfastGuideFragment)
+        bind.btnAdminAdd.setOnClickListener {
+            navigate(R.id.action_menuListFragment_to_addMenuFragment)
         }
-        bind.itemLunch.setOnClickListener {
-            checkPremiumAndNavigate(R.id.action_menuListFragment_to_lunchGuideFragment)
+    }
+
+    private fun observeState(bind: FragmentMenuListBinding) {
+        val user = UserProfileRepository.user
+        bind.btnAdminAdd.visibility = if (user.admin) android.view.View.VISIBLE else android.view.View.GONE
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collectLatest { state ->
+                    bind.progressBar.visibility = if (state.isLoading) android.view.View.VISIBLE else android.view.View.GONE
+
+                    val uiItems = mutableListOf<MenuUiItem>()
+
+                    // 1. Popular Categories (Horizontal)
+                    val allCategories = state.categories.map {
+                        MenuFilterItem(id = it.id, name = it.name, imageUrl = it.imageUrl)
+                    }
+                    if (allCategories.isNotEmpty()) {
+                        uiItems.add(MenuUiItem.Header(R.string.mashhur_kategoriyalar))
+                        uiItems.add(MenuUiItem.PopularCategoriesList(allCategories))
+                    }
+
+                    // 2. Meal Time (Horizontal)
+                    val mealCategories = state.categories.filter { it.meal }.map {
+                        MenuFilterItem(id = it.id, name = it.name, imageUrl = it.imageUrl)
+                    }
+                    if (mealCategories.isNotEmpty()) {
+                        uiItems.add(MenuUiItem.Header(R.string.kun_tartibi))
+                        uiItems.add(MenuUiItem.MealTimeList(mealCategories))
+                    }
+
+                    // 3. Pick your method (Horizontal)
+                    val difficultyFilters = MenuDifficulty.entries.map { diff ->
+                        MenuFilterItem(
+                            id = diff.id,
+                            name = getString(diff.textResId),
+                            emoji = diff.emoji
+                        )
+                    }
+                    uiItems.add(MenuUiItem.Header(R.string.qiyinchilik_darajasi))
+                    uiItems.add(MenuUiItem.MethodList(difficultyFilters))
+
+                    // 4. Pick your diet (3-column Grid, 2 vertical rows)
+                    val dietCategories = state.categories.filter { !it.meal }
+                    if (dietCategories.isNotEmpty()) {
+                        uiItems.add(MenuUiItem.Header(R.string.parhezni_tanlang))
+                        dietCategories.take(6).forEach { cat ->
+                            uiItems.add(
+                                MenuUiItem.DietItem(
+                                    item = MenuFilterItem(id = cat.id, name = cat.name, imageUrl = cat.imageUrl),
+                                    isSelected = false
+                                )
+                            )
+                        }
+                    }
+
+                    // 5. Recipe ranges / calories (3-column Grid, 2 vertical rows)
+                    uiItems.add(MenuUiItem.Header(R.string.kaloriya_boyicha_retseptlar))
+                    getCalorieFilterItems().take(6).forEach { cal ->
+                        uiItems.add(
+                            MenuUiItem.CalorieItem(
+                                item = cal,
+                                isSelected = false
+                            )
+                        )
+                    }
+
+                    multiViewAdapter?.submitList(uiItems)
+                }
+            }
         }
-        bind.itemDinner.setOnClickListener {
-            checkPremiumAndNavigate(R.id.action_menuListFragment_to_dinnerGuideFragment)
-        }
-        bind.itemSnacks.setOnClickListener {
-            checkPremiumAndNavigate(R.id.action_menuListFragment_to_snacksGuideFragment)
-        }
-        bind.itemProtein.setOnClickListener {
-            checkPremiumAndNavigate(R.id.action_menuListFragment_to_proteinGuideFragment)
-        }
-        bind.itemCarbs.setOnClickListener {
-            checkPremiumAndNavigate(R.id.action_menuListFragment_to_carbsGuideFragment)
-        }
-        bind.itemLipids.setOnClickListener {
-            checkPremiumAndNavigate(R.id.action_menuListFragment_to_lipidsGuideFragment)
-        }
+    }
+
+    private fun getCalorieFilterItems(): List<MenuFilterItem> {
+        return listOf(
+            MenuFilterItem("50_100", getString(R.string.calorie_50_100), "🍉"),
+            MenuFilterItem("100_200", getString(R.string.calorie_100_200), "🥪"),
+            MenuFilterItem("200_300", getString(R.string.calorie_200_300), "🍪"),
+            MenuFilterItem("300_400", getString(R.string.calorie_300_400), "🥞"),
+            MenuFilterItem("400_500", getString(R.string.calorie_400_500), "🥣"),
+            MenuFilterItem("500_600", getString(R.string.calorie_500_600), "🧆")
+        )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        multiViewAdapter = null
     }
 }

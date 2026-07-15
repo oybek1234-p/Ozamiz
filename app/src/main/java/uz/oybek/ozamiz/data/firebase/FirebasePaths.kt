@@ -90,5 +90,6 @@ object FirebasePaths {
             weightLogs(uid).child(fileName)
 
         fun paymentCheck(uid: String): StorageReference = paymentChecks(uid)
+        fun categoryPhotos(categoryId: String): StorageReference = root.child("categories/$categoryId.jpg")
     }
 }

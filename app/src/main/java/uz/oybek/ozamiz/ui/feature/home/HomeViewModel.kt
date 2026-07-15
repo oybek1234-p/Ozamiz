@@ -58,6 +58,9 @@ class HomeViewModel : ViewModel() {
     private val _showWeightLogEvent = MutableSharedFlow<Unit>()
     val showWeightLogEvent = _showWeightLogEvent.asSharedFlow()
 
+    private val _exerciseAddedEvent = MutableSharedFlow<Int>()
+    val exerciseAddedEvent = _exerciseAddedEvent.asSharedFlow()
+
     private val _showDailyAnalysisEvent = Channel<DailyAnalysisData>(Channel.BUFFERED)
     val showDailyAnalysisEvent = _showDailyAnalysisEvent.receiveAsFlow()
 
@@ -205,12 +208,23 @@ class HomeViewModel : ViewModel() {
                 val currentExerciseBurnt = summary.burnedCalories
                 val waterTarget = user.targetWaterMl
 
+                val remaining = if (summary.consumedCalories > targetCals + 100) {
+                    val net = summary.consumedCalories - currentExerciseBurnt
+                    if (net <= targetCals) {
+                        0
+                    } else {
+                        targetCals - net
+                    }
+                } else {
+                    targetCals - summary.consumedCalories
+                }
+
                 _uiState.update {
                     it.copy(
                         isInitialLoading = false,
                         isRefreshing = false,
                         selectedDate = date,
-                        caloriesRemaining = targetCals - summary.consumedCalories,
+                        caloriesRemaining = remaining,
                         caloriesConsumed = summary.consumedCalories,
                         caloriesTarget = targetCals,
                         waterConsumed = currentWater,
@@ -298,5 +312,21 @@ class HomeViewModel : ViewModel() {
 
     fun setSecondOnboardingSheetSeen(seen: Boolean) {
         AppPreference.isSecondOnboardingSheetSeen = seen
+    }
+
+    fun addExercise(exerciseType: String, durationMin: Int, caloriesBurned: Int) {
+        viewModelScope.launch {
+            val date = uiState.value.selectedDate
+            val log = ExerciseLog(
+                exerciseType = exerciseType,
+                durationMin = durationMin,
+                caloriesBurned = caloriesBurned
+            )
+            val success = ExerciseLogRepository.add(log, date)
+            if (success) {
+                PointsRepository.onEvent(PointsEvent.Exercise(caloriesBurned))
+                _exerciseAddedEvent.emit(caloriesBurned)
+            }
+        }
     }
 }

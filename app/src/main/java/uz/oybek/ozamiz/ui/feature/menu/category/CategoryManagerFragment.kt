@@ -19,10 +19,35 @@ import uz.oybek.ozamiz.data.menu.model.MenuCategory
 import uz.oybek.ozamiz.databinding.FragmentCategoryManagerBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.isVisible
+import uz.oybek.ozamiz.ui.utils.loadPhoto
+import uz.oybek.ozamiz.ui.utils.toDp
+import android.net.Uri
+
 class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
 
     private val viewModel: CategoryManagerViewModel by viewModels()
     private lateinit var adapter: MenuCategoryAdapter
+    private var selectedImageUri: Uri? = null
+    private var selectedEditImageUri: Uri? = null
+    private var editDialogImageView: android.widget.ImageView? = null
+
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            selectedImageUri = uri
+            binding.imageCategoryPreview.isVisible = true
+            binding.containerCategoryUploadInfo.isVisible = false
+            binding.imageCategoryPreview.loadPhoto(uri.toString())
+        }
+    }
+
+    private val editImagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            selectedEditImageUri = uri
+            editDialogImageView?.loadPhoto(uri.toString())
+        }
+    }
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -51,13 +76,20 @@ class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
             findNavController().popBackStack()
         }
 
+        bind.cardCategoryImagePicker.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
+        }
+
         bind.btnAdd.setOnClickListener {
             val name = bind.editNewCategory.text.toString().trim()
-            val isSecondary = bind.checkIsSecondary.isChecked
+            val meal = !bind.checkIsSecondary.isChecked
             if (name.isNotEmpty()) {
-                viewModel.addCategory(name, isSecondary)
+                viewModel.addCategory(name, meal, selectedImageUri)
                 bind.editNewCategory.setText("")
                 bind.checkIsSecondary.isChecked = false
+                selectedImageUri = null
+                bind.imageCategoryPreview.isVisible = false
+                bind.containerCategoryUploadInfo.isVisible = true
             }
         }
     }
@@ -78,25 +110,66 @@ class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
     }
 
     private fun showEditDialog(category: MenuCategory) {
-        val layout = android.widget.LinearLayout(requireContext()).apply {
+        selectedEditImageUri = null
+        val context = requireContext()
+        val layout = android.widget.LinearLayout(context).apply {
             orientation = android.widget.LinearLayout.VERTICAL
-            setPadding(50, 20, 50, 20)
+            setPadding(context.toDp(20), context.toDp(10), context.toDp(20), context.toDp(10))
         }
 
-        val editText = EditText(requireContext()).apply {
+        // Add Image Picker inside custom dialog layout
+        val pickerContainer = android.widget.FrameLayout(context).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                context.toDp(120)
+            ).apply {
+                bottomMargin = context.toDp(16)
+            }
+            background = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.round_lay_stroke)
+        }
+
+        val dialogImageView = android.widget.ImageView(context).apply {
+            layoutParams = android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+            clipToOutline = true
+            background = androidx.core.content.ContextCompat.getDrawable(context, R.drawable.round_lay)
+            if (category.imageUrl.isNotEmpty()) {
+                loadPhoto(category.imageUrl)
+            } else {
+                setImageResource(R.drawable.camera_ic)
+            }
+        }
+        editDialogImageView = dialogImageView
+
+        pickerContainer.addView(dialogImageView)
+        pickerContainer.setOnClickListener {
+            editImagePickerLauncher.launch("image/*")
+        }
+
+        val editText = EditText(context).apply {
             setText(category.name)
             hint = "Kategoriya nomi"
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                bottomMargin = context.toDp(12)
+            }
         }
         
-        val checkBox = android.widget.CheckBox(requireContext()).apply {
+        val checkBox = android.widget.CheckBox(context).apply {
             text = "Ikkilamchi kategoriya"
-            isChecked = category.isSecondary
+            isChecked = !category.meal
         }
 
+        layout.addView(pickerContainer)
         layout.addView(editText)
         layout.addView(checkBox)
 
-        AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(context)
             .setTitle("Kategoriyani tahrirlash")
             .setView(layout)
             .setPositiveButton("Saqlash") { _, _ ->
@@ -104,11 +177,14 @@ class CategoryManagerFragment : BaseFragment<FragmentCategoryManagerBinding>() {
                 if (newName.isNotEmpty()) {
                     viewModel.updateCategory(category.copy(
                         name = newName,
-                        isSecondary = checkBox.isChecked
-                    ))
+                        meal = !checkBox.isChecked
+                    ), selectedEditImageUri)
                 }
             }
             .setNegativeButton("Bekor", null)
+            .setOnDismissListener {
+                editDialogImageView = null
+            }
             .show()
     }
 

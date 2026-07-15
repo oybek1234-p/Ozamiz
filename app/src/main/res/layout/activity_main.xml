@@ -22,7 +22,7 @@
         android:id="@+id/bottom_nav_view"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        app:backgroundTint="?colorSurfaceContainerLowest"
+        app:backgroundTint="?colorSurfaceContainer"
         app:elevation="8dp"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurfaceContainerLowest"
+    android:background="?colorSurfaceContainer"
 
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_bold"
             android:text="@string/how_active"
-            android:textColor="?attr/colorOnSurface" />
+            android:textColor="?colorOnSurface" />
 
         <TextView
             style="@style/Title3_17"
@@ -35,7 +35,7 @@
             android:layout_marginTop="@dimen/dimen_12"
             android:gravity="center"
             android:text="@string/how_active_info"
-            android:textColor="?attr/colorOnSurface" />
+            android:textColor="?colorOnSurface" />
 
     </LinearLayout>
 

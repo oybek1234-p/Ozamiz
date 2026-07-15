@@ -5,11 +5,11 @@
         android:id="@+id/home"
         android:icon="@drawable/calculate_ic"
         android:title="Asosiy" />
+
     <item
         android:id="@+id/aiChatFragment"
         android:icon="@drawable/chat_ic"
         android:title="@string/ai_chatbot_title" />
-
 
     <item
         android:id="@+id/natijaFragment2"
@@ -26,7 +26,6 @@
         android:icon="@drawable/food_ic"
         android:title="Menyular"
         android:visible="true" />
-
 
     <item
         android:id="@+id/profileFragment"

@@ -12,19 +12,18 @@ plugins {
 android {
     namespace = "uz.oybek.ozamiz"
     compileSdk = 36
-
+    
     packagingOptions {
         resources {
             excludes += "META-INF/DEPENDENCIES"
             excludes += "META-INF/INDEX.LIST"
         }
     }
-
     defaultConfig {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 36
-        versionCode = 91
+        versionCode = 92
         versionName = "9.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "ru", "uz"))

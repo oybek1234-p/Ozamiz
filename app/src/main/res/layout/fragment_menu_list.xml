@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurfaceContainer">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -13,335 +15,39 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="12dp">
+            android:layout_height="56dp"
+            android:paddingHorizontal="20dp">
+
+            <ImageButton
+                android:id="@+id/btnAdminAdd"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/oval_back"
+                android:backgroundTint="?colorSurfaceContainerHigh"
+                android:src="@drawable/add_ic"
+                android:contentDescription="Add Menu"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:tint="?colorOnSurface" />
         </RelativeLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recvMenuList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="14dp"
-            android:paddingBottom="32dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:layout_marginBottom="8dp">
-
-                <!-- Ertalabki choy -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/item_breakfast"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="18dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:layout_marginBottom="12dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/breakfast_simple"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Ertalabki choy"
-                            android:textColor="?colorOnSurface"
-                            android:gravity="center"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:layout_marginBottom="8dp">
-
-                <!-- Tushlik -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/item_lunch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="18dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:layout_marginBottom="12dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/lunch_simple"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Tushlik"
-                            android:textColor="?colorOnSurface"
-                            android:gravity="center"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Kechki ovqat -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/item_dinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="18dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:layout_marginBottom="12dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/dinner_simple"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Kechki ovqat"
-                            android:textColor="?colorOnSurface"
-                            android:gravity="center"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:layout_marginBottom="8dp">
-
-                <!-- Orada ovqatlar -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/item_snacks"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="18dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:layout_marginBottom="12dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/apple_simple"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Orada ovqatlar"
-                            android:textColor="?colorOnSurface"
-                            android:gravity="center"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Oqsilli taomlar -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/item_protein"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="18dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:layout_marginBottom="12dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/egg"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/protein_guide_title"
-                            android:textColor="?colorOnSurface"
-                            android:gravity="center"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
-            <!-- Row 4: Uglevodli taomlar & Yog'li taomlar -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:layout_marginBottom="8dp">
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/item_carbs"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="18dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:layout_marginBottom="12dp"
-
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/bread"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/carbs_guide_title"
-                            android:textColor="?colorOnSurface"
-                            android:gravity="center"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Yog'li taomlar -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/item_lipids"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_margin="6dp"
-                    app:cardBackgroundColor="?colorSurface"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="18dp">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:layout_width="72dp"
-                            android:layout_height="72dp"
-                            android:layout_marginBottom="12dp"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/fat_ic"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="@string/fats_guide_title"
-                            android:textColor="?colorOnSurface"
-                            android:gravity="center"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

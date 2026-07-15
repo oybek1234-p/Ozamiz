@@ -24,7 +24,7 @@ sealed class AddExerciseUiState {
         AddExerciseUiState()
 
     object Saving : AddExerciseUiState()
-    data class Success(val exerciseId: String) : AddExerciseUiState()
+    data class Success(val exerciseId: String, val caloriesBurned: Int) : AddExerciseUiState()
     data class Error(val message: String) : AddExerciseUiState()
 }
 
@@ -76,7 +76,7 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
             val success = ExerciseLogRepository.add(exerciseLog, selectedDate)
             if (success) {
                 PointsRepository.onEvent(PointsEvent.Exercise(caloriesBurned))
-                _uiState.value = AddExerciseUiState.Success(exercise.name)
+                _uiState.value = AddExerciseUiState.Success(exercise.name, caloriesBurned)
             } else {
                 _uiState.value = AddExerciseUiState.Error("Saqlashda xatolik yuz berdi")
             }

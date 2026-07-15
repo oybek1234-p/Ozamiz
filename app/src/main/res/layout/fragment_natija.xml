@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurfaceContainerLowest">
+    android:background="?attr/colorSurfaceContainer">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurfaceContainerLowest"
+        android:background="?colorSurfaceContainer"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -46,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
@@ -99,7 +99,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                     app:cardCornerRadius="28dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
@@ -216,7 +216,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
@@ -356,7 +356,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
                     android:visibility="gone"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
@@ -410,7 +410,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                     app:cardCornerRadius="24dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
@@ -595,7 +595,7 @@
                      android:layout_width="match_parent"
                      android:layout_height="wrap_content"
                      android:layout_marginBottom="32dp"
-                     app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                      app:cardCornerRadius="24dp"
                      app:cardElevation="0dp"
                      app:strokeColor="?attr/colorOutlineVariant"

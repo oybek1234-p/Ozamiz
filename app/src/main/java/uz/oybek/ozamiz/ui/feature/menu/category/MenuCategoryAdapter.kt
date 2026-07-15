@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.menu.model.MenuCategory
 import uz.oybek.ozamiz.databinding.ItemMenuCategoryBinding
 
@@ -33,16 +34,31 @@ class MenuCategoryAdapter(
             binding.textCategoryName.text = item.name
             
             // Apply dynamic colors based on category type
-            val containerAttr = if (item.isSecondary) com.google.android.material.R.attr.colorSecondaryContainer else com.google.android.material.R.attr.colorPrimaryContainer
-            val onContainerAttr = if (item.isSecondary) com.google.android.material.R.attr.colorOnSecondaryContainer else com.google.android.material.R.attr.colorOnPrimaryContainer
+            val containerAttr = if (!item.meal) com.google.android.material.R.attr.colorSecondaryContainer else com.google.android.material.R.attr.colorPrimaryContainer
+            val onContainerAttr = if (!item.meal) com.google.android.material.R.attr.colorOnSecondaryContainer else com.google.android.material.R.attr.colorOnPrimaryContainer
             
             val containerColor = MaterialColors.getColor(binding.root, containerAttr)
             val onContainerColor = MaterialColors.getColor(binding.root, onContainerAttr)
 
             binding.iconContainer.backgroundTintList = ColorStateList.valueOf(containerColor)
-            binding.imgCategoryIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
             
-            binding.textCategoryType.text = if (item.isSecondary) "Qo'shimcha" else "Asosiy"
+            if (item.imageUrl.isNotEmpty()) {
+                binding.imgCategoryPhoto.visibility = android.view.View.VISIBLE
+                binding.imgCategoryIcon.visibility = android.view.View.GONE
+                binding.iconContainer.clipToOutline = true
+                com.bumptech.glide.Glide.with(binding.imgCategoryPhoto)
+                    .load(item.imageUrl)
+                    .placeholder(R.drawable.placeholder_food)
+                    .centerCrop()
+                    .into(binding.imgCategoryPhoto)
+            } else {
+                binding.imgCategoryPhoto.visibility = android.view.View.GONE
+                binding.imgCategoryIcon.visibility = android.view.View.VISIBLE
+                binding.imgCategoryIcon.imageTintList = ColorStateList.valueOf(onContainerColor)
+                binding.imgCategoryIcon.setImageResource(R.drawable.food_ic)
+            }
+            
+            binding.textCategoryType.text = if (!item.meal) "Qo'shimcha" else "Asosiy"
             binding.textCategoryType.backgroundTintList = ColorStateList.valueOf(containerColor)
             binding.textCategoryType.setTextColor(onContainerColor)
             

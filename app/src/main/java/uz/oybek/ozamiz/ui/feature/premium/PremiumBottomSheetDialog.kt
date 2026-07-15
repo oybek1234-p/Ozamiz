@@ -37,9 +37,8 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return (super.onCreateDialog(savedInstanceState) as BottomSheetDialog).also { dialog ->
             dialog.setOnShowListener {
-                val sheet =
-                    dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                        ?: return@setOnShowListener
+                val sheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+                    ?: return@setOnShowListener
                 val behavior = BottomSheetBehavior.from(sheet)
                 behavior.skipCollapsed = true
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -79,21 +78,9 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             val isMonthly = state.selectedPrice == monthlyPrice
             val context = requireContext()
 
-            val primaryColor = MaterialColors.getColor(
-                context,
-                androidx.appcompat.R.attr.colorPrimary,
-                android.graphics.Color.GREEN
-            )
-            val outlineColor = MaterialColors.getColor(
-                context,
-                com.google.android.material.R.attr.colorOutlineVariant,
-                android.graphics.Color.LTGRAY
-            )
-            val surfaceColor = MaterialColors.getColor(
-                context,
-                com.google.android.material.R.attr.colorSurfaceContainerLowest,
-                android.graphics.Color.WHITE
-            )
+            val primaryColor = MaterialColors.getColor(context, androidx.appcompat.R.attr.colorPrimary, android.graphics.Color.GREEN)
+            val outlineColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorOutlineVariant, android.graphics.Color.LTGRAY)
+            val surfaceColor = MaterialColors.getColor(context, com.google.android.material.R.attr.colorSurfaceContainerLowest, android.graphics.Color.WHITE)
 
             binding.cardMonthly.strokeWidth = if (isMonthly) 2.dpToPx() else 1.dpToPx()
             binding.cardMonthly.strokeColor = if (isMonthly) primaryColor else outlineColor
@@ -109,8 +96,7 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             binding.textYearlyPrice.text = "${NumberFormattingUtils.formatPrice(yearlyPrice)} sum"
 
             val yearlyMonthlyEquivalent = yearlyPrice / 12
-            binding.textYearlyMonthlyEquivalent.text =
-                "Atigi ${NumberFormattingUtils.formatPrice(yearlyMonthlyEquivalent)} sum / oy 🚀"
+            binding.textYearlyMonthlyEquivalent.text = "Atigi ${NumberFormattingUtils.formatPrice(yearlyMonthlyEquivalent)} sum / oy 🚀"
 
             showState(state.paymentChecking)
             replacePremiumText(binding.root)
@@ -125,19 +111,18 @@ class PremiumBottomSheetDialog : BottomSheetDialogFragment() {
             val price = viewModel.uiState.value?.yearlyPrice ?: 0L
             if (price > 0) viewModel.updateSelectedPrice(price)
         }
+
         binding.button.setOnClickListener {
             val selectedPrice = viewModel.uiState.value?.selectedPrice ?: 0L
             if (selectedPrice <= 0) {
                 showToast("Ma'lumot yuklanmoqda...")
                 return@setOnClickListener
             }
-            setFragmentResult(
-                REQUEST_KEY, bundleOf(
-                    RESULT_ACTION to ACTION_GO_TO_PAYMENT,
-                    KEY_SELECTED_PRICE to selectedPrice,
-                    KEY_IS_YEARLY to (selectedPrice == viewModel.uiState.value?.yearlyPrice)
-                )
-            )
+            setFragmentResult(REQUEST_KEY, bundleOf(
+                RESULT_ACTION to ACTION_GO_TO_PAYMENT,
+                KEY_SELECTED_PRICE to selectedPrice,
+                KEY_IS_YEARLY to (selectedPrice == viewModel.uiState.value?.yearlyPrice)
+            ))
             dismiss()
         }
         replacePremiumText(binding.root)

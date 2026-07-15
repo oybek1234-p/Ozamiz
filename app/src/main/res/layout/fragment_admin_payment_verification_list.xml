@@ -4,14 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest">
+    android:background="?colorSurfaceContainer">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout_admin_payments"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurfaceContainerLowest"
-        android:fitsSystemWindows="true"
+        android:background="?colorSurface"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -19,7 +18,7 @@
             style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?colorSurfaceContainerLowest"
+            android:background="?colorSurface"
             app:navigationIcon="@drawable/arrow_back"
             app:navigationIconTint="?colorOnSurface"
             app:title="@string/admin_premium_verifications"

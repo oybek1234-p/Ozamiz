@@ -9,5 +9,6 @@ import kotlinx.parcelize.Parcelize
 data class MenuCategory(
     var id: String = "",
     var name: String = "",
-    var isSecondary: Boolean = false
+    var imageUrl: String = "",
+    var meal: Boolean = true
 ) : Parcelable

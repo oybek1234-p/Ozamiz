@@ -83,6 +83,7 @@ class AddExerciseLogFragment
                         is AddExerciseUiState.Success -> {
                             setFragmentResult("exercise_added_request", android.os.Bundle().apply {
                                 putString("exerciseId", state.exerciseId)
+                                putInt("caloriesBurned", state.caloriesBurned)
                             })
                             findNavController().popBackStack(R.id.home, false)
                         }

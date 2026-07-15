@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest">
+    android:background="?colorSurface">
 
     <!-- Header -->
     <LinearLayout
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:background="?colorSurfaceContainerLowest"
+        android:background="?colorSurfaceContainer"
         android:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -44,8 +44,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        android:isScrollContainer="true"
-        android:scrollbarStyle="outsideOverlay"
         app:layout_constraintTop_toBottomOf="@id/headerLayout"
         app:layout_constraintBottom_toTopOf="@id/footerLayout">
 
@@ -120,23 +118,23 @@
                     android:background="@drawable/round_lay"/>
             </FrameLayout>
             
-            <!-- Categories -->
+            <!-- Meal Time Categories -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_marginBottom="8dp">
-                
+
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Kategoriyalar"
+                    android:text="Kun tartibi (Meal Time)"
                     android:fontFamily="@font/roboto_medium"
                     android:textColor="?colorOnSurface"
                     android:textSize="14sp"/>
-                    
+
                 <TextView
                     android:id="@+id/btnAddCategory"
                     android:layout_width="wrap_content"
@@ -146,16 +144,64 @@
                     android:textStyle="bold"
                     android:textSize="12sp"/>
             </LinearLayout>
-            
+
             <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroupCategories"
+                android:id="@+id/chipGroupMealTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:chipSpacing="8dp"
+                app:singleSelection="false"/>
+
+            <!-- Diet Categories -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Parhezlar (Diets)"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="?colorOnSurface"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"/>
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupDiets"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 app:chipSpacing="8dp"
                 app:singleSelection="false"/>
                 
-            <!-- Inputs -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Taom turi"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="?colorOnSurface"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+
+            <RadioGroup
+                android:id="@+id/radioGroupType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/radioMenu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kompleks menu"
+                    android:checked="true"
+                    android:layout_marginEnd="24dp"/>
+
+                <RadioButton
+                    android:id="@+id/radioFood"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yagona mahsulot"/>
+            </RadioGroup>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -164,7 +210,7 @@
                 android:textColor="?colorOnSurface"
                 android:textSize="14sp"
                 android:layout_marginBottom="4dp"/>
-                
+
             <EditText
                 android:id="@+id/editName"
                 android:layout_width="match_parent"
@@ -174,44 +220,226 @@
                 android:hint="Masalan: Pishirilgan somsa"
                 android:inputType="textCapSentences"
                 android:layout_marginBottom="16dp"/>
-                
+
+            <LinearLayout
+                android:id="@+id/containerMenuFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ingredientlar"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/editIngredients"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@drawable/round_lay_stroke"
+                    android:padding="12dp"
+                    android:gravity="top|start"
+                    android:hint="Masalan: 200g go'sht, piyoz, un..."
+                    android:inputType="textMultiLine"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tayyorlash usuli"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/editPreparationMethod"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@drawable/round_lay_stroke"
+                    android:padding="12dp"
+                    android:gravity="top|start"
+                    android:hint="Tayyorlash usuli..."
+                    android:inputType="textMultiLine"
+                    android:layout_marginBottom="16dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tayyorlash vaqti (daq.)"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?colorOnSurface"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="4dp"/>
+
+                        <EditText
+                            android:id="@+id/editPrepTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/round_lay_stroke"
+                            android:padding="12dp"
+                            android:hint="15"
+                            android:inputType="number"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Qiyinchilik darajasi"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?colorOnSurface"
+                            android:textSize="14sp"
+                            android:layout_marginBottom="4dp"/>
+
+                        <RadioGroup
+                            android:id="@+id/radioGroupDifficulty"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <RadioButton
+                                android:id="@+id/radioDifficultyEasy"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Oson"
+                                android:checked="true"
+                                android:textSize="12sp"/>
+
+                            <RadioButton
+                                android:id="@+id/radioDifficultyMedium"
+                                android:layout_width="wrap_content"
+                                  android:layout_height="wrap_content"
+                                  android:text="O'rtacha"
+                                  android:textSize="12sp"/>
+
+                            <RadioButton
+                                android:id="@+id/radioDifficultyHard"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Qiyin"
+                                android:textSize="12sp"/>
+                        </RadioGroup>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/containerFoodFields"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mahsulot haqida"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/editAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:background="@drawable/round_lay_stroke"
+                    android:padding="12dp"
+                    android:gravity="top|start"
+                    android:hint="Tavsif bu yerda bo'ladi..."
+                    android:inputType="textMultiLine"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nimalarga boyligi"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/editRichIn"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/round_lay_stroke"
+                    android:padding="12dp"
+                    android:hint="Masalan: Oqsilga, Vitamin C ga boy"
+                    android:inputType="textCapSentences"
+                    android:layout_marginBottom="16dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Iste'mol vaqti"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp"/>
+
+                <EditText
+                    android:id="@+id/editConsumptionTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:background="@drawable/round_lay_stroke"
+                    android:padding="12dp"
+                    android:hint="Masalan: Ozish uchun obetgacha"
+                    android:inputType="textCapSentences"
+                    android:layout_marginBottom="16dp"/>
+            </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ingredientlar"
+                android:text="Foydali xususiyati"
                 android:fontFamily="@font/roboto_medium"
                 android:textColor="?colorOnSurface"
                 android:textSize="14sp"
                 android:layout_marginBottom="4dp"/>
 
             <EditText
-                android:id="@+id/editIngredients"
+                android:id="@+id/editBenefits"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:background="@drawable/round_lay_stroke"
                 android:padding="12dp"
                 android:gravity="top|start"
-                android:hint="Masalan: 200g go'sht, piyoz, un..."
+                android:hint="Foydali xususiyatlari..."
                 android:inputType="textMultiLine"
                 android:layout_marginBottom="16dp"/>
-                
-             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Haqida"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="?colorOnSurface"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp"/>
 
             <EditText
                 android:id="@+id/editDescription"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:background="@drawable/round_lay_stroke"
-                android:padding="12dp"
-                android:gravity="top|start"
-                android:hint="Tayyorlanish usuli va foydali tomonlari..."
+                android:layout_height="1dp"
+                android:visibility="gone"
+                android:background="@android:color/transparent"
                 android:inputType="textMultiLine"
                 android:layout_marginBottom="16dp"/>
                 

@@ -8,7 +8,7 @@
     android:elevation="@dimen/dimen_2"
     android:background="@drawable/round_lay"
     android:clickable="true"
-    android:backgroundTint="?colorSurfaceContainerLow"
+    android:backgroundTint="?colorSurfaceContainerLowest"
     android:focusable="true"
     android:gravity="center"
     android:orientation="vertical"

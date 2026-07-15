@@ -156,7 +156,7 @@ class LogFoodViewModel() : ViewModel() {
         if (user.isPremium()) {
             canAdd.invoke(true, false)
         } else {
-            if (AppPreference.getFoodLogLimitCount() <= 5 && (user.streakInfo?.bestStreak
+            if (AppPreference.getFoodLogLimitCount() <= 6 && (user.streakInfo?.bestStreak
                     ?: 0) < 7
             ) {
                 canAdd.invoke(true, true)

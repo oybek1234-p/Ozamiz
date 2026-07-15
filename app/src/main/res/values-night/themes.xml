@@ -1,9 +1,9 @@
 <resources>
     <style name="Base.Ozamiz" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Backgrounds & Status Bar -->
-        <item name="backgroundColor">?attr/colorSurfaceContainer</item>
-        <item name="android:windowBackground">?attr/colorSurfaceContainer</item>
-        <item name="android:statusBarColor">?attr/colorSurfaceContainer</item>
+        <item name="backgroundColor">@color/md_theme_dark_surfaceContainer</item>
+        <item name="android:windowBackground">@color/md_theme_dark_surfaceContainer</item>
+        <item name="android:statusBarColor">@color/md_theme_dark_surfaceContainer</item>
         <item name="android:windowLightStatusBar">false</item>
 
         <!-- Primary Colors -->

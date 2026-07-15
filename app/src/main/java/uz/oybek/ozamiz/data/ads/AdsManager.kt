@@ -2,6 +2,7 @@ package uz.oybek.ozamiz.data.ads
 
 import android.app.Activity
 import android.content.Context
+import com.yandex.mobile.ads.banner.BannerAdEventListener
 import com.yandex.mobile.ads.banner.BannerAdSize
 import com.yandex.mobile.ads.banner.BannerAdView
 import com.yandex.mobile.ads.common.AdError
@@ -21,11 +22,16 @@ object AdsManager {
         YandexAds.initialize(context) {}
     }
 
-    fun createBannerView(context: Context, adUnitId: String): BannerAdView {
+    fun createBannerView(
+        context: Context,
+        adUnitId: String,
+        listener: BannerAdEventListener? = null
+    ): BannerAdView {
         val bannerAdView = BannerAdView(context)
 
         val adSize = getAdSize(context)
         bannerAdView.setAdSize(adSize)
+        bannerAdView.setBannerAdEventListener(listener)
 
         val adRequest = AdRequest.Builder(adUnitId).build()
         bannerAdView.loadAd(adRequest)

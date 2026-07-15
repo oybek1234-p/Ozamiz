@@ -25,10 +25,16 @@ object MenuRepository {
         awaitClose { subscription.remove() }
     }
 
-    suspend fun addCategory(name: String, isSecondary: Boolean = false): DataWrapper<Unit> {
+    suspend fun addCategory(name: String, meal: Boolean = true, imageUri: Uri? = null): DataWrapper<Unit> {
         return try {
             val id = UUID.randomUUID().toString()
-            val category = MenuCategory(id = id, name = name, isSecondary = isSecondary)
+            var category = MenuCategory(id = id, name = name, meal = meal)
+            if (imageUri != null) {
+                val ref = FirebasePaths.Storage.categoryPhotos(id)
+                ref.putFile(imageUri).await()
+                val url = ref.downloadUrl.await().toString()
+                category = category.copy(imageUrl = url)
+            }
             FirebasePaths.Firestore.menuCategories().document(id).set(category).await()
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
@@ -36,9 +42,16 @@ object MenuRepository {
         }
     }
 
-    suspend fun updateCategory(category: MenuCategory): DataWrapper<Unit> {
+    suspend fun updateCategory(category: MenuCategory, imageUri: Uri? = null): DataWrapper<Unit> {
         return try {
-            FirebasePaths.Firestore.menuCategories().document(category.id).set(category).await()
+            var categoryToSave = category
+            if (imageUri != null) {
+                val ref = FirebasePaths.Storage.categoryPhotos(category.id)
+                ref.putFile(imageUri).await()
+                val url = ref.downloadUrl.await().toString()
+                categoryToSave = category.copy(imageUrl = url)
+            }
+            FirebasePaths.Firestore.menuCategories().document(category.id).set(categoryToSave).await()
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
             DataWrapper.Error(e.message ?: "Noma'lum xato")
@@ -108,6 +121,18 @@ object MenuRepository {
         } catch (e: Exception) {
             DataWrapper.Error(e.message ?: "Noma'lum xato")
         }
+    }
+
+    fun getMeals(categories: List<MenuCategory>): List<MenuCategory> {
+        return categories.filter { it.meal }
+    }
+
+    fun getDiets(categories: List<MenuCategory>): List<MenuCategory> {
+        return categories.filter { !it.meal }
+    }
+
+    fun partitionCategories(categories: List<MenuCategory>): Pair<List<MenuCategory>, List<MenuCategory>> {
+        return categories.partition { it.meal }
     }
 }
 

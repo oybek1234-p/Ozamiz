@@ -1,7 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.menu.add
 
 import android.net.Uri
-import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -50,21 +49,51 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
         bind.cardImagePicker.setOnClickListener { imagePickerLauncher.launch("image/*") }
         bind.btnAddCategory.setOnClickListener { findNavController().navigate(R.id.categoryManagerFragment) }
 
+        bind.radioGroupType.setOnCheckedChangeListener { _, checkedId ->
+            val isMenu = checkedId == R.id.radioMenu
+            bind.containerMenuFields.visibility = if (isMenu) android.view.View.VISIBLE else android.view.View.GONE
+            bind.containerFoodFields.visibility = if (isMenu) android.view.View.GONE else android.view.View.VISIBLE
+        }
+
         bind.btnSave.setOnClickListener {
-            val categoryIds = bind.chipGroupCategories.checkedChipIds.map { id ->
-                bind.chipGroupCategories.findViewById<Chip>(id).tag as String
+            val clickedMealIds = bind.chipGroupMealTime.checkedChipIds.map { id ->
+                bind.chipGroupMealTime.findViewById<Chip>(id).tag as String
             }
+            val clickedDietIds = bind.chipGroupDiets.checkedChipIds.map { id ->
+                bind.chipGroupDiets.findViewById<Chip>(id).tag as String
+            }
+            val categoryIds = clickedMealIds + clickedDietIds
+
+            val isMenu = bind.radioGroupType.checkedRadioButtonId == R.id.radioMenu
+            val type = if (isMenu) "menu" else "food"
+
+            val difficultyStr = if (isMenu) {
+                when (bind.radioGroupDifficulty.checkedRadioButtonId) {
+                    R.id.radioDifficultyEasy -> "Oson"
+                    R.id.radioDifficultyMedium -> "O'rtacha"
+                    R.id.radioDifficultyHard -> "Qiyin"
+                    else -> "Oson"
+                }
+            } else ""
 
             viewModel.saveMenu(
                 name = bind.editName.text.toString(),
-                description = bind.editDescription.text.toString(),
-                ingredients = bind.editIngredients.text.toString(),
+                description = "",
+                ingredients = if (isMenu) bind.editIngredients.text.toString() else "",
                 calories = bind.editCalories.text.toString(),
                 protein = bind.editProtein.text.toString(),
                 fat = bind.editFat.text.toString(),
                 carbs = bind.editCarbs.text.toString(),
                 selectedCategoryIds = categoryIds,
-                imageUri = selectedImageUri
+                imageUri = selectedImageUri,
+                type = type,
+                preparationMethod = if (isMenu) bind.editPreparationMethod.text.toString() else "",
+                about = if (!isMenu) bind.editAbout.text.toString() else "",
+                richIn = if (!isMenu) bind.editRichIn.text.toString() else "",
+                benefits = bind.editBenefits.text.toString(),
+                consumptionTime = if (!isMenu) bind.editConsumptionTime.text.toString() else "",
+                preparationTime = if (isMenu) bind.editPrepTime.text.toString() else "",
+                difficulty = difficultyStr
             )
         }
     }
@@ -93,15 +122,31 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
     }
 
     private fun updateCategoryChips(bind: FragmentAddMenuBinding, state: AddMenuUiState) {
-        if (bind.chipGroupCategories.childCount != state.categories.size && state.categories.isNotEmpty()) {
-            bind.chipGroupCategories.removeAllViews()
-            state.categories.forEach { category ->
-                bind.chipGroupCategories.addView(
-                    Chip(ContextThemeWrapper(requireContext(), com.google.android.material.R.style.Widget_Material3_Chip_Filter)).apply {
+        val mealCategories = state.categories.filter { it.meal }
+        val dietCategories = state.categories.filter { !it.meal }
+
+        if (bind.chipGroupMealTime.childCount != mealCategories.size && mealCategories.isNotEmpty()) {
+            bind.chipGroupMealTime.removeAllViews()
+            mealCategories.forEach { category ->
+                bind.chipGroupMealTime.addView(
+                    Chip(requireContext()).apply {
                         text = category.name
                         tag = category.id
                         isCheckable = true
                     }
+                )
+            }
+        }
+
+        if (bind.chipGroupDiets.childCount != dietCategories.size && dietCategories.isNotEmpty()) {
+            bind.chipGroupDiets.removeAllViews()
+            dietCategories.forEach { category ->
+                bind.chipGroupDiets.addView(
+                    Chip(requireContext()).apply {
+                        text = category.name
+                        tag = category.id
+                        isCheckable = true
+                      }
                 )
             }
         }

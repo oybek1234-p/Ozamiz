@@ -32,10 +32,91 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/roboto_regular"
-            android:text="Siz bugungi rejalashtirilgan kaloriya sarfining 70% idan ko'prog'ini yoqdingiz!"
+            android:text="Siz ajoyib natija ko'rsatdingiz!"
             android:textColor="?colorOnSurfaceVariant"
             android:textSize="14sp"
             android:textAlignment="center" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_rounded_16"
+            android:backgroundTint="?colorSurfaceContainer"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Yoqilgan kaloriya:"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurfaceVariant"/>
+                <TextView
+                    android:id="@+id/text_burned_calories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 kkal"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="?colorPrimary"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Teng keladigan yegulik:"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurfaceVariant"/>
+                <TextView
+                    android:id="@+id/text_food_equivalent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="?colorOnSurface"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="12dp">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Yoqilgan yog' miqdori:"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?colorOnSurfaceVariant"/>
+                <TextView
+                    android:id="@+id/text_fat_burned"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 g"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="?colorOnSurface"/>
+            </LinearLayout>
+        </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_ajoyib"

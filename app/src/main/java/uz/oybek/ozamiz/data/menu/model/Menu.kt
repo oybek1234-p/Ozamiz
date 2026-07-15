@@ -20,6 +20,14 @@ data class Menu(
     var fat: Double = 0.0,
     var carbs: Double = 0.0,
     var searchKeywords: List<String> = emptyList(),
+    var type: String = "menu",
+    var preparationMethod: String = "",
+    var about: String = "",
+    var richIn: String = "",
+    var benefits: String = "",
+    var consumptionTime: String = "",
+    var preparationTime: Int = 15,
+    var difficulty: String = "Oson",
     @ServerTimestamp
     var createdAt: Date? = null
 ) : Parcelable

@@ -45,7 +45,15 @@ class AddMenuViewModel : ViewModel() {
         fat: String,
         carbs: String,
         selectedCategoryIds: List<String>,
-        imageUri: Uri?
+        imageUri: Uri?,
+        type: String,
+        preparationMethod: String,
+        about: String,
+        richIn: String,
+        benefits: String,
+        consumptionTime: String,
+        preparationTime: String,
+        difficulty: String
     ) {
         if (name.isBlank() || selectedCategoryIds.isEmpty() || imageUri == null) {
             _uiState.value = _uiState.value.copy(isValidationError = true)
@@ -63,7 +71,15 @@ class AddMenuViewModel : ViewModel() {
                 calories = calories.toIntOrNull() ?: 0,
                 protein = protein.toDoubleOrNull() ?: 0.0,
                 fat = fat.toDoubleOrNull() ?: 0.0,
-                carbs = carbs.toDoubleOrNull() ?: 0.0
+                carbs = carbs.toDoubleOrNull() ?: 0.0,
+                type = type,
+                preparationMethod = preparationMethod,
+                about = about,
+                richIn = richIn,
+                benefits = benefits,
+                consumptionTime = consumptionTime,
+                preparationTime = preparationTime.toIntOrNull() ?: 15,
+                difficulty = difficulty.ifEmpty { "Oson" }
             )
 
             val result = MenuRepository.addMenu(menu, imageUri)

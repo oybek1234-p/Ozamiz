@@ -18,10 +18,6 @@ class CarbsGuideFragment : BaseFragment<FragmentCarbsGuideBinding>() {
             findNavController().navigateUp()
         }
 
-        bind.btnSeeReadyMenus.setOnClickListener {
-            findNavController().navigate(CarbsGuideFragmentDirections.actionCarbsGuideFragmentToReadyMenusFragment())
-        }
-
         val isPremium = uz.oybek.ozamiz.data.user.local.LocalUser.user.premium
         if (!isPremium) {
             bind.premiumOverlay.visibility = android.view.View.VISIBLE

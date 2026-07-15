@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.menu.category
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,10 +34,10 @@ class CategoryManagerViewModel : ViewModel() {
         }
     }
 
-    fun addCategory(name: String, isSecondary: Boolean) {
+    fun addCategory(name: String, meal: Boolean, imageUri: Uri? = null) {
         if (name.isBlank()) return
         viewModelScope.launch {
-            MenuRepository.addCategory(name.trim(), isSecondary)
+            MenuRepository.addCategory(name.trim(), meal, imageUri)
             // No need to reload manually, flow will update
         }
     }
@@ -47,9 +48,9 @@ class CategoryManagerViewModel : ViewModel() {
         }
     }
 
-    fun updateCategory(category: MenuCategory) {
+    fun updateCategory(category: MenuCategory, imageUri: Uri? = null) {
         viewModelScope.launch {
-            MenuRepository.updateCategory(category)
+            MenuRepository.updateCategory(category, imageUri)
         }
     }
 }

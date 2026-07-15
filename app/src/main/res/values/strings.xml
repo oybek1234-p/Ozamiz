@@ -531,7 +531,7 @@
     <string name="infarkt">Yurak qon tomir kasalligi(Infarkt)</string>
     <string name="erkak">Erkak</string>
     <string name="ayol">Ayol</string>
-    <string name="splash_text">Chiroyli qomat, yengil vazn, yosharish, sog\’lom hayot sari</string>
+    <string name="splash_text">Biz bilan oson vazn tashlang</string>
     <string name="email_orqali">Email orqali</string>
     <string name="what_gender">Jinsingiz nima?</string>
     <string name="what_gender_subtitle">Har bir odam uchun maqsad belgilashimiz uchun jinsingiz muhim</string>
@@ -1032,7 +1032,7 @@
     <string name="exercise_benefit_item_4">🔋 Uyquni yaxshilaydi va energiya bag\'ishlaydi</string>
     <string name="exercise_benefits_ajoyib">Ajoyib 🏃</string>
 
-    <string name="exercise_50_title">Bugungi sport maqsadi yarmi bajarildi!</string>
+    <string name="exercise_50_title">Bugungi harakat maqsadi bajarildi!</string>
     <string name="exercise_50_ajoyib">Shunday davom etaman! 🔥</string>
 
     <!-- Daily Calorie 4 items -->
@@ -1058,14 +1058,14 @@
     <string name="food_manti">Manti</string>
     <string name="food_milk_glass">Bir stakan sut</string>
     <string name="food_honey_spoon">Bir qoshiq asal</string>
-    <string name="food_salad_plate">Bir tarela salat</string>
+    <string name="food_salad_plate">Bir tarelka salat</string>
     <string name="food_lagman_bowl">Bir kosa lag\'mon</string>
     <string name="food_ice_cream">Muzqaymoq</string>
     <string name="food_donut">Donut pishiriq</string>
     <string name="food_cookie">Pechenye</string>
     <string name="food_hot_dog">Hot-dog</string>
     <string name="food_yogurt">Yogurt</string>
-    <string name="food_pasta_plate">Bir tarela makaron</string>
+    <string name="food_pasta_plate">Bir tarelka makaron</string>
     <string name="food_green_tea">Shakarli ko\'k choy</string>
     <string name="food_kebab_100g">100g kabob</string>
     <string name="food_cheese_slice">Bir bo\'lak pishloq</string>
@@ -1075,5 +1075,30 @@
     <string name="food_lavash">Lavash</string>
 
     <string name="exercise_calories_equal_format">Bugun mashg\'ulotlar davomida %1$d kkal sarfladingiz.Bu %2$s %3$s energiyasiga teng!</string>
+
+    <string name="exercise_duration_format">%d daqiqa</string>
+    <string name="calories_unit_format">%d kkal</string>
+    <string name="how_to_burn_fat_title">Yog\' yoqish qoidalari ⚡</string>
+    <string name="how_to_burn_fat_content">Tanangiz yog\' yoqish rejimiga o\'tishi uchun quyidagi tavsiyalarga amal qiling:\n\n💧 <b>Ko\'proq suv iching:</b> Suv metabolizmni tezlashtiradi va ochlik hissini kamaytiradi.\n🚶 <b>Jismoniy faollik:</b> Kuniga kamida 30-40 daqiqa piyoda yuring yoki engil mashqlar bajaring.\n🛌 <b>Sifatli uyqu:</b> Sutka davomida 7-8 soat uxlash gormonal muvozanat uchun juda muhim.\n🍏 <b>Kamroq shirinlik:</b> Qand va tezkor uglevodlarni cheklang, ular yog\' to\'planishini osonlashtiradi.\n🔥 <b>Defitsit:</b> Kundalik kaloriya sarfi iste\'mol qilinganidan ko\'proq bo\'lishini ta\'minlang.</string>
+    <string name="hungry_what_to_eat_title">Ochlikda nima yeyish mumkin? 🍏</string>
+    <string name="hungry_what_to_eat_content">Agar belgilangan limitdan keyin qattiq ochlik his qilsangiz, quyidagi past kaloriyali mahsulotlarni tanlang:\n\n🥒 <b>Bodring va ko\'katlar:</b> Deyarli kaloriyasiz va oshqozonni to\'ldiradi.\n🥛 <b>Kefir yoki qatiq:</b> Past yog\'li sut mahsulotlari hazm qilishni yaxshilaydi.\n🥚 <b>Tuxum oqi:</b> Sof oqsil manbai, uzoq vaqt to\'q tutadi.\n🍵 <b>Ko\'k choy:</b> Shakar qo\'shmasdan iching, u ochlik gormonlarini bostiradi.\n🥬 <b>Karam salati:</b> Kletchatkaga boy va kkal darajasi juda past.</string>
+
+    <string name="oson">Oson</string>
+    <string name="ortacha">O\'rtacha</string>
+    <string name="qiyin">Qiyin</string>
+    <string name="calorie_50_100">50-100 kkal</string>
+    <string name="calorie_100_200">100-200 kkal</string>
+    <string name="calorie_200_300">200-300 kkal</string>
+    <string name="calorie_300_400">300-400 kkal</string>
+    <string name="calorie_400_500">400-500 kkal</string>
+    <string name="calorie_500_600">500-600 kkal</string>
+
+    <string name="kashf_eting">Kashf eting (Taom turlari)</string>
+    <string name="usulni_tanlang">Usulni tanlang (Qiyinchilik)</string>
+    <string name="parhezni_tanlang">Parhezni tanlang</string>
+    <string name="kaloriya_boyicha_retseptlar">Kaloriya bo\'yicha retseptlar</string>
+    <string name="kun_tartibi">Kun tartibi</string>
+    <string name="qiyinchilik_darajasi">Qiyinchilik darajasi</string>
+    <string name="mashhur_kategoriyalar">Mashhur kategoriyalar</string>
 </resources>
 
