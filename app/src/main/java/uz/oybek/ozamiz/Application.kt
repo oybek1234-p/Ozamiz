@@ -51,7 +51,7 @@ class Application : Application() {
 
     private fun initFirebase() {
         FirebaseApp.initializeApp(this)
-        
+
         MotivationNotificationManager(this).createNotificationChannel()
 
         val settings = firestoreSettings {

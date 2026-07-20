@@ -2,71 +2,43 @@ Configuration on demand is an incubating feature.
 Reusing configuration cache.
 > Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
 > Task :app:preBuild UP-TO-DATE
-> Task :app:generateSafeArgsDebug UP-TO-DATE
-> Task :app:injectCrashlyticsVersionControlInfoDebug UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
-> Task :app:processDebugGoogleServices UP-TO-DATE
 > Task :app:injectCrashlyticsMappingFileIdDebug UP-TO-DATE
-> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
-> Task :app:dataBindingTriggerDebug UP-TO-DATE
+> Task :app:injectCrashlyticsVersionControlInfoDebug UP-TO-DATE
+> Task :app:generateSafeArgsDebug UP-TO-DATE
 > Task :app:generateDebugResValues UP-TO-DATE
-> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:dataBindingTriggerDebug UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
 > Task :app:generateDebugResources UP-TO-DATE
-> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:packageDebugResources UP-TO-DATE
-> Task :app:mapDebugSourceSetPaths UP-TO-DATE
-> Task :app:mergeDebugResources UP-TO-DATE
-> Task :app:checkDebugAarMetadata UP-TO-DATE
 > Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
 > Task :app:processDebugMainManifest UP-TO-DATE
 > Task :app:processDebugManifest UP-TO-DATE
 > Task :app:processDebugManifestForPackage UP-TO-DATE
-> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
 > Task :app:processDebugResources UP-TO-DATE
-> Task :app:kaptGenerateStubsDebugKotlin
+> Task :app:kaptGenerateStubsDebugKotlin UP-TO-DATE
 > Task :app:kaptDebugKotlin UP-TO-DATE
-> Task :app:compileDebugKotlin
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/ai/local/AiChatDatabase.kt:23:18 'fun fallbackToDestructiveMigration(): RoomDatabase.Builder<AiChatDatabase>' is deprecated. Replace by overloaded version with parameter to indicate if all tables should be dropped or not.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/food/SavedFoodRepository.kt:19:13 Condition is always 'false'.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/DailyLogRepository.kt:25:17 Condition is always 'false'.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/DailyLogRepository.kt:57:17 Condition is always 'false'.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/DailySummaryRepository.kt:22:13 Condition is always 'false'.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/logs/ExerciseLogRepository.kt:67:13 Condition is always 'false'.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/data/utils/DateUtils.kt:15:13 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/base/BaseAdapter.kt:51:63 'val adapterPosition: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/base/BaseAdapter.kt:56:67 'val adapterPosition: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/base/SelectableAdapter.kt:56:40 'val adapterPosition: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/ai/AiChatFragment.kt:48:71 'static field SOFT_INPUT_ADJUST_RESIZE: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:16:8 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:41:32 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:52:56 'fun getSignInCredentialFromIntent(p0: Intent?): SignInCredential' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:93:60 'fun getSignInCredentialFromIntent(p0: Intent?): SignInCredential' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:116:27 'fun beginSignIn(p0: BeginSignInRequest): Task<BeginSignInResult!>' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:162:25 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:163:13 'class BeginSignInRequest : AbstractSafeParcelable' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/auth/AuthFragment.kt:163:32 'class GoogleIdTokenRequestOptions : AbstractSafeParcelable' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/community/CommunityUsersAdapter.kt:37:32 'val adapterPosition: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/home/DailyTipDetailsBottomSheet.kt:24:26 'fun <T : Parcelable!> getParcelable(p0: String?): T?' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/home/DateScrollerAdapter.kt:24:51 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/log/photo/AddWeightPhotoUiState.kt:97:17 'when' is exhaustive so 'else' is redundant here.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/log/photo/WeightPhotoLogAdapter.kt:22:49 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/log/voice/VoiceRecorderBottomSheet.kt:117:88 'constructor(): MediaRecorder' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/detail/MenuDetailFragment.kt:34:23 'fun <T : Parcelable!> getParcelable(p0: String?): T?' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/menu/list/MenuAdapter.kt:43:55 'val adapterPosition: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/NatijaViewModel.kt:82:21 'when' is exhaustive so 'else' is redundant here.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryAdapter.kt:20:57 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryAdapter.kt:21:56 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryViewModel.kt:47:21 'when' is exhaustive so 'else' is redundant here.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/natija/WeightHistoryViewModel.kt:65:17 'when' is exhaustive so 'else' is redundant here.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/ExerciseType.kt:9:5 This annotation is currently applied to the value parameter only, but in the future it will also be applied to field.
-- To opt in to applying to both value parameter and field, add '-Xannotation-default-target=param-property' to your compiler arguments.
-- To keep applying to the value parameter only, use the '@param:' annotation target.
-
-See https://youtrack.jetbrains.com/issue/KT-73255 for more details.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/ExerciseTypeAdapter.kt:19:24 'val adapterPosition: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/exercise/ExerciseTypeAdapter.kt:20:41 'val adapterPosition: Int' is deprecated. Deprecated in Java.
-w: file:///C:/Users/User/AndroidStudioProjects/Ozamiz/app/src/main/java/uz/oybek/ozamiz/ui/feature/onboarding/screens/plan/PlanFragment.kt:17:9 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
-
-BUILD SUCCESSFUL in 36s
-23 actionable tasks: 2 executed, 21 up-to-date
-Configuration cache entry reused.

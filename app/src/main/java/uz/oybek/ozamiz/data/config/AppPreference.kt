@@ -17,8 +17,6 @@ import java.io.OutputStream
 @Serializable
 data class AppSettings(
     val isFirstRegistration: Boolean = false,
-    val isSecondOnboardingSheetSeen: Boolean = false,
-    val isFirstLogAdded: Boolean = false,
     val isAppReviewShown: Boolean = false,
     val dietologMessageCount: Int = 0,
     val foodLogLimitDate: String = "",
@@ -29,6 +27,11 @@ data class AppSettings(
     val lastExerciseBenefitsDate: String = "",
     val lastExercise50AnalysisDate: String = "",
     val currentTaskId: String? = null,
+    val todayAiMenuJson: String = "",
+    val todayAiMenuDate: String = "",
+    val aiMenuGenerationCount: Int = 0,
+    val lastFoodLogTime: Long = 0L,
+    val lastFoodFeedbackDate: String = ""
 )
 
 object AppSettingsSerializer : Serializer<AppSettings> {
@@ -69,14 +72,6 @@ object AppPreference {
         dataStore.updateData { block(it) }
     }
 
-    var isSecondOnboardingSheetSeen: Boolean
-        get() = current.isSecondOnboardingSheetSeen
-        set(value) = runBlocking { update { it.copy(isSecondOnboardingSheetSeen = value) } }
-
-    var isFirstLogAdded: Boolean
-        get() = current.isFirstLogAdded
-        set(value) = runBlocking { update { it.copy(isFirstLogAdded = value) } }
-
     var isAppReviewShown: Boolean
         get() = current.isAppReviewShown
         set(value) = runBlocking { update { it.copy(isAppReviewShown = value) } }
@@ -100,6 +95,26 @@ object AppPreference {
     var lastExercise50AnalysisDate: String
         get() = current.lastExercise50AnalysisDate
         set(value) = runBlocking { update { it.copy(lastExercise50AnalysisDate = value) } }
+
+    var todayAiMenuJson: String
+        get() = current.todayAiMenuJson
+        set(value) = runBlocking { update { it.copy(todayAiMenuJson = value) } }
+
+    var todayAiMenuDate: String
+        get() = current.todayAiMenuDate
+        set(value) = runBlocking { update { it.copy(todayAiMenuDate = value) } }
+
+    var aiMenuGenerationCount: Int
+        get() = current.aiMenuGenerationCount
+        set(value) = runBlocking { update { it.copy(aiMenuGenerationCount = value) } }
+
+    var lastFoodLogTime: Long
+        get() = current.lastFoodLogTime
+        set(value) = runBlocking { update { it.copy(lastFoodLogTime = value) } }
+
+    var lastFoodFeedbackDate: String
+        get() = current.lastFoodFeedbackDate
+        set(value) = runBlocking { update { it.copy(lastFoodFeedbackDate = value) } }
 
     suspend fun incrementDietologMessageCount() {
         update { s ->

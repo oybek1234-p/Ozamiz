@@ -76,7 +76,7 @@ object UserMapper {
         u.weight = (snapshot.child(User::weight.name).value as? Number)?.toDouble() ?: -1.0
         u.targetWeight = (snapshot.child(User::targetWeight.name).value as? Number)?.toDouble()
         u.startWeight = (snapshot.child(User::startWeight.name).value as? Number)?.toDouble()
-        u.goal = snapshot.child(User::goal.name).value as? String ?: ""
+        u.goal = (snapshot.child(User::goal.name).value as? String).let { if (it.isNullOrEmpty()) "lose_weight" else it }
         u.activityLevel = snapshot.child(User::activityLevel.name).value as? String ?: UserActivityLevel.LIGHTLY_ACTIVE.name
         u.targetCalories = (snapshot.child(User::targetCalories.name).value as? Number)?.toInt() ?: 0
         u.targetProtein = (snapshot.child(User::targetProtein.name).value as? Number)?.toInt() ?: 0
@@ -184,7 +184,7 @@ object UserMapper {
         u.weight = getDoubleSafe(User::weight.name, -1.0)
         u.targetWeight = getDoubleOptionalSafe(User::targetWeight.name)
         u.startWeight = getDoubleOptionalSafe(User::startWeight.name)
-        u.goal = getStringSafe(User::goal.name)
+        u.goal = getStringSafe(User::goal.name).let { if (it.isEmpty()) "lose_weight" else it }
         u.activityLevel = getStringSafe(User::activityLevel.name).let { if (it.isEmpty()) UserActivityLevel.LIGHTLY_ACTIVE.name else it }
         u.targetCalories = getIntSafe(User::targetCalories.name, 0)
         u.targetProtein = getIntSafe(User::targetProtein.name, 0)
@@ -252,7 +252,7 @@ object UserMapper {
         u.weight = (map["weight"] as? Number)?.toDouble() ?: -1.0
         u.targetWeight = (map["targetWeight"] as? Number)?.toDouble()
         u.startWeight = (map["startWeight"] as? Number)?.toDouble()
-        u.goal = map["goal"]?.toString() ?: ""
+        u.goal = map["goal"]?.toString().let { if (it.isNullOrEmpty()) "lose_weight" else it }
         u.activityLevel = map["activityLevel"]?.toString() ?: "LIGHTLY_ACTIVE"
 
         u.targetCalories = (map["targetCalories"] as? Number)?.toInt() ?: 0

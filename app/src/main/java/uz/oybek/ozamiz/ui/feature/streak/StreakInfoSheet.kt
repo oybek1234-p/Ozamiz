@@ -160,6 +160,7 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
 
             result.onSuccess { list ->
                 adapter.submitList(list.filter { (it.streakInfo?.currentStreak ?: 0) >= 0 }
+                    .sortedByDescending { it.streakInfo?.currentStreak ?: 0 }
                     .take(10))
             }.onFailure {
                 // Ignore gracefully
@@ -204,6 +205,23 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
 
     private fun setupViews(info: StreakInfo, isNewAction: Boolean, returnedAfterManyDays: Boolean) {
         binding.textStreakMainCount.text = info.currentStreak.toString()
+
+        val description = when (info.currentStreak) {
+            1 -> getString(R.string.streak_desc_day_1)
+            2 -> getString(R.string.streak_desc_day_2)
+            3 -> getString(R.string.streak_desc_day_3, info.currentStreak)
+            4 -> getString(R.string.streak_desc_day_4)
+            5 -> getString(R.string.streak_desc_day_5, info.currentStreak)
+            6 -> getString(R.string.streak_desc_day_6)
+            else -> {
+                if (info.currentStreak % 7 == 0) {
+                    getString(R.string.streak_desc_weekly, info.currentStreak)
+                } else {
+                    getString(R.string.streak_desc_default, info.currentStreak)
+                }
+            }
+        }
+        binding.textStreakDescription.text = description
 
         binding.textBestStreak.text = info.bestStreak.toString()
 
@@ -263,7 +281,8 @@ class TopStreakUsersAdapter(
 
     inner class ViewHolder(val binding: uz.oybek.ozamiz.databinding.ItemTopStreakUserBinding) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
-        fun bind(user: User) {
+        fun bind(user: User, position: Int) {
+            binding.textRank.text = (position + 1).toString()
             binding.textName.text = user.name.ifBlank { "Foydalanuvchi" }
             val streak = user.streakInfo?.currentStreak ?: 0
             binding.textStreakCount.text = "$streak 🔥"
@@ -290,6 +309,6 @@ class TopStreakUsersAdapter(
     override fun getItemCount() = users.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(users[position])
+        holder.bind(users[position], position)
     }
 }

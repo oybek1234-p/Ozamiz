@@ -10,11 +10,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.menu.CategoryType
 import uz.oybek.ozamiz.data.menu.FilterId
 import uz.oybek.ozamiz.data.menu.MenuCategories
+import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.databinding.FragmentMenuSearchResultsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>() {
 
@@ -31,6 +36,25 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
 
         setupFilters(bind)
         setupResultsList(bind)
+        loadBanner()
+
+        findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<Menu>("updated_menu")
+            ?.observe(viewLifecycleOwner) { updatedMenu ->
+                if (updatedMenu != null) {
+                    viewModel.onMenuUpdated(updatedMenu)
+                    findNavController().currentBackStackEntry?.savedStateHandle?.remove<Menu>("updated_menu")
+                }
+            }
+
+        findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<String>("deleted_menu_id")
+            ?.observe(viewLifecycleOwner) { deletedMenuId ->
+                if (deletedMenuId != null) {
+                    viewModel.onMenuDeleted(deletedMenuId)
+                    findNavController().currentBackStackEntry?.savedStateHandle?.remove<String>("deleted_menu_id")
+                }
+            }
     }
 
     private fun setupFilters(bind: FragmentMenuSearchResultsBinding) {
@@ -69,13 +93,24 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
 
         filterAdapter.submitList(categories)
 
-        val initialSelectedId = try {
-            FilterId.valueOf(args.filterValue)
-        } catch (e: Exception) {
-            null
+        val savedCategoryId = viewModel.state.value.categoryId
+        val targetId = if (savedCategoryId != null) {
+            try { FilterId.valueOf(savedCategoryId) } catch (e: Exception) { null }
+        } else {
+            try { FilterId.valueOf(args.filterValue) } catch (e: Exception) { null }
         }
-        filterAdapter.setSelectedId(initialSelectedId)
-        viewModel.setCategory(initialSelectedId?.name)
+
+        filterAdapter.setSelectedId(targetId)
+        viewModel.setCategory(targetId?.name)
+
+        targetId?.let { id ->
+            val index = categories.indexOfFirst { it.id == id }
+            if (index >= 0) {
+                bind.recvSubFilters.post {
+                    bind.recvSubFilters.smoothScrollToPosition(index)
+                }
+            }
+        }
     }
 
     private fun setupResultsList(bind: FragmentMenuSearchResultsBinding) {
@@ -106,6 +141,18 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
                 }
             }
         }
+    }
+
+    private fun loadBanner() {
+        if (UserProfileRepository.user.isPremium()) {
+            binding.bannerContainer.visibility = View.GONE
+            return
+        }
+        val bannerView = AdsManager.createBannerView(
+            requireContext(),
+            AdsConfig.BANNER_HOME
+        )
+        binding.bannerContainer.addView(bannerView)
     }
 
     override fun inflateBinding(

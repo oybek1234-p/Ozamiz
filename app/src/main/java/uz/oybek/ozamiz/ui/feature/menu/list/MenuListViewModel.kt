@@ -23,6 +23,7 @@ class MenuListViewModel : ViewModel() {
         items += MenuUiItem.PopularCategoriesList(
             MenuCategories.popularCategories
         )
+        
         items += MenuUiItem.Header(R.string.kaloriya_boyicha_retseptlar)
         items += MenuUiItem.CalorieList(
             CalorieFilter.entries.toList()

@@ -105,7 +105,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var signOut: Runnable? = null
-        var isAppReady = false
     }
 
     private fun initInsets() {
@@ -120,9 +119,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition {
-            !isAppReady
-        }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -146,7 +142,6 @@ class MainActivity : AppCompatActivity() {
         checkCurrentUser(graph)
         navHost.navController.graph = graph
 
-        checkAndShowAppReview()
         initChatBadgeObserving()
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
@@ -167,15 +162,12 @@ class MainActivity : AppCompatActivity() {
         if (user.valid.not()) {
             UserAuthRepository.signOut()
             graph.setStartDestination(R.id.authFragment)
-            isAppReady = true
         } else if (user.valid) {
             if (user.name.isEmpty()) {
                 graph.setStartDestination(R.id.onboarding)
-                isAppReady = true
             }
         } else {
             graph.setStartDestination(R.id.authFragment)
-            isAppReady = true
         }
     }
 
@@ -391,14 +383,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkAndShowAppReview() {
-        if (AppPreference.isAppReviewShown
-                .not() && (user.streakInfo?.bestStreak ?: 0) > 3
-        ) {
-            requestAppReview()
-            AppPreference.isAppReviewShown = true
-        }
-    }
+
 
     fun requestAppReview() {
         try {

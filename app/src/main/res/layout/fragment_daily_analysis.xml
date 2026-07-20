@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorPrimary">
+    android:background="?attr/colorSurfaceContainerLowest">
 
     <ImageButton
         android:id="@+id/btnBack"
@@ -15,7 +15,7 @@
         android:src="@drawable/arrow_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/white" />
+        app:tint="?attr/colorOnSurface" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieCelebrate"
@@ -33,8 +33,7 @@
         android:id="@+id/cardContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/bg_bottom_sheet_top_rounded"
-        android:backgroundTint="@color/analysis_card_bg"
+        android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lottieCelebrate">
 

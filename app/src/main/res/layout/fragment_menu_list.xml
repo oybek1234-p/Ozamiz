@@ -3,15 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="?colorSurfaceContainer">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recvMenuList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        tools:listitem="@layout/item_search_menu"
         android:clipToPadding="false"
         android:padding="@dimen/dimen_8"
+        android:paddingBottom="100dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <FrameLayout
+        android:id="@+id/banner_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:minHeight="50dp"
+        android:background="?colorSurfaceContainer" />
 
     <ProgressBar
         android:id="@+id/progressBar"

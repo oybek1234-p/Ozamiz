@@ -31,4 +31,5 @@ sealed interface MenuUiItem {
         val items: List<FilterItem>
     ) : MenuUiItem
 
+    data class DietitianCard(val hasMenu: Boolean) : MenuUiItem
 }

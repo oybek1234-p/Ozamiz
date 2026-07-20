@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.data.menu
 
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
@@ -13,6 +14,17 @@ import java.util.UUID
 
 object MenuRepository {
 
+//    init {
+//        addMenus()
+//    }
+//
+//    private fun addMenus() {
+//        menuList.forEach {
+//            it.createdAt = Date()
+//            FirebasePaths.Firestore.menus().add(it)
+//        }
+//    }
+
     suspend fun loadMenus(
         categoryId: String? = null,
         lastMenuId: String? = null,
@@ -21,8 +33,7 @@ object MenuRepository {
     ): DataWrapper<List<Menu>> {
         return try {
             var query = FirebasePaths.Firestore.menus()
-                .orderBy(Menu::createdAt.name, Query.Direction.DESCENDING)
-                .limit(pageSize.toLong())
+                .orderBy(Menu::createdAt.name, Query.Direction.DESCENDING).limit(pageSize.toLong())
 
             if (categoryId != null) {
                 query = query.whereArrayContains(Menu::categoryIds.name, categoryId)
@@ -33,7 +44,11 @@ object MenuRepository {
                 query = query.startAfter(lastDate)
             }
             val snapshot = query.get().await()
-            val menus = snapshot.toObjects(Menu::class.java)
+            val menus = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Menu::class.java)?.apply {
+                    id = doc.id
+                }
+            }
             DataWrapper.Success(menus)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -42,23 +57,23 @@ object MenuRepository {
     }
 
     suspend fun searchMenus(
-        queryText: String,
-        lastName: String? = null,
-        pageSize: Int = 12
+        queryText: String, lastName: String? = null, pageSize: Int = 12
     ): DataWrapper<List<Menu>> {
         return try {
-            var query = FirebasePaths.Firestore.menus()
-                .orderBy(Menu::name.name, Query.Direction.ASCENDING)
-                .startAt(queryText)
-                .endAt(queryText + "\uf8ff")
-                .limit(pageSize.toLong())
+            var query =
+                FirebasePaths.Firestore.menus().orderBy(Menu::name.name, Query.Direction.ASCENDING)
+                    .startAt(queryText).endAt(queryText + "\uf8ff").limit(pageSize.toLong())
 
             if (lastName != null) {
                 query = query.startAfter(lastName)
             }
 
             val snapshot = query.get().await()
-            val menus = snapshot.toObjects(Menu::class.java)
+            val menus = snapshot.documents.mapNotNull { doc ->
+                doc.toObject(Menu::class.java)?.apply {
+                    id = doc.id
+                }
+            }
             DataWrapper.Success(menus)
         } catch (e: Exception) {
             DataWrapper.Error(e.message)
@@ -69,12 +84,11 @@ object MenuRepository {
         return try {
             val id = menu.id.ifEmpty { UUID.randomUUID().toString() }
             var menuToSave = menu.copy(
-                id = id,
-                createdAt = menu.createdAt ?: Date()
+                id = id, createdAt = menu.createdAt ?: Date()
             )
 
             if (imageUri != null) {
-                val compressedUri = ImageCompressor.compressImageToUri(imageUri) ?: imageUri
+                val compressedUri = ImageCompressor.compressImageToUri(imageUri, maxSizeKb = 100) ?: imageUri
                 val photoUrl =
                     ImageUploader.uploadImage(compressedUri, FirebasePaths.Storage.menuPhotos(id))
                 menuToSave = menuToSave.copy(imageUrl = photoUrl)
@@ -89,7 +103,13 @@ object MenuRepository {
 
     suspend fun deleteMenu(menuId: String): DataWrapper<Unit> {
         return try {
-            FirebasePaths.Firestore.menus().document(menuId).delete().await()
+            val task = FirebasePaths.Firestore.menus().document(menuId).delete()
+            task.addOnFailureListener {
+                throw it
+            }.addOnSuccessListener {
+                    Log.d("MenuRepository", "deleteMenu success: $menuId")
+                }
+            task.await()
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
             DataWrapper.Error(e.message)

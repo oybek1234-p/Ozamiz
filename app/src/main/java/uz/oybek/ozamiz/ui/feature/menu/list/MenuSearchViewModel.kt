@@ -99,4 +99,28 @@ class MenuSearchViewModel : ViewModel() {
             }
         }
     }
+
+    fun onMenuUpdated(updatedMenu: Menu) {
+        for (entry in cacheMap.entries) {
+            cacheMap[entry.key] = entry.value.map {
+                if (it.id == updatedMenu.id) updatedMenu else it
+            }
+        }
+        _state.update { currentState ->
+            val updatedList = currentState.list.map {
+                if (it.id == updatedMenu.id) updatedMenu else it
+            }
+            currentState.copy(list = updatedList)
+        }
+    }
+
+    fun onMenuDeleted(deletedMenuId: String) {
+        for (entry in cacheMap.entries) {
+            cacheMap[entry.key] = entry.value.filter { it.id != deletedMenuId }
+        }
+        _state.update { currentState ->
+            val updatedList = currentState.list.filter { it.id != deletedMenuId }
+            currentState.copy(list = updatedList)
+        }
+    }
 }

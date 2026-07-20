@@ -420,6 +420,16 @@
                         android:background="?colorSurfaceContainerHighest" />
 
                     <include
+                        android:id="@+id/section_natija"
+                        layout="@layout/item_profile_section" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginStart="52dp"
+                        android:background="?colorSurfaceContainerHighest" />
+
+                    <include
                         android:id="@+id/section_calorie_settings"
                         layout="@layout/item_profile_section" />
 

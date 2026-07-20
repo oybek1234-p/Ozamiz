@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardMeal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="?colorOutlineVariant"
+    app:cardBackgroundColor="?colorSurfaceContainerLowest">
+
+    <!-- Add a colored left stroke view -->
+    <View
+        android:id="@+id/viewIndicator"
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="#FFA500" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:paddingStart="20dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Placeholder for Icon -->
+            <ImageView
+                android:id="@+id/imgMealIcon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_rounded_8"
+                android:backgroundTint="?colorSurfaceContainerLow"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/food_ic" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@+id/imgMealIcon"
+                app:layout_constraintEnd_toStartOf="@+id/textMealCalories"
+                app:layout_constraintStart_toEndOf="@+id/imgMealIcon"
+                app:layout_constraintTop_toTopOf="@+id/imgMealIcon">
+
+                <TextView
+                    android:id="@+id/textMealTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="?colorOnSurface"
+                    android:textSize="18sp"
+                    tools:text="Nonushta" />
+
+                <TextView
+                    android:id="@+id/textMealTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="13sp"
+                    tools:text="07:00 – 08:00" />
+            </LinearLayout>
+
+            <!-- Calories and Check -->
+            <LinearLayout
+                android:id="@+id/textMealCalories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/textCaloriesVal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="#FFA500"
+                    android:textSize="18sp"
+                    tools:text="280" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_gravity="bottom"
+                    android:paddingBottom="2dp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:text="kkal"
+                    android:textColor="?android:textColorSecondary"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="?colorSurfaceVariant" />
+
+        <LinearLayout
+            android:id="@+id/containerItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical" />
+            
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="?colorSurfaceVariant" />
+
+        <TextView
+            android:id="@+id/textMealTip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/roboto_regular"
+            android:textColor="?android:textColorSecondary"
+            android:textSize="14sp"
+            tools:text="💡 Choy (shakarsiz)" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

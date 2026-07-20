@@ -32,6 +32,7 @@ import uz.oybek.ozamiz.data.logs.model.WaterLog
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.utils.dateApiFormat
@@ -63,6 +64,9 @@ class HomeViewModel : ViewModel() {
 
     private val _showDailyAnalysisEvent = Channel<DailyAnalysisData>(Channel.BUFFERED)
     val showDailyAnalysisEvent = _showDailyAnalysisEvent.receiveAsFlow()
+
+    private val _showFoodFeedbackEvent = MutableSharedFlow<String>()
+    val showFoodFeedbackEvent = _showFoodFeedbackEvent.asSharedFlow()
 
     private val _showWaterBenefitsEvent = MutableSharedFlow<Unit>()
     val showWaterBenefitsEvent = _showWaterBenefitsEvent.asSharedFlow()
@@ -125,6 +129,7 @@ class HomeViewModel : ViewModel() {
                         daysFromRegister = daysFromRegister
                     )
                 }
+                checkYesterdayFoodLogFeedback(user)
             }
         }
         startLoadingData(initialSelectedDate)
@@ -298,21 +303,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    fun isFirstLogAdded(): Boolean {
-        return AppPreference.isFirstLogAdded
-    }
 
-    fun setFirstLogAdded(added: Boolean) {
-        AppPreference.isFirstLogAdded = added
-    }
-
-    fun isSecondOnboardingSheetSeen(): Boolean {
-        return AppPreference.isSecondOnboardingSheetSeen
-    }
-
-    fun setSecondOnboardingSheetSeen(seen: Boolean) {
-        AppPreference.isSecondOnboardingSheetSeen = seen
-    }
 
     fun addExercise(exerciseType: String, durationMin: Int, caloriesBurned: Int) {
         viewModelScope.launch {
@@ -326,6 +317,30 @@ class HomeViewModel : ViewModel() {
             if (success) {
                 PointsRepository.onEvent(PointsEvent.Exercise(caloriesBurned))
                 _exerciseAddedEvent.emit(caloriesBurned)
+            }
+        }
+    }
+
+    private val _showFoodFeedbackEventShared = MutableSharedFlow<String>()
+    private var feedbackChecked = false
+
+    private fun checkYesterdayFoodLogFeedback(user: User) {
+        if (feedbackChecked) return
+        feedbackChecked = true
+        viewModelScope.launch {
+            try {
+                val yesterday = Date(System.currentTimeMillis() - 86400000L)
+                val yesterdayStr = yesterday.dateApiFormat()
+
+                if (AppPreference.lastFoodFeedbackDate == yesterdayStr) return@launch
+
+                val summary = LogRepository.getDailySummarySync(yesterday)
+                val targetCalories = user.targetCalories
+                if (targetCalories > 0 && summary.consumedCalories < targetCalories * 0.5) {
+                    _showFoodFeedbackEvent.emit(yesterdayStr)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

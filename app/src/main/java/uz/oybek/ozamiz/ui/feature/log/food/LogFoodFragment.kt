@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
+import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.local.user
@@ -138,6 +139,12 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     }
 
     private fun setupActionButtons() = with(binding) {
+        buttonMealRecommendation.setOnSafeClickListener {
+            navigate(R.id.mealTipsFragment, Bundle().apply {
+                putStringArray("tips", emptyArray())
+                putString("mealType", currentMeal())
+            })
+        }
         buttonQuickCamera.setOnSafeClickListener {
             checkPremiumAndRun { launchCamera() }
         }
@@ -153,13 +160,17 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             }
         }
         buttonSavedFoods.setOnSafeClickListener {
-            navigate(R.id.savedFoodsFragment, Bundle().apply {
-                putString(ARG_MEAL_TYPE, currentMeal())
-                putLong(ARG_TIMESTAMP, logDate.time)
-            })
+            checkPremiumAndRun {
+                navigate(R.id.savedFoodsFragment, Bundle().apply {
+                    putString(ARG_MEAL_TYPE, currentMeal())
+                    putLong(ARG_TIMESTAMP, logDate.time)
+                })
+            }
         }
         buttonSearchList.setOnSafeClickListener {
-            navigateToSearchFood()
+            checkPremiumAndRun {
+                navigateToSearchFood()
+            }
         }
     }
 
@@ -274,7 +285,8 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
     private fun checkPremiumAndRun(action: () -> Unit) {
         viewModel.canAddLog { can, limited ->
             if (can) {
-                if (limited) {
+                val currentCount = AppPreference.getFoodLogLimitCount()
+                if (!user.isPremium() && limited && (currentCount == 3 || currentCount == 6)) {
                     AdsManager.loadAndShowInterstitial(
                         requireActivity(),
                         AdsConfig.INTERSTITIAL_FOOD_ADD
@@ -282,6 +294,8 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
                 } else {
                     action()
                 }
+            } else {
+                PremiumBottomSheetDialog().show(childFragmentManager, PremiumBottomSheetDialog.TAG)
             }
         }
     }

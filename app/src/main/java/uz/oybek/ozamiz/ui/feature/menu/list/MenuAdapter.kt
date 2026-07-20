@@ -9,6 +9,10 @@ import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.databinding.ItemSearchMenuBinding
 import uz.oybek.ozamiz.ui.base.BaseAdapter
 import uz.oybek.ozamiz.ui.utils.loadPhoto
+import androidx.fragment.app.FragmentActivity
+import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.data.user.local.user
 
 class MenuAdapter(
     private val onMenuClick: (Menu) -> Unit,
@@ -29,23 +33,39 @@ class MenuAdapter(
             }
             binding.apply {
                 (this as ItemSearchMenuBinding)
-                textName.text = model.name
-                textMeta.text = binding.root.context.getString(
-                    R.string.calories_format,
-                    model.calories
-                ) + "  " + binding.root.context.getString(
-                    R.string.duration_hint
-                ) + " " + model.preparationTime
+                val isPremiumUser = user.isPremium()
+                val isLocked = !isPremiumUser && pos >= 3
 
-                if (model.imageUrl != null) {
+                if (isLocked) {
+                    textName.text = root.context.getString(R.string.premium)
+                    textMeta.visibility = View.GONE
+                    premiumOverlay.visibility = View.VISIBLE
+                    root.setOnClickListener {
+                        (root.context as? FragmentActivity)?.let { activity ->
+                            PremiumBottomSheetDialog().show(
+                                activity.supportFragmentManager,
+                                PremiumBottomSheetDialog.TAG
+                            )
+                        }
+                    }
+                } else {
+                    textName.text = model.name
+                    textMeta.visibility = View.VISIBLE
+                    textMeta.text = root.context.getString(
+                        R.string.calories_format,
+                        model.calories
+                    ) + "  " + root.context.getString(
+                        R.string.duration_hint
+                    ) + " " + model.preparationTime
+                    premiumOverlay.visibility = View.GONE
+                    root.setOnClickListener { onMenuClick(model) }
+                }
+
+                if (model.imageUrl != null && !isLocked) {
                     imageMenu.loadPhoto(model.imageUrl!!)
                 } else {
                     imageMenu.setImageResource(R.drawable.placeholder_food)
                 }
-
-                premiumOverlay.visibility = View.GONE
-
-                binding.root.setOnClickListener { onMenuClick(model) }
             }
         }
     }

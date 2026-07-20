@@ -16,13 +16,22 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysisResult
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.utils.formatToHhMmA
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
+import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.config.AppPreference
+import uz.oybek.ozamiz.data.logs.LogRepository
+import uz.oybek.ozamiz.ui.MainActivity
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
 import uz.oybek.ozamiz.ui.utils.VaznimColors
+import uz.oybek.ozamiz.ui.utils.playSuccessSound
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Date
 
@@ -34,6 +43,7 @@ class AnalyzeResultFragment : Fragment() {
     private val viewModel: AnalyzeResultViewModel by viewModels()
     private lateinit var ingredientsAdapter: IngredientsAdapter
     private var hasPlayedConfetti = false
+    private var hasPlayedSuccessSound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +96,7 @@ class AnalyzeResultFragment : Fragment() {
         }
         setupListeners()
         setupUI()
+        loadBanner()
 
         if (arguments?.getBoolean(KEY_IS_FROM_FAVORITE) == true) {
             val args = requireArguments()
@@ -104,6 +115,18 @@ class AnalyzeResultFragment : Fragment() {
             )
             viewModel.setRecallResult(analysis)
         }
+    }
+
+    private fun loadBanner() {
+        if (UserProfileRepository.user.isPremium()) {
+            binding.bannerContainer.visibility = View.GONE
+            return
+        }
+        val bannerView = AdsManager.createBannerView(
+            requireContext(),
+            AdsConfig.BANNER_LOG_FOOD
+        )
+        binding.bannerContainer.addView(bannerView)
     }
 
     private fun showAnalyzing(isAnalyzing: Boolean) {
@@ -273,6 +296,14 @@ class AnalyzeResultFragment : Fragment() {
                     }
                 }
 
+                if (!hasPlayedSuccessSound) {
+                    val score = analysisResult.healthScore ?: 0
+                    if (score >= 8) {
+                        hasPlayedSuccessSound = true
+                        playSuccessSound()
+                    }
+                }
+
                 val adviceText = analysisResult.advice
                 if (!adviceText.isNullOrBlank()) {
                     binding.layoutAdvice.isVisible = true
@@ -314,7 +345,34 @@ class AnalyzeResultFragment : Fragment() {
             viewModel.event.collect { event ->
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
-                        findNavController().popBackStack(R.id.home, false)
+                        val todaySummary = LogRepository.getDailySummarySync(Date())
+                        val hasDrunkWater = todaySummary.consumedWaterMl > 0
+
+                        val analysisResult = viewModel.state.value.result?.result
+                        val warnings = ArrayList<String>()
+                        if (analysisResult?.limitBread == true) warnings.add("limitBread")
+                        if (analysisResult?.sodaDrink == true) warnings.add("sodaDrink")
+                        if (analysisResult?.heavyDinner == true) warnings.add("heavyDinner")
+                        if (analysisResult?.limitCalorie == true) warnings.add("limitCalorie")
+                        if (analysisResult?.waterBeforeMeal == true && !hasDrunkWater) warnings.add("waterBeforeMeal")
+
+                        val currentStreak = user.streakInfo?.currentStreak ?: 0
+                        if (!AppPreference.isAppReviewShown && currentStreak >= 3) {
+                            (activity as? MainActivity)?.requestAppReview()
+                            AppPreference.isAppReviewShown = true
+                        }
+
+                        if (warnings.isNotEmpty()) {
+                            val args = Bundle().apply {
+                                putStringArray("warnings", warnings.toTypedArray())
+                            }
+                            findNavController().navigate(
+                                R.id.action_analyzeResultFragment_to_aiFeedbackFragment,
+                                args
+                            )
+                        } else {
+                            findNavController().popBackStack(R.id.home, false)
+                        }
                     }
 
                     is AnalyzeResultEvent.Failure -> {

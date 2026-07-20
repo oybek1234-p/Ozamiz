@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_dialog_rounded"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <ImageView
+            android:id="@+id/img_girl_illustration"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:src="@drawable/girl_ouu"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:id="@+id/text_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/limit_congrats_title"
+            android:textColor="?colorOnSurface"
+            android:textSize="18sp"
+            android:textAlignment="center" />
+
+        <TextView
+            android:id="@+id/text_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/limit_congrats_desc"
+            android:textColor="?colorOnSurfaceVariant"
+            android:textSize="15sp"
+            android:textAlignment="center"
+            android:lineSpacingMultiplier="1.2" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_stop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/limit_action_stop"
+            app:cornerRadius="16dp" />
+
+    </LinearLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie_confetti"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        app:lottie_rawRes="@raw/confeti_effect"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="false" />
+
+</FrameLayout>

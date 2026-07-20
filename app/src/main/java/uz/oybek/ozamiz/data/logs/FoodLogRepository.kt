@@ -143,6 +143,16 @@ object FoodLogRepository {
 
         try {
             foodLog.logId = generateKey()
+            val tempPhotoUrl = foodLog.photoUrl
+            val dateStr = date.dateApiFormat()
+            val reference = FirebasePaths.Database.foodLogs(userId, dateStr)
+
+            reference
+                .child(foodLog.logId)
+                .setValue(foodLog)
+                .await()
+
+            uz.oybek.ozamiz.data.config.AppPreference.lastFoodLogTime = System.currentTimeMillis()
 
             LogRepository.updateSummary(
                 date = date,
@@ -154,19 +164,19 @@ object FoodLogRepository {
             )
             applicationScope.launch {
                 try {
-                    val dateStr = date.dateApiFormat()
                     val uploadImageUrl = if (image != null && !image.startsWith("http"))
                         ImageUploader.uploadImage(
                             image.toUri(),
                             FirebasePaths.Storage.foodLogs(userId)
-                        ) else foodLog.photoUrl
+                        ) else tempPhotoUrl
 
-                    val reference = FirebasePaths.Database.foodLogs(userId, dateStr)
-                    foodLog.photoUrl = uploadImageUrl
-                    reference
-                        .child(foodLog.logId)
-                        .setValue(foodLog)
-                        .await()
+                    if (uploadImageUrl != tempPhotoUrl) {
+                        foodLog.photoUrl = uploadImageUrl
+                        reference
+                            .child(foodLog.logId)
+                            .setValue(foodLog)
+                            .await()
+                    }
 
                     if (shouldShare) {
                         launch {

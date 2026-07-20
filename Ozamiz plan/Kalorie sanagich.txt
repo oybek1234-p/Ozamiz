@@ -1,0 +1,64 @@
+🥗 AI Kaloriya Sanagich: Texnik Topshiriq
+1. Kirish nuqtasi (UI)
+Home screenda "Ovqat qo'shish" tugmasi bosilganda 3 ta tanlov chiqadi:
+
+📸 Rasmga olish (AI Vision)
+
+🔍 Shtrix-kod skaner (Barcode)
+
+✍️ Matn orqali (Masalan: "1 ta somsa va achchiq choy")
+
+2. AI Vision (Rasm orqali aniqlash)
+Bu qismda Gemini API (Vision) ishlatiladi. Foydalanuvchi likopchadagi ovqatni rasmga oladi.
+
+Mantiq: AI rasmdagi ovqatni taniyadi, uning porsiyasini (grammini) taxmin qiladi va kaloriyasini hisoblaydi.
+
+Prompt (Parda ortida):
+
+"Sen O'zbekistondagi taomlar bo'yicha ekspertsan. Rasmdagi ovqatni aniqla. Masalan: 'Tandir somsa, 2 ta'. Keyin uning kaloriyasi, oqsil (protein), yog' (fat) va uglevod (carbs) miqdorini taxminiy grammda chiqarib ber."
+
+3. Barcode Scanner (Shtrix-kod)
+Magazinlardagi mahsulotlar (shokolad, kefir, ichimliklar) uchun.
+
+Texnologiya: Google ML Kit (Barcode Scanning) — juda tez va tekin.
+
+Mantiq:
+
+Shtrix-kod skaner qilinadi.
+
+Agar mahsulot bazada bo'lsa — ma'lumotlar srazu chiqadi.
+
+Bonus (AI yordami): Agar mahsulot bazada bo'lmasa, AI'dan so'raladi: "Mana bu shtrix-kod [kod] ostidagi mahsulotning (masalan: 'Coca-cola 0.5') kaloriyasi qancha?"
+
+4. Natija oynasi (Result Screen)
+AI yoki Skaner ma'lumot topgandan keyin foydalanuvchiga quyidagi ko'rinishda tasdiqlash oynasi chiqadi:
+
+Nomi: "Osh (palov), taxminan 300 gr"
+
+Energiya: 550 kcal
+
+Makronutrientlar (Grafik ko'rinishida):
+
+🥩 Oqsil: 15g
+
+🥑 Yog': 25g
+
+🍞 Uglevod: 60g
+
+Tugma: "Kundalikka qo'shish"
+
+5. Home Screen bilan integratsiya (Dashboard update)
+Foydalanuvchi "Qo'shish"ni bosishi bilan asosiy ekrandagi ko'rsatkichlar o'zgaradi:
+
+Qolgan kaloriya: Maqsad - (Yeyilgan ovqatlar + Mashq).
+
+Makronutrient progress: Kunlik oqsil, yog' va uglevod normalari to'lib borishi (progress bar ko'rinishida).
+
+Nega muhim? Ayollar ko'proq oqsil va kamroq uglevod yeyishni kuzatishni yaxshi ko'radilar.
+
+6. Mashq va Suv integratsiyasi
+Hozirgi tizimingga qo'shimcha:
+
+Mashq: Foydalanuvchi mashq qo'shsa, uning "Yeyishi mumkin bo'lgan" kaloriyasi avtomatik ko'payishi kerak (chunki u energiya sarfladi).
+
+Suv: Har bir stakan suv uchun asosiy ekranda bittadan "suv tomchisi" iconi yonib borishi kerak.

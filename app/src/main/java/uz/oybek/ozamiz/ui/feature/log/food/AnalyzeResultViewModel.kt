@@ -263,36 +263,6 @@ class AnalyzeResultViewModel : ViewModel() {
             val log = result.toFoodLog()
             val targetDate = loadedLogDate ?: LogFragment.currentDate
 
-            val dailySummary = LogRepository.getDailySummarySync(targetDate)
-            val user = UserProfileRepository.user
-
-            val exceededTypes = mutableListOf<String>()
-            val overages = mutableMapOf<String, Int>()
-
-            val totalCalories = dailySummary.consumedCalories + log.calories
-            if (user.targetCalories > 0 && totalCalories > user.targetCalories) {
-                exceededTypes.add("kaloriya")
-                overages["kaloriya"] = totalCalories - user.targetCalories
-            }
-
-            val totalProtein = dailySummary.consumedProtein + (log.protein ?: 0.0)
-            if (user.targetProtein > 0 && totalProtein > user.targetProtein) {
-                exceededTypes.add("oqsil")
-                overages["oqsil"] = (totalProtein - user.targetProtein).toInt()
-            }
-
-            val totalFat = dailySummary.consumedFat + (log.fat ?: 0.0)
-            if (user.targetFat > 0 && totalFat > user.targetFat) {
-                exceededTypes.add("yog'")
-                overages["yog'"] = (totalFat - user.targetFat).toInt()
-            }
-
-            val totalCarbs = dailySummary.consumedCarbs + (log.carbs ?: 0.0)
-            if (user.targetCarbs > 0 && totalCarbs > user.targetCarbs) {
-                exceededTypes.add("uglevod")
-                overages["uglevod"] = (totalCarbs - user.targetCarbs).toInt()
-            }
-
             FoodLogRepository.add(result.photoUrl, log, targetDate, shouldShare)
             launch {
                 StreakRepository.updateStreak()
@@ -301,11 +271,7 @@ class AnalyzeResultViewModel : ViewModel() {
             }
             _state.update { it.copy(isLoading = false) }
 
-            if (exceededTypes.isNotEmpty()) {
-                _event.send(AnalyzeResultEvent.LimitExceeded(exceededTypes, overages))
-            } else {
-                _event.send(AnalyzeResultEvent.Saved)
-            }
+            _event.send(AnalyzeResultEvent.Saved)
         }
     }
 

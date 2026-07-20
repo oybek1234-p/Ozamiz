@@ -118,7 +118,7 @@ object MenuCategories {
         ),
         FilterItem(
             id = FilterId.HIGH_PROTEIN,
-            name = "Yuqori proteinli",
+            name = "Oqsillga boy",
             emoji = "🍳"
         ),
         FilterItem(

@@ -86,7 +86,7 @@ object UserProfileRepository {
         if (user.valid) {
             val children = UserMapper.toMap(user)
             FirebasePaths.Database.user(user.uid).updateChildren(children)
-            FirebasePaths.Firestore.publicUser(user.uid).update(children)
+            FirebasePaths.Firestore.publicUser(user.uid).set(children, com.google.firebase.firestore.SetOptions.merge())
         }
     }
 
@@ -174,7 +174,7 @@ object UserProfileRepository {
         LocalUser.saveUser()
         runCatching {
             FirebasePaths.Database.user(user.uid).child(fieldName).setValue(value)
-            FirebasePaths.Firestore.publicUser(user.uid).update(fieldName, value)
+            FirebasePaths.Firestore.publicUser(user.uid).set(mapOf(fieldName to value), com.google.firebase.firestore.SetOptions.merge())
         }
         userListeners.forEach { it.invoke(user) }
     }
@@ -205,7 +205,7 @@ object UserProfileRepository {
     fun observeCurrentUser(result: (user: User?) -> Unit) {
         userListeners.add(result)
         if (user.valid) result.invoke(user)
-        if (isObserving || !user.valid) return
+        if (isObserving || !user.valid || user.name.isEmpty()) return
 
         isObserving = true
         userListener = object : ValueEventListener {

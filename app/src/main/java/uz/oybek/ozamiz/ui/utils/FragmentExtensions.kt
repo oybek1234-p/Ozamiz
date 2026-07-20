@@ -88,3 +88,16 @@ fun Fragment.triggerVibration(durationMs: Long = 50) {
     context?.triggerVibration(durationMs)
 }
 
+fun Fragment.playSuccessSound() {
+    context?.let { ctx ->
+        try {
+            val mediaPlayer = android.media.MediaPlayer.create(ctx.applicationContext, uz.oybek.ozamiz.R.raw.success)
+            mediaPlayer?.setOnCompletionListener { mp ->
+                mp.release()
+            }
+            mediaPlayer?.start()
+        } catch (_: Exception) {
+        }
+    }
+}
+

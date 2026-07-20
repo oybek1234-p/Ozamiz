@@ -22,12 +22,11 @@ data class Menu(
     var fiber: Double = 0.0,
     var sugar: Double = 0.0,
     var salt: Double = 0.0,
+    var servingSize: String = "",
     var searchKeywords: List<String> = emptyList(),
     var type: String = "menu",
     var preparationMethod: List<String> = emptyList(),
     var about: String = "",
-    var richIn: String = "",
-    var consumptionTime: String = "",
     var preparationTime: Int = 15,
     var difficulty: String = "Oson",
     @ServerTimestamp

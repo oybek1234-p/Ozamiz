@@ -10,6 +10,7 @@
     <string name="audio_transcription_in_progress">Tekshiryapman ...</string>
     <string name="input_via_voice_hint">Ovoz orqali</string>
     <string name="bugungi_tavsiyalar">Bugungi tavsiyalar</string>
+    <string name="hindering_factors">Ozishga to\'sqinlik qiluvchi jihatlar</string>
     <string name="stop_and_analyze">Tahlil qilish</string>
     <string name="recording_speak_now">Sizni eshityapman, gapiring</string>
     <string name="voice_listening">Eshityapman</string>
@@ -250,6 +251,8 @@
     <string name="error_parsing_ai_response">AI javobini tushunishda xatolik</string>
     <string name="log_add_success_ai">AI taklifi logga qo\'shildi</string>
     <string name="log_add_error_ai">AI taklifini logga qo\'shishda xato</string>
+    <string name="food_add_interval_error_hours">Keyingi taomni %1$d soat %2$d daqiqadan keyin kiritishingiz mumkin.</string>
+    <string name="food_add_interval_error_mins">Keyingi taomni %1$d daqiqadan keyin kiritishingiz mumkin.</string>
 
     <string name="healthiness_good">Yaxshi tanlov</string>
     <string name="healthiness_moderate">Me\'yorda yeng</string>
@@ -639,6 +642,11 @@
     <string name="ai_rec_format">%1$s:\n%2$s</string>
     <string name="premium_rec_request">Kunlik Sun\'iy Intellekt taom tavsiyalarini ko\'rish uchun Premiumga o\'ting</string>
     <string name="ai_menu_title">Taomnoma</string>
+    <string name="ai_menu_card_title">Bugungi menyu</string>
+    <string name="ai_menu_card_subtitle_no_menu">Shaxsiy menyu tuzish uchun bosing</string>
+    <string name="ai_menu_card_subtitle_has_menu">Sizning bugungi menyuingiz tayyor</string>
+    <string name="meal_recommendation_title">Ovqatlanish tavsiyasi</string>
+    <string name="meal_recommendation_subtitle">Siz uchun maxsus tavsiyalar</string>
 
     <string name="cashback_title">Pulingizni qaytaramiz agar:</string>
     <string name="cashback_desc">1 oyda 25 kun har kuni 3 mahal ovqatni kiriting</string>
@@ -986,14 +994,27 @@
     <string name="calories_oshdi_format">%1$d kal oshdi.</string>
     <string name="calories_limit_toldi">limit to\'ldi.</string>
     <string name="calories_remaining_label_oshdi">kaloriya me\'yordan oshdi</string>
-    <string name="calories_remaining_label_qoldi">kaloriya yeyishingiz mumkin</string>
+    <string name="calories_remaining_label_qoldi">Siz yana ovqat yeyishingiz mumkin</string>
+    <string name="btn_what_to_eat_title">Sog\'lom ovqatlanish</string>
+    <string name="btn_recommendations_title">Tavsiyalar</string>
+
+    <string name="health_tip_1_title">Ovqatdan oldin suv iching 🥤</string>
+    <string name="health_tip_1_desc">Ovqatlanishdan 15-20 daqiqa oldin suv ichishni odat qiling. Bu metabolizmni 30% gacha tezlashtiradi.</string>
+    <string name="health_tip_2_title">Oqsil va kletchatkani ko\'paytiring 🥚 🥦</string>
+    <string name="health_tip_2_desc">Ratsioningizda oqsil (tuxum, go\'sht) va kletchatka (sabzavotlar) miqdorini oshiring. Ular sizni uzoq vaqt to\'q tutadi.</string>
+    <string name="health_tip_3_title">Shirinlik va xamirdan qoching 🧁 ❌</string>
+    <string name="health_tip_3_desc">Shakar va xamirli taomlar qondagi insulin miqdorini keskin oshirib, yog\' yig\'ilishiga sabab bo\'ladi.</string>
+    <string name="health_tip_4_title">Sog\'lom uyquga amal qiling 💤</string>
+    <string name="health_tip_4_desc">Kuniga 7-8 soat uxlashga harakat qiling. Uyqu yetishmasligi stress gormonlarini oshiradi va qorin qismida yog\' yig\'ilishiga olib keladi.</string>
+    <string name="health_tip_5_title">To\'g\'ri yeyish muhim 🥗</string>
+    <string name="health_tip_5_desc">Ozish — bu kam yeyish emas, balki to\'g\'ri yeyishdir. Sifatli mahsulotlarni tanlang va tanangizga g\'amxo\'rlik qiling.</string>
     <string name="calories_eaten_format">%1$d yeyildi</string>
     <string name="meal_remaining_format">%1$d qoldi</string>
     <string name="water_bajarildi">Bajarildi</string>
     <string name="exercise_bajarildi">Bajarildi</string>
     <string name="exercise_remaining_format">%1$d qoldi</string>
     <string name="fat_burn_title">Yog\' yoqish</string>
-    <string name="add_btn">Qo\'shish</string>
+
     <string name="tushundim_btn">Tushundim</string>
     <string name="ajoyib_title">Ajoyib!</string>
     <string name="share_result_title">Ajoyib natija! 🌟</string>
@@ -1015,25 +1036,36 @@
     <string name="berildi_text">Berildi</string>
     <string name="bal_berildi">Bal berildi</string>
     <string name="plus_5_ball">+5 bal</string>
-    <string name="sog_liq_bahosi">Sog\'liq bahosi\n</string>
+    <string name="sog_liq_bahosi">Sog\'liq bahosi</string>
 
-    <!-- Water benefits (4 items) -->
+    <!-- Water benefits (10 items) -->
     <string name="water_benefit_item_1">💧 Ochlikni aldaydi — kamroq ovqat yeysiz</string>
     <string name="water_benefit_item_2">🔥 Yog\' yoqishni va metabolizmni tezlashtiradi</string>
     <string name="water_benefit_item_3">✨ Terini tozalaydi, elastikligini oshiradi</string>
     <string name="water_benefit_item_4">🧠 Miya faoliyatini va ish qobiliyatini yaxshilaydi</string>
-    <string name="water_benefits_title">Ajoyib! Suv ichish foydalari:</string>
+    <string name="water_benefit_item_5">🔋 Energiyani oshiradi va charchoqni kamaytiradi</string>
+    <string name="water_benefit_item_6">🦷 Og\'iz bo\'shlig\'i sog\'lig\'ini yaxshilaydi</string>
+    <string name="water_benefit_item_7">🌡️ Tana haroratini mo\'tadillashtiradi</string>
+    <string name="water_benefit_item_8">🧩 Bo\'g\'imlar harakatchanligini yaxshilaydi</string>
+    <string name="water_benefit_item_9">🛡️ Immunitetni mustahkamlaydi</string>
+    <string name="water_benefit_item_10">🌊 Buyraklar faoliyatini yaxshilaydi</string>
+    <string name="water_benefits_title">Ajoyib! Gap yo\'q sizga</string>
 
-    <!-- Exercise benefits & 50% -->
-    <string name="exercise_benefits_title">Sport nafaqat ozish, balki sog\'liqdir</string>
+    <!-- Exercise benefits (10 items) -->
     <string name="exercise_benefit_item_1">⚡ Moddalar almashinuvini tezlashtiradi</string>
     <string name="exercise_benefit_item_2">💪 Mushaklarni mustahkamlaydi va tonusda saqlaydi</string>
     <string name="exercise_benefit_item_3">❤️ Yurak-qon tomir tizimini yaxshilaydi</string>
     <string name="exercise_benefit_item_4">🔋 Uyquni yaxshilaydi va energiya bag\'ishlaydi</string>
+    <string name="exercise_benefit_item_5">🧠 Stressni kamaytiradi va kayfiyatni ko\'taradi</string>
+    <string name="exercise_benefit_item_6">🦴 Suyaklarni mustahkamlaydi</string>
+    <string name="exercise_benefit_item_7">🧘 Diqqatni jamlashni yaxshilaydi</string>
+    <string name="exercise_benefit_item_8">🩸 Qon bosimini normallashtirishga yordam beradi</string>
+    <string name="exercise_benefit_item_9">🏃 Chidamlilikni oshiradi</string>
+    <string name="exercise_benefit_item_10">🧬 Qarish jarayonini sekinlashtiradi</string>
     <string name="exercise_benefits_ajoyib">Ajoyib 🏃</string>
 
-    <string name="exercise_50_title">Bugungi harakat maqsadi bajarildi!</string>
-    <string name="exercise_50_ajoyib">Shunday davom etaman! 🔥</string>
+    <string name="exercise_50_title">Sizga qoil qoldim!</string>
+    <string name="exercise_50_ajoyib">Davom etaman 🔥</string>
 
     <!-- Daily Calorie 4 items -->
     <string name="food_benefit_item_1">🥗 Bugun me\'yorda ovqatlandingiz (kaloriya nazoratda)</string>
@@ -1083,6 +1115,7 @@
     <string name="hungry_what_to_eat_title">Ochlikda nima yeyish mumkin? 🍏</string>
     <string name="hungry_what_to_eat_content">Agar belgilangan limitdan keyin qattiq ochlik his qilsangiz, quyidagi past kaloriyali mahsulotlarni tanlang:\n\n🥒 <b>Bodring va ko\'katlar:</b> Deyarli kaloriyasiz va oshqozonni to\'ldiradi.\n🥛 <b>Kefir yoki qatiq:</b> Past yog\'li sut mahsulotlari hazm qilishni yaxshilaydi.\n🥚 <b>Tuxum oqi:</b> Sof oqsil manbai, uzoq vaqt to\'q tutadi.\n🍵 <b>Ko\'k choy:</b> Shakar qo\'shmasdan iching, u ochlik gormonlarini bostiradi.\n🥬 <b>Karam salati:</b> Kletchatkaga boy va kkal darajasi juda past.</string>
 
+    <string name="boshlangich">Boshlang\'ich</string>
     <string name="oson">Oson</string>
     <string name="ortacha">O\'rtacha</string>
     <string name="qiyin">Qiyin</string>
@@ -1104,5 +1137,73 @@
     <string name="food_type_tab">Ovqat</string>
     <string name="select_categories_done">Tanlash</string>
     <string name="categories_title">Kategoriyalar</string>
+    <string name="card_dietolog_title">Shaxsiy AI Dietolog</string>
+    <string name="card_dietolog_subtitle">Sog\'lom ovqatlanish bo\'yicha 24/7 savollarga javob oling</string>
+    <string name="card_others_title">Boshqa odamlar</string>
+    <string name="card_others_subtitle">Boshqalar bilan natija va rasmlarni bo\'lishing</string>
+    <string name="add_btn">Qo\'shish</string>
+    <string name="exceeded_calories_burn_msg">%1$d kaloriya yoqishingiz kerak, mashqlarni bajaring</string>
+    <string name="food_add_error">Xatolik yuz berdi. Iltimos keyinroq qayta urinib ko\'ring.</string>
+    <string name="vazn_yoqotish_mashqlari">Vazn yo\'qotish mashqlari</string>
+    <string name="exerc_header_title">Kaloriyalarni yoqing va vazn yo\'qoting</string>
+    <string name="exerc_header_desc">Uy sharoitida bajariladigan mashqlar sizga kaloriyalarni maksimal yoqishga va maqsadingizga erishishga yordam beradi.</string>
+    <string name="exerc_qayta_boshlash">Qayta boshlash</string>
+    <string name="exerc_boshlash">Boshlash</string>
+    <string name="exerc_pauza">Pauza</string>
+    <string name="exerc_remaining">qoldi</string>
+    <string name="exerc_foydasi">Foydasi</string>
+    <string name="exerc_korsatmalar">Ko\'rsatmalar</string>
+    <string name="exerc_yoqilgan_kaloriyalar">Yoqilgan kaloriyalar</string>
+    <string name="exerc_davomiylik">Davomiylik</string>
+    <string name="exerc_cal_format">%1$d cal</string>
+    <string name="exerc_sec_format">%1$ds</string>
+    <string name="exerc_timer_format">%1$02d:%2$02d</string>
+    <string name="exerc_min_format">%1$d daqiqa</string>
+    <string name="exerc_bajardim_btn">Bajardim</string>
+    <string name="exerc_tab_mashqlar">Mashqlar</string>
+    <string name="exerc_tab_videolar">Videolar</string>
+    <string name="exerc_video_benefits_format">Foydasi: %1$s</string>
+    <string name="exerc_logged_success">Mashg\'ulot muvaffaqiyatli saqlandi!</string>
+    <string name="feedback_question">Nima uchun kecha kam ovqat kiritdingiz?</string>
+    <string name="feedback_option_1">Qidiruv qiyin ekan</string>
+    <string name="feedback_option_2">Vaqtim bo\'lmadi</string>
+    <string name="feedback_option_3">Nima qilishni tushunmadim</string>
+    <string name="feedback_option_4">Hammasini kiritdim</string>
+    <string name="feedback_encouragement">Hech qisi yo\'q, bugun qo\'shishni unutmang, ozish uchun sog\'lom ovqatlarni tanlashingiz, va kaloriya meyoridan oshirmaslik kerak</string>
+    <string name="feedback_action_add">Albatta qo\'shaman</string>
+    <string name="limit_congrats_title">Bugun zo\'r shug\'ullandingiz!</string>
+    <string name="limit_congrats_desc">Bugun boshqa ovqat yemasangiz, 1 haftada %s kgga ozasiz.</string>
+    <string name="limit_action_stop">Boshqa yemayman</string>
+    <string name="exercise_summary_calories_format">Yoqilgan kaloriya: %1$d kkal</string>
+    <string name="exercise_summary_fat_format">Yoqilgan yog\': %1$.1f g</string>
+    <string name="exercise_summary_food_format">Teng keladigan yegulik: %1$s</string>
+    <string name="water_congrats_title_1">Ajoyib natija!</string>
+    <string name="water_congrats_title_2">Suv — hayot manbai!</string>
+    <string name="water_congrats_title_3">Sog\'lom hayot sari!</string>
+    <string name="water_congrats_title_4">Barakalla, davom eting!</string>
+    <string name="water_congrats_title_5">Suv me\'yori bajarilmoqda!</string>
+    <string name="exercise_congrats_title_1">Sizga qoyil qoldim!</string>
+    <string name="exercise_congrats_title_2">Super natija!</string>
+    <string name="exercise_congrats_title_3">Ajoyib faollik!</string>
+    <string name="exercise_congrats_title_4">Chempionlardek faol!</string>
+    <string name="exercise_congrats_title_5">Harakatga barakat!</string>
+    <string name="water_personal_status_low">Siz bugun juda kam suv ichgansiz (%1$.1f litr). Sog\'liq va ozish uchun ko\'proq suv iching!</string>
+    <string name="water_personal_status_medium">Yaxshi boshlanish! Bugun %1$.1f litr suv ichdingiz. Kunlik 2 litr me\'yorga yaqinlashmoqdasiz.</string>
+    <string name="water_personal_status_high">Ajoyib ko\'rsatkich! Bugun %1$.1f litr suv ichib, metabolizmni va ozishni maksimal tezlashtirdingiz!</string>
+    <string name="btn_oshirmayman">Oshirmayman</string>
+    <string name="btn_tushunarli">Tushunarli</string>
+    <string name="warning_limit_bread_title">Kuniga 2 bo\'lakdan oshiq non yeyish semirishga olib keladi, bugun boshqa nonli ovqatlar yemang!</string>
+    <string name="warning_soda_drink_title">Ovqat bilan birga gazli va shakarli ichimliklar ichish to\'g\'ridan to\'g\'ri ozishni to\'xtatadi, bugun boshqa shirin ichimliklar ichmang.</string>
+    <string name="warning_heavy_dinner_title">Hozirgina kechqurun og\'ir ovqat yedingiz, kechqurun og\'ir ovqat yeyish to\'g\'ridan to\'g\'ri semirtiradi</string>
+    <string name="warning_limit_calorie_title">Bugungi ovqat meyorini bajardingiz, endi ertagacha boshqa ovqat yemang, va faqat suv iching, tanangiz suv yoqishga o\'tadi</string>
+    <string name="warning_water_before_meal_title">Ovqatlanishdan 15-20 daqiqa oldin 1 stakan iliq suv ichishni odat qiling, siz to\'qroq tutadi, va ozishingizga yordam beradi</string>
+    <string name="streak_desc_day_1">Ozishga birinchi qadam tashlandi.</string>
+    <string name="streak_desc_day_2">Ajoyib boshlanish! Ertaga ham sizni kutib qolaman.</string>
+    <string name="streak_desc_day_3">%1$d kun bo\'ldiki, to\'g\'ri yo\'ldasiz! Zamonamiz qahramonisiz!</string>
+    <string name="streak_desc_day_4">Muntazamlik bu mukammallik! Biz bilan davom eting!</string>
+    <string name="streak_desc_day_5">%1$d kun ketma-ketlik! O\'zingiz bilan faxrlansangiz arziydi!</string>
+    <string name="streak_desc_day_6">Hali to\'xtash niyatimiz yo\'q, shunday emasmi? Ertaga ham kutaman!</string>
+    <string name="streak_desc_weekly">%1$d kunlik natija! Haqiqiy mo\'jizakor intizom egasisiz!</string>
+    <string name="streak_desc_default">%1$d kunlik ajoyib muntazamlik! Ertaga ham kutib qolaman!</string>
 </resources>
 

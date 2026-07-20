@@ -12,6 +12,7 @@ import uz.oybek.ozamiz.databinding.FragmentDailyAnalysisBinding
 import uz.oybek.ozamiz.databinding.ItemAnalysisStatBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.ExerciseCalorieConverter
+import uz.oybek.ozamiz.ui.utils.playSuccessSound
 
 class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
 
@@ -24,6 +25,9 @@ class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
     
     override fun viewCreated(bind: FragmentDailyAnalysisBinding) {
         val type = arguments?.getString(ARG_TYPE) ?: TYPE_DAILY
+        if (type == TYPE_DAILY || type == TYPE_WATER_60 || type == TYPE_EXERCISE_50) {
+            playSuccessSound()
+        }
         val foodCount = arguments?.getInt(ARG_FOOD_COUNT) ?: 0
         val healthyFoodCount = arguments?.getInt(ARG_HEALTHY_FOOD_COUNT) ?: 0
         val points = arguments?.getInt(ARG_POINTS) ?: 0
@@ -47,7 +51,7 @@ class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
 
             val bgTypedValue = TypedValue()
             requireContext().theme.resolveAttribute(
-                com.google.android.material.R.attr.colorPrimaryContainer,
+                com.google.android.material.R.attr.colorSurfaceContainerLow,
                 bgTypedValue,
                 true
             )
@@ -55,7 +59,7 @@ class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
 
             val textTypedValue = TypedValue()
             requireContext().theme.resolveAttribute(
-                com.google.android.material.R.attr.colorOnPrimaryContainer,
+                com.google.android.material.R.attr.colorOnSurface,
                 textTypedValue,
                 true
             )
@@ -69,74 +73,136 @@ class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
 
         when (type) {
             TYPE_WATER_BENEFITS -> {
-                bind.textAccentHeader.text = getString(R.string.sog_liq_bahosi).trim().uppercase()
-                bind.textTitle.text = getString(R.string.water_benefits_title)
+                bind.textAccentHeader.visibility = View.GONE
+                val waterTitles = listOf(
+                    R.string.water_congrats_title_1,
+                    R.string.water_congrats_title_2,
+                    R.string.water_congrats_title_3,
+                    R.string.water_congrats_title_4,
+                    R.string.water_congrats_title_5
+                )
+                bind.textTitle.text = getString(waterTitles.random())
                 bind.lottieCelebrate.setAnimation(R.raw.water_filling)
                 bind.containerDailyStats.visibility = View.VISIBLE
                 bind.layoutPoints.visibility = View.VISIBLE
-                bind.textContent.visibility = View.GONE
-                addStatItem("💧", getString(R.string.water_benefit_item_1))
-                addStatItem("🔥", getString(R.string.water_benefit_item_2))
-                addStatItem("✨", getString(R.string.water_benefit_item_3))
-                addStatItem("🧠", getString(R.string.water_benefit_item_4))
+                
+                val liters = waterMl / 1000f
+                val waterPersonalMsg = when {
+                    liters < 1.0f -> getString(R.string.water_personal_status_low, liters)
+                    liters <= 2.0f -> getString(R.string.water_personal_status_medium, liters)
+                    else -> getString(R.string.water_personal_status_high, liters)
+                }
+                bind.textContent.text = waterPersonalMsg
+                bind.textContent.visibility = View.VISIBLE
+
+                val waterBenefits = listOf(
+                    R.string.water_benefit_item_1, R.string.water_benefit_item_2, R.string.water_benefit_item_3,
+                    R.string.water_benefit_item_4, R.string.water_benefit_item_5, R.string.water_benefit_item_6,
+                    R.string.water_benefit_item_7, R.string.water_benefit_item_8, R.string.water_benefit_item_9,
+                    R.string.water_benefit_item_10
+                )
+                val shuffled = waterBenefits.shuffled().take(3)
+                for (benefitRes in shuffled) {
+                    addStatItem("", getString(benefitRes))
+                }
 
                 bind.textPoints.text = getString(R.string.plus_5_ball)
                 bind.btnDone.text = getString(R.string.water_benefits_ajoyib)
             }
 
             TYPE_WATER_60 -> {
-                val waterLiters = waterMl / 1000f
-                val speedupMultiplier = waterLiters
-                bind.textAccentHeader.text = getString(R.string.sog_liq_bahosi).trim().uppercase()
-                bind.textTitle.text =
-                    getString(R.string.water_60_title_dynamic, waterLiters, speedupMultiplier)
+                bind.textAccentHeader.visibility = View.GONE
+                val waterTitles = listOf(
+                    R.string.water_congrats_title_1,
+                    R.string.water_congrats_title_2,
+                    R.string.water_congrats_title_3,
+                    R.string.water_congrats_title_4,
+                    R.string.water_congrats_title_5
+                )
+                bind.textTitle.text = getString(waterTitles.random())
                 bind.lottieCelebrate.setAnimation(R.raw.water_filling)
                 bind.containerDailyStats.visibility = View.VISIBLE
                 bind.layoutPoints.visibility = View.VISIBLE
-                bind.textContent.visibility = View.GONE
+                
+                val liters = waterMl / 1000f
+                val waterPersonalMsg = when {
+                    liters < 1.0f -> getString(R.string.water_personal_status_low, liters)
+                    liters <= 2.0f -> getString(R.string.water_personal_status_medium, liters)
+                    else -> getString(R.string.water_personal_status_high, liters)
+                }
+                bind.textContent.text = waterPersonalMsg
+                bind.textContent.visibility = View.VISIBLE
 
-                addStatItem("💧", getString(R.string.water_benefit_item_1))
-                addStatItem("🔥", getString(R.string.water_benefit_item_2))
-                addStatItem("✨", getString(R.string.water_benefit_item_3))
-                addStatItem("🧠", getString(R.string.water_benefit_item_4))
+                val waterBenefits = listOf(
+                    R.string.water_benefit_item_1, R.string.water_benefit_item_2, R.string.water_benefit_item_3,
+                    R.string.water_benefit_item_4, R.string.water_benefit_item_5, R.string.water_benefit_item_6,
+                    R.string.water_benefit_item_7, R.string.water_benefit_item_8, R.string.water_benefit_item_9,
+                    R.string.water_benefit_item_10
+                )
+                val shuffled = waterBenefits.shuffled().take(3)
+                for (benefitRes in shuffled) {
+                    addStatItem("", getString(benefitRes))
+                }
 
                 bind.textPoints.text = getString(R.string.plus_5_ball)
                 bind.btnDone.text = getString(R.string.water_60_ajoyib)
             }
 
             TYPE_EXERCISE_BENEFITS -> {
-                bind.textAccentHeader.text = getString(R.string.sog_liq_bahosi).trim().uppercase()
-                bind.textTitle.text = getString(R.string.exercise_benefits_title)
+                bind.textAccentHeader.visibility = View.GONE
+                val exerciseTitles = listOf(
+                    R.string.exercise_congrats_title_1,
+                    R.string.exercise_congrats_title_2,
+                    R.string.exercise_congrats_title_3,
+                    R.string.exercise_congrats_title_4,
+                    R.string.exercise_congrats_title_5
+                )
+                bind.textTitle.text = getString(exerciseTitles.random())
                 bind.lottieCelebrate.setAnimation(R.raw.cat_happy)
                 bind.containerDailyStats.visibility = View.VISIBLE
                 bind.layoutPoints.visibility = View.VISIBLE
                 bind.textContent.visibility = View.GONE
 
-                addStatItem("⚡", getString(R.string.exercise_benefit_item_1))
-                addStatItem("💪", getString(R.string.exercise_benefit_item_2))
-                addStatItem("❤️", getString(R.string.exercise_benefit_item_3))
-                addStatItem("🔋", getString(R.string.exercise_benefit_item_4))
-                val caloriesText = caloriesEquivalentText(caloriesBurned)
-                if (caloriesText.isNotEmpty()) addStatItem("🔥", caloriesText)
+                val caloriesText = getString(R.string.exercise_summary_calories_format, caloriesBurned)
+                addStatItem("🔥", caloriesText)
+
+                val fatBurned = ExerciseCalorieConverter.getFatBurnedGram(caloriesBurned)
+                val fatText = getString(R.string.exercise_summary_fat_format, fatBurned)
+                addStatItem("💧", fatText)
+
+                val foodEquiv = ExerciseCalorieConverter.getEquivalentFood(requireContext(), caloriesBurned)
+                val foodText = getString(R.string.exercise_summary_food_format, foodEquiv)
+                addStatItem("🍎", foodText)
 
                 bind.textPoints.text = getString(R.string.plus_5_ball)
                 bind.btnDone.text = getString(R.string.exercise_benefits_ajoyib)
             }
 
             TYPE_EXERCISE_50 -> {
-                bind.textAccentHeader.text = getString(R.string.sog_liq_bahosi).trim().uppercase()
-                bind.textTitle.text = getString(R.string.exercise_50_title)
+                bind.textAccentHeader.visibility = View.GONE
+                val exerciseTitles = listOf(
+                    R.string.exercise_congrats_title_1,
+                    R.string.exercise_congrats_title_2,
+                    R.string.exercise_congrats_title_3,
+                    R.string.exercise_congrats_title_4,
+                    R.string.exercise_congrats_title_5
+                )
+                bind.textTitle.text = getString(exerciseTitles.random())
                 bind.lottieCelebrate.setAnimation(R.raw.cat_happy)
                 bind.containerDailyStats.visibility = View.VISIBLE
                 bind.layoutPoints.visibility = View.VISIBLE
                 bind.textContent.visibility = View.GONE
 
-                val caloriesText = caloriesEquivalentText(caloriesBurned)
-                if (caloriesText.isNotEmpty()) addStatItem("🔥", caloriesText)
-                addStatItem("⚡", getString(R.string.exercise_benefit_item_1))
-                addStatItem("💪", getString(R.string.exercise_benefit_item_2))
-                addStatItem("❤️", getString(R.string.exercise_benefit_item_3))
-                addStatItem("🔋", getString(R.string.exercise_benefit_item_4))
+                val caloriesText = getString(R.string.exercise_summary_calories_format, caloriesBurned)
+                addStatItem("🔥", caloriesText)
+
+                val fatBurned = ExerciseCalorieConverter.getFatBurnedGram(caloriesBurned)
+                val fatText = getString(R.string.exercise_summary_fat_format, fatBurned)
+                addStatItem("💧", fatText)
+
+                val foodEquiv = ExerciseCalorieConverter.getEquivalentFood(requireContext(), caloriesBurned)
+                val foodText = getString(R.string.exercise_summary_food_format, foodEquiv)
+                addStatItem("🍎", foodText)
 
                 bind.textPoints.text = getString(R.string.plus_5_ball)
                 bind.btnDone.text = getString(R.string.exercise_50_ajoyib)
@@ -176,11 +242,7 @@ class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
     }
 
     fun caloriesEquivalentText(kcal: Int): String {
-        if (kcal <= 0) return ""
-        val match = ExerciseCalorieConverter.caloriesFoods.minByOrNull { kotlin.math.abs(it.first - kcal) } ?: return ""
-        val foodName = getString(match.second.first)
-        val emoji = match.second.second
-        return getString(R.string.exercise_calories_equal_format, kcal, emoji, foodName)
+        return ""
     }
 
     companion object {

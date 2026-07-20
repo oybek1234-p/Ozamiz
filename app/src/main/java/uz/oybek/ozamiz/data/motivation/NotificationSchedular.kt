@@ -45,8 +45,8 @@ object NotificationSchedular {
                 if (type == MotivationAlarmType.INACTIVITY) {
                     add(Calendar.DAY_OF_YEAR, 1)
                 } else {
-                    set(Calendar.HOUR_OF_DAY, 11)
-                    set(Calendar.MINUTE, 25)
+                    set(Calendar.HOUR_OF_DAY, type.hour)
+                    set(Calendar.MINUTE, 0)
                     set(Calendar.SECOND, 0)
                     set(Calendar.MILLISECOND, 0)
                     if (before(calendar)) {
@@ -56,12 +56,15 @@ object NotificationSchedular {
             }
             val intent = Intent(context, MotivationAlarmReceiver::class.java).apply {
                 putExtra("ALARM_TYPE", type.typeKey)
+                addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+                addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
             }
             val pendingIntent = PendingIntent.getBroadcast(
                 context, type.id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             scheduleAlarm(
+                context,
                 alarmManager,
                 targetTime.timeInMillis,
                 pendingIntent
@@ -70,33 +73,46 @@ object NotificationSchedular {
     }
 
     private fun scheduleAlarm(
+        context: Context,
         alarmManager: AlarmManager,
         triggerTime: Long,
         pendingIntent: PendingIntent
     ) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (alarmManager.canScheduleExactAlarms()) {
+            val showIntent = PendingIntent.getActivity(
+                context,
+                0,
+                context.packageManager.getLaunchIntentForPackage(context.packageName),
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            val alarmClockInfo = AlarmManager.AlarmClockInfo(triggerTime, showIntent)
+            alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
+        } catch (e: Exception) {
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (alarmManager.canScheduleExactAlarms()) {
+                        alarmManager.setExactAndAllowWhileIdle(
+                            AlarmManager.RTC_WAKEUP,
+                            triggerTime,
+                            pendingIntent
+                        )
+                    } else {
+                        alarmManager.setAndAllowWhileIdle(
+                            AlarmManager.RTC_WAKEUP,
+                            triggerTime,
+                            pendingIntent
+                        )
+                    }
+                } else {
                     alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP,
                         triggerTime,
                         pendingIntent
                     )
-                } else {
-                    alarmManager.setAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerTime,
-                        pendingIntent
-                    )
                 }
-            } else
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    triggerTime,
-                    pendingIntent
-                )
-        } catch (_: SecurityException) {
-            alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            } catch (_: SecurityException) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            }
         }
     }
 }

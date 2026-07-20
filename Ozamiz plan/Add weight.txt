@@ -1,0 +1,32 @@
+Tushunarli. Hech qanday "chizg‘ich" yoki ortiqcha elementlarsiz, faqat aniq raqam (input) orqali vazn kiritish oynasini loyihalashtiramiz. Bu millionlab odamlar uchun eng tushunarli va xatosiz usul.
+
+⚖️ Vazn kiritish oynasi (Sodda va Aniq)
+Ushbu oyna ochilishi bilan fokus srazu raqam kiritish maydoniga tushadi.
+
+1. Raqam kiritish maydoni (TextField)
+Dizayn: Ekranning markazida juda katta va qalin raqamlar bilan yoziladigan joy (masalan: 85.5).
+
+Klaviatura: Faqat raqamli klaviatura (KeyboardType.Number yoki Decimal) avtomatik ochiladi.
+
+Vergul va Nuqta: O'zbekistonda ko'p foydalanuvchilar verguldan ham foydalanishadi. Dastur kiritilgan , ni avtomatik . ga o'girib hisoblashi kerak.
+
+2. Avtomatik hisoblagich (Real-time Feedback)
+Raqam yozilayotgan joyning pastida, o'sha zahotiyoq oxirgi vazn bilan farq ko'rinib turadi:
+
+Yozuv: "Oxirgi marta: 86.0 kg edi."
+
+O'zgarish: "Hozirgi farq: -0.5 kg" (Agar foydalanuvchi kamroq son yozsa, srazu yashil rangda farq chiqadi).
+
+3. Tasdiqlash tugmasi
+Tugma: "Saqlash" yoki "Tayyor".
+
+Mantiq: Tugma faqat raqam kiritilgandan keyin aktivlashadi.
+
+Ballar: Tugma ostida kichkina yashil matn: +10 ball beriladi.
+
+🛠 Dasturchi uchun "Logic" eslatmalari:
+Avto-fokus: Oyna ochilishi bilan TextField fokus oladi va klaviatura chiqadi. User tugmani bosib o'tirmaydi.
+
+Default qiymat: Maydon bo'sh bo'lmaydi, ichida oxirgi kiritilgan vazn turadi (masalan, 86.0). Foydalanuvchi shunchaki ustiga yozib ketadi.
+
+Xatolikni oldini olish: Agar foydalanuvchi masalan 200 kg dan ko'p yoki 30 kg dan kam son yozsa, "Raqamni tekshiring" degan ogohlantirish chiqadi.

@@ -92,11 +92,11 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
-            android:fontFamily="@font/roboto_regular"
+            android:fontFamily="@font/roboto_medium"
             android:gravity="center"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="15sp"
-            android:text="Ketma-ketlikni saqlab qolish uchun har kuni ovqat qo'shib boring" />
+            android:textSize="16sp"
+            android:text="@string/streak_desc_default" />
 
         <LinearLayout
             android:layout_width="match_parent"

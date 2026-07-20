@@ -57,9 +57,9 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     override fun viewCreated(bind: FragmentAiChatBinding) {
         setupRecyclerViews(bind)
         setupListeners(bind)
+        handleInitialArguments()
         setupKeyboardListener(bind)
         observeState(bind)
-        handleInitialArguments()
         setupPremiumListener()
         initBannerAd(bind)
         bind.sendButton.scaleX = 0.85f
@@ -102,10 +102,23 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     }
 
     private fun setupKeyboardListener(bind: FragmentAiChatBinding) {
-        val bottomMarginOffset = toDp(56f, requireContext())
+        val applyPadding = { insets: WindowInsetsCompat ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val bottomMarginOffset = if (showBottomSheet) toDp(56f, requireContext()) else 0
+            val bottomPadding = if (imeInsets.bottom == 0) {
+                0
+            } else {
+                maxOf(0, imeInsets.bottom - bottomMarginOffset - systemBars.bottom)
+            }
+            bind.root.setPadding(0, 0, 0, bottomPadding)
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(bind.root) { v, insets ->
+            applyPadding(insets)
             insets
         }
+
         ViewCompat.setWindowInsetsAnimationCallback(
             bind.root,
             object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
@@ -113,17 +126,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                     insets: WindowInsetsCompat,
                     runningAnimations: MutableList<WindowInsetsAnimationCompat>
                 ): WindowInsetsCompat {
-                    val imeHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-                    val navHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
-
-                    val bottomPadding = if (imeHeight == 0) {
-                        0
-                    } else {
-                        maxOf(0, imeHeight - bottomMarginOffset - navHeight)
-                    }
-
-                    binding.root.setPadding(0, 0, 0, bottomPadding)
-
+                    applyPadding(insets)
                     return insets
                 }
             }
@@ -132,17 +135,20 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
 
     private fun handleInitialArguments() {
         val prompt = arguments?.getString("initialPrompt")
-        if (!prompt.isNullOrBlank()) {
+        val showBackButton = arguments?.getBoolean("showBackButton", false) ?: false
+        if (!prompt.isNullOrBlank() || showBackButton) {
             showBottomSheet = false
             binding.toolbar.setNavigationIcon(R.drawable.arrow_back)
             binding.toolbar.setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
-            viewModel.run {
-                startNewChat(true)
-                sendMessage(prompt) {}
+            if (!prompt.isNullOrBlank()) {
+                viewModel.run {
+                    startNewChat(true)
+                    sendMessage(prompt) {}
+                }
+                arguments?.remove("initialPrompt")
             }
-            arguments?.remove("initialPrompt")
         } else {
             binding.toolbar.navigationIcon = null
         }

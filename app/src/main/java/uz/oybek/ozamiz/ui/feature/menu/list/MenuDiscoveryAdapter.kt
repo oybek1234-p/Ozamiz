@@ -15,7 +15,8 @@ import uz.oybek.ozamiz.databinding.ItemMenuHorizontalRecyclerBinding
 import uz.oybek.ozamiz.databinding.ItemMenuListHeaderBinding
 
 class MenuDiscoveryAdapter(
-    private val onFilterClick: (type: CategoryType, item: FilterItem) -> Unit
+    private val onFilterClick: (type: CategoryType, item: FilterItem) -> Unit,
+    private val onDietitianClick: () -> Unit
 ) : ListAdapter<MenuUiItem, RecyclerView.ViewHolder>(DiscoveryDiffCallback()) {
 
     override fun getItemViewType(position: Int): Int {
@@ -27,6 +28,7 @@ class MenuDiscoveryAdapter(
             is MenuUiItem.MethodList -> TYPE_METHOD
             is MenuUiItem.DietList -> TYPE_DIET
             is MenuUiItem.IngredientsList -> TYPE_INGREDIENTS
+            is MenuUiItem.DietitianCard -> TYPE_DIETITIAN
             else -> TYPE_HEADER
         }
     }
@@ -36,6 +38,9 @@ class MenuDiscoveryAdapter(
         return when (viewType) {
             TYPE_HEADER -> HeaderViewHolder(
                 ItemMenuListHeaderBinding.inflate(inflater, parent, false)
+            )
+            TYPE_DIETITIAN -> DietitianCardViewHolder(
+                uz.oybek.ozamiz.databinding.ItemMenuDietitianCardBinding.inflate(inflater, parent, false)
             )
             else -> GridViewHolder(
                 ItemMenuHorizontalRecyclerBinding.inflate(inflater, parent, false)
@@ -52,6 +57,7 @@ class MenuDiscoveryAdapter(
             is MenuUiItem.MethodList -> (holder as GridViewHolder).bindLargeHorizontal(item.items, CategoryType.METHODS)
             is MenuUiItem.DietList -> (holder as GridViewHolder).bindGrid(item.items, CategoryType.DIETS, 3)
             is MenuUiItem.IngredientsList -> (holder as GridViewHolder).bindGrid(item.items, CategoryType.INGREDIENTS, 3)
+            is MenuUiItem.DietitianCard -> (holder as DietitianCardViewHolder).bind(item)
             else -> {}
         }
     }
@@ -117,6 +123,23 @@ class MenuDiscoveryAdapter(
         }
     }
 
+    inner class DietitianCardViewHolder(
+        private val binding: uz.oybek.ozamiz.databinding.ItemMenuDietitianCardBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: MenuUiItem.DietitianCard) {
+            if (item.hasMenu) {
+                binding.textDietitianTitle.text = "Bugungi AI Menyu"
+                binding.textDietitianSubtitle.text = "Sizning shaxsiy menyuingiz tayyor"
+            } else {
+                binding.textDietitianTitle.text = "Dietolog siz uchun menyu tuzadi"
+                binding.textDietitianSubtitle.text = "Shaxsiy menyu tuzish uchun bosing"
+            }
+            binding.root.setOnClickListener {
+                onDietitianClick()
+            }
+        }
+    }
+
     private class DiscoveryDiffCallback : DiffUtil.ItemCallback<MenuUiItem>() {
         override fun areItemsTheSame(oldItem: MenuUiItem, newItem: MenuUiItem): Boolean {
             return oldItem === newItem
@@ -135,5 +158,6 @@ class MenuDiscoveryAdapter(
         const val TYPE_METHOD = 4
         const val TYPE_DIET = 5
         const val TYPE_INGREDIENTS = 6
+        const val TYPE_DIETITIAN = 7
     }
 }

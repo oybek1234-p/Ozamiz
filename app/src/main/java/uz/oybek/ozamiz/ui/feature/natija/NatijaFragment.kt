@@ -29,6 +29,11 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
     }
 
     override fun viewCreated(bind: FragmentNatijaBinding) {
+        bind.toolbarNatija.setNavigationIcon(R.drawable.arrow_back)
+        bind.toolbarNatija.setNavigationOnClickListener {
+            closeFragment()
+        }
+
         setupClickListeners(bind)
         observeState(bind)
 

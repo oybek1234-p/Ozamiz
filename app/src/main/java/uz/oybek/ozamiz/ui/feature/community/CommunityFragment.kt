@@ -63,6 +63,16 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
     }
 
     private fun setupToolbar() {
+        val showBackButton = arguments?.getBoolean("showBackButton", false) ?: false
+        if (showBackButton) {
+            showBottomSheet = false
+            binding.toolbar.setNavigationIcon(R.drawable.arrow_back)
+            binding.toolbar.setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+        } else {
+            binding.toolbar.navigationIcon = null
+        }
         binding.btnNotifications.setOnClickListener {
             findNavController().navigate(R.id.action_communityFragment_to_notificationsFragment)
         }

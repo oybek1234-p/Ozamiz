@@ -30,13 +30,6 @@
                 app:layout_collapseMode="parallax"
                 tools:src="@drawable/placeholder_food" />
 
-            <View
-                android:id="@+id/scrimView"
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:layout_gravity="bottom"
-                android:background="@drawable/bottom_gradient_scrim" />
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -55,11 +48,26 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_centerVertical="true"
+                        android:layout_alignParentStart="true"
                         android:background="@drawable/blur_background_pill"
                         android:contentDescription="Back"
                         android:padding="8dp"
                         android:src="@drawable/arrow_back"
                         app:tint="@android:color/white" />
+
+                    <ImageButton
+                        android:id="@+id/btnEdit"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:background="@drawable/blur_background_pill"
+                        android:contentDescription="Edit"
+                        android:padding="8dp"
+                        android:src="@drawable/edit"
+                        android:visibility="gone"
+                        app:tint="@android:color/white"
+                        tools:visibility="visible" />
                 </RelativeLayout>
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -68,8 +76,6 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_bottom_sheet_top_rounded"
-        android:layout_marginTop="-24dp"
         android:backgroundTint="?colorSurface"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -77,344 +83,143 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="24dp"
-            android:paddingBottom="40dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="32dp">
 
-            <TextView
-                android:id="@+id/textName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_bold"
-                android:textColor="?colorOnSurface"
-                android:textSize="26sp"
-                tools:text="Taom nomi" />
-
-            <!-- Metadata Badges Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="top|start"
+                android:baselineAligned="false">
+                
+                <TextView
+                    android:id="@+id/textName"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    style="@style/Headline2_16"
+                    android:textColor="?colorOnSurface"
+                    tools:text="Overnight Raspberry &amp; Almond Oats" />
+                    
+                <TextView
+                    android:id="@+id/textFoodCalories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?attr/colorPrimary"
+                    android:textSize="18sp"
+                    android:visibility="gone"
+                    android:background="@drawable/blur_background_pill"
+                    android:backgroundTint="?attr/colorSurfaceVariant"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    tools:text="286 Kal"
+                    tools:visibility="visible" />
+            </LinearLayout>
+
+            <!-- Metadata Row -->
+            <LinearLayout
+                android:id="@+id/metadataRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:weightSum="3">
 
                 <!-- Calories -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/containerCaloriesPill"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/pill_background"
-                    android:backgroundTint="?attr/colorSurfaceContainerHigh"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/fire_ic"
-                        app:tint="?attr/colorPrimary" />
+                        app:tint="?attr/colorOnSurfaceVariant" />
                     <TextView
                         android:id="@+id/textCalories"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?attr/colorPrimary"
-                        tools:text="450 kkal" />
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/roboto_regular"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="286 Cal" />
                 </LinearLayout>
-
-                <View android:layout_width="8dp" android:layout_height="1dp" />
 
                 <!-- Prep Time -->
                 <LinearLayout
                     android:id="@+id/containerPrepTime"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/pill_background"
-                    android:backgroundTint="?attr/colorSurfaceContainerHigh"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp"
-                    android:visibility="gone"
-                    tools:visibility="visible">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:src="@drawable/date_ic"
                         app:tint="?attr/colorOnSurfaceVariant" />
                     <TextView
                         android:id="@+id/textPrepTimeValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/roboto_bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/roboto_regular"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        tools:text="15 daq." />
+                        tools:text="185 minutes" />
                 </LinearLayout>
-
-                <View android:layout_width="8dp" android:layout_height="1dp" />
 
                 <!-- Difficulty -->
                 <LinearLayout
                     android:id="@+id/containerDifficulty"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/pill_background"
-                    android:backgroundTint="?attr/colorSurfaceContainerHigh"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="6dp"
-                    android:visibility="gone"
-                    tools:visibility="visible">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/badge_ic"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/food_ic"
                         app:tint="?attr/colorOnSurfaceVariant" />
                     <TextView
                         android:id="@+id/textDifficultyValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/roboto_bold"
+                        android:layout_marginTop="8dp"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/roboto_regular"
                         android:textColor="?attr/colorOnSurfaceVariant"
-                        tools:text="Oson" />
+                        tools:text="Easy" />
                 </LinearLayout>
             </LinearLayout>
-
-            <!-- Category Tags ChipGroup Scroll -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:scrollbars="none">
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupCategoryTags"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:singleLine="true" />
-            </HorizontalScrollView>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:baselineAligned="false"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_rounded_16"
-                    android:backgroundTint="?colorSurfaceContainer"
-                    android:paddingVertical="12dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Oqsil"
-                        android:textSize="11sp"
-                        android:textColor="?colorOnSurfaceVariant"
-                        android:fontFamily="@font/roboto_medium" />
-                    <TextView
-                        android:id="@+id/textProtein"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface"
-                        android:textSize="16sp"
-                        tools:text="25g" />
-                </LinearLayout>
-
-                <View android:layout_width="12dp" android:layout_height="1dp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_rounded_16"
-                    android:backgroundTint="?colorSurfaceContainer"
-                    android:paddingVertical="12dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Yog'"
-                        android:textSize="11sp"
-                        android:textColor="?colorOnSurfaceVariant"
-                        android:fontFamily="@font/roboto_medium" />
-                    <TextView
-                        android:id="@+id/textFat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface"
-                        android:textSize="16sp"
-                        tools:text="15g" />
-                </LinearLayout>
-
-                <View android:layout_width="12dp" android:layout_height="1dp" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:background="@drawable/bg_rounded_16"
-                    android:backgroundTint="?colorSurfaceContainer"
-                    android:paddingVertical="12dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Uglevod"
-                        android:textSize="11sp"
-                        android:textColor="?colorOnSurfaceVariant"
-                        android:fontFamily="@font/roboto_medium" />
-                    <TextView
-                        android:id="@+id/textCarbs"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface"
-                        android:textSize="16sp"
-                        tools:text="40g" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Ingredients header + Portions selector -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:id="@+id/labelIngredients"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/roboto_bold"
-                    android:text="Tarkibi"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="18sp" />
-
-                <!-- Serving Size Selector -->
-                <LinearLayout
-                    android:id="@+id/servingSelector"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/pill_background"
-                    android:backgroundTint="?attr/colorSurfaceContainerHigh"
-                    android:padding="4dp"
-                    android:visibility="gone"
-                    tools:visibility="visible">
-
-                    <TextView
-                        android:id="@+id/btnSrvDec"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:gravity="center"
-                        android:text="-"
-                        android:textSize="18sp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?attr/colorPrimary"
-                        android:background="@drawable/oval_back"
-                        android:backgroundTint="?attr/colorSurface"
-                        android:clickable="true"
-                        android:focusable="true"/>
-
-                    <TextView
-                        android:id="@+id/textServingsCount"
-                        android:layout_width="40dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="1"
-                        android:textSize="12sp"
-                        android:fontFamily="@font/roboto_medium"
-                        android:textColor="?attr/colorOnSurface"/>
-
-                    <TextView
-                        android:id="@+id/btnSrvInc"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:gravity="center"
-                        android:text="+"
-                        android:textSize="18sp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?attr/colorPrimary"
-                        android:background="@drawable/oval_back"
-                        android:backgroundTint="?attr/colorSurface"
-                        android:clickable="true"
-                        android:focusable="true"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/textIngredients"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_regular"
-                android:lineSpacingMultiplier="1.4"
-                android:textColor="?colorOnSurfaceVariant"
-                android:textSize="15sp"
-                tools:text="Tarkibi ko'rsatiladi..." />
-
-            <TextView
-                android:id="@+id/labelDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Tayyorlash usuli"
-                android:textColor="?colorOnSurface"
-                android:textSize="18sp"
-                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/textDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_regular"
-                android:lineSpacingMultiplier="1.4"
-                android:textColor="?colorOnSurfaceVariant"
-                android:textSize="15sp"
-                android:visibility="gone"
-                tools:text="Tavsif bu yerda bo'ladi..." />
-
-            <TextView
-                android:id="@+id/labelAbout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Mahsulot haqida"
-                android:textColor="?colorOnSurface"
-                android:textSize="18sp"
-                android:visibility="gone" />
+                android:fontFamily="@font/roboto_regular"
+                android:lineSpacingMultiplier="1.2"
+                android:textColor="?colorOnSurfaceVariant"
+                android:textSize="16sp"
+                android:visibility="gone"
+                tools:text="Our overnight raspberry and almond oats..." />
 
             <TextView
                 android:id="@+id/textAbout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:fontFamily="@font/roboto_regular"
                 android:lineSpacingMultiplier="1.4"
                 android:textColor="?colorOnSurfaceVariant"
@@ -423,21 +228,10 @@
                 tools:text="Tavsif ko'rsatiladi..." />
 
             <TextView
-                android:id="@+id/labelRichIn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Nimalarga boyligi"
-                android:textColor="?colorOnSurface"
-                android:textSize="18sp"
-                android:visibility="gone" />
-
-            <TextView
                 android:id="@+id/textRichIn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:fontFamily="@font/roboto_regular"
                 android:lineSpacingMultiplier="1.4"
                 android:textColor="?colorOnSurfaceVariant"
@@ -445,80 +239,244 @@
                 android:visibility="gone"
                 tools:text="Vitaminlar va minerallar..." />
 
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupCategoryTags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:chipSpacingVertical="8dp"
+                app:chipSpacingHorizontal="8dp" />
+
+            <TextView
+                android:id="@+id/labelIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                style="@style/Headline2_16"
+                android:text="Tarkibi"
+                android:textColor="?colorOnSurface" />
+
+            <TextView
+                android:id="@+id/textIngredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/roboto_regular"
+                android:lineSpacingMultiplier="1.6"
+                android:textColor="?colorOnSurfaceVariant"
+                android:textSize="15sp"
+                tools:text="• Cinnamon\n• Raspberries (50 g)" />
+
+            <!-- Instructions -->
+            <View
+                android:id="@+id/divider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?colorSurfaceContainerHighest"
+                android:layout_marginTop="24dp" />
+
             <TextView
                 android:id="@+id/labelPreparationMethod"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
+                style="@style/Headline2_16"
                 android:text="Tayyorlash usuli"
-                android:textColor="?colorOnSurface"
-                android:textSize="18sp"
-                android:visibility="gone" />
+                android:textColor="?colorOnSurface" />
 
-            <TextView
-                android:id="@+id/textPreparationMethod"
+            <LinearLayout
+                android:id="@+id/containerSteps"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_regular"
-                android:lineSpacingMultiplier="1.4"
-                android:textColor="?colorOnSurfaceVariant"
-                android:textSize="15sp"
-                android:visibility="gone"
-                tools:text="Qadamlar ro'yxati..." />
+                android:orientation="vertical" />
 
-            <TextView
-                android:id="@+id/labelBenefits"
+            <!-- Nutrition Facts List -->
+            <View
+                android:id="@+id/divider2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?colorSurfaceContainerHighest"
+                android:layout_marginTop="24dp" />
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Foydali xususiyati"
-                android:textColor="?colorOnSurface"
-                android:textSize="18sp"
-                android:visibility="gone" />
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textBenefits"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_regular"
-                android:lineSpacingMultiplier="1.4"
-                android:textColor="?colorOnSurfaceVariant"
-                android:textSize="15sp"
-                android:visibility="gone"
-                tools:text="Salomatlikka foydalari..." />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Kaloriya"
+                        style="@style/Headline2_16"
+                        android:textColor="?colorOnSurface"
+                        />
+                    <TextView
+                        android:id="@+id/textFactCalories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="16sp"
+                        tools:text="286 Kal"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/labelConsumptionTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Iste'mol vaqti"
-                android:textColor="?colorOnSurface"
-                android:textSize="18sp"
-                android:visibility="gone" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Oqsil"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:id="@+id/textProtein"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"
+                        tools:text="46.1 g"/>
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/textConsumptionTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_regular"
-                android:lineSpacingMultiplier="1.4"
-                android:textColor="?colorOnSurfaceVariant"
-                android:textSize="15sp"
-                android:visibility="gone"
-                tools:text="Masalan: Ertalab yoki tushlikda..." />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Uglevod"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:id="@+id/textCarbs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"
+                        tools:text="7.5 g"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Kletchatka"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:id="@+id/textFactFiber"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"
+                        tools:text="2.3 g"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Qand miqdori"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:id="@+id/textFactSugar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"
+                        tools:text="7.3 g"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Yog'"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:id="@+id/textFat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"
+                        tools:text="36.4 g"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="12dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Tuz"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"/>
+                    <TextView
+                        android:id="@+id/textFactSalt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_bold"
+                        android:textColor="?colorOnSurfaceVariant"
+                        android:textSize="16sp"
+                        tools:text="2.6 g"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
 
             <Button
                 android:id="@+id/btnDelete"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="24dp"
                 android:backgroundTint="?colorError"
                 android:fontFamily="@font/roboto_bold"
                 android:text="O'chirish"
@@ -531,4 +489,3 @@
     </androidx.core.widget.NestedScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-

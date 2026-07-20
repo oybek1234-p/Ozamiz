@@ -63,5 +63,10 @@ data class FoodAnalysisResult(
     val pros: List<String>? = null,
     val cons: List<String>? = null,
     val advice: String? = null,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val limitBread: Boolean? = null,
+    val sodaDrink: Boolean? = null,
+    val heavyDinner: Boolean? = null,
+    val limitCalorie: Boolean? = null,
+    val waterBeforeMeal: Boolean? = null
 )

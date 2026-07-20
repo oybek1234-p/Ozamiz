@@ -5,62 +5,27 @@ import java.util.Calendar
 object NotificationMessages {
 
     val morningMessages = listOf(
-        "Xayrli tong! Kunni bir stakan suv bilan boshlash — eng to'g'ri qaror. 💧",
-        "Bugungi maqsadingiz sari ilk qadam: Nonushtani kiritish. 🍳",
-        "Ertalabki yengil ovqat kun davomida tetik yurishingizga yordam beradi. ☀️",
-        "Muvaffaqiyat kichik odatlardan boshlanadi. Suv ichish esdan chiqmadimi? 🌊",
-        "Bugun o'zingizni qanday his qilyapsiz? Ilovaga kirib, rejimni boshlang. 🚀",
-        "Nonushtadagi oqsil — kun bo'yi to'q yurishning siri. 🥚",
-        "Sizning sog'lig'ingiz — bu sarmoya. Bugun unga nima qo'shasiz? 💎",
-        "Harakatda baraka bor. Bugungi kunni faol o'tkazing! 🏃‍♂️",
-        "Oshqozonni qiynamang, kunni iliq suv bilan boshlang. 🍵",
-        "Bugun nima yeyishingizni rejalashtirdingiz? Keling, birga bajaramiz. 📝",
-        "Oynaga qarab bir jilmaying va nonushtani belgilab qo'ying. 😊",
-        "Ertalabki intizom — kun bo'yi yaxshi kayfiyat garovi. ✅",
-        "Kofe yaxshi, lekin suv undan ham muhimroq. ☕+💧",
-        "Bugun kechagidan yaxshiroq natija ko'rsatish uchun imkoniyat bor. 📈",
-        "Irodangizni mustahkamlang: Shirinliksiz choy ichib ko'ring. 💪",
-        "Siz o'ylagandan ham kuchlisiz. Boshladikmi? 🏁",
-        "Ilovaga kirish uchun 10 soniya vaqt ajrating, natijasi uzoqqa yetadi. ⏱️"
+        "Kunni 1 stakan iliq suv bilan boshlaymiz! 💧",
+        "Nonushtada nima yeganingizni yozib qo'ydingizmi? 🍳",
+        "Tongni yengil nonushta bilan boshlaylik, {name}. Qani, kiritamiz!",
+        "Ishtaha joyidami? 🥚 Nonushtani belgilab, kunni tetik boshlang.",
+        "Kunlik suvni boshladikmi? 🌊 1 stakan suv — ajoyib boshlanish!"
     )
 
     val lunchMessages = listOf(
-        "Tushlik vaqti! Yoqimli ishtaha. Nima yeganingizni yozib qo'ying. 🍽️",
-        "Ko'p ovqat yeyish shart emas, foydalisini yeyish muhim. 🥗",
-        "Gazli ichimliklar o'rniga oddiy suv yoki choy tanlang. Tanangiz minnatdor bo'ladi. 🍵",
-        "Yarim kun o'tdi. Suv ichish normasini tekshirib ko'ring. 📊",
-        "Ovqatni kiritish — bu o'z-o'zini nazorat qilishning eng oson yo'li. 📲",
-        "Tushlikdan keyin biroz piyoda yurish hazm qilishni yaxshilaydi. 🚶",
-        "Fast-food tez pishadi, lekin qorinda og'irlik qiladi. Yengilroq ovqat tanlang. 🍎",
-        "Qorin to'ydimi? Haddan tashqari to'yib ketishdan saqlaning. ⚖️",
-        "Bugungi menyuingizda sabzavotlar bormi? Ular vitamin manbai. 🥕",
-        "Ovqatlanayotganda shoshilmang, har bir luqmadan zavq oling. 🧘‍♂️",
-        "Agar hozir yozmasangiz, kechqurun esdan chiqib qolishi mumkin. 🧠",
-        "Sizning maqsadingiz — sog'lom va chiroyli tana. Buni unutmang. 🎯",
-        "Shirinlik yegingiz kelyaptimi? Balki shunchaki chanqagandirsiz? 🥛",
-        "Ilovaga kirib, qancha kaloriya qolganini ko'rib chiqing. 📉",
-        "Tuzni kamroq ishlating, ta'm sezish qobiliyatingiz yaxshilanadi. 🧂",
-        "Tushlik — bu quvvat olish vaqti. Uni to'g'ri sarflang. 🔋",
-        "Hozirgi kichik tanlov — kelajakdagi katta natija. 🌱"
+        "Tushlik vaqti bo'ldi! 🍽️ Yoqimli ishtaha. Nimalar yedingiz?",
+        "Qorinni haddan ortiq to'ydirmaymiz. 🥗 Yengilroq ovqatlarni yozib qo'ying.",
+        "Yarim kun o'tdi. Suv normasini tekshirib olamiz! 🥤",
+        "{name}, kofe yoki shirinlikdan oldin 1 stakan suv ichib ko'ring. 💧",
+        "Tushlikda nimalar tanovul qildingiz? Yozib qo'ying. 📲"
     )
 
     val eveningMessages = listOf(
-        "Ishlar bilan charchamadingizmi? Bir stakan suv ichib, tetiklanib oling. 💧",
-        "Kechki ovqatni yengilroq qiling, ertalab yengil uyg'onasiz. 🌙",
-        "Bugungi rejangiz qanday bajarildi? Ilovada tekshiramiz. ✅",
-        "Uxlashdan 3 soat oldin ovqatlanishni to'xtatish — oltin qoida. ⏳",
-        "Bugun o'zingizni qanday his qilyapsiz? Ilovaga kirib, rejimni boshlang. 🚀",
-        "Kechki sayr — ham sog'likka, ham uyquga foyda. 🌳",
-        "Shirinliksiz bir kun o'tdimi? Demak, irodangiz chiniqyapti. 🏆",
-        "Agar qorningiz ochsa, bir stakan qatiq eng yaxshi yechim. 🥛",
-        "Bugun suv normasini bajardingizmi? Oxirgi stakan! 🥂",
-        "Ilovaga hamma narsani kiritdingizmi? Hisob-kitobni to'g'rilab qo'yaylik. 📲",
-        "Ertangi kun menyusini hozir o'ylab qo'ysangiz, ertalab oson bo'ladi. 📅",
-        "Uyqu oldidan telefon emas, tinchlik kerak. Miya dam olsin. 📵",
-        "Bugungi kun tarixingizda qoladi. Uni chiroyli yakunlang. 📜",
-        "Siz to'g'ri yo'ldasiz. Sabr va harakat o'z mevasini beradi. 🌟",
-        "Ertalab tetik uyg'onish uchun vaqtliroq yoting. 🛌",
-        "Xayrli tun! Ertaga yangi kuch bilan davom ettiramiz. ✨"
+        "Kechki ovqatni yengilroq qilamiz. 🌙 Uxlashdan 3 soat oldin ovqatlanishni tugatamiz.",
+        "Kechki ovqat kiritildimi? Kunlik hisob-kitobni yakunlaymiz! 📲",
+        "Kun yakuni yaqin, {name}. Suv ichish esdan chiqmadimi? Oxirgi stakan! 🥂",
+        "Ertaga yengil uyg'onish uchun kechki ovqatni hoziroq kiritib qo'ying. 🥦",
+        "Kechki sayrni ham unutmang, faollikni oshiramiz! 🌳"
     )
 
     val dailyTips = listOf(
@@ -97,17 +62,16 @@ object NotificationMessages {
     )
 
     val inactivityMessages = listOf(
-        "Sizni sog'indik! Sog'lom turmush tarzi sari harakatni davom ettiramiz. 🌟",
-        "Bugun hali hech narsa kiritmadingiz. Keling, bugungi kunni birgalikda tahlil qilamiz! 📲",
-        "O'z oldingizga qo'ygan maqsadingiz esingizdami? Kichik qadamlar katta natijaga olib keladi. 💪",
-        "Tanaffus yaxshi, lekin ortga chekinmang. Ilovaga kirib faollikni yangilang! 🚶‍♂️"
+        "Sog'indik! 👋 Keling, bugungi taom va suvlarni yozishni boshlaymiz.",
+        "Maqsad sari chekinish yo'q, {name}! Kirib, faollikni belgilaymiz. 💪",
+        "Bugun hali hech narsa yozmabsiz. Yo'qotilgan natijalarni tiklaylik! 📲"
     )
 
     fun getMessageForType(type: String): String {
         val calendar = Calendar.getInstance()
         val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
 
-        return when (type) {
+        val rawMessage = when (type) {
             NotificationSchedular.MotivationAlarmType.BREAKFAST.typeKey -> morningMessages.random()
             NotificationSchedular.MotivationAlarmType.LUNCH.typeKey -> lunchMessages.random()
             NotificationSchedular.MotivationAlarmType.DINNER.typeKey -> eveningMessages.random()
@@ -120,5 +84,8 @@ object NotificationMessages {
             NotificationSchedular.MotivationAlarmType.INACTIVITY.typeKey -> inactivityMessages.random()
             else -> dailyTips.random()
         }
+
+        val userName = uz.oybek.ozamiz.data.user.local.LocalUser.user.name.ifBlank { "do'stim" }
+        return rawMessage.replace("{name}", userName)
     }
 }

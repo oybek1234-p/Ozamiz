@@ -73,6 +73,7 @@
                         android:layout_marginTop="12dp"
                         android:orientation="vertical">
 
+
                         <com.google.android.material.card.MaterialCardView
                             android:id="@+id/button_quick_camera"
                             android:layout_width="match_parent"
@@ -381,6 +382,51 @@
 
 
 
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/button_meal_recommendation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:clickable="true"
+                            android:layout_marginTop="@dimen/dimen_12"
+                            android:focusable="true"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:padding="16dp">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/food_ic"
+                                    app:tint="?attr/colorOnTertiaryContainer" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="16dp"
+                                    android:layout_weight="1"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="Ovqatlanish tavsiyasi"
+                                    android:textColor="?attr/colorOnTertiaryContainer"
+                                    android:textSize="16sp" />
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:rotation="180"
+                                    android:src="@drawable/arrow_back"
+                                    app:tint="?attr/colorOnTertiaryContainer" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 

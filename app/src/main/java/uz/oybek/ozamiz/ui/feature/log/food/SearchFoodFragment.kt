@@ -19,11 +19,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import java.util.Date
@@ -58,6 +62,19 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
         observeData(bind)
         viewModel.updateMealType(mealType)
         bind.inputSearchFood.showKeyboard()
+        loadBanner()
+    }
+
+    private fun loadBanner() {
+        if (UserProfileRepository.user.isPremium()) {
+            binding.bannerContainer.visibility = View.GONE
+            return
+        }
+        val bannerView = AdsManager.createBannerView(
+            requireContext(),
+            AdsConfig.BANNER_LOG_FOOD
+        )
+        binding.bannerContainer.addView(bannerView)
     }
 
     private fun setupUI(bind: FragmentSearchFoodBinding) = with(bind) {

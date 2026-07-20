@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorSurfaceContainer">
@@ -47,8 +46,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@android:color/transparent"
-                app:layout_collapseMode="pin"
-                app:contentInsetStart="0dp">
+                app:contentInsetStart="0dp"
+                app:layout_collapseMode="pin">
 
                 <ImageButton
                     android:id="@+id/btnBack"
@@ -88,7 +87,7 @@
                 android:fontFamily="@font/roboto_bold"
                 android:text="@string/dinner_guide_title"
                 android:textColor="?colorOnSurface"
-                android:textSize="17sp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -100,7 +99,7 @@
                 android:textColor="?colorOnSurface"
                 android:textSize="16sp" />
 
-            <!-- Ovqatdan oldin -->
+            <!-- Before Dinner -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -110,49 +109,45 @@
                 android:textColor="?colorOnSurface"
                 android:textSize="17sp" />
 
-            <!-- Point 1 Card: 3 Hours -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                app:cardBackgroundColor="?colorSurfaceContainerLowest"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="1dp"
                 app:strokeColor="?colorOutlineVariant"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                <TextView
+                app:strokeWidth="1dp">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:lineSpacingMultiplier="1.4"
-                    android:text="@string/dinner_before_time"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="16sp" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_regular"
+                        android:lineSpacingMultiplier="1.4"
+                        android:text="@string/dinner_before_time"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="16sp" />
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="12dp"
+                        android:background="?colorOutlineVariant" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_regular"
+                        android:lineSpacingMultiplier="1.4"
+                        android:text="@string/dinner_before_water"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Point 2 Card: Water -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:lineSpacingMultiplier="1.4"
-                    android:text="@string/dinner_before_water"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="16sp" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Cheklovlar -->
+            <!-- Limits -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -162,70 +157,44 @@
                 android:textColor="?colorOnSurface"
                 android:textSize="17sp" />
 
-            <!-- Limit 1: carbs -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                app:cardBackgroundColor="?colorSurfaceContainerLowest"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="1dp"
                 app:strokeColor="?colorOutlineVariant"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                <TextView
+                app:strokeWidth="1dp">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:lineSpacingMultiplier="1.4"
-                    android:text="@string/dinner_limit_carbs"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="16sp" />
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dinner_limit_carbs"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="16sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/dinner_limit_fruits"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="16sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/dinner_limit_salt"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Limit 2: fruits -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:lineSpacingMultiplier="1.4"
-                    android:text="@string/dinner_limit_fruits"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="16sp" />
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Limit 3: salt -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:lineSpacingMultiplier="1.4"
-                    android:text="@string/dinner_limit_salt"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="16sp" />
-            </com.google.android.material.card.MaterialCardView>
-
+            <!-- Variants -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -234,70 +203,6 @@
                 android:text="@string/dinner_variants_title"
                 android:textColor="?colorOnSurface"
                 android:textSize="17sp" />
-
-            <!-- Variant 1 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/dinner_variant_1_title"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface" 
-                        android:textSize="17sp"/>
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/dinner_variant_1_desc"
-                        android:textSize="16sp" 
-                        android:textColor="?colorOnSurface"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Variant 2 -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/dinner_variant_2_title"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface" 
-                        android:textSize="17sp"/>
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/dinner_variant_2_desc"
-                        android:textSize="16sp" 
-                        android:textColor="?colorOnSurface"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -308,16 +213,16 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Variant 3 -->
+                    <!-- Variant 1 -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
+                        app:cardBackgroundColor="?colorSurfaceContainerLowest"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
                         app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
+                        app:strokeWidth="1dp">
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -326,243 +231,84 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_3_title"
                                 android:fontFamily="@font/roboto_bold"
+                                android:text="@string/dinner_variant_1_title"
                                 android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
+                                android:textSize="17sp" />
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/dinner_variant_1_desc"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Variant 2 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:cardBackgroundColor="?colorSurfaceContainerLowest"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="?colorOutlineVariant"
+                        app:strokeWidth="1dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/dinner_variant_2_title"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="17sp" />
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/dinner_variant_2_desc"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="16sp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Variant 3 -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:cardBackgroundColor="?colorSurfaceContainerLowest"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="?colorOutlineVariant"
+                        app:strokeWidth="1dp">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/dinner_variant_3_title"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="17sp" />
                             <TextView
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:text="@string/dinner_variant_3_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
+                                android:textColor="?colorOnSurface"
+                                android:textSize="16sp" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Variant 4 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_4_title"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/dinner_variant_4_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Variant 5 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_5_title"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/dinner_variant_5_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Variant 6 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_6_title"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/dinner_variant_6_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Variant 7 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_7_title"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/dinner_variant_7_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Variant 8 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_8_title"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/dinner_variant_8_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Variant 9 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_9_title"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/dinner_variant_9_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Variant 10 -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="1dp"
-                        app:strokeColor="?colorOutlineVariant"
-                        app:cardBackgroundColor="?colorSurfaceContainerLowest">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/dinner_variant_10_title"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?colorOnSurface"
-                                android:textSize="17sp"/>
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:text="@string/dinner_variant_10_desc"
-                                android:textSize="16sp"
-                                android:textColor="?colorOnSurface"/>
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
                 </LinearLayout>
 
                 <LinearLayout
@@ -587,7 +333,7 @@
                         android:layout_marginTop="16dp"
                         android:fontFamily="@font/roboto_bold"
                         android:gravity="center"
-                        android:text="Barcha variantlarni ko'rish uchun Premium obuna bo'ling"
+                        android:text="@string/premium_overlay_text"
                         android:textColor="?colorOnSurface"
                         android:textSize="18sp" />
 
@@ -597,23 +343,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="24dp"
                         android:paddingHorizontal="32dp"
-                        android:text="Premiumga o'tish"
+                        android:text="@string/premiumga_o_tish"
                         app:cornerRadius="24dp" />
                 </LinearLayout>
             </FrameLayout>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                app:cardBackgroundColor="?colorSecondaryContainer"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:strokeColor="?colorOutlineVariant"
-                app:strokeWidth="1dp">
-
-            </com.google.android.material.card.MaterialCardView>
-
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

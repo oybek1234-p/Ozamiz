@@ -46,42 +46,52 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         setupListeners(bind)
         setupScrollBehavior(bind)
         
+        findNavController().currentBackStackEntry?.savedStateHandle
+            ?.getLiveData<Menu>("updated_menu")
+            ?.observe(viewLifecycleOwner) { updatedMenu ->
+                if (updatedMenu != null) {
+                    menu = updatedMenu
+                    setupViews(bind, updatedMenu)
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set("updated_menu", updatedMenu)
+                }
+            }
+        
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.deleteSuccess.collect {
+                findNavController().previousBackStackEntry?.savedStateHandle?.set("deleted_menu_id", menu?.id)
                 findNavController().popBackStack()
             }
         }
     }
 
     private fun setupScrollBehavior(bind: FragmentMenuDetailBinding) {
-        bind.appBar.addOnOffsetChangedListener(com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+        bind.appBar.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
             val context = appBarLayout.context
             val isCollapsed = Math.abs(verticalOffset) >= appBarLayout.totalScrollRange - 100
-            
+
             val tintColor = if (isCollapsed) {
-                com.google.android.material.color.MaterialColors.getColor(context, com.google.android.material.R.attr.colorOnSurface, 0)
+                com.google.android.material.color.MaterialColors.getColor(
+                    context,
+                    com.google.android.material.R.attr.colorOnSurface,
+                    0
+                )
             } else {
                 android.graphics.Color.WHITE
             }
-            
+
             bind.btnBack.imageTintList = android.content.res.ColorStateList.valueOf(tintColor)
             bind.btnBack.backgroundTintList = if (isCollapsed) {
                 android.content.res.ColorStateList.valueOf(android.graphics.Color.TRANSPARENT)
             } else {
-                null // Defaults to the drawable's color/tint
+                null
             }
-            
-            bind.scrimView.alpha = 1f - (Math.abs(verticalOffset).toFloat() / appBarLayout.totalScrollRange.toFloat())
-        })
+        }
     }
-
-    private var currentServings = 1
-    private var originalIngredients: List<String> = emptyList()
 
     private fun setupViews(bind: FragmentMenuDetailBinding, menu: Menu) {
         bind.textName.text = menu.name
 
-        bind.btnDelete.visibility = if (UserProfileRepository.user.admin) android.view.View.VISIBLE else android.view.View.GONE
+        // setup visibility in setupListeners
 
         // Metadata badges
         val isMenu = menu.type == "menu"
@@ -90,8 +100,17 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         bind.containerDifficulty.visibility = if (isMenu) android.view.View.VISIBLE else android.view.View.GONE
         bind.textDifficultyValue.text = menu.difficulty
 
-        // Populate Category Tags Chips
-        val allCategories = MenuCategories.mainMeals + 
+        if (isMenu) {
+            bind.metadataRow.visibility = android.view.View.VISIBLE
+            bind.textFoodCalories.visibility = android.view.View.GONE
+            bind.containerCaloriesPill.layoutParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            bind.metadataRow.weightSum = 3f
+        } else {
+            bind.metadataRow.visibility = android.view.View.GONE
+            bind.textFoodCalories.visibility = android.view.View.VISIBLE
+            bind.textFoodCalories.text = getString(R.string.calories_format, menu.calories)
+        }
+        val allCategories = MenuCategories.mainMeals +
             MenuCategories.methods + 
             MenuCategories.diets + 
             MenuCategories.ingredients
@@ -99,118 +118,85 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         val matched = allCategories.filter { menu.categoryIds.contains(it.id.name) }
         matched.forEach { cat ->
             val chip = com.google.android.material.chip.Chip(requireContext()).apply {
-                text = "${cat.emoji} ${cat.name}"
+                text = cat.name
                 isCheckable = false
                 isClickable = false
+                chipStrokeWidth = 0f
+                val bgColor = com.google.android.material.color.MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerHigh, android.graphics.Color.LTGRAY)
+                chipBackgroundColor = android.content.res.ColorStateList.valueOf(bgColor)
             }
             bind.chipGroupCategoryTags.addView(chip)
         }
 
         if (isMenu) {
+            bind.textDescription.visibility = if (menu.description.isBlank()) android.view.View.GONE else android.view.View.VISIBLE
+            bind.textDescription.text = menu.description
+
             bind.labelIngredients.visibility = if (menu.ingredients.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
             bind.textIngredients.visibility = bind.labelIngredients.visibility
-            
-            originalIngredients = menu.ingredients
-            currentServings = 1
-            bind.servingSelector.visibility = if (menu.ingredients.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
-            bind.textServingsCount.text = currentServings.toString()
-            updateIngredientsText(bind)
+            bind.textIngredients.text = menu.ingredients.joinToString("\n") { "• $it" }
 
             bind.labelPreparationMethod.visibility = if (menu.preparationMethod.isEmpty()) android.view.View.GONE else android.view.View.VISIBLE
-            bind.textPreparationMethod.visibility = bind.labelPreparationMethod.visibility
-            bind.textPreparationMethod.text = menu.preparationMethod.mapIndexed { index, s -> "${index + 1}. $s" }.joinToString("\n\n")
 
-            bind.labelAbout.visibility = android.view.View.GONE
+            bind.containerSteps.removeAllViews()
+            menu.preparationMethod.forEachIndexed { index, step ->
+                val stepView = layoutInflater.inflate(R.layout.item_instruction_step, bind.containerSteps, false)
+                val textStepNumber = stepView.findViewById<android.widget.TextView>(R.id.textStepNumber)
+                val textStepContent = stepView.findViewById<android.widget.TextView>(R.id.textStepContent)
+                textStepNumber.text = (index + 1).toString()
+                textStepContent.text = step
+                bind.containerSteps.addView(stepView)
+            }
+            bind.containerSteps.visibility = bind.labelPreparationMethod.visibility
+            bind.divider1.visibility = bind.labelPreparationMethod.visibility
+
             bind.textAbout.visibility = android.view.View.GONE
-            bind.labelRichIn.visibility = android.view.View.GONE
             bind.textRichIn.visibility = android.view.View.GONE
-            bind.labelConsumptionTime.visibility = android.view.View.GONE
-            bind.textConsumptionTime.visibility = android.view.View.GONE
-            bind.labelDescription.visibility = android.view.View.GONE
-            bind.textDescription.visibility = android.view.View.GONE
+
         } else {
-            bind.labelAbout.visibility = if (menu.about.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
-            bind.textAbout.visibility = bind.labelAbout.visibility
-            bind.textAbout.text = menu.about
-
-            bind.labelRichIn.visibility = if (menu.richIn.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
-            bind.textRichIn.visibility = bind.labelRichIn.visibility
-            bind.textRichIn.text = menu.richIn
-
-            bind.labelConsumptionTime.visibility = if (menu.consumptionTime.isNullOrBlank()) android.view.View.GONE else android.view.View.VISIBLE
-            bind.textConsumptionTime.visibility = bind.labelConsumptionTime.visibility
-            bind.textConsumptionTime.text = menu.consumptionTime
-
+            bind.textDescription.visibility = android.view.View.GONE
             bind.labelIngredients.visibility = android.view.View.GONE
             bind.textIngredients.visibility = android.view.View.GONE
-            bind.labelDescription.visibility = android.view.View.GONE
-            bind.textDescription.visibility = android.view.View.GONE
             bind.labelPreparationMethod.visibility = android.view.View.GONE
-            bind.textPreparationMethod.visibility = android.view.View.GONE
+            bind.containerSteps.visibility = android.view.View.GONE
+            bind.divider1.visibility = android.view.View.GONE
+
+            bind.textAbout.text = menu.about
         }
 
         bind.textCalories.text = getString(R.string.calories_format, menu.calories)
+
+        bind.textFactCalories.text = getString(R.string.calories_format, menu.calories)
         bind.textProtein.text = "${menu.protein} g"
         bind.textFat.text = "${menu.fat} g"
         bind.textCarbs.text = "${menu.carbs} g"
+        bind.textFactFiber.text = "${menu.fiber} g"
+        bind.textFactSugar.text = "${menu.sugar} g"
+        bind.textFactSalt.text = "${menu.salt} g"
 
         if (menu.imageUrl != null) {
             bind.imageMenu.loadPhoto(menu.imageUrl!!)
         }
     }
 
-    private fun updateIngredientsText(bind: FragmentMenuDetailBinding) {
-        bind.textIngredients.text = scaleIngredients(originalIngredients, currentServings)
-    }
-
-    private fun scaleIngredients(ingredients: List<String>, multiplier: Int): String {
-        val regex = Regex("(\\d+(?:\\.\\d+)?\\s*)(g|ml|mL|l|kg|tbsp|tsp|cup|dona|stakan|osh qoshiq|choy qoshiq|ta|\\))")
-        return ingredients.joinToString("\n") { line ->
-            val scaledLine = if (multiplier <= 1) {
-                line
-            } else {
-                regex.replace(line) { matchResult ->
-                    val numWithSpace = matchResult.groupValues[1]
-                    val unit = matchResult.groupValues[2]
-                    val numberPart = numWithSpace.trim()
-                    val spacePart = numWithSpace.substring(numberPart.length)
-                    val num = numberPart.toDoubleOrNull()
-                    if (num != null) {
-                        val scaled = num * multiplier
-                        val formatted = if (scaled % 1.0 == 0.0) scaled.toInt().toString() else String.format(java.util.Locale.US, "%.1f", scaled)
-                        "$formatted$spacePart$unit"
-                    } else {
-                        matchResult.value
-                    }
-                }
-            }
-            "• $scaledLine"
-        }
-    }
-
     private fun setupListeners(bind: FragmentMenuDetailBinding) {
+        val isAdmin = UserProfileRepository.user.admin
+        bind.btnDelete.visibility = if (isAdmin) android.view.View.VISIBLE else android.view.View.GONE
+        bind.btnEdit.visibility = if (isAdmin) android.view.View.VISIBLE else android.view.View.GONE
+
         bind.btnBack.setOnClickListener {
             findNavController().popBackStack()
         }
 
+        bind.btnEdit.setOnClickListener {
+            val bundle = android.os.Bundle().apply {
+                putParcelable("menuToEdit", menu)
+            }
+            findNavController().navigate(R.id.action_menuDetailFragment_to_addMenuFragment, bundle)
+        }
+
         bind.btnDelete.setOnClickListener {
             showDeleteConfirmation()
-        }
-
-        bind.btnSrvDec.setOnClickListener {
-            if (currentServings > 1) {
-                currentServings--
-                bind.textServingsCount.text = currentServings.toString()
-                updateIngredientsText(bind)
-            }
-        }
-
-        bind.btnSrvInc.setOnClickListener {
-            if (currentServings < 20) {
-                currentServings++
-                bind.textServingsCount.text = currentServings.toString()
-                updateIngredientsText(bind)
-            }
         }
     }
 

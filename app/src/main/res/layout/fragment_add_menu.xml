@@ -358,43 +358,7 @@
                     android:inputType="textMultiLine"
                     android:layout_marginBottom="16dp"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Nimalarga boyligi"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp"/>
 
-                <EditText
-                    android:id="@+id/editRichIn"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/round_lay_stroke"
-                    android:padding="12dp"
-                    android:hint="Masalan: Oqsilga, Vitamin C ga boy"
-                    android:inputType="textCapSentences"
-                    android:layout_marginBottom="16dp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Iste'mol vaqti"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp"/>
-
-                <EditText
-                    android:id="@+id/editConsumptionTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:background="@drawable/round_lay_stroke"
-                    android:padding="12dp"
-                    android:hint="Masalan: Ozish uchun obetgacha"
-                    android:inputType="textCapSentences"
-                    android:layout_marginBottom="16dp"/>
             </LinearLayout>
 
             <EditText
@@ -404,6 +368,25 @@
                 android:visibility="gone"
                 android:background="@android:color/transparent"
                 android:inputType="textMultiLine"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Xizmat hajmi (Masalan: 1 kosa)"
+                android:fontFamily="@font/roboto_medium"
+                android:textColor="?colorOnSurface"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp"/>
+
+            <EditText
+                android:id="@+id/editServingSize"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/round_lay_stroke"
+                android:padding="12dp"
+                android:hint="Masalan: 1 kosa osh"
+                android:inputType="textCapSentences"
                 android:layout_marginBottom="16dp"/>
                 
             <!-- Macros Grid -->

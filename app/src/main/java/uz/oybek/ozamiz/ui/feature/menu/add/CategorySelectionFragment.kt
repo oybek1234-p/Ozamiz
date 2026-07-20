@@ -24,12 +24,14 @@ class CategorySelectionFragment : BaseFragment<FragmentCategorySelectBinding>() 
     ) = FragmentCategorySelectBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentCategorySelectBinding) {
-        val adapter = CategorySelectionAdapter { category, isSelected ->
+        var adapter: CategorySelectionAdapter? = null
+        adapter = CategorySelectionAdapter { category, isSelected ->
             if (isSelected) {
                 selectedCategories.add(category)
             } else {
                 selectedCategories.removeIf { it.id == category.id }
             }
+            adapter?.let { updateList(bind, it) }
         }
         updateList(bind, adapter)
 

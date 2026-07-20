@@ -21,9 +21,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import androidx.transition.TransitionManager
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
+import uz.oybek.ozamiz.data.ai.TodayAiMenuRepository
+import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.model.UserExercise
 import uz.oybek.ozamiz.data.streak.StreakInfo
@@ -90,7 +93,9 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         initWater()
         initExercise()
         initWeightLogListener()
+        initFeaturesCards()
         initMealRecommendation()
+        initCustomCards()
         observeUiState()
         observeStreakUpdate()
         observeExerciseAdded()
@@ -161,22 +166,33 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         ) { _, bundle ->
             val calories = bundle.getInt("caloriesBurned", 0)
             if (calories > 0) {
-                val args = DailyAnalysisFragment.createArgs(
-                    type = DailyAnalysisFragment.TYPE_EXERCISE_50,
-                    caloriesBurned = calories
-                )
-                navigate(R.id.action_home_to_dailyAnalysisFragment, args)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(1000)
+                    val args = DailyAnalysisFragment.createArgs(
+                        type = DailyAnalysisFragment.TYPE_EXERCISE_50,
+                        caloriesBurned = calories
+                    )
+                    navigate(R.id.action_home_to_dailyAnalysisFragment, args)
+                }
             }
         }
     }
 
     private fun setupLimitExceededResultListener() {
-
+        parentFragmentManager.setFragmentResultListener("limit_exceeded_result", viewLifecycleOwner) { _, bundle ->
+            val exceededTypes = bundle.getStringArrayList("exceeded_types") ?: emptyList()
+            if (exceededTypes.contains("calories")) {
+                if (childFragmentManager.findFragmentByTag(CalorieLimitReachedDialogFragment.TAG) == null) {
+                    val dialog = CalorieLimitReachedDialogFragment.newInstance()
+                    dialog.show(childFragmentManager, CalorieLimitReachedDialogFragment.TAG)
+                }
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        checkOnboarding()
+        viewModel.refresh()
     }
 
     override fun onDestroyView() {
@@ -187,7 +203,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun checkNotificationPermission() {
         val ctx = context ?: return
-        if (viewModel.isSecondOnboardingSheetSeen().not()) return
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     ctx, android.Manifest.permission.POST_NOTIFICATIONS
@@ -197,65 +212,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             }
         }
     }
-
-    private fun checkOnboarding() {
-        runCatching {
-            if (!viewModel.isFirstLogAdded()) {
-                showAppOnboarding()
-            } else if (!viewModel.isSecondOnboardingSheetSeen()) {
-                showSecondOnboardingSheet()
-            }
-        }
-    }
-
-    private fun showAppOnboarding() {
-        if (activity == null || isDetached) return
-        runCatching {
-            onboardingSheet?.dismiss()
-        }
-        viewModel.setSecondOnboardingSheetSeen(false)
-        val name = user.name
-        val greetingText = getString(
-            if (user.goal == "gain_weight")
-                R.string.onboarding_step_1_semirish else R.string.onboarding_step_1_ozish,
-            name
-        )
-
-        onboardingSheet = AppOnboardingBottomSheet(
-            text = greetingText,
-            buttonText = getString(R.string.add_food_title),
-            onButtonClick = {
-                LogFoodFragment.navigate(
-                    navController = findNavController(),
-                    timeStamp = viewModel.uiState.value.selectedDate.time,
-                    meal = MealTime.Breakfast.id,
-                    openCamera = false,
-                    openEditText = true
-                )
-                viewModel.setFirstLogAdded(true)
-            },
-            onLaterClick = { }).apply {
-            show(mainActivity()!!.supportFragmentManager, AppOnboardingBottomSheet.TAG)
-        }
-    }
-
-    private fun showSecondOnboardingSheet() {
-        if (activity == null || isDetached) return
-        viewModel.setSecondOnboardingSheetSeen(true)
-
-        val name = user.name
-        val cal = viewModel.uiState.value.caloriesRemaining
-        if (cal <= 0) return
-        val remainingText = getString(R.string.onboarding_step_2, name, cal)
-
-        AppOnboardingBottomSheet(
-            text = remainingText,
-            buttonText = getString(R.string.tushundim_btn),
-            title = getString(R.string.ajoyib_title),
-            onButtonClick = { }).show(childFragmentManager, AppOnboardingBottomSheet.TAG)
-    }
-
-    private var onboardingSheet: AppOnboardingBottomSheet? = null
 
     private fun initCalendar() = binding.apply {
         if (dateAdapter == null) {
@@ -268,10 +224,21 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             adapter = dateAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             itemAnimator = null
-            alpha = 0f
+            alpha = 1f
         }
         swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
+        }
+        toolbarTitle.setOnClickListener {
+            val isVisible = dateScrollerRecyclerView.visibility == View.VISIBLE
+            TransitionManager.beginDelayedTransition(appBarLayout)
+            if (isVisible) {
+                dateScrollerRecyclerView.visibility = View.GONE
+                toolbarTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_down, 0)
+            } else {
+                dateScrollerRecyclerView.visibility = View.VISIBLE
+                toolbarTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_up, 0)
+            }
         }
     }
 
@@ -302,14 +269,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 navigate(R.id.action_home_to_macroInfoFragment, args)
             }
         }
-        showLimitExercises.setOnSafeClickListener {
-            val currentState = viewModel.uiState.value
-            val excessCalories = (currentState.caloriesConsumed - currentState.caloriesTarget).coerceAtLeast(0)
-            if (excessCalories > 0) {
-                OverageExerciseBottomSheet.newInstance(excessCalories)
-                    .show(childFragmentManager, OverageExerciseBottomSheet.TAG)
-            }
-        }
+
         btnHowFatBurned.setOnSafeClickListener {
             InfoBottomSheet.newInstance(
                 getString(R.string.how_to_burn_fat_title),
@@ -405,10 +365,31 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    private fun initFeaturesCards() = binding.apply {
+        cardWhatToEat.setOnSafeClickListener {
+            navigate(R.id.plateRuleFragment)
+        }
+        cardRecommendations.setOnSafeClickListener {
+            navigate(R.id.healthRecommendationsFragment)
+        }
+    }
+
     private fun initMealRecommendation() = binding.apply {
-        btnMealRecommendation.setOnSafeClickListener {
-            MealRecommendationBottomSheet.newInstance()
-                .show(childFragmentManager, MealRecommendationBottomSheet.TAG)
+        // card_meal_recommendation_home was removed from layout
+    }
+
+    private fun initCustomCards() = binding.apply {
+        cardDietologistHome.setOnSafeClickListener {
+            val bundle = Bundle().apply {
+                putBoolean("showBackButton", true)
+            }
+            navigate(R.id.aiChatFragment, bundle)
+        }
+        cardCommunityHome.setOnSafeClickListener {
+            val bundle = Bundle().apply {
+                putBoolean("showBackButton", true)
+            }
+            navigate(R.id.communityFragment, bundle)
         }
     }
 
@@ -418,7 +399,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 launch {
                     viewModel.uiState.collect {
                         stateCollectCount++
-                        MainActivity.isAppReady = true
                     }
                 }
                 launch {
@@ -497,6 +477,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 }
                 launch {
                     viewModel.showDailyAnalysisEvent.collect { data ->
+                        delay(1000)
                         val args = DailyAnalysisFragment.createArgs(
                             foodCount = data.foodCount,
                             healthyFoodCount = data.healthyFoodCount,
@@ -512,12 +493,13 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                         navigate(R.id.action_home_to_dailyAnalysisFragment, args)
                     }
                 }
-
                 launch {
-                    viewModel.showRateAppEvent.collect {
-                        delay(WEIGHT_LOG_DELAY)
-                        if (isResumed && childFragmentManager.fragments.isEmpty()) {
-                            (activity as? MainActivity)?.requestAppReview()
+                    viewModel.showFoodFeedbackEvent.collect { yesterdayDateStr ->
+                        if (isResumed) {
+                            val args = Bundle().apply {
+                                putString("date_str", yesterdayDateStr)
+                            }
+                            navigate(R.id.action_home_to_foodLogFeedbackDialogFragment, args)
                         }
                     }
                 }
@@ -609,11 +591,8 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 state.caloriesTarget > 0 && effectiveConsumed > state.caloriesTarget + 100
 
             layoutCalorieText.isVisible = !reachedLimit && !exceededLimit
-            layoutLimitInfo.isVisible = reachedLimit || exceededLimit
-            textLimitSubtitle.visibility = View.GONE
-
             layoutNormalProgress.isVisible = reachedLimit.not() && exceededLimit.not()
-            macrosContainer.isVisible = !reachedLimit && !exceededLimit
+            macrosContainer.isVisible = reachedLimit.not() && exceededLimit.not()
             limitReached.isVisible = reachedLimit
             limitExeed.isVisible = exceededLimit
 
@@ -729,13 +708,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             card.progressMeal.setProgressCompat(consumed.coerceAtMost(max), animate)
             card.progressMeal.setIndicatorColor(cPrimary)
 
-            val hideCalories = consumed >= max || state.caloriesConsumed >= state.caloriesTarget
-            card.layoutCalories.isVisible = !hideCalories
-            if (!hideCalories) {
-                card.textMealCalories.text =
-                    getString(R.string.meal_remaining_format, max - consumed)
-                card.textMealCalories.setTextColor(cOnSurfaceVariant)
-            }
+            card.layoutCalories.isVisible = false
         }
     }
 
@@ -867,6 +840,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                     try {
                         showStreakSheet(viewModel.uiState.value.streakInfo, it)
                         StreakRepository.clearStreakResult()
+                        val currentStreak = it.updatedUser.streakInfo?.currentStreak ?: 0
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -878,6 +852,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private fun observeExerciseAdded() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.exerciseAddedEvent.collect { calories ->
+                delay(1000)
                 val args = DailyAnalysisFragment.createArgs(
                     type = DailyAnalysisFragment.TYPE_EXERCISE_50,
                     caloriesBurned = calories

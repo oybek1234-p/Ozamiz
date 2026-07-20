@@ -1,0 +1,41 @@
+📊 Progress Bo'limi: Texnik Topshiriq (Soddalashtirilgan)
+1. Vazn Ko'rsatkichlari (Asosiy Blok)
+Ekranning yuqori qismida foydalanuvchi o'z raqamlarini aniq ko'radi:
+
+Boshlang'ich vazn: (masalan: 98 kg) — birinchi marta kiritilgan raqam.
+
+Hozirgi vazn: (92 kg) — oxirgi kiritilgan raqam.
+
+Farq: ( -6 kg ) — qizil yoki yashil rangda (ozgan bo'lsa yashil, semirgan bo'lsa qizil).
+
+Maqsad: (80 kg) — foydalanuvchi yetmoqchi bo'lgan nuqta.
+
+2. Vazn Grafigi (Line Chart)
+Vaznning vaqt davomida qanday o'zgarib borayotganini ko'rsatuvchi vizual grafik.
+
+X-o'qi: Sana (Kun/Hafta/Oy).
+
+Y-o'qi: Kilogramm.
+
+Dizayn: Oddiy chiziqli grafik. Hech qanday murakkab elementlarsiz, faqat pastga qarab ketayotgan trend.
+
+3. Ballar (💎 Ballar) - Hozirgi holat
+Gemifikatsiyaning asosi bo'lib turgan ballar bu yerda ham ko'rinadi:
+
+Jami ballar: Foydalanuvchi ilovani ishlatishni boshlagandan beri yig'gan barcha ballari.
+
+Bugungi ballar: Faqat bugun vazifalar va ovqat qo'shish orqali olingan ballar.
+
+Ballar tarixi: Oxirgi 7 kunda qancha ball to'plagani haqida kichik bar-chart (ustunli grafik).
+
+4. Vazn Kiritish Tarixi (History List)
+Grafikdan pastda barcha kiritilgan o'lchovlar ro'yxat ko'rinishida turadi:
+
+Format: [Sana] — [Vazn] — [O'zgarish (+/-)]
+
+Misol: 15-yanvar — 92.5 kg — (-0.5 kg)
+
+5. UI va Bog'liqliklar
+Kiritish tugmasi: Ekran burchagida doimiy turadigan + tugmasi orqali yangi vazn kiritiladi.
+
+Yangilanish: Vazn kiritilganda grafik avtomatik qayta chiziladi va ballar hisobiga bonus qo'shiladi (agar vazn kiritish vazifa sifatida berilgan bo'lsa).

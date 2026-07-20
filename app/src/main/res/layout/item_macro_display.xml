@@ -7,16 +7,17 @@
     android:gravity="center"
     android:elevation="0dp"
     android:orientation="vertical"
-    android:paddingVertical="12dp"
-    android:paddingHorizontal="8dp"
+    android:paddingVertical="6dp"
+    android:paddingHorizontal="4dp"
     android:background="@drawable/round_lay"
     android:backgroundTint="?colorSurfaceContainerLowest">
 
     <TextView
         android:id="@+id/textView_macro_name"
-        style="@style/Text2_15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:fontFamily="@font/roboto_regular"
         android:textColor="?colorOnSurfaceVariant"
         tools:text="Protein" />
 
@@ -29,11 +30,11 @@
 
         <TextView
             android:id="@+id/textView_macro_value"
-            style="@style/Title3_17"
-            android:fontFamily="@font/roboto_bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="?colorOnSurface"
+            android:textSize="14sp"
+            android:fontFamily="@font/roboto_medium"
+            android:textColor="?colorOnSurfaceVariant"
             tools:text="8g" />
 
     </LinearLayout>

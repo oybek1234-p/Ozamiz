@@ -1,0 +1,84 @@
+🤖 AI Chat: Texnik Topshiriq (Blueprint)
+1. Kirish nuqtalari (Context flow)
+AI Chatga foydalanuvchi 3 xil usulda kiradi va har safar AI har xil holatda kutib oladi:
+
+A. Bottom Nav orqali (To'g'ridan-to'g'ri):
+
+Holat: Chat bo'sh.
+
+AI xabari: "Salom! Men sizning shaxsiy diyetologingizman. To'yda nima yeyishni, muzlatkichdagi narsalardan nima pishirishni yoki stressni qanday yengishni so'rang."
+
+B. Home -> "Menyu tuzish (AI)" orqali:
+
+Holat: Keshdagi mahsulotlar bilan birga.
+
+AI xabari: Srazu javob berishni boshlaydi: "Muzlatkichingizdagi [mahsulotlar]dan quyidagi 2 ta sog'lom taomni tayyorlashingiz mumkin..."
+
+C. Home -> "Ko'chadaman" orqali:
+
+Holat: "Ko'chadaman" konteksti bilan.
+
+AI xabari: "Ko'chada ekansiz, sog'lom tanlov qilishga yordam beraman. O'zbek oshxonalarida yeyishingiz mumkin bo'lgan 5 ta xavfsiz taom: ..."
+
+2. Dizayn va UI Elementlari (ChatGPT Style)
+Chat oynasi:
+
+User xabarlari: O'ng tomonda, to'q ko'k yoki yashil fonda.
+
+AI xabarlari: Chap tomonda, och kulrang fonda.
+
+Typing State (Yozish jarayoni):
+
+AI javob qaytarayotgan paytda pastda ... (uchta nuqta) pulsatsiya qilib turishi va "Diyetolog o'ylamoqda" yozuvi chiqishi shart.
+
+Typewriter Effect: Matn birdaniga "paq" etib chiqmaydi, harfma-harf teriladi. Bu foydalanuvchiga "jonli" muloqot hissini beradi.
+
+Input Field:
+
+Pastda matn yozish joyi.
+
+O'ngda "Yuborish" (Arrow icon).
+
+3. AI Funksionalligi va State Management
+Android'da buni boshqarish uchun quyidagi holatlar (states) bo'lishi kerak:
+
+IdleState: Chat yangi ochilgan holat.
+
+LoadingState: So'rov yuborilgan, AI javobini kutyapmiz (Progress bar/Pulsing dots).
+
+SuccessState: Javob keldi va ekranga chiqarildi.
+
+ErrorState: Internet yo'q yoki AI bilan bog'lanib bo'lmadi.
+
+4. Prompt Engineering (Orqa fondagi mantiq)
+Foydalanuvchi ko'rmaydigan, lekin biz AI (Gemini) ga yuboradigan "yashirin" ko'rsatmalar:
+
+"Sen O'zbekistondagi eng tajribali diyetologsan."
+
+"Sening mijozing — ozishni xohlaydigan, lekin biroz dangasa va stressi bor odam."
+
+"Javoblaring qisqa, tushunarli va do'stona bo'lsin. Murakkab terminlarni ishlatma."
+
+"Agar taom tavsiya qilsang, O'zbekistonda topish mumkin bo'lgan mahsulotlarni ayt."
+
+5. Maxsus Funksiyalar (Special Tools)
+Context Awareness: AI foydalanuvchining vazni, maqsadi va streakini bilishi kerak. Masalan: "Siz allaqachon 5 kundan beri tartibdasiz, bugun kichik bir meva bilan o'zingizni siylashingiz mumkin."
+
+"Ko'chadaman" Ro'yxati: AI ko'cha uchun har doim 5 ta xavfsiz variantni biladi:
+
+Shashlik (yog'siz qismi) + Achchiq-chuchuk.
+
+Qaynatma sho'rva (yog'ini olib tashlab).
+
+Mastava (kamroq guruch bilan).
+
+Mol go'shtidan dimlama.
+
+Ko'k choy va limon.
+
+Texnik tavsiya (Android):
+Gemini SDK: To'g'ridan-to'g'ri Google AI SDK ishlatish (tez va tekin).
+
+ViewModel: Chat tarixini va input holatini ushlab turish uchun.
+
+List Animation: Yangi xabar kelganda chat avtomatik ravishda eng pastga tushishi (animateScrollToItem) kerak.

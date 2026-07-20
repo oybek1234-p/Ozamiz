@@ -55,6 +55,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
 
         setupSection(
+            bind.sectionNatija, R.drawable.trending, getString(R.string.natija_title)
+        ) {
+            if (findNavController().currentDestination?.id == R.id.profileFragment) {
+                navigate(R.id.action_profileFragment_to_natijaFragment2)
+            }
+        }
+
+        setupSection(
             bind.sectionCalorieSettings, R.drawable.calculate_ic, getString(R.string.hisoblagich)
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {

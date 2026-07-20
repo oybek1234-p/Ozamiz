@@ -10,7 +10,7 @@
         android:id="@+id/natijaFragment2"
         android:icon="@drawable/progress_ic"
         android:title="@string/natija_title"
-        android:visible="true" />
+        android:visible="false" />
 
     <item
         android:id="@+id/menuListFragment"
@@ -22,7 +22,7 @@
         android:id="@+id/exercises"
         android:icon="@drawable/fitness_ic"
         android:title="Mashqlar"
-        android:visible="true" />
+        android:visible="false" />
 
     <item
         android:id="@+id/profileFragment"
