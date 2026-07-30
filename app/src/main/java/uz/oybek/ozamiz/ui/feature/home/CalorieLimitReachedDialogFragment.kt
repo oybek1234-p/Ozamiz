@@ -44,6 +44,7 @@ class CalorieLimitReachedDialogFragment : DialogFragment() {
         val finalLoss = if (weeklyLossKg > 0.05) weeklyLossKg else 0.5
         val lossStr = String.format(Locale.US, "%.1f", finalLoss)
 
+        binding.imgGirlIllustration.setImageResource(R.drawable.girl_weight)
         binding.textDesc.text = getString(R.string.limit_congrats_desc, lossStr)
         binding.lottieConfetti.playAnimation()
     }

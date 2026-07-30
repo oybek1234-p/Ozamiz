@@ -147,7 +147,7 @@ object AiPromptBuilder {
             - "healthScore": 1 dan 10 gacha (1 - juda zararli, 10 - o'ta sog'lom).
             - "limitBread": boolean (true, agar foydalanuvchi bugun jami 2 bo'lakdan oshiq non/hamir mahsuloti yegan bo'lsa yoki ushbu taomda ko'p miqdorda non bo'lsa)
             - "sodaDrink": boolean (true, agar ovqat tarkibida gazli, shakarli, yoki shirin ichimliklar bo'lsa)
-            - "heavyDinner": boolean (true, agar ovqat kechki payt yeyilgan bo'lsa va u hazm bo'lishi qiyin, o'ta yog'li yoki og'ir bo'lsa)
+            - "heavyDinner": boolean (true, faqat va faqat soat 21:00 dan (kechki soat 9:00 dan) keyin hazm bo'lishi qiyin, o'ta yog'li yoki og'ir ovqat yeyilgandagina true bering. Soat 21:00 dan oldin har qanday ovqat uchun bu maydon false bo'lishi shart!)
             - "limitCalorie": boolean (true, agar kiritilgan kaloriya bilan foydalanuvchining bugungi kunlik kaloriya me'yori to'lgan bo'lsa)
             - "waterBeforeMeal": boolean (true, agar keyingi asosiy ovqatlanishdan oldin 1 stakan iliq suv ichishni tavsiya qilsangiz)
             - "cons": Ozishga to\'sqinlik qiluvchi omillar ro\'yxati (masalan, yuqori yog\', shakar, tuz yoki hamir/non ko\'pligi haqida qisqa faktlar. Masalan: ["2 burdadan ko\'p non yeyilgan (o\'rniga sabzavot tavsiya etiladi)", "Yug\'li ovqat ko\'p", "Shakar miqdori haddan tashqari ko\'p"]. Yomon so\'zlar, urishish yoki qattiq tavsiya ohangi bo\'lmasligi, faqat holat ko\'rsatilishi shart).

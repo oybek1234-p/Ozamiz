@@ -159,7 +159,144 @@
                     android:id="@+id/main_progress"
                     layout="@layout/home_main_progress" />
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_yesterday_eval"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    tools:visibility="visible">
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="top"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/girl"
+                                android:scaleType="centerCrop"
+                                app:cornerRadius="12dp" />
+
+                            <TextView
+                                android:id="@+id/text_yesterday_eval_desc"
+                                style="@style/TextAppearance.Material3.TitleMedium"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="14dp"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="15sp"
+                                tools:text="Kecha 300 kkal defitsit qilib, 39 g yog' yoqdingiz! Bu ketishda 1 haftada 0.8 kg vazn tashlaysiz, ajoyib! 🔥" />
+
+                            <ImageView
+                                android:id="@+id/btn_close_yesterday_eval"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_marginStart="8dp"
+                                android:background="?selectableItemBackgroundBorderless"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_close_24"
+                                app:tint="?attr/colorOnSurfaceVariant" />
+                        </LinearLayout>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_ajoyib_yesterday_eval"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="match_parent"
+                            android:layout_height="46dp"
+                            android:layout_marginTop="12dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="Ajoyib!"
+                            android:textSize="15sp"
+                            app:cornerRadius="14dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_app_feedback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?selectableItemBackground"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:importantForAccessibility="no"
+                            android:padding="2dp"
+                            android:src="@drawable/new_logo" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/TextAppearance.Material3.TitleMedium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="Ilovamiz sizga manzur bo'lyaptimi? ⭐"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                style="@style/Text1_14"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Fikringizni qoldiring"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:importantForAccessibility="no"
+                            android:rotation="-90"
+                            android:src="@drawable/ic_arrow_down"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:id="@+id/layout_meal_cards"
@@ -751,6 +888,70 @@
                             app:layout_constraintTop_toTopOf="parent" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_goal_prediction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                style="@style/TextAppearance.Material3.TitleMedium"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="Bugun ajoyib ketyapsiz! 🌟"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🎯"
+                                android:textSize="24sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/text_goal_time_remaining"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorPrimary"
+                            android:textSize="15sp"
+                            tools:text="Maqsadgacha: 1 oy 12 kun qoldi" />
+
+                        <TextView
+                            android:id="@+id/text_goal_target_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp"
+                            tools:text="Shu ketishda 25-avgustga borib maqsadingizga erishasiz!" />
+                    </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>

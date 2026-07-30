@@ -17,11 +17,13 @@ class AiFeedbackFragment : Fragment() {
 
     private var warningKeys: List<String> = emptyList()
     private var currentIndex = 0
+    private var isGoalReached = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             warningKeys = it.getStringArray("warnings")?.toList() ?: emptyList()
+            isGoalReached = it.getBoolean("isGoalReached", false)
         }
     }
 
@@ -57,22 +59,27 @@ class AiFeedbackFragment : Fragment() {
         val key = warningKeys[currentIndex]
         when (key) {
             "limitBread" -> {
+                binding.imgIllustration.setImageResource(R.drawable.girl_no_bread)
                 binding.txtMessage.text = getString(R.string.warning_limit_bread_title)
                 binding.btnAction.text = getString(R.string.btn_oshirmayman)
             }
             "sodaDrink" -> {
+                binding.imgIllustration.setImageResource(R.drawable.girl_sad)
                 binding.txtMessage.text = getString(R.string.warning_soda_drink_title)
                 binding.btnAction.text = getString(R.string.btn_oshirmayman)
             }
             "heavyDinner" -> {
+                binding.imgIllustration.setImageResource(R.drawable.girl_ouu)
                 binding.txtMessage.text = getString(R.string.warning_heavy_dinner_title)
                 binding.btnAction.text = getString(R.string.btn_tushunarli)
             }
             "limitCalorie" -> {
+                binding.imgIllustration.setImageResource(R.drawable.girl_happy)
                 binding.txtMessage.text = getString(R.string.warning_limit_calorie_title)
                 binding.btnAction.text = getString(R.string.btn_tushunarli)
             }
             "waterBeforeMeal" -> {
+                binding.imgIllustration.setImageResource(R.drawable.girl_water)
                 binding.txtMessage.text = getString(R.string.warning_water_before_meal_title)
                 binding.btnAction.text = getString(R.string.btn_tushunarli)
             }
@@ -88,7 +95,11 @@ class AiFeedbackFragment : Fragment() {
     }
 
     private fun exitFlow() {
-        findNavController().popBackStack(R.id.home, false)
+        if (isGoalReached) {
+            findNavController().navigate(R.id.action_aiFeedbackFragment_to_weeklyPredictionFragment)
+        } else {
+            findNavController().popBackStack(R.id.home, false)
+        }
     }
 
     override fun onDestroyView() {

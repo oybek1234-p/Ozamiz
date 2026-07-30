@@ -471,6 +471,11 @@
             app:destination="@id/aiFeedbackFragment"
             app:popUpTo="@id/home"
             app:popUpToInclusive="false" />
+        <action
+            android:id="@+id/action_analyzeResultFragment_to_weeklyPredictionFragment"
+            app:destination="@id/weeklyPredictionFragment"
+            app:popUpTo="@id/home"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -481,6 +486,11 @@
         <argument
             android:name="warnings"
             app:argType="string[]" />
+        <action
+            android:id="@+id/action_aiFeedbackFragment_to_weeklyPredictionFragment"
+            app:destination="@id/weeklyPredictionFragment"
+            app:popUpTo="@id/home"
+            app:popUpToInclusive="false" />
     </fragment>
 
     <fragment
@@ -1021,7 +1031,17 @@
             android:name="type"
             android:defaultValue="DAILY"
             app:argType="string" />
+        <action
+            android:id="@+id/action_dailyAnalysisFragment_to_weeklyPredictionFragment"
+            app:destination="@id/weeklyPredictionFragment"
+            app:popUpTo="@id/home" />
     </fragment>
+
+    <fragment
+        android:id="@+id/weeklyPredictionFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.home.WeeklyPredictionFragment"
+        android:label="Haftalik prognoz"
+        tools:layout="@layout/fragment_weekly_prediction" />
 
     <fragment
         android:id="@+id/exercises"

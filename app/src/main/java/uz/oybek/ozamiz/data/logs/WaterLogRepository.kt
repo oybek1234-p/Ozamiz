@@ -17,6 +17,12 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
     }
 
     override suspend fun add(log: WaterLog, date: Date): Boolean {
+        if (log.timestampLong <= 0L) {
+            log.timestampLong = System.currentTimeMillis()
+        }
+        if (log.timestamp == null) {
+            log.timestamp = System.currentTimeMillis()
+        }
         val success = super.add(log, date)
         if (success) {
             LogRepository.updateSummary(

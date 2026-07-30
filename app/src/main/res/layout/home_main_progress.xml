@@ -383,15 +383,16 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                android:src="@drawable/girl_ouu"
-                app:shapeAppearanceOverlay="@style/CircleImageView" />
+                android:src="@drawable/girl"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/RadiusImageView16" />
 
             <TextView
                 style="@style/Text2_15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_12"
-                android:text="Bugun meyordan ozgina oshib ketildi, ertagacha faqat suv ichishingiz mumkin, mashqlarni bajarishni tavsiya beraman"
+                android:text="Bugun ozgina me'yordan oshib ketdi, hech qisi yo'q, piyoda yurish yoki raqsga tushsangiz me'yorga keladi"
                 android:textColor="?attr/colorOnSurface" />
 
         </LinearLayout>

@@ -23,6 +23,12 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
     }
 
     override suspend fun add(log: ExerciseLog, date: Date): Boolean {
+        if (log.timestampLong <= 0L) {
+            log.timestampLong = System.currentTimeMillis()
+        }
+        if (log.timestamp == null) {
+            log.timestamp = System.currentTimeMillis()
+        }
         val success = super.add(log, date)
         if (success) {
             LogRepository.updateSummary(

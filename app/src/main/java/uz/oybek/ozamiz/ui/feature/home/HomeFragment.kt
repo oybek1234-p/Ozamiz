@@ -33,6 +33,7 @@ import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.streak.StreakManager
 import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.user.model.daysFromRegister
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.ui.MainActivity
@@ -56,6 +57,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private var animateProgress = true
     private var stateCollectCount = 0
     private var lastSelectedDate: Date? = null
+    private var hasShownFeedbackDialogThisSession = false
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -96,6 +98,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         initFeaturesCards()
         initMealRecommendation()
         initCustomCards()
+        initAppFeedbackCard(bind)
         observeUiState()
         observeStreakUpdate()
         observeExerciseAdded()
@@ -550,7 +553,85 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         return list.indexOfFirst { DateUtils.isSameDay(it, state.selectedDate) }
     }
 
+    private fun updateGoalPrediction() = binding.apply {
+        val u = user
+        val currentWeight = u.weight
+        val targetWeight = u.targetWeight
+
+        if (currentWeight > 0 && targetWeight != null && targetWeight < currentWeight) {
+            val weightToLose = currentWeight - targetWeight
+            val daysTotal = kotlin.math.ceil(weightToLose / 0.0714).toInt()
+            val months = daysTotal / 30
+            val remainingDays = daysTotal % 30
+
+            val remainingText = when {
+                months > 0 && remainingDays > 0 -> "Maqsadgacha: $months oy $remainingDays kun qoldi"
+                months > 0 -> "Maqsadgacha: $months oy qoldi"
+                else -> "Maqsadgacha: $daysTotal kun qoldi"
+            }
+
+            val calendar = java.util.Calendar.getInstance().apply {
+                add(java.util.Calendar.DAY_OF_YEAR, daysTotal)
+            }
+            val monthNames = arrayOf("yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr")
+            val targetDateStr = "${calendar.get(java.util.Calendar.DAY_OF_MONTH)}-${monthNames[calendar.get(java.util.Calendar.MONTH)]}"
+
+            textGoalTimeRemaining.text = remainingText
+            textGoalTargetDate.text = "Shu ketishda $targetDateStr ga borib maqsadingizga erishasiz! 💪"
+            cardGoalPrediction.isVisible = true
+        } else {
+            cardGoalPrediction.isVisible = false
+        }
+    }
+
+    private fun updateYesterdayEval() = binding.apply {
+        val today = DateUtils.todayString()
+        if (AppPreference.lastYesterdayEvalClosedDate == today) {
+            cardYesterdayEval.isVisible = false
+            return@apply
+        }
+
+        btnCloseYesterdayEval.setOnClickListener {
+            AppPreference.lastYesterdayEvalClosedDate = today
+            cardYesterdayEval.isVisible = false
+        }
+
+        btnAjoyibYesterdayEval.setOnClickListener {
+            AppPreference.lastYesterdayEvalClosedDate = today
+            cardYesterdayEval.isVisible = false
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val yesterday = java.util.Date(System.currentTimeMillis() - 86400000L)
+                val summary = uz.oybek.ozamiz.data.logs.LogRepository.getDailySummarySync(yesterday)
+                val u = user
+
+                if (summary.consumedCalories > 0 || summary.burnedCalories > 0) {
+                    val tdee = uz.oybek.ozamiz.data.food.DietController.calculateTDEE(u)
+                    val deficit = maxOf(0.0, tdee - summary.consumedCalories + summary.burnedCalories).toInt()
+                    val fatGrams = (deficit / 7.7).toInt()
+                    val weeklyLossKg = (deficit * 7.0) / 7700.0
+                    val formattedLoss = String.format(java.util.Locale.US, "%.1f", minOf(1.5, maxOf(0.1, weeklyLossKg)))
+
+                    if (deficit > 50) {
+                        textYesterdayEvalDesc.text = "Kecha $deficit kkal defitsit qilib, $fatGrams g yog' yoqdingiz! Bu ketishda 1 haftada $formattedLoss kg vazn tashlaysiz! 🔥"
+                    } else {
+                        textYesterdayEvalDesc.text = "Kecha ${summary.consumedCalories} kkal taomlandingiz. Bugun defitsitni ushlab, yana faolroq bo'lishga harakat qilamiz! 💪"
+                    }
+                    cardYesterdayEval.isVisible = true
+                } else {
+                    cardYesterdayEval.isVisible = false
+                }
+            } catch (_: Exception) {
+                cardYesterdayEval.isVisible = false
+            }
+        }
+    }
+
     private fun updateCalorieAndMacros(state: HomeUiState) = binding.apply {
+        updateGoalPrediction()
+        updateYesterdayEval()
         val useAnimation = true
         val context = requireContext()
         val cPrimary = VaznimColors.getPrimary(context)
@@ -860,6 +941,48 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 navigate(R.id.action_home_to_dailyAnalysisFragment, args)
             }
         }
+    }
+
+    private fun initAppFeedbackCard(bind: FragmentHomeBinding) {
+        val firstOpen = AppPreference.firstAppOpenTimestamp
+        if (firstOpen == 0L) {
+            AppPreference.firstAppOpenTimestamp = System.currentTimeMillis()
+        }
+
+        val daysFromReg = user.daysFromRegister()
+        val daysFromFirstOpen = DateUtils.daysBetween(
+            AppPreference.firstAppOpenTimestamp,
+            System.currentTimeMillis()
+        )
+        val daysUsed = maxOf(daysFromReg, daysFromFirstOpen)
+
+        val shouldShow = daysUsed >= 3 && !AppPreference.isAppFeedbackCompleted
+
+        bind.cardAppFeedback.isVisible = shouldShow
+
+        if (shouldShow) {
+            bind.cardAppFeedback.setOnSafeClickListener {
+                showAppFeedbackDialog()
+            }
+
+            if (!hasShownFeedbackDialogThisSession) {
+                hasShownFeedbackDialogThisSession = true
+                lifecycleScope.launch {
+                    delay(800)
+                    if (isAdded && !isStateSaved && !AppPreference.isAppFeedbackCompleted) {
+                        showAppFeedbackDialog()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showAppFeedbackDialog() {
+        val dialog = AppFeedbackDialogFragment.newInstance()
+        dialog.onDismissCallback = {
+            binding.cardAppFeedback.isVisible = !AppPreference.isAppFeedbackCompleted
+        }
+        dialog.show(childFragmentManager, "AppFeedbackDialogFragment")
     }
 
     companion object {

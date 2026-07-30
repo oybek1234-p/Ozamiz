@@ -25,6 +25,7 @@ import uz.oybek.ozamiz.data.utils.formatToHhMmA
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.ui.MainActivity
@@ -346,13 +347,17 @@ class AnalyzeResultFragment : Fragment() {
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
                         val todaySummary = LogRepository.getDailySummarySync(Date())
+                        val targetCalories = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
+                        val isGoalReached = targetCalories > 0 && todaySummary.consumedCalories >= targetCalories
+
                         val hasDrunkWater = todaySummary.consumedWaterMl > 0
 
                         val analysisResult = viewModel.state.value.result?.result
                         val warnings = ArrayList<String>()
                         if (analysisResult?.limitBread == true) warnings.add("limitBread")
                         if (analysisResult?.sodaDrink == true) warnings.add("sodaDrink")
-                        if (analysisResult?.heavyDinner == true) warnings.add("heavyDinner")
+                        val currentHour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+                        if (analysisResult?.heavyDinner == true && currentHour >= 21) warnings.add("heavyDinner")
                         if (analysisResult?.limitCalorie == true) warnings.add("limitCalorie")
                         if (analysisResult?.waterBeforeMeal == true && !hasDrunkWater) warnings.add("waterBeforeMeal")
 
@@ -365,10 +370,15 @@ class AnalyzeResultFragment : Fragment() {
                         if (warnings.isNotEmpty()) {
                             val args = Bundle().apply {
                                 putStringArray("warnings", warnings.toTypedArray())
+                                putBoolean("isGoalReached", isGoalReached)
                             }
                             findNavController().navigate(
                                 R.id.action_analyzeResultFragment_to_aiFeedbackFragment,
                                 args
+                            )
+                        } else if (isGoalReached) {
+                            findNavController().navigate(
+                                R.id.action_analyzeResultFragment_to_weeklyPredictionFragment
                             )
                         } else {
                             findNavController().popBackStack(R.id.home, false)

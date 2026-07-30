@@ -12,11 +12,13 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_girl_illustration"
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:src="@drawable/girl_ouu"
+            android:src="@drawable/girl_weight"
+            android:scaleType="centerCrop"
+            app:cornerRadius="20dp"
             android:contentDescription="@null" />
 
         <TextView

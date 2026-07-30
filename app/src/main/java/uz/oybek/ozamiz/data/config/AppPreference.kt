@@ -31,7 +31,10 @@ data class AppSettings(
     val todayAiMenuDate: String = "",
     val aiMenuGenerationCount: Int = 0,
     val lastFoodLogTime: Long = 0L,
-    val lastFoodFeedbackDate: String = ""
+    val lastFoodFeedbackDate: String = "",
+    val isAppFeedbackCompleted: Boolean = false,
+    val firstAppOpenTimestamp: Long = 0L,
+    val lastYesterdayEvalClosedDate: String = ""
 )
 
 object AppSettingsSerializer : Serializer<AppSettings> {
@@ -96,6 +99,10 @@ object AppPreference {
         get() = current.lastExercise50AnalysisDate
         set(value) = runBlocking { update { it.copy(lastExercise50AnalysisDate = value) } }
 
+    var lastYesterdayEvalClosedDate: String
+        get() = current.lastYesterdayEvalClosedDate
+        set(value) = runBlocking { update { it.copy(lastYesterdayEvalClosedDate = value) } }
+
     var todayAiMenuJson: String
         get() = current.todayAiMenuJson
         set(value) = runBlocking { update { it.copy(todayAiMenuJson = value) } }
@@ -115,6 +122,14 @@ object AppPreference {
     var lastFoodFeedbackDate: String
         get() = current.lastFoodFeedbackDate
         set(value) = runBlocking { update { it.copy(lastFoodFeedbackDate = value) } }
+
+    var isAppFeedbackCompleted: Boolean
+        get() = current.isAppFeedbackCompleted
+        set(value) = runBlocking { update { it.copy(isAppFeedbackCompleted = value) } }
+
+    var firstAppOpenTimestamp: Long
+        get() = current.firstAppOpenTimestamp
+        set(value) = runBlocking { update { it.copy(firstAppOpenTimestamp = value) } }
 
     suspend fun incrementDietologMessageCount() {
         update { s ->

@@ -299,7 +299,14 @@ class HomeViewModel : ViewModel() {
             }
             PointsRepository.onEvent(PointsEvent.AddWater(currentWater + amount))
             val date = uiState.value.selectedDate
-            WaterLogRepository.add(WaterLog(amountMl = amount), date)
+            WaterLogRepository.add(
+                WaterLog(
+                    amountMl = amount,
+                    timestamp = System.currentTimeMillis(),
+                    timestampLong = System.currentTimeMillis()
+                ),
+                date
+            )
         }
     }
 
@@ -311,7 +318,9 @@ class HomeViewModel : ViewModel() {
             val log = ExerciseLog(
                 exerciseType = exerciseType,
                 durationMin = durationMin,
-                caloriesBurned = caloriesBurned
+                caloriesBurned = caloriesBurned,
+                timestamp = System.currentTimeMillis(),
+                timestampLong = System.currentTimeMillis()
             )
             val success = ExerciseLogRepository.add(log, date)
             if (success) {

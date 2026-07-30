@@ -6,11 +6,13 @@
     android:background="?colorSurface"
     android:padding="24dp">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/img_illustration"
         android:layout_width="220dp"
         android:layout_height="220dp"
         android:src="@drawable/girl"
+        android:scaleType="centerCrop"
+        app:cornerRadius="20dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/txt_message"
         app:layout_constraintStart_toStartOf="parent"

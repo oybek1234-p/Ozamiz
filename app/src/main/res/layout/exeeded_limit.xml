@@ -6,11 +6,13 @@
     android:background="?colorSurfaceContainerLowest"
     android:layout_height="match_parent">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageView"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/girl_ouu"
+        android:src="@drawable/girl"
+        android:scaleType="centerCrop"
+        app:cornerRadius="20dp"
         android:layout_marginTop="@dimen/dimen_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +26,7 @@
         android:layout_marginHorizontal="56dp"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="Bugun ovqatlar biroz meyordan oshib ketdi, ular yog' bo'lib to'planmasligi uchun harakat qilishimiz kerak, 300 kal yog'ga aylanishi mumkin"
+        android:text="Bugun ozgina me'yordan oshib ketdi, hech qisi yo'q, piyoda yurish yoki raqsga tushsangiz me'yorga keladi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />

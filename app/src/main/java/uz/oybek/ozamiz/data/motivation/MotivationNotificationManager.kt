@@ -11,19 +11,23 @@ import uz.oybek.ozamiz.R
 class MotivationNotificationManager(private val context: Context) {
 
     companion object {
-        const val CHANNEL_ID = "motivation_channel_v2"
+        const val CHANNEL_ID = "motivation_channel_v3"
         const val CHANNEL_NAME = "Eslatmalar"
     }
 
     fun createNotificationChannel() {
-        val importance = NotificationManager.IMPORTANCE_HIGH // Changed to HIGH
-        val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
-            description = "Channel for daily motivation messages"
-            lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, CHANNEL_NAME, importance).apply {
+                description = "Channel for daily motivation messages"
+                lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+                enableVibration(true)
+                setShowBadge(true)
+            }
+            val notificationManager: NotificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
-        val notificationManager: NotificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
     }
 
     fun showMotivationNotification(message: String) {
@@ -51,7 +55,9 @@ class MotivationNotificationManager(private val context: Context) {
             .setContentTitle(context.getString(R.string.app_name))
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)

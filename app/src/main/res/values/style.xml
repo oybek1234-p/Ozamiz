@@ -42,6 +42,16 @@
         <item name="cornerSize">@dimen/dimen_12</item>
     </style>
 
+    <style name="RadiusImageView16">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="RadiusImageView20">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+    </style>
+
     <attr name="arrowEnabled" format="boolean" />
     <attr name="title" format="string" />
     <attr name="iconRes" format="reference" />

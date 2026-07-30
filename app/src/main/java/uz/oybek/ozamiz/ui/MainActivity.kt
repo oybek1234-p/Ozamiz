@@ -146,7 +146,6 @@ class MainActivity : AppCompatActivity() {
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
         observeLevelUp()
-        NotificationSchedular.rescheduleToday(this)
     }
 
     private fun observeLevelUp() {
@@ -199,6 +198,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         UserProfileRepository.updateLastSeen()
+        NotificationSchedular.rescheduleToday(this)
     }
 
     private fun initUser() {
@@ -209,8 +209,6 @@ class MainActivity : AppCompatActivity() {
                     signOut?.run()
                 }
             }
-
-            NotificationSchedular.rescheduleToday(this)
         }
     }
 

@@ -1,118 +1,73 @@
 package uz.oybek.ozamiz.data.motivation
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.os.Build
-import java.util.Calendar
-
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 object NotificationSchedular {
 
-    enum class MotivationAlarmType(val id: Int, val hour: Int, val typeKey: String) {
-        BREAKFAST(101, 8, "breakfast"),
-        TIP(102, 10, "tip"),
-        LUNCH(103, 13, "lunch"),
-        DINNER(105, 19, "dinner"),
-        INACTIVITY(107, 24, "inactivity")
+    enum class MotivationAlarmType(val id: Int, val hour: Int, val minute: Int, val typeKey: String) {
+        BREAKFAST(101, 8, 0, "breakfast"),
+        TIP(102, 10, 0, "tip"),
+        LUNCH(103, 13, 0, "lunch"),
+        DINNER(105, 19, 0, "dinner"),
+        NIGHT_FASTING(106, 20, 45, "night_fasting"),
+        INACTIVITY(107, 24, 0, "inactivity")
     }
 
     fun rescheduleToday(context: Context) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
         try {
             NotificationManagerCompat.from(context).cancelAll()
+            WorkManager.getInstance(context).cancelUniqueWork("motivation_work_test")
         } catch (_: Exception) {}
-
-        for (type in MotivationAlarmType.entries) {
-            val intent = Intent(context, MotivationAlarmReceiver::class.java)
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, type.id, intent,
-                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-            )
-            if (pendingIntent != null) {
-                alarmManager.cancel(pendingIntent)
-                pendingIntent.cancel()
-            }
-        }
 
         val calendar = Calendar.getInstance()
 
         for (type in MotivationAlarmType.entries) {
-            val targetTime = Calendar.getInstance().apply {
-                if (type == MotivationAlarmType.INACTIVITY) {
-                    add(Calendar.DAY_OF_YEAR, 1)
-                } else {
-                    set(Calendar.HOUR_OF_DAY, type.hour)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                    if (before(calendar)) {
-                        add(Calendar.DAY_OF_YEAR, 1)
-                    }
-                }
-            }
-            val intent = Intent(context, MotivationAlarmReceiver::class.java).apply {
-                putExtra("ALARM_TYPE", type.typeKey)
-                addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-                addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
-            }
-            val pendingIntent = PendingIntent.getBroadcast(
-                context, type.id, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            )
-            scheduleAlarm(
-                context,
-                alarmManager,
-                targetTime.timeInMillis,
-                pendingIntent
-            )
+            val delayMillis = calculateDelayForType(type, calendar)
+            enqueueWorkForType(context, type.typeKey, delayMillis)
         }
     }
 
-    private fun scheduleAlarm(
-        context: Context,
-        alarmManager: AlarmManager,
-        triggerTime: Long,
-        pendingIntent: PendingIntent
-    ) {
-        try {
-            val showIntent = PendingIntent.getActivity(
-                context,
-                0,
-                context.packageManager.getLaunchIntentForPackage(context.packageName),
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
-            val alarmClockInfo = AlarmManager.AlarmClockInfo(triggerTime, showIntent)
-            alarmManager.setAlarmClock(alarmClockInfo, pendingIntent)
-        } catch (e: Exception) {
-            try {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    if (alarmManager.canScheduleExactAlarms()) {
-                        alarmManager.setExactAndAllowWhileIdle(
-                            AlarmManager.RTC_WAKEUP,
-                            triggerTime,
-                            pendingIntent
-                        )
-                    } else {
-                        alarmManager.setAndAllowWhileIdle(
-                            AlarmManager.RTC_WAKEUP,
-                            triggerTime,
-                            pendingIntent
-                        )
-                    }
-                } else {
-                    alarmManager.setExactAndAllowWhileIdle(
-                        AlarmManager.RTC_WAKEUP,
-                        triggerTime,
-                        pendingIntent
-                    )
+    fun scheduleNextForType(context: Context, typeKey: String) {
+        val type = MotivationAlarmType.entries.find { it.typeKey == typeKey } ?: return
+        val calendar = Calendar.getInstance()
+        val delayMillis = calculateDelayForType(type, calendar)
+        enqueueWorkForType(context, typeKey, delayMillis)
+    }
+
+    private fun calculateDelayForType(type: MotivationAlarmType, now: Calendar): Long {
+        return if (type == MotivationAlarmType.INACTIVITY) {
+            TimeUnit.HOURS.toMillis(24)
+        } else {
+            val targetTime = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, type.hour)
+                set(Calendar.MINUTE, type.minute)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+                if (before(now) || equals(now)) {
+                    add(Calendar.DAY_OF_YEAR, 1)
                 }
-            } catch (_: SecurityException) {
-                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
             }
+            targetTime.timeInMillis - now.timeInMillis
         }
+    }
+
+    private fun enqueueWorkForType(context: Context, typeKey: String, delayMillis: Long) {
+        val workRequest = OneTimeWorkRequestBuilder<MotivationWorker>()
+            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+            .setInputData(workDataOf("ALARM_TYPE" to typeKey))
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "motivation_work_$typeKey",
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
     }
 }

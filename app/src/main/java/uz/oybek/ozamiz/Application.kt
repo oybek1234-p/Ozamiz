@@ -13,6 +13,7 @@ import com.google.firebase.firestore.persistentCacheSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.descriptors.StructureKind
 import uz.oybek.ozamiz.data.firebase.database
 import uz.oybek.ozamiz.data.firebase.firestore
 import uz.oybek.ozamiz.data.motivation.NotificationSchedular

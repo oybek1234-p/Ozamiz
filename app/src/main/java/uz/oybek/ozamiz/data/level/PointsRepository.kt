@@ -120,7 +120,7 @@ object PointsRepository {
         if (AppPreference.lastDailyAnalysisDate == today) return
         val user = UserProfileRepository.user
         val progress = if (user.targetCalories > 0) summary.consumedCalories.toFloat() / user.targetCalories else 0f
-        if (foodJustAdded && progress >= 0.5f) {
+        if (foodJustAdded && progress >= 0.9f) {
             foodJustAdded = false
             AppPreference.lastDailyAnalysisDate = today
             val healthyCount = foodLogs.count { (it.healthLevel ?: 0) >= 8 }

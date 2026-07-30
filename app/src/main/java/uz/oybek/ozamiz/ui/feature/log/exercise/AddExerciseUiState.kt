@@ -71,7 +71,9 @@ class AddExerciseLogViewModel(application: Application) : AndroidViewModel(appli
             val exerciseLog = ExerciseLog(
                 exerciseType = exercise.name,
                 durationMin = duration,
-                caloriesBurned = caloriesBurned
+                caloriesBurned = caloriesBurned,
+                timestamp = System.currentTimeMillis(),
+                timestampLong = System.currentTimeMillis()
             )
             val success = ExerciseLogRepository.add(exerciseLog, selectedDate)
             if (success) {

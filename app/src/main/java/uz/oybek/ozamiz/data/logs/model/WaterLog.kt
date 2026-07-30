@@ -10,7 +10,7 @@ data class WaterLog(
     override var logId: String = "",
     var amountMl: Int = 0,
     var timestamp: Any? = null,
-    var timestampLong: Long = 0L
+    var timestampLong: Long = System.currentTimeMillis()
 ) : LogItem {
-    constructor() : this("", 0, null, 0L)
+    constructor() : this("", 0, null, System.currentTimeMillis())
 }

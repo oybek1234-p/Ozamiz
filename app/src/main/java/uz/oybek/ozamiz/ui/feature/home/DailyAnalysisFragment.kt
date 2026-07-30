@@ -86,14 +86,7 @@ class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
                 bind.containerDailyStats.visibility = View.VISIBLE
                 bind.layoutPoints.visibility = View.VISIBLE
                 
-                val liters = waterMl / 1000f
-                val waterPersonalMsg = when {
-                    liters < 1.0f -> getString(R.string.water_personal_status_low, liters)
-                    liters <= 2.0f -> getString(R.string.water_personal_status_medium, liters)
-                    else -> getString(R.string.water_personal_status_high, liters)
-                }
-                bind.textContent.text = waterPersonalMsg
-                bind.textContent.visibility = View.VISIBLE
+                bind.textContent.visibility = View.GONE
 
                 val waterBenefits = listOf(
                     R.string.water_benefit_item_1, R.string.water_benefit_item_2, R.string.water_benefit_item_3,
@@ -124,14 +117,7 @@ class DailyAnalysisFragment : BaseFragment<FragmentDailyAnalysisBinding>() {
                 bind.containerDailyStats.visibility = View.VISIBLE
                 bind.layoutPoints.visibility = View.VISIBLE
                 
-                val liters = waterMl / 1000f
-                val waterPersonalMsg = when {
-                    liters < 1.0f -> getString(R.string.water_personal_status_low, liters)
-                    liters <= 2.0f -> getString(R.string.water_personal_status_medium, liters)
-                    else -> getString(R.string.water_personal_status_high, liters)
-                }
-                bind.textContent.text = waterPersonalMsg
-                bind.textContent.visibility = View.VISIBLE
+                bind.textContent.visibility = View.GONE
 
                 val waterBenefits = listOf(
                     R.string.water_benefit_item_1, R.string.water_benefit_item_2, R.string.water_benefit_item_3,

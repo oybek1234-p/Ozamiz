@@ -5,66 +5,62 @@ import java.util.Calendar
 object NotificationMessages {
 
     val morningMessages = listOf(
-        "Kunni 1 stakan iliq suv bilan boshlaymiz! 💧",
-        "Nonushtada nima yeganingizni yozib qo'ydingizmi? 🍳",
-        "Tongni yengil nonushta bilan boshlaylik, {name}. Qani, kiritamiz!",
-        "Ishtaha joyidami? 🥚 Nonushtani belgilab, kunni tetik boshlang.",
-        "Kunlik suvni boshladikmi? 🌊 1 stakan suv — ajoyib boshlanish!"
+        "Ertalab 1 stakan iliq suv iching 💧",
+        "Kunni suv ichish bilan boshlash qorin qismini yo'qotishga yordam beradi. 🌊",
+        "Nonushtani o'tkazib yuborish vazn tashlashni sekinlashtiradi 📱",
+        "Ertalabki taomni to'yib yeng, shunda kun davomida kamroq ochqaysiz 📝",
+        "Albatta nonushtangizni menga qo'shib qo'ying 📊",
+        "Uyg'ongandan keyingi dastlabki 1 soat ichida ovqatlanish foydali 🍽️",
+        "Ertalab ko'proq suv ichish tanani tozalaydi. 💧",
+        "Tonggi harakatlar va suv — ozishning asosiy kaliti ⚖️",
+        "Nonushta qildingizmi? Menga ayting, hisoblab qo'yaman🚀"
     )
 
     val lunchMessages = listOf(
-        "Tushlik vaqti bo'ldi! 🍽️ Yoqimli ishtaha. Nimalar yedingiz?",
-        "Qorinni haddan ortiq to'ydirmaymiz. 🥗 Yengilroq ovqatlarni yozib qo'ying.",
-        "Yarim kun o'tdi. Suv normasini tekshirib olamiz! 🥤",
-        "{name}, kofe yoki shirinlikdan oldin 1 stakan suv ichib ko'ring. 💧",
-        "Tushlikda nimalar tanovul qildingiz? Yozib qo'ying. 📲"
+        "Tushlikdan 15 daqiqa oldin 1 stakan suv iching. Bu ortiqcha yeyishdan asraydi. 💧",
+        "Tushlikga nima yedingiz? Menga ayting 📉",
+        "Ovqatni yaxshilab chaynab yeng, shunda miya to'yganini tezroq sezadi. 🦷",
+        "Tushlik qilib bo'ldingizmi? Yeganlaringizni kiritib qo'ying 📊",
+        "Tushlikdan so'ng darhol o'tirmang, 10 daqiqa yuring",
+        "Juda to'yib ovqatlanmang, dasturxondan biroz och qolib turish foydali 🍽️",
+        "Tushlikdan 15 daqiqa oldin suv ichib oling, metobolizm tezlashadi📝",
+        "Ovqatlanish paytida telefonga chalg'imaslik tezroq to'yishga yordam beradi. 📵",
+        "Yengil tushlik — kechgacha tetik yurish siri. 📱"
     )
 
     val eveningMessages = listOf(
-        "Kechki ovqatni yengilroq qilamiz. 🌙 Uxlashdan 3 soat oldin ovqatlanishni tugatamiz.",
-        "Kechki ovqat kiritildimi? Kunlik hisob-kitobni yakunlaymiz! 📲",
-        "Kun yakuni yaqin, {name}. Suv ichish esdan chiqmadimi? Oxirgi stakan! 🥂",
-        "Ertaga yengil uyg'onish uchun kechki ovqatni hoziroq kiritib qo'ying. 🥦",
-        "Kechki sayrni ham unutmang, faollikni oshiramiz! 🌳"
+        "Uxlashdan kamida 3 soat oldin ovqatlanishni to'xtating. Kechki ovqatni dasturga yozing. 🌙",
+        "Kechki payt shish paydo bo'lmasligi uchun sho'r taomlarni umuman yemang. 🧂",
+        "Uxlashdan oldin so'nggi 1 stakan suvni ichib oling, yog'larni tezroq eritadi 💧",
+        "Kunlik vazifalar yakunlandi. Nima yeganingizni yozib qo'ying ✨",
+        "Kechasi og'ir ovqat yeyish vaznni oshiradi. Yengil ovqatlanning 🍽️",
+        "Kechki sayrga chiqing, kamida 15 daqiqa piyoda yuring 🚶",
     )
 
     val dailyTips = listOf(
-        "Kuniga 8 stakan suv ichish metabolizmni 30% ga tezlashtiradi. 💧",
-        "Ovqatni yaxshilab chaynab yeyish hazm qilishni osonlashtiradi. 🦷",
-        "Kechki ovqatda oqsil va sabzavotlarga e'tibor qarating. 🥗",
-        "Uyqudan 2 soat oldin gadjetlardan foydalanmaslik uyqu sifatini oshiradi. 😴",
-        "Shakar o'rniga tabiiy asal yoki mevalardan foydalaning. 🍎",
-        "Har kuni 15 daqiqa piyoda yurish yurak faoliyatini yaxshilaydi. 🚶‍♂️",
-        "Nonushtada murakkab uglevodlar (bo'tqalar) uzoq vaqt to'q tutadi. 🥣",
-        "Tuz miqdorini kamaytirish tanadagi shishlarni yo'qotadi. 🧂",
-        "Trans-yog'lardan (chips, fast-food) butkul voz kechish sog'liq uchun foydali. 🚫🍟",
-        "Meva va sabzavotlar rang-barang bo'lishi vitaminlar xilma-xilligini ta'minlaydi. 🌈",
-        "Yashil choy antioksidantlarga boy va vazn tashlashga yordam beradi. 🍵",
-        "Ovqatlanish paytida suv ichmaslikka harakat qiling. 🚱",
-        "Stressni kamaytirish uchun nafas mashqlarini bajaring. 🧘‍♂️",
-        "Yong'oqlar miya faoliyati uchun juda foydali, lekin me'yorni biling. 🥜",
-        "Kechki ovqatdan so'ng darhol yotmang, biroz harakat qiling. 🚶",
-        "D vitaminini quyosh nurlaridan yoki shifokor tavsiyasi bilan oling. ☀️",
-        "Har kuni bir vaqtda ovqatlanishga odatlaning. 🕒",
-        "Tushlikdan oldin 2 stakan suv ichish ko'p yeb qo'yishdan asraydi. 💧💧",
-        "Qatiq va kefir ichak florasi uchun juda muhim. 🥛",
-        "Sport bilan shug'ullanish endorfin gormonini ishlab chiqaradi. 🏋️‍♂️",
-        "Quritilgan mevalar shirinlikka bo'lgan ehtiyojni qondiradi. 🍇",
-        "Baliq iste'mol qilish omega-3 yog' kislotalari bilan ta'minlaydi. 🐟",
-        "Tuxum — eng sifatli oqsil manbalaridan biri. 🥚",
-        "Qahvani kunning birinchi yarmida ichish tavsiya etiladi. ☕",
-        "Suvga limon yoki yalpiz qo'shib ichish tetiklashtiradi. 🍋",
-        "Olma po'stlog'i kletchatkaga boy, uni artmasdan yeng. 🍏",
-        "Ertalabki badantarbiya kun bo'yi quvvat beradi. 🤸‍♂️",
-        "Haddan tashqari ko'p kofein suvsizlanishga olib keladi. ☕❌",
-        "Uxlashdan oldin xonani shamollatish chuqur uyquga yordam beradi. 💨",
-        "Sog'lom turmush tarzi — bu vaqtinchalik parhez emas, bu hayot tarzi. ✨"
+        "Suv yetishmasa, organizm yog' parchalashni to'xtatadi. Kuniga 2 litr iching. 💧",
+        "Ovqatni televizor yoki telefon oldida yesangiz, odatdagidan ko'proq yeb qo'yasiz. 📵",
+        "Uyqu 7 soatdan kam bo'lsa, ishtahani ochuvchi gormonlar ko'payib ketadi. 😴",
+        "Taomga tuzni ko'p qo'shish tanada suv yig'ib, vaznni oshiradi va shish paydo qiladi. 🧂",
+        "Yurish tezligini oshirish oddiy yurishga nisbatan 2 barobar ko'p kaloriya yoqadi. 🚶",
+        "Qovurilgan ovqatdan ko'ra qaynatilgan yoki bug'da pishgan ovqat ozishga yordam beradi. 🍲",
+        "Och qolganda darhol yemasdan, avval 1 stakan suv iching. Chanqoq ochlikdek tuyulishi mumkin. 🌊",
+        "Kichikroq idishda ovqatlanish miyaga ko'p ovqat yegandek his beradi va tez to'ydiradi. 🍽️",
+        "Kuniga 10 000 qadam yurishni odat qilsangiz, ortiqcha vazn tezroq yo'qoladi. 🏃",
+        "Har kuni bir xil vaqtda ovqatlanish organizmning yog' yig'ishini to'xtatadi. 🕒"
     )
 
     val inactivityMessages = listOf(
-        "Sog'indik! 👋 Keling, bugungi taom va suvlarni yozishni boshlaymiz.",
-        "Maqsad sari chekinish yo'q, {name}! Kirib, faollikni belgilaymiz. 💪",
-        "Bugun hali hech narsa yozmabsiz. Yo'qotilgan natijalarni tiklaylik! 📲"
+        "Biz-ku eslatib charchamaymiz, lekin taroziga o'zingiz chiqasiz. Ma'lumotlarni kiriting. ⚖️",
+        "Bugun jimligingiz sababi nima? Nimanidir ko'p yeb qo'ydingizmi? Dasturga yozing. 😉",
+        "Parhezni to'xtatdingiz shekilli... Natijalar o'z-o'zidan kelmaydi, dasturga kiring. 🛑",
+        "Bir kunlik tanaffus kechagi mehnatingizni yo'qqa chiqaradi. Zanjirni uzmang. 📉",
+        "O'zgarishni xohlagandingiz, nega endi to'xtab qoldingiz? Keling, davom etamiz. 🚀",
+        "Bizdan qochib qutula olmaysiz! Yeganlaringizni ro'yxatga olib, vijdonan yengil torting. 📱",
+        "Ma'lumot kiritmasangiz ham kaloriya tanangizga singib ketaveradi. Yaxshisi nazoratni tiklang. 📊",
+        "O'zingizga bergan va'dangiz esingizdami? Vaqt ketyapti, ro'yxatni to'ldirib qo'ying. ⏳",
+        "Sizni kutib charchadik. Ortiqcha vazn bilan xayrlashish fikri o'zgardimi? 🤷",
+        "Kechagi mehnatingizni havoga sovurmang. Yeganlaringizni hoziroq dasturga yozing. ⚠️"
     )
 
     fun getMessageForType(type: String): String {

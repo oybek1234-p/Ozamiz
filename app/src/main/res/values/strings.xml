@@ -1191,12 +1191,12 @@
     <string name="water_personal_status_medium">Yaxshi boshlanish! Bugun %1$.1f litr suv ichdingiz. Kunlik 2 litr me\'yorga yaqinlashmoqdasiz.</string>
     <string name="water_personal_status_high">Ajoyib ko\'rsatkich! Bugun %1$.1f litr suv ichib, metabolizmni va ozishni maksimal tezlashtirdingiz!</string>
     <string name="btn_oshirmayman">Oshirmayman</string>
-    <string name="btn_tushunarli">Tushunarli</string>
-    <string name="warning_limit_bread_title">Kuniga 2 bo\'lakdan oshiq non yeyish semirishga olib keladi, bugun boshqa nonli ovqatlar yemang!</string>
-    <string name="warning_soda_drink_title">Ovqat bilan birga gazli va shakarli ichimliklar ichish to\'g\'ridan to\'g\'ri ozishni to\'xtatadi, bugun boshqa shirin ichimliklar ichmang.</string>
-    <string name="warning_heavy_dinner_title">Hozirgina kechqurun og\'ir ovqat yedingiz, kechqurun og\'ir ovqat yeyish to\'g\'ridan to\'g\'ri semirtiradi</string>
-    <string name="warning_limit_calorie_title">Bugungi ovqat meyorini bajardingiz, endi ertagacha boshqa ovqat yemang, va faqat suv iching, tanangiz suv yoqishga o\'tadi</string>
-    <string name="warning_water_before_meal_title">Ovqatlanishdan 15-20 daqiqa oldin 1 stakan iliq suv ichishni odat qiling, siz to\'qroq tutadi, va ozishingizga yordam beradi</string>
+    <string name="btn_tushunarli">Ajoyib!</string>
+    <string name="warning_limit_bread_title">Kunlik non me\'yoriga yetib keldik! Bugun boshqa non va xamirli taomlar yemay turishga kelishdikmi? Bu bilan maqsadimizga yana bir qadam yaqinlashamiz. 🌾</string>
+    <string name="warning_soda_drink_title">Shakarli va gazli ichimliklar ozish jarayonini sekinlashtiradi. Bugun ularning o\'rniga toza suv yoki ko\'k choy tanlashga nima deysiz? 🍵</string>
+    <string name="warning_heavy_dinner_title">Kechqurun me\'yordan ortiq yeyish tanamizni biroz toliqtirishi mumkin. Bir oz piyoda yurib, tanamizga metabolizmni tiklashga yordam beraylik! 🚶</string>
+    <string name="warning_limit_calorie_title">Qoyil! Bugungi kaloriya me\'yorini to\'liq bajardingiz! Endi ertagacha toza suv ichib tursangiz, tanangiz tun boyi faol yog\' yoqish rejimida ishlaydi. 🎉</string>
+    <string name="warning_water_before_meal_title">Ovqatlanishdan 15-20 daqiqa oldin 1 stakan iliq suv ichishni odat qiling! Bu me\'dani to\'q tutadi va yog\' parchalanishini sezilarli tezlashtiradi. 💧</string>
     <string name="streak_desc_day_1">Ozishga birinchi qadam tashlandi.</string>
     <string name="streak_desc_day_2">Ajoyib boshlanish! Ertaga ham sizni kutib qolaman.</string>
     <string name="streak_desc_day_3">%1$d kun bo\'ldiki, to\'g\'ri yo\'ldasiz! Zamonamiz qahramonisiz!</string>
@@ -1205,5 +1205,8 @@
     <string name="streak_desc_day_6">Hali to\'xtash niyatimiz yo\'q, shunday emasmi? Ertaga ham kutaman!</string>
     <string name="streak_desc_weekly">%1$d kunlik natija! Haqiqiy mo\'jizakor intizom egasisiz!</string>
     <string name="streak_desc_default">%1$d kunlik ajoyib muntazamlik! Ertaga ham kutib qolaman!</string>
+    <string name="weekly_prediction_title">Haftalik natija taxmini 🎯</string>
+    <string name="weekly_prediction_desc_format">Bugungi ko\'rsatkichlaringiz va ma\'lumotlaringiz asosida: Shu zaylda davom etsangiz, 1 haftada maksimum %1$s kg vazn yo\'qotishingiz mumkin! 🔥</string>
+    <string name="weekly_prediction_screen_text">Shunday davom etsangiz, 1 haftada %1$s kilogram vazn tashlaysiz.</string>
 </resources>
 
