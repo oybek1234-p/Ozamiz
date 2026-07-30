@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Top Header with Close Button -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/new_logo"
+                android:importantForAccessibility="no"
+                android:layout_gravity="start|center_vertical" />
+
+            <ImageView
+                android:id="@+id/button_close"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="end|center_vertical"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:importantForAccessibility="no"
+                android:padding="4dp"
+                android:src="@drawable/ic_close_24"
+                app:tint="?attr/colorOnSurfaceVariant" />
+        </FrameLayout>
+
+        <!-- STEP 1 Layout -->
+        <LinearLayout
+            android:id="@+id/layout_step_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/title_step_1"
+                style="@style/Title2_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="Ilovamiz sizga manzur bo'lyaptimi?"
+                android:textColor="?attr/colorOnSurface" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_negative"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="👎 Yomon, yoqmadi"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="15sp"
+                    app:cornerRadius="14dp"
+                    app:strokeColor="?attr/colorOutline"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_positive"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="👍 Yaxshi ilova"
+                    android:textSize="15sp"
+                    app:cornerRadius="14dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- STEP 2A (Negative Feedback) Layout -->
+        <LinearLayout
+            android:id="@+id/layout_step_2_negative"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                style="@style/Title2_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="Fikringiz biz uchun muhim!"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                style="@style/Text2_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="Biz &quot;Ozamiz&quot; jamoasimiz. Ilovani siz uchun yanada qulay qilishni xohlaymiz. Iltimos, dasturning qayerini to'g'rilashimiz kerakligi va qanday kamchiliklari borligini bizga ochiq yozing."
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/input_layout_feedback"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:hintEnabled="false"
+                app:boxCornerRadiusBottomEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusTopStart="14dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_text_feedback"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top|start"
+                    android:hint="Masalan: Ovqat qidirish qiyinroq, yangi taomlar qo'shish kerak yoki qidiruv tezroq bo'lsa yaxshi bo'lardi..."
+                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                    android:inputType="textMultiLine"
+                    android:minLines="3"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_submit_feedback"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="Jo'natish"
+                android:textSize="15sp"
+                app:cornerRadius="14dp" />
+        </LinearLayout>
+
+        <!-- STEP 2B (Positive Feedback) Layout -->
+        <LinearLayout
+            android:id="@+id/layout_step_2_positive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/Title2_20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="Rahmat! Biz bundan juda xursandmiz. 🎉"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                style="@style/Text2_15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="Ilovamiz rivojlanishi va ko'proq insonlarga yetib borishi uchun Google Play'da bizga 5 yulduz qo'yib, qo'llab-quvvatlang!"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button_rate_app"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="⭐️⭐️⭐️⭐️⭐️ Baho berish"
+                android:textSize="15sp"
+                app:cornerRadius="14dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
