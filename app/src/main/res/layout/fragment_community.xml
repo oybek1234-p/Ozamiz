@@ -76,7 +76,7 @@
                     style="@style/WidgetAppChipChoice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Hammasi"
+                    android:text="Ovqatlar"
                     android:checked="true" />
 
                 <com.google.android.material.chip.Chip
@@ -84,8 +84,7 @@
                     style="@style/WidgetAppChipChoice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Natija"
-                    android:visibility="gone" />
+                    android:text="Ozganlar" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipUsers"

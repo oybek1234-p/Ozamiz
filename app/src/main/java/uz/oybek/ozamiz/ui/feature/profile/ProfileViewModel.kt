@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
+import uz.oybek.ozamiz.data.user.UserAuthRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.User
@@ -36,16 +37,36 @@ class ProfileViewModel : ViewModel() {
             initialValue = LocalUser.user ?: User()
         )
 
+    val userProfile: StateFlow<User> get() = userState
+
     val user: User
         get() = UserProfileRepository.user
 
-    fun updateCalorieSettings(calories: Int, protein: Int, fat: Int, carbs: Int, goal: String) {
+    fun updateCalorieSettings(
+        calories: Int,
+        protein: Int,
+        fat: Int,
+        carbs: Int,
+        goal: String,
+        targetWeight: Double? = null,
+        activityLevel: String? = null,
+        currentWeight: Double? = null
+    ) {
         UserProfileRepository.updateUser {
             targetCalories = calories
             targetProtein = protein
             targetFat = fat
             targetCarbs = carbs
             this.goal = goal
+            if (targetWeight != null && targetWeight > 0) {
+                this.targetWeight = targetWeight
+            }
+            if (currentWeight != null && currentWeight > 0) {
+                this.weight = currentWeight
+            }
+            if (!activityLevel.isNullOrBlank()) {
+                this.activityLevel = activityLevel
+            }
         }
     }
 
@@ -60,5 +81,13 @@ class ProfileViewModel : ViewModel() {
                 UserProfileRepository.updateAvatarUrl(url)
             }
         }
+    }
+
+    fun logout() {
+        UserAuthRepository.signOut()
+    }
+
+    fun deleteAccount() {
+        UserAuthRepository.deleteAccount()
     }
 }

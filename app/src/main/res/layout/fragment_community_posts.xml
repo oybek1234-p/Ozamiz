@@ -25,7 +25,7 @@
                 style="@style/WidgetAppChipChoice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hammasi"
+                android:text="Ovqatlar"
                 android:checked="true" />
 
 
@@ -33,9 +33,8 @@
                 android:id="@+id/chipOzganlar"
                 style="@style/WidgetAppChipChoice"
                 android:layout_width="wrap_content"
-                android:visibility="gone"
                 android:layout_height="wrap_content"
-                android:text="Natija" />
+                android:text="Ozganlar" />
 
         </com.google.android.material.chip.ChipGroup>
     </HorizontalScrollView>

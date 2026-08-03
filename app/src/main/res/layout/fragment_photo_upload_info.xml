@@ -32,17 +32,6 @@
             android:paddingHorizontal="20dp"
             android:paddingTop="8dp">
 
-            <!-- Header Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Hozirgi holatingizni rasmga oling"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="24sp"
-                android:lineSpacingExtra="4dp" />
-
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
@@ -107,7 +96,7 @@
                             android:layout_weight="1"
                             android:text="Har doim bir xil kiyimda va bir xil fonda suratga tushing"
                             android:textColor="?colorOnSurface"
-                            android:textSize="15sp"
+                            android:textSize="16sp"
                             android:lineSpacingExtra="2dp" />
                     </LinearLayout>
 
@@ -140,7 +129,7 @@
                             android:layout_weight="1"
                             android:text="Kamerani ko'krak balandligida ushlab, to'liq tanani ko'rsating"
                             android:textColor="?colorOnSurface"
-                            android:textSize="15sp"
+                            android:textSize="16sp"
                             android:lineSpacingExtra="2dp" />
                     </LinearLayout>
 
@@ -172,7 +161,7 @@
                             android:layout_weight="1"
                             android:text="Yaxshi yoritilgan joyda, tabiiy holatda turing"
                             android:textColor="?colorOnSurface"
-                            android:textSize="15sp"
+                            android:textSize="16sp"
                             android:lineSpacingExtra="2dp" />
                     </LinearLayout>
 

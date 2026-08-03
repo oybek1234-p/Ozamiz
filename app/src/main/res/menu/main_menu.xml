@@ -7,15 +7,15 @@
         android:title="Asosiy" />
 
     <item
-        android:id="@+id/natijaFragment2"
-        android:icon="@drawable/progress_ic"
-        android:title="@string/natija_title"
-        android:visible="false" />
-
-    <item
         android:id="@+id/menuListFragment"
         android:icon="@drawable/food_ic"
         android:title="Menyular"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/natijaFragment2"
+        android:icon="@drawable/progress_ic"
+        android:title="@string/natija_title"
         android:visible="true" />
 
     <item

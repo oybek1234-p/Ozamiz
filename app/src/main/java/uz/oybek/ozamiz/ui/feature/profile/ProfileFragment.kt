@@ -6,7 +6,6 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -16,6 +15,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.level.LevelRepository
@@ -48,6 +48,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         bind.btnEditAvatar.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
+
         setupSection(
             bind.sectionMyInfo, R.drawable.person_filled, getString(R.string.my_information)
         ) {
@@ -55,28 +56,21 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         }
 
         setupSection(
-            bind.sectionNatija, R.drawable.trending, getString(R.string.natija_title)
-        ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.action_profileFragment_to_natijaFragment2)
-            }
-        }
-
-        setupSection(
-            bind.sectionCalorieSettings, R.drawable.calculate_ic, getString(R.string.hisoblagich)
-        ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.action_profileFragment_to_calorieSettingsFragment)
-            }
-        }
-
-        setupSection(
             bind.sectionSupport, R.drawable.help_ic, getString(R.string.help_and_support)
         ) {
             (activity as? MainActivity)?.showSupportSheet()
         }
-        setupSection(bind.sectionRateApp, R.drawable.star_ic, getString(R.string.rate_app)) {
+
+        setupSection(
+            bind.sectionRateApp, R.drawable.star_ic, getString(R.string.rate_app)
+        ) {
             openAppInPlayStore()
+        }
+
+        setupSection(
+            bind.sectionLogout, R.drawable.cancel_ic, getString(R.string.logout)
+        ) {
+            showLogoutConfirmationDialog()
         }
 
         setupSection(
@@ -96,15 +90,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 navigate(R.id.action_profileFragment_to_adminUsersListFragment)
             }
         }
+
         setupSection(
             bind.sectionAdminPosts, R.drawable.post_ic, getString(R.string.postlar)
         ) {
             if (findNavController().currentDestination?.id == R.id.profileFragment) {
                 navigate(R.id.action_profileFragment_to_adminPostManagerFragment)
             }
-        }
-        bind.buttonLogout.setOnClickListener {
-            showLogoutConfirmationDialog()
         }
 
         bind.premiumButton.setOnClickListener {
@@ -126,25 +118,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                 navigate(R.id.levelFragment)
             }
         }
+
         setupPaymentCheckListener()
         observeViewModel(bind)
-    }
-
-    private fun observeCashbackProgress(bind: FragmentProfileBinding) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.cashbackProgress.collect { days ->
-                    bind.progressCashback.progress = days
-
-                    if (days >= 24) {
-                        bind.textCashbackStatus.text = getString(R.string.cashback_success)
-                    } else {
-                        bind.textCashbackStatus.text =
-                            getString(R.string.cashback_status_format, days)
-                    }
-                }
-            }
-        }
     }
 
     private fun setupPaymentCheckListener() {
@@ -193,13 +169,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                             getString(R.string.text_profile_points_format, user.scorePoints)
 
                         bind.cardUserLevel.isVisible = true
-                        bind.buttonLogout.isVisible = true
 
                         val isPremiumActive = PremiumUtils.isPremium(user)
 
                         when {
                             isPremiumActive -> {
                                 bind.premiumStatusText.isVisible = true
+                                bind.premiumStatusText.text = "Premium"
                                 bind.premiumView.isVisible = false
                             }
 
@@ -219,7 +195,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
                         bind.textViewUserName.text = getString(R.string.default_user_name)
                         bind.imageViewUserAvatar.setImageResource(R.drawable.user_photo_placeholder)
                         bind.cardUserLevel.isVisible = false
-                        bind.buttonLogout.isVisible = false
                         bind.premiumStatusText.isVisible = false
                         bind.premiumView.isVisible = false
                         bind.sectionAdminPremiumUsers.isVisible = false
@@ -250,12 +225,14 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
     private fun showLogoutConfirmationDialog() {
         if (!isAdded) return
-        AlertDialog.Builder(requireContext()).setTitle(R.string.logout_confirmation_title)
-            .setMessage(R.string.logout_confirmation_message)
-            .setPositiveButton(R.string.logout) { _, _ ->
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle(getString(R.string.logout_confirmation_title))
+            .setMessage(getString(R.string.logout_confirmation_message))
+            .setPositiveButton(getString(R.string.logout)) { _, _ ->
+                viewModel.logout()
                 MainActivity.signOut?.run()
-            }.setNegativeButton(
-                R.string.cancel, null
-            ).show()
+            }
+            .setNegativeButton(getString(R.string.cancel), null)
+            .show()
     }
 }

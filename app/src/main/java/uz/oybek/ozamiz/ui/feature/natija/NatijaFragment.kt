@@ -29,11 +29,6 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
     }
 
     override fun viewCreated(bind: FragmentNatijaBinding) {
-        bind.toolbarNatija.setNavigationIcon(R.drawable.arrow_back)
-        bind.toolbarNatija.setNavigationOnClickListener {
-            closeFragment()
-        }
-
         setupClickListeners(bind)
         observeState(bind)
 
@@ -49,14 +44,24 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
 
     private fun setupClickListeners(bind: FragmentNatijaBinding) {
         bind.btnAddWeight.setOnClickListener {
-            navigate(R.id.photoUploadInfoFragment)
-        }
-
-        bind.btnAddWeightBottom.setOnClickListener {
-            navigate(R.id.photoUploadInfoFragment)
+            navigate(R.id.addWeightPhotoFragment)
         }
         bind.btnWeightHistory.setOnClickListener {
             navigate(R.id.action_natijaFragment_to_weightHistoryFragment)
+        }
+        bind.btnEditGoalWeight.setOnClickListener {
+            val sheet = EditWeightGoalsBottomSheet.newInstance()
+            sheet.onSavedListener = {
+                viewModel.loadData()
+            }
+            sheet.show(childFragmentManager, EditWeightGoalsBottomSheet.TAG)
+        }
+        bind.btnPredictionInfo.setOnClickListener {
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Tavsiya va taxmin")
+                .setMessage("Ushbu ko'rsatkichlar sizning kunlik kaloriya va faolligingiz asosida hisoblangan taxminiy natijalardir.")
+                .setPositiveButton("Tushunarli", null)
+                .show()
         }
     }
 
@@ -65,34 +70,27 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
                     bind.swipeRefreshNatija.isRefreshing = state.isLoading
+                    bind.cardAddWeight.isVisible = true
 
-                    // Add Weight Banner visibility based on 7-day logic
-                    bind.cardAddWeight.isVisible = state.showTopBanner
-                    bind.cardAddWeightBottom.isVisible = state.showBottomBanner
+                    // Prediction Summary with Target Completion Date
+                    if (state.isPredictionLoading) {
+                        bind.tvPredictionSummary.text = "Hisoblanmoqda..."
+                    } else {
+                        val rawWeekly = state.weeklyPredictedLoss.replace("-", "").replace("+", "").trim()
+                        val rawMonthly = state.monthlyPredictedLoss.replace("-", "").replace("+", "").trim()
+                        val rawDuration = state.goalDurationText.replace("qoldi", "").trim()
+                        val goalDate = state.goalDateFormatted
 
-                    // Prediction
-                    bind.cardPrediction.isVisible = state.estimatedGoalDate != null
-                    if (state.estimatedGoalDate != null) {
-                        val targetDate = java.time.Instant.ofEpochMilli(state.estimatedGoalDate)
-                            .atZone(java.time.ZoneId.systemDefault())
-                            .toLocalDate()
-                        val today = java.time.LocalDate.now()
-                        val period = java.time.Period.between(today, targetDate)
+                        val weeklyText = if (rawWeekly.isNotEmpty() && rawWeekly != "...") rawWeekly else "0.5 kg"
+                        val monthlyText = if (rawMonthly.isNotEmpty() && rawMonthly != "...") rawMonthly else "1.8 kg"
+                        val durationText = if (rawDuration.isNotEmpty() && rawDuration != "Hisoblanmoqda...") rawDuration else "2 oy 5 kunda"
 
-                        val months = period.months + (period.years * 12)
-                        val days = period.days
-
-                        val durationStr = StringBuilder()
-                        if (months > 0) durationStr.append("$months oy")
-                        if (days > 0) {
-                            if (durationStr.isNotEmpty()) durationStr.append(", ")
-                            durationStr.append("$days kun")
+                        val summaryText = if (state.isGainGoal) {
+                            "Tog'ri ovqatlansangiz har hafta $weeklyText semirasiz, oyiga $monthlyText semirasiz. Maqsadingizga $durationText erishasiz."
+                        } else {
+                            "Tog'ri ovqatlansangiz har hafta $weeklyText ozasiz, oyiga $monthlyText ozasiz. Maqsadingizga $durationText erishasiz."
                         }
-                        if (durationStr.isEmpty()) durationStr.append("Bugun")
-                        else durationStr.append("da")
-
-                        bind.tvPredictionDate.text = durationStr.toString()
-                        bind.tvPredictionWeight.text = "${(state.goalWeight ?: 0.0).toInt()} kg"
+                        bind.tvPredictionSummary.text = summaryText
                     }
 
                     // Photos
@@ -103,7 +101,6 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                         val hasAfter = state.photoAfter != null
                         val onlyOnePhoto = hasBefore xor hasAfter
 
-                        // Before
                         if (hasBefore) {
                             bind.layoutPhotoBefore.isVisible = true
                             bind.tvPhotoBeforeLabel.text = "Oldin"
@@ -115,9 +112,7 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
 
                             bind.imgPhotoBefore.setOnClickListener {
                                 state.photoBefore?.let { url ->
-                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
-                                        url
-                                    )
+                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(url)
                                         .show(parentFragmentManager, "full_image")
                                 }
                             }
@@ -125,7 +120,6 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                             bind.layoutPhotoBefore.isVisible = false
                         }
 
-                        // After
                         if (hasAfter) {
                             bind.layoutPhotoAfter.isVisible = true
                             bind.tvPhotoAfterLabel.text = "Hozir"
@@ -137,9 +131,7 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
 
                             bind.imgPhotoAfter.setOnClickListener {
                                 state.photoAfter?.let { url ->
-                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
-                                        url
-                                    )
+                                    uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(url)
                                         .show(parentFragmentManager, "full_image")
                                 }
                             }
@@ -150,10 +142,17 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
                         bind.spacerPhotoBalance.isVisible = onlyOnePhoto
                     }
 
-
                     updateStats(bind, state)
                 }
             }
+        }
+    }
+
+    private fun formatWeightValue(value: Double): String {
+        return if (value % 1.0 == 0.0) {
+            value.toInt().toString()
+        } else {
+            String.format(java.util.Locale.US, "%.1f", value)
         }
     }
 
@@ -165,71 +164,33 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
         val startW = state.startWeight ?: currentW
         val goalW = state.goalWeight ?: 0.0
 
-        bind.tvStartWeight.text = if (startW != null && startW > 0) "Boshlanish: ${
-            String.format(
-                "%.1f",
-                startW
-            )
-        } kg" else "Boshlanish: -- kg"
         bind.tvCurrentWeight.text =
-            if (currentW != null && currentW > 0) String.format("%.1f kg", currentW) else "-- kg"
-        bind.tvGoalWeight.text = if (goalW > 0) "Maqsad: ${goalW.toInt()} kg" else "Maqsad: -- kg"
+            if (currentW != null && currentW > 0) "${formatWeightValue(currentW)} kg" else "-- kg"
+        bind.tvGoalWeight.text =
+            if (goalW > 0) "${formatWeightValue(goalW)} kg" else "-- kg"
+        bind.tvStartWeight.text =
+            if (startW != null && startW > 0) "${formatWeightValue(startW)} kg" else "-- kg"
 
-        // Progress Calculation
-        if (startW != null && currentW != null && goalW > 0 && startW != goalW) {
-            val totalPath = Math.abs(startW - goalW)
-            val achieved = Math.abs(startW - currentW)
-            val progress = ((achieved / totalPath) * 100).toInt().coerceIn(0, 100)
-            bind.progressWeight.setProgress(progress, true)
+        val totalDiff = if (startW != null && currentW != null && startW > 0) {
+            currentW - startW
         } else {
-            bind.progressWeight.progress = 0
+            state.weightDiff
         }
-        val diff = state.weightDiff
-        val absDiff = Math.abs(diff)
-        val diffFormatted = String.format("%.1f", absDiff)
+        val absDiff = Math.abs(totalDiff)
+        val diffFormatted = formatWeightValue(absDiff)
 
-        // Maqsad semirishmi yoki ozish?
-        val isGainGoal =
-            (state.goalWeight ?: 0.0) > (state.startWeight ?: state.currentWeight ?: 0.0)
-
-        val greenColor = android.graphics.Color.parseColor("#4CAF50")
-        val redColor = android.graphics.Color.parseColor("#F44336")
-        val greenBg = android.graphics.Color.parseColor("#104CAF50")
-        val redBg = android.graphics.Color.parseColor("#10F44336")
-
+        bind.tvTotalChangeLabel.text = "Natija"
         when {
-            diff < 0 -> {
-                // Vazn kamaydi. Ozish bo'lsa yashil, semirish bo'lsa qizil.
-                val color = if (isGainGoal) redColor else greenColor
-                val bg = if (isGainGoal) redBg else greenBg
-                bind.tvWeightDiff.text = "-$diffFormatted kg"
-                bind.tvWeightDiff.setTextColor(color)
-                bind.ivDiffArrow.setImageResource(R.drawable.trending_down)
-                bind.ivDiffArrow.imageTintList = android.content.res.ColorStateList.valueOf(color)
-                bind.layoutWeightDiff.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(bg)
+            totalDiff < 0 -> {
+                bind.tvWeightDiff.text = "$diffFormatted kg kamaydi"
             }
 
-            diff > 0 -> {
-                // Vazn ortdi. Semirish bo'lsa yashil, ozish bo'lsa qizil.
-                val color = if (isGainGoal) greenColor else redColor
-                val bg = if (isGainGoal) greenBg else redBg
-                bind.tvWeightDiff.text = "+$diffFormatted kg"
-                bind.tvWeightDiff.setTextColor(color)
-                bind.ivDiffArrow.setImageResource(R.drawable.trending)
-                bind.ivDiffArrow.imageTintList = android.content.res.ColorStateList.valueOf(color)
-                bind.layoutWeightDiff.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(bg)
+            totalDiff > 0 -> {
+                bind.tvWeightDiff.text = "$diffFormatted kg qo'shildi"
             }
 
             else -> {
-                bind.tvWeightDiff.text = "0.0 kg"
-                bind.tvWeightDiff.setTextColor(android.graphics.Color.GRAY)
-                bind.ivDiffArrow.setImageResource(R.drawable.trending)
-                bind.ivDiffArrow.imageTintList =
-                    android.content.res.ColorStateList.valueOf(android.graphics.Color.GRAY)
-                bind.layoutWeightDiff.backgroundTintList =
-                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#10808080"))
+                bind.tvWeightDiff.text = "$diffFormatted kg"
             }
         }
         updateBmi(bind, state)
@@ -247,64 +208,11 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
         bind.cardBmi.isVisible = true
         bind.tvBmiValue.text = String.format("%.2f", bmi)
 
-        val statusText = when (category) {
-            BmiCategory.UNDERWEIGHT -> "Kam vazn"
-            BmiCategory.HEALTHY -> "Sog'lom"
-            BmiCategory.OVERWEIGHT -> "Ortiqcha vazn"
-            BmiCategory.OBESE -> "Semizlik"
-            else -> ""
-        }
-
-        val color = when (category) {
-            BmiCategory.UNDERWEIGHT -> Color.parseColor("#2196F3")
-            BmiCategory.HEALTHY -> Color.parseColor("#4CAF50")
-            BmiCategory.OVERWEIGHT -> Color.parseColor("#FFC107")
-            BmiCategory.OBESE -> Color.parseColor("#F44336")
-            else -> Color.GRAY
-        }
-
         bind.btnBmiInfo.setOnClickListener {
             if (bmi > 0) {
                 val sheet = BmiInfoBottomSheetFragment.newInstance(bmi, category)
                 sheet.show(parentFragmentManager, "bmi_info")
             }
-        }
-
-        bind.tvBmiStatus.text = statusText
-        bind.tvBmiStatus.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
-
-        // Marker Position
-        bind.layoutBmiScale.post {
-            val width = bind.layoutBmiScale.width
-
-            val percentage = when {
-                bmi < 18.5 -> {
-                    // Underweight: 0.0 -> 0.33
-                    val ratio = ((bmi - 10.0) / (18.5 - 10.0)).coerceIn(0.0, 1.0)
-                    0.0 + ratio * 0.33
-                }
-
-                bmi < 25.0 -> {
-                    // Healthy: 0.33 -> 0.66
-                    val ratio = ((bmi - 18.5) / (25.0 - 18.5)).coerceIn(0.0, 1.0)
-                    0.33 + ratio * 0.33
-                }
-
-                bmi < 30.0 -> {
-                    // Overweight: 0.66 -> 0.83 (Yellow Zone)
-                    val ratio = ((bmi - 25.0) / (30.0 - 25.0)).coerceIn(0.0, 1.0)
-                    0.66 + ratio * 0.17
-                }
-
-                else -> {
-                    // Obese: 0.83 -> 1.0
-                    val ratio = ((bmi - 30.0) / (45.0 - 30.0)).coerceIn(0.0, 1.0)
-                    0.83 + ratio * 0.17
-                }
-            }
-
-            val x = (width * percentage).toFloat()
-            bind.viewBmiMarker.translationX = x
         }
     }
 }

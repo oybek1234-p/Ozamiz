@@ -36,6 +36,8 @@ import uz.oybek.ozamiz.ui.utils.playSuccessSound
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Date
 
+import androidx.fragment.app.setFragmentResultListener
+
 class AnalyzeResultFragment : Fragment() {
 
     private var _binding: BottomSheetCalorieResultBinding? = null
@@ -85,6 +87,20 @@ class AnalyzeResultFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setFragmentResultListener(EditIngredientBottomSheet.REQUEST_KEY) { _, bundle ->
+            val action = bundle.getString(EditIngredientBottomSheet.RESULT_ACTION) ?: EditIngredientBottomSheet.ACTION_SAVE
+            val position = bundle.getInt(EditIngredientBottomSheet.RESULT_POSITION, -1)
+            if (position == -1) return@setFragmentResultListener
+
+            if (action == EditIngredientBottomSheet.ACTION_DELETE) {
+                viewModel.deleteFoodItem(position)
+            } else {
+                val json = bundle.getString(EditIngredientBottomSheet.RESULT_INGREDIENT) ?: return@setFragmentResultListener
+                val item = com.google.gson.Gson().fromJson(json, uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient::class.java)
+                viewModel.updateFoodItem(position, item)
+            }
+        }
 
         binding.toolbar.inflateMenu(R.menu.menu_analyze_result)
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
@@ -282,10 +298,24 @@ class AnalyzeResultFragment : Fragment() {
                 }
                 binding.textViewTimestamp.text = Date(analysisResult.timestamp).formatToHhMmA()
 
-                ingredientsAdapter =
-                    IngredientsAdapter(
-                        ingredients = analysisResult.ingredients ?: emptyList()
-                    )
+                val foodItemsList = analysisResult.getNormalizedFoodItems()
+                if (foodItemsList.isNotEmpty()) {
+                    binding.layoutFoodItemsContainer.isVisible = true
+                    if (!::ingredientsAdapter.isInitialized) {
+                        ingredientsAdapter = IngredientsAdapter(
+                            ingredients = foodItemsList,
+                            onItemClick = { ingredient, position ->
+                                EditIngredientBottomSheet.newInstance(ingredient, position)
+                                    .show(parentFragmentManager, EditIngredientBottomSheet.TAG)
+                            }
+                        )
+                        binding.recyclerFoodItems.adapter = ingredientsAdapter
+                    } else {
+                        ingredientsAdapter.updateData(foodItemsList)
+                    }
+                } else {
+                    binding.layoutFoodItemsContainer.isVisible = false
+                }
 
                 if (!hasPlayedConfetti) {
                     val score = analysisResult.healthScore ?: 0
@@ -513,6 +543,7 @@ class AnalyzeResultFragment : Fragment() {
             }
         }
         binding.cardCalorieBanner.setOnClickListener(editCaloriesListener)
+        binding.buttonEditCalories.setOnClickListener(editCaloriesListener)
 
         binding.layoutProtein.root.setOnClickListener {
             val currentVal = viewModel.resultLive.value?.result?.result?.protein ?: 0.0

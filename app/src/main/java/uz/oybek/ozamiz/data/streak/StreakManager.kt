@@ -16,21 +16,33 @@ object StreakManager {
         val streakStartedNew: Boolean = false,
         val newBestStreakAchieved: Boolean = false,
         val isFirstActionToday: Boolean = false,
-        val returnedAfterManyDays: Boolean = false
+        val returnedAfterManyDays: Boolean = false,
+        val streakWasFrozen: Boolean = false
     )
 
-    fun isStreakActive(streakInfo: StreakInfo?): Boolean {
-        if (streakInfo == null) return false
+    fun getDaysSinceLastAction(streakInfo: StreakInfo?): Long {
+        if (streakInfo == null) return Long.MAX_VALUE
         val lastDateStr = streakInfo.lastActionDate
-        if (lastDateStr.isBlank()) return false
+        if (lastDateStr.isBlank()) return Long.MAX_VALUE
         return try {
             val lastDate = LocalDate.parse(lastDateStr, dateFormatter)
             val today = LocalDate.now()
-            val daysDiff = ChronoUnit.DAYS.between(lastDate, today)
-            daysDiff <= 1L
+            ChronoUnit.DAYS.between(lastDate, today)
         } catch (e: Exception) {
-            false
+            Long.MAX_VALUE
         }
+    }
+
+    fun isStreakFrozen(streakInfo: StreakInfo?): Boolean {
+        val daysDiff = getDaysSinceLastAction(streakInfo)
+        // If user missed 1 or 2 days (daysDiff is 2 or 3) and had an existing streak
+        return daysDiff in 2L..3L && (streakInfo?.currentStreak ?: 0) > 0
+    }
+
+    fun isStreakActive(streakInfo: StreakInfo?): Boolean {
+        if (streakInfo == null) return false
+        val daysDiff = getDaysSinceLastAction(streakInfo)
+        return daysDiff <= 3L
     }
 
     fun updateUserStreakOnAction(currentUser: User): StreakUpdateResult {
@@ -52,12 +64,24 @@ object StreakManager {
         var streakBroken = false
         var streakStartedNew = false
         var returnedAfterManyDays = false
+        var streakWasFrozen = false
 
         val newStreakInfo = when {
             daysDiff == 1L -> {
                 streakContinued = true
                 currentStreakInfo.copy(
                     currentStreak = currentStreakInfo.currentStreak + 1,
+                    activeDays = currentStreakInfo.activeDays + 1,
+                    lastActionDate = todayStr
+                )
+            }
+            daysDiff in 2L..3L -> {
+                // User missed up to 2 days: Streak is frozen & preserved!
+                streakContinued = true
+                streakWasFrozen = true
+                val streakToKeep = if (currentStreakInfo.currentStreak > 0) currentStreakInfo.currentStreak + 1 else 1
+                currentStreakInfo.copy(
+                    currentStreak = streakToKeep,
                     activeDays = currentStreakInfo.activeDays + 1,
                     lastActionDate = todayStr
                 )
@@ -87,7 +111,8 @@ object StreakManager {
             streakStartedNew = streakStartedNew,
             newBestStreakAchieved = newBestStreakAchieved,
             isFirstActionToday = true,
-            returnedAfterManyDays = returnedAfterManyDays
+            returnedAfterManyDays = returnedAfterManyDays,
+            streakWasFrozen = streakWasFrozen
         )
     }
 }

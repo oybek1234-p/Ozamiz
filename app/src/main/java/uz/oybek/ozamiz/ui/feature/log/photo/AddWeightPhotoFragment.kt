@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import com.bumptech.glide.Glide
+import androidx.fragment.app.setFragmentResultListener
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAddWeightPhotoBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -61,12 +62,34 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
             if (isAdded) findNavController().popBackStack()
         }
 
+        // Auto focus editTextWeight & open soft keyboard immediately
+        bind.editTextWeight.requestFocus()
+        bind.editTextWeight.postDelayed({
+            if (isAdded) {
+                val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+                imm?.showSoftInput(bind.editTextWeight, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+            }
+        }, 150)
+
+        val openPhotoUploadFlow = {
+            hideSoftInput(requireActivity())
+            navigate(R.id.photoUploadInfoFragment)
+        }
+
         bind.layoutAddImagePlaceholder.setOnClickListener {
-            showImageSourceChooser()
+            openPhotoUploadFlow()
         }
         bind.imageViewPicked.setOnClickListener {
-            showImageSourceChooser()
+            openPhotoUploadFlow()
         }
+
+        // Handle return from photo rules screen
+        parentFragmentManager.setFragmentResultListener("photo_info_confirmed", viewLifecycleOwner) { _, bundle ->
+            if (bundle.getBoolean("confirmed", false)) {
+                showImageSourceChooser()
+            }
+        }
+
         bind.buttonRemoveImage.setOnClickListener {
             viewModel.onImageSelected(null)
         }
@@ -175,7 +198,7 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
 
         sheetBinding.btnUploadPhoto.setOnClickListener {
             dialog.dismiss()
-            showImageSourceChooser()
+            navigate(R.id.photoUploadInfoFragment)
         }
 
         sheetBinding.btnSkipPhoto.setOnClickListener {

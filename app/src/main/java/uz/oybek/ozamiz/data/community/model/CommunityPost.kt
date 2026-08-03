@@ -34,7 +34,8 @@ data class CommunityPost(
     var type: String = PostType.MANUAL,
     @get:PropertyName("premiumUser")
     @set:PropertyName("premiumUser")
-    var isPremiumUser: Boolean = false
+    var isPremiumUser: Boolean = false,
+    var mealType: String? = null
 )
 
 object PostType {

@@ -187,14 +187,72 @@ object LogRepository {
         }
     }
 
+    private val localSummaryCache = java.util.concurrent.ConcurrentHashMap<String, DailySummary>()
+
+    fun cacheSummary(dateStr: String, summary: DailySummary) {
+        localSummaryCache[dateStr] = summary
+    }
+
+    suspend fun get7DaySummariesFast(dates: List<Date>): Map<String, DailySummary> {
+        val userId = currentUserId
+        if (userId.isBlank()) return emptyMap()
+
+        val resultMap = mutableMapOf<String, DailySummary>()
+        val missingDates = mutableListOf<String>()
+
+        for (d in dates) {
+            val key = d.dateApiFormat()
+            val cached = localSummaryCache[key]
+            if (cached != null) {
+                resultMap[key] = cached
+            } else {
+                missingDates.add(key)
+            }
+        }
+
+        if (missingDates.isEmpty()) {
+            return resultMap
+        }
+
+        try {
+            val minDate = missingDates.minOrNull() ?: dates.last().dateApiFormat()
+            val maxDate = missingDates.maxOrNull() ?: dates.first().dateApiFormat()
+
+            val snapshot = FirebasePaths.Database.summaries(userId)
+                .orderByKey()
+                .startAt(minDate)
+                .endAt(maxDate)
+                .get()
+                .await()
+
+            for (child in snapshot.children) {
+                val key = child.key ?: continue
+                val summary = child.getValue(DailySummary::class.java)
+                if (summary != null) {
+                    localSummaryCache[key] = summary
+                    resultMap[key] = summary
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return resultMap
+    }
+
     suspend fun getDailySummarySync(date: Date): DailySummary {
         val userId = currentUserId
         if (userId.isBlank()) return DailySummary()
+        val formattedDate = date.dateApiFormat()
+        val cached = localSummaryCache[formattedDate]
+        if (cached != null) return cached
+
         return try {
-            val formattedDate = date.dateApiFormat()
             val snapshot = FirebasePaths.Database.dailyLogs(userId, formattedDate).get().await()
             val dailyLogs = snapshot.getValueSafe(DailyLogs::class.java)
-            calculateSummary(dailyLogs)
+            val summary = calculateSummary(dailyLogs)
+            localSummaryCache[formattedDate] = summary
+            summary
         } catch (e: Exception) {
             e.printStackTrace()
             DailySummary()

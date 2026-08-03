@@ -71,8 +71,23 @@ class HomeViewModel : ViewModel() {
     private val _showWaterBenefitsEvent = MutableSharedFlow<Unit>()
     val showWaterBenefitsEvent = _showWaterBenefitsEvent.asSharedFlow()
 
+    private val _showStreakFreezeEvent = MutableSharedFlow<Unit>()
+    val showStreakFreezeEvent = _showStreakFreezeEvent.asSharedFlow()
+
     private val _showWater60AnalysisEvent = MutableSharedFlow<DailyAnalysisData>()
     val showWater60AnalysisEvent = _showWater60AnalysisEvent.asSharedFlow()
+
+    private var hasCheckedFreezeThisSession = false
+
+    private fun checkStreakFrozen(user: User) {
+        if (hasCheckedFreezeThisSession) return
+        if (uz.oybek.ozamiz.data.streak.StreakManager.isStreakFrozen(user.streakInfo)) {
+            hasCheckedFreezeThisSession = true
+            viewModelScope.launch {
+                _showStreakFreezeEvent.emit(Unit)
+            }
+        }
+    }
 
 
     data class DailyAnalysisData(
@@ -129,7 +144,7 @@ class HomeViewModel : ViewModel() {
                         daysFromRegister = daysFromRegister
                     )
                 }
-                checkYesterdayFoodLogFeedback(user)
+                checkStreakFrozen(user)
             }
         }
         startLoadingData(initialSelectedDate)
@@ -334,23 +349,6 @@ class HomeViewModel : ViewModel() {
     private var feedbackChecked = false
 
     private fun checkYesterdayFoodLogFeedback(user: User) {
-        if (feedbackChecked) return
-        feedbackChecked = true
-        viewModelScope.launch {
-            try {
-                val yesterday = Date(System.currentTimeMillis() - 86400000L)
-                val yesterdayStr = yesterday.dateApiFormat()
-
-                if (AppPreference.lastFoodFeedbackDate == yesterdayStr) return@launch
-
-                val summary = LogRepository.getDailySummarySync(yesterday)
-                val targetCalories = user.targetCalories
-                if (targetCalories > 0 && summary.consumedCalories < targetCalories * 0.5) {
-                    _showFoodFeedbackEvent.emit(yesterdayStr)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        // Disabled per user request
     }
 }

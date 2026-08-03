@@ -13,6 +13,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
@@ -110,6 +111,8 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
         }
     }
 
+    private var capturedPhotoUri: Uri? = null
+
     private fun takePhoto() {
         if (isCapturing) return
         val capture = imageCapture ?: return
@@ -134,14 +137,45 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     if (!isAdded) return
-                    isCapturing = false
-                    deliverAction(
-                        ACTION_PHOTO,
-                        bundleOf(RESULT_URI to Uri.fromFile(photoFile).toString())
-                    )
+                    val photoUri = Uri.fromFile(photoFile)
+                    capturedPhotoUri = photoUri
+                    showPhotoReview(photoUri)
                 }
             }
         )
+    }
+
+    private fun showPhotoReview(uri: Uri) = with(binding) {
+        layoutPhotoPreview.isVisible = true
+        imageViewPhotoPreview.setImageURI(uri)
+        editTextFoodDescription.setText("")
+        editTextFoodDescription.requestFocus()
+
+        val imm = ContextCompat.getSystemService(requireContext(), android.view.inputmethod.InputMethodManager::class.java)
+        editTextFoodDescription.postDelayed({
+            if (isAdded && layoutPhotoPreview.isVisible) {
+                imm?.showSoftInput(editTextFoodDescription, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+            }
+        }, 100)
+
+        buttonTekshirish.setOnClickListener {
+            val userDescription = editTextFoodDescription.text?.toString()?.trim().orEmpty()
+            imm?.hideSoftInputFromWindow(editTextFoodDescription.windowToken, 0)
+            deliverAction(
+                ACTION_PHOTO,
+                bundleOf(
+                    RESULT_URI to uri.toString(),
+                    RESULT_DESCRIPTION to userDescription
+                )
+            )
+        }
+
+        buttonRetakePhoto.setOnClickListener {
+            imm?.hideSoftInputFromWindow(editTextFoodDescription.windowToken, 0)
+            layoutPhotoPreview.isVisible = false
+            isCapturing = false
+            buttonCapture.isEnabled = true
+        }
     }
 
     private fun deliverAction(action: String, extras: Bundle = bundleOf()) {
@@ -155,6 +189,7 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
         const val REQUEST_KEY = "food_camera_request"
         const val RESULT_ACTION = "action"
         const val RESULT_URI = "uri"
+        const val RESULT_DESCRIPTION = "description"
 
         const val ACTION_PHOTO = "action_photo"
         const val ACTION_WRITE = "action_write"

@@ -1,53 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="6dp"
     android:background="@drawable/round_lay"
-    android:backgroundTint="?colorSurfaceContainerHigh"
-    android:layout_marginBottom="8dp"
+    android:backgroundTint="?colorSurfaceContainerLowest"
     android:clickable="true"
     android:focusable="true"
+    android:foreground="?selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="12dp">
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="10dp">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/textView_ingredient_name"
+        style="@style/Text2_15"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal">
+        android:ellipsize="end"
+        android:fontFamily="@font/roboto_medium"
+        android:maxLines="1"
+        android:textColor="?colorOnSurface"
+        tools:text="Osh va qo'shimchalar" />
 
-        <TextView
-            android:id="@+id/textView_ingredient_name"
-            style="@style/Text1_16"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_medium"
-            android:textColor="?colorOnSurface"
-            tools:text="Lettuce" />
-
-        <TextView
-            android:id="@+id/textView_ingredient_calories"
-            style="@style/Text2_15"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textColor="?colorOnSurfaceVariant"
-            tools:text="• 20 cal" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/textView_ingredient_calories"
+        style="@style/Caption1_13"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="@font/roboto_bold"
+        android:singleLine="true"
+        android:textColor="?colorPrimary"
+        tools:text="• 450 kkal" />
 
     <TextView
         android:id="@+id/textView_ingredient_amount"
-        style="@style/Text2_15"
+        style="@style/Caption1_13"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
         android:background="@drawable/round_lay"
-        android:backgroundTint="?colorSurface"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="6dp"
+        android:backgroundTint="?colorSurfaceContainerHigh"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:singleLine="true"
         android:textColor="?colorOnSurfaceVariant"
-        tools:text="1.5 cups" />
+        tools:text="200 g" />
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/edit"
+        app:tint="?colorOnSurfaceVariant" />
 
 </LinearLayout>

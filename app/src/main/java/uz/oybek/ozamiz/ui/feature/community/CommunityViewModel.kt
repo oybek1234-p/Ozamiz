@@ -54,9 +54,11 @@ class CommunityViewModel : ViewModel() {
         val isFirstLoad = lastVisiblePostId == null
         _state.update { it.copy(isLoading = isFirstLoad, isPaging = !isFirstLoad, error = null) }
 
+        val requestLimit = 10L
+
         viewModelScope.launch {
             val result = CommunityPostRepository.getPosts(
-                limit = 8,
+                limit = requestLimit,
                 lastVisiblePostId = lastVisiblePostId,
                 verifiedOnly = true,
                 filter = _state.value.filter
@@ -78,7 +80,7 @@ class CommunityViewModel : ViewModel() {
                             posts = updatedPosts,
                             isLoading = false,
                             isPaging = false,
-                            hasReachedEnd = newPosts.size < 8
+                            hasReachedEnd = newPosts.size < requestLimit
                         )
                     }
                 }

@@ -23,6 +23,10 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
         const val REQUEST_KEY = "EditIngredientResult"
         const val RESULT_INGREDIENT = "ingredient"
         const val RESULT_POSITION = "position"
+        const val RESULT_ACTION = "action"
+        const val ACTION_SAVE = "save"
+        const val ACTION_DELETE = "delete"
+
         private const val ARG_INGREDIENT_JSON = "arg_ingredient"
         private const val ARG_POSITION = "arg_position"
 
@@ -54,26 +58,37 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val item = ingredient ?: return dismiss()
 
-        // Hozirgi qiymatlarni qo'yish
         binding.editTextIngredientName.setText(item.name)
+        binding.editTextIngredientAmount.setText(
+            item.amount?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: ""
+        )
+        binding.editTextIngredientUnit.setText(item.unit ?: "")
         binding.editTextIngredientCalories.setText(item.calories?.toString() ?: "")
-        
-        // Agar points va unit bo'lsa, ularni nomiga qo'shib ko'rsatish yoki alohida (dizaynga qarab)
-        // Hozircha name o'zida hammasini tahrirlashga ruxsat beramiz
-        
+
         binding.buttonSave.setOnClickListener {
-            val newName = binding.editTextIngredientName.text.toString()
+            val newName = binding.editTextIngredientName.text.toString().trim()
+            val newAmount = binding.editTextIngredientAmount.text.toString().toDoubleOrNull()
+            val newUnit = binding.editTextIngredientUnit.text.toString().trim()
             val newCalories = binding.editTextIngredientCalories.text.toString().toIntOrNull()
 
             val updatedIngredient = item.copy(
-                name = newName,
+                name = newName.ifEmpty { item.name },
+                amount = newAmount,
+                unit = newUnit.ifEmpty { null },
                 calories = newCalories
-                // Amount va unitni name ichidan ajratib olish logikasi murakkab bo'lishi mumkin,
-                // shuning uchun AI qayta analiz qilganda o'zi to'g'irlaydi deb hisoblaymiz.
             )
 
             setFragmentResult(REQUEST_KEY, bundleOf(
+                RESULT_ACTION to ACTION_SAVE,
                 RESULT_INGREDIENT to Gson().toJson(updatedIngredient),
+                RESULT_POSITION to position
+            ))
+            dismiss()
+        }
+
+        binding.buttonDelete.setOnClickListener {
+            setFragmentResult(REQUEST_KEY, bundleOf(
+                RESULT_ACTION to ACTION_DELETE,
                 RESULT_POSITION to position
             ))
             dismiss()

@@ -145,7 +145,7 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
 
                     if (startWeight > weight && weight > 0) {
                         val lost = startWeight - weight
-                        bind.tvOuterWeightLoss.text = "${lost.fmt()} kilogram ozildi"
+                        bind.tvOuterWeightLoss.text = "${lost.fmt()} kilogram kamaydi"
                         bind.tvOuterWeightLoss.isVisible = true
                     } else {
                         bind.tvOuterWeightLoss.isVisible = false

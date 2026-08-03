@@ -385,4 +385,68 @@ class AnalyzeResultViewModel : ViewModel() {
         }
         syncLogUpdate()
     }
+
+    fun updateFoodItem(position: Int, updatedItem: uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient) {
+        val currentResult = _state.value.result ?: return
+        val resultObj = currentResult.result ?: return
+        val currentItems = resultObj.getNormalizedFoodItems().toMutableList()
+        if (position in currentItems.indices) {
+            currentItems[position] = updatedItem
+        } else return
+
+        val newTotalCalories = currentItems.sumOf { it.calories ?: 0 }
+        val newName = currentItems.joinToString(", ") { item ->
+            buildString {
+                append(item.name)
+                if (item.amount != null && item.amount > 0) {
+                    val fmtAmount = if (item.amount % 1.0 == 0.0) item.amount.toInt().toString() else item.amount.toString()
+                    append(" ($fmtAmount ${item.unit.orEmpty()})".trimEnd())
+                }
+            }
+        }
+
+        val updatedResultObj = resultObj.copy(
+            name = if (newName.isNotBlank()) newName else resultObj.name,
+            calories = if (newTotalCalories > 0) newTotalCalories else resultObj.calories,
+            foodItems = currentItems,
+            ingredients = currentItems.map { it.name }
+        )
+
+        _state.update { state ->
+            state.copy(result = currentResult.copy(result = updatedResultObj))
+        }
+        syncLogUpdate()
+
+        if (newName.isNotBlank()) {
+            updateLog(newName)
+        }
+    }
+
+    fun deleteFoodItem(position: Int) {
+        val currentResult = _state.value.result ?: return
+        val resultObj = currentResult.result ?: return
+        val currentItems = resultObj.getNormalizedFoodItems().toMutableList()
+        if (position in currentItems.indices) {
+            currentItems.removeAt(position)
+        } else return
+
+        val newTotalCalories = currentItems.sumOf { it.calories ?: 0 }
+        val newName = currentItems.joinToString(", ") { it.name }
+
+        val updatedResultObj = resultObj.copy(
+            name = if (newName.isNotBlank()) newName else resultObj.name,
+            calories = if (newTotalCalories > 0) newTotalCalories else resultObj.calories,
+            foodItems = currentItems,
+            ingredients = currentItems.map { it.name }
+        )
+
+        _state.update { state ->
+            state.copy(result = currentResult.copy(result = updatedResultObj))
+        }
+        syncLogUpdate()
+
+        if (newName.isNotBlank()) {
+            updateLog(newName)
+        }
+    }
 }

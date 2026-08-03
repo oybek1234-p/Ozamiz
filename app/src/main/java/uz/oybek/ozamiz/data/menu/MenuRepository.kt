@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
+import menuList
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.uploader.ImageCompressor
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
@@ -14,16 +15,16 @@ import java.util.UUID
 
 object MenuRepository {
 
-//    init {
-//        addMenus()
-//    }
-//
-//    private fun addMenus() {
+    init {
+        addMenus()
+    }
+
+    private fun addMenus() {
 //        menuList.forEach {
 //            it.createdAt = Date()
 //            FirebasePaths.Firestore.menus().add(it)
 //        }
-//    }
+    }
 
     suspend fun loadMenus(
         categoryId: String? = null,

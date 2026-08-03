@@ -88,4 +88,121 @@
         android:src="@drawable/arrow_back"
         app:tint="@android:color/white" />
 
+    <!-- Photo Review Overlay State -->
+    <LinearLayout
+        android:id="@+id/layout_photo_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?colorSurfaceContainer"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="48dp"
+            android:paddingBottom="12dp">
+
+            <ImageButton
+                android:id="@+id/button_retake_photo"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="start|center_vertical"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cancel"
+                android:src="@drawable/arrow_back"
+                app:tint="?colorOnSurface" />
+
+            <TextView
+                style="@style/Title3_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/camera_review_title"
+                android:textColor="?colorOnSurface" />
+        </FrameLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:paddingHorizontal="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageView_photo_preview"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearance="@style/RadiusImageView12" />
+
+                <TextView
+                    android:id="@+id/textView_about_food_label"
+                    style="@style/Title3_17"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/about_food_label"
+                    android:textColor="?colorOnSurface" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editText_food_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top|start"
+                        android:hint="@string/camera_food_description_hint"
+                        android:imeOptions="actionDone"
+                        android:inputType="textCapSentences|textMultiLine"
+                        android:minLines="3"
+                        android:maxLines="5"
+                        android:textColor="?colorOnSurface" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_tekshirish"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="24dp"
+                    android:backgroundTint="?colorPrimary"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/btn_check_analyze"
+                    android:textColor="?colorSurface"
+                    android:textSize="16sp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/arrow_right"
+                    app:iconGravity="textStart"
+                    app:iconPadding="10dp"
+                    app:iconTint="?colorSurface" />
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </LinearLayout>
+
 </FrameLayout>

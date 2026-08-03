@@ -28,6 +28,7 @@ val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
 class Application : Application() {
 
+
     override fun onCreate() {
         super.onCreate()
         appContext = this

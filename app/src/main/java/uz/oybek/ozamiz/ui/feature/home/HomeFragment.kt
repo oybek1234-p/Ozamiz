@@ -43,6 +43,7 @@ import uz.oybek.ozamiz.ui.feature.log.exercise.ExerciseAchievementDialog
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet
+import uz.oybek.ozamiz.ui.feature.streak.StreakFreezeSheet
 import uz.oybek.ozamiz.ui.utils.VaznimColors
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.triggerVibration
@@ -464,6 +465,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                     }
                 }
                 launch {
+                    viewModel.showStreakFreezeEvent.collect {
+                        StreakFreezeSheet.show(childFragmentManager)
+                    }
+                }
+                launch {
                     viewModel.showStreakSheetEvent.collect { (streakInfo, returnedAfterManyDays) ->
                         val sheet = StreakInfoSheet.newInstance(
                             streakInfo = streakInfo,
@@ -494,16 +500,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                             caloriesBurned = data.caloriesBurned
                         )
                         navigate(R.id.action_home_to_dailyAnalysisFragment, args)
-                    }
-                }
-                launch {
-                    viewModel.showFoodFeedbackEvent.collect { yesterdayDateStr ->
-                        if (isResumed) {
-                            val args = Bundle().apply {
-                                putString("date_str", yesterdayDateStr)
-                            }
-                            navigate(R.id.action_home_to_foodLogFeedbackDialogFragment, args)
-                        }
                     }
                 }
             }
@@ -554,79 +550,11 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun updateGoalPrediction() = binding.apply {
-        val u = user
-        val currentWeight = u.weight
-        val targetWeight = u.targetWeight
-
-        if (currentWeight > 0 && targetWeight != null && targetWeight < currentWeight) {
-            val weightToLose = currentWeight - targetWeight
-            val daysTotal = kotlin.math.ceil(weightToLose / 0.0714).toInt()
-            val months = daysTotal / 30
-            val remainingDays = daysTotal % 30
-
-            val remainingText = when {
-                months > 0 && remainingDays > 0 -> "Maqsadgacha: $months oy $remainingDays kun qoldi"
-                months > 0 -> "Maqsadgacha: $months oy qoldi"
-                else -> "Maqsadgacha: $daysTotal kun qoldi"
-            }
-
-            val calendar = java.util.Calendar.getInstance().apply {
-                add(java.util.Calendar.DAY_OF_YEAR, daysTotal)
-            }
-            val monthNames = arrayOf("yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr")
-            val targetDateStr = "${calendar.get(java.util.Calendar.DAY_OF_MONTH)}-${monthNames[calendar.get(java.util.Calendar.MONTH)]}"
-
-            textGoalTimeRemaining.text = remainingText
-            textGoalTargetDate.text = "Shu ketishda $targetDateStr ga borib maqsadingizga erishasiz! 💪"
-            cardGoalPrediction.isVisible = true
-        } else {
-            cardGoalPrediction.isVisible = false
-        }
+        cardGoalPrediction.isVisible = false
     }
 
     private fun updateYesterdayEval() = binding.apply {
-        val today = DateUtils.todayString()
-        if (AppPreference.lastYesterdayEvalClosedDate == today) {
-            cardYesterdayEval.isVisible = false
-            return@apply
-        }
-
-        btnCloseYesterdayEval.setOnClickListener {
-            AppPreference.lastYesterdayEvalClosedDate = today
-            cardYesterdayEval.isVisible = false
-        }
-
-        btnAjoyibYesterdayEval.setOnClickListener {
-            AppPreference.lastYesterdayEvalClosedDate = today
-            cardYesterdayEval.isVisible = false
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            try {
-                val yesterday = java.util.Date(System.currentTimeMillis() - 86400000L)
-                val summary = uz.oybek.ozamiz.data.logs.LogRepository.getDailySummarySync(yesterday)
-                val u = user
-
-                if (summary.consumedCalories > 0 || summary.burnedCalories > 0) {
-                    val tdee = uz.oybek.ozamiz.data.food.DietController.calculateTDEE(u)
-                    val deficit = maxOf(0.0, tdee - summary.consumedCalories + summary.burnedCalories).toInt()
-                    val fatGrams = (deficit / 7.7).toInt()
-                    val weeklyLossKg = (deficit * 7.0) / 7700.0
-                    val formattedLoss = String.format(java.util.Locale.US, "%.1f", minOf(1.5, maxOf(0.1, weeklyLossKg)))
-
-                    if (deficit > 50) {
-                        textYesterdayEvalDesc.text = "Kecha $deficit kkal defitsit qilib, $fatGrams g yog' yoqdingiz! Bu ketishda 1 haftada $formattedLoss kg vazn tashlaysiz! 🔥"
-                    } else {
-                        textYesterdayEvalDesc.text = "Kecha ${summary.consumedCalories} kkal taomlandingiz. Bugun defitsitni ushlab, yana faolroq bo'lishga harakat qilamiz! 💪"
-                    }
-                    cardYesterdayEval.isVisible = true
-                } else {
-                    cardYesterdayEval.isVisible = false
-                }
-            } catch (_: Exception) {
-                cardYesterdayEval.isVisible = false
-            }
-        }
+        cardYesterdayEval.isVisible = false
     }
 
     private fun updateCalorieAndMacros(state: HomeUiState) = binding.apply {

@@ -179,30 +179,35 @@ object FoodLogRepository {
                     }
 
                     if (shouldShare) {
-                        launch {
-                            if (user.valid) {
-                                runCatching {
-                                    val post = CommunityPost(
-                                        userId = user.uid,
-                                        userName = user.name.ifBlank { "Foydalanuvchi" },
-                                        userAvatarUrl = user.avatarUrl,
-                                        photoUrl = uploadImageUrl.orEmpty(),
-                                        photos = emptyList(),
-                                        title = foodLog.description,
-                                        description = "",
-                                        foodName = foodLog.description,
-                                        calories = foodLog.calories,
-                                        protein = foodLog.protein,
-                                        fat = foodLog.fat,
-                                        carbs = foodLog.carbs,
-                                        healthScore = foodLog.healthLevel ?: 0,
-                                        userScore = user.scorePoints,
-                                        verified = true,
-                                        isVisible = true,
-                                        type = FOOD,
-                                        isPremiumUser = PremiumUtils.isPremium(user)
-                                    )
-                                    CommunityPostRepository.addPost(post)
+                        val photo = uploadImageUrl.orEmpty()
+                        val score = foodLog.healthLevel ?: 0
+                        if (photo.isNotBlank() && score >= 8) {
+                            launch {
+                                if (user.valid) {
+                                    runCatching {
+                                        val post = CommunityPost(
+                                            userId = user.uid,
+                                            userName = user.name.ifBlank { "Foydalanuvchi" },
+                                            userAvatarUrl = user.avatarUrl,
+                                            photoUrl = photo,
+                                            photos = listOf(photo),
+                                            title = foodLog.description,
+                                            description = foodLog.aiInsights ?: "",
+                                            foodName = foodLog.description,
+                                            calories = foodLog.calories,
+                                            protein = foodLog.protein,
+                                            fat = foodLog.fat,
+                                            carbs = foodLog.carbs,
+                                            healthScore = score,
+                                            userScore = user.scorePoints,
+                                            verified = true,
+                                            isVisible = true,
+                                            type = FOOD,
+                                            isPremiumUser = PremiumUtils.isPremium(user),
+                                            mealType = foodLog.mealType
+                                        )
+                                        CommunityPostRepository.addPost(post)
+                                    }
                                 }
                             }
                         }

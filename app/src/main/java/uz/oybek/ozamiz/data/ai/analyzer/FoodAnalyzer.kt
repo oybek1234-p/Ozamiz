@@ -41,8 +41,8 @@ object FoodAnalyzer {
     ): FoodAnalysis? = withContext(Dispatchers.IO) {
         runCatching {
             val userPrompt = AiPromptBuilder.buildFoodAnalyzerPrompt(
-                description.orEmpty(),
-                meal,
+                mealTime = meal,
+                userDescription = description.orEmpty(),
                 photo = image != null
             )
             val model = getModel()

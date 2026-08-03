@@ -428,10 +428,11 @@
     <string name="reminders">Eslatmalar</string>
     <string name="help_and_support">Savolingiz bormi</string>
     <string name="about_app">Ilova haqida</string>
-    <string name="rate_app">Vaznim ilovasini baholang</string>
+    <string name="rate_app">Ilovani baholash</string>
     <string name="logout">Chiqish</string>
     <string name="logout_confirmation_title">Chiqishni tasdiqlang</string>
     <string name="logout_confirmation_message">Haqiqatan ham akkauntingizdan chiqmoqchimisiz?</string>
+    <string name="delete_account">Hisobni o\'chirish</string>
     <string name="default_user_name">Foydalanuvchi</string>
 
     <!-- AboutFragment uchun stringlar -->
@@ -823,6 +824,13 @@
     <string name="streak_top_people">Top odamlar</string>
     <string name="streak_continue">Davom etish</string>
 
+    <!-- Streak Freeze -->
+    <string name="streak_frozen_title">Siz %1$d kun ilovaga kirmaganingiz sababli ketma-ketligingiz muzlatib qo\'yildi</string>
+    <string name="streak_frozen_desc">Ketma-ketlik yo\'qolmasligi uchun har kuni ilovaga kirib faollik ko\'rsating!</string>
+    <string name="streak_frozen_btn_continue">Davom etaman</string>
+    <string name="streak_frozen_success_title">Ajoyib, yana ilovaga qaytganingizdan xursandmiz, har kuni qo\'shib boring, va ketma-ketlikni saqlab qoling.</string>
+    <string name="streak_frozen_btn_got_it">Tushundim</string>
+
     <!-- Oqsilli Taomlar (Protein Foods) -->
     <string name="protein_menu_desc">Mushaklarni mustahkamlash va to\'qlik</string>
     <string name="protein_guide_title">Oqsilli taomlar</string>
@@ -1208,5 +1216,13 @@
     <string name="weekly_prediction_title">Haftalik natija taxmini 🎯</string>
     <string name="weekly_prediction_desc_format">Bugungi ko\'rsatkichlaringiz va ma\'lumotlaringiz asosida: Shu zaylda davom etsangiz, 1 haftada maksimum %1$s kg vazn yo\'qotishingiz mumkin! 🔥</string>
     <string name="weekly_prediction_screen_text">Shunday davom etsangiz, 1 haftada %1$s kilogram vazn tashlaysiz.</string>
+    <string name="about_food_label">Ovqat haqida yozing (Ixtiyoriy)</string>
+    <string name="camera_review_title">Tahlil qilish</string>
+    <string name="camera_food_description_hint">Masalan: 100 gram osh,\n1 bo\'lak non, 1 piyola qatiq...</string>
+    <string name="btn_check_analyze">Tahlil qilish</string>
+    <string name="food_items_list_title">Dasturxondagi ovqatlar</string>
+    <string name="amount_hint">Miqdori (masalan: 200)</string>
+    <string name="unit_hint">Birlik (gramm, bo\'lak, dona)</string>
+    <string name="edit_calories_btn">O\'zgartirish</string>
 </resources>
 

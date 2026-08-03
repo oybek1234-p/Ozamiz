@@ -62,16 +62,17 @@ class CommunityPostAdapter(
             }
 
             // Hide calories and food name if not a food post
-            val isFoodPost = post.type == FOOD
+            val isFoodPost = post.type == FOOD || post.foodName.isNotBlank()
             binding.tvFoodCalories.isVisible = isFoodPost && post.calories > 0
+            val mealLabel = getMealTimeLabel(post.mealType)
+            val foodTitle = post.foodName.ifBlank { post.title }
+
             if (isFoodPost) {
-                val p = post.protein?.toInt() ?: 0
-                val c = post.carbs?.toInt() ?: 0
-                val f = post.fat?.toInt() ?: 0
-                binding.tvFoodName.text = post.foodName.ifBlank { post.title }
-                binding.tvFoodCalories.text = "${post.calories} kkal - $p oq, $c ug, $f yog'"
+                binding.tvFoodName.text = if (mealLabel.isNotEmpty()) "$mealLabel • $foodTitle" else foodTitle
+                val scoreText = if (post.healthScore > 0) "  •  ⭐ ${post.healthScore}/10" else ""
+                binding.tvFoodCalories.text = "${post.calories} kkal$scoreText"
             } else {
-                binding.tvFoodName.text = post.title
+                binding.tvFoodName.text = if (mealLabel.isNotEmpty()) "$mealLabel • $foodTitle" else foodTitle
             }
 
             binding.layoutViews.isVisible = post.viewsCount > 0
@@ -89,16 +90,23 @@ class CommunityPostAdapter(
                 binding.tvComment.isVisible = false
             } else {
                 binding.tvComment.isVisible = true
-                binding.tvComment.text = description
+                val formattedDesc = if (isFoodPost && !description.startsWith("💡") && !description.startsWith("✅")) {
+                    "💡 Foydalari: $description"
+                } else {
+                    description
+                }
+                binding.tvComment.text = formattedDesc
             }
             val timestamp = post.timestamp
             if (timestamp != null) {
                 val diff = System.currentTimeMillis() - timestamp.time
+                val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
                 val hours = TimeUnit.MILLISECONDS.toHours(diff)
                 val days = TimeUnit.MILLISECONDS.toDays(diff)
                 binding.tvTime.text = when {
                     days > 0 -> "$days ${binding.root.context.getString(R.string.kun_oldin)}"
                     hours > 0 -> "$hours ${binding.root.context.getString(R.string.sohat_oldin)}"
+                    minutes > 0 -> "$minutes minut oldin"
                     else -> binding.root.context.getString(R.string.yaqinda)
                 }
             } else {
@@ -199,6 +207,16 @@ class CommunityPostAdapter(
                 }
                 popup.show()
             }
+        }
+    }
+
+    private fun getMealTimeLabel(mealType: String?): String {
+        return when (mealType?.lowercase()?.trim()) {
+            "breakfast", "nonushta" -> "Nonushta 🌅"
+            "lunch", "tushlik" -> "Tushlik ☀️"
+            "dinner", "kechki_ovqat", "kechki", "kechki ovqat" -> "Kechki ovqat 🌙"
+            "snack", "tamaddi", "orada" -> "Tamaddi 🍎"
+            else -> ""
         }
     }
 }

@@ -389,14 +389,15 @@
                             android:id="@+id/button_meal_recommendation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
                             android:layout_marginBottom="12dp"
                             android:clickable="true"
-                            android:layout_marginTop="@dimen/dimen_12"
                             android:focusable="true"
                             app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
                             app:cardCornerRadius="16dp"
                             app:cardElevation="0dp"
-                            app:strokeWidth="0dp">
+                            app:strokeColor="?attr/colorOutlineVariant"
+                            app:strokeWidth="1dp">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -405,28 +406,50 @@
                                 android:orientation="horizontal"
                                 android:padding="16dp">
 
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:src="@drawable/food_ic"
-                                    app:tint="?attr/colorOnTertiaryContainer" />
+                                <FrameLayout
+                                    android:layout_width="40dp"
+                                    android:layout_height="40dp"
+                                    android:background="@drawable/bg_circle_filled">
 
-                                <TextView
+                                    <ImageView
+                                        android:layout_width="22dp"
+                                        android:layout_height="22dp"
+                                        android:layout_gravity="center"
+                                        android:src="@drawable/food_ic"
+                                        app:tint="?attr/colorPrimary" />
+                                </FrameLayout>
+
+                                <LinearLayout
                                     android:layout_width="0dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="16dp"
+                                    android:layout_marginStart="14dp"
                                     android:layout_weight="1"
-                                    android:fontFamily="@font/roboto_medium"
-                                    android:text="Ovqatlanish tavsiyasi"
-                                    android:textColor="?attr/colorOnTertiaryContainer"
-                                    android:textSize="16sp" />
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/roboto_bold"
+                                        android:text="Ovqatlanish tavsiyasi"
+                                        android:textColor="?attr/colorOnSurface"
+                                        android:textSize="15sp" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="2dp"
+                                        android:fontFamily="@font/roboto_regular"
+                                        android:text="Sog\'lom va balansli taomlar ro\'yxati"
+                                        android:textColor="?attr/colorOnSurfaceVariant"
+                                        android:textSize="13sp" />
+                                </LinearLayout>
 
                                 <ImageView
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
                                     android:rotation="180"
                                     android:src="@drawable/arrow_back"
-                                    app:tint="?attr/colorOnTertiaryContainer" />
+                                    app:tint="?attr/colorOnSurfaceVariant" />
                             </LinearLayout>
                         </com.google.android.material.card.MaterialCardView>
 

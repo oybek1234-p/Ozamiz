@@ -40,8 +40,8 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageView_food_photo"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center_horizontal"
                 android:scaleType="centerCrop"
                 app:shapeAppearance="@style/RadiusImageView12"
@@ -201,6 +201,19 @@
 
                         </LinearLayout>
                     </LinearLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/button_edit_calories"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:fontFamily="@font/roboto_medium"
+                        android:paddingHorizontal="8dp"
+                        android:text="@string/edit_calories_btn"
+                        android:textColor="?colorPrimary"
+                        android:textSize="13sp" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -238,6 +251,7 @@
                     android:layout_weight="1" />
             </LinearLayout>
 
+            <!-- 1. Dietolog Maslahati -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_ai_health"
                 android:layout_width="match_parent"
@@ -277,23 +291,43 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- 2. Ovqatlar ro'yxati -->
+            <LinearLayout
+                android:id="@+id/layout_food_items_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_food_items"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:itemCount="3"
+                    tools:listitem="@layout/item_analyzed_ingredient" />
+            </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/health_ball"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/round_lay"
                 android:layout_marginTop="@dimen/dimen_12"
+                android:background="@drawable/round_lay"
                 android:backgroundTint="?colorSurfaceContainerLowest"
                 android:gravity="center"
-                android:paddingVertical="@dimen/dimen_12"
+                android:orientation="horizontal"
                 android:paddingHorizontal="@dimen/dimen_8"
-                android:orientation="horizontal">
+                android:paddingVertical="@dimen/dimen_12">
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/ballanimation"
                     android:layout_width="40dp"
-                    android:visibility="gone"
                     android:layout_height="40dp"
+                    android:visibility="gone"
                     app:lottie_autoPlay="true"
                     app:lottie_rawRes="@raw/bouncing_fruits"
                     app:lottie_repeatCount="100"
@@ -302,15 +336,15 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="20dp"
-                    android:paddingEnd="@dimen/dimen_18"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingEnd="@dimen/dimen_18">
 
                     <TextView
                         style="@style/Headline3_15"
                         android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="@dimen/dimen_12"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/dimen_12"
+                        android:layout_weight="1"
                         android:text="@string/sog_liq_bahosi"
                         android:textColor="?colorOnSurface" />
 
@@ -320,8 +354,8 @@
                         style="@style/Headline3_15"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5 ball"
                         android:fontFamily="@font/roboto_bold"
+                        android:text="5 ball"
                         android:textColor="?colorOnSurface" />
 
 

@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.user.UserProfileRepository
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object StreakRepository {
 
@@ -14,6 +16,20 @@ object StreakRepository {
 
     fun clearStreakResult() {
         _levelFlow.value = null
+    }
+
+    fun unfreezeStreak() {
+        val currentUser = UserProfileRepository.user
+        if (!currentUser.valid) return
+        val streakInfo = currentUser.streakInfo ?: return
+
+        val today = LocalDate.now()
+        val yesterdayStr = today.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+        val updatedStreakInfo = streakInfo.copy(
+            lastActionDate = yesterdayStr
+        )
+        UserProfileRepository.updateStreakInfo(updatedStreakInfo)
     }
 
     fun updateStreak() {

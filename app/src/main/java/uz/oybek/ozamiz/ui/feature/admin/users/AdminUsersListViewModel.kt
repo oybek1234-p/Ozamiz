@@ -55,7 +55,7 @@ class AdminUsersListViewModel : ViewModel() {
 
         _isLoading.value = true
         viewModelScope.launch {
-            AdminRepository.getUsers(
+            AdminRepository.getUsersFromDatabase(
                 limit = 20,
                 lastUserId = lastUserId,
                 sortBy = UserSortType.RECENT_ACTIVITY,

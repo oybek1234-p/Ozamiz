@@ -33,7 +33,17 @@ data class NatijaUiState(
     val estimatedGoalDate: Long? = null,
     val error: String? = null,
     val bmi: Double? = null,
-    val bmiCategory: BmiCategory = BmiCategory.NONE
+    val bmiCategory: BmiCategory = BmiCategory.NONE,
+
+    val avgDailyDeficit: Int = 0,
+    val dailyFatGrams: Int = 0,
+    val weeklyPredictedLoss: String = "-0.5 kg",
+    val monthlyPredictedLoss: String = "-2.0 kg",
+    val goalDurationText: String = "",
+    val goalDateFormatted: String = "",
+    val isSurplus: Boolean = false,
+    val isGainGoal: Boolean = false,
+    val isPredictionLoading: Boolean = true
 )
 
 enum class BmiCategory {
@@ -42,7 +52,23 @@ enum class BmiCategory {
 
 class NatijaViewModel : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NatijaUiState())
+    private fun getInitialIsGainGoal(): Boolean {
+        val user = LocalUser.user
+        if (!user.goal.isNullOrBlank()) {
+            return user.goal == "gain_weight"
+        }
+        val targetW = user.targetWeight ?: 0.0
+        val currentW = if (user.weight > 0) user.weight else 70.0
+        return targetW > 0.0 && targetW > currentW
+    }
+
+    private val _uiState = MutableStateFlow(
+        NatijaUiState(
+            isGainGoal = getInitialIsGainGoal(),
+            weeklyPredictedLoss = if (getInitialIsGainGoal()) "+0.5 kg" else "-0.5 kg",
+            monthlyPredictedLoss = if (getInitialIsGainGoal()) "+2.0 kg" else "-2.0 kg"
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     fun loadData() {
@@ -88,10 +114,10 @@ class NatijaViewModel : ViewModel() {
         val user = LocalUser.user
         val validLogs = logs.filter { it.weightKg > 0 }
 
-        val currentW = if (user.weight > 0) user.weight else validLogs.lastOrNull()?.weightKg
-        val startW = if ((user.startWeight
+        val currentW = validLogs.lastOrNull()?.weightKg ?: (if (user.weight > 0) user.weight else null)
+        val startW = (if ((user.startWeight
                 ?: 0.0) > 0
-        ) user.startWeight else validLogs.firstOrNull()?.weightKg
+        ) user.startWeight else null) ?: validLogs.firstOrNull()?.weightKg
 
         // Calculate diff (comparison with previous log)
         val diff = if (validLogs.size >= 2) {
@@ -130,6 +156,7 @@ class NatijaViewModel : ViewModel() {
                     bmiCategory = bmiData.second
                 )
             }
+            calculateDeficitAndGoalForecast(currentW, targetWeight)
             return
         }
 
@@ -216,12 +243,47 @@ class NatijaViewModel : ViewModel() {
                 estimatedGoalDate = predictionDate,
                 error = null,
                 bmi = bmiData.first,
-                bmiCategory = bmiData.second
+                bmiCategory = bmiCategoryFromBmi(bmiData.first)
             )
+        }
+        
+        calculateDeficitAndGoalForecast(currentW, targetWeight)
+    }
+
+    private fun bmiCategoryFromBmi(bmi: Double): BmiCategory {
+        return when {
+            bmi <= 0 -> BmiCategory.NONE
+            bmi < 18.5 -> BmiCategory.UNDERWEIGHT
+            bmi < 25.0 -> BmiCategory.HEALTHY
+            bmi < 30.0 -> BmiCategory.OVERWEIGHT
+            else -> BmiCategory.OBESE
         }
     }
 
+    private fun calculateDeficitAndGoalForecast(currentW: Double?, targetW: Double?) {
+        viewModelScope.launch {
+            val currentUser = LocalUser.user
+            val prediction = uz.oybek.ozamiz.data.prediction.WeightPredictionRepository.calculatePrediction(
+                user = currentUser,
+                currentWeightOverride = currentW,
+                targetWeightOverride = targetW
+            )
 
+            _uiState.update {
+                it.copy(
+                    avgDailyDeficit = prediction.avgDailyDeficit,
+                    dailyFatGrams = prediction.dailyFatGrams,
+                    weeklyPredictedLoss = prediction.weeklyLossStr,
+                    monthlyPredictedLoss = prediction.monthlyLossStr,
+                    goalDurationText = prediction.remainingTimeStr,
+                    goalDateFormatted = prediction.targetDateFormatted,
+                    isSurplus = prediction.isSurplus,
+                    isGainGoal = prediction.isGainGoal,
+                    isPredictionLoading = false
+                )
+            }
+        }
+    }
 
     private fun calculateBmi(weight: Double, heightCm: Int): Pair<Double, BmiCategory> {
         if (weight <= 0 || heightCm <= 0) return 0.0 to BmiCategory.NONE

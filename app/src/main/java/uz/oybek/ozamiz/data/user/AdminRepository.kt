@@ -87,6 +87,44 @@ object AdminRepository {
         query.limit(limit.toLong()).get().await().toObjectsList<User>()
     }
 
+    suspend fun getUsersFromDatabase(
+        limit: Int = 20,
+        lastUserId: String? = null,
+        sortBy: UserSortType = UserSortType.RECENT_ACTIVITY,
+        premiumOnly: Boolean = false
+    ): Result<List<User>> = returnResult {
+        val snapshot = FirebasePaths.Database.users().get().await()
+        var list = snapshot.children.mapNotNull {
+            it.getValueSafe(User::class.java)
+        }
+
+        if (premiumOnly) {
+            list = list.filter { it.premium }
+        }
+
+        list = when (sortBy) {
+            UserSortType.MOST_POINTS -> list.sortedByDescending { it.scorePoints }
+            UserSortType.RECENT_ACTIVITY -> list.sortedByDescending { it.lastSeenTime }
+            UserSortType.MOST_ACTIVE -> list.sortedByDescending { it.scorePoints }
+            UserSortType.TOP_STREAK -> list.sortedByDescending { it.streakInfo?.currentStreak ?: 0 }
+        }
+
+        if (!lastUserId.isNullOrBlank()) {
+            val index = list.indexOfFirst { it.uid == lastUserId }
+            if (index != -1 && index + 1 < list.size) {
+                list = list.subList(index + 1, list.size)
+            } else if (index != -1) {
+                list = emptyList()
+            }
+        }
+
+        if (limit > 0 && list.size > limit) {
+            list = list.take(limit)
+        }
+
+        list
+    }
+
     suspend fun getPublicUser(userId: String): User? {
         if (userId.isBlank()) return null
         return try {

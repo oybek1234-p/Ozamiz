@@ -117,7 +117,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
                 val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
 
                 if (!postsViewModel.state.value.isLoading && !postsViewModel.state.value.isPaging && !postsViewModel.state.value.hasReachedEnd) {
-                    if (totalItemCount <= lastVisibleItem + 2) {
+                    if (lastVisibleItem + 5 >= totalItemCount) {
                         postsViewModel.loadPosts()
                     }
                 }

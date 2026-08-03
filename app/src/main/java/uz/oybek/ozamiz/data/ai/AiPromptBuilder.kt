@@ -124,7 +124,7 @@ object AiPromptBuilder {
         """.trimIndent()
 
         return """
-            Siz tajribali Diyetolog.Foydalanuvchi yuborgan ovqat rasmi yoki tavsifini tahlil qil.
+            Siz tajribali Diyetolog va Ovqat analitikisiz. Foydalanuvchi yuborgan ovqat rasmi yoki tavsifini tahlil qiling.
 
             ${userContext}
 
@@ -133,58 +133,62 @@ object AiPromptBuilder {
             🔴 JAVOB FORMATI:
             Faqat JSON formatida javob bering. Javobingizda boshqa hech qanday matn bo'lmasligi shart.
 
-            🟢 ANALIZ ALGORITMI:
-            1. Ovqat turi va tarkibini aniqlang, taqribiy kaloriya qiymatini hisoblang.
-            2. Miqdorini (porsiya, dona, gramm) taxmin qiling.
+            🟢 ANALIZ ALGORITMI VA QAT'IY QOIDALAR:
+            1. Rasmdagi va tavsifdagi DASTURXON YOKI LIKOPCHADAGI HAR BIR KO'RINGAN OVQATNI ALOHIDA-ALOHIDA ANIQLANG!
+               - Masalan, agar rasmda osh, non, salat, qatiq ko'rinsa yoki tavsifda bir nechta ovqat kiritilgan bo'lsa, ularning HAR BIRINI alohida "foodItems" ro'yxatiga kiriting!
+               - Ovqatlarni bittaga umumlashtirib qo'ymang va kaloriyani kamaytirib ko'rsatmang! Har bir ko'ringan taomni alohida tahlil qiling.
 
-            🔵 QOIDALAR:
-            - "name": Ovqat nomi va aniqlangan miqdori (Masalan: "Qo'y go'shtli kabob, 2 six").
-            - "calories": Taqribiy kaloriya qiymati (kkal) - ovqat kaloriyasini aniq hisoblang.
-            - "protein": Ovqat tarkibidagi oqsil miqdori (gramm, Double).
-            - "fat": Ovqat tarkibidagi yog' miqdori (gramm, Double).
-            - "carbs": Ovqat tarkibidagi uglevod miqdori (gramm, Double).
-            - "ingredients": Ovqat tarkibidagi asosiy mahsulotlar ro'yxati.
-            - "healthScore": 1 dan 10 gacha (1 - juda zararli, 10 - o'ta sog'lom).
-            - "limitBread": boolean (true, agar foydalanuvchi bugun jami 2 bo'lakdan oshiq non/hamir mahsuloti yegan bo'lsa yoki ushbu taomda ko'p miqdorda non bo'lsa)
-            - "sodaDrink": boolean (true, agar ovqat tarkibida gazli, shakarli, yoki shirin ichimliklar bo'lsa)
-            - "heavyDinner": boolean (true, faqat va faqat soat 21:00 dan (kechki soat 9:00 dan) keyin hazm bo'lishi qiyin, o'ta yog'li yoki og'ir ovqat yeyilgandagina true bering. Soat 21:00 dan oldin har qanday ovqat uchun bu maydon false bo'lishi shart!)
-            - "limitCalorie": boolean (true, agar kiritilgan kaloriya bilan foydalanuvchining bugungi kunlik kaloriya me'yori to'lgan bo'lsa)
-            - "waterBeforeMeal": boolean (true, agar keyingi asosiy ovqatlanishdan oldin 1 stakan iliq suv ichishni tavsiya qilsangiz)
-            - "cons": Ozishga to\'sqinlik qiluvchi omillar ro\'yxati (masalan, yuqori yog\', shakar, tuz yoki hamir/non ko\'pligi haqida qisqa faktlar. Masalan: ["2 burdadan ko\'p non yeyilgan (o\'rniga sabzavot tavsiya etiladi)", "Yug\'li ovqat ko\'p", "Shakar miqdori haddan tashqari ko\'p"]. Yomon so\'zlar, urishish yoki qattiq tavsiya ohangi bo\'lmasligi, faqat holat ko\'rsatilishi shart).
-            - "advice": Agar ovqatga bog'liq biron bir e'tiroz yoki foydaliroq qilish bo'yicha tavsiya/o'zgarish bo'lsa (masalan, non o'rniga sabzavot yeyish haqida yoki qisqartirish tavsiyasi), faqat shundagina tavsiyani yozing. Agar e'tiroz yoki tavsiya bo'lmasa, bu maydonni bo'sh qoldiring (null yoki bo'sh satr).
+            2. HAR BIR OVQAT UCHUN "foodItems" RO'YXATIDA QUYIDAGI MAYDONLARNI TOLDIRING:
+               - "name": Ovqat nomi (Masalan: "Osh", "Tandir non", "Achchiq-chuq salat").
+               - "amount": Taqribiy og'irligi yoki miqdori (Double, masalan: 200.0, 1.0).
+               - "unit": Miqdor birligi (String, masalan: "gramm", "bo'lak", "dona", "piyola").
+               - "calories": Ushbu muayyan ovqatning kaloriyasi (Int, kkal).
 
+            3. UMUMIY METRIKALAR ("foodItems" YIG'INDISI BO'LISHI SHART):
+               - "name": Umumlashgan taomlar sarlavhasi (Masalan: "Osh, Tandir non va Salat").
+               - "calories": Barcha "foodItems" kaloriyalarining ANIQ YIG'INDISI (Int, kkal).
+               - "protein": Jami oqsil miqdori (gramm, Double).
+               - "fat": Jami yog' miqdori (gramm, Double).
+               - "carbs": Jami uglevod miqdori (gramm, Double).
+               - "ingredients": Har bir ovqat nomlari ro'yxati (List<String>).
+               - "foodItems": Har bir alohida ovqat ob'ektlari ro'yxati (List of AnalyzedIngredient).
+               - "healthScore": 1 dan 10 gacha (1 - juda zararli, 10 - o'ta sog'lom).
+               - "limitBread": boolean (true, agar foydalanuvchi bugun jami 2 bo'lakdan oshiq non/hamir mahsuloti yegan bo'lsa yoki ushbu taomda ko'p miqdorda non bo'lsa)
+               - "sodaDrink": boolean (true, agar ovqat tarkibida gazli, shakarli, yoki shirin ichimliklar bo'lsa)
+               - "heavyDinner": boolean (true, faqat va faqat soat 21:00 dan keyin hazm bo'lishi qiyin, o'ta yog'li yoki og'ir ovqat yeyilgandagina true bering. Soat 21:00 dan oldin false bo'lsin!)
+               - "limitCalorie": boolean (true, agar kiritilgan kaloriya bilan kunlik kaloriya me'yori to'lgan bo'lsa)
+               - "waterBeforeMeal": boolean (true, agar ovqatdan oldin 1 stakan iliq suv ichishni tavsiya qilsangiz)
+               - "cons": Ozishga to'sqinlik qiluvchi omillar ro'yxati.
+               - "advice": Agar ovqatga bog'liq foydaliroq qilish bo'yicha tavsiya bo'lsa, qisqa 1-2 gap matn yozing.
 
-            ADVICE UCHUN QAT'IY QOIDALAR (BUZISH TAQIQLANADI):
-            1. Javob juda qisqa va lo'nda bo'lishi shart (maksimal 1-2 tagacha qisqa gap)
-            2. Masalan: "Bilasizmi, bu ovqatni yanada foydaliroq qilish mumkin! Agar 2 ta non o'rniga 1 ta non yeb, yoniga 1 piyola qatiq va ozgina pomidor-bodring qo'shsangiz:\n✅ Qorningiz tezroq to'yadi.\n✅ Kaloriya me'yordan oshmaydi.\n✅ Ertalab o'zingizni yengil his qilasiz.\nShunday o'zgartirish kiritaylikmi?"
-            3. Matnda mutlaqo Markdown belgilarini (*, **, #, `) ishlatma. Faqat toza matn qaytar. AI belgilari ko'rinmasligi kerak.
-            4. Hurmat qil, sizlab gapir!, vaziyatga qarab kam holatlarda emoji qosh
-            5. Ismi bilan har doim chaqirma, bazida faqat, bazida opa, oka, yoki umuman yozma.
-            6. TAQIQLAR: Ilmiy so'zlarni (protein, uglevod) ishlatmang, xalq tushunadigan so'zlarni asil holicha ishlating (go'sht, sariyog')
-            8. O'zbeklar kam yeydigan, qimmat, ololmaydigan ovqatlarni aytma(Gosht, baliq)
-            9. Asosan shu ovqat haqida gapir, foydasi, zarari, tavsiya(balki)
-            10. Bu ovqat yetarli emas, bugung kam ovqat yebsiz dema!
-      
-         
+             🔴 FOYDALANUVCHI YOZGAN MATNLI IZOH (HINT/TAVSIF) ANIQ USTUNLIKKA EGA:
+             - Agar foydalanuvchi matnli izoh kiritgan bo'lsa (masalan: "kapuchino", "osh", "100g mol go'shti", "kola", "3 ta tuxum"), USHBU MATN RASMDAN USTUN DURADI VA U 100% ANIQ HAQIQAT HISOBLANADI!
+             - Rasmda faqat stakan, kosacha, idish yoki tushunarsiz shakl ko'rinsa ham, foydalanuvchi matnda nimani yozgan bo'lsa (masalan stakandagi ichimlikni "kapuchino" degan bo'lsa), uni oddiy suv emas, AYNAN KAPUCHINO deb tahlil qiling va kaloriyasini kapuchinoga mos chiqarib bering! Foydalanuvchi matnini e'tiborsiz qoldirish MUTLAQO TAQIQLANADI!
+
+             ADVICE UCHUN QAT'IY QOIDALAR:
+             1. Javob juda qisqa va lo'nda bo'lishi shart (maksimal 1-2 tagacha qisqa gap)
+             2. Matnda mutlaqo Markdown belgilarini (*, **, #, `) ishlatma. Faqat toza matn qaytar.
+             3. Hurmat qil, sizlab gapir!
+             4. O'zbeklar kam yeydigan, qimmat ovqatlarni aytma.
         """.trimIndent()
     }
 
     fun buildFoodAnalyzerPrompt(
         mealTime: String,
-        foodName: String = "",
+        userDescription: String = "",
         photo: Boolean = false,
         audio: Boolean = false
     ): String {
         return StringBuilder().apply {
-            if (foodName.isNotEmpty()) {
-                append("Ovqat: $foodName")
+            if (userDescription.isNotBlank()) {
+                append("🔴 FOYDALANUVCHI YOZGAN TAVSIF/HINT (USHBU MATN RASMDAN USTUN VA 100% ANIQ HAQIQATDIR): \"$userDescription\"\n")
             }
-            append(" Vaqti: $mealTime")
+            append("Vaqti/Mahal: $mealTime.")
             if (photo) {
-                append(" Rasmni tahlil qil")
+                append(" Iltimos, rasmni va kiritilgan matnni birgalikda tahlil qiling.")
             }
             if (audio) {
-                append(" Audioni tahlil qil")
+                append(" Audioni tahlil qiling.")
             }
         }.toString()
     }

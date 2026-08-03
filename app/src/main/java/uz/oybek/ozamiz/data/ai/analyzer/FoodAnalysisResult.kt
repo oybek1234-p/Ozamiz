@@ -59,6 +59,7 @@ data class FoodAnalysisResult(
     val fat: Double? = null,
     val carbs: Double? = null,
     val ingredients: List<String>? = null,
+    val foodItems: List<AnalyzedIngredient>? = null,
     val healthScore: Int? = null,
     val pros: List<String>? = null,
     val cons: List<String>? = null,
@@ -69,4 +70,14 @@ data class FoodAnalysisResult(
     val heavyDinner: Boolean? = null,
     val limitCalorie: Boolean? = null,
     val waterBeforeMeal: Boolean? = null
-)
+) {
+    fun getNormalizedFoodItems(): List<AnalyzedIngredient> {
+        if (!foodItems.isNullOrEmpty()) return foodItems
+        if (!ingredients.isNullOrEmpty()) {
+            return ingredients.map { itemStr ->
+                AnalyzedIngredient(name = itemStr, calories = null, amount = null, unit = null)
+            }
+        }
+        return emptyList()
+    }
+}

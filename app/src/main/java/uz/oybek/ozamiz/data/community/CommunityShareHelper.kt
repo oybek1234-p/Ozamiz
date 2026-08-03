@@ -15,7 +15,8 @@ object CommunityShareHelper {
 
     fun shareFoodLogIfNeeded(foodLog: FoodLog) {
         val score = foodLog.healthLevel ?: 0
-        if (score < 9) return
+        val photo = foodLog.photoUrl.orEmpty()
+        if (score < 8 || photo.isBlank()) return
 
         val user = UserProfileRepository.user
         val userId = Firebase.auth.currentUser?.uid ?: return
@@ -39,7 +40,8 @@ object CommunityShareHelper {
                 verified = true,
                 isVisible = true,
                 type = PostType.FOOD,
-                isPremiumUser = PremiumUtils.isPremium(user)
+                isPremiumUser = PremiumUtils.isPremium(user),
+                mealType = foodLog.mealType
             )
             CommunityPostRepository.addPost(post)
         }

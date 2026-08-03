@@ -192,9 +192,10 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             when (bundle.getString(FoodCameraFragment.RESULT_ACTION)) {
                 FoodCameraFragment.ACTION_PHOTO -> {
                     bundle.getString(FoodCameraFragment.RESULT_URI)?.let { uriString ->
+                        val descriptionText = bundle.getString(FoodCameraFragment.RESULT_DESCRIPTION) ?: ""
                         navigateToResult(
                             imageUri = Uri.parse(uriString),
-                            description = "",
+                            description = descriptionText,
                             meal = currentMeal()
                         )
                     }

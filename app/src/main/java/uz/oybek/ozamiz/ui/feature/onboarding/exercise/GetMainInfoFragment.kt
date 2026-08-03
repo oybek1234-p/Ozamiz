@@ -2,6 +2,7 @@ package uz.oybek.ozamiz.ui.feature.onboarding.exercise
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -11,14 +12,16 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.chip.Chip
+import com.google.android.material.color.MaterialColors
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.user.model.info.Gender
 import uz.oybek.ozamiz.data.user.model.info.UserActivityLevel
 import uz.oybek.ozamiz.databinding.GetInfoMainFragmentBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import java.util.Date
+import kotlin.math.roundToInt
 
 class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
@@ -26,8 +29,11 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
     private var selectedGender: Int = -1
     private val selectedProblems = mutableListOf<String>()
     private var isNewUser: Boolean = true
-    private var activityLevelSelected: String = ""
+    private var activityLevelSelected: String = UserActivityLevel.LIGHTLY_ACTIVE.name
     private var manzilSelected: String = "Uzbekistan"
+
+    private var selectedGoal: String = "lose_weight"
+    private var selectedPace: Int = 500
 
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
@@ -64,10 +70,10 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
         heightLay.editText?.setText(if (user.height > 0) user.height.toString() else "")
         weightInput.editText?.setText(
-            if (user.weight > 0) String.format("%.1f", user.weight).replace(',', '.') else ""
+            if (user.weight > 0) String.format(java.util.Locale.US, "%.1f", user.weight) else ""
         )
         targetWeightView.editText?.setText(user.targetWeight?.let {
-            String.format("%.1f", it).replace(',', '.')
+            String.format(java.util.Locale.US, "%.1f", it)
         } ?: "")
 
         val activityAdapter = ArrayAdapter(
@@ -84,6 +90,7 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             }
             onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
                 activityLevelSelected = UserActivityLevel.entries[position].name
+                recalculate(bind)
             }
         }
 
@@ -93,34 +100,211 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
         selectedProblems.clear()
         user.problems?.let { selectedProblems.addAll(it) }
+
+        selectedGoal = if (!user.goal.isNullOrBlank()) user.goal else {
+            val targetW = user.targetWeight ?: 65.0
+            if (targetW > user.weight) "gain_weight" else "lose_weight"
+        }
+        selectedPace = if (selectedGoal == "gain_weight") 400 else 500
+
+        updateGoalCardsUI(bind)
+        updatePaceCardsUI(bind)
+        recalculate(bind)
+
+        val targetCals = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
+        bind.editCalories.setText(targetCals.toString())
+        bind.editProtein.setText(user.targetProtein.toString())
+        bind.editFat.setText(user.targetFat.toString())
+        bind.editCarbs.setText(user.targetCarbs.toString())
     }
 
     private fun setupListeners(bind: GetInfoMainFragmentBinding) = with(bind) {
         male.setOnClickListener {
             selectedGender = Gender.MALE
-            updateGenderSelectionUI(this)
-            calculateAndDisplayIdealWeightIfNeeded(this)
+            updateGenderSelectionUI(bind)
+            calculateAndDisplayIdealWeightIfNeeded(bind)
+            recalculate(bind)
         }
         female.setOnClickListener {
             selectedGender = Gender.FEMALE
-            updateGenderSelectionUI(this)
-            calculateAndDisplayIdealWeightIfNeeded(this)
+            updateGenderSelectionUI(bind)
+            calculateAndDisplayIdealWeightIfNeeded(bind)
+            recalculate(bind)
         }
 
-        heightLay.editText?.doAfterTextChanged { calculateAndDisplayIdealWeightIfNeeded(this) }
-        weightInput.editText?.doAfterTextChanged { validateTargetWeight(this) }
-        targetWeightView.editText?.doAfterTextChanged { validateTargetWeight(this) }
+        heightLay.editText?.doAfterTextChanged {
+            calculateAndDisplayIdealWeightIfNeeded(bind)
+            recalculate(bind)
+        }
+        weightInput.editText?.doAfterTextChanged {
+            validateTargetWeight(bind)
+            recalculate(bind)
+        }
+        targetWeightView.editText?.doAfterTextChanged {
+            validateTargetWeight(bind)
+            recalculate(bind)
+        }
+        ageView.editText?.doAfterTextChanged {
+            recalculate(bind)
+        }
 
-        chipGroup.setOnCheckedStateChangeListener { group, _ ->
-            selectedProblems.clear()
-            group.checkedChipIds.forEach { chipId ->
-                val chip = group.findViewById<Chip>(chipId)
-                chip.tag?.toString()?.let { selectedProblems.add(it) }
-            }
+        // Goal Cards (Ozish / Semirish)
+        cardLoseWeight.setOnClickListener {
+            selectedGoal = "lose_weight"
+            selectedPace = 500
+            updateGoalCardsUI(bind)
+            updatePaceCardsUI(bind)
+            recalculate(bind)
+        }
+        cardGainWeight.setOnClickListener {
+            selectedGoal = "gain_weight"
+            selectedPace = 400
+            updateGoalCardsUI(bind)
+            updatePaceCardsUI(bind)
+            recalculate(bind)
+        }
+
+        // Speed Cards (Normal / Tezroq)
+        cardPaceNormal.setOnClickListener {
+            selectedPace = if (selectedGoal == "gain_weight") 400 else 500
+            updatePaceCardsUI(bind)
+            recalculate(bind)
+        }
+        cardPaceFast.setOnClickListener {
+            selectedPace = if (selectedGoal == "gain_weight") 600 else 700
+            updatePaceCardsUI(bind)
+            recalculate(bind)
         }
 
         save.setOnClickListener {
             handleSaveClick(bind)
+        }
+    }
+
+    private fun updateGoalCardsUI(bind: GetInfoMainFragmentBinding) {
+        val primaryColor = MaterialColors.getColor(requireContext(), androidx.appcompat.R.attr.colorPrimary, 0)
+        val outlineColor = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOutlineVariant, 0)
+        val cardBgLowest = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerLowest, 0)
+        val primaryContainer = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorPrimaryContainer, 0)
+
+        val isLose = selectedGoal == "lose_weight"
+
+        bind.cardLoseWeight.strokeWidth = if (isLose) 2.dpToPx() else 1.dpToPx()
+        bind.cardLoseWeight.strokeColor = if (isLose) primaryColor else outlineColor
+        bind.cardLoseWeight.setCardBackgroundColor(if (isLose) primaryContainer else cardBgLowest)
+
+        bind.cardGainWeight.strokeWidth = if (!isLose) 2.dpToPx() else 1.dpToPx()
+        bind.cardGainWeight.strokeColor = if (!isLose) primaryColor else outlineColor
+        bind.cardGainWeight.setCardBackgroundColor(if (!isLose) primaryContainer else cardBgLowest)
+    }
+
+    private fun updatePaceCardsUI(bind: GetInfoMainFragmentBinding) {
+        val primaryColor = MaterialColors.getColor(requireContext(), androidx.appcompat.R.attr.colorPrimary, 0)
+        val outlineColor = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOutlineVariant, 0)
+        val cardBgUnselected = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainer, 0)
+        val primaryContainer = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorPrimaryContainer, 0)
+
+        val isGain = selectedGoal == "gain_weight"
+        val isNormalSelected = selectedPace == 500 || selectedPace == 400
+
+        bind.textSpeedSectionTitle.text = if (isGain) "Semirish tezligi" else "Ozish tezligi"
+
+        // Normal card
+        bind.cardPaceNormal.strokeWidth = if (isNormalSelected) 2.dpToPx() else 1.dpToPx()
+        bind.cardPaceNormal.strokeColor = if (isNormalSelected) primaryColor else outlineColor
+        bind.cardPaceNormal.setCardBackgroundColor(if (isNormalSelected) primaryContainer else cardBgUnselected)
+        bind.iconPaceNormalCheck.isVisible = isNormalSelected
+
+        // Fast card
+        bind.cardPaceFast.strokeWidth = if (!isNormalSelected) 2.dpToPx() else 1.dpToPx()
+        bind.cardPaceFast.strokeColor = if (!isNormalSelected) primaryColor else outlineColor
+        bind.cardPaceFast.setCardBackgroundColor(if (!isNormalSelected) primaryContainer else cardBgUnselected)
+        bind.iconPaceFastCheck.isVisible = !isNormalSelected
+
+        if (isGain) {
+            bind.textPaceNormalTitle.text = "Normal semirish (+400 kkal)"
+            bind.textPaceFastTitle.text = "Tezroq semirish (+600 kkal)"
+        } else {
+            bind.textPaceNormalTitle.text = "Normal ozish (-500 kkal)"
+            bind.textPaceFastTitle.text = "Tezroq ozish (-700 kkal)"
+        }
+    }
+
+    private fun recalculate(bind: GetInfoMainFragmentBinding) {
+        val curW = bind.weightInput.editText?.text?.toString()?.replace(',', '.')?.toDoubleOrNull() ?: LocalUser.user.weight
+        val tarW = bind.targetWeightView.editText?.text?.toString()?.replace(',', '.')?.toDoubleOrNull() ?: (LocalUser.user.targetWeight ?: 65.0)
+        val h = bind.heightLay.editText?.text?.toString()?.toIntOrNull() ?: LocalUser.user.height
+        val a = bind.ageView.editText?.text?.toString()?.toIntOrNull() ?: LocalUser.user.age
+
+        val tempUser = User(
+            gender = if (selectedGender != -1) selectedGender else Gender.MALE,
+            weight = if (curW > 0) curW else 70.0,
+            height = if (h > 0) h else 170,
+            age = if (a > 0) a else 25,
+            activityLevel = activityLevelSelected,
+            goal = selectedGoal
+        )
+
+        val tdee = DietController.calculateTDEE(tempUser).roundToInt()
+
+        val isGain = selectedGoal == "gain_weight"
+        val deltaCals = if (selectedPace > 0) selectedPace else (if (isGain) 400 else 500)
+
+        val targetCals = if (isGain) {
+            tdee + deltaCals
+        } else {
+            maxOf(tdee - deltaCals, if (tempUser.gender == Gender.MALE) 1500 else 1200)
+        }
+
+        bind.editCalories.setText(targetCals.toString())
+
+        val macros = if (isGain) {
+            DietController.calculateMacrosByPercent(targetCals, 0.25, 0.25, 0.50)
+        } else {
+            DietController.calculateMacrosByPercent(targetCals, 0.35, 0.25, 0.40)
+        }
+
+        bind.editProtein.setText(macros.protein.toString())
+        bind.editFat.setText(macros.fat.toString())
+        bind.editCarbs.setText(macros.carbs.toString())
+
+        val weeklyKg = if (isGain) {
+            if (deltaCals == 600) 0.6 else 0.4
+        } else {
+            if (deltaCals == 700) 0.7 else 0.5
+        }
+
+        val (weeklyStr, monthlyStr) = if (isGain) {
+            if (deltaCals == 600) Pair("0.6", "2.4") else Pair("0.4", "1.6")
+        } else {
+            if (deltaCals == 700) Pair("0.7", "2.8") else Pair("0.5", "1.8")
+        }
+
+        val durationStr = getDurationText(curW, tarW, weeklyKg)
+
+        if (isGain) {
+            bind.textEnergySummary.text =
+                "Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi, $deltaCals kkal ortiqcha yesak vazn yig'ish boshlanadi. Natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg semirasiz. Maqsadga esa $durationStr erishasiz."
+        } else {
+            val deficitAmount = tdee - targetCals
+            val defVal = if (deficitAmount > 0) deficitAmount else deltaCals
+            bind.textEnergySummary.text =
+                "Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi, $defVal kkal kamroq ovqat yeymiz natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg ozasiz. Maqsadga esa $durationStr erishasiz."
+        }
+    }
+
+    private fun getDurationText(currentWeight: Double, targetWeight: Double, weeklyKg: Double): String {
+        val diff = kotlin.math.abs(currentWeight - targetWeight)
+        if (diff <= 0.1 || weeklyKg <= 0.0) return "erishgansiz"
+        val weeksNeeded = diff / weeklyKg
+        val daysNeeded = (weeksNeeded * 7).roundToInt()
+
+        val months = daysNeeded / 30
+        val remainingDays = daysNeeded % 30
+        return when {
+            months > 0 && remainingDays > 0 -> "$months oy $remainingDays kunda"
+            months > 0 -> "$months oyda"
+            else -> "$daysNeeded kunda"
         }
     }
 
@@ -144,7 +328,7 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
         val age = ageStr?.toIntOrNull()
         if (age == null || age <= 0 || age > 120) {
-            showToast("Iltimos, yoshingizni to'g'ri kiriting")
+            showToast("Iltimos, yoshingizni to'g me'yoriy to'g'ri kiriting")
             return
         }
 
@@ -174,6 +358,10 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             return
         }
 
+        val calories = bind.editCalories.text.toString().toIntOrNull() ?: 0
+        val protein = bind.editProtein.text.toString().toIntOrNull() ?: 0
+        val fat = bind.editFat.text.toString().toIntOrNull() ?: 0
+        val carbs = bind.editCarbs.text.toString().toIntOrNull() ?: 0
 
         viewModel.saveUserInfoAndGeneratePlan(
             name = name,
@@ -187,6 +375,14 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             activityLevel = activityLevelSelected,
             manzil = manzilSelected
         )
+
+        uz.oybek.ozamiz.data.user.UserProfileRepository.updateUser {
+            if (calories > 0) this.targetCalories = calories
+            if (protein > 0) this.targetProtein = protein
+            if (fat > 0) this.targetFat = fat
+            if (carbs > 0) this.targetCarbs = carbs
+            this.goal = selectedGoal
+        }
     }
 
     private fun calculateAndDisplayIdealWeightIfNeeded(bind: GetInfoMainFragmentBinding) {
@@ -208,10 +404,21 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
     }
 
     private fun updateGenderSelectionUI(bind: GetInfoMainFragmentBinding) {
+        val primaryColor = MaterialColors.getColor(requireContext(), androidx.appcompat.R.attr.colorPrimary, 0)
+        val outlineColor = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOutlineVariant, 0)
+        val cardBgLowest = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerLowest, 0)
+        val primaryContainer = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorPrimaryContainer, 0)
+
         val maleSelected = selectedGender == Gender.MALE
         val femaleSelected = selectedGender == Gender.FEMALE
-        bind.male.strokeWidth = if (maleSelected) 3.dpToPx() else 1.dpToPx()
-        bind.female.strokeWidth = if (femaleSelected) 3.dpToPx() else 1.dpToPx()
+
+        bind.male.strokeWidth = if (maleSelected) 2.dpToPx() else 1.dpToPx()
+        bind.male.strokeColor = android.content.res.ColorStateList.valueOf(if (maleSelected) primaryColor else outlineColor)
+        bind.male.backgroundTintList = android.content.res.ColorStateList.valueOf(if (maleSelected) primaryContainer else cardBgLowest)
+
+        bind.female.strokeWidth = if (femaleSelected) 2.dpToPx() else 1.dpToPx()
+        bind.female.strokeColor = android.content.res.ColorStateList.valueOf(if (femaleSelected) primaryColor else outlineColor)
+        bind.female.backgroundTintList = android.content.res.ColorStateList.valueOf(if (femaleSelected) primaryContainer else cardBgLowest)
     }
 
     private fun observeViewModel(bind: GetInfoMainFragmentBinding) {
@@ -222,11 +429,9 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
         viewModel.idealWeightRangeText.observe(viewLifecycleOwner) { rangeText ->
             val hasValue = rangeText != null
-            bind.idealWeightCon.isVisible = hasValue
-            bind.textViewIdealWeightInfo.isVisible = hasValue
             bind.textViewIdealWeightRange.isVisible = hasValue
             if (hasValue) {
-                bind.textViewIdealWeightRange.text = rangeText
+                bind.textViewIdealWeightRange.text = "Sizning ideal vazningiz: $rangeText"
             }
             validateTargetWeight(bind)
         }

@@ -85,8 +85,9 @@ object UserProfileRepository {
     private fun saveUserNetworkForce(user: User) {
         if (user.valid) {
             val children = UserMapper.toMap(user)
+            val publicChildren = UserMapper.toPublicMap(user)
             FirebasePaths.Database.user(user.uid).updateChildren(children)
-            FirebasePaths.Firestore.publicUser(user.uid).set(children, com.google.firebase.firestore.SetOptions.merge())
+            FirebasePaths.Firestore.publicUser(user.uid).set(publicChildren)
         }
     }
 
@@ -168,13 +169,46 @@ object UserProfileRepository {
     fun updateRegisterDate(value: Long) =
         updateField(User::registerDate.name, value) { registerDate = value }
 
+    private val PUBLIC_FIELDS = setOf(
+        User::uid.name,
+        User::name.name,
+        User::avatarUrl.name,
+        User::scorePoints.name,
+        User::lastSeenTime.name,
+        User::premium.name,
+        User::isPremiumYearly.name,
+        User::isMonthlyPremium.name,
+        User::gender.name,
+        User::region.name,
+        User::registerDate.name,
+        User::height.name,
+        User::weight.name,
+        User::startWeight.name,
+        User::targetWeight.name,
+        User::age.name,
+        User::goal.name,
+        User::targetCalories.name,
+        User::streakInfo.name
+    )
+
     private fun <T> updateField(fieldName: String, value: T, work: User.() -> Unit) {
         if (!user.valid) return
         work(user)
         LocalUser.saveUser()
         runCatching {
             FirebasePaths.Database.user(user.uid).child(fieldName).setValue(value)
-            FirebasePaths.Firestore.publicUser(user.uid).set(mapOf(fieldName to value), com.google.firebase.firestore.SetOptions.merge())
+            if (fieldName in PUBLIC_FIELDS) {
+                val publicValue = if (fieldName == User::streakInfo.name && value is StreakInfo) {
+                    mapOf(
+                        StreakInfo::currentStreak.name to value.currentStreak,
+                        StreakInfo::bestStreak.name to value.bestStreak,
+                        StreakInfo::lastActionDate.name to value.lastActionDate,
+                        StreakInfo::activeDays.name to value.activeDays,
+                        StreakInfo::streakGoal.name to value.streakGoal
+                    )
+                } else value
+                FirebasePaths.Firestore.publicUser(user.uid).set(mapOf(fieldName to publicValue), com.google.firebase.firestore.SetOptions.merge())
+            }
         }
         userListeners.forEach { it.invoke(user) }
     }

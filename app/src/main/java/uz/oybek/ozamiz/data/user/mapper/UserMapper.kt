@@ -10,6 +10,39 @@ import uz.oybek.ozamiz.util.handleException
 
 object UserMapper {
 
+    fun toPublicMap(u: User): Map<String, Any?> {
+        return mapOf(
+            User::uid.name to u.uid,
+            User::name.name to u.name,
+            User::avatarUrl.name to u.avatarUrl,
+            User::scorePoints.name to u.scorePoints,
+            User::lastSeenTime.name to u.lastSeenTime,
+            User::premium.name to u.premium,
+            User::isPremiumYearly.name to u.isPremiumYearly,
+            User::isMonthlyPremium.name to u.isMonthlyPremium,
+            User::gender.name to u.gender,
+            User::region.name to u.region,
+            User::registerDate.name to u.registerDate,
+            User::height.name to u.height,
+            User::weight.name to u.weight,
+            User::startWeight.name to u.startWeight,
+            User::targetWeight.name to u.targetWeight,
+            User::age.name to u.age,
+            User::goal.name to u.goal,
+            User::targetCalories.name to u.targetCalories,
+
+            User::streakInfo.name to u.streakInfo?.let { streak ->
+                mapOf(
+                    StreakInfo::currentStreak.name to streak.currentStreak,
+                    StreakInfo::bestStreak.name to streak.bestStreak,
+                    StreakInfo::lastActionDate.name to streak.lastActionDate,
+                    StreakInfo::activeDays.name to streak.activeDays,
+                    StreakInfo::streakGoal.name to streak.streakGoal
+                )
+            }
+        )
+    }
+
     fun toMap(u: User): Map<String, Any?> {
         return mapOf(
             User::uid.name to u.uid,
