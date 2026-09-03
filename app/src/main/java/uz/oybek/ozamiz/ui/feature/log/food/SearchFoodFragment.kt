@@ -1,33 +1,30 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.view.animation.OvershootInterpolator
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.ads.AdsConfig
-import uz.oybek.ozamiz.data.ads.AdsManager
-import uz.oybek.ozamiz.data.food.model.FoodDatabase
+import uz.oybek.ozamiz.data.food.limit.FoodLimitManager
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import java.util.Date
@@ -38,8 +35,12 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private val adapter by lazy {
         FoodSearchAdapter(
-            onAddClick = { food, btn, progress -> directAdd(food, btn, progress) },
-            onItemClick = { showSelectionSheet(it) }
+            onAddClick = { food, btn, progress ->
+                directAdd(food, btn, progress)
+            },
+            onItemClick = { food ->
+                showSelectionSheet(food)
+            }
         )
     }
 
@@ -49,8 +50,10 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            mealType = it.getString(ARG_MEAL_TYPE, "")
-            timestamp = it.getLong(ARG_TIMESTAMP, System.currentTimeMillis())
+            val rawTs = it.getLong(ARG_TIMESTAMP, -1L)
+            timestamp = if (rawTs > 0) rawTs else System.currentTimeMillis()
+            val rawMeal = it.getString(ARG_MEAL_TYPE) ?: it.getString("meal")
+            mealType = uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(rawMeal, timestamp)
         }
     }
 
@@ -66,23 +69,23 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
     }
 
     private fun loadBanner() {
-        if (UserProfileRepository.user.isPremium()) {
-            binding.bannerContainer.visibility = View.GONE
-            return
-        }
-        val bannerView = AdsManager.createBannerView(
-            requireContext(),
-            AdsConfig.BANNER_LOG_FOOD
-        )
-        binding.bannerContainer.addView(bannerView)
+        binding.bannerContainer.visibility = View.GONE
     }
 
     private fun setupUI(bind: FragmentSearchFoodBinding) = with(bind) {
         toolbarSearchFood.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
 
+        recyclerSearchResults.layoutManager = SafeLinearLayoutManager(requireContext())
         recyclerSearchResults.adapter = adapter
+
+        adapter.addLoadStateListener { loadState ->
+            val isLoading = loadState.refresh is LoadState.Loading
+            bind.progressSearch.isVisible = isLoading
+            val isEmpty = loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
+            bind.layoutEmptyState.isVisible = isEmpty
+        }
 
         inputSearchFood.addTextChangedListener {
             viewModel.searchFoods(it.toString())
@@ -98,21 +101,17 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private fun observeData(bind: FragmentSearchFoodBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.state.collectLatest { state ->
-                adapter.submitList(state.searchResults)
-                bind.progressSearch.isVisible = state.isSearching
-                bind.layoutEmptyState.isVisible =
-                    !state.isSearching && state.searchResults.isEmpty() && state.query.isNotBlank()
+            viewModel.foodPagingFlow.collectLatest { pagingData ->
+                adapter.submitData(pagingData)
+                bind.recyclerSearchResults.scrollToPosition(0)
+            }
+        }
 
-                val showCount =
-                    !state.isSearching && (state.query.isNotBlank() || state.searchResults.isNotEmpty())
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.searchResultCount.collectLatest { count ->
+                val showCount = count != null && count > 0
                 bind.textViewSearchResultsCount.isVisible = showCount
-                if (showCount) {
-                    val count = if (state.query.isBlank()) {
-                        FoodDatabase.allFoods.size
-                    } else {
-                        state.searchResults.size
-                    }
+                if (showCount && count != null) {
                     bind.textViewSearchResultsCount.text =
                         bind.root.context.getString(R.string.search_foods_count_format, count)
                 }
@@ -130,8 +129,13 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
             val defaultServing = foodItem.servingSizes.firstOrNull()
             val weight = defaultServing?.grams ?: 100.0
-            val quantityDescription =
-                if (defaultServing != null) "1 ${defaultServing.description}" else "100 g"
+            val weightInt = weight.toInt()
+            val quantityDescription = when {
+                defaultServing == null -> "${weightInt} g"
+                defaultServing.description.contains("g)", ignoreCase = true) || defaultServing.description.equals("100 g", ignoreCase = true) -> defaultServing.description
+                defaultServing.description.equals("gramm", ignoreCase = true) -> "${weightInt} g"
+                else -> "1 ${defaultServing.description.lowercase()}"
+            }
 
             val calories = (foodItem.caloriesPer100g * weight / 100).toInt()
             val protein = (foodItem.proteinPer100g * weight / 100)
@@ -162,24 +166,16 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private fun animateClick(view: View) {
         view.animate()
-            .scaleX(0.5f)
-            .scaleY(0.5f)
-            .setInterpolator(AccelerateDecelerateInterpolator())
-            .setDuration(200)
+            .scaleX(0.92f)
+            .scaleY(0.92f)
+            .setInterpolator(DecelerateInterpolator())
+            .setDuration(100)
             .withEndAction {
                 view.animate()
-                    .scaleX(1.4f)
-                    .scaleY(1.4f)
-                    .setInterpolator(OvershootInterpolator(3.0f))
-                    .setDuration(400)
-                    .withEndAction {
-                        view.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .setInterpolator(DecelerateInterpolator())
-                            .setDuration(400)
-                            .start()
-                    }
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setInterpolator(DecelerateInterpolator())
+                    .setDuration(150)
                     .start()
             }
             .start()
@@ -203,6 +199,21 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
         const val ARG_TIMESTAMP = "timestamp"
 
         fun navigate(
+            fragment: BaseFragment<*>,
+            mealType: String,
+            timestamp: Long
+        ) {
+            val bundle = Bundle().apply {
+                putString(ARG_MEAL_TYPE, mealType)
+                putLong(ARG_TIMESTAMP, timestamp)
+            }
+            fragment.navigate(
+                R.id.action_logFoodFragment_to_searchFoodFragment,
+                bundle
+            )
+        }
+
+        fun navigate(
             navController: NavController,
             mealType: String,
             timestamp: Long
@@ -211,10 +222,24 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
                 putString(ARG_MEAL_TYPE, mealType)
                 putLong(ARG_TIMESTAMP, timestamp)
             }
-            navController.navigate(
-                R.id.action_logFoodFragment_to_searchFoodFragment,
-                bundle
-            )
+            try {
+                navController.navigate(
+                    R.id.action_logFoodFragment_to_searchFoodFragment,
+                    bundle
+                )
+            } catch (e: Exception) {
+                // ignore
+            }
+        }
+    }
+}
+
+private class SafeLinearLayoutManager(context: android.content.Context) : LinearLayoutManager(context) {
+    override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
+        try {
+            super.onLayoutChildren(recycler, state)
+        } catch (e: IndexOutOfBoundsException) {
+            Log.e("SafeLayoutManager", "IndexOutOfBoundsException in RecyclerView: ${e.message}")
         }
     }
 }

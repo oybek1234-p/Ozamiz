@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.storage
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +11,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.data.utils.recordException
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
@@ -29,37 +29,42 @@ object ImageUploader {
     ): String? = withContext(Dispatchers.IO) {
         val originalFile = fromUri(uri) ?: return@withContext null
 
-        val bitmap = if (shouldBlurFaces) {
-            val originalBitmap = BitmapFactory.decodeFile(originalFile.absolutePath)
-            uz.oybek.ozamiz.util.FaceBlurrer.blurFaces(originalBitmap)
-        } else {
-            null
+        // 1. Birinchi navbatda suratni to'liq compress qilamiz (500x500 WebP)
+        val compressedFile = ImageCompressor.compressImageFileDirect(originalFile) ?: originalFile
+
+        // 2. Keyin compress bo'lgan yengil suratni FaceBlurrer'ga beramiz
+        if (shouldBlurFaces) {
+            try {
+                val bitmap = BitmapFactory.decodeFile(compressedFile.absolutePath)
+                if (bitmap != null) {
+                    val blurredBitmap = uz.oybek.ozamiz.util.FaceBlurrer.blurFaces(bitmap)
+                    val out = FileOutputStream(compressedFile)
+                    blurredBitmap.compress(Bitmap.CompressFormat.WEBP, 85, out)
+                    out.close()
+                    if (blurredBitmap != bitmap) {
+                        bitmap.recycle()
+                    }
+                    blurredBitmap.recycle()
+                }
+            } catch (e: Exception) {
+                recordException(e)
+            }
         }
 
-        val fileToCompress = if (bitmap != null) {
-            val blurredFile = File(appContext.cacheDir, "blurred_${System.currentTimeMillis()}.webp")
-            val out = FileOutputStream(blurredFile)
-            bitmap.compress(Bitmap.CompressFormat.WEBP, 90, out)
-            out.close()
-            blurredFile
-        } else {
-            originalFile
-        }
-        val compressedFile = ImageCompressor.compressImageFileDirect(fileToCompress)
-        val byteArray = compressedFile?.readBytes() ?: return@withContext null
+        val byteArray = compressedFile.readBytes()
         try {
             val fileName = "${UUID.randomUUID()}.$IMAGE_EXTENSION"
             val imageRef = folderRef.child(fileName)
             
-            if (originalFile.exists()) originalFile.delete()
-            if (fileToCompress != originalFile && fileToCompress.exists()) fileToCompress.delete()
+            if (originalFile.exists() && originalFile != compressedFile) originalFile.delete()
+            if (compressedFile.exists()) compressedFile.delete()
             
             val uploadTask = imageRef.putBytes(byteArray).await()
             val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
             downloadUrl
         } catch (e: Exception) {
-            Firebase.crashlytics.recordException(e)
-            return@withContext null
+            recordException(e)
+            null
         }
     }
 
@@ -72,7 +77,7 @@ object ImageUploader {
             Firebase.storage.getReferenceFromUrl(imageUrl).delete().await()
             DataWrapper.Success(Unit)
         } catch (e: Exception) {
-            Firebase.crashlytics.recordException(e)
+            recordException(e)
             DataWrapper.Success(Unit)
         }
     }

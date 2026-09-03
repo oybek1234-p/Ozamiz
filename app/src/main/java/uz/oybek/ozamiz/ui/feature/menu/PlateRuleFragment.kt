@@ -2,7 +2,6 @@ package uz.oybek.ozamiz.ui.feature.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.menu.CategoryType
 import uz.oybek.ozamiz.data.menu.FilterId
@@ -22,7 +21,7 @@ class PlateRuleFragment : BaseFragment<FragmentPlateRuleBinding>() {
 
     override fun viewCreated(bind: FragmentPlateRuleBinding) {
         bind.btnBack.setOnClickListener {
-            findNavController().navigateUp()
+            navigateUp()
         }
 
         bind.btnViewVegRecipes.setOnClickListener {
@@ -42,6 +41,6 @@ class PlateRuleFragment : BaseFragment<FragmentPlateRuleBinding>() {
         val action = PlateRuleFragmentDirections.actionPlateRuleFragmentToPlateSectionDetailFragment(
             sectionType = sectionType
         )
-        findNavController().navigate(action)
+        navigate(action)
     }
 }

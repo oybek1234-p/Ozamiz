@@ -2,113 +2,152 @@ package uz.oybek.ozamiz.ui.feature.log.food
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
+import java.io.File
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysisResult
+import uz.oybek.ozamiz.data.analytics.AnalyticsManager
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
-import uz.oybek.ozamiz.data.utils.formatToHhMmA
-import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
+import uz.oybek.ozamiz.data.config.AppPreference
+import uz.oybek.ozamiz.data.food.DietController
+import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.food.DietController
-import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.logs.LogRepository
-import uz.oybek.ozamiz.ui.MainActivity
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.data.utils.formatToHhMmA
+import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
 import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
+import uz.oybek.ozamiz.ui.MainActivity
+import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.VaznimColors
 import uz.oybek.ozamiz.ui.utils.playSuccessSound
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Date
 
-import androidx.fragment.app.setFragmentResultListener
+class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
 
-class AnalyzeResultFragment : Fragment() {
-
-    private var _binding: BottomSheetCalorieResultBinding? = null
-    private val binding get() = _binding!!
 
     private val viewModel: AnalyzeResultViewModel by viewModels()
     private lateinit var ingredientsAdapter: IngredientsAdapter
     private var hasPlayedConfetti = false
     private var hasPlayedSuccessSound = false
+    private var loadingTextJob: Job? = null
+
+    private fun startSequentialLoadingText() {
+        if (loadingTextJob?.isActive == true) return
+        loadingTextJob = viewLifecycleOwner.lifecycleScope.launch {
+            binding.loadingText.text = "Ovqatni aniqlayapmiz..."
+            delay(2000)
+            binding.loadingText.text = "Kaloriyasini hisoblayapmiz..."
+            delay(2000)
+            binding.loadingText.text = "Tayyor!"
+        }
+    }
+
+    private fun stopSequentialLoadingText() {
+        loadingTextJob?.cancel()
+        loadingTextJob = null
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             val logId = it.getString(KEY_LOG_ID)
             val userId = it.getString(KEY_USER_ID)
-            val timestamp = it.getLong(KEY_TIMESTAMP, -1L)
-            if (timestamp != -1L) {
-                viewModel.setLogDate(Date(timestamp))
-            }
+            val rawTimestamp = it.getLong(KEY_TIMESTAMP, -1L)
+            val timestamp = if (rawTimestamp > 0) rawTimestamp else System.currentTimeMillis()
+            viewModel.setLogDate(Date(timestamp))
+
+            val rawMeal = it.getString(KEY_MEAL_TYPE) ?: it.getString("meal")
+            val meal = uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(rawMeal, timestamp)
+
             if (logId != null) {
                 viewModel.loadLog(logId, Date(timestamp), userId)
             } else {
-                val id = it.getInt(KEY_ID, -1)
-                if (id != -1) {
-                    viewModel.setResult(FoodAnalyzer.getLastAnalyzed(id))
+                val imageUri =
+                    (it.getParcelable(KEY_IMAGE_URI) ?: it.getString(
+                        KEY_IMAGE_URI
+                    )?.toUri())
+                val audioUri =
+                    (it.getParcelable(KEY_AUDIO_URI) ?: it.getString(
+                        KEY_AUDIO_URI
+                    )?.toUri())
+                val description = it.getString(KEY_PENDING_DESCRIPTION) ?: ""
+                if (audioUri != null) {
+                    viewModel.analyzeAudio(audioUri, meal, Date(timestamp))
                 } else {
-                    val imageUri = it.getString(KEY_IMAGE_URI)?.toUri()
-                    val audioUri = it.getString(KEY_AUDIO_URI)?.toUri()
-                    val description = it.getString(KEY_PENDING_DESCRIPTION) ?: ""
-                    val meal = it.getString(KEY_MEAL_TYPE) ?: ""
-                    if (audioUri != null) {
-                        viewModel.analyzeAudio(audioUri, meal, Date(timestamp))
-                    } else {
-                        viewModel.startAnalyze(imageUri, description, meal, Date(timestamp))
-                    }
+                    viewModel.startAnalyze(imageUri, description, meal, Date(timestamp))
                 }
             }
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        _binding = BottomSheetCalorieResultBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun inflateBinding(
+        inflater: LayoutInflater, container: ViewGroup?
+    ): BottomSheetCalorieResultBinding {
+        return BottomSheetCalorieResultBinding.inflate(inflater, container, false)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun viewCreated(bind: BottomSheetCalorieResultBinding) {
 
         setFragmentResultListener(EditIngredientBottomSheet.REQUEST_KEY) { _, bundle ->
-            val action = bundle.getString(EditIngredientBottomSheet.RESULT_ACTION) ?: EditIngredientBottomSheet.ACTION_SAVE
+            val action = bundle.getString(EditIngredientBottomSheet.RESULT_ACTION)
+                ?: EditIngredientBottomSheet.ACTION_SAVE
             val position = bundle.getInt(EditIngredientBottomSheet.RESULT_POSITION, -1)
             if (position == -1) return@setFragmentResultListener
 
             if (action == EditIngredientBottomSheet.ACTION_DELETE) {
+                AnalyticsManager.logFeatureUsed("analyze_ingredient_deleted")
                 viewModel.deleteFoodItem(position)
             } else {
-                val json = bundle.getString(EditIngredientBottomSheet.RESULT_INGREDIENT) ?: return@setFragmentResultListener
-                val item = com.google.gson.Gson().fromJson(json, uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient::class.java)
+                AnalyticsManager.logFeatureUsed("analyze_ingredient_edited")
+                val json = bundle.getString(EditIngredientBottomSheet.RESULT_INGREDIENT)
+                    ?: return@setFragmentResultListener
+                val item = com.google.gson.Gson()
+                    .fromJson(json, uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient::class.java)
                 viewModel.updateFoodItem(position, item)
             }
         }
 
+        binding.toolbar.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        binding.toolbar.background =
+            android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT)
+        binding.toolbar.elevation = 0f
+
         binding.toolbar.inflateMenu(R.menu.menu_analyze_result)
         binding.toolbar.setOnMenuItemClickListener { menuItem ->
-            if (menuItem.itemId == R.id.action_favorite) {
-                viewModel.toggleFavorite()
-                true
-            } else {
-                false
+            when (menuItem.itemId) {
+                R.id.action_favorite -> {
+                    viewModel.toggleFavorite()
+                    true
+                }
+                R.id.action_share -> {
+                    viewModel.shareFood()
+                    true
+                }
+                else -> false
             }
         }
         setupListeners()
@@ -117,71 +156,74 @@ class AnalyzeResultFragment : Fragment() {
 
         if (arguments?.getBoolean(KEY_IS_FROM_FAVORITE) == true) {
             val args = requireArguments()
-            val analysis = FoodAnalysis(
-                id = args.getString(KEY_DESCRIPTION).hashCode(),
-                photoUrl = args.getString(KEY_PHOTO_URL)?.takeIf { it != "null" },
-                result = FoodAnalysisResult(
-                    name = args.getString(KEY_DESCRIPTION) ?: "",
-                    calories = args.getDouble(KEY_CALORIES).toInt(),
-                    protein = args.getDouble(KEY_PROTEIN),
-                    fat = args.getDouble(KEY_FAT),
-                    carbs = args.getDouble(KEY_CARBS),
-                    healthScore = 0
-                ),
-                mealType = args.getString(KEY_MEAL_TYPE) ?: ""
-            )
-            viewModel.setRecallResult(analysis)
+            val logId = args.getString(KEY_LOG_ID)
+            if (logId == null || viewModel.state.value.result == null) {
+                val analysis = FoodAnalysis(
+                    id = args.getString(KEY_DESCRIPTION).hashCode(),
+                    photoUrl = args.getString(KEY_PHOTO_URL)?.takeIf { it != "null" },
+                    result = FoodAnalysisResult(
+                        name = args.getString(KEY_DESCRIPTION) ?: "",
+                        calories = args.getDouble(KEY_CALORIES).toInt(),
+                        protein = args.getDouble(KEY_PROTEIN),
+                        fat = args.getDouble(KEY_FAT),
+                        carbs = args.getDouble(KEY_CARBS),
+                        healthScore = 0
+                    ),
+                    mealType = args.getString(KEY_MEAL_TYPE) ?: ""
+                )
+                viewModel.setRecallResult(analysis)
+            }
         }
     }
 
     private fun loadBanner() {
-        if (UserProfileRepository.user.isPremium()) {
-            binding.bannerContainer.visibility = View.GONE
-            return
-        }
-        val bannerView = AdsManager.createBannerView(
-            requireContext(),
-            AdsConfig.BANNER_LOG_FOOD
-        )
-        binding.bannerContainer.addView(bannerView)
+        binding.bannerContainer.visibility = View.GONE
     }
 
     private fun showAnalyzing(isAnalyzing: Boolean) {
         val wasAnalyzing = binding.lottieLoadingCalories.isVisible && !isAnalyzing
 
         binding.layoutMacros.isVisible = !isAnalyzing
-        binding.lottieLoadingCalories.isVisible = isAnalyzing
-        binding.imageViewFire.isVisible = !isAnalyzing
-
-        val favoriteItem = binding.toolbar.menu.findItem(R.id.action_favorite)
-        favoriteItem?.isVisible = !isAnalyzing && viewModel.state.value.result != null
+        binding.layoutPortionCounter.isVisible = !isAnalyzing
+        binding.cardCalorieBanner.isVisible = !isAnalyzing
+        binding.cardLoadingState.isVisible = isAnalyzing
+        binding.cardErrorState.isVisible = false  // analyzing boshlanganda error yashiriladi
+        binding.buttonFavorite.isVisible = !isAnalyzing && viewModel.state.value.result != null
+        binding.buttonShareFloating.isVisible = !isAnalyzing && viewModel.state.value.result != null
 
         if (isAnalyzing) {
+            startSequentialLoadingText()
             binding.layoutBottomActions.visibility = View.VISIBLE
+            binding.layoutRecallActions.isVisible = false
+            binding.layoutHorizontalActions.isVisible = true
             binding.buttonSaveToLog.isVisible = false
             binding.layoutSaveContainer.isVisible = false
-            binding.buttonReLog.isVisible = true
-            binding.buttonReLog.text = getString(R.string.cancel)
-            binding.buttonReLog.icon =
-                ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
+            binding.buttonCancel.isVisible = true
+            binding.buttonCancel.text = getString(R.string.delete)
+            binding.buttonCancel.icon =
+                ContextCompat.getDrawable(requireContext(), R.drawable.delete_ic)
 
-            binding.calorieCard.isVisible = false
             binding.healthBall.isVisible = false
-            binding.loadingCard.isVisible = true
             binding.cardAiHealth.isVisible = false
         } else {
-            binding.calorieCard.isVisible = true
-            binding.loadingCard.isVisible = false
+            stopSequentialLoadingText()
+            binding.cardLoadingState.isVisible = false
+            binding.cardCalorieBanner.isVisible = true
+            binding.layoutPortionCounter.isVisible = true
             binding.cardAiHealth.isVisible = true
-            binding.healthBall.isVisible = true
+            binding.healthBall.isVisible = false
 
-            val state = viewModel.state.value
-            binding.buttonSaveToLog.isVisible = !state.isRecallMode
-            binding.layoutSaveContainer.isVisible = !state.isRecallMode
-            binding.buttonReLog.isVisible = !state.isRecallMode
-            binding.buttonReLog.text = getString(R.string.cancel)
-            binding.buttonReLog.icon =
-                ContextCompat.getDrawable(requireContext(), R.drawable.arrow_back)
+            binding.buttonCancel.isVisible = true
+            binding.buttonCancel.text = getString(R.string.delete)
+            binding.buttonCancel.icon =
+                ContextCompat.getDrawable(requireContext(), R.drawable.delete_ic)
+            binding.buttonSaveToLog.isVisible = true
+            binding.layoutSaveContainer.isVisible = true
+            val isSaved = viewModel.state.value.isSaved
+            binding.buttonSaveToLog.text =
+                if (isSaved) getString(R.string.food_saved) else getString(R.string.save)
+            binding.buttonSaveToLog.icon =
+                ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
 
             if (wasAnalyzing) {
                 binding.layoutBottomActions.alpha = 0f
@@ -196,23 +238,21 @@ class AnalyzeResultFragment : Fragment() {
     private fun showLoading(show: Boolean) {
         binding.progressBarButton.isVisible = show
         binding.buttonSaveToLog.isEnabled = !show
-        binding.buttonReLog.isEnabled = !show
+        binding.buttonFavorite.isEnabled = !show
+        binding.buttonCancel.isEnabled = !show
         binding.buttonReLogFull.isEnabled = !show
         binding.buttonDelete.isEnabled = !show
 
-        binding.buttonSaveToLog.text = if (show) "" else getString(R.string.save)
-
         if (show) {
-            binding.buttonSaveToLog.animate().alpha(0f).setDuration(200).start()
-            binding.buttonReLog.animate().alpha(0f).setDuration(200).start()
-            binding.buttonDelete.animate().alpha(0f).setDuration(200).start()
+            binding.buttonSaveToLog.text = ""
+            binding.buttonSaveToLog.icon = null
         } else {
-            binding.buttonSaveToLog.animate().alpha(1f).setDuration(500).start()
-            binding.buttonReLog.animate().alpha(1f).setDuration(500).start()
-            binding.buttonDelete.animate().alpha(1f).setDuration(500).start()
+            val isSaved = viewModel.state.value.isSaved
+            binding.buttonSaveToLog.text =
+                if (isSaved) getString(R.string.food_saved) else getString(R.string.save)
+            binding.buttonSaveToLog.icon =
+                ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
         }
-
-        binding.nestedScrollView.alpha = if (show) 0.5f else 1.0f
     }
 
     private fun setupUI() {
@@ -221,8 +261,6 @@ class AnalyzeResultFragment : Fragment() {
                 showAnalyzing(state.isAnalyzing)
 
                 if (state.isAnalyzing) {
-                    binding.loadingText.text = getString(R.string.analyzing)
-
                     if (!state.pendingDescription.isNullOrBlank()) {
                         binding.textViewFoodName.text =
                             if (state.pendingDescription == "pending_description_voice") {
@@ -233,16 +271,35 @@ class AnalyzeResultFragment : Fragment() {
                         binding.layoutFoodName.isVisible = true
                     }
 
+                    binding.imageViewFoodPhoto.isVisible = true
                     if (state.pendingImageUri != null) {
-                        binding.imageViewFoodPhoto.isVisible = true
-                        Glide.with(this@AnalyzeResultFragment)
-                            .load(state.pendingImageUri)
+                        Glide.with(this@AnalyzeResultFragment).load(state.pendingImageUri)
+                            .placeholder(R.drawable.placeholder_food)
+                            .error(R.drawable.placeholder_food).into(binding.imageViewFoodPhoto)
+                    } else {
+                        Glide.with(this@AnalyzeResultFragment).load(R.drawable.placeholder_food)
                             .into(binding.imageViewFoodPhoto)
                     }
                     return@collect
                 }
 
-                showLoading(state.isLoading)
+                showLoading(state.isLoading || state.isSaving)
+
+                // --- Error holati: calorie/macros/tarkib yashiriladi, retry card ko'rsatiladi ---
+                if (state.isError) {
+                    binding.cardErrorState.isVisible = true
+                    binding.cardCalorieBanner.isVisible = false
+                    binding.layoutMacros.isVisible = false
+                    binding.layoutPortionCounter.isVisible = false
+                    binding.cardAiHealth.isVisible = false
+                    binding.layoutFoodItemsContainer.isVisible = false
+                    binding.layoutBottomActions.isVisible = false
+                    binding.buttonFavorite.isVisible = false
+                    binding.buttonShareFloating.isVisible = false
+                    return@collect
+                }
+                binding.cardErrorState.isVisible = false
+
                 val analysisResult = state.result?.result ?: run {
                     if (!state.pendingDescription.isNullOrBlank()) {
                         binding.textViewFoodName.text =
@@ -260,62 +317,75 @@ class AnalyzeResultFragment : Fragment() {
                 val photoUrl = state.result.photoUrl
                 if (!photoUrl.isNullOrEmpty() && photoUrl != "null") {
                     binding.imageViewFoodPhoto.isVisible = true
-                    Glide
-                        .with(this@AnalyzeResultFragment)
-                        .load(photoUrl)
-                        .placeholder(R.drawable.placeholder_food)
+                    Glide.with(this@AnalyzeResultFragment).load(photoUrl)
+                        .placeholder(R.drawable.placeholder_food).error(R.drawable.placeholder_food)
                         .into(binding.imageViewFoodPhoto)
 
                     binding.imageViewFoodPhoto.setOnClickListener {
                         uz.oybek.ozamiz.ui.common.dialog.FullScreenImageDialog.newInstance(
                             photoUrl
-                        )
-                            .show(parentFragmentManager, "full_image")
+                        ).show(parentFragmentManager, "full_image")
                     }
                 } else if (state.pendingImageUri != null) {
                     binding.imageViewFoodPhoto.isVisible = true
-                    Glide.with(this@AnalyzeResultFragment)
-                        .load(state.pendingImageUri)
+                    Glide.with(this@AnalyzeResultFragment).load(state.pendingImageUri)
+                        .placeholder(R.drawable.placeholder_food).error(R.drawable.placeholder_food)
                         .into(binding.imageViewFoodPhoto)
                 } else {
-                    binding.imageViewFoodPhoto.isVisible = false
+                    binding.imageViewFoodPhoto.isVisible = true
+                    Glide.with(this@AnalyzeResultFragment).load(R.drawable.placeholder_food)
+                        .into(binding.imageViewFoodPhoto)
                 }
-                binding.textViewFoodName.text = analysisResult.name
+                binding.textViewFoodName.text = analysisResult.name.replace(
+                    Regex("^[\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\uFE0F\\u200D\\s]+"), ""
+                ).trim()
                 binding.layoutFoodName.isVisible = true
-
-                binding.healthBall.apply {
-                    if (analysisResult.healthScore != null) {
-                        isVisible = true
-                        binding.ballCount.setTextColor(
-                            when (analysisResult.healthScore) {
-                                in 0..3 -> VaznimColors.getOnSurface(requireContext())
-                                in 4..5 -> VaznimColors.getOrange(requireContext())
-                                else -> VaznimColors.getGreen(requireContext())
-                            }
-                        )
-                        binding.ballCount.text = analysisResult.healthScore.toString() + " ball"
-                    }
+                val portion = analysisResult.portionMultiplier ?: 1.0
+                currentPortionMultiplier = portion
+                val countText = if (currentPortionMultiplier % 1.0 == 0.0) {
+                    currentPortionMultiplier.toInt().toString()
+                } else {
+                    String.format(java.util.Locale.US, "%.1f", currentPortionMultiplier)
                 }
-                binding.textViewTimestamp.text = Date(analysisResult.timestamp).formatToHhMmA()
+                binding.textViewPortionCount.text = countText
+
+                binding.healthBall.isVisible = false
+                val timestampMs = analysisResult.timestamp.takeIf { it > 0 } ?: (arguments?.getLong(
+                    KEY_TIMESTAMP,
+                    -1L
+                )?.takeIf { it > 0 }) ?: System.currentTimeMillis()
+                val timeStr = android.text.format.DateFormat.getTimeFormat(requireContext())
+                    .format(Date(timestampMs))
+                val rawMeal = state.result.mealType
+                val mealStr = when (rawMeal.lowercase()) {
+                    "breakfast", "nonushta" -> getString(R.string.category_breakfast)
+                    "lunch", "tushlik" -> getString(R.string.category_lunch)
+                    "dinner", "kechki ovqat", "kechki" -> getString(R.string.category_dinner)
+                    "snack", "perekus" -> getString(R.string.category_snack)
+                    else -> rawMeal.takeIf { it.isNotBlank() } ?: ""
+                }
+                val fullTimeBadge = if (mealStr.isNotBlank()) "$mealStr • $timeStr" else timeStr
+                binding.textViewTimestamp.text = fullTimeBadge
+                binding.textViewTimestamp.isVisible = true
 
                 val foodItemsList = analysisResult.getNormalizedFoodItems()
+                val showTarkibi = foodItemsList.isNotEmpty()
+                binding.layoutFoodItemsContainer.isVisible = showTarkibi
+                binding.recyclerFoodItems.isVisible = showTarkibi
+
                 if (foodItemsList.isNotEmpty()) {
-                    binding.layoutFoodItemsContainer.isVisible = true
                     if (!::ingredientsAdapter.isInitialized) {
                         ingredientsAdapter = IngredientsAdapter(
-                            ingredients = foodItemsList,
-                            onItemClick = { ingredient, position ->
+                            ingredients = foodItemsList, onItemClick = { ingredient, position ->
                                 EditIngredientBottomSheet.newInstance(ingredient, position)
                                     .show(parentFragmentManager, EditIngredientBottomSheet.TAG)
-                            }
-                        )
+                            })
                         binding.recyclerFoodItems.adapter = ingredientsAdapter
                     } else {
                         ingredientsAdapter.updateData(foodItemsList)
                     }
-                } else {
-                    binding.layoutFoodItemsContainer.isVisible = false
                 }
+
 
                 if (!hasPlayedConfetti) {
                     val score = analysisResult.healthScore ?: 0
@@ -326,7 +396,6 @@ class AnalyzeResultFragment : Fragment() {
                         binding.confettiAnimation.playAnimation()
                     }
                 }
-
                 if (!hasPlayedSuccessSound) {
                     val score = analysisResult.healthScore ?: 0
                     if (score >= 8) {
@@ -334,38 +403,35 @@ class AnalyzeResultFragment : Fragment() {
                         playSuccessSound()
                     }
                 }
+                val adviceStr = analysisResult.advice?.trim()
+                val showAdvice = !adviceStr.isNullOrBlank()
+                binding.layoutAdvice.isVisible = showAdvice
+                binding.cardAiHealth.isVisible = showAdvice
+                binding.textViewAdvice.text = adviceStr
 
-                val adviceText = analysisResult.advice
-                if (!adviceText.isNullOrBlank()) {
-                    binding.layoutAdvice.isVisible = true
-                    binding.textViewAdvice.text = adviceText
-                } else {
-                    binding.layoutAdvice.isVisible = false
-                }
+                binding.buttonFavorite.isVisible = !state.isAnalyzing && state.result != null
+                binding.buttonFavorite.setImageResource(
+                    if (state.isFavorite) R.drawable.ic_bookmark_filled else R.drawable.ic_bookmark_outline
+                )
+                binding.buttonShareFloating.isVisible = !state.isAnalyzing && state.result != null
 
-                binding.cardAiHealth.isVisible = !adviceText.isNullOrBlank()
-
-                val favoriteItem = binding.toolbar.menu.findItem(R.id.action_favorite)
-                favoriteItem?.isVisible = true && !state.isAnalyzing
-                if (favoriteItem != null && state.result != null) {
-                    favoriteItem.setIcon(
-                        if (state.isSaved) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
-                    )
-                }
-
+                binding.layoutHorizontalActions.isVisible = !state.isRecallMode
                 binding.buttonSaveToLog.isVisible = !state.isRecallMode
                 binding.layoutSaveContainer.isVisible = !state.isRecallMode
-                binding.buttonSaveToLog.text = getString(R.string.save)
-                binding.buttonSaveToLog.icon =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
+                if (!state.isLoading && !state.isSaving) {
+                    binding.buttonSaveToLog.text =
+                        if (state.isSaved) getString(R.string.food_saved) else getString(R.string.save)
+                    binding.buttonSaveToLog.icon =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.check_ic)
+                }
 
-                binding.buttonReLog.isVisible = !state.isRecallMode
-                binding.buttonReLog.text = getString(R.string.cancel)
-                binding.buttonReLog.icon = ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.arrow_back
+                binding.buttonCancel.isVisible = !state.isRecallMode
+                binding.buttonCancel.text = getString(R.string.delete)
+                binding.buttonCancel.icon = ContextCompat.getDrawable(
+                    requireContext(), R.drawable.delete_ic
                 )
 
+                binding.layoutRecallActions.isVisible = state.isRecallMode
                 binding.buttonReLogFull.isVisible = state.isRecallMode
                 binding.buttonDelete.isVisible =
                     state.isRecallMode && arguments?.getString(KEY_LOG_ID) != null
@@ -377,19 +443,14 @@ class AnalyzeResultFragment : Fragment() {
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
                         val todaySummary = LogRepository.getDailySummarySync(Date())
-                        val targetCalories = if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(user)
-                        val isGoalReached = targetCalories > 0 && todaySummary.consumedCalories >= targetCalories
+                        if (!isAdded || isDetached || context == null) return@collect
 
-                        val hasDrunkWater = todaySummary.consumedWaterMl > 0
-
-                        val analysisResult = viewModel.state.value.result?.result
-                        val warnings = ArrayList<String>()
-                        if (analysisResult?.limitBread == true) warnings.add("limitBread")
-                        if (analysisResult?.sodaDrink == true) warnings.add("sodaDrink")
-                        val currentHour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-                        if (analysisResult?.heavyDinner == true && currentHour >= 21) warnings.add("heavyDinner")
-                        if (analysisResult?.limitCalorie == true) warnings.add("limitCalorie")
-                        if (analysisResult?.waterBeforeMeal == true && !hasDrunkWater) warnings.add("waterBeforeMeal")
+                        val targetCalories =
+                            if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(
+                                user
+                            )
+                        val isGoalReached =
+                            targetCalories > 0 && todaySummary.consumedCalories >= targetCalories
 
                         val currentStreak = user.streakInfo?.currentStreak ?: 0
                         if (!AppPreference.isAppReviewShown && currentStreak >= 3) {
@@ -397,47 +458,17 @@ class AnalyzeResultFragment : Fragment() {
                             AppPreference.isAppReviewShown = true
                         }
 
-                        if (warnings.isNotEmpty()) {
-                            val args = Bundle().apply {
-                                putStringArray("warnings", warnings.toTypedArray())
-                                putBoolean("isGoalReached", isGoalReached)
-                            }
-                            findNavController().navigate(
-                                R.id.action_analyzeResultFragment_to_aiFeedbackFragment,
-                                args
-                            )
-                        } else if (isGoalReached) {
-                            findNavController().navigate(
-                                R.id.action_analyzeResultFragment_to_weeklyPredictionFragment
-                            )
+                        val todayStr = DateUtils.todayString()
+                        if (isGoalReached && AppPreference.lastDailyGoalReachedDate != todayStr) {
+                            AppPreference.lastDailyGoalReachedDate = todayStr
+                            navigate(R.id.action_analyzeResultFragment_to_dailyGoalAnalysisFragment)
                         } else {
-                            findNavController().popBackStack(R.id.home, false)
+                            popBackStack(R.id.home, false)
                         }
                     }
 
-                    is AnalyzeResultEvent.Failure -> {
-                        val resId = resources.getIdentifier(
-                            event.message,
-                            "string",
-                            requireContext().packageName
-                        )
-                        val message = if (resId != 0) getString(resId) else event.message
-                        android.widget.Toast.makeText(
-                            requireContext(),
-                            message,
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    is AnalyzeResultEvent.PromptShare -> {}
-
-                    is AnalyzeResultEvent.LimitExceeded -> {
-                        val bundle = Bundle().apply {
-                            putStringArrayList("exceeded_types", ArrayList(event.exceededTypes))
-                            putSerializable("overages", HashMap(event.overages))
-                        }
-                        parentFragmentManager.setFragmentResult("limit_exceeded_result", bundle)
-                        findNavController().popBackStack(R.id.home, false)
+                    is AnalyzeResultEvent.PromptShare -> {
+                        shareFoodAnalysis(event)
                     }
                 }
             }
@@ -446,48 +477,94 @@ class AnalyzeResultFragment : Fragment() {
 
     private fun updateMacrosAndCalorie(result: FoodAnalysisResult) {
         binding.textViewFoodName.text = result.name
-        val totalCalories = result.calories
+        val totalCalories = result.getEffectiveCalories()
         binding.textViewCalories.text = totalCalories.toString()
 
         bindMacro(
             binding.layoutProtein,
             getString(R.string.protein),
-            result.protein
+            result.getEffectiveProtein(),
+            R.drawable.egg_ic
         )
         bindMacro(
             binding.layoutCarbs,
             getString(R.string.carbs_hint),
-            result.carbs
+            result.getEffectiveCarbs(),
+            R.drawable.bread
         )
         bindMacro(
             binding.layoutFats,
             getString(R.string.fat_hint),
-            result.fat
+            result.getEffectiveFat(),
+            R.drawable.fat_ic
         )
     }
 
     @SuppressLint("SetTextI18n")
     private fun bindMacro(
-        layout: ItemMacroDisplayBinding,
-        name: String,
-        value: Double?
+        layout: ItemMacroDisplayBinding, name: String, value: Double?, iconRes: Int
     ) {
+        layout.imageViewMacroIcon.setImageResource(iconRes)
+        layout.imageViewMacroIcon.isVisible = true
         layout.textViewMacroName.text = name
         val totalValue = (value ?: 0.0)
         layout.textViewMacroValue.text = getString(R.string.gram_format, totalValue.toInt())
     }
 
+
+    private var currentPortionMultiplier: Double = 1.0
+
     private fun setupListeners() {
+        binding.buttonPortionMinus.setOnClickListener {
+            if (currentPortionMultiplier > 0.5) {
+                currentPortionMultiplier -= 0.5
+                val countText = if (currentPortionMultiplier % 1.0 == 0.0) {
+                    currentPortionMultiplier.toInt().toString()
+                } else {
+                    String.format(java.util.Locale.US, "%.1f", currentPortionMultiplier)
+                }
+                binding.textViewPortionCount.text = countText
+                viewModel.scalePortion(currentPortionMultiplier)
+            }
+        }
+
+        binding.buttonPortionPlus.setOnClickListener {
+            if (currentPortionMultiplier < 10.0) {
+                currentPortionMultiplier += 0.5
+                val countText = if (currentPortionMultiplier % 1.0 == 0.0) {
+                    currentPortionMultiplier.toInt().toString()
+                } else {
+                    String.format(java.util.Locale.US, "%.1f", currentPortionMultiplier)
+                }
+                binding.textViewPortionCount.text = countText
+                viewModel.scalePortion(currentPortionMultiplier)
+            }
+        }
+
         binding.buttonSaveToLog.setOnSafeClickListener {
             viewModel.onSaveClick()
         }
 
-        binding.buttonReLog.setOnSafeClickListener {
-            findNavController().popBackStack()
+        binding.buttonFavorite.setOnClickListener {
+            viewModel.toggleFavorite()
+        }
+
+        binding.buttonShareFloating.setOnSafeClickListener {
+            viewModel.shareFood()
+        }
+
+        binding.buttonCancel.setOnSafeClickListener {
+            AnalyticsManager.logFeatureUsed("analyze_food_deleted")
+            viewModel.cancelAndExit()
+            popBackStack(R.id.home, false)
         }
 
         binding.buttonReLogFull.setOnSafeClickListener {
             viewModel.reLog()
+        }
+
+        binding.buttonRetryAnalyze.setOnSafeClickListener {
+            viewModel.retryAnalyze()
         }
 
         binding.buttonDelete.setOnSafeClickListener {
@@ -495,143 +572,272 @@ class AnalyzeResultFragment : Fragment() {
                 .setTitle(R.string.confirm_delete_title)
                 .setMessage(R.string.confirm_delete_log_message)
                 .setPositiveButton(R.string.yes) { _, _ ->
+                    AnalyticsManager.logFeatureUsed("analyze_food_deleted")
                     viewModel.deleteLog { success ->
                         if (success) {
-                            findNavController().popBackStack()
+                            popBackStack()
                         }
                     }
-                }
-                .setNegativeButton(R.string.no, null)
-                .show()
+                }.setNegativeButton(R.string.no, null).show()
         }
-        binding.toolbar.setNavigationOnClickListener {
-            val isRecall = viewModel.resultLive.value?.isRecallMode == true
+        binding.buttonBackFloating.setOnClickListener {
+            val isRecall = viewModel.state.value.isRecallMode
             if (isRecall) {
-                findNavController().popBackStack()
+                popBackStack()
             } else {
-                findNavController().popBackStack(R.id.home, false)
+                popBackStack(R.id.home, false)
+            }
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+            val isRecall = viewModel.state.value.isRecallMode
+            if (isRecall) {
+                popBackStack()
+            } else {
+                popBackStack(R.id.home, false)
             }
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            object : androidx.activity.OnBackPressedCallback(true) {
+            viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val isRecall = viewModel.resultLive.value?.isRecallMode == true
+                    val isRecall = viewModel.state.value.isRecallMode
                     if (isRecall) {
-                        findNavController().popBackStack()
+                        popBackStack()
                     } else {
-                        findNavController().popBackStack(R.id.home, false)
+                        popBackStack(R.id.home, false)
                     }
                 }
-            }
-        )
+            })
 
-        val nameEditListener = View.OnClickListener {
-            val currentName = binding.textViewFoodName.text.toString()
-            showEditNameDialog(currentName)
-        }
-        binding.layoutFoodName.setOnClickListener(nameEditListener)
-
-        val editCaloriesListener = View.OnClickListener {
-            val currentCalories = binding.textViewCalories.text.toString().toDoubleOrNull() ?: 0.0
-            showEditNumberDialog(
-                getString(R.string.edit_calories_title),
-                currentCalories
-            ) { newValue ->
+        val calorieEditListener = View.OnClickListener {
+            val res = viewModel.state.value.result?.result
+            val currentVal = res?.getEffectiveCalories()?.toDouble() ?: 0.0
+            showEditNumberDialog(getString(R.string.kaloriya), currentVal) { newValue ->
                 viewModel.updateCalories(newValue)
             }
         }
-        binding.cardCalorieBanner.setOnClickListener(editCaloriesListener)
-        binding.buttonEditCalories.setOnClickListener(editCaloriesListener)
+        binding.buttonEditCalories.setOnClickListener(calorieEditListener)
+        binding.calorieCard.setOnClickListener(calorieEditListener)
 
         binding.layoutProtein.root.setOnClickListener {
-            val currentVal = viewModel.resultLive.value?.result?.result?.protein ?: 0.0
+            val res = viewModel.state.value.result?.result
+            val currentVal = res?.getEffectiveProtein() ?: 0.0
             showEditNumberDialog(getString(R.string.edit_protein_title), currentVal) { newValue ->
                 viewModel.updateProtein(newValue)
             }
         }
         binding.layoutCarbs.root.setOnClickListener {
-            val currentVal = viewModel.resultLive.value?.result?.result?.carbs ?: 0.0
+            val res = viewModel.state.value.result?.result
+            val currentVal = res?.getEffectiveCarbs() ?: 0.0
             showEditNumberDialog(getString(R.string.edit_carbs_title), currentVal) { newValue ->
                 viewModel.updateCarbs(newValue)
             }
         }
         binding.layoutFats.root.setOnClickListener {
-            val currentVal = viewModel.resultLive.value?.result?.result?.fat ?: 0.0
+            val res = viewModel.state.value.result?.result
+            val currentVal = res?.getEffectiveFat() ?: 0.0
             showEditNumberDialog(getString(R.string.edit_fat_title), currentVal) { newValue ->
                 viewModel.updateFat(newValue)
             }
         }
-    }
 
-    private fun showEditNameDialog(currentName: String) {
-        val input = android.widget.EditText(requireContext())
-        input.setText(currentName)
-        input.hint = getString(R.string.food_name_hint)
+        binding.buttonAddIngredient.setOnClickListener {
+            AddIngredientBottomSheet().show(childFragmentManager, AddIngredientBottomSheet.TAG)
+        }
 
-        val container = android.widget.FrameLayout(requireContext())
-        val params = android.widget.FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        params.marginStart = resources.getDimensionPixelSize(R.dimen.dimen_24)
-        params.marginEnd = resources.getDimensionPixelSize(R.dimen.dimen_24)
-        input.layoutParams = params
-        container.addView(input)
-
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle(R.string.edit_food_title)
-            .setView(container)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val newName = input.text.toString()
-                if (newName.isNotBlank() && newName != currentName) {
-                    viewModel.updateLog(newName)
-                }
+        childFragmentManager.setFragmentResultListener(
+            AddIngredientBottomSheet.REQUEST_KEY, viewLifecycleOwner
+        ) { _, bundle ->
+            val input = bundle.getString(AddIngredientBottomSheet.RESULT_INPUT)
+            val singleJson = bundle.getString(AddIngredientBottomSheet.RESULT_SINGLE_JSON)
+            val singleResult = singleJson?.let {
+                uz.oybek.ozamiz.data.utils.gson?.fromJson(
+                    it, uz.oybek.ozamiz.data.ai.analyzer.SingleIngredientResult::class.java
+                )
             }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+            if (!input.isNullOrBlank()) {
+                AnalyticsManager.logFeatureUsed("analyze_ingredient_added")
+                viewModel.addIngredientWithAi(input, singleResult)
+            }
+        }
     }
 
     private fun showEditNumberDialog(
-        title: String,
-        currentValue: Double,
-        onSave: (Double) -> Unit
+        title: String, currentValue: Double, onSave: (Double) -> Unit
     ) {
         val input = android.widget.EditText(requireContext())
-        input.setText(
-            if (currentValue % 1.0 == 0.0) currentValue.toInt()
-                .toString() else currentValue.toString()
-        )
+        val initialText = if (currentValue % 1.0 == 0.0) currentValue.toInt()
+            .toString() else currentValue.toString()
+        input.setText(initialText)
+        input.setSelection(initialText.length)
         input.inputType =
             android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
 
         val container = android.widget.FrameLayout(requireContext())
         val params = android.widget.FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
         params.marginStart = resources.getDimensionPixelSize(R.dimen.dimen_24)
         params.marginEnd = resources.getDimensionPixelSize(R.dimen.dimen_24)
         input.layoutParams = params
         container.addView(input)
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(title)
-            .setView(container)
+        val dialog = AlertDialog.Builder(requireContext()).setTitle(title).setView(container)
             .setPositiveButton(R.string.save) { _, _ ->
-                val newValue = input.text.toString().toDoubleOrNull()
+                val rawText = input.text.toString().replace(',', '.').trim()
+                val newValue = rawText.toDoubleOrNull()
                 if (newValue != null) {
                     onSave(newValue)
                 }
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
+            }.setNegativeButton(R.string.cancel, null).create()
+
+        dialog.window?.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+
+        dialog.setOnShowListener {
+            input.postDelayed({
+                if (isAdded) {
+                    input.requestFocus()
+                    val length = input.text?.length ?: 0
+                    input.setSelection(length)
+                    val imm =
+                        requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+                    imm?.showSoftInput(
+                        input,
+                        android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
+                    )
+                }
+            }, 100)
+        }
+
+        dialog.show()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun shareFoodAnalysis(event: AnalyzeResultEvent.PromptShare) {
+        val timeStr = if (event.timestamp > 0) {
+            android.text.format.DateFormat.getTimeFormat(requireContext())
+                .format(Date(event.timestamp))
+        } else ""
+
+        val shareText = buildShareText(
+            name = event.name,
+            mealType = event.mealType,
+            timeStr = timeStr,
+            calories = event.calories,
+            protein = event.protein,
+            fat = event.fat,
+            carbs = event.carbs,
+            advice = event.advice
+        )
+
+        val rawUri: Uri? = event.photoUrl?.takeIf { it.isNotBlank() && it != "null" }?.toUri()
+            ?: (arguments?.getParcelable(KEY_IMAGE_URI) ?: arguments?.getString(KEY_IMAGE_URI)?.toUri())
+
+        val shareUri: Uri? = rawUri?.let { uri ->
+            try {
+                if (uri.scheme == "file" || uri.scheme == null) {
+                    val filePath = uri.path ?: uri.toString()
+                    val file = File(filePath)
+                    if (file.exists()) {
+                        FileProvider.getUriForFile(
+                            requireContext(),
+                            "${requireContext().packageName}.provider",
+                            file
+                        )
+                    } else {
+                        uri
+                    }
+                } else {
+                    uri
+                }
+            } catch (e: Exception) {
+                uri
+            }
+        }
+
+        val cleanTitle = event.name.replace(
+            Regex("^[\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\uFE0F\\u200D\\s]+"), ""
+        ).trim()
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            putExtra(Intent.EXTRA_SUBJECT, cleanTitle)
+            putExtra(Intent.EXTRA_TITLE, cleanTitle)
+
+            if (shareUri != null) {
+                type = "image/*"
+                putExtra(Intent.EXTRA_STREAM, shareUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                val clipData = android.content.ClipData.newUri(requireContext().contentResolver, cleanTitle, shareUri)
+                clipData.addItem(android.content.ClipData.Item(shareText))
+                this.clipData = clipData
+            } else {
+                type = "text/plain"
+                this.clipData = android.content.ClipData.newPlainText(cleanTitle, shareText)
+            }
+        }
+
+        try {
+            val clipboard = requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+            val clip = android.content.ClipData.newPlainText("Food Analysis", shareText)
+            clipboard?.setPrimaryClip(clip)
+        } catch (e: Exception) {
+            // Ignore
+        }
+
+        val chooser = Intent.createChooser(intent, "Ovqat tahlilini ulashish").apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        startActivity(chooser)
+    }
+
+    private fun buildShareText(
+        name: String,
+        mealType: String,
+        timeStr: String,
+        calories: Int,
+        protein: Double?,
+        fat: Double?,
+        carbs: Double?,
+        advice: String?
+    ): String {
+        val cleanName = name.replace(
+            Regex("^[\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\uFE0F\\u200D\\s]+"), ""
+        ).trim()
+
+        val mealStr = when (mealType.lowercase()) {
+            "breakfast", "nonushta" -> getString(R.string.category_breakfast)
+            "lunch", "tushlik" -> getString(R.string.category_lunch)
+            "dinner", "kechki ovqat", "kechki" -> getString(R.string.category_dinner)
+            "snack", "perekus" -> getString(R.string.category_snack)
+            else -> mealType.takeIf { it.isNotBlank() } ?: ""
+        }
+
+        val fullBadge = if (mealStr.isNotBlank() && timeStr.isNotBlank()) {
+            "$mealStr • $timeStr"
+        } else mealStr.ifBlank { timeStr }
+
+        val p = (protein ?: 0.0).toInt()
+        val f = (fat ?: 0.0).toInt()
+        val c = (carbs ?: 0.0).toInt()
+
+        val sb = StringBuilder()
+        sb.append("🥗 $cleanName\n\n")
+
+        if (fullBadge.isNotBlank()) {
+            sb.append("🍽 Mahall: $fullBadge\n")
+        }
+        sb.append("🔥 Kaloriya: $calories kkal\n")
+        sb.append("🥩 Oqsil: ${p}g | 🥑 Yog': ${f}g | 🍞 Uglevod: ${c}g\n\n")
+
+        val cleanAdvice = advice?.trim()
+        if (!cleanAdvice.isNullOrBlank()) {
+            sb.append("💡 Tavsiya:\n$cleanAdvice\n\n")
+        }
+
+        sb.append("📱 Vaznim ilovasi orqali tahlil qilindi")
+
+        return sb.toString()
     }
 
     companion object {
@@ -641,7 +847,6 @@ class AnalyzeResultFragment : Fragment() {
         const val KEY_LOG_ID = "logId"
         const val KEY_USER_ID = "userId"
         const val KEY_TIMESTAMP = "timestamp"
-        const val KEY_ID = "id"
         const val KEY_IS_FROM_FAVORITE = "isFromFavorite"
         const val KEY_DESCRIPTION = "description"
         const val KEY_CALORIES = "calories"

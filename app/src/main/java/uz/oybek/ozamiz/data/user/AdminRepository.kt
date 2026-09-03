@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.data.user
 
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.getValueSafe
@@ -59,7 +60,7 @@ object AdminRepository {
     }
 
     suspend fun getUsers(
-        limit: Int,
+        limit: Int = 8,
         lastUserId: String? = null,
         sortBy: UserSortType = UserSortType.RECENT_ACTIVITY,
         premiumOnly: Boolean = false
@@ -69,6 +70,7 @@ object AdminRepository {
             UserSortType.RECENT_ACTIVITY -> User::lastSeenTime.name
             UserSortType.MOST_ACTIVE -> User::scorePoints.name
             UserSortType.TOP_STREAK -> "streakInfo.${StreakInfo::currentStreak.name}"
+            UserSortType.TOP_WEIGHT_LOSS -> User::lastSeenTime.name // Fallback if field not in Firestore
         }
         var query: Query = FirebasePaths.Firestore.publicUsers()
 
@@ -79,12 +81,12 @@ object AdminRepository {
         query = query.orderBy(queryField, Query.Direction.DESCENDING)
 
         if (!lastUserId.isNullOrBlank()) {
-            val lastDocument = FirebasePaths.Firestore.publicUser(lastUserId).get().await()
+            val lastDocument = FirebasePaths.Firestore.publicUser(lastUserId).get(Source.SERVER).await()
             if (lastDocument.exists()) {
                 query = query.startAfter(lastDocument)
             }
         }
-        query.limit(limit.toLong()).get().await().toObjectsList<User>()
+        query.limit(limit.toLong()).get(Source.SERVER).await().toObjectsList<User>()
     }
 
     suspend fun getUsersFromDatabase(
@@ -107,6 +109,11 @@ object AdminRepository {
             UserSortType.RECENT_ACTIVITY -> list.sortedByDescending { it.lastSeenTime }
             UserSortType.MOST_ACTIVE -> list.sortedByDescending { it.scorePoints }
             UserSortType.TOP_STREAK -> list.sortedByDescending { it.streakInfo?.currentStreak ?: 0 }
+            UserSortType.TOP_WEIGHT_LOSS -> list.sortedByDescending { 
+                val start = it.startWeight ?: 0.0
+                val current = it.weight
+                if (start > current && current > 0) start - current else -1.0
+            }
         }
 
         if (!lastUserId.isNullOrBlank()) {
@@ -128,7 +135,7 @@ object AdminRepository {
     suspend fun getPublicUser(userId: String): User? {
         if (userId.isBlank()) return null
         return try {
-            FirebasePaths.Firestore.publicUser(userId).get().await().toObjectSafe<User>()
+            FirebasePaths.Firestore.publicUser(userId).get(Source.SERVER).await().toObjectSafe<User>()
         } catch (e: Exception) {
             handleException(e)
             null

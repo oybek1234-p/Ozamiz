@@ -12,7 +12,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.feedback.AppFeedbackRepository
 import uz.oybek.ozamiz.databinding.DialogAppFeedbackBinding
 import uz.oybek.ozamiz.ui.MainActivity
@@ -66,7 +65,7 @@ class AppFeedbackDialogFragment : DialogFragment() {
             lifecycleScope.launch {
                 try {
                     AppFeedbackRepository.saveAppFeedback(text, "dislike")
-                    AppPreference.isAppFeedbackCompleted = true
+                    uz.oybek.ozamiz.data.user.UserProfileRepository.updateUser { isRated = true }
                     Toast.makeText(context, "Rahmat! Fikringiz qabul qilindi. 🙏", Toast.LENGTH_SHORT).show()
                     onDismissCallback?.invoke()
                     dismiss()
@@ -78,7 +77,7 @@ class AppFeedbackDialogFragment : DialogFragment() {
         }
 
         binding.buttonRateApp.setOnClickListener {
-            AppPreference.isAppFeedbackCompleted = true
+            uz.oybek.ozamiz.data.user.UserProfileRepository.updateUser { isRated = true }
             onDismissCallback?.invoke()
             (activity as? MainActivity)?.requestAppReview()
             openPlayStoreFallback()
@@ -109,9 +108,20 @@ class AppFeedbackDialogFragment : DialogFragment() {
     private fun openPlayStoreFallback() {
         val packageName = context?.packageName ?: return
         try {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
-        } catch (_: ActivityNotFoundException) {
-            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")).apply {
+                setPackage("com.android.vending")
+                addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+            }
+            startActivity(intent)
+        } catch (_: Exception) {
+            try {
+                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")).apply {
+                    setPackage("com.android.vending")
+                }
+                startActivity(webIntent)
+            } catch (_: Exception) {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
+            }
         }
     }
 

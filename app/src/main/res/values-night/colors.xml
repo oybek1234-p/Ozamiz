@@ -27,8 +27,8 @@
     <color name="analysis_protein_text">#E1BEE7</color>
     <color name="analysis_sweets_bg">#311B22</color>
     <color name="analysis_sweets_text">#F48FB1</color>
-    <color name="analysis_screen_header_bg">#121513</color>
-    <color name="analysis_card_bg">#1D201E</color>
+    <color name="analysis_screen_header_bg">#000000</color>
+    <color name="analysis_card_bg">#181C19</color>
     <color name="analysis_text_accent">#7ADB9E</color>
     <color name="analysis_btn_bg">#7ADB9E</color>
     <color name="analysis_btn_text">#003920</color>

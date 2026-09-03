@@ -2,8 +2,8 @@ package uz.oybek.ozamiz
 
 import android.app.Application
 import android.content.Context
-import com.facebook.BuildConfig
 import com.facebook.FacebookSdk
+import com.google.firebase.BuildConfig
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
@@ -48,7 +48,9 @@ class Application : Application() {
         } else {
             PlayIntegrityAppCheckProviderFactory.getInstance()
         }
-        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(appCheckProviderFactory)
+        FirebaseAppCheck.getInstance().installAppCheckProviderFactory(
+            appCheckProviderFactory
+        )
     }
 
     private fun initFirebase() {

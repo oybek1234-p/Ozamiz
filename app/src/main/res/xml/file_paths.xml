@@ -2,6 +2,7 @@
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-cache-path name="my_images" path="." />
     <cache-path name="internal_cache" path="." />
-    <!-- Agar boshqa joylarda ham fayl saqlash kerak bo'lsa, shu yerga qo'shiladi -->
-    <!-- Masalan, external-files-path, files-path va hokazo -->
+    <files-path name="internal_files" path="." />
+    <external-files-path name="external_files" path="." />
+    <external-path name="external_storage" path="." />
 </paths>

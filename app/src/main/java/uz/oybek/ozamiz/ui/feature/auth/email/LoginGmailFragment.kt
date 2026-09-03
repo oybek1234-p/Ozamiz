@@ -39,6 +39,8 @@ class LoginGmailFragment :
         if (loading.value == true) return
         loading.postVal(true)
         viewModel.signInEmail(email, password) { result ->
+            // Fragment view may have been destroyed while the network call was in-flight
+            if (bindingT == null) return@signInEmail
             if (result.isSuccess) {
                 signedIn()
             } else {
@@ -68,6 +70,8 @@ class LoginGmailFragment :
         loading.postVal(true)
 
         viewModel.signUpEmail(email, password) { result ->
+            // Fragment view may have been destroyed while the network call was in-flight
+            if (bindingT == null) return@signUpEmail
             if (result.isSuccess) {
                 loading.postVal(false)
                 signedIn()

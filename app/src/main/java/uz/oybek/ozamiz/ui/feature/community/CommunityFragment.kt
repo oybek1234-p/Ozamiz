@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
@@ -24,7 +23,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
     private lateinit var postsAdapter: CommunityPostAdapter
     private lateinit var usersAdapter: CommunityUsersAdapter
-    private var lastSelectedChipId: Int = R.id.chipAll
+    private var lastSelectedChipId: Int = R.id.chipOzganlar
 
     init {
         showBottomSheet = true
@@ -42,7 +41,15 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
         setupRecyclerViews()
         setupSwipeRefresh()
         setupFilters()
-        restoreFilterState()
+
+        val selectWeightLoss = arguments?.getBoolean("selectWeightLoss", false) ?: false
+        if (selectWeightLoss) {
+            arguments?.remove("selectWeightLoss")
+            binding.chipGroupFilter.check(R.id.chipOzganlar)
+        } else {
+            restoreFilterState()
+        }
+
         observeViewModel()
         observeNotifications()
     }
@@ -68,28 +75,30 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
             showBottomSheet = false
             binding.toolbar.setNavigationIcon(R.drawable.arrow_back)
             binding.toolbar.setNavigationOnClickListener {
-                findNavController().popBackStack()
+                popBackStack()
             }
         } else {
             binding.toolbar.navigationIcon = null
         }
         binding.btnNotifications.setOnClickListener {
-            findNavController().navigate(R.id.action_communityFragment_to_notificationsFragment)
+            navigate(R.id.action_communityFragment_to_notificationsFragment)
         }
         binding.fabAddPost.setOnClickListener {
-            findNavController().navigate(R.id.action_communityFragment_to_addPostFragment)
+            navigate(R.id.action_communityFragment_to_addPostFragment)
         }
     }
 
     private fun setupRecyclerViews() {
         postsAdapter = CommunityPostAdapter(
-            onLikeClick = { postId -> postsViewModel.toggleLike(postId) },
+            onLikeClick = { postId ->
+                postsViewModel.toggleLike(postId)
+            },
             onUserClick = { userId, userName ->
                 val bundle = Bundle().apply {
                     putString("userId", userId)
                     putString("userName", userName)
                 }
-                findNavController().navigate(
+                navigate(
                     R.id.action_communityFragment_to_communityProfileFragment,
                     bundle
                 )
@@ -129,7 +138,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
                 putString("userId", user.uid)
                 putString("userName", user.name)
             }
-            findNavController().navigate(
+            navigate(
                 R.id.action_communityFragment_to_communityProfileFragment,
                 bundle
             )
@@ -167,28 +176,20 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
     private fun setupFilters() {
         binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
             val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
-            if (checkedId == lastSelectedChipId) return@setOnCheckedStateChangeListener
             lastSelectedChipId = checkedId
             
-            binding.rvPosts.isVisible = checkedId != R.id.chipUsers
-            binding.rvUsers.isVisible = checkedId == R.id.chipUsers
+            val isUsers = checkedId == R.id.chipUsers
+            binding.rvPosts.isVisible = !isUsers
+            binding.rvUsers.isVisible = isUsers
 
             when (checkedId) {
-                R.id.chipAll -> {
-                    postsViewModel.setFilter(ALL)
-                    val postsState = postsViewModel.state.value
-                    binding.swipeRefresh.isRefreshing = postsState.isLoading
-                    binding.progressBar.isVisible = postsState.isPaging
-                    binding.tvEmpty.isVisible = !postsState.isLoading && postsState.posts.isEmpty()
-                    binding.tvEmpty.text = getString(R.string.community_empty_posts)
-                }
                 R.id.chipOzganlar -> {
                     postsViewModel.setFilter(WEIGHT_LOSS)
                     val postsState = postsViewModel.state.value
                     binding.swipeRefresh.isRefreshing = postsState.isLoading
                     binding.progressBar.isVisible = postsState.isPaging
                     binding.tvEmpty.isVisible = !postsState.isLoading && postsState.posts.isEmpty()
-                    binding.tvEmpty.text = getString(R.string.community_empty_posts)
+                    binding.tvEmpty.text = "Xatolik yuz berdi"
                 }
                 R.id.chipUsers -> {
                     usersViewModel.setSortBy(UserSortType.RECENT_ACTIVITY)
@@ -211,7 +212,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
                     binding.progressBar.isVisible = state.isPaging
                     postsAdapter.submitList(state.posts)
                     binding.tvEmpty.isVisible = !state.isLoading && state.posts.isEmpty()
-                    binding.tvEmpty.text = getString(R.string.community_empty_posts)
+                    val emptyText = if (binding.chipGroupFilter.checkedChipId == R.id.chipOzganlar) 
+                        "Xatolik yuz berdi" else getString(R.string.community_empty_posts)
+                    binding.tvEmpty.text = emptyText
                 }
                 state.error?.let {
                     android.widget.Toast.makeText(requireContext(), it, android.widget.Toast.LENGTH_SHORT).show()

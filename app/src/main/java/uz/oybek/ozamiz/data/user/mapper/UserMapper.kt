@@ -2,10 +2,11 @@ package uz.oybek.ozamiz.data.user.mapper
 
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.firestore.DocumentSnapshot
-import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.user.model.info.UserActivityLevel
+import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.data.utils.roundTo1Decimal
 import uz.oybek.ozamiz.util.handleException
 
 object UserMapper {
@@ -18,15 +19,16 @@ object UserMapper {
             User::scorePoints.name to u.scorePoints,
             User::lastSeenTime.name to u.lastSeenTime,
             User::premium.name to u.premium,
+            User::premiumDate.name to u.premiumDate,
             User::isPremiumYearly.name to u.isPremiumYearly,
             User::isMonthlyPremium.name to u.isMonthlyPremium,
             User::gender.name to u.gender,
             User::region.name to u.region,
             User::registerDate.name to u.registerDate,
             User::height.name to u.height,
-            User::weight.name to u.weight,
-            User::startWeight.name to u.startWeight,
-            User::targetWeight.name to u.targetWeight,
+            User::weight.name to u.weight.roundTo1Decimal(),
+            User::startWeight.name to u.startWeight?.roundTo1Decimal(),
+            User::targetWeight.name to u.targetWeight?.roundTo1Decimal(),
             User::age.name to u.age,
             User::goal.name to u.goal,
             User::targetCalories.name to u.targetCalories,
@@ -59,9 +61,9 @@ object UserMapper {
             User::region.name to u.region,
             User::age.name to u.age,
             User::height.name to u.height,
-            User::weight.name to u.weight,
-            User::targetWeight.name to u.targetWeight,
-            User::startWeight.name to u.startWeight,
+            User::weight.name to u.weight.roundTo1Decimal(),
+            User::targetWeight.name to u.targetWeight?.roundTo1Decimal(),
+            User::startWeight.name to u.startWeight?.roundTo1Decimal(),
             User::goal.name to u.goal,
             User::activityLevel.name to u.activityLevel,
             User::targetCalories.name to u.targetCalories,
@@ -77,6 +79,7 @@ object UserMapper {
             User::paymentCheckPhotoUrl.name to u.paymentCheckPhotoUrl,
             User::admin.name to u.admin,
             User::scorePoints.name to u.scorePoints,
+            User::isRated.name to u.isRated,
 
             User::streakInfo.name to u.streakInfo?.let { streak ->
                 mapOf(
@@ -123,6 +126,7 @@ object UserMapper {
         u.paymentCheckPhotoUrl = snapshot.child(User::paymentCheckPhotoUrl.name).value as? String
         u.admin = snapshot.child(User::admin.name).value as? Boolean ?: false
         u.scorePoints = (snapshot.child(User::scorePoints.name).value as? Number)?.toInt() ?: 0
+        u.isRated = snapshot.child(User::isRated.name).value as? Boolean ?: false
 
         u.problems = try {
             val problemsChild = snapshot.child(User::problems.name)
@@ -132,7 +136,6 @@ object UserMapper {
         } catch (e: Exception) {
             null
         }
-
         u.streakInfo = try {
             val streakChild = snapshot.child(User::streakInfo.name)
             if (streakChild.exists()) {
@@ -239,6 +242,7 @@ object UserMapper {
         }
         u.admin = getBooleanSafe(User::admin.name, false)
         u.scorePoints = getIntSafe(User::scorePoints.name, 0)
+        u.isRated = getBooleanSafe(User::isRated.name, false)
 
         u.problems = try {
             (snapshot.get(User::problems.name) as? List<*>)?.mapNotNull { it?.toString() }
@@ -261,72 +265,6 @@ object UserMapper {
         }
 
         u.lastWeightLogTimestamp = getLongSafe(User::lastWeightLogTimestamp.name, 0L)
-
-        return u
-    }
-
-    fun fromMap(map: Map<String, Any?>): User {
-        val u = User()
-        u.uid = map["uid"]?.toString() ?: ""
-        u.name = map["name"]?.toString() ?: ""
-        u.phoneNumber = map["phoneNumber"]?.toString() ?: ""
-        u.gmail = map["gmail"]?.toString() ?: ""
-        u.lastSeenTime = (map["lastSeenTime"] as? Number)?.toLong() ?: 0L
-        u.unreadMessages = (map["unreadMessages"] as? Number)?.toInt() ?: 0
-        u.premium = map["premium"] as? Boolean ?: false
-        u.premiumDate = (map["premiumDate"] as? Number)?.toLong() ?: 0L
-        u.isPremiumYearly = map["isPremiumYearly"] as? Boolean ?: false
-        u.isMonthlyPremium = map["isMonthlyPremium"] as? Boolean ?: false
-
-        u.gender = (map["gender"] as? Number)?.toInt() ?: -1
-        u.region = map["region"]?.toString() ?: " "
-        u.age = (map["age"] as? Number)?.toInt() ?: -1
-        u.height = (map["height"] as? Number)?.toInt() ?: -1
-        u.weight = (map["weight"] as? Number)?.toDouble() ?: -1.0
-        u.targetWeight = (map["targetWeight"] as? Number)?.toDouble()
-        u.startWeight = (map["startWeight"] as? Number)?.toDouble()
-        u.goal = map["goal"]?.toString().let { if (it.isNullOrEmpty()) "lose_weight" else it }
-        u.activityLevel = map["activityLevel"]?.toString() ?: "LIGHTLY_ACTIVE"
-
-        u.targetCalories = (map["targetCalories"] as? Number)?.toInt() ?: 0
-        u.targetProtein = (map["targetProtein"] as? Number)?.toInt() ?: 0
-        u.targetFat = (map["targetFat"] as? Number)?.toInt() ?: 0
-        u.targetCarbs = (map["targetCarbs"] as? Number)?.toInt() ?: 0
-        u.targetWaterMl = (map["targetWaterMl"] as? Number)?.toInt() ?: 2500
-        u.avatarUrl = map["avatarUrl"]?.toString()
-
-        u.registerDate = (map["registerDate"] as? Number)?.toLong() ?: System.currentTimeMillis()
-        u.paymentChecking = map["paymentChecking"] as? Boolean ?: false
-        u.paymentCheckPhotoUrl = map["paymentCheckPhotoUrl"]?.toString()
-        u.admin = map["admin"] as? Boolean ?: false
-        u.scorePoints = (map["scorePoints"] as? Number)?.toInt() ?: 0
-        u.lastWeightLogTimestamp = (map["lastWeightLogTimestamp"] as? Number)?.toLong() ?: 0L
-
-        u.problems = try {
-            (map["problems"] as? List<*>)?.mapNotNull { it?.toString() }
-        } catch (e: Exception) {
-            null
-        }
-
-        u.streakInfo = try {
-            val streakMap = map["streakInfo"] as? Map<*, *>
-            if (streakMap != null) {
-                val lastActionDate = streakMap["lastActionDate"]?.toString() ?: ""
-                val currentStreak = (streakMap["currentStreak"] as? Number)?.toInt() ?: 0
-                val bestStreak = (streakMap["bestStreak"] as? Number)?.toInt() ?: 0
-                val activeDays = (streakMap["activeDays"] as? Number)?.toInt() ?: 0
-                val streakGoal = (streakMap["streakGoal"] as? Number)?.toInt() ?: 7
-                StreakInfo(
-                    lastActionDate = lastActionDate,
-                    currentStreak = currentStreak,
-                    bestStreak = bestStreak,
-                    activeDays = activeDays,
-                    streakGoal = streakGoal
-                )
-            } else null
-        } catch (e: Exception) {
-            null
-        }
 
         return u
     }

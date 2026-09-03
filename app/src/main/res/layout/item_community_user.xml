@@ -9,13 +9,15 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imgAvatar"
-        android:layout_width="52dp"
-        android:layout_height="52dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:shapeAppearanceOverlay="@style/CircleImageView"
+        app:strokeColor="?attr/colorPrimary"
+        app:strokeWidth="1.5dp"
         app:srcCompat="@drawable/user_photo_placeholder" />
 
     <LinearLayout
@@ -62,10 +64,22 @@
         android:maxLines="1"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="@+id/layoutName"
+        app:layout_constraintEnd_toStartOf="@+id/tvWeightLoss"
         app:layout_constraintStart_toStartOf="@+id/layoutName"
         app:layout_constraintTop_toBottomOf="@+id/layoutName"
         tools:text="🔥 Legend" />
+
+    <TextView
+        android:id="@+id/tvWeightLoss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/roboto_bold"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@+id/tvLevel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvLevel"
+        tools:text="-12.5 kg" />
 
     <TextView
         android:id="@+id/tvLastSeen"

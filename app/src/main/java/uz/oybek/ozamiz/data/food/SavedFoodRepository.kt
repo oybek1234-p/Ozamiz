@@ -79,6 +79,17 @@ object SavedFoodRepository {
         }
     }
 
+    suspend fun getSavedFood(foodId: String): FoodLog? {
+        val userId = currentUserId
+        if (userId.isBlank() || foodId.isBlank()) return null
+        return try {
+            val snapshot = reference.child(foodId).get().await()
+            snapshot.getValue(FoodLog::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     suspend fun getSavedFoodKeyByDescription(description: String): String? {
         val userId = currentUserId
         if (userId.isBlank()) return null

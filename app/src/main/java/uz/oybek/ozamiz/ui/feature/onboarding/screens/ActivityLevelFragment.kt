@@ -38,8 +38,7 @@ class ActivityLevelFragment : OnBoardingChildFragment<FragmentActivityLevelBindi
             ) {
                 holder.binding.apply {
                     (this as ActivityLevelItemBinding)
-                    titleView.text = model.title
-                    subtitleView.text = model.subtitle
+                    titleView.text = "${model.title} - ${model.subtitle}"
                 }
             }
 

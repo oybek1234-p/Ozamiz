@@ -31,30 +31,34 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
 
     override fun viewCreated(bind: FragmentMenuSearchResultsBinding) {
         bind.btnBack.setOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
 
         setupFilters(bind)
         setupResultsList(bind)
         loadBanner()
 
-        findNavController().currentBackStackEntry?.savedStateHandle
-            ?.getLiveData<Menu>("updated_menu")
-            ?.observe(viewLifecycleOwner) { updatedMenu ->
-                if (updatedMenu != null) {
-                    viewModel.onMenuUpdated(updatedMenu)
-                    findNavController().currentBackStackEntry?.savedStateHandle?.remove<Menu>("updated_menu")
+        try {
+            findNavController().currentBackStackEntry?.savedStateHandle
+                ?.getLiveData<Menu>("updated_menu")
+                ?.observe(viewLifecycleOwner) { updatedMenu ->
+                    if (updatedMenu != null) {
+                        viewModel.onMenuUpdated(updatedMenu)
+                        findNavController().currentBackStackEntry?.savedStateHandle?.remove<Menu>("updated_menu")
+                    }
                 }
-            }
 
-        findNavController().currentBackStackEntry?.savedStateHandle
-            ?.getLiveData<String>("deleted_menu_id")
-            ?.observe(viewLifecycleOwner) { deletedMenuId ->
-                if (deletedMenuId != null) {
-                    viewModel.onMenuDeleted(deletedMenuId)
-                    findNavController().currentBackStackEntry?.savedStateHandle?.remove<String>("deleted_menu_id")
+            findNavController().currentBackStackEntry?.savedStateHandle
+                ?.getLiveData<String>("deleted_menu_id")
+                ?.observe(viewLifecycleOwner) { deletedMenuId ->
+                    if (deletedMenuId != null) {
+                        viewModel.onMenuDeleted(deletedMenuId)
+                        findNavController().currentBackStackEntry?.savedStateHandle?.remove<String>("deleted_menu_id")
+                    }
                 }
-            }
+        } catch (e: Exception) {
+            // ignore
+        }
     }
 
     private fun setupFilters(bind: FragmentMenuSearchResultsBinding) {
@@ -119,7 +123,7 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
                 MenuSearchResultsFragmentDirections.actionMenuSearchResultsFragmentToMenuDetailFragment(
                     menu
                 )
-            findNavController().navigate(action)
+            navigate(action)
         }, {
             viewModel.loadNext()
         })
@@ -144,15 +148,7 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
     }
 
     private fun loadBanner() {
-        if (UserProfileRepository.user.isPremium()) {
-            binding.bannerContainer.visibility = View.GONE
-            return
-        }
-        val bannerView = AdsManager.createBannerView(
-            requireContext(),
-            AdsConfig.BANNER_HOME
-        )
-        binding.bannerContainer.addView(bannerView)
+        binding.bannerContainer.visibility = View.GONE
     }
 
     override fun inflateBinding(

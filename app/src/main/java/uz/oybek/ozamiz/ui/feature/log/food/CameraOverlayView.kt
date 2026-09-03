@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 
@@ -14,19 +14,20 @@ class CameraOverlayView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = OVERLAY_COLOR
-    }
+    private val strokeWidth = 3.5f * resources.displayMetrics.density
 
-    private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val cornerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         style = Paint.Style.STROKE
-        strokeWidth = STROKE_WIDTH_DP * resources.displayMetrics.density
+        strokeWidth = this@CameraOverlayView.strokeWidth
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
     }
 
-    private val cutoutRect = RectF()
-    private val cornerRadius = CORNER_RADIUS_DP * resources.displayMetrics.density
-    private val verticalOffset = VERTICAL_OFFSET_DP * resources.displayMetrics.density
+    private val cornerPath = Path()
+    private val density = resources.displayMetrics.density
+    private val cornerLength = 24f * density
+    private val cornerRadius = 14f * density
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -35,26 +36,42 @@ class CameraOverlayView @JvmOverloads constructor(
         val viewHeight = height.toFloat()
         if (viewWidth <= 0f || viewHeight <= 0f) return
 
-        val cutoutSize = viewWidth * CUTOUT_WIDTH_RATIO
-        val left = (viewWidth - cutoutSize) / 2f
-        val top = (viewHeight - cutoutSize) / 2f - verticalOffset
-        val right = left + cutoutSize
-        val bottom = top + cutoutSize
+        val rectWidth = viewWidth * 0.84f
+        val rectHeight = rectWidth * 0.95f
 
-        cutoutRect.set(left, top, right, bottom)
+        val left = (viewWidth - rectWidth) / 2f
+        val top = (viewHeight - rectHeight) / 2f
+        val right = left + rectWidth
+        val bottom = top + rectHeight
 
-        canvas.drawRect(0f, 0f, viewWidth, top, backgroundPaint)
-        canvas.drawRect(0f, bottom, viewWidth, viewHeight, backgroundPaint)
-        canvas.drawRect(0f, top, left, bottom, backgroundPaint)
-        canvas.drawRect(right, top, viewWidth, bottom, backgroundPaint)
-        canvas.drawRoundRect(cutoutRect, cornerRadius, cornerRadius, strokePaint)
-    }
+        val r = cornerRadius.coerceAtMost(cornerLength / 2f)
 
-    companion object {
-        private const val OVERLAY_COLOR = 0x77000000.toInt()
-        private const val CUTOUT_WIDTH_RATIO = 0.85f
-        private const val CORNER_RADIUS_DP = 24f
-        private const val STROKE_WIDTH_DP = 2f
-        private const val VERTICAL_OFFSET_DP = 40f
+        cornerPath.reset()
+
+        // 1. Top-Left Corner ┌
+        cornerPath.moveTo(left, top + cornerLength)
+        cornerPath.lineTo(left, top + r)
+        cornerPath.quadTo(left, top, left + r, top)
+        cornerPath.lineTo(left + cornerLength, top)
+
+        // 2. Top-Right Corner ┐
+        cornerPath.moveTo(right - cornerLength, top)
+        cornerPath.lineTo(right - r, top)
+        cornerPath.quadTo(right, top, right, top + r)
+        cornerPath.lineTo(right, top + cornerLength)
+
+        // 3. Bottom-Right Corner ┘
+        cornerPath.moveTo(right, bottom - cornerLength)
+        cornerPath.lineTo(right, bottom - r)
+        cornerPath.quadTo(right, bottom, right - r, bottom)
+        cornerPath.lineTo(right - cornerLength, bottom)
+
+        // 4. Bottom-Left Corner └
+        cornerPath.moveTo(left + cornerLength, bottom)
+        cornerPath.lineTo(left + r, bottom)
+        cornerPath.quadTo(left, bottom, left, bottom - r)
+        cornerPath.lineTo(left, bottom - cornerLength)
+
+        canvas.drawPath(cornerPath, cornerPaint)
     }
 }

@@ -123,7 +123,7 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
     }
 
     private fun setupListeners(bind: FragmentAddMenuBinding) {
-        bind.btnBack.setOnClickListener { findNavController().popBackStack() }
+        bind.btnBack.setOnClickListener { popBackStack() }
         bind.cardImagePicker.setOnClickListener { imagePickerLauncher.launch("image/*") }
 
         bind.btnAddIngredient.setOnClickListener {
@@ -135,7 +135,7 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
         }
 
         bind.btnSelectCategories.setOnClickListener {
-            findNavController().navigate(R.id.action_addMenuFragment_to_categorySelectionFragment)
+            navigate(R.id.action_addMenuFragment_to_categorySelectionFragment)
         }
 
         bind.radioGroupType.setOnCheckedChangeListener { _, checkedId ->
@@ -232,9 +232,13 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
                         viewModel.clearSavedState()
                         Toast.makeText(context, "Muvaffaqiyatli saqlandi!", Toast.LENGTH_SHORT)
                             .show()
-                        findNavController().previousBackStackEntry
-                            ?.savedStateHandle?.set(KEY_MENU_UPDATED, state.savedMenu)
-                        findNavController().popBackStack()
+                        try {
+                            findNavController().previousBackStackEntry
+                                ?.savedStateHandle?.set(KEY_MENU_UPDATED, state.savedMenu)
+                        } catch (e: Exception) {
+                            // ignore
+                        }
+                        popBackStack()
                     }
 
                     if (state.isValidationError) {

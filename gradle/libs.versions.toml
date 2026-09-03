@@ -22,6 +22,7 @@ firebaseAi = "17.6.0"
 firebaseVertexai = "16.5.0"
 common = "0.10.0"
 workRuntimeKtxVersion = "2.11.1"
+firebaseAiVersion = "17.16.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,7 @@ firebase-ai = { group = "com.google.firebase", name = "firebase-ai", version.ref
 firebase-vertexai = { group = "com.google.firebase", name = "firebase-vertexai", version.ref = "firebaseVertexai" }
 common = { group = "com.google.ai.client.generativeai", name = "common", version.ref = "common" }
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
+com-google-firebase-firebase-ai = { group = "com.google.firebase", name = "firebase-ai", version.ref = "firebaseAiVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

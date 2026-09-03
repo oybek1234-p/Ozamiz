@@ -14,8 +14,8 @@ import uz.oybek.ozamiz.databinding.ItemTodaysFoodBinding
 
 class RecentLogsAdapter(
     private val onItemClick: (FoodLog) -> Unit,
-    private val onDeleteClick: (FoodLog) -> Unit,
-    private val onLikeClick: (FoodLog) -> Unit
+    private val onAddClick: ((FoodLog) -> Unit)? = null,
+    private val onDeleteClick: ((FoodLog) -> Unit)? = null
 ) : ListAdapter<FoodLog, RecentLogsAdapter.FoodLogViewHolder>(FOOD_LOG_DIFF_CALLBACK) {
 
     private var savedFoodIds: Set<String> = emptySet()
@@ -50,12 +50,7 @@ class RecentLogsAdapter(
             }
             binding.btnDeleteFood.setOnClickListener {
                 if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
-                    getItem(bindingAdapterPosition)?.let { log -> onDeleteClick(log) }
-                }
-            }
-            binding.btnLikeFood.setOnClickListener {
-                if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
-                    getItem(bindingAdapterPosition)?.let { log -> onLikeClick(log) }
+                    getItem(bindingAdapterPosition)?.let { log -> onDeleteClick?.invoke(log) }
                 }
             }
         }
@@ -82,15 +77,6 @@ class RecentLogsAdapter(
             } else {
                 binding.imageViewFood.visibility = View.GONE
             }
-
-            val isLiked = savedFoodIds.contains(foodLog.description.lowercase().trim())
-            binding.btnLikeFood.setImageResource(
-                if (isLiked) R.drawable.ic_heart_filled else R.drawable.ic_heart_outline
-            )
-            binding.btnLikeFood.imageTintList = android.content.res.ColorStateList.valueOf(
-                if (isLiked) itemView.context.getColor(R.color.likeColor)
-                else itemView.context.getColor(R.color.iconColor)
-            )
         }
     }
 

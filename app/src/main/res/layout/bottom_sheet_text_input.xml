@@ -33,14 +33,19 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_analyze_and_save"
-        style="@style/FilledButton"
+        style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="54dp"
         android:layout_marginTop="24dp"
-        app:iconPadding="@dimen/dimen_8"
-        app:icon="@drawable/check_ic"
-        app:iconGravity="textStart"
+        android:backgroundTint="?colorPrimary"
+        android:fontFamily="@font/roboto_bold"
         android:text="Tahlil qilish"
-        app:cornerRadius="12dp" />
+        android:textColor="?colorSurface"
+        android:textSize="16sp"
+        app:cornerRadius="27dp"
+        app:icon="@drawable/arrow_right"
+        app:iconGravity="textEnd"
+        app:iconPadding="@dimen/dimen_12"
+        app:iconTint="?colorSurface" />
 
 </LinearLayout>

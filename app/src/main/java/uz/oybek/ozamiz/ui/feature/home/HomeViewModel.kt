@@ -2,9 +2,11 @@ package uz.oybek.ozamiz.ui.feature.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +33,7 @@ import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.logs.model.WaterLog
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DataWrapper
@@ -59,25 +62,40 @@ class HomeViewModel : ViewModel() {
     private val _showWeightLogEvent = MutableSharedFlow<Unit>()
     val showWeightLogEvent = _showWeightLogEvent.asSharedFlow()
 
+    var lastCaloriesEaten: Int? = null
+    var lastCaloriesRemaining: Int? = null
+    var lastCaloriesBurned: Int? = null
+    var lastProteinConsumed: Int? = null
+    var lastFatConsumed: Int? = null
+    var lastCarbsConsumed: Int? = null
+    private var lastDate: Date? = null
+
+    fun checkDateReset(newDate: Date) {
+        if (lastDate == null || !DateUtils.isSameDay(lastDate, newDate)) {
+            lastDate = newDate
+            lastCaloriesEaten = null
+            lastCaloriesRemaining = null
+            lastCaloriesBurned = null
+            lastProteinConsumed = null
+            lastFatConsumed = null
+            lastCarbsConsumed = null
+        }
+    }
+
     private val _exerciseAddedEvent = MutableSharedFlow<Int>()
     val exerciseAddedEvent = _exerciseAddedEvent.asSharedFlow()
-
-    private val _showDailyAnalysisEvent = Channel<DailyAnalysisData>(Channel.BUFFERED)
-    val showDailyAnalysisEvent = _showDailyAnalysisEvent.receiveAsFlow()
-
-    private val _showFoodFeedbackEvent = MutableSharedFlow<String>()
-    val showFoodFeedbackEvent = _showFoodFeedbackEvent.asSharedFlow()
-
-    private val _showWaterBenefitsEvent = MutableSharedFlow<Unit>()
-    val showWaterBenefitsEvent = _showWaterBenefitsEvent.asSharedFlow()
 
     private val _showStreakFreezeEvent = MutableSharedFlow<Unit>()
     val showStreakFreezeEvent = _showStreakFreezeEvent.asSharedFlow()
 
-    private val _showWater60AnalysisEvent = MutableSharedFlow<DailyAnalysisData>()
-    val showWater60AnalysisEvent = _showWater60AnalysisEvent.asSharedFlow()
-
     private var hasCheckedFreezeThisSession = false
+    
+    var pendingCameraArgs: android.os.Bundle? = null
+        private set
+
+    fun setPendingCameraArgs(args: android.os.Bundle?) {
+        pendingCameraArgs = args
+    }
 
     private fun checkStreakFrozen(user: User) {
         if (hasCheckedFreezeThisSession) return
@@ -89,41 +107,9 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-
-    data class DailyAnalysisData(
-        val foodCount: Int,
-        val healthyFoodCount: Int,
-        val points: Int,
-        val waterMl: Int,
-        val hasExercise: Boolean = false,
-        val hasProteinGoal: Boolean = false,
-        val noSweets: Boolean = false,
-        val noBread: Boolean = false,
-        val type: String = "DAILY", // "DAILY", "WATER_60"
-        val caloriesBurned: Int = 0
-    )
-
     private var dataCollectionJob: Job? = null
 
     init {
-        viewModelScope.launch {
-            PointsRepository.analysisEventFlow.collect { info ->
-                _showDailyAnalysisEvent.send(
-                    DailyAnalysisData(
-                        foodCount = info.foodCount,
-                        healthyFoodCount = info.healthyFoodCount,
-                        points = info.points,
-                        waterMl = info.waterMl,
-                        hasExercise = info.hasExercise,
-                        hasProteinGoal = info.hasProteinGoal,
-                        noSweets = info.noSweets,
-                        noBread = info.noBread,
-                        type = info.type,
-                        caloriesBurned = info.caloriesBurned
-                    )
-                )
-            }
-        }
         val initialDates = DateUtils.generateDatesForScroller()
         val initialSelectedDate = DateUtils.getStartOfDay(Date())
         _uiState.update {
@@ -132,19 +118,21 @@ class HomeViewModel : ViewModel() {
                 selectedDate = initialSelectedDate
             )
         }
-        UserProfileRepository.observeCurrentUser { user ->
-            if (user != null && user.valid) {
-                val daysFromRegister = user.daysFromRegister()
-                val settings = AppPreference.current
-                
-                _uiState.update { state ->
-                    state.copy(
-                        streakInfo = user.streakInfo,
-                        userPoints = user.scorePoints,
-                        daysFromRegister = daysFromRegister
-                    )
+        viewModelScope.launch {
+            LocalUser.userLive.asFlow().collect { user ->
+                if (user.valid) {
+                    val daysFromRegister = user.daysFromRegister()
+                    
+                    _uiState.update { state ->
+                        state.copy(
+                            streakInfo = user.streakInfo,
+                            userPoints = user.scorePoints,
+                            daysFromRegister = daysFromRegister,
+                            paymentChecking = user.paymentChecking
+                        )
+                    }
+                    checkStreakFrozen(user)
                 }
-                checkStreakFrozen(user)
             }
         }
         startLoadingData(initialSelectedDate)
@@ -153,11 +141,16 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun observeScrollerSummaries() {
-        val startTime = System.currentTimeMillis()
         val dates = _uiState.value.datesForScroller
         if (dates.isEmpty()) return
 
-        val flows = dates.map { date ->
+        // Observe only selected date and adjacent dates to keep home screen smooth and fast
+        val selectedDate = _uiState.value.selectedDate
+        val datesToObserve = dates.filter {
+            kotlin.math.abs(it.time - selectedDate.time) <= 3 * 86400000L
+        }
+
+        val flows = datesToObserve.map { date ->
             LogRepository.observeDailySummary(date).map { date to it }
         }
 
@@ -167,11 +160,10 @@ class HomeViewModel : ViewModel() {
                     .associate { it.first.dateApiFormat() to (it.second as DataWrapper.Success).data }
             }.collect { map ->
                 _uiState.update { state ->
-                    state.copy(dailySummaries = map)
+                    state.copy(dailySummaries = state.dailySummaries + map)
                 }
             }
         }
-        Log.d("HomePerf", "HomeViewModel.observeScrollerSummaries execution time: ${System.currentTimeMillis() - startTime} ms")
     }
 
     private fun checkWeightLog() {
@@ -188,7 +180,6 @@ class HomeViewModel : ViewModel() {
     )
 
     private fun startLoadingData(date: Date) {
-        PointsRepository.resetState()
         dataCollectionJob?.cancel()
         dataCollectionJob = viewModelScope.launch {
             try {
@@ -228,16 +219,7 @@ class HomeViewModel : ViewModel() {
                 val currentExerciseBurnt = summary.burnedCalories
                 val waterTarget = user.targetWaterMl
 
-                val remaining = if (summary.consumedCalories > targetCals + 100) {
-                    val net = summary.consumedCalories - currentExerciseBurnt
-                    if (net <= targetCals) {
-                        0
-                    } else {
-                        targetCals - net
-                    }
-                } else {
-                    targetCals - summary.consumedCalories
-                }
+                val remaining = targetCals - summary.consumedCalories
 
                 _uiState.update {
                     it.copy(
@@ -262,8 +244,6 @@ class HomeViewModel : ViewModel() {
                         dailyFoodLogs = foodLogs
                     )
                 }
-
-                PointsRepository.checkActivitiesAndTrigger(date, summary, foodLogs, exerciseLogs)
             }
 
             is DataWrapper.Error -> {
@@ -286,9 +266,6 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-
-
-
     fun onDateSelected(date: Date) {
         _uiState.update { it.copy(selectedDate = date, isInitialLoading = false) }
         startLoadingData(date)
@@ -296,6 +273,10 @@ class HomeViewModel : ViewModel() {
 
     fun refresh() {
         _uiState.update { it.copy(isRefreshing = true) }
+        viewModelScope.launch {
+            delay(600)
+            _uiState.update { it.copy(isRefreshing = false) }
+        }
         startLoadingData(_uiState.value.selectedDate)
     }
 
@@ -305,7 +286,6 @@ class HomeViewModel : ViewModel() {
         if (currentWater + amount > 4000) {
             return
         }
-        PointsRepository.addWaterTrigger()
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
@@ -325,8 +305,6 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-
-
     fun addExercise(exerciseType: String, durationMin: Int, caloriesBurned: Int) {
         viewModelScope.launch {
             val date = uiState.value.selectedDate
@@ -343,12 +321,5 @@ class HomeViewModel : ViewModel() {
                 _exerciseAddedEvent.emit(caloriesBurned)
             }
         }
-    }
-
-    private val _showFoodFeedbackEventShared = MutableSharedFlow<String>()
-    private var feedbackChecked = false
-
-    private fun checkYesterdayFoodLogFeedback(user: User) {
-        // Disabled per user request
     }
 }

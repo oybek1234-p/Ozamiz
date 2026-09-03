@@ -10,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.R
-import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.databinding.FragmentAddPostBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -67,7 +66,7 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
     }
 
     private fun setupListeners() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        binding.toolbar.setNavigationOnClickListener { navigateUp() }
 
         binding.btnSelectImages.setOnClickListener {
             galleryLauncher.launch("image/*")
@@ -143,7 +142,7 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
 
             if (result.isSuccess) {
                 Toast.makeText(requireContext(), "Post tekshiruvga yuborildi", Toast.LENGTH_LONG).show()
-                findNavController().navigateUp()
+                navigateUp()
             } else {
                 Toast.makeText(requireContext(), "Xatolik: ${result.exceptionOrNull()?.message}", Toast.LENGTH_SHORT).show()
             }

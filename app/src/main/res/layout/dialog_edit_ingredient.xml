@@ -5,16 +5,33 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp"
-    android:background="?colorSurfaceContainer">
+    android:background="@drawable/bg_bottom_sheet_top_rounded">
 
-    <TextView
-        style="@style/Title2_20"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp"
-        android:text="Ovqatni tahrirlash"
-        android:textColor="?colorOnSurface" />
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            style="@style/Title2_20"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Ovqatni tahrirlash"
+            android:textColor="?colorOnSurface" />
+
+        <ImageButton
+            android:id="@+id/button_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="end|center_vertical"
+            android:background="?selectableItemBackgroundBorderless"
+            android:contentDescription="Yopish"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/close_ic"
+            app:tint="?colorOnSurface" />
+    </FrameLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputLayout_ingredient_name"
@@ -30,43 +47,20 @@
             android:inputType="textCapSentences" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputLayout_ingredient_amount"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:orientation="horizontal">
+        android:hint="Miqdori (gramm)">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputLayout_ingredient_amount"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editText_ingredient_amount"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:hint="@string/amount_hint">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editText_ingredient_amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberDecimal" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputLayout_ingredient_unit"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/unit_hint">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editText_ingredient_unit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text" />
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
+            android:inputType="numberDecimal" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputLayout_ingredient_calories"
@@ -91,7 +85,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_delete"
-            style="@style/Widget.Material3.Button.TextButton"
+            style="@style/Widget.Material3.Button.ElevatedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/delete"
@@ -105,17 +99,10 @@
             android:layout_weight="1" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_cancel"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel" />
-
-        <com.google.android.material.button.MaterialButton
             android:id="@+id/button_save"
+            style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:text="@string/save" />
     </LinearLayout>
 

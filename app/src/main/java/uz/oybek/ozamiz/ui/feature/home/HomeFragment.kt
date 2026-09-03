@@ -11,7 +11,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.yandex.mobile.ads.banner.BannerAdEventListener
@@ -21,11 +20,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import android.animation.ValueAnimator
+import android.view.animation.DecelerateInterpolator
+import androidx.core.os.bundleOf
 import androidx.transition.TransitionManager
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
-import uz.oybek.ozamiz.data.ai.TodayAiMenuRepository
 import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.model.UserExercise
@@ -37,9 +39,15 @@ import uz.oybek.ozamiz.data.user.model.daysFromRegister
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.ui.MainActivity
+import android.net.Uri
+import androidx.fragment.app.setFragmentResultListener
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.log.food.FoodCameraFragment
+import uz.oybek.ozamiz.ui.feature.log.food.AnalyzeResultFragment
 import uz.oybek.ozamiz.ui.feature.log.food.LogFoodFragment
 import uz.oybek.ozamiz.ui.feature.log.exercise.ExerciseAchievementDialog
+import uz.oybek.ozamiz.ui.feature.log.water.LogWaterDialog
 import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet
@@ -52,6 +60,8 @@ import kotlin.math.absoluteValue
 
 class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
+    override val screenName: String = "HomeFragment"
+
     private val viewModel: HomeViewModel by activityViewModels()
     private var dateAdapter: DateScrollerAdapter? = null
 
@@ -60,27 +70,46 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private var lastSelectedDate: Date? = null
     private var hasShownFeedbackDialogThisSession = false
 
+    private fun animateIntegerText(
+        textView: android.widget.TextView,
+        fromValue: Int,
+        toValue: Int,
+        duration: Long = 450L,
+        formatter: ((Int) -> String)? = null
+    ) {
+        if (fromValue == toValue) {
+            textView.text = formatter?.invoke(toValue) ?: toValue.toString()
+            return
+        }
+        val animator = ValueAnimator.ofInt(fromValue, toValue).apply {
+            this.duration = duration
+            interpolator = DecelerateInterpolator()
+            addUpdateListener { anim ->
+                val valInt = anim.animatedValue as Int
+                textView.text = formatter?.invoke(valInt) ?: valInt.toString()
+            }
+        }
+        animator.start()
+    }
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { }
 
-    init {
-        showBottomSheet = true
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initWeightLogCard()
-    }
-
-    private fun initWeightLogCard() {
-        lifecycleScope.launch {
-            delay(WEIGHT_LOG_DELAY)
-            val needShowWeightLog = viewModel.uiState.value.showWeightLogCard
-            if (needShowWeightLog) {
-                navigate(R.id.photoUploadInfoFragment)
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val bundle = viewModel.pendingCameraArgs
+            if (bundle != null) {
+                navigate(R.id.action_home_to_foodCameraFragment, bundle)
+                viewModel.setPendingCameraArgs(null)
             }
         }
+    }
+
+    init {
+        showBottomSheet = true
     }
 
     override fun inflateBinding(
@@ -105,9 +134,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         observeExerciseAdded()
         checkNotificationPermission()
         setupLimitExceededResultListener()
-        setupPremiumResultListener()
         setupExerciseAddedResultListener()
-        initBannerAd(bind)
         if (animateProgress) {
             lifecycleScope.launch {
                 delay(200)
@@ -116,87 +143,16 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
-    private fun initBannerAd(bind: FragmentHomeBinding) {
-        if (user.isPremium()) return
-        val bannerView = AdsManager.createBannerView(
-            requireContext(),
-            AdsConfig.BANNER_HOME,
-            object : BannerAdEventListener {
-                override fun onAdLoaded() {
-                    bind.bannerAdContainerHome.visibility = android.view.View.VISIBLE
-                }
-
-                override fun onAdFailedToLoad(error: AdRequestError) {
-                    bind.bannerAdContainerHome.visibility = android.view.View.GONE
-                }
-
-                override fun onAdClicked() {}
-                override fun onImpression(impressionData: ImpressionData?) {}
-            })
-        bind.bannerAdContainerHome.removeAllViews()
-        bind.bannerAdContainerHome.addView(bannerView)
-    }
-
-    private fun checkPremiumAndNavigate(destinationId: Int) {
-        if (user.isPremium()) {
-            navigate(destinationId)
-        } else {
-            PremiumBottomSheetDialog().show(childFragmentManager, PremiumBottomSheetDialog.TAG)
-        }
-    }
-
-    private fun setupPremiumResultListener() {
-        childFragmentManager.setFragmentResultListener(
-            PremiumBottomSheetDialog.REQUEST_KEY,
-            viewLifecycleOwner
-        ) { _, bundle ->
-            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
-            if (result == "go_to_payment") {
-                val price = bundle.getLong("selected_price", 29000L)
-                val isYearly = bundle.getBoolean("is_yearly", false)
-                val args = androidx.core.os.bundleOf("price" to price, "is_yearly" to isYearly)
-                findNavController().navigate(
-                    R.id.paymentGetCheckFragment,
-                    args
-                )
-            }
-        }
-    }
-
     private fun setupExerciseAddedResultListener() {
-        parentFragmentManager.setFragmentResultListener(
-            "exercise_added_request",
-            viewLifecycleOwner
-        ) { _, bundle ->
-            val calories = bundle.getInt("caloriesBurned", 0)
-            if (calories > 0) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    delay(1000)
-                    val args = DailyAnalysisFragment.createArgs(
-                        type = DailyAnalysisFragment.TYPE_EXERCISE_50,
-                        caloriesBurned = calories
-                    )
-                    navigate(R.id.action_home_to_dailyAnalysisFragment, args)
-                }
-            }
-        }
+        // Exercise added praise screen disabled per user requirement
     }
 
     private fun setupLimitExceededResultListener() {
-        parentFragmentManager.setFragmentResultListener("limit_exceeded_result", viewLifecycleOwner) { _, bundle ->
-            val exceededTypes = bundle.getStringArrayList("exceeded_types") ?: emptyList()
-            if (exceededTypes.contains("calories")) {
-                if (childFragmentManager.findFragmentByTag(CalorieLimitReachedDialogFragment.TAG) == null) {
-                    val dialog = CalorieLimitReachedDialogFragment.newInstance()
-                    dialog.show(childFragmentManager, CalorieLimitReachedDialogFragment.TAG)
-                }
-            }
-        }
+        // Disabled popup screens per user request
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.refresh()
     }
 
     override fun onDestroyView() {
@@ -238,42 +194,34 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             TransitionManager.beginDelayedTransition(appBarLayout)
             if (isVisible) {
                 dateScrollerRecyclerView.visibility = View.GONE
-                toolbarTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_down, 0)
+                toolbarTitle.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    R.drawable.ic_arrow_down,
+                    0
+                )
             } else {
                 dateScrollerRecyclerView.visibility = View.VISIBLE
-                toolbarTitle.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_up, 0)
+                toolbarTitle.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    R.drawable.ic_arrow_up,
+                    0
+                )
             }
         }
     }
 
     private fun initCalorieAndMacros() = binding.mainProgress.apply {
         cardProtein.setOnClickListener {
-            checkPremiumAndNavigate(R.id.proteinGuideFragment)
+            navigate(R.id.proteinGuideFragment)
         }
         cardFat.setOnClickListener {
-            checkPremiumAndNavigate(R.id.lipidsGuideFragment)
+            navigate(R.id.lipidsGuideFragment)
         }
         cardCarbs.setOnClickListener {
-            checkPremiumAndNavigate(R.id.carbsGuideFragment)
+            navigate(R.id.carbsGuideFragment)
         }
-        btnDetailedInfo.setOnSafeClickListener {
-            val currentState = viewModel.uiState.value
-            if (currentState.caloriesRemaining < 0) {
-                val excessCalories = currentState.caloriesRemaining.absoluteValue
-                val exceededTypes = listOf("kaloriya")
-                val overages = mapOf("kaloriya" to excessCalories)
-                OverageInfoBottomSheet.newInstance(exceededTypes, overages)
-                    .show(childFragmentManager, OverageInfoBottomSheet.TAG)
-            } else {
-                val args = Bundle().apply {
-                    putString(MacroInfoFragment.ARG_MACRO_TYPE, MacroInfoFragment.MACRO_CALORIES)
-                    putInt(MacroInfoFragment.ARG_CONSUMED, currentState.caloriesConsumed)
-                    putInt(MacroInfoFragment.ARG_TARGET, currentState.caloriesTarget)
-                }
-                navigate(R.id.action_home_to_macroInfoFragment, args)
-            }
-        }
-
         btnHowFatBurned.setOnSafeClickListener {
             InfoBottomSheet.newInstance(
                 getString(R.string.how_to_burn_fat_title),
@@ -288,23 +236,49 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    private fun openFoodCamera(mealId: String) {
+        checkLimitAndProceed {
+            val timestamp = viewModel.uiState.value.selectedDate.time
+            val cameraBundle = bundleOf(
+                "mealType" to mealId,
+                "timestamp" to timestamp,
+                "openCamera" to true
+            )
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    android.Manifest.permission.CAMERA
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                navigate(R.id.action_home_to_foodCameraFragment, cameraBundle)
+            } else {
+                viewModel.setPendingCameraArgs(cameraBundle)
+                cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+            }
+        }
+    }
+
     private fun initMeals() = binding.apply {
         fun onMealClick(meal: String) {
             LogFoodFragment.navigate(
-                navController = findNavController(),
+                fragment = this@LogFragment,
                 timeStamp = viewModel.uiState.value.selectedDate.time,
                 meal = meal,
                 openCamera = false
             )
         }
+
+        fun onAddMealQuickClick(meal: String) {
+            openFoodCamera(meal)
+        }
+
         cardBreakfast.root.setOnSafeClickListener { onMealClick(MealTime.Breakfast.id) }
-        cardBreakfast.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Breakfast.id) }
+        cardBreakfast.btnAddMeal.setOnSafeClickListener { onAddMealQuickClick(MealTime.Breakfast.id) }
         cardLunch.root.setOnSafeClickListener { onMealClick(MealTime.Lunch.id) }
-        cardLunch.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Lunch.id) }
+        cardLunch.btnAddMeal.setOnSafeClickListener { onAddMealQuickClick(MealTime.Lunch.id) }
         cardDinner.root.setOnSafeClickListener { onMealClick(MealTime.Dinner.id) }
-        cardDinner.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Dinner.id) }
+        cardDinner.btnAddMeal.setOnSafeClickListener { onAddMealQuickClick(MealTime.Dinner.id) }
         cardSnack.root.setOnSafeClickListener { onMealClick(MealTime.Snack.id) }
-        cardSnack.btnAddMeal.setOnSafeClickListener { onMealClick(MealTime.Snack.id) }
+        cardSnack.btnAddMeal.setOnSafeClickListener { onAddMealQuickClick(MealTime.Snack.id) }
 
         cardBreakfast.imgMealIcon.setImageResource(R.drawable.breakfast_simple)
         cardBreakfast.textMealName.text = getString(R.string.breakfast)
@@ -318,19 +292,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun initWater() = binding.apply {
         cardWater.setOnSafeClickListener {
-            TodayWatersBottomSheet().show(childFragmentManager, TodayWatersBottomSheet.TAG)
+            LogWaterDialog().show(childFragmentManager, "LogWaterDialog")
         }
-        btnWater250.setOnSafeClickListener {
-            viewModel.addWater(250)
-            triggerVibration()
-        }
-        btnWater500.setOnSafeClickListener {
-            viewModel.addWater(500)
-            triggerVibration()
-        }
-        btnWater1000.setOnSafeClickListener {
-            viewModel.addWater(1000)
-            triggerVibration()
+        btnAddWater.setOnSafeClickListener {
+            LogWaterDialog().show(childFragmentManager, "LogWaterDialog")
         }
         childFragmentManager.setFragmentResultListener(
             KEY_WATER_ADDED_REQUEST, viewLifecycleOwner
@@ -344,26 +309,17 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun initExercise() = binding.apply {
         cardExercise.setOnSafeClickListener {
-            TodayExercisesBottomSheet().show(childFragmentManager, TodayExercisesBottomSheet.TAG)
+            navigate(R.id.selectExerciseFragment)
         }
-        btnQuickWalk.setOnSafeClickListener {
-            val args = Bundle().apply {
-                putString(KEY_EXERCISE_ID, UserExercise.PiyodaYurish.name)
-            }
-            navigate(R.id.addExerciseLogFragment, args)
-        }
-        btnQuickRun.setOnSafeClickListener {
-            val args = Bundle().apply {
-                putString(KEY_EXERCISE_ID, UserExercise.Yugurish.name)
-            }
-            navigate(R.id.addExerciseLogFragment, args)
-        }
-        btnQuickOther.setOnSafeClickListener {
+        btnAddExercise.setOnSafeClickListener {
             navigate(R.id.selectExerciseFragment)
         }
     }
 
     private fun initWeightLogListener() = binding.apply {
+        cardWeightLog.setOnSafeClickListener {
+            navigate(R.id.addWeightPhotoFragment)
+        }
         btnAddWeightHome.setOnSafeClickListener {
             navigate(R.id.addWeightPhotoFragment)
         }
@@ -372,9 +328,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private fun initFeaturesCards() = binding.apply {
         cardWhatToEat.setOnSafeClickListener {
             navigate(R.id.plateRuleFragment)
-        }
-        cardRecommendations.setOnSafeClickListener {
-            navigate(R.id.healthRecommendationsFragment)
         }
     }
 
@@ -392,8 +345,12 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         cardCommunityHome.setOnSafeClickListener {
             val bundle = Bundle().apply {
                 putBoolean("showBackButton", true)
+                putBoolean("selectWeightLoss", true)
             }
             navigate(R.id.communityFragment, bundle)
+        }
+        cardPremiumChecking.setOnSafeClickListener {
+            navigate(R.id.premiumFragment)
         }
     }
 
@@ -401,67 +358,15 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.uiState.collect {
-                        stateCollectCount++
-                    }
-                }
-                launch {
-                    viewModel.uiState.map {
-                        listOf(
-                            it.selectedDate,
-                            it.datesForScroller,
-                            it.dailySummaries,
-                            it.isRefreshing,
-                            it.caloriesTarget
-                        )
-                    }.distinctUntilChanged().collect {
-                        updateCalendar(viewModel.uiState.value)
-                    }
-                }
-                launch {
-                    viewModel.uiState.map {
-                        listOf(
-                            it.caloriesRemaining,
-                            it.caloriesConsumed,
-                            it.caloriesTarget,
-                            it.proteinConsumed,
-                            it.proteinTarget,
-                            it.fatConsumed,
-                            it.fatTarget,
-                            it.carbsConsumed,
-                            it.carbsTarget
-                        )
-                    }.distinctUntilChanged().collect {
-                        updateCalorieAndMacros(viewModel.uiState.value)
-                    }
-                }
-                launch {
-                    viewModel.uiState.map {
-                        listOf(it.dailyFoodLogs, it.caloriesTarget, it.caloriesConsumed)
-                    }.distinctUntilChanged().collect {
-                        updateMeals(viewModel.uiState.value)
-                    }
-                }
-                launch {
-                    viewModel.uiState.map { it.waterConsumed to it.waterTarget }
-                        .distinctUntilChanged().collect {
-                            updateWater(viewModel.uiState.value)
-                        }
-                }
-                launch {
-                    viewModel.uiState.map { it.exerciseTarget to it.exerciseBurnt }
-                        .distinctUntilChanged().collect {
-                            updateExercise(viewModel.uiState.value)
-                        }
-                }
-                launch {
-                    viewModel.uiState.map { it.streakInfo }.distinctUntilChanged().collect {
-                        updateStreak(viewModel.uiState.value)
-                    }
-                }
-                launch {
-                    viewModel.uiState.map { it.showWeightLogCard }.distinctUntilChanged().collect {
-                        binding.cardWeightLog.isVisible = it
+                    viewModel.uiState.collect { state ->
+                        updateCalendar(state)
+                        updateCalorieAndMacros(state)
+                        updateMeals(state)
+                        updateWater(state)
+                        updateExercise(state)
+                        updateStreak(state)
+                        binding.cardWeightLog.isVisible = state.showWeightLogCard
+                        binding.cardPremiumChecking.isVisible = state.paymentChecking
                     }
                 }
                 launch {
@@ -477,29 +382,6 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                             returnedAfterManyDays = returnedAfterManyDays
                         )
                         sheet.show(childFragmentManager, StreakInfoSheet.TAG)
-                    }
-                }
-                launch {
-                    viewModel.showWeightLogEvent.collect {
-                        navigate(R.id.photoUploadInfoFragment)
-                    }
-                }
-                launch {
-                    viewModel.showDailyAnalysisEvent.collect { data ->
-                        delay(1000)
-                        val args = DailyAnalysisFragment.createArgs(
-                            foodCount = data.foodCount,
-                            healthyFoodCount = data.healthyFoodCount,
-                            points = data.points,
-                            waterMl = data.waterMl,
-                            hasExercise = data.hasExercise,
-                            hasProteinGoal = data.hasProteinGoal,
-                            noSweets = data.noSweets,
-                            noBread = data.noBread,
-                            type = data.type,
-                            caloriesBurned = data.caloriesBurned
-                        )
-                        navigate(R.id.action_home_to_dailyAnalysisFragment, args)
                     }
                 }
             }
@@ -554,12 +436,13 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun updateYesterdayEval() = binding.apply {
-        cardYesterdayEval.isVisible = false
+
     }
 
     private fun updateCalorieAndMacros(state: HomeUiState) = binding.apply {
         updateGoalPrediction()
         updateYesterdayEval()
+        viewModel.checkDateReset(state.selectedDate)
         val useAnimation = true
         val context = requireContext()
         val cPrimary = VaznimColors.getPrimary(context)
@@ -567,57 +450,82 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         val cGreen = VaznimColors.getGreen(context)
         val cTrack = VaznimColors.getTrack(context)
         val cOnSurface = VaznimColors.getOnSurface(context)
+        val cOnSurfaceVariant = VaznimColors.getOnSurfaceVariant(context)
 
         mainProgress.apply {
+            textCaloriesEatenCount.text = state.caloriesConsumed.toString()
+            textCaloriesBurnedCount.text = state.exerciseBurnt.toString()
+
+            val remainingNew = state.caloriesRemaining.absoluteValue
+            val oldRemaining = viewModel.lastCaloriesRemaining
+
+            val cOnSurfaceVariant = VaznimColors.getOnSurfaceVariant(context)
             textCaloriesRemainingLabel.text = if (state.caloriesRemaining < 0) {
                 getString(R.string.calories_remaining_label_oshdi)
             } else {
                 getString(R.string.calories_remaining_label_qoldi)
             }
-            textCaloriesRemainingCount.text = state.caloriesRemaining.absoluteValue.toString()
-            textEatenCount.text = getString(R.string.calories_eaten_format, state.caloriesConsumed)
-            val effectiveConsumed = if (state.caloriesTarget > 0 && state.caloriesConsumed > state.caloriesTarget + 100) {
-                val net = state.caloriesConsumed - state.exerciseBurnt
-                if (net <= state.caloriesTarget) {
-                    state.caloriesTarget
-                } else {
-                    net
-                }
-            } else {
-                state.caloriesConsumed
-            }
+            textCaloriesRemainingLabel.setTextColor(cOnSurfaceVariant)
+            animateIntegerText(
+                textCaloriesRemainingCount,
+                oldRemaining ?: remainingNew,
+                remainingNew,
+                450L
+            )
+            viewModel.lastCaloriesRemaining = remainingNew
 
-            progressCaloriesCircular.max = state.caloriesTarget
+            val effectiveConsumed =
+                if (state.caloriesTarget > 0 && state.caloriesConsumed > state.caloriesTarget + 100) {
+                    val net = state.caloriesConsumed - state.exerciseBurnt
+                    if (net <= state.caloriesTarget) {
+                        state.caloriesTarget
+                    } else {
+                        net
+                    }
+                } else {
+                    state.caloriesConsumed
+                }
+
+            val maxTarget = if (state.caloriesTarget > 0) state.caloriesTarget else 2000
+            progressCaloriesCircular.max = maxTarget
             progressCaloriesCircular.setProgressCompat(
-                effectiveConsumed.absoluteValue.coerceAtMost(state.caloriesTarget),
+                effectiveConsumed.absoluteValue.coerceAtMost(maxTarget),
                 useAnimation
             )
-            btnDetailedInfo.isVisible = true
+
+            val currentUser = user
+            val targetW = currentUser.targetWeight ?: 0.0
+            val isGainWeight = currentUser.goal == "gain_weight" || (targetW > 0.0 && currentUser.weight > 0.0 && targetW > currentUser.weight)
 
             val reachedLimit =
-                state.caloriesTarget > 0 && effectiveConsumed >= state.caloriesTarget - 100 && effectiveConsumed <= state.caloriesTarget + 100
-            val exceededLimit =
-                state.caloriesTarget > 0 && effectiveConsumed > state.caloriesTarget + 100
-
-            layoutCalorieText.isVisible = !reachedLimit && !exceededLimit
-            layoutNormalProgress.isVisible = reachedLimit.not() && exceededLimit.not()
-            macrosContainer.isVisible = reachedLimit.not() && exceededLimit.not()
+                state.caloriesTarget > 0 && effectiveConsumed >= state.caloriesTarget - 100
+            layoutCalorieText.isVisible = true
+            layoutNormalProgress.isVisible = true
+            macrosContainer.isVisible = true
             limitReached.isVisible = reachedLimit
-            limitExeed.isVisible = exceededLimit
 
+            if (reachedLimit) {
+                if (isGainWeight) {
+                    textLimitEmoji.text = "🎉"
+                    textLimitReachedMessage.text = "Maqsad bajarildi!"
+                    btnHungryWhatToEat.visibility = android.view.View.GONE
+                } else {
+                    textLimitEmoji.text = "🔥"
+                    textLimitReachedMessage.text = "Maqsad bajarildi, tez orada tanangiz yog' yoqishga o'tadi, ertagacha faqat suv ichishingiz mumkin"
+                    btnHungryWhatToEat.visibility = android.view.View.VISIBLE
+                }
+            }
 
             val calorieColor = when {
-                effectiveConsumed > state.caloriesTarget + 100 -> VaznimColors.getRed(context)
-                effectiveConsumed >= state.caloriesTarget - 100 && effectiveConsumed <= state.caloriesTarget + 100 -> cGreen
+                effectiveConsumed > state.caloriesTarget + 100 -> {
+                    if (isGainWeight) cGreen else cYellow
+                }
+                effectiveConsumed >= state.caloriesTarget - 100 -> cGreen
                 else -> cPrimary
             }
             progressCaloriesCircular.setIndicatorColor(calorieColor)
             progressCaloriesCircular.trackColor = cTrack
-            textCaloriesRemainingCount.setTextColor(
-                if (effectiveConsumed > state.caloriesTarget + 100) VaznimColors.getRed(
-                    context
-                ) else cOnSurface
-            )
+            textCaloriesRemainingCount.setTextColor(cOnSurface)
 
             bindMacro(
                 progressProtein,
@@ -628,9 +536,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 cYellow,
                 cGreen,
                 cTrack,
-                cOnSurface,
+                cOnSurfaceVariant,
                 useAnimation
             )
+
             bindMacro(
                 progressFat,
                 textFatValue,
@@ -640,9 +549,10 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 cYellow,
                 cGreen,
                 cTrack,
-                cOnSurface,
+                cOnSurfaceVariant,
                 useAnimation
             )
+
             bindMacro(
                 progressCarbs,
                 textCarbsValue,
@@ -652,14 +562,14 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                 cYellow,
                 cGreen,
                 cTrack,
-                cOnSurface,
+                cOnSurfaceVariant,
                 useAnimation
             )
         }
     }
 
     private fun bindMacro(
-        progress: LinearProgressIndicator,
+        progress: CircularProgressIndicator,
         text: android.widget.TextView,
         consumed: Int,
         target: Int,
@@ -667,15 +577,16 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         cYellow: Int,
         cGreen: Int,
         cTrack: Int,
-        cOnSurface: Int,
+        cOnSurfaceVariant: Int,
         animate: Boolean
     ) {
         val isExceededByMoreThan10 = consumed > target + 10
         val isExceeded = consumed > target
         val isCompleted = consumed >= target * 0.95 && consumed <= target + 10
 
-        progress.max = if (isExceeded) consumed else target
-        progress.setProgressCompat(consumed, animate)
+        val maxVal = (if (isExceeded) consumed else target).coerceAtLeast(1)
+        progress.max = maxVal
+        progress.setProgressCompat(consumed.coerceAtMost(maxVal), animate)
 
         val color = when {
             isExceededByMoreThan10 -> cYellow
@@ -684,7 +595,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         }
         progress.setIndicatorColor(color)
         progress.trackColor = cTrack
-        text.setTextColor(if (isExceededByMoreThan10) cYellow else cOnSurface)
+        text.setTextColor(cOnSurfaceVariant)
 
         val diff = (target - consumed).absoluteValue
         text.text = if (consumed <= target) {
@@ -697,108 +608,98 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     private fun updateMeals(state: HomeUiState) = binding.apply {
         val animate = animateProgress
         val context = requireContext()
-        val mealCalories = state.dailyFoodLogs.groupBy { it.mealType }
-            .mapValues { it.value.sumOf { f -> f.calories } }
+        val mealLogsMap = state.dailyFoodLogs.groupBy { log ->
+            val ts = (log.timestamp as? Number)?.toLong() ?: System.currentTimeMillis()
+            MealTime.getValidMeal(log.mealType, ts)
+        }
         val target = state.caloriesTarget.toFloat()
         val cPrimary = VaznimColors.getPrimary(context)
-        val cOnSurfaceVariant = VaznimColors.getOnSurfaceVariant(context)
-        val meals = listOf(
-            Triple(
-                cardBreakfast, MealTime.Breakfast.id, (target * 0.3f).toInt()
-            ),
-            Triple(cardLunch, MealTime.Lunch.id, (target * 0.4f).toInt()),
-            Triple(cardDinner, MealTime.Dinner.id, (target * 0.2f).toInt()),
-            Triple(cardSnack, MealTime.Snack.id, (target * 0.1f).toInt())
+        val cYellow = VaznimColors.getYellow(context)
+        val timeFormat = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+
+        data class MealConfig(
+            val card: uz.oybek.ozamiz.databinding.ItemHomeMealCardBinding,
+            val id: String,
+            val baseMax: Int,
+            val baseTitle: String
         )
-        meals.forEach { (card, id, baseMax) ->
-            val consumed = mealCalories[id] ?: 0
+
+        val meals = listOf(
+            MealConfig(
+                cardBreakfast,
+                MealTime.Breakfast.id,
+                (target * 0.3f).toInt(),
+                getString(R.string.breakfast)
+            ),
+            MealConfig(
+                cardLunch,
+                MealTime.Lunch.id,
+                (target * 0.4f).toInt(),
+                getString(R.string.lunch)
+            ),
+            MealConfig(
+                cardDinner,
+                MealTime.Dinner.id,
+                (target * 0.2f).toInt(),
+                getString(R.string.dinner)
+            ),
+            MealConfig(
+                cardSnack,
+                MealTime.Snack.id,
+                (target * 0.1f).toInt(),
+                getString(R.string.snack)
+            )
+        )
+        meals.forEach { (card, id, baseMax, baseTitle) ->
+            val logs = mealLogsMap[id] ?: emptyList()
+            val consumed = logs.sumOf { it.calories }
             val max = if (baseMax > 0) baseMax else 400
             card.progressMeal.max = max
             card.progressMeal.setProgressCompat(consumed.coerceAtMost(max), animate)
-            card.progressMeal.setIndicatorColor(cPrimary)
 
-            card.layoutCalories.isVisible = false
+            val indicatorColor = if (consumed > max) cYellow else cPrimary
+            card.progressMeal.setIndicatorColor(indicatorColor)
+
+            card.textMealName.text = baseTitle
+            card.layoutCalories.isVisible = true
+
+            val foodNames = logs.mapNotNull { it.description.takeIf { d -> d.isNotBlank() } }
+                .joinToString(", ")
+
+            if (foodNames.isNotEmpty()) {
+                card.textLastEaten.text = "$consumed/$max kkal • $foodNames"
+            } else {
+                card.textLastEaten.text = "$consumed/$max kkal"
+            }
         }
     }
 
     private fun updateWater(state: HomeUiState) = binding.apply {
-        val context = requireContext()
-        val litersStr = String.format(LITERS_FORMAT, state.waterConsumed / 1000f)
-        val goalLitersStr = String.format(LITERS_FORMAT, state.waterTarget / 1000f)
-        val isWaterCompleted = state.waterTarget > 0 && state.waterConsumed >= state.waterTarget
+        val litersConsumed = state.waterConsumed / 1000f
+        val litersTarget = if (state.waterTarget > 0) state.waterTarget / 1000f else 2.5f
+        val waterTargetMl = if (state.waterTarget > 0) state.waterTarget else 2500
 
-        textCurrentWaterLiters.text = if (isWaterCompleted) {
-            getString(R.string.water_bajarildi)
-        } else {
-            getString(R.string.water_consumed_format, litersStr)
-        }
-        textCurrentWaterLiters.setTextColor(
-            if (isWaterCompleted) VaznimColors.getGreen(context) else VaznimColors.getOnSurface(
-                context
-            )
-        )
+        titleWater.text = "Suv"
+        textWaterValue.text = String.format(java.util.Locale.US, "%.1f ichildi", litersConsumed)
+        textCurrentWaterLiters.text =
+            String.format(java.util.Locale.US, "Maqsad %.1f litr", litersTarget)
 
-        if (isWaterCompleted) {
-            val drawable = ContextCompat.getDrawable(context, R.drawable.check_ic)
-            drawable?.setTint(VaznimColors.getGreen(context))
-            textCurrentWaterLiters.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                drawable, null, null, null
-            )
-            textCurrentWaterLiters.compoundDrawablePadding =
-                (4 * resources.displayMetrics.density).toInt()
-        } else {
-            textCurrentWaterLiters.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                null, null, null, null
-            )
-        }
-
-        textWaterGoal.text = getString(R.string.water_goal_format, goalLitersStr)
-        textWaterGoal.isVisible = state.waterTarget > 0
-        progressWater.max = state.waterTarget
-        progressWater.setProgressCompat(state.waterConsumed, true)
-        titleWater.text = getString(R.string.water_title)
+        val waterProgress =
+            ((state.waterConsumed.toFloat() / waterTargetMl) * 100).toInt().coerceIn(0, 100)
+        progressWater.max = 100
+        progressWater.setProgressCompat(waterProgress, animateProgress)
     }
 
     private fun updateExercise(state: HomeUiState) = binding.apply {
-        val context = requireContext()
-        val cPrimary = VaznimColors.getPrimary(context)
-        val cGreen = VaznimColors.getGreen(context)
-        val cTrack = VaznimColors.getTrack(context)
-        val cOnSurface = VaznimColors.getOnSurface(context)
+        val targetKcal = if (state.exerciseTarget > 0) state.exerciseTarget else 300
+        titleExercise.text = "Harakat"
+        textExerciseValue.text = "${state.exerciseBurnt} kal yoqildi"
+        textExerciseProgress.text = "Maqsad $targetKcal kal"
 
-        progressExercise.max = state.exerciseTarget
-        progressExercise.setProgressCompat(state.exerciseBurnt, true)
-
-        val isExerciseFull = state.exerciseBurnt >= state.exerciseTarget && state.exerciseTarget > 0
-        progressExercise.setIndicatorColor(if (isExerciseFull) cGreen else cPrimary)
-        progressExercise.trackColor = cTrack
-
-        val exRemaining = maxOf(0, state.exerciseTarget - state.exerciseBurnt)
-        textExerciseProgress.text = if (exRemaining > 0) {
-            getString(R.string.exercise_remaining_format, exRemaining)
-        } else {
-            getString(R.string.exercise_bajarildi)
-        }
-        textExerciseProgress.setTextColor(if (isExerciseFull) cGreen else cOnSurface)
-
-        if (isExerciseFull) {
-            val drawable = ContextCompat.getDrawable(context, R.drawable.check_ic)
-            drawable?.setTint(cGreen)
-            textExerciseProgress.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                drawable, null, null, null
-            )
-            textExerciseProgress.compoundDrawablePadding =
-                (4 * resources.displayMetrics.density).toInt()
-        } else {
-            textExerciseProgress.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                null, null, null, null
-            )
-        }
-
-        titleExercise.text = getString(R.string.fat_burn_title)
-        val fatBurnt = (state.exerciseBurnt / 7.7).toInt()
-        textExerciseStatus.text = getString(R.string.fat_burnt_today, fatBurnt)
-        textExerciseStatus.isVisible = state.exerciseBurnt > 0
+        val exerciseProgress =
+            ((state.exerciseBurnt.toFloat() / targetKcal) * 100).toInt().coerceIn(0, 100)
+        progressExercise.max = 100
+        progressExercise.setProgressCompat(exerciseProgress, animateProgress)
     }
 
     private fun updateStreak(state: HomeUiState) = binding.apply {
@@ -859,16 +760,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun observeExerciseAdded() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.exerciseAddedEvent.collect { calories ->
-                delay(1000)
-                val args = DailyAnalysisFragment.createArgs(
-                    type = DailyAnalysisFragment.TYPE_EXERCISE_50,
-                    caloriesBurned = calories
-                )
-                navigate(R.id.action_home_to_dailyAnalysisFragment, args)
-            }
-        }
+        // Exercise added praise screen disabled per user requirement
     }
 
     private fun initAppFeedbackCard(bind: FragmentHomeBinding) {
@@ -884,7 +776,8 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         )
         val daysUsed = maxOf(daysFromReg, daysFromFirstOpen)
 
-        val shouldShow = daysUsed >= 3 && !AppPreference.isAppFeedbackCompleted
+        val isFeedbackDone = UserProfileRepository.user.isRated
+        val shouldShow = daysUsed >= 3 && !isFeedbackDone
 
         bind.cardAppFeedback.isVisible = shouldShow
 
@@ -892,30 +785,20 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
             bind.cardAppFeedback.setOnSafeClickListener {
                 showAppFeedbackDialog()
             }
-
-            if (!hasShownFeedbackDialogThisSession) {
-                hasShownFeedbackDialogThisSession = true
-                lifecycleScope.launch {
-                    delay(800)
-                    if (isAdded && !isStateSaved && !AppPreference.isAppFeedbackCompleted) {
-                        showAppFeedbackDialog()
-                    }
-                }
-            }
         }
     }
 
     private fun showAppFeedbackDialog() {
         val dialog = AppFeedbackDialogFragment.newInstance()
         dialog.onDismissCallback = {
-            binding.cardAppFeedback.isVisible = !AppPreference.isAppFeedbackCompleted
+            val isDone = UserProfileRepository.user.isRated
+            binding.cardAppFeedback.isVisible = !isDone
         }
         dialog.show(childFragmentManager, "AppFeedbackDialogFragment")
     }
 
     companion object {
         var currentDate: Date = Date()
-        private const val WEIGHT_LOG_DELAY = 2000L
         private const val DATE_FORMAT = "d-MMMM"
         private const val COMMA_SPACE = ", "
         private const val LITERS_FORMAT = "%.1f"

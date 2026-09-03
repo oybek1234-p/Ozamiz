@@ -10,7 +10,6 @@ import uz.oybek.ozamiz.databinding.ItemSearchMenuBinding
 import uz.oybek.ozamiz.ui.base.BaseAdapter
 import uz.oybek.ozamiz.ui.utils.loadPhoto
 import androidx.fragment.app.FragmentActivity
-import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.data.user.local.user
 
@@ -42,10 +41,8 @@ class MenuAdapter(
                     premiumOverlay.visibility = View.VISIBLE
                     root.setOnClickListener {
                         (root.context as? FragmentActivity)?.let { activity ->
-                            PremiumBottomSheetDialog().show(
-                                activity.supportFragmentManager,
-                                PremiumBottomSheetDialog.TAG
-                            )
+                            val navHostFragment = activity.supportFragmentManager.findFragmentById(R.id.container) as? androidx.navigation.fragment.NavHostFragment
+                            navHostFragment?.navController?.navigate(R.id.premiumFragment)
                         }
                     }
                 } else {

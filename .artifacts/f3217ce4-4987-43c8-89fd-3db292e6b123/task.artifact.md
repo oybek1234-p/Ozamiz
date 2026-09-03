@@ -1,0 +1,4 @@
+- [ ] AI Promptni yangilash (`AiPromptBuilder.kt`)
+- [ ] UI mantiqini yangilash (`AnalyzeResultFragment.kt`)
+- [ ] Layout matnlarini to'g'irlash (`bottom_sheet_calorie_result.xml`)
+- [ ] O'zgarishlarni tekshirish

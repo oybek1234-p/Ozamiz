@@ -8,6 +8,7 @@ import com.google.firebase.database.MutableData
 import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.firebase.database
@@ -28,7 +29,6 @@ import kotlin.coroutines.resume
 
 object UserProfileRepository {
 
-    private val userListeners = mutableListOf<(user: User?) -> Unit>()
     private var isObserving = false
     private var userListener: ValueEventListener? = null
     var onboardingStarted = false
@@ -37,13 +37,22 @@ object UserProfileRepository {
 
     fun init() {
         LocalUser.getUser()
-        checkRegisterDateError()
+        if (user.uid.isNotEmpty()) {
+            observeCurrentUser()
+        }
     }
-
-    private fun checkRegisterDateError() {
-        if (DateUtils.toLongTimestamp(user.registerDate) < 500000) {
-            val now = System.currentTimeMillis()
-            updateRegisterDate(now)
+    
+    suspend fun saveUserNetworkSuspend(user: User): Boolean {
+        if (!user.valid) return false
+        return try {
+            val children = UserMapper.toMap(user)
+            val publicChildren = UserMapper.toPublicMap(user)
+            FirebasePaths.Database.user(user.uid).updateChildren(children).await()
+            FirebasePaths.Firestore.publicUser(user.uid).set(publicChildren).await()
+            true
+        } catch (e: Exception) {
+            handleException(e)
+            false
         }
     }
 
@@ -53,7 +62,10 @@ object UserProfileRepository {
         if (userId.isBlank()) return DataWrapper.Error()
 
         return try {
-            val imageUrl = ImageUploader.uploadImage(checkImageUri, FirebasePaths.Storage.paymentChecks(userId))
+            val imageUrl = ImageUploader.uploadImage(
+                checkImageUri,
+                FirebasePaths.Storage.paymentChecks(userId)
+            )
             if (imageUrl != null) {
                 updateUser {
                     paymentChecking = true
@@ -74,15 +86,14 @@ object UserProfileRepository {
 
     fun updateUser(work: User.() -> Unit = {}) {
         work(user)
+        LocalUser.saveUser()
 
         if (user.valid) {
-            LocalUser.saveUser()
             saveUserNetworkForce(user)
-            userListeners.forEach { it.invoke(user) }
         }
     }
 
-    private fun saveUserNetworkForce(user: User) {
+    fun saveUserNetworkForce(user: User) {
         if (user.valid) {
             val children = UserMapper.toMap(user)
             val publicChildren = UserMapper.toPublicMap(user)
@@ -98,76 +109,21 @@ object UserProfileRepository {
         }
     }
 
-    fun updateName(value: String) = updateField(User::name.name, value) { name = value }
-    fun updateAge(value: Int) = updateField(User::age.name, value) { age = value }
-    fun updateHeight(value: Int) = updateField(User::height.name, value) { height = value }
     fun updateWeight(value: Double) = updateField(User::weight.name, value) { weight = value }
-    fun updateTargetWeight(value: Double?) =
-        updateField(User::targetWeight.name, value) { targetWeight = value }
-
     fun updateStartWeight(value: Double?) =
         updateField(User::startWeight.name, value) { startWeight = value }
 
-    fun updateGoal(value: String) = updateField(User::goal.name, value) { goal = value }
-    fun updateActivityLevel(value: String) =
-        updateField(User::activityLevel.name, value) { activityLevel = value }
 
     fun updateAvatarUrl(value: String?) =
         updateField(User::avatarUrl.name, value) { avatarUrl = value }
 
-    fun updateGender(value: Int) = updateField(User::gender.name, value) { gender = value }
-    fun updateRegion(value: String) = updateField(User::region.name, value) { region = value }
     fun updateScorePoints(value: Int) =
         updateField(User::scorePoints.name, value) { scorePoints = value }
-
-    fun updateTargetCalories(value: Int) =
-        updateField(User::targetCalories.name, value) { targetCalories = value }
-
-    fun updateTargetProtein(value: Int) =
-        updateField(User::targetProtein.name, value) { targetProtein = value }
-
-    fun updateTargetFat(value: Int) = updateField(User::targetFat.name, value) { targetFat = value }
-    fun updateTargetCarbs(value: Int) =
-        updateField(User::targetCarbs.name, value) { targetCarbs = value }
-
-    fun updateTargetWaterMl(value: Int) =
-        updateField(User::targetWaterMl.name, value) { targetWaterMl = value }
-
-    fun updatePremium(value: Boolean) = updateField(User::premium.name, value) { premium = value }
-    fun updatePremiumDate(value: Long) =
-        updateField(User::premiumDate.name, value) { premiumDate = value }
-
-    fun updateIsPremiumYearly(value: Boolean) =
-        updateField(User::isPremiumYearly.name, value) { isPremiumYearly = value }
-
-    fun updateIsMonthlyPremium(value: Boolean) =
-        updateField(User::isMonthlyPremium.name, value) { isMonthlyPremium = value }
-
-    fun updatePhoneNumber(value: String) =
-        updateField(User::phoneNumber.name, value) { phoneNumber = value }
-
-    fun updateGmail(value: String) = updateField(User::gmail.name, value) { gmail = value }
-    fun updateUnreadMessages(value: Int) =
-        updateField(User::unreadMessages.name, value) { unreadMessages = value }
-
     fun updateLastWeightLogTimestamp(value: Long) =
         updateField(User::lastWeightLogTimestamp.name, value) { lastWeightLogTimestamp = value }
 
-    fun updatePaymentChecking(value: Boolean) =
-        updateField(User::paymentChecking.name, value) { paymentChecking = value }
-
-    fun updatePaymentCheckPhotoUrl(value: String?) =
-        updateField(User::paymentCheckPhotoUrl.name, value) { paymentCheckPhotoUrl = value }
-
-    fun updateAdmin(value: Boolean) = updateField(User::admin.name, value) { admin = value }
-    fun updateProblems(value: List<String>?) =
-        updateField(User::problems.name, value) { problems = value }
-
     fun updateStreakInfo(value: StreakInfo?) =
         updateField(User::streakInfo.name, value) { streakInfo = value }
-
-    fun updateRegisterDate(value: Long) =
-        updateField(User::registerDate.name, value) { registerDate = value }
 
     private val PUBLIC_FIELDS = setOf(
         User::uid.name,
@@ -176,6 +132,7 @@ object UserProfileRepository {
         User::scorePoints.name,
         User::lastSeenTime.name,
         User::premium.name,
+        User::premiumDate.name,
         User::isPremiumYearly.name,
         User::isMonthlyPremium.name,
         User::gender.name,
@@ -192,9 +149,10 @@ object UserProfileRepository {
     )
 
     private fun <T> updateField(fieldName: String, value: T, work: User.() -> Unit) {
-        if (!user.valid) return
         work(user)
         LocalUser.saveUser()
+        if (!user.valid) return
+
         runCatching {
             FirebasePaths.Database.user(user.uid).child(fieldName).setValue(value)
             if (fieldName in PUBLIC_FIELDS) {
@@ -207,19 +165,10 @@ object UserProfileRepository {
                         StreakInfo::streakGoal.name to value.streakGoal
                     )
                 } else value
-                FirebasePaths.Firestore.publicUser(user.uid).set(mapOf(fieldName to publicValue), com.google.firebase.firestore.SetOptions.merge())
-            }
-        }
-        userListeners.forEach { it.invoke(user) }
-    }
-
-    suspend fun refreshUser() {
-        auth.currentUser?.uid?.let { uid ->
-            loadUser(uid)?.let { networkUser ->
-                if (networkUser.valid) {
-                    LocalUser.user = networkUser
-                    LocalUser.saveUser()
-                }
+                FirebasePaths.Firestore.publicUser(user.uid).set(
+                    mapOf(fieldName to publicValue),
+                    com.google.firebase.firestore.SetOptions.merge()
+                )
             }
         }
     }
@@ -236,10 +185,8 @@ object UserProfileRepository {
         }
     }
 
-    fun observeCurrentUser(result: (user: User?) -> Unit) {
-        userListeners.add(result)
-        if (user.valid) result.invoke(user)
-        if (isObserving || !user.valid || user.name.isEmpty()) return
+    fun observeCurrentUser() {
+        if (isObserving || user.uid.isEmpty()) return
 
         isObserving = true
         userListener = object : ValueEventListener {
@@ -251,12 +198,9 @@ object UserProfileRepository {
                 if (onboardingStarted || !snapshot.exists()) return
 
                 val loadedUser = UserMapper.fromSnapshot(snapshot)
-                if (loadedUser.valid) {
-                    if (loadedUser != LocalUser.user) {
-                        LocalUser.user = loadedUser
-                        LocalUser.saveUser()
-                        userListeners.forEach { it.invoke(loadedUser) }
-                    }
+                if (loadedUser.valid && loadedUser.name.isNotBlank() && loadedUser != LocalUser.user) {
+                    LocalUser.user = loadedUser
+                    LocalUser.saveUser()
                 }
             }
         }
@@ -274,12 +218,6 @@ object UserProfileRepository {
     fun setUnreadNotificationsZero() {
         if (user.valid && user.unreadMessages != 0) {
             FirebasePaths.Database.unreadMessages(user.uid).setValue(0)
-        }
-    }
-
-    fun removeUnreadMessageListener(eventListener: ValueEventListener) {
-        if (user.valid) {
-            FirebasePaths.Database.unreadMessages(user.uid).removeEventListener(eventListener)
         }
     }
 

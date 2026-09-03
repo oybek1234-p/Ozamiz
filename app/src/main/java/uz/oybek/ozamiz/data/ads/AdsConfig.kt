@@ -5,4 +5,5 @@ object AdsConfig {
     const val BANNER_LOG_FOOD = "R-M-19591920-2"
     const val BANNER_DIETOLOG = "R-M-19591920-3"
     const val INTERSTITIAL_FOOD_ADD = "R-M-19591920-4"
+    const val REWARDED_FOOD_ADD = "R-M-19591920-5"
 }

@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.streak
 
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,14 +14,21 @@ import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import uz.oybek.ozamiz.ui.utils.VaznimColors
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.streak.StreakComplimentsProvider
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.AdminRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.user.model.UserSortType.TOP_STREAK
+import uz.oybek.ozamiz.data.user.model.UserSortType
 import uz.oybek.ozamiz.databinding.DialogStreakInfoBinding
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 class StreakInfoSheet : BottomSheetDialogFragment() {
 
@@ -127,12 +135,59 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         setupTopUsersList()
     }
 
+    private fun setupWeekCalendar(info: StreakInfo) {
+        val today = LocalDate.now()
+        val monday = today.with(DayOfWeek.MONDAY)
+        val dayBindings = listOf(
+            binding.dayMon, binding.dayTue, binding.dayWed,
+            binding.dayThu, binding.dayFri, binding.daySat, binding.daySun
+        )
+        val dayNames = listOf("Du", "Se", "Cho", "Pa", "Ju", "Sha", "Yak")
+
+        val currentStreak = info.currentStreak
+        val lastDate = info.lastActionDate.takeIf { it.isNotBlank() }?.let {
+            try { LocalDate.parse(it, DateTimeFormatter.ISO_LOCAL_DATE) } catch (_: Exception) { null }
+        }
+        val ctx = requireContext()
+        val primaryColor = VaznimColors.getPrimary(ctx)
+        val surfaceContainerColor = VaznimColors.getSurfaceContainerHigh(ctx)
+
+        for (i in 0..6) {
+            val date = monday.plusDays(i.toLong())
+            val b = dayBindings[i]
+            b.textDayName.text = dayNames[i]
+            b.textDayNumber.text = date.dayOfMonth.toString()
+
+            val isFuture = date.isAfter(today)
+
+            val isActiveDay = if (lastDate != null && currentStreak > 0) {
+                !isFuture && ChronoUnit.DAYS.between(date, lastDate) in 0 until currentStreak
+            } else false
+
+            val color = if (isActiveDay) primaryColor else surfaceContainerColor
+            b.containerDayBadge.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
+
+            if (isActiveDay) {
+                b.textDayNumber.visibility = View.GONE
+                b.iconDayCheck.visibility = View.VISIBLE
+            } else {
+                b.textDayNumber.visibility = View.VISIBLE
+                b.textDayNumber.setTextColor(Color.GRAY)
+                b.iconDayCheck.visibility = View.GONE
+            }
+        }
+    }
+
     private fun setupTopUsersList() {
         val topUsersAdapter = TopStreakUsersAdapter { user ->
             dismiss()
             val bundle =
                 bundleOf("userId" to user.uid, "userName" to user.name.ifBlank { "Foydalanuvchi" })
-            findNavController(this).navigate(R.id.communityProfileFragment, bundle)
+            try {
+                findNavController(this).navigate(R.id.communityProfileFragment, bundle)
+            } catch (e: Exception) {
+                // ignore
+            }
         }
         binding.recyclerTopUsers.apply {
             layoutManager = androidx.recyclerview.widget.LinearLayoutManager(
@@ -150,20 +205,30 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         binding.progressTopUsers.visibility = View.VISIBLE
         binding.recyclerTopUsers.visibility = View.GONE
 
+        val currentUserGoal = UserProfileRepository.user.goal.ifBlank { "lose_weight" }
+
         viewLifecycleOwner.lifecycleScope.launch {
             val result = AdminRepository.getUsers(
-                limit = 10,
-                sortBy = TOP_STREAK
+                limit = 50,
+                sortBy = UserSortType.RECENT_ACTIVITY
             )
             binding.progressTopUsers.visibility = View.GONE
             binding.recyclerTopUsers.visibility = View.VISIBLE
 
             result.onSuccess { list ->
-                adapter.submitList(list.filter { (it.streakInfo?.currentStreak ?: 0) >= 0 }
-                    .sortedByDescending { it.streakInfo?.currentStreak ?: 0 }
-                    .take(10))
+                val currentUid = uz.oybek.ozamiz.data.firebase.auth.currentUser?.uid
+                val filteredWithAvatar = list.filter { it.uid != currentUid && !it.avatarUrl.isNullOrBlank() }
+                val filteredWithGoal = filteredWithAvatar.filter { it.goal.isBlank() || it.goal == currentUserGoal }
+
+                val finalList = if (filteredWithGoal.size >= 3) {
+                    filteredWithGoal
+                } else {
+                    filteredWithAvatar
+                }
+
+                adapter.submitList(finalList.take(10))
             }.onFailure {
-                // Ignore gracefully
+                binding.progressTopUsers.visibility = View.GONE
             }
         }
     }
@@ -206,31 +271,12 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
     private fun setupViews(info: StreakInfo, isNewAction: Boolean, returnedAfterManyDays: Boolean) {
         binding.textStreakMainCount.text = info.currentStreak.toString()
 
-        val description = when (info.currentStreak) {
-            1 -> getString(R.string.streak_desc_day_1)
-            2 -> getString(R.string.streak_desc_day_2)
-            3 -> getString(R.string.streak_desc_day_3, info.currentStreak)
-            4 -> getString(R.string.streak_desc_day_4)
-            5 -> getString(R.string.streak_desc_day_5, info.currentStreak)
-            6 -> getString(R.string.streak_desc_day_6)
-            else -> {
-                if (info.currentStreak % 7 == 0) {
-                    getString(R.string.streak_desc_weekly, info.currentStreak)
-                } else {
-                    getString(R.string.streak_desc_default, info.currentStreak)
-                }
-            }
-        }
-        binding.textStreakDescription.text = description
+        binding.textStreakDescription.text =
+            StreakComplimentsProvider.getComplimentForStreak(info.currentStreak)
 
-        binding.textBestStreak.text = info.bestStreak.toString()
+        setupWeekCalendar(info)
 
-        binding.textTotalActiveDays.text = info.activeDays.toString()
-
-        val weeks = maxOf(1, (info.activeDays + 6) / 7)
-        binding.textActiveWeeks.text = "$weeks Hafta"
-
-        binding.layoutTopUsersContainer.visibility = View.GONE
+        binding.layoutTopUsersContainer.visibility = View.VISIBLE
 
         val isActive = uz.oybek.ozamiz.data.streak.StreakManager.isStreakActive(info)
         if (isActive) {
@@ -282,14 +328,28 @@ class TopStreakUsersAdapter(
     inner class ViewHolder(val binding: uz.oybek.ozamiz.databinding.ItemTopStreakUserBinding) :
         androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User, position: Int) {
-            binding.textRank.text = (position + 1).toString()
+            binding.textRank.visibility = View.GONE
             binding.textName.text = user.name.ifBlank { "Foydalanuvchi" }
-            val streak = user.streakInfo?.currentStreak ?: 0
-            binding.textStreakCount.text = "$streak 🔥"
-            binding.textStreakInfo.text = "${user.streakInfo?.bestStreak ?: 0} kun"
+
+            val startW = user.startWeight
+            val currW = user.weight
+            if (startW != null && currW > 0 && startW > currW) {
+                val diff = startW - currW
+                binding.textStreakCount.text = String.format(Locale.US, "-%.1f kg", diff)
+            } else if (user.streakInfo?.currentStreak ?: 0 > 0) {
+                val streak = user.streakInfo?.currentStreak ?: 0
+                binding.textStreakCount.text = "$streak kun"
+            } else {
+                binding.textStreakCount.text = "Aktiv"
+            }
+
+            binding.textStreakInfo.visibility = View.GONE
+
             if (!user.avatarUrl.isNullOrBlank()) {
                 com.bumptech.glide.Glide.with(binding.root)
                     .load(user.avatarUrl)
+                    .placeholder(R.drawable.user_photo_placeholder)
+                    .error(R.drawable.user_photo_placeholder)
                     .into(binding.imgAvatar)
             } else {
                 binding.imgAvatar.setImageResource(R.drawable.user_photo_placeholder)

@@ -1,115 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:layout_marginBottom="@dimen/dimen_4"
-    android:foreground="?selectableItemBackground"
-    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="0dp"
-    app:strokeColor="?attr/colorOutlineVariant"
-    app:strokeWidth="0dp">
+    android:minHeight="68dp"
+    android:paddingHorizontal="@dimen/dimen_24"
+    android:paddingVertical="@dimen/dimen_18">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:minHeight="82dp"
-        android:padding="@dimen/dimen_12">
+    <FrameLayout
+        android:id="@+id/layout_progress_container"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <FrameLayout
-            android:id="@+id/layout_progress_container"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/progress_meal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:indicatorColor="?attr/colorPrimary"
-                app:indicatorSize="52dp"
-                app:indicatorTrackGapSize="0dp"
-                app:trackColor="?attr/colorSurfaceContainerHigh"
-                app:trackCornerRadius="4dp"
-                app:trackThickness="4dp"
-                tools:progress="60" />
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/img_meal_icon"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:padding="@dimen/dimen_2"
-                android:layout_margin="@dimen/dimen_4"
-                android:scaleType="centerCrop"
-                tools:src="@drawable/breakfast_simple" />
-        </FrameLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_text_container"
-            android:layout_width="0dp"
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_meal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_add_meal"
-            app:layout_constraintStart_toEndOf="@id/layout_progress_container"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_gravity="center"
+            app:indicatorColor="?attr/colorPrimary"
+            app:indicatorSize="56dp"
+            app:indicatorTrackGapSize="0dp"
+            app:trackColor="?attr/colorSurfaceContainerHigh"
+            app:trackCornerRadius="3dp"
+            app:trackThickness="4.5dp"
+            tools:progress="60" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/img_meal_icon"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/breakfast_simple" />
+    </FrameLayout>
+
+    <!-- Right Side Add Button -->
+    <ImageButton
+        android:id="@+id/btn_add_meal"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="10dp"
+        android:src="@drawable/add_ic"
+        android:background="@drawable/bg_circle_primary"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/colorOnPrimary" />
+
+    <!-- Middle Content Container -->
+    <LinearLayout
+        android:id="@+id/layout_text_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="@dimen/dimen_18"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_add_meal"
+        app:layout_constraintStart_toEndOf="@id/layout_progress_container"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Top Row: Meal Title (Left) + Time (Right) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/text_meal_name"
                 style="@style/TextAppearance.Material3.TitleMedium"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:fontFamily="@font/roboto_bold"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="17sp"
+                android:textSize="15sp"
                 tools:text="Ertalabki" />
 
-            <LinearLayout
-                android:id="@+id/layout_calories"
+            <TextView
+                android:id="@+id/text_meal_calories"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
+                tools:text="08:00" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_calories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/text_last_eaten"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/text_meal_calories"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?attr/colorOnSurfaceVariant"
-                    android:textSize="13sp"
-                    tools:text="450 kkal yeyildi" />
-
-            </LinearLayout>
+                android:ellipsize="end"
+                android:fontFamily="@font/roboto_regular"
+                android:maxLines="1"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
+                tools:text="100/450 kkal • Osh, choy" />
         </LinearLayout>
 
-        <ImageButton
-            android:id="@+id/btn_add_meal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:iconTint="?colorOnSurface"
-            app:icon="@drawable/add_ic"
-            android:padding="@dimen/dimen_12"
-            android:src="@drawable/add_ic"
-            android:backgroundTint="?colorSurfaceContainer"
-            app:iconGravity="textEnd"
-            android:background="@drawable/oval_back"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="?colorOnSurface" />
+    </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

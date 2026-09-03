@@ -52,7 +52,7 @@ class AdminFoodLogsAdapter(
                     .into(binding.imageViewFood)
             } else {
                 val icon = when (log.type) {
-                    "water" -> R.drawable.water_ic
+                    "water" -> R.drawable.water_full_24px
                     "exercise" -> R.drawable.sport_ic
                     else -> R.drawable.food_ic
                 }

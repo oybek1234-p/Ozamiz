@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.firebase.crashlytics
 import uz.oybek.ozamiz.data.firebase.currentUserId
 import uz.oybek.ozamiz.data.firebase.getValueSafe
 import uz.oybek.ozamiz.data.logs.model.AdminGenericLog
@@ -19,6 +18,8 @@ import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.DailySummary
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.dateApiFormat
+import uz.oybek.ozamiz.data.utils.recordException
+import uz.oybek.ozamiz.data.utils.roundTo1Decimal
 import java.util.Date
 import kotlin.coroutines.resume
 
@@ -149,7 +150,7 @@ object LogRepository {
         awaitClose { reference.removeEventListener(listener) }
     }
 
-    private fun calculateSummary(logs: DailyLogs?): DailySummary {
+    fun calculateSummary(logs: DailyLogs?): DailySummary {
         if (logs == null) {
             return DailySummary()
         }
@@ -160,9 +161,9 @@ object LogRepository {
         val consumedCalories = foodLogs.filter { it.calories > 0 }.sumOf { it.calories }
         val consumedWaterMl = waterLogs.sumOf { it.amountMl }
         val burnedCalories = exerciseLogs.sumOf { it.caloriesBurned }
-        val consumedProtein = foodLogs.sumOf { it.protein ?: 0.0 }
-        val consumedCarbs = foodLogs.sumOf { it.carbs ?: 0.0 }
-        val consumedFat = foodLogs.sumOf { it.fat ?: 0.0 }
+        val consumedProtein = foodLogs.sumOf { it.protein ?: 0.0 }.roundTo1Decimal()
+        val consumedCarbs = foodLogs.sumOf { it.carbs ?: 0.0 }.roundTo1Decimal()
+        val consumedFat = foodLogs.sumOf { it.fat ?: 0.0 }.roundTo1Decimal()
 
         return DailySummary(
             consumedCalories = consumedCalories,
@@ -322,9 +323,9 @@ object LogRepository {
                     consumedCalories = (current.consumedCalories + caloriesDelta).coerceAtLeast(0),
                     consumedWaterMl = (current.consumedWaterMl + waterDelta).coerceAtLeast(0),
                     burnedCalories = (current.burnedCalories + exerciseDelta).coerceAtLeast(0),
-                    consumedProtein = (current.consumedProtein + proteinDelta).coerceAtLeast(0.0),
-                    consumedCarbs = (current.consumedCarbs + carbsDelta).coerceAtLeast(0.0),
-                    consumedFat = (current.consumedFat + fatDelta).coerceAtLeast(0.0),
+                    consumedProtein = (current.consumedProtein + proteinDelta).coerceAtLeast(0.0).roundTo1Decimal(),
+                    consumedCarbs = (current.consumedCarbs + carbsDelta).coerceAtLeast(0.0).roundTo1Decimal(),
+                    consumedFat = (current.consumedFat + fatDelta).coerceAtLeast(0.0).roundTo1Decimal(),
                     mealsCount = (current.mealsCount + mealsDelta).coerceAtLeast(0),
                     timestamp = System.currentTimeMillis()
                 )
@@ -339,7 +340,7 @@ object LogRepository {
             ) {
                 it.resume(Unit)
                 if (error != null) {
-                    crashlytics.recordException(error.toException())
+                    recordException(error.toException())
                 }
             }
         })

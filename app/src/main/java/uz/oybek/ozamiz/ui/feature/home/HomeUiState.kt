@@ -32,5 +32,6 @@ data class HomeUiState(
     val waterLogs: List<WaterLog> = emptyList(),
     val showWeightLogCard: Boolean = false,
     val userPoints: Int = 0,
-    val daysFromRegister: Int = 0
+    val daysFromRegister: Int = 0,
+    val paymentChecking: Boolean = false
 )

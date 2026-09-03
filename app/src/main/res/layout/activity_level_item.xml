@@ -4,35 +4,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/dimen_12"
+    android:layout_marginBottom="14dp"
     app:cardBackgroundColor="?colorSurfaceContainerLowest"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
     app:strokeColor="?colorOutlineVariant"
-    app:strokeWidth="2dp">
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/dimen_18"
-        android:paddingVertical="@dimen/dimen_14">
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp">
 
         <TextView
             android:id="@+id/title_view"
             style="@style/Title3_17"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_medium"
+            android:lineSpacingExtra="4dp"
             android:textColor="?colorOnSurface"
-            android:fontFamily="@font/roboto_bold"
-            tools:text="Light active" />
-
-        <TextView
-            android:id="@+id/subtitle_view"
-            style="@style/Text1_14"
-            android:layout_width="match_parent"
-            android:layout_marginTop="@dimen/dimen_8"
-            android:layout_height="wrap_content"
-            android:textColor="?colorOnSurfaceVariant"
-            tools:text="House work" />
+            tools:text="Kamharakat - Ofis ishi yoki uyda" />
     </LinearLayout>
 
 </com.google.android.material.card.MaterialCardView>

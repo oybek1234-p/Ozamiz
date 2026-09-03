@@ -59,7 +59,10 @@ class CommunityUsersViewModel : ViewModel() {
                 if (newUsers.isEmpty()) {
                     _state.update { it.copy(isLoading = false, isPaging = false, hasReachedEnd = true) }
                 } else {
-                    val users = if (isFirstLoad) newUsers else _state.value.users + newUsers
+                    val filteredUsers = newUsers.filter { user ->
+                        !user.avatarUrl.isNullOrBlank() && user.avatarUrl != "null"
+                    }
+                    val users = if (isFirstLoad) filteredUsers else _state.value.users + filteredUsers
                     
                     lastUserId = newUsers.lastOrNull()?.uid
 

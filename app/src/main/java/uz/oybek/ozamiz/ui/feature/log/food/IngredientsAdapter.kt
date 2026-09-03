@@ -33,7 +33,7 @@ class IngredientsAdapter(
             binding.textViewIngredientName.text = item.name
 
             val calText = if (item.calories != null && item.calories > 0) {
-                "• ${item.calories} kkal"
+                "${item.calories} kal"
             } else ""
             binding.textViewIngredientCalories.text = calText
             binding.textViewIngredientCalories.isVisible = calText.isNotEmpty()
@@ -52,6 +52,10 @@ class IngredientsAdapter(
             }
             binding.textViewIngredientAmount.text = amountStr
             binding.textViewIngredientAmount.isVisible = amountStr.isNotEmpty()
+
+            binding.textViewIngredientMacros.isVisible = false
+
+            binding.viewDivider.isVisible = position < ingredients.size - 1
 
             binding.root.setOnClickListener {
                 onItemClick?.invoke(item, position)

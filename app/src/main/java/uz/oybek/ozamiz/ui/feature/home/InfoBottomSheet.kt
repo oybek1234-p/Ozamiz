@@ -25,6 +25,18 @@ class InfoBottomSheet : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    override fun onStart() {
+        super.onStart()
+        dialog?.let { dialog ->
+            val bottomSheet = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let { sheet ->
+                val behavior = com.google.android.material.bottomsheet.BottomSheetBehavior.from(sheet)
+                behavior.state = com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
+                behavior.skipCollapsed = true
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val title = arguments?.getString(ARG_TITLE) ?: ""
@@ -32,15 +44,15 @@ class InfoBottomSheet : BottomSheetDialogFragment() {
 
         binding.textTitle.text = title
 
-        if (title.contains("Ochlikda") || title.contains("Hungry")) {
-            val mainText = content.substringBefore("\n\n")
+        if (title.contains("Ochlikda") || title.contains("Hungry") || title.contains("ochdi") || title.contains("Qornim") || title.contains("yengil")) {
+            val mainText = "Kunlik kaloriya maqsadi bajarilgandan so'ng kutilmaganda ochlik hissi paydo bo'lsa, quyidagi xavfsiz va past kaloriyali taomlarni iste'mol qilishingiz mumkin:"
             binding.textContent.text = mainText
 
             val foods = listOf(
-                HungryFood("🥒", "Bodring va ko'katlar", "Deyarli kaloriyasiz va oshqozonni to'ldiradi"),
-                HungryFood("🥛", "Kefir yoki qatiq", "Past yog'li sut mahsulotlari hazm qilishni yaxshilaydi"),
-                HungryFood("🥚", "Tuxum oqi", "Sof oqsil manbai, uzoq vaqt to'q tutadi"),
-                HungryFood("🍵", "Ko'k choy", "Shakar qo'shmasdan iching, ochlikni bostiradi"),
+                HungryFood("🥒", "Bodring va ko'katlar", "Deyarli 0 kkal — oshqozonni to'ldiradi va ochlikni bostiradi"),
+                HungryFood("🥛", "Kefir yoki qatiq (1%)", "Past yog'li sut mahsuloti — hazmni yaxshilaydi va tinchlantiradi"),
+                HungryFood("🥚", "Tuxum oqi", "Sof oqsil manbai — uzoq vaqt to'q tutadi"),
+                HungryFood("🍵", "Ko'k choy (shakarsiz)", "Moddalar almashinuvini tezlashtiradi va ishtahani bog'laydi"),
                 HungryFood("🥬", "Karam salati", "Kletchatkaga boy va kkal darajasi juda past")
             )
 

@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.ui.feature.exercises
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
@@ -12,7 +11,6 @@ import uz.oybek.ozamiz.databinding.FragmentWeightLossExercisesBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.base.ListClickListener
 import uz.oybek.ozamiz.ui.base.BaseAdapter
-import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
 import uz.oybek.ozamiz.ui.utils.visibleOrGone
 
 class WeightLossExercisesFragment : BaseFragment<FragmentWeightLossExercisesBinding>() {
@@ -51,15 +49,12 @@ class WeightLossExercisesFragment : BaseFragment<FragmentWeightLossExercisesBind
         exercisesAdapter.addClickListener(object : ListClickListener<WeightLossExerciseUiModel>() {
             override fun onClick(holder: BaseAdapter.ViewHolder<*>, model: WeightLossExerciseUiModel) {
                 if (model.isLocked) {
-                    PremiumBottomSheetDialog().show(
-                        childFragmentManager,
-                        PremiumBottomSheetDialog.TAG
-                    )
+                    navigate(R.id.premiumFragment)
                 } else {
                     val direction = WeightLossExercisesFragmentDirections.actionExercisesToWeightLossExerciseDetailFragment(
                         model.exercise.id
                     )
-                    findNavController().navigate(direction)
+                    navigate(direction)
                 }
             }
         })
@@ -73,15 +68,12 @@ class WeightLossExercisesFragment : BaseFragment<FragmentWeightLossExercisesBind
         videosAdapter.addClickListener(object : ListClickListener<WeightLossVideoUiModel>() {
             override fun onClick(holder: BaseAdapter.ViewHolder<*>, model: WeightLossVideoUiModel) {
                 if (model.isLocked) {
-                    PremiumBottomSheetDialog().show(
-                        childFragmentManager,
-                        PremiumBottomSheetDialog.TAG
-                    )
+                    navigate(R.id.premiumFragment)
                 } else {
                     val direction = WeightLossExercisesFragmentDirections.actionExercisesToWeightLossVideoDetailFragment(
                         model.video.id
                     )
-                    findNavController().navigate(direction)
+                    navigate(direction)
                 }
             }
         })

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.databinding.FragmentHealthRecommendationsBinding
 
@@ -21,7 +20,7 @@ class HealthRecommendationsFragment : BaseFragment<FragmentHealthRecommendations
 
     override fun viewCreated(bind: FragmentHealthRecommendationsBinding) {
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            navigateUp()
         }
     }
 }

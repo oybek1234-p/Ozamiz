@@ -5,7 +5,6 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentWeightLossVideoDetailBinding
@@ -31,7 +30,7 @@ class WeightLossVideoDetailFragment : BaseFragment<FragmentWeightLossVideoDetail
         viewModel.loadVideo(args.videoId)
 
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            navigateUp()
         }
 
         bind.btnDone.setOnClickListener {
@@ -83,7 +82,7 @@ class WeightLossVideoDetailFragment : BaseFragment<FragmentWeightLossVideoDetail
 
             if (state.isLoggedSuccessfully) {
                 showToast(getString(R.string.exerc_logged_success))
-                findNavController().navigateUp()
+                navigateUp()
             }
         }
     }

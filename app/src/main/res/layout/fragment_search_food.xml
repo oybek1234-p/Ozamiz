@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainer"
+    android:background="?colorSurfaceContainerLowest"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -51,7 +51,7 @@
         android:id="@+id/text_view_search_results_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="16dp"
         android:layout_marginTop="10dp"
         android:textColor="?attr/colorOnSurfaceVariant"
         android:textSize="14sp"
@@ -71,6 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
             android:paddingBottom="100dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_food_search_result" />

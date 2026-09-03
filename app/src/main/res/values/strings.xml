@@ -50,7 +50,7 @@
     <string name="ismingizni_kiriting">Izmingizni kiriting</string>
     <string name="obed">Obed</string>
     <string name="time_ex">13:00</string>
-    <string name="kaloriya">Kaloriya</string>
+    <string name="kaloriya">kaloriya</string>
     <string name="oqsillar">Oqsillar</string>
     <string name="_16_187_g">16/187 g</string>
     <string name="protein">Oqsil</string>
@@ -74,6 +74,7 @@
     <string name="edit">Tahrirlash</string>
     <string name="delete">O\'chirish</string>
     <string name="cancel">Bekor qilish</string>
+    <string name="food_saved">Saqlandi</string>
     <string name="confirm_delete_title">O\'chirishni tasdiqlang</string>
     <string name="confirm_delete_message">\'%1$s\'ni o\'chirishga ishonchingiz komilmi?</string>
     <string name="confirm_delete_message_generic">\'%1$s\'ni o\'chirishga ishonchingiz komilmi?</string>
@@ -424,12 +425,12 @@
     <string name="error_enter_target_weight">Ozish yoki semirishni tanlagan bo\'lsangiz, iltimos, maqsad vaznni kiriting.</string>
 
     <string name="profile_title">Profil</string>
-    <string name="my_information">Ma\'lumotlar</string>
+    <string name="my_information">Shaxsiy ma\'lumotlar</string>
     <string name="reminders">Eslatmalar</string>
-    <string name="help_and_support">Savolingiz bormi</string>
+    <string name="help_and_support">Yordam va qo\'llab-quvvatlash</string>
     <string name="about_app">Ilova haqida</string>
-    <string name="rate_app">Ilovani baholash</string>
-    <string name="logout">Chiqish</string>
+    <string name="rate_app">Ilovaga baho bering</string>
+    <string name="logout">Tizimdan chiqish</string>
     <string name="logout_confirmation_title">Chiqishni tasdiqlang</string>
     <string name="logout_confirmation_message">Haqiqatan ham akkauntingizdan chiqmoqchimisiz?</string>
     <string name="delete_account">Hisobni o\'chirish</string>
@@ -539,22 +540,22 @@
     <string name="email_orqali">Email orqali</string>
     <string name="what_gender">Jinsingiz nima?</string>
     <string name="what_gender_subtitle">Har bir odam uchun maqsad belgilashimiz uchun jinsingiz muhim</string>
-    <string name="what_name">Ismingiz kiriting</string>
+    <string name="what_name">Ismingizni kiriting</string>
     <string name="start_stable_loss">Samarali va sog\'lom o\'zgarishni boshlang!</string>
     <string name="diagram_text_1">🙌 Ozamiz bilan nima xohlasangiz, shuni yeng. Sevimli taomlardan tiyilish va qiyin "qoidalar" endi yo‘q!</string>
     <string name="diagram_text_2">🍏 Biz sizga kundalik hayotingizga mos tushadigan, eng muhimi — sog\'lom o\'zgarish yo\'lini o\'rgatamiz.</string>
-    <string name="ismingiz">Ismingiz...</string>
+    <string name="ismingiz">Yozing</string>
     <string name="calorie_info_title">Bu juda oson</string>
     <string name="calorie_info_subtitle">Natija siri — to\'g\'ri kaloriya me\'yorini saqlashdir. Sog\'lom maqsadingizda biz yordam beramiz!</string>
     <string name="what_age">Necha yoshsiz?</string>
     <string name="yoshingiz">Yoshingiz</string>
     <string name="age_error">Yoshingizni to\'g\'ri kiriting</string>
     <string name="what_height">Bo\'yingizni kiriting</string>
-    <string name="buyingiz">Bo\'yingiz</string>
+    <string name="buyingiz">sm</string>
     <string name="how_active">Siz qanchalik faolsiz?</string>
     <string name="how_active_info">Kundalik faollik darajangizni bilish bizga kaloriya ehtiyojingizni aniqroq hisoblashda yordam beradi.</string>
     <string name="what_current_weight">Hozirgi vazningiz qancha?</string>
-    <string name="vazningiz_kg">Vazningiz (kg)</string>
+    <string name="vazningiz_kg">Vazn (kg)</string>
     <string name="what_target_weight">Keling, siz erishmoqchi bo‘lgan maqsadni belgilaymiz!</string>
     <string name="see_effect_title">Tez orada sog‘lig‘ingiz va umumiy holatingizda ijobiy o‘zgarishlarni ko‘rasiz.</string>
     <string name="s_effect_1">🩸 Qandli diabet xavfi kamayadi</string>
@@ -567,7 +568,7 @@
     <string name="madina_24_yosh">Madina, 24 yosh</string>
     <string name="communtity_join">Bizning safimizga qo‘shiling!</string>
     <string name="today">Bugun</string>
-    <string name="plan_estimated_title">Siz %1$s sanasigacha %2$skg vaznga erisha olasiz!</string>
+    <string name="plan_estimated_title">Siz %s da maqsadga erisha olasiz!</string>
 
     <string name="benefits_title">Shaxsiy reja afzalliklari</string>
     <string name="benefit_1">✨  Oson va tushunarli</string>
@@ -600,8 +601,8 @@
     <string name="label_protein">Oqsil</string>
     <string name="label_fat">Fat</string>
     <string name="macro_short_format">%1$d / %2$d g</string>
-    <string name="macro_remaining_format">%1$d qoldi</string>
-    <string name="macro_exceeded_format">%1$d oshdi</string>
+    <string name="macro_remaining_format">%1$d gr qoldi</string>
+    <string name="macro_exceeded_format">%1$d gr oshdi</string>
     <string name="protein_desc">Mushak quruvchi</string>
     <string name="fat_desc">Energiya manbai</string>
     <string name="carbs_desc">Kuch manbai</string>
@@ -825,7 +826,7 @@
     <string name="streak_continue">Davom etish</string>
 
     <!-- Streak Freeze -->
-    <string name="streak_frozen_title">Siz %1$d kun ilovaga kirmaganingiz sababli ketma-ketligingiz muzlatib qo\'yildi</string>
+    <string name="streak_frozen_title">Siz %1$d kun kirmadingiz, ketma-ketlik muzladi. Saqlab qolish uchun har kuni kiring</string>
     <string name="streak_frozen_desc">Ketma-ketlik yo\'qolmasligi uchun har kuni ilovaga kirib faollik ko\'rsating!</string>
     <string name="streak_frozen_btn_continue">Davom etaman</string>
     <string name="streak_frozen_success_title">Ajoyib, yana ilovaga qaytganingizdan xursandmiz, har kuni qo\'shib boring, va ketma-ketlikni saqlab qoling.</string>
@@ -935,15 +936,15 @@
     <string name="delete_cancel">Bekor qilish</string>
     <string name="profile_deleted_success">Profil muvaffaqiyatli o\'chirildi</string>
     <string name="user_search_empty">Qidiruv bo\'yicha foydalanuvchilar topilmadi</string>
-    <string name="daily_food_limit_title">Kunlik me\'yor to\'ldi</string>
-    <string name="daily_food_limit_msg">Bir kunda 5 martagacha rasmli/yozma ovqat qo\'shishingiz mumkin, ko\'proq qo\'shish uchun Premium sotib oling</string>
+    <string name="daily_food_limit_title">Bugungi rasmga olish limitingiz tugadi</string>
+    <string name="daily_food_limit_msg">Ertaga yana 3 ta beriladi. Ovqatni tayyor ro\'yxatdan kiriting yoki premium sotib oling</string>
+    <string name="ai_chat_limit_title">Bugungi limit tugadi</string>
+    <string name="ai_chat_limit_msg_free">Ertaga yana 3 ta beriladi. Cheksiz muloqot uchun Premium oling.</string>
+    <string name="ai_chat_limit_msg_premium">Bugun kunlik 30 ta xabar limitingizga yetdingiz. Ertaga yangilanadi, ertaga kiring.</string>
+    <string name="ai_chat_limit_hint">Bugungi limit tugadi. Ertaga kiring</string>
     <string name="premium_sheet_benefit_dietologist">Shaxsiy dietolog, ozishga har kuni yordam beradi</string>
     <string name="premium_sheet_benefit_analysis">Oson ozish</string>
     <string name="premium_sheet_benefit_recommendations">Kunlik foydali tavsiyalar</string>
-    <string name="ai_chat_limit_title">Suhbat limiti tugadi</string>
-    <string name="ai_chat_limit_msg">AI dietolog bilan bugungi suhbat limiti (5 ta xabar) tugadi. Suhbatni davom ettirish uchun Premium obunani faollashtiring.</string>
-    <string name="ai_food_limit_title">Dietolog limiti to\'ldi</string>
-    <string name="ai_food_limit_msg">Bugungi dietolog orqali ovqat tahlili 3 marta limiti to\'ldi. Cheksiz tahlillar uchun Premiumga o\'ting.</string>
     <string name="daily_water_limit_title">Kunlik suv limiti to\'ldi</string>
     <string name="daily_water_limit_msg">Bir kunda 5 martagacha suv qo\'shishingiz mumkin, ko\'proq qo\'shish uchun Premium obunani faollashtiring</string>
     <string name="food_search_details_format">%2$s %1$d kkal </string>
@@ -951,10 +952,12 @@
     <string name="search_foods_count_format">%1$d ta ovqat topildi</string>
     <string name="log_food_camera_title">Ovqatni rasmga olish</string>
     <string name="log_food_camera_instruction">Ovqatni ko\'rsating</string>
-    <string name="log_food_camera_list">Ro\'yxat</string>
-    <string name="log_food_text_title">Yozish</string>
+    <string name="log_food_camera_list">Ovqatlar ro\'yxati</string>
+    <string name="log_food_text_title">Yozib kiritish</string>
     <string name="log_food_voice_title">Gapirish </string>
     <string name="log_food_recent_history">Oxirgi qo\'shilganlar</string>
+    <string name="log_food_empty_history">Har bir yegan ovqatingizni qo\'shing. Me\'yordan oshmasangiz maqsadingizga erishasiz.</string>
+    <string name="add_food_btn">Ovqat qo\'shish</string>
     <string name="log_food_toolbar_title">Dietolog ovqatni tekshiradi</string>
     <string name="log_food_analyzing">Hisoblayapmiz...</string>
     <string name="log_food_search_list_title">Ovqatlar ro\'yxati</string>
@@ -964,7 +967,7 @@
     <string name="log_food_favorite_added">Sevimlilarga qo\'shildi!</string>
     <string name="log_food_favorite_removed">Sevimlilardan olib tashlandi</string>
     <string name="log_food_added_success">Qo\'shildi!</string>
-    <string name="log_food_daily_limit_reached">Kunlik me\'yor (5 ta) to\'ldi!</string>
+    <string name="log_food_daily_limit_reached">Kunlik me\'yor (3 ta) to\'ldi!</string>
     <string name="log_food_mic_error">Mikrofon xatosi: %1$s</string>
     <string name="log_food_camera_permission_denied">Rasmga olish uchun kamera ruxsati zarur</string>
     <string name="log_food_camera_permission_title">Kamera ruxsati</string>
@@ -1001,8 +1004,8 @@
     <string name="calories_exceeded_subtitle">Suv, choy, yengil sabzavotli salat yeyishingiz mumkin, %1$s</string>
     <string name="calories_oshdi_format">%1$d kal oshdi.</string>
     <string name="calories_limit_toldi">limit to\'ldi.</string>
-    <string name="calories_remaining_label_oshdi">kaloriya me\'yordan oshdi</string>
-    <string name="calories_remaining_label_qoldi">Siz yana ovqat yeyishingiz mumkin</string>
+    <string name="calories_remaining_label_oshdi">oshdi</string>
+    <string name="calories_remaining_label_qoldi">qoldi</string>
     <string name="btn_what_to_eat_title">Sog\'lom ovqatlanish</string>
     <string name="btn_recommendations_title">Tavsiyalar</string>
 
@@ -1098,7 +1101,7 @@
     <string name="food_manti">Manti</string>
     <string name="food_milk_glass">Bir stakan sut</string>
     <string name="food_honey_spoon">Bir qoshiq asal</string>
-    <string name="food_salad_plate">Bir tarelka salat</string>
+    <string name="food_salad_plate">Bir tarelka pomidor salat</string>
     <string name="food_lagman_bowl">Bir kosa lag\'mon</string>
     <string name="food_ice_cream">Muzqaymoq</string>
     <string name="food_donut">Donut pishiriq</string>
@@ -1145,10 +1148,10 @@
     <string name="food_type_tab">Ovqat</string>
     <string name="select_categories_done">Tanlash</string>
     <string name="categories_title">Kategoriyalar</string>
-    <string name="card_dietolog_title">Shaxsiy AI Dietolog</string>
+    <string name="card_dietolog_title">Dietolog</string>
     <string name="card_dietolog_subtitle">Sog\'lom ovqatlanish bo\'yicha 24/7 savollarga javob oling</string>
-    <string name="card_others_title">Boshqa odamlar</string>
-    <string name="card_others_subtitle">Boshqalar bilan natija va rasmlarni bo\'lishing</string>
+    <string name="card_others_title">Vazn tashlaganlar</string>
+    <string name="card_others_subtitle">Boshqalarning vazn yo\'qotish natijalari va motivatsiya rasmlarini ko\'ring</string>
     <string name="add_btn">Qo\'shish</string>
     <string name="exceeded_calories_burn_msg">%1$d kaloriya yoqishingiz kerak, mashqlarni bajaring</string>
     <string name="food_add_error">Xatolik yuz berdi. Iltimos keyinroq qayta urinib ko\'ring.</string>
@@ -1223,6 +1226,35 @@
     <string name="food_items_list_title">Dasturxondagi ovqatlar</string>
     <string name="amount_hint">Miqdori (masalan: 200)</string>
     <string name="unit_hint">Birlik (gramm, bo\'lak, dona)</string>
+    <string name="meal_recommendation_info_format">%1$d/%2$d kal</string>
+    <string name="meal_recommendation_title_format">%s tavsiyalari</string>
+    <string name="log_food_write_ai">Yozish</string>
+    <string name="log_food_list_option">Ro\'yxatdan qidirish</string>
     <string name="edit_calories_btn">O\'zgartirish</string>
+    <string name="bugun_yoqildi">Bugun yoqildi:</string>
+    <string name="maqsad_bajarildi">✅ Maqsad bajarildi</string>
+    <string name="exercise_progress_format">%1$d / %2$d kkal</string>
+
+    <!-- Exercise Motivational Tips (20 items) -->
+    <string name="exercise_tip_1">🏃 Muntazam mashqlar metabolizmni 24 soatgacha yuqori darajada ushlab turadi.</string>
+    <string name="exercise_tip_2">🔥 30 daqiqa piyoda yurish organizmda yog\' yoqish gormonlarini faollashtiradi.</string>
+    <string name="exercise_tip_3">💪 Mushak massasining ko\'payishi hatto dam olayotganingizda ham ko\'proq kaloriya sarflashga yordam beradi.</string>
+    <string name="exercise_tip_4">🍎 Sport bilan shug\'ullanish noto\'g\'ri ovqatlarga bo\'lgan ishtiyoqni pasaytiradi.</string>
+    <string name="exercise_tip_5">⚡ Ertalabki badantarbiya kun bo\'yi tetiklik va yuqori energiya beradi.</string>
+    <string name="exercise_tip_6">🛌 Jismoniy faollik uyqu sifatini yaxshilaydi, bu esa vazn nazorati uchun juda muhim.</string>
+    <string name="exercise_tip_7">🎯 Kuniga 10 000 qadam bosish semirish xavfini 50% ga kamaytiradi.</string>
+    <string name="exercise_tip_8">🧬 Mashqlar insulin sezgirligini oshirib, qandli diabetdan himoya qiladi.</string>
+    <string name="exercise_tip_9">🧘 Sport stress gormoni — kortizolni kamaytiradi, bu esa qorin qismidagi yog\'larni eritishga yordam beradi.</string>
+    <string name="exercise_tip_10">❤️ Faol hayot tarzi yurakni baquvvat qiladi va qon aylanishini yaxshilaydi.</string>
+    <string name="exercise_tip_11">🚶 Har bir qadam — sog\'lom vazn sari tashlangan qadamdir.</string>
+    <string name="exercise_tip_12">🥗 Sport va to\'g\'ri ovqatlanish birgalikda natijani 3 barobar tezlashtiradi.</string>
+    <string name="exercise_tip_13">💦 Mashq paytida suv ichishni unutmang, bu yog\' parchalanishiga yordam beradi.</string>
+    <string name="exercise_tip_14">📉 Haftasiga 150 daqiqa mashq qilish sog\'lom ozish uchun ideal me\'yordir.</string>
+    <string name="exercise_tip_15">🔥 Kuch ishlatiladigan mashqlar suyaklarni mustahkamlaydi va qomatni go\'zal qiladi.</string>
+    <string name="exercise_tip_16">🌟 Bugungi mashg\'ulot — ertangi go\'zal qomatingiz garovidir.</string>
+    <string name="exercise_tip_17">🧠 Jismoniy tarbiya miyani kislorod bilan to\'yintiradi va xotirani kuchaytiradi.</string>
+    <string name="exercise_tip_18">🍃 Tabiat qo\'ynida sayr qilish ruhni orom oldiradi va kaloriyalarni yoqadi.</string>
+    <string name="exercise_tip_19">🚀 Ozishni istasangiz, harakatni hoziroq boshlang, natija sizni kuttirmaydi.</string>
+    <string name="exercise_tip_20">🏆 Eng qiyini — boshlash, qolgani intizom va vaqt masalasidir.</string>
 </resources>
 

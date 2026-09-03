@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.ui.feature.exercises
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentWeightLossExerciseDetailBinding
@@ -29,7 +28,7 @@ class WeightLossExerciseDetailFragment : BaseFragment<FragmentWeightLossExercise
         viewModel.loadExercise(args.exerciseId)
 
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            navigateUp()
         }
 
         bind.btnPlayPause.setOnClickListener {

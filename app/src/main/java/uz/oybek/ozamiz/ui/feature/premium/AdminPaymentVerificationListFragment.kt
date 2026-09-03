@@ -7,7 +7,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.databinding.FragmentAdminPaymentVerificationListBinding
@@ -29,7 +28,7 @@ class AdminPaymentVerificationListFragment :
 
     override fun viewCreated(bind: FragmentAdminPaymentVerificationListBinding) {
         bind.toolbarAdminPayments.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
         setupRecyclerView(bind)
         observeViewModel(bind)
@@ -46,7 +45,7 @@ class AdminPaymentVerificationListFragment :
                 .actionAdminPaymentVerificationListFragmentToAdminPaymentVerificationDetailFragment(
                     user.uid
                 )
-            findNavController().navigate(action)
+            navigate(action)
         }
         bind.recyclerViewAdminPayments.layoutManager = LinearLayoutManager(requireContext())
         bind.recyclerViewAdminPayments.adapter = adapter

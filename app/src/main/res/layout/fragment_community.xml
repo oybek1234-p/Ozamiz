@@ -4,13 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurfaceContainer">
+    android:background="?attr/colorSurfaceContainerLowest">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurfaceContainer"
+        android:background="?attr/colorSurfaceContainerLowest"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -72,18 +72,11 @@
                 app:singleSelection="true">
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipAll"
-                    style="@style/WidgetAppChipChoice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ovqatlar"
-                    android:checked="true" />
-
-                <com.google.android.material.chip.Chip
                     android:id="@+id/chipOzganlar"
                     style="@style/WidgetAppChipChoice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checked="true"
                     android:text="Ozganlar" />
 
                 <com.google.android.material.chip.Chip
@@ -91,7 +84,7 @@
                     style="@style/WidgetAppChipChoice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Foydalanuvchilar" />
+                    android:text="Top foydalanuvchilar" />
 
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>

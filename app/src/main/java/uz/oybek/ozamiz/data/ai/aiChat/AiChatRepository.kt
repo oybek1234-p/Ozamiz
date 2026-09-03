@@ -1,11 +1,8 @@
 package uz.oybek.ozamiz.data.ai.aiChat
 
 import com.google.firebase.Firebase
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.Content
-import com.google.firebase.ai.type.content
-import com.google.firebase.ai.type.generationConfig
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.functions.functions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -37,14 +34,10 @@ import java.util.Date
 
 object AiChatRepository {
 
-    private var chatHistory = mutableListOf<Content>()
-
     private val _newMessagesEvent = MutableSharedFlow<String>()
     val newMessagesEvent = _newMessagesEvent.asSharedFlow()
 
-    val isGenerating = MutableStateFlow(false)
     private val _suggestedReplies = MutableStateFlow<List<String>>(emptyList())
-    val suggestedReplies: StateFlow<List<String>> = _suggestedReplies.asStateFlow()
 
     private val aiChatDao by lazy {
         AiChatDatabase.getDatabase(appContext).aiChatDao()
@@ -52,122 +45,6 @@ object AiChatRepository {
 
     suspend fun getCachedMessages(): List<AiChatMessageEntity>? {
         return aiChatDao.getMessagesForDateFlow(DateUtils.todayString()).firstOrNull()
-    }
-
-    private fun getModel(systemInstructionText: String) = Firebase.ai.generativeModel(
-        modelName = AiPromptBuilder.MODEL_NAME,
-        generationConfig = generationConfig {
-            temperature = 0.7f
-            topK = 40
-            topP = 0.95f
-        },
-        systemInstruction = content { text(systemInstructionText) })
-
-    suspend fun onFoodLogAdded(foodLog: FoodLog? = null) {
-        isGenerating.value = true
-        try {
-            val date = Date()
-            val summary = LogRepository.getDailySummarySync(date)
-
-            val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-            val todayStr = DateUtils.todayString()
-
-            if (foodLog != null) {
-                checkLateFood(foodLog, hour, todayStr)
-            }
-
-            if (checkCalorieLimit(summary, user, todayStr)) {
-                return
-            }
-
-            if (checkLowProteinHighCarbFat(summary, user, todayStr)) {
-                return
-            }
-
-            if (checkMacroLimits(summary, user, todayStr)) {
-                return
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            isGenerating.value = false
-        }
-    }
-
-    private suspend fun checkLateFood(foodLog: FoodLog, hour: Int, todayStr: String) {
-        if (foodLog.calories > 200 && (hour !in 4..20)) {
-            val tag = AiChatMessageEntity.TAG_LATE_FOOD
-            if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
-                appContext.resources.getStringArray(R.array.late_food_warnings).randomOrNull()
-                    ?.let {
-                        saveCachedMessage(it, false, tag)
-                    }
-            }
-        }
-    }
-
-    private suspend fun checkCalorieLimit(
-        summary: DailySummary, user: User, todayStr: String
-    ): Boolean {
-        val netCalories = summary.consumedCalories
-        if (netCalories >= user.targetCalories) {
-            val tag = AiChatMessageEntity.TAG_CALORIE_LIMIT
-            if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
-                val parsedMessage = DietologAnswers.calorieLimitExceededMessages.random()
-                saveCachedMessage(parsedMessage, false, tag)
-                _newMessagesEvent.emit(parsedMessage)
-                return true
-            }
-        }
-        return false
-    }
-
-    private suspend fun checkLowProteinHighCarbFat(
-        summary: DailySummary, user: User, todayStr: String
-    ): Boolean {
-        if (summary.consumedFat > user.targetFat && summary.consumedCarbs > user.targetCarbs && summary.consumedProtein < user.targetProtein * 0.5) {
-            val tag = AiChatMessageEntity.TAG_PROTEIN_LOW
-            if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
-                val warning = DietologAnswers.lowProteinHighCarbFatMessages.random()
-                saveCachedMessage(warning, false, tag)
-                _newMessagesEvent.emit(warning)
-                return true
-            }
-        }
-        return false
-    }
-
-    private suspend fun checkMacroLimits(
-        summary: DailySummary, user: User, todayStr: String
-    ): Boolean {
-        if (user.targetFat > 0 && summary.consumedFat > user.targetFat) {
-            val tag = AiChatMessageEntity.TAG_FAT_EXCEEDED
-            if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
-                val parsedMessage = DietologAnswers.fatExceededMessages.random()
-                saveCachedMessage(parsedMessage, false, tag)
-                _newMessagesEvent.emit(parsedMessage)
-                return true
-            }
-        }
-        if (user.targetCarbs > 0 && summary.consumedCarbs > user.targetCarbs) {
-            val tag = AiChatMessageEntity.TAG_CARBS_EXCEEDED
-            if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
-                val parsedMessage = DietologAnswers.carbExceededMessages.random()
-                saveCachedMessage(parsedMessage, false, tag)
-                _newMessagesEvent.emit(parsedMessage)
-                return true
-            }
-        }
-        if (user.targetProtein > 0 && summary.consumedProtein > user.targetProtein) {
-            val tag = AiChatMessageEntity.TAG_PROTEIN_EXCEEDED
-            if (!aiChatDao.hasMessageWithTag(todayStr, tag)) {
-                val parsedMessage = DietologAnswers.proteinExceededMessages.random()
-                saveCachedMessage(parsedMessage, false, tag)
-                _newMessagesEvent.emit(parsedMessage)
-                return true
-            }
-        }
-        return false
     }
 
     suspend fun saveMessageToFirestore(
@@ -198,9 +75,30 @@ object AiChatRepository {
         }
     }
 
+    private suspend fun callChatFunction(
+        message: String,
+        history: List<Map<String, String>>,
+        systemInstruction: String
+    ): String? = withContext(Dispatchers.IO) {
+        val data = hashMapOf(
+            "message" to message.trim(),
+            "history" to history,
+            "systemInstruction" to systemInstruction
+        )
+
+        val result = Firebase.functions("europe-west1")
+            .getHttpsCallable("chatWithDietolog")
+            .call(data)
+            .await()
+
+        val resultMap = result.data as? Map<*, *>
+        resultMap?.get("text") as? String
+    }
+
     suspend fun clearHistory() {
+        android.util.Log.d("DietologAI", "[CLEAR HISTORY]")
         aiChatDao.clearAllMessages()
-        chatHistory.clear()
+        clearReplies()
     }
 
     suspend fun saveCachedMessage(text: String, isUser: Boolean, tag: String? = null) {
@@ -218,127 +116,95 @@ object AiChatRepository {
         _suggestedReplies.value = emptyList()
     }
 
-    var suggestedShownCount = 0
-
     fun sendMessage(
         text: String, chatId: String?
     ): Flow<DataWrapper<String>> = flow {
 
-        saveCachedMessage(text, true)
-
-        if (chatId != null) {
-            saveMessageToFirestore(chatId, text, true, System.currentTimeMillis())
-        }
-        var fullResponse = ""
+        val delimiterRegex = Regex("---+\\s*suggestions?\\s*---+", RegexOption.IGNORE_CASE)
         try {
-            val systemPrompt = AiPromptBuilder.buildDietologInstruction(suggestedShownCount < 3)
-            val userContent = content(role = "user") { text(text) }
-            val modelInstance = getModel(systemPrompt)
-            val chat = modelInstance.startChat(chatHistory)
-            val stream = chat.sendMessageStream(userContent)
-
-            stream.collect { chunk ->
-                val chunkText = chunk.text ?: ""
-                fullResponse += chunkText
-                val parsed = extractStreamingJsonMessage(fullResponse)
-
-                emit(DataWrapper.Success(parsed))
+            try {
+                saveCachedMessage(text, true)
+            } catch (e: Exception) {
+                android.util.Log.e("DietologAI", "Error caching user message", e)
             }
 
-            chatHistory.add(userContent)
-            chatHistory.add(content(role = "model") { text(fullResponse) })
-
-            val finalParsed =
-                extractJsonMessage(fullResponse) ?: extractStreamingJsonMessage(fullResponse)
-
-            saveCachedMessage(finalParsed, false)
-
-            val parsedQuestions = extractJsonReplies(fullResponse)
-
-            if (suggestedShownCount < 3) {
-                _suggestedReplies.value = parsedQuestions
-                suggestedShownCount++
-            }
             if (chatId != null) {
-                if (user.isPremium().not()) {
-                    AppPreference.incrementDietologMessageCount()
+                try {
+                    saveMessageToFirestore(chatId, text, true, System.currentTimeMillis())
+                } catch (e: Exception) {
+                    android.util.Log.e("DietologAI", "Error saving to Firestore", e)
                 }
-                saveMessageToFirestore(chatId, finalParsed, false, System.currentTimeMillis())
             }
-        } catch (e: Exception) {
-            emit(DataWrapper.Error(e.localizedMessage))
-        }
-    }
 
-    private fun extractStreamingJsonMessage(text: String): String {
-        val keyIndex = text.indexOf("\"message\"")
-        if (keyIndex != -1) {
-            val colonIndex = text.indexOf(":", keyIndex + 9)
-            if (colonIndex != -1) {
-                val quoteStart = text.indexOf("\"", colonIndex + 1)
-                if (quoteStart != -1) {
-                    val builder = StringBuilder()
-                    var escaped = false
-                    var i = quoteStart + 1
-                    while (i < text.length) {
-                        val c = text[i]
-                        if (escaped) {
-                            builder.append(c)
-                            escaped = false
-                        } else if (c == '\\') {
-                            escaped = true
-                        } else if (c == '"') {
-                            break
-                        } else {
-                            builder.append(c)
-                        }
-                        i++
+            val cached = getCachedMessages().orEmpty()
+            val recentCached = cached.takeLast(3).dropWhile { !it.isUser }
+            val historyList = recentCached.map { msg ->
+                mapOf(
+                    "role" to if (msg.isUser) "user" else "model",
+                    "text" to msg.text
+                )
+            }
+
+            val instruction = AiPromptBuilder.buildDietologInstruction()
+            val fullResponse = callChatFunction(text, historyList, instruction) ?: ""
+
+            val finalCleanText =
+                fullResponse.split(delimiterRegex).firstOrNull()?.trim() ?: fullResponse.trim()
+            android.util.Log.d("DietologAI", "[AI RESPONSE FINAL]:\n$finalCleanText")
+
+            if (finalCleanText.isNotBlank()) {
+                try {
+                    saveCachedMessage(finalCleanText, false)
+                } catch (e: Exception) {
+                    android.util.Log.e("DietologAI", "Error caching final AI response", e)
+                }
+                extractAndEmitSuggestions(fullResponse, delimiterRegex)
+
+                if (chatId != null) {
+                    try {
+                        saveMessageToFirestore(
+                            chatId,
+                            finalCleanText,
+                            false,
+                            System.currentTimeMillis()
+                        )
+                    } catch (e: Exception) {
+                        android.util.Log.e(
+                            "DietologAI",
+                            "Error saving final AI response to Firestore",
+                            e
+                        )
                     }
-                    return builder.toString()
                 }
-            }
-        }
-        val trimmed = text.trim()
-        if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-            return ""
-        }
-        return text
-    }
-
-    private fun extractJsonMessage(text: String): String? {
-        return try {
-            val jsonStart = text.indexOf("{")
-            val jsonEnd = text.lastIndexOf("}")
-            if (jsonStart != -1 && jsonEnd != -1) {
-                val jsonString = text.substring(jsonStart, jsonEnd + 1)
-                val obj = org.json.JSONObject(jsonString)
-                obj.getString("message")
+                emit(DataWrapper.Success(finalCleanText))
             } else {
-                null
+                throw IllegalStateException("Bo'sh javob qaytdi")
             }
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    private fun extractJsonReplies(text: String): List<String> {
-        return try {
-            val jsonStart = text.indexOf("{")
-            val jsonEnd = text.lastIndexOf("}")
-            if (jsonStart != -1 && jsonEnd != -1) {
-                val jsonString = text.substring(jsonStart, jsonEnd + 1)
-                val obj = org.json.JSONObject(jsonString)
-                val arr = obj.getJSONArray("replies")
-                val result = mutableListOf<String>()
-                for (i in 0 until arr.length()) {
-                    result.add(arr.getString(i))
-                }
-                result
-            } else {
-                emptyList()
-            }
+            android.util.Log.d("DietologAI", "==================================================")
         } catch (e: Exception) {
-            emptyList()
+            android.util.Log.e("DietologAI", "[ERROR OCCURRED]: ${e.message}", e)
+            val errorMsg =
+                "Kechirasiz, javob tayyorlanishida xatolik yuz berdi. Qaytadan so'rashingiz mumkin."
+            try {
+                saveCachedMessage(errorMsg, false)
+            } catch (_: Exception) {
+            }
+            emit(DataWrapper.Success(errorMsg))
+        }
+    }
+
+    private fun extractAndEmitSuggestions(fullResponse: String, delimiterRegex: Regex) {
+        val parts = fullResponse.split(delimiterRegex)
+        if (parts.size > 1) {
+            val suggestionsSection = parts[1].trim()
+            val questions = suggestionsSection.lines()
+                .map { it.replace(Regex("^[0-9•\\-\\.\\s]+"), "").trim() }
+                .filter { it.isNotBlank() && it.length in 4..45 }
+                .take(3)
+            if (questions.isNotEmpty()) {
+                _suggestedReplies.value = questions
+                android.util.Log.d("DietologAI", "[SUGGESTIONS EXTRACTED]: $questions")
+            }
         }
     }
 }

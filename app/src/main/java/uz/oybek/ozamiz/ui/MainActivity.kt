@@ -3,6 +3,8 @@ package uz.oybek.ozamiz.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentSender
+import android.content.res.Configuration
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
@@ -10,6 +12,7 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -18,9 +21,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import com.google.android.material.color.MaterialColors
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
@@ -50,7 +55,6 @@ import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.CompanyLinks
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
-import uz.oybek.ozamiz.databinding.DialogLevelUpBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
 import uz.oybek.ozamiz.databinding.SupportSheetBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -60,19 +64,13 @@ import uz.oybek.ozamiz.util.PhoneUtils
 import uz.oybek.ozamiz.util.handleException
 
 class MainActivity : AppCompatActivity() {
-
+    
     lateinit var navController: NavController
     private lateinit var navHost: NavHostFragment
 
     private lateinit var binding: ActivityMainBinding
     private var systemInsets: WindowInsetsCompat? = null
     private var topInsetPaddingEnabled = true
-
-    fun setTopInsetPaddingEnabled(enabled: Boolean) {
-        if (topInsetPaddingEnabled == enabled) return
-        topInsetPaddingEnabled = enabled
-        updateContainerPadding()
-    }
 
     private fun updateRootPadding() {
         val insets = systemInsets ?: return
@@ -145,28 +143,16 @@ class MainActivity : AppCompatActivity() {
         initChatBadgeObserving()
         initUpdateManager(updateLauncher)
         initInternetConnectivity()
-        observeLevelUp()
-    }
-
-    private fun observeLevelUp() {
-        lifecycleScope.launch {
-            PointsRepository.newLevelUnlockedFlow.collect {
-                delay(1000)
-                showLevelUpDialog(it)
-            }
-        }
     }
 
     private fun checkCurrentUser(graph: NavGraph) {
-        if (user.valid.not()) {
+        if (!user.valid) {
             UserAuthRepository.signOut()
             graph.setStartDestination(R.id.authFragment)
-        } else if (user.valid) {
-            if (user.name.isEmpty()) {
-                graph.setStartDestination(R.id.onboarding)
-            }
+        } else if (!user.hasBasicCalorieData) {
+            graph.setStartDestination(R.id.onboarding)
         } else {
-            graph.setStartDestination(R.id.authFragment)
+            graph.setStartDestination(R.id.home)
         }
     }
 
@@ -191,6 +177,7 @@ class MainActivity : AppCompatActivity() {
                         badge.clearNumber()
                     }
                 }
+                updateStatusBarForDestination(destination.id)
             }
         }
     }
@@ -199,12 +186,44 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         UserProfileRepository.updateLastSeen()
         NotificationSchedular.rescheduleToday(this)
+        if (::navController.isInitialized) {
+            updateStatusBarForDestination()
+        }
+    }
+
+    fun updateStatusBarForDestination(destinationId: Int? = if (::navController.isInitialized) navController.currentDestination?.id else null) {
+        if (destinationId == R.id.foodCameraFragment) {
+            binding.root.setBackgroundColor(Color.BLACK)
+            enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.dark(Color.BLACK),
+                navigationBarStyle = SystemBarStyle.dark(Color.BLACK)
+            )
+        } else {
+            val colorSurfaceContainerLowest = MaterialColors.getColor(
+                this,
+                com.google.android.material.R.attr.colorSurfaceContainerLowest,
+                Color.WHITE
+            )
+            binding.root.setBackgroundColor(colorSurfaceContainerLowest)
+            val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            if (isNightMode) {
+                enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.dark(colorSurfaceContainerLowest),
+                    navigationBarStyle = SystemBarStyle.dark(colorSurfaceContainerLowest)
+                )
+            } else {
+                enableEdgeToEdge(
+                    statusBarStyle = SystemBarStyle.light(colorSurfaceContainerLowest, colorSurfaceContainerLowest),
+                    navigationBarStyle = SystemBarStyle.light(colorSurfaceContainerLowest, colorSurfaceContainerLowest)
+                )
+            }
+        }
     }
 
     private fun initUser() {
-        LocalUser.getUser()
+        UserProfileRepository.init()
         if (LocalUser.user.valid) {
-            UserProfileRepository.observeCurrentUser {
+            LocalUser.userLive.observe(this) {
                 if (it == null || it.valid.not()) {
                     signOut?.run()
                 }
@@ -351,6 +370,7 @@ class MainActivity : AppCompatActivity() {
         if (bottomNavShown == show && binding.bottomNavView.isVisible == show) return
         bottomNavShown = show
         updateContainerPadding()
+        binding.bottomNavDivider.isVisible = show
         if (show.not() && justInvisible) {
             binding.bottomNavView.isInvisible = false
             return
@@ -409,23 +429,5 @@ class MainActivity : AppCompatActivity() {
             0,
             if (show) 0 else systemBars.bottom
         )
-    }
-
-    private fun showLevelUpDialog(level: Level) {
-        val binding = DialogLevelUpBinding.inflate(layoutInflater).apply {
-            textLevelEmoji.text = level.emoji
-            textLevelName.text = level.name
-            textLevelMotivation.text = level.motivationText
-        }
-        val dialog = AlertDialog.Builder(
-            this,
-            R.style.RoundedCornersDialog
-        ).apply {
-            setView(binding.root)
-        }.create()
-        binding.btnLevelUpOk.setOnClickListener {
-            dialog.dismiss()
-        }
-        dialog.show()
     }
 }

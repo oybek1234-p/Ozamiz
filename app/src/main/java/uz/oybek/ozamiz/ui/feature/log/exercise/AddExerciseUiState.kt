@@ -12,16 +12,20 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.level.PointsEvent
 import uz.oybek.ozamiz.data.level.PointsRepository
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
+import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
 import uz.oybek.ozamiz.data.logs.model.UserExercise
+import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
 import java.util.Date
 
 sealed class AddExerciseUiState {
     object Loading : AddExerciseUiState()
-    data class Input(val selectedExercise: UserExercise, val caloriesBurned: Int) :
-        AddExerciseUiState()
+    data class Input(
+        val selectedExercise: UserExercise,
+        val caloriesBurned: Int
+    ) : AddExerciseUiState()
 
     object Saving : AddExerciseUiState()
     data class Success(val exerciseId: String, val caloriesBurned: Int) : AddExerciseUiState()

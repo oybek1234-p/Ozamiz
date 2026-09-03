@@ -2,7 +2,6 @@ package uz.oybek.ozamiz.ui.feature.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentPlateSectionDetailBinding
@@ -19,7 +18,7 @@ class PlateSectionDetailFragment : BaseFragment<FragmentPlateSectionDetailBindin
 
     override fun viewCreated(bind: FragmentPlateSectionDetailBinding) {
         bind.btnBack.setOnClickListener {
-            findNavController().navigateUp()
+            navigateUp()
         }
 
         setupContent(bind)

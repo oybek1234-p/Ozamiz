@@ -9,26 +9,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.data.ai.aiChat.ChatMessage
 import uz.oybek.ozamiz.databinding.ItemChatMessageBinding
-import uz.oybek.ozamiz.databinding.ItemChatThinkingBinding
 import uz.oybek.ozamiz.ui.utils.MarkdownUtils
 
-class AiChatAdapter(
-) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback) {
+class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(DiffCallback) {
 
     companion object {
-        private const val TYPE_USER = 0
-        private const val TYPE_AI = 1
-        private const val TYPE_THINKING = 2
+        private const val PAYLOAD_TEXT_UPDATE = "payload_text_update"
     }
 
-    override fun getItemViewType(position: Int): Int {
-        val item = getItem(position)
-        return when {
-            item.isThinking -> TYPE_THINKING
-            item.isUser -> TYPE_USER
-            else -> TYPE_AI
-        }
-    }
+    var activeTurnMinHeight: Int = 0
 
     private var lastAnimatedPosition = -1
     private var isInitialLoad = true
@@ -38,6 +27,11 @@ class AiChatAdapter(
         currentList: MutableList<ChatMessage>
     ) {
         super.onCurrentListChanged(previousList, currentList)
+        // Yangi xabar kelishi bilan oldingi AI xabari avtomatik wrap_content (minimumHeight = 0) bo'ladi
+        if (previousList.isNotEmpty() && currentList.size > previousList.size) {
+            notifyItemChanged(previousList.size - 1)
+        }
+
         if (currentList.isEmpty()) {
             lastAnimatedPosition = -1
             isInitialLoad = true
@@ -47,50 +41,89 @@ class AiChatAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return when (viewType) {
-            TYPE_THINKING -> ThinkingViewHolder(
-                ItemChatThinkingBinding.inflate(inflater, parent, false)
-            )
-
-            else -> MessageViewHolder(
-                ItemChatMessageBinding.inflate(inflater, parent, false)
-            )
-        }
+        return MessageViewHolder(ItemChatMessageBinding.inflate(inflater, parent, false))
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: MessageViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
         val item = getItem(position)
-        if (holder is MessageViewHolder) {
-            holder.bind(item)
-            val currentPos = holder.bindingAdapterPosition
-            if (currentPos != RecyclerView.NO_POSITION && currentPos > lastAnimatedPosition) {
-                lastAnimatedPosition = currentPos
-                holder.runEntranceAnimation()
-            }
-        } else if (holder is ThinkingViewHolder) {
-            holder.startAnimation()
+        val isLastItem = position == itemCount - 1
+
+        // Faqat eng oxirgi faol AI xabariga to'liq ekran bo'shlig'i beriladi.
+        // Oldingi barcha xabarlar o'zining tabiiy wrap_content hajmiga qaytadi.
+        if (isLastItem && !item.isUser && activeTurnMinHeight > 0) {
+            holder.itemView.minimumHeight = activeTurnMinHeight
+        } else {
+            holder.itemView.minimumHeight = 0
+        }
+
+        if (payloads.contains(PAYLOAD_TEXT_UPDATE)) {
+            holder.updateContent(item)
+            return
+        }
+        super.onBindViewHolder(holder, position, payloads)
+    }
+
+    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+        val item = getItem(position)
+        val isLastItem = position == itemCount - 1
+
+        if (isLastItem && !item.isUser && activeTurnMinHeight > 0) {
+            holder.itemView.minimumHeight = activeTurnMinHeight
+        } else {
+            holder.itemView.minimumHeight = 0
+        }
+
+        holder.bind(item)
+        val currentPos = holder.bindingAdapterPosition
+        if (currentPos != RecyclerView.NO_POSITION && currentPos > lastAnimatedPosition) {
+            lastAnimatedPosition = currentPos
+            holder.runEntranceAnimation()
         }
     }
 
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+    override fun onViewRecycled(holder: MessageViewHolder) {
         super.onViewRecycled(holder)
-        if (holder is ThinkingViewHolder) {
-            holder.stopAnimation()
-        }
+        holder.stopThinkingAnimation()
     }
 
-    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+    override fun onViewDetachedFromWindow(holder: MessageViewHolder) {
         super.onViewDetachedFromWindow(holder)
-        if (holder is ThinkingViewHolder) {
-            holder.stopAnimation()
-        }
+        holder.stopThinkingAnimation()
     }
 
     class MessageViewHolder(
         private val binding: ItemChatMessageBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+
+        private val animators = mutableListOf<android.animation.Animator>()
+
+        fun updateContent(message: ChatMessage) {
+            if (message.isUser) {
+                binding.userMessageLayout.isVisible = true
+                binding.aiMessageLayout.isVisible = false
+                binding.userMessageText.text = MarkdownUtils.formatMarkdown(message.text)
+            } else {
+                binding.userMessageLayout.isVisible = false
+                binding.aiMessageLayout.isVisible = true
+
+                if (message.isThinking || message.text.isBlank()) {
+                    binding.thinkingContainer.isVisible = true
+                    binding.aiMessageText.isVisible = false
+                    startThinkingAnimation()
+                } else {
+                    stopThinkingAnimation()
+                    binding.thinkingContainer.isVisible = false
+                    binding.aiMessageText.isVisible = true
+                    binding.aiMessageText.text = MarkdownUtils.formatMarkdown(message.text)
+                }
+            }
+        }
 
         fun bind(message: ChatMessage) {
             binding.userMessageLayout.apply {
@@ -106,50 +139,11 @@ class AiChatAdapter(
                 translationY = 0f
             }
 
-            binding.apply {
-                val cleanedText = message.text
-                if (message.isUser) {
-                    userMessageLayout.isVisible = true
-                    aiMessageLayout.isVisible = false
-                    userMessageText.text = MarkdownUtils.formatMarkdown(cleanedText)
-                } else {
-                    userMessageLayout.isVisible = false
-                    aiMessageLayout.isVisible = true
-                    aiMessageText.text = MarkdownUtils.formatMarkdown(cleanedText)
-                }
-            }
+            updateContent(message)
         }
 
-        fun runEntranceAnimation() {
-            val targetView = if (binding.userMessageLayout.isVisible) {
-                binding.userMessageLayout
-            } else {
-                binding.aiMessageLayout
-            }
-
-            targetView.alpha = 0f
-            targetView.scaleX = 0.85f
-            targetView.scaleY = 0.85f
-            targetView.translationY = 40f
-
-            targetView.animate()
-                .alpha(1f)
-                .scaleX(1f)
-                .scaleY(1f)
-                .translationY(0f)
-                .setDuration(250)
-                .setInterpolator(android.view.animation.DecelerateInterpolator())
-                .start()
-        }
-    }
-
-    class ThinkingViewHolder(private val binding: ItemChatThinkingBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        private val animators = mutableListOf<android.animation.Animator>()
-
-        fun startAnimation() {
-            stopAnimation()
+        fun startThinkingAnimation() {
+            if (animators.isNotEmpty()) return
 
             val dots = listOf(binding.dot1, binding.dot2, binding.dot3)
             dots.forEachIndexed { index, dot ->
@@ -181,7 +175,7 @@ class AiChatAdapter(
             }
         }
 
-        fun stopAnimation() {
+        fun stopThinkingAnimation() {
             animators.forEach { it.cancel() }
             animators.clear()
 
@@ -192,13 +186,49 @@ class AiChatAdapter(
             binding.dot3.translationY = 0f
             binding.dot3.alpha = 1f
         }
+
+        fun runEntranceAnimation() {
+            val targetView = if (binding.userMessageLayout.isVisible) {
+                binding.userMessageLayout
+            } else {
+                binding.aiMessageLayout
+            }
+
+            targetView.alpha = 0f
+            targetView.scaleX = 0.9f
+            targetView.scaleY = 0.9f
+            targetView.translationY = 20f
+
+            targetView.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .translationY(0f)
+                .setDuration(200)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+        }
     }
 
     object DiffCallback : DiffUtil.ItemCallback<ChatMessage>() {
-        override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage) =
-            oldItem.timestamp == newItem.timestamp
+        override fun areItemsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
+            return if (oldItem.id.isNotBlank() && newItem.id.isNotBlank()) {
+                oldItem.id == newItem.id
+            } else {
+                oldItem.timestamp == newItem.timestamp && oldItem.isUser == newItem.isUser
+            }
+        }
 
-        override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage) =
-            oldItem == newItem
+        override fun areContentsTheSame(oldItem: ChatMessage, newItem: ChatMessage): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun getChangePayload(oldItem: ChatMessage, newItem: ChatMessage): Any? {
+            return if (oldItem.id == newItem.id && (oldItem.text != newItem.text || oldItem.isThinking != newItem.isThinking)) {
+                PAYLOAD_TEXT_UPDATE
+            } else {
+                null
+            }
+        }
     }
 }

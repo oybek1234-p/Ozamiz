@@ -2,19 +2,18 @@ package uz.oybek.ozamiz.ui.feature.log.food
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.databinding.ItemFoodSearchResultBinding
-import uz.oybek.ozamiz.R
 import kotlin.math.roundToInt
 
 class FoodSearchAdapter(
     private val onAddClick: (FoodItem, com.google.android.material.button.MaterialButton, android.view.View) -> Unit,
     private val onItemClick: (FoodItem) -> Unit
-) : ListAdapter<FoodItem, FoodSearchAdapter.FoodViewHolder>(FoodDiffCallback()) {
+) : PagingDataAdapter<FoodItem, FoodSearchAdapter.FoodViewHolder>(FoodDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodViewHolder {
         val binding = ItemFoodSearchResultBinding.inflate(
@@ -24,7 +23,10 @@ class FoodSearchAdapter(
     }
 
     override fun onBindViewHolder(holder: FoodViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val item = getItem(position)
+        if (item != null) {
+            holder.bind(item)
+        }
     }
 
     inner class FoodViewHolder(private val binding: ItemFoodSearchResultBinding) :
@@ -32,28 +34,27 @@ class FoodSearchAdapter(
 
         fun bind(item: FoodItem) {
             binding.textViewFoodName.text = item.name
-            
+
             val defaultServing = item.servingSizes.firstOrNull()
             val weight = defaultServing?.grams ?: 100.0
             val calories = (item.caloriesPer100g * weight / 100).roundToInt()
+            val weightInt = weight.roundToInt()
 
-            binding.textViewFoodServing.text = if (defaultServing != null) {
-                binding.root.context.getString(
-                    R.string.food_search_details_format,
-                    calories,
-                    defaultServing.description
-                )
-            } else {
-                binding.root.context.getString(
-                    R.string.food_search_details_default_format,
-                    calories
-                )
+            val servingDescription = when {
+                defaultServing == null -> "100 g"
+                defaultServing.description.contains("g)", ignoreCase = true) || defaultServing.description.equals("100 g", ignoreCase = true) -> defaultServing.description
+                defaultServing.description.equals("gramm", ignoreCase = true) -> "100 g"
+                else -> "${defaultServing.description} (${weightInt} g)"
             }
 
-            binding.imageViewVerified.isVisible = item.isVerified
+            binding.textViewFoodServing.text = "$servingDescription • $calories kkal"
 
-            binding.buttonAddFood.setOnClickListener { onAddClick(item, binding.buttonAddFood, binding.progressAddFood) }
-            binding.root.setOnClickListener { onItemClick(item) }
+            binding.buttonAddFood.setOnClickListener {
+                onAddClick(item, binding.buttonAddFood, binding.progressAddFood)
+            }
+            binding.root.setOnClickListener {
+                onItemClick(item)
+            }
         }
     }
 

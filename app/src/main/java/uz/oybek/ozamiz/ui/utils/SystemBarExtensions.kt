@@ -20,6 +20,7 @@ fun Fragment.applySystemBarStyle(
     val window = requireActivity().window
     val decorView = window.decorView
     val controller = WindowCompat.getInsetsController(window, decorView)
+
     val previous = SystemBarStyle(
         statusBarColor = window.statusBarColor,
         navigationBarColor = window.navigationBarColor,
@@ -38,6 +39,7 @@ fun Fragment.restoreSystemBarStyle(style: SystemBarStyle) {
     val window = activity.window
     val decorView = window.decorView
     val controller = WindowCompat.getInsetsController(window, decorView)
+
     window.statusBarColor = style.statusBarColor
     window.navigationBarColor = style.navigationBarColor
     controller.isAppearanceLightStatusBars = style.lightStatusBars

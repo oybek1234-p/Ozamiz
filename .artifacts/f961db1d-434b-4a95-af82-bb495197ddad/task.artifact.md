@@ -1,0 +1,4 @@
+- [x] Add debounce to `SearchFoodViewModel`
+- [x] Implement `SafeLinearLayoutManager` in `SearchFoodFragment`
+- [x] Add scroll-to-top logic when new search results are submitted
+- [x] Verify fix by running the app and testing rapid search input

@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.data.logs.model
 
 import androidx.annotation.Keep
+import uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient
 import uz.oybek.ozamiz.data.logs.base.LogItem
 
 @Keep
@@ -16,7 +17,11 @@ data class FoodLog(
     var aiInsights: String? = null,
     var aiGenerated: Boolean = true,
     var healthLevel: Int? = null,
-    var timestamp: Any = System.currentTimeMillis()
+    var timestamp: Any = System.currentTimeMillis(),
+    var foodItems: List<AnalyzedIngredient>? = null,
+    var advice: String? = null,
+    var tags: List<String>? = null,
+    var rawAnalysisJson: String? = null
 ) : LogItem {
     constructor() : this(
         "",
@@ -30,6 +35,10 @@ data class FoodLog(
         null,
         true,
         null,
-        0L
+        0L,
+        null,
+        null,
+        null,
+        null
     )
 }

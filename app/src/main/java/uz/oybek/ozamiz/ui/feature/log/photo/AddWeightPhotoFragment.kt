@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import com.bumptech.glide.Glide
 import androidx.fragment.app.setFragmentResultListener
@@ -59,7 +58,7 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
 
     override fun viewCreated(bind: FragmentAddWeightPhotoBinding) {
         bind.toolbarAddWeightPhoto.setNavigationOnClickListener {
-            if (isAdded) findNavController().popBackStack()
+            popBackStack()
         }
 
         // Auto focus editTextWeight & open soft keyboard immediately
@@ -178,9 +177,7 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
 
                     if (state.logAddedSuccessfully) {
                         showToast(getString(R.string.info_saved_success))
-                        if (isAdded && findNavController().currentDestination?.id == R.id.addWeightPhotoFragment) {
-                            closeFragment()
-                        }
+                        closeFragment()
                         viewModel.resetSuccessFlag()
                     }
                 }

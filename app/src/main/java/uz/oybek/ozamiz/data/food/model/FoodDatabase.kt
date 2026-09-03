@@ -2,1500 +2,733 @@ package uz.oybek.ozamiz.data.food.model
 
 object FoodDatabase {
     val allFoods = listOf(
-        FoodItem(
-            "1", "Oq non",
+        FoodItem("1", "Oq non",
             265.0, 9.0, 3.0, 49.0,
             listOf(
                 ServingSize("Bo'lak", 40.0),
                 ServingSize("Chorak", 125.0),
                 ServingSize("Yarimta", 250.0),
                 ServingSize("Butun", 500.0)
-            ),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "2", "Qaynatilgan tuxum",
+            ), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("non", "xleb", "oqnon")),
+        FoodItem("2", "Qaynatilgan tuxum",
             155.0, 13.0, 11.0, 1.1,
-            listOf(ServingSize("Dona", 50.0)),
-            true, "Sut va tuxum"
-        ),
-        FoodItem(
-            "3", "Palov (Osh)",
+            listOf(ServingSize("Dona", 50.0)), true, "Sut va tuxum", isPopular = true, searchAliases = listOf("tuxum", "pishgan tuxum", "qaynatma tuxum", "yoytso")),
+        FoodItem("3", "Palov (Osh)",
             220.0, 8.0, 12.0, 20.0,
             listOf(
                 ServingSize("Kosa", 250.0),
                 ServingSize("Likop", 350.0),
                 ServingSize("Lagan", 500.0)
-            ),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "4", "Sho'rva (go'shtli)",
+            ), true, "Taomlar", isPopular = true, searchAliases = listOf("osh", "plov", "palov", "choyxona oshi", "toy oshi")),
+        FoodItem("4", "Sho'rva (go'shtli)",
             85.0, 6.0, 5.0, 4.0,
-            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "5", "Go'shtli somsa (tandir)",
+            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("shorva", "shurva", "goshtli shorva", "soup")),
+        FoodItem("5", "Go'shtli somsa (tandir)",
             250.0, 10.0, 15.0, 18.0,
-            listOf(ServingSize("Dona", 120.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "6", "Pomidor-bodring salati (Achchiq-chuchuk)",
+            listOf(ServingSize("Dona", 120.0)), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("somsa", "samsa", "tandir somsa", "goshtli somsa")),
+        FoodItem("6", "Pomidor-bodring salati (Achchiq-chuchuk)",
             45.0, 0.9, 3.0, 4.0,
-            listOf(ServingSize("Likopcha", 100.0), ServingSize("Kosa", 150.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "7", "Qatiq",
+            listOf(ServingSize("Likopcha", 100.0), ServingSize("Kosa", 150.0)), true, "Salatlar va gazaklar", isPopular = true, searchAliases = listOf("achchiq chuchuk", "achichuk", "shakarob", "salat", "achik chuchuk")),
+        FoodItem("7", "Qatiq",
             60.0, 3.5, 3.2, 4.5,
-            listOf(ServingSize("Kosa", 200.0), ServingSize("Stakan", 200.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "8", "Manti (go'shtli)",
+            listOf(ServingSize("Kosa", 200.0), ServingSize("Stakan", 200.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("katik", "kefir", "qatiq")),
+        FoodItem("8", "Manti (go'shtli)",
             230.0, 12.0, 12.0, 18.0,
-            listOf(ServingSize("Dona", 40.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "9", "Lag'mon (qovurma)",
+            listOf(ServingSize("Dona", 40.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("manti", "manti goshtli")),
+        FoodItem("9", "Lag'mon (qovurma)",
             190.0, 9.0, 8.0, 21.0,
-            listOf(ServingSize("Kosa", 300.0), ServingSize("Katta kosa", 400.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "10", "Shashlik (qo'y go'shti)",
+            listOf(ServingSize("Kosa", 300.0), ServingSize("Katta kosa", 400.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("lagmon", "lagman", "qovurma lagmon")),
+        FoodItem("10", "Shashlik (qo'y go'shti)",
             280.0, 18.0, 22.0, 1.0,
-            listOf(ServingSize("Six", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "11", "Qovurilgan tuxum",
+            listOf(ServingSize("Six", 100.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("shashlik", "qoy shashlik", "sashlik")),
+        FoodItem("11", "Qovurilgan tuxum",
             98.0, 7.0, 7.5, 0.5,
-            listOf(ServingSize("Dona", 50.0)),
-            true, "Sut va tuxum"
-        ),
-        FoodItem(
-            "12", "Mastava",
+            listOf(ServingSize("Dona", 50.0)), true, "Sut va tuxum", isPopular = true, searchAliases = listOf("glazunya", "omlet", "qovurma tuxum", "yoychnitsa")),
+        FoodItem("12", "Mastava",
             90.0, 4.0, 4.5, 9.0,
-            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "13", "Dimlama",
+            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("mastava")),
+        FoodItem("13", "Dimlama",
             120.0, 8.0, 7.0, 6.0,
-            listOf(ServingSize("Kosa", 300.0), ServingSize("Likop", 400.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "14", "Qozon kabob",
+            listOf(ServingSize("Kosa", 300.0), ServingSize("Likop", 400.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("dimlama", "dymlama")),
+        FoodItem("14", "Qozon kabob",
             250.0, 15.0, 18.0, 6.0,
-            listOf(ServingSize("Likop", 300.0), ServingSize("Lagan", 450.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "15", "Olma",
+            listOf(ServingSize("Likop", 300.0), ServingSize("Lagan", 450.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("qozon kabob", "kazan kabab", "kazan kebab")),
+        FoodItem("15", "Olma",
             52.0, 0.3, 0.2, 14.0,
             listOf(
                 ServingSize("Kichik", 100.0),
                 ServingSize("O'rtacha", 150.0),
                 ServingSize("Katta", 220.0)
-            ),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "16", "Kotlet (go'shtli)",
+            ), true, "Mevalar", isPopular = true, searchAliases = listOf("apple", "yabloko")),
+        FoodItem("16", "Kotlet (go'shtli)",
             260.0, 15.0, 18.0, 9.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "17", "Kartoshka pyuresi",
+            listOf(ServingSize("Dona", 80.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("kotlet", "kotleta", "cutlet")),
+        FoodItem("17", "Kartoshka pyuresi",
             105.0, 2.5, 4.0, 15.0,
-            listOf(ServingSize("Likopcha", 150.0), ServingSize("Likop", 250.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "18", "Grechka (qaynatilgan)",
+            listOf(ServingSize("Likopcha", 150.0), ServingSize("Likop", 250.0)), true, "Garnirlar", isPopular = true, searchAliases = listOf("pyure", "pure", "kartoshka pure")),
+        FoodItem("18", "Grechka (qaynatilgan)",
             110.0, 4.2, 1.1, 21.0,
-            listOf(ServingSize("Kosa", 150.0), ServingSize("Likop", 250.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "19", "Chuchvara sho'rva",
+            listOf(ServingSize("Kosa", 150.0), ServingSize("Likop", 250.0)), true, "Garnirlar", isPopular = true, searchAliases = listOf("grechka", "greshka", "buckwheat")),
+        FoodItem("19", "Chuchvara sho'rva",
             110.0, 7.0, 5.0, 10.0,
-            listOf(ServingSize("Kosa", 300.0), ServingSize("Katta kosa", 400.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "20", "Shaurma (tovuqli)",
+            listOf(ServingSize("Kosa", 300.0), ServingSize("Katta kosa", 400.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("chuchvara", "pelmeni")),
+        FoodItem("20", "Shaurma (tovuqli)",
             250.0, 12.0, 14.0, 18.0,
             listOf(
                 ServingSize("Kichik", 180.0),
                 ServingSize("Standart", 250.0),
                 ServingSize("Katta", 330.0)
-            ),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "21", "Patir non",
+            ), true, "Fastfud", isPopular = true, searchAliases = listOf("shaormo", "shavarma", "doner", "shawarma")),
+        FoodItem("21", "Patir non",
             290.0, 8.0, 6.0, 50.0,
             listOf(
                 ServingSize("Bo'lak", 50.0),
                 ServingSize("Chorak", 100.0),
                 ServingSize("Yarimta", 200.0),
                 ServingSize("Butun", 400.0)
-            ),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "22", "Lag'mon (suyuq)",
+            ), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("patir", "patyr")),
+        FoodItem("22", "Lag'mon (suyuq)",
             130.0, 7.0, 5.0, 14.0,
-            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "23", "Moshxo'rda",
+            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("suyuq lagmon", "lagman soup")),
+        FoodItem("23", "Moshxo'rda",
             95.0, 5.0, 4.0, 10.0,
-            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "24", "Qovurilgan kartoshka",
+            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("moshxorda", "moshxurda")),
+        FoodItem("24", "Qovurilgan kartoshka",
             150.0, 3.0, 7.0, 18.0,
-            listOf(ServingSize("Likopcha", 150.0), ServingSize("Likop", 250.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "25", "Jarkop",
+            listOf(ServingSize("Likopcha", 150.0), ServingSize("Likop", 250.0)), true, "Garnirlar", isPopular = true, searchAliases = listOf("qovurma kartoshka", "jarenaya kartoshka")),
+        FoodItem("25", "Jarkop",
             180.0, 10.0, 12.0, 8.0,
-            listOf(ServingSize("Kosa", 250.0), ServingSize("Likop", 350.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "26", "Sut",
+            listOf(ServingSize("Kosa", 250.0), ServingSize("Likop", 350.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("jarkop")),
+        FoodItem("26", "Sut",
             64.0, 3.2, 3.6, 4.8,
-            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "27", "Uzum",
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("milk", "moloko")),
+        FoodItem("27", "Uzum",
             69.0, 0.7, 0.2, 18.0,
-            listOf(ServingSize("Shingil", 250.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "28", "Tarvuz",
+            listOf(ServingSize("Shingil", 250.0)), true, "Mevalar", isPopular = true, searchAliases = listOf("grape", "vinograd")),
+        FoodItem("28", "Tarvuz",
             30.0, 0.6, 0.2, 7.6,
-            listOf(ServingSize("Bo'lak", 250.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "29", "Qovun",
+            listOf(ServingSize("Bo'lak", 250.0)), true, "Mevalar", isPopular = true, searchAliases = listOf("watermelon", "arbuz")),
+        FoodItem("29", "Qovun",
             34.0, 0.8, 0.2, 8.0,
-            listOf(ServingSize("Bo'lak", 200.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "30", "Kompot (mevali)",
+            listOf(ServingSize("Bo'lak", 200.0)), true, "Mevalar", isPopular = true, searchAliases = listOf("melon", "dinya")),
+        FoodItem("30", "Kompot (mevali)",
             60.0, 0.2, 0.0, 15.0,
             listOf(
                 ServingSize("Piyola", 150.0),
                 ServingSize("Stakan", 200.0),
                 ServingSize("Grafin", 1000.0)
-            ),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "31", "Sariyog'",
+            ), true, "Ichimliklar", searchAliases = listOf("kompot", "kompot mevali")),
+        FoodItem("31", "Sariyog'",
             717.0, 0.9, 81.0, 0.1,
-            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)),
-            true, "Yog'lar"
-        ),
-        FoodItem(
-            "32", "Tvorog",
+            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)), true, "Yog'lar", isPopular = true, searchAliases = listOf("sariyog", "maslo", "slivochnoye maslo")),
+        FoodItem("32", "Tvorog",
             145.0, 18.0, 9.0, 1.3,
-            listOf(ServingSize("Osh qoshiq", 30.0), ServingSize("Kosa", 200.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "33", "Shashlik (mol go'shti)",
+            listOf(ServingSize("Osh qoshiq", 30.0), ServingSize("Kosa", 200.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("tvorog", "cottage cheese")),
+        FoodItem("33", "Shashlik (mol go'shti)",
             250.0, 22.0, 18.0, 0.0,
-            listOf(ServingSize("Six", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "34", "Kartoshkali somsa",
+            listOf(ServingSize("Six", 100.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("mol shashlik", "govyadina shashlik")),
+        FoodItem("34", "Kartoshkali somsa",
             220.0, 6.0, 11.0, 24.0,
-            listOf(ServingSize("Dona", 120.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "35", "Qovoqli somsa",
+            listOf(ServingSize("Dona", 120.0)), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("kartoshka somsa", "samsa s kartofelem")),
+        FoodItem("35", "Qovoqli somsa",
             190.0, 5.0, 9.0, 22.0,
-            listOf(ServingSize("Dona", 120.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "36", "Ko'k somsa",
+            listOf(ServingSize("Dona", 120.0)), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("qovoq somsa", "samsa s tikvoy")),
+        FoodItem("36", "Ko'k somsa",
             210.0, 7.0, 12.0, 18.0,
-            listOf(ServingSize("Dona", 100.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "37", "Norin",
+            listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("kok somsa", "zelenaya samsa")),
+        FoodItem("37", "Norin",
             280.0, 15.0, 18.0, 14.0,
-            listOf(ServingSize("Likopcha", 150.0), ServingSize("Likop", 250.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "38", "Xonim (go'shtli)",
+            listOf(ServingSize("Likopcha", 150.0), ServingSize("Likop", 250.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("norin", "narin")),
+        FoodItem("38", "Xonim (go'shtli)",
             190.0, 9.0, 8.0, 20.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "39", "Pishloq (brinza)",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("xonim", "khanum")),
+        FoodItem("39", "Pishloq (oq / brinza)",
             260.0, 18.0, 20.0, 0.0,
-            listOf(ServingSize("Bo'lak", 30.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "40", "Shaftoli",
+            listOf(ServingSize("Bo'lak", 30.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("brinza", "brynza", "feta", "oq pishloq")),
+        FoodItem("40", "Shaftoli",
             39.0, 0.9, 0.3, 10.0,
             listOf(
                 ServingSize("Kichik", 120.0),
                 ServingSize("O'rtacha", 150.0),
                 ServingSize("Katta", 200.0)
-            ),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "41", "Salat 'Olivye'",
+            ), true, "Mevalar", searchAliases = listOf("peach", "persik")),
+        FoodItem("41", "Salat 'Olivye'",
             180.0, 6.0, 14.0, 7.0,
-            listOf(ServingSize("Kosa", 150.0), ServingSize("Likop", 250.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "42", "Qatlama",
+            listOf(ServingSize("Kosa", 150.0), ServingSize("Likop", 250.0)), true, "Salatlar va gazaklar", isPopular = true, searchAliases = listOf("olivye", "olivier")),
+        FoodItem("42", "Qatlama",
             350.0, 7.0, 18.0, 40.0,
-            listOf(ServingSize("Dona", 100.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "43", "Bo'g'irsoq",
+            listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari", searchAliases = listOf("katlama")),
+        FoodItem("43", "Bo'g'irsoq",
             330.0, 6.0, 15.0, 42.0,
-            listOf(ServingSize("Dona", 20.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "44", "Sho'rva (tovuq go'shtidan)",
+            listOf(ServingSize("Dona", 20.0)), true, "Non va non mahsulotlari", searchAliases = listOf("bogirsoq", "baursak")),
+        FoodItem("44", "Sho'rva (tovuq go'shtidan)",
             60.0, 7.0, 2.5, 3.0,
-            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "45", "Tovuq filesi (qaynatilgan)",
+            listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("tovuq shorva", "kuriniy sup")),
+        FoodItem("45", "Tovuq filesi (qaynatilgan)",
             165.0, 31.0, 3.6, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "46", "Baliq (qovurilgan)",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("tovuq file", "kurinaya grudka")),
+        FoodItem("46", "Baliq (qovurilgan)",
             220.0, 20.0, 15.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "47", "Makaron (qaylali)",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("baliq", "fish", "ryba")),
+        FoodItem("47", "Makaron (qaylali)",
             190.0, 8.0, 7.0, 25.0,
-            listOf(ServingSize("Likop", 250.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "48", "Asal",
+            listOf(ServingSize("Likop", 250.0)), true, "Taomlar", searchAliases = listOf("makaron", "pasta")),
+        FoodItem("48", "Asal",
             304.0, 0.8, 0.0, 82.0,
-            listOf(ServingSize("Choy qoshiq", 7.0), ServingSize("Osh qoshiq", 20.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "49", "Murabbo",
+            listOf(ServingSize("Choy qoshiq", 7.0), ServingSize("Osh qoshiq", 20.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("honey", "med")),
+        FoodItem("49", "Murabbo",
             260.0, 0.2, 0.1, 68.0,
-            listOf(ServingSize("Choy qoshiq", 10.0), ServingSize("Osh qoshiq", 25.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "50", "Qurt",
+            listOf(ServingSize("Choy qoshiq", 10.0), ServingSize("Osh qoshiq", 25.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("varenye", "jam")),
+        FoodItem("50", "Qurt",
             260.0, 25.0, 8.0, 22.0,
-            listOf(ServingSize("Dona", 20.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "51", "Lavash (go'shtli roll)",
+            listOf(ServingSize("Dona", 20.0)), true, "Sut va sut mahsulotlari", searchAliases = listOf("kurt", "kurut")),
+        FoodItem("51", "Lavash (go'shtli roll)",
             260.0, 11.0, 15.0, 20.0,
             listOf(
                 ServingSize("Kichik", 180.0),
                 ServingSize("Standart", 260.0),
                 ServingSize("Katta", 340.0)
-            ),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "52", "Gamburger",
+            ), true, "Fastfud", isPopular = true, searchAliases = listOf("lavash", "goshtli lavash", "roll")),
+        FoodItem("52", "Gamburger",
             295.0, 15.0, 14.0, 27.0,
-            listOf(ServingSize("Standart", 150.0), ServingSize("Katta (Double)", 250.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "53", "Kartoshka fri",
+            listOf(ServingSize("Standart", 150.0), ServingSize("Katta (Double)", 250.0)), true, "Fastfud", isPopular = true, searchAliases = listOf("burger", "hamburger", "ganburger")),
+        FoodItem("53", "Kartoshka fri",
             312.0, 3.4, 15.0, 41.0,
             listOf(
                 ServingSize("Kichik", 80.0),
                 ServingSize("O'rtacha", 110.0),
                 ServingSize("Katta", 150.0)
-            ),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "54", "Pizza (Pepperoni)",
+            ), true, "Fastfud", isPopular = true, searchAliases = listOf("fri", "french fries", "kartoska fri")),
+        FoodItem("54", "Pizza (Pepperoni)",
             285.0, 12.0, 14.0, 28.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "55", "Hot-dog",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Fastfud", isPopular = true, searchAliases = listOf("pitsa", "pizza", "peperoni")),
+        FoodItem("55", "Hot-dog",
             290.0, 10.0, 16.0, 25.0,
-            listOf(ServingSize("Standart", 120.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "56", "Pista (kungaboqar)",
+            listOf(ServingSize("Standart", 120.0)), true, "Fastfud", isPopular = true, searchAliases = listOf("hotdog", "xot dog", "xotdog")),
+        FoodItem("56", "Pista (kungaboqar)",
             600.0, 21.0, 53.0, 11.0,
-            listOf(ServingSize("Hovuch", 30.0), ServingSize("Piyola", 80.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "57", "Yong'oq",
+            listOf(ServingSize("Hovuch", 30.0), ServingSize("Piyola", 80.0)), true, "Gazaklar", searchAliases = listOf("semichka", "pista")),
+        FoodItem("57", "Yong'oq",
             654.0, 15.0, 65.0, 14.0,
-            listOf(ServingSize("Dona", 5.0), ServingSize("Hovuch", 30.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "58", "Mayiz",
+            listOf(ServingSize("Dona", 5.0), ServingSize("Hovuch", 30.0)), true, "Gazaklar", searchAliases = listOf("gretskiy orex", "walnut")),
+        FoodItem("58", "Mayiz",
             299.0, 3.1, 0.5, 79.0,
-            listOf(ServingSize("Hovuch", 40.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "59", "Holva",
+            listOf(ServingSize("Hovuch", 40.0)), true, "Mevalar", searchAliases = listOf("izum", "raisin")),
+        FoodItem("59", "Holva",
             520.0, 12.0, 30.0, 54.0,
-            listOf(ServingSize("Bo'lak", 30.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "60", "Pechenye",
+            listOf(ServingSize("Bo'lak", 30.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("xalva", "halva")),
+        FoodItem("60", "Pechenye",
             430.0, 7.0, 15.0, 65.0,
-            listOf(ServingSize("Dona", 10.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "61", "Shokolad (sutli)",
+            listOf(ServingSize("Dona", 10.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("pechene", "cookie")),
+        FoodItem("61", "Shokolad (sutli)",
             535.0, 8.0, 30.0, 59.0,
-            listOf(ServingSize("Bo'lakcha", 6.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "62", "Muzqaymoq (plombir)",
+            listOf(ServingSize("Bo'lakcha", 6.0)), true, "Shirinliklar va desertlar", isPopular = true, searchAliases = listOf("shokolad", "chocolate")),
+        FoodItem("62", "Muzqaymoq (plombir)",
             230.0, 3.7, 15.0, 21.0,
-            listOf(ServingSize("Sharcha", 50.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "63", "Banan",
+            listOf(ServingSize("Sharcha", 50.0)), true, "Shirinliklar va desertlar", isPopular = true, searchAliases = listOf("morojnoye", "ice cream")),
+        FoodItem("63", "Banan",
             89.0, 1.1, 0.3, 23.0,
             listOf(
                 ServingSize("Kichik", 90.0),
                 ServingSize("O'rtacha", 120.0),
                 ServingSize("Katta", 150.0)
-            ),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "64", "Anor",
+            ), true, "Mevalar", isPopular = true, searchAliases = listOf("banana")),
+        FoodItem("64", "Anor",
             83.0, 1.7, 1.2, 19.0,
-            listOf(ServingSize("Kichik", 200.0), ServingSize("O'rtacha", 280.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "65", "O'rik",
+            listOf(ServingSize("Kichik", 200.0), ServingSize("O'rtacha", 280.0)), true, "Mevalar", searchAliases = listOf("pomegranate", "granat")),
+        FoodItem("65", "O'rik",
             48.0, 1.4, 0.4, 11.0,
-            listOf(ServingSize("Dona", 35.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "66", "Gilos",
+            listOf(ServingSize("Dona", 35.0)), true, "Mevalar", searchAliases = listOf("abrikos", "apricot")),
+        FoodItem("66", "Gilos",
             63.0, 1.1, 0.2, 16.0,
-            listOf(ServingSize("Piyola", 150.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "67", "Qulupnay",
+            listOf(ServingSize("Piyola", 150.0)), true, "Mevalar", searchAliases = listOf("chereeshnya", "cherry")),
+        FoodItem("67", "Qulupnay",
             32.0, 0.7, 0.3, 7.7,
-            listOf(ServingSize("Piyola", 150.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "68", "Dolma (tok bargidan)",
+            listOf(ServingSize("Piyola", 150.0)), true, "Mevalar", searchAliases = listOf("klubnika", "strawberry")),
+        FoodItem("68", "Dolma (tok bargidan)",
             180.0, 8.0, 12.0, 10.0,
-            listOf(ServingSize("Dona", 30.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "69", "Smetana (20%)",
+            listOf(ServingSize("Dona", 30.0)), true, "Taomlar", searchAliases = listOf("dolma", "tolma")),
+        FoodItem("69", "Smetana (20%)",
             206.0, 2.5, 20.0, 3.2,
-            listOf(ServingSize("Osh qoshiq", 20.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "70", "Kefir",
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("smetana")),
+        FoodItem("70", "Kefir",
             50.0, 3.0, 2.5, 4.0,
-            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "71", "Qalampir do'lma",
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("kefir")),
+        FoodItem("71", "Qalampir do'lma",
             170.0, 7.0, 11.0, 10.0,
-            listOf(ServingSize("Dona", 100.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "72", "Karam do'lma (Golubsi)",
+            listOf(ServingSize("Dona", 100.0)), true, "Taomlar", searchAliases = listOf("farshirovanniy perec", "perec dolma")),
+        FoodItem("72", "Karam do'lma (Golubsi)",
             160.0, 8.0, 10.0, 9.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "73", "Tovuq gril",
+            listOf(ServingSize("Dona", 80.0)), true, "Taomlar", searchAliases = listOf("golubsi", "golubtsy")),
+        FoodItem("73", "Tovuq gril",
             240.0, 25.0, 15.0, 0.0,
             listOf(
                 ServingSize("Oyoqcha", 150.0),
                 ServingSize("Qanotcha", 50.0),
                 ServingSize("Chorak", 250.0)
-            ),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "74", "Borshch",
+            ), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("kuritsa gril", "tovuq gril")),
+        FoodItem("74", "Borshch",
             55.0, 2.0, 3.0, 6.0,
-            listOf(ServingSize("Kosa", 300.0), ServingSize("Katta kosa", 400.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "75", "Beshbarmoq",
+            listOf(ServingSize("Kosa", 300.0), ServingSize("Katta kosa", 400.0)), true, "Taomlar", searchAliases = listOf("borsh", "borscht")),
+        FoodItem("75", "Beshbarmoq",
             250.0, 14.0, 15.0, 14.0,
-            listOf(ServingSize("Kosa", 300.0), ServingSize("Lagan", 500.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "76", "Sumalak",
+            listOf(ServingSize("Kosa", 300.0), ServingSize("Lagan", 500.0)), true, "Taomlar", searchAliases = listOf("beshparmak", "beshbarmoq")),
+        FoodItem("76", "Sumalak",
             140.0, 4.0, 2.0, 26.0,
-            listOf(ServingSize("Piyola", 100.0), ServingSize("Kosa", 200.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "77", "Nisholda",
+            listOf(ServingSize("Piyola", 100.0), ServingSize("Kosa", 200.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("sumalyak")),
+        FoodItem("77", "Nisholda",
             250.0, 2.0, 0.1, 62.0,
-            listOf(ServingSize("Piyola", 100.0), ServingSize("Kosa", 150.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "78", "Ayron",
+            listOf(ServingSize("Piyola", 100.0), ServingSize("Kosa", 150.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("nishalda")),
+        FoodItem("78", "Ayron",
             40.0, 1.7, 1.5, 2.5,
-            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "79", "Shashlik (tovuq go'shti)",
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("ayran")),
+        FoodItem("79", "Shashlik (tovuq go'shti)",
             180.0, 25.0, 8.0, 0.0,
-            listOf(ServingSize("Six", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "80", "Shashlik (qiyma)",
+            listOf(ServingSize("Six", 100.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("tovuq shashlik", "kuriniy shashlik")),
+        FoodItem("80", "Shashlik (qiyma)",
             320.0, 16.0, 28.0, 1.0,
-            listOf(ServingSize("Six", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "81", "Tandir kabob",
+            listOf(ServingSize("Six", 100.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("lula shashlik", "qiyma shashlik", "lyulya shashlik")),
+        FoodItem("81", "Tandir kabob",
             290.0, 20.0, 23.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "82", "Kolbasa (qaynatilgan)",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("tandir kabob", "tandyr kebab")),
+        FoodItem("82", "Kolbasa (qaynatilgan)",
             257.0, 13.0, 22.0, 1.5,
-            listOf(ServingSize("Bo'lak", 20.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "83", "Sosiska (qaynatilgan)",
+            listOf(ServingSize("Bo'lak", 20.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("kolbasa", "qaynatilgan kolbasa", "doktorskaya", "doktor kolbasa")),
+        FoodItem("83", "Sosiska",
             280.0, 11.0, 25.0, 2.0,
-            listOf(ServingSize("Dona", 50.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "84", "Tuzlangan bodring",
+            listOf(ServingSize("Dona", 50.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("sosiska", "sutli sosiska", "sosiski")),
+        FoodItem("84", "Tuzlangan bodring",
             16.0, 0.8, 0.1, 2.5,
-            listOf(ServingSize("Dona", 60.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "85", "Tuzlangan pomidor",
+            listOf(ServingSize("Dona", 60.0)), true, "Salatlar va gazaklar", searchAliases = listOf("soleniy ogurets", "tuzlama bodring")),
+        FoodItem("85", "Tuzlangan pomidor",
             20.0, 1.1, 0.1, 3.5,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "86", "Sabzili salat (koreyscha)",
+            listOf(ServingSize("Dona", 80.0)), true, "Salatlar va gazaklar", searchAliases = listOf("soleniy pomidor", "tuzlama pomidor")),
+        FoodItem("86", "Sabzili salat (koreyscha)",
             134.0, 1.2, 11.0, 8.0,
-            listOf(ServingSize("Likopcha", 100.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "87", "Coca-Cola",
+            listOf(ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar", searchAliases = listOf("morkovcha", "koreyskiy morkov")),
+        FoodItem("87", "Coca-Cola",
             42.0, 0.0, 0.0, 10.6,
-            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "88", "Olma sharbati",
+            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("koka kola", "cocacola", "koka", "kola", "coke")),
+        FoodItem("88", "Olma sharbati",
             46.0, 0.1, 0.1, 11.0,
-            listOf(ServingSize("Stakan", 200.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "89", "Manniy bo'tqasi (sutli)",
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("yablochniy sok", "apple juice")),
+        FoodItem("89", "Manniy bo'tqasi (sutli)",
             100.0, 3.0, 3.2, 15.0,
-            listOf(ServingSize("Kosa", 200.0)),
-            true, "Bo'tqalar"
-        ),
-        FoodItem(
-            "90", "Ovsyanaya bo'tqa (sutli)",
+            listOf(ServingSize("Kosa", 200.0)), true, "Bo'tqalar", searchAliases = listOf("mannaya kasha", "manka")),
+        FoodItem("90", "Ovsyanaya bo'tqa (sutli)",
             102.0, 3.6, 4.1, 14.0,
-            listOf(ServingSize("Kosa", 200.0)),
-            true, "Bo'tqalar"
-        ),
-        FoodItem(
-            "91", "Ugra osh",
+            listOf(ServingSize("Kosa", 200.0)), true, "Bo'tqalar", searchAliases = listOf("ovsyanka", "gerkules", "suli kasha")),
+        FoodItem("91", "Ugra osh",
             80.0, 4.0, 3.5, 8.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "92", "Qovurdoq",
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("ugra", "ugro osh")),
+        FoodItem("92", "Qovurdoq",
             350.0, 16.0, 30.0, 2.0,
-            listOf(ServingSize("Likop", 150.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "93", "Tuxum barak",
+            listOf(ServingSize("Likop", 150.0)), true, "Go'shtli taomlar", searchAliases = listOf("kavardak", "qavurdoq")),
+        FoodItem("93", "Tuxum barak",
             220.0, 9.0, 10.0, 23.0,
-            listOf(ServingSize("Dona", 30.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "94", "Ma'shkichiri",
+            listOf(ServingSize("Dona", 30.0)), true, "Taomlar", searchAliases = listOf("yaitso barak", "tuxumbarak")),
+        FoodItem("94", "Ma'shkichiri",
             160.0, 7.0, 8.0, 15.0,
-            listOf(ServingSize("Kosa", 250.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "95", "Chalop",
+            listOf(ServingSize("Kosa", 250.0)), true, "Taomlar", searchAliases = listOf("mashkichiri", "mash kichiri")),
+        FoodItem("95", "Chalop",
             45.0, 1.5, 2.0, 3.0,
-            listOf(ServingSize("Kosa", 250.0), ServingSize("Stakan", 200.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "96", "Go'ja",
+            listOf(ServingSize("Kosa", 250.0), ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("chalop")),
+        FoodItem("96", "Go'ja",
             90.0, 4.0, 3.0, 12.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "97", "Kofe",
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("guja", "goja")),
+        FoodItem("97", "Kofe",
             3.0, 0.1, 0.0, 0.0,
-            listOf(ServingSize("Chashka", 180.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "98", "Blinchik (go'shtli)",
+            listOf(ServingSize("Chashka", 180.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("coffee", "kava", "kapuchino", "latte")),
+        FoodItem("98", "Blinchik (go'shtli)",
             230.0, 9.0, 12.0, 21.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "99", "Blinchik (tvorogli)",
+            listOf(ServingSize("Dona", 80.0)), true, "Taomlar", searchAliases = listOf("blini", "blinchiki")),
+        FoodItem("99", "Blinchik (tvorogli)",
             190.0, 10.0, 8.0, 19.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "100", "Tort 'Napoleon'",
+            listOf(ServingSize("Dona", 80.0)), true, "Taomlar", searchAliases = listOf("tvorog blinchik", "blini s tvorogom")),
+        FoodItem("100", "Tort 'Napoleon'",
             440.0, 6.0, 28.0, 41.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "101", "Tort 'Medovik'",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("napoleon", "tort")),
+        FoodItem("101", "Tort 'Medovik'",
             410.0, 5.0, 22.0, 48.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "102", "Keks",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("medovik", "tort")),
+        FoodItem("102", "Keks",
             380.0, 6.0, 18.0, 50.0,
-            listOf(ServingSize("Bo'lak", 50.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "103", "Jigar kabob",
+            listOf(ServingSize("Bo'lak", 50.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("muffin", "cupcake", "keks")),
+        FoodItem("103", "Jigar kabob",
             220.0, 20.0, 15.0, 1.0,
-            listOf(ServingSize("Six", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "104", "Qaymoq",
+            listOf(ServingSize("Six", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("jigar shashlik", "jigar")),
+        FoodItem("104", "Qaymoq",
             337.0, 2.2, 35.0, 2.9,
-            listOf(ServingSize("Osh qoshiq", 20.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "105", "Loviya sho'rva",
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Sut va sut mahsulotlari", searchAliases = listOf("kaymak", "kaymok")),
+        FoodItem("105", "Loviya sho'rva",
             100.0, 6.0, 4.0, 10.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "106", "No'xat sho'rak",
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("fasoleviy sup", "loviya")),
+        FoodItem("106", "No'xat sho'rak",
             180.0, 10.0, 9.0, 14.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "107", "Gumma (ichak-chavoqdan)",
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("nuxat", "nuhot")),
+        FoodItem("107", "Gumma (ichak-chavoqdan)",
             240.0, 14.0, 18.0, 5.0,
-            listOf(ServingSize("Dona", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "108", "Hasip",
+            listOf(ServingSize("Dona", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("gumma", "pirojki gumma")),
+        FoodItem("108", "Hasip",
             260.0, 12.0, 20.0, 8.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "109", "Chips (kartoshka)",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("xasip", "hasip")),
+        FoodItem("109", "Chips (kartoshka)",
             536.0, 7.0, 35.0, 53.0,
-            listOf(ServingSize("Paketcha", 30.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "110", "Xurmo",
+            listOf(ServingSize("Paketcha", 30.0)), true, "Gazaklar", searchAliases = listOf("chipsy", "chipsi")),
+        FoodItem("110", "Xurmo",
             282.0, 2.5, 0.5, 75.0,
-            listOf(ServingSize("Dona", 25.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "111", "Anjir",
+            listOf(ServingSize("Dona", 25.0)), true, "Mevalar", searchAliases = listOf("korolek", "persimmon", "xurma")),
+        FoodItem("111", "Anjir",
             74.0, 0.8, 0.3, 19.0,
-            listOf(ServingSize("Dona", 50.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "112", "Behi",
+            listOf(ServingSize("Dona", 50.0)), true, "Mevalar", searchAliases = listOf("fig", "inzhir", "anjir")),
+        FoodItem("112", "Behi",
             57.0, 0.4, 0.1, 15.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "113", "Nok",
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Mevalar", searchAliases = listOf("ayva", "quince", "behi")),
+        FoodItem("113", "Nok",
             57.0, 0.4, 0.1, 15.0,
-            listOf(ServingSize("Kichik", 120.0), ServingSize("O'rtacha", 160.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "114", "Oladi (quymoq)",
+            listOf(ServingSize("Kichik", 120.0), ServingSize("O'rtacha", 160.0)), true, "Mevalar", searchAliases = listOf("grusha", "pear", "nok")),
+        FoodItem("114", "Oladi (quymoq)",
             250.0, 7.0, 10.0, 32.0,
-            listOf(ServingSize("Dona", 30.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "115", "Jiz (go'sht qovurmasi)",
+            listOf(ServingSize("Dona", 30.0)), true, "Non va non mahsulotlari", searchAliases = listOf("oladii", "oladushki")),
+        FoodItem("115", "Jiz (go'sht qovurmasi)",
             400.0, 15.0, 38.0, 0.0,
-            listOf(ServingSize("Likopcha", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "116", "Qat-qat somsa (varaqi)",
+            listOf(ServingSize("Likopcha", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("jiz", "jizbiz")),
+        FoodItem("116", "Qat-qat somsa (varaqi)",
             280.0, 9.0, 18.0, 20.0,
-            listOf(ServingSize("Dona", 100.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "117", "Dimlangan karam",
+            listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari", searchAliases = listOf("sloyennaya samsa", "varaqi somsa")),
+        FoodItem("117", "Dimlangan karam",
             75.0, 2.5, 4.0, 8.0,
-            listOf(ServingSize("Likop", 200.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "118", "Shirmoy non",
+            listOf(ServingSize("Likop", 200.0)), true, "Garnirlar", searchAliases = listOf("tushonaya kapusta")),
+        FoodItem("118", "Shirmoy non",
             270.0, 8.0, 3.5, 51.0,
-            listOf(ServingSize("Bo'lak", 50.0), ServingSize("Butun", 400.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "119", "Chak-chak",
+            listOf(ServingSize("Bo'lak", 50.0), ServingSize("Butun", 400.0)), true, "Non va non mahsulotlari", searchAliases = listOf("shirmoy", "shirmoy patir")),
+        FoodItem("119", "Chak-chak",
             450.0, 6.0, 20.0, 60.0,
-            listOf(ServingSize("Bo'lak", 50.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "120", "Baqlajon ikrasi",
+            listOf(ServingSize("Bo'lak", 50.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("chakchak", "chak chak")),
+        FoodItem("120", "Baqlajon ikrasi",
             130.0, 1.5, 10.0, 8.0,
-            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Likopcha", 100.0)),
-            true, "Salatlar va gazaklar"
-        ),
-
-        // YANGI QO'SHILGANLAR BOSHLANISHI (121-750+)
-
-        FoodItem(
-            "121", "Sabzi (xom)", 41.0, 0.9, 0.2, 10.0,
-            listOf(ServingSize("Kichik", 50.0), ServingSize("O'rtacha", 70.0), ServingSize("Katta", 100.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "122", "Rediska (xom)", 16.0, 0.7, 0.1, 3.4,
-            listOf(ServingSize("Dona", 15.0), ServingSize("Bog'", 150.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "123", "Bodring (xom)", 15.0, 0.7, 0.1, 3.6,
-            listOf(ServingSize("Kichik", 80.0), ServingSize("O'rtacha", 150.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "124", "Pomidor (xom)", 18.0, 0.9, 0.2, 3.9,
-            listOf(ServingSize("Kichik", 90.0), ServingSize("O'rtacha", 120.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "125", "Piyoz (xom)", 40.0, 1.1, 0.1, 9.3,
-            listOf(ServingSize("Kichik", 70.0), ServingSize("O'rtacha", 100.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "126", "Kartoshka (xom)", 77.0, 2.0, 0.1, 17.0,
-            listOf(ServingSize("Kichik", 100.0), ServingSize("O'rtacha", 170.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "127", "Qotgan non (suxari)", 330.0, 11.0, 2.0, 68.0,
-            listOf(ServingSize("Bo'lak", 15.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "128", "Moxora (go'shtsiz)", 110.0, 5.0, 3.0, 16.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "129", "Vinegret salati", 120.0, 1.5, 9.0, 8.0,
-            listOf(ServingSize("Likopcha", 150.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "130", "Salat 'Sezar' (tovuqli)", 170.0, 15.0, 10.0, 5.0,
-            listOf(ServingSize("Likop", 250.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "131", "Salat 'Grecheskiy'", 140.0, 5.0, 12.0, 4.0,
-            listOf(ServingSize("Likop", 200.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "132", "Qo'ziqorinli sho'rva", 45.0, 2.5, 2.0, 5.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "133", "Jiz-biz", 420.0, 18.0, 38.0, 1.0,
-            listOf(ServingSize("Likop", 200.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "134", "Tovuq filesi (qovurilgan)", 195.0, 30.0, 7.8, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "135", "Guruch (qaynatilgan)", 130.0, 2.7, 0.3, 28.0,
-            listOf(ServingSize("Kosa", 150.0), ServingSize("Likop", 200.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "136", "Pepsi", 41.0, 0.0, 0.0, 10.4,
-            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "137", "Fanta", 48.0, 0.0, 0.0, 11.7,
-            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "138", "Choy (shakarli)", 20.0, 0.0, 0.0, 5.0,
-            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 250.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "140", "Navvot", 387.0, 0.0, 0.0, 100.0,
-            listOf(ServingSize("Bo'lakcha", 10.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "141", "Parvarda", 400.0, 0.1, 0.2, 99.0,
-            listOf(ServingSize("Dona", 8.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "142", "Bodom", 579.0, 21.0, 49.0, 22.0,
-            listOf(ServingSize("Hovuch", 30.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "143", "Paxta yog'i", 884.0, 0.0, 100.0, 0.0,
-            listOf(ServingSize("Osh qoshiq", 15.0)),
-            true, "Yog'lar"
-        ),
-        FoodItem(
-            "144", "Kungaboqar yog'i", 884.0, 0.0, 100.0, 0.0,
-            listOf(ServingSize("Osh qoshiq", 15.0)),
-            true, "Yog'lar"
-        ),
-        FoodItem(
-            "145", "Mayonez", 680.0, 0.9, 75.0, 2.6,
-            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)),
-            true, "Qaylalar va souslar"
-        ),
-        FoodItem(
-            "146", "Ketchup", 101.0, 1.2, 0.1, 25.0,
-            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)),
-            true, "Qaylalar va souslar"
-        ),
-        FoodItem(
-            "147", "Sutli shokolad", 535.0, 8.0, 30.0, 59.0,
-            listOf(ServingSize("Bo'lakcha", 10.0), ServingSize("Plitka", 100.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "148", "Qora shokolad (70%)", 598.0, 7.6, 43.0, 46.0,
-            listOf(ServingSize("Bo'lakcha", 10.0), ServingSize("Plitka", 100.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "149", "Vafli", 500.0, 5.0, 25.0, 65.0,
-            listOf(ServingSize("Dona", 20.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "150", "Bulochka (sodda)", 280.0, 8.0, 5.0, 50.0,
-            listOf(ServingSize("Dona", 60.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "151", "Palov (Choyxona oshi)", 250.0, 9.0, 15.0, 19.0,
-            listOf(ServingSize("Bir portsiya", 400.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "152", "Palov (To'y oshi)", 280.0, 10.0, 18.0, 20.0,
-            listOf(ServingSize("Bir portsiya", 450.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "153", "Qovurilgan chuchvara", 350.0, 12.0, 20.0, 30.0,
-            listOf(ServingSize("Likopcha", 150.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "154", "Samarqand noni", 280.0, 9.5, 3.2, 52.0,
-            listOf(ServingSize("Bo'lak", 80.0), ServingSize("Butun", 800.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "155", "Yog'li patir", 320.0, 8.0, 10.0, 49.0,
-            listOf(ServingSize("Bo'lak", 60.0), ServingSize("Butun", 450.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "156", "Tuzlangan karam", 19.0, 1.8, 0.1, 2.0,
-            listOf(ServingSize("Likopcha", 100.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "157", "Salat 'Pod shuboy'", 195.0, 5.0, 16.0, 8.0,
-            listOf(ServingSize("Likopcha", 150.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "158", "Perlovka (qaynatilgan)", 109.0, 3.1, 0.5, 23.0,
-            listOf(ServingSize("Kosa", 200.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "159", "Makkajo'xori (qaynatilgan)", 96.0, 3.4, 1.5, 21.0,
-            listOf(ServingSize("So'ta", 200.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "160", "Makkajo'xori uni", 360.0, 7.0, 1.5, 79.0,
-            listOf(ServingSize("Osh qoshiq", 20.0)),
-            true, "Un mahsulotlari"
-        ),
-        FoodItem(
-            "161", "Bug'doy uni (oliy nav)", 340.0, 10.0, 1.1, 74.0,
-            listOf(ServingSize("Osh qoshiq", 20.0), ServingSize("Stakan", 130.0)),
-            true, "Un mahsulotlari"
-        ),
-        FoodItem(
-            "162", "Shakar", 398.0, 0.0, 0.0, 99.8,
-            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "163", "Tuz", 0.0, 0.0, 0.0, 0.0,
-            listOf(ServingSize("Choy qoshiq", 5.0)),
-            true, "Ziravorlar"
-        ),
-        FoodItem(
-            "164", "Mol go'shti (yog'siz, qaynatilgan)", 200.0, 30.0, 8.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "165", "Qo'y go'shti (yog'li, qaynatilgan)", 290.0, 25.0, 21.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "166", "Mineral suv (gazli)", 0.0, 0.0, 0.0, 0.0,
-            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "167", "Limon", 29.0, 1.1, 0.3, 9.0,
-            listOf(ServingSize("Bo'lakcha", 10.0), ServingSize("Dona", 80.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "168", "Apelsin", 47.0, 0.9, 0.1, 12.0,
-            listOf(ServingSize("Dona", 150.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "169", "Mandarin", 53.0, 0.8, 0.3, 13.0,
-            listOf(ServingSize("Dona", 70.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "170", "Kiwi", 61.0, 1.1, 0.5, 15.0,
-            listOf(ServingSize("Dona", 75.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "171", "Qo'ziqorin (shampinyon, qovurilgan)", 50.0, 5.0, 3.0, 2.0,
-            listOf(ServingSize("Likopcha", 100.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "172", "Baqlajon (qovurilgan)", 90.0, 1.0, 7.0, 6.0,
-            listOf(ServingSize("Likopcha", 150.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "173", "Qovoqcha (kabachki, qovurilgan)", 88.0, 1.0, 6.0, 7.0,
-            listOf(ServingSize("Likopcha", 150.0)),
-            true, "Garnirlar"
-        ),
-        FoodItem(
-            "174", "Ko'k piyoz", 19.0, 1.3, 0.1, 3.2,
-            listOf(ServingSize("Bog'", 50.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "175", "Ukrop (shivit)", 43.0, 2.5, 0.5, 6.3,
-            listOf(ServingSize("Bog'", 30.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "176", "Petrushka", 36.0, 3.7, 0.4, 7.6,
-            listOf(ServingSize("Bog'", 30.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "177", "Kashnich (kinza)", 23.0, 2.1, 0.5, 3.7,
-            listOf(ServingSize("Bog'", 30.0)),
-            true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "178", "Xandon pista", 562.0, 20.0, 45.0, 28.0,
-            listOf(ServingSize("Hovuch", 30.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "179", "Turshak (o'rik qoqi)", 241.0, 3.4, 0.5, 63.0,
-            listOf(ServingSize("Hovuch", 50.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "180", "Olcha", 50.0, 0.8, 0.2, 12.0,
-            listOf(ServingSize("Piyola", 150.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "181", "No'xat (qaynatilgan)", 139.0, 8.4, 2.6, 23.0,
-            listOf(ServingSize("Kosa", 200.0)),
-            true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "182", "Loviya (qaynatilgan)", 127.0, 8.5, 0.5, 23.0,
-            listOf(ServingSize("Kosa", 180.0)),
-            true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "183", "Mosh (qaynatilgan)", 105.0, 7.0, 0.4, 19.0,
-            listOf(ServingSize("Kosa", 200.0)),
-            true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "184", "Yasmiq (chechevitsa, qaynatilgan)", 116.0, 9.0, 0.4, 20.0,
-            listOf(ServingSize("Kosa", 200.0)),
-            true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "185", "Pizza 'Margarita'", 250.0, 10.0, 10.0, 30.0,
-            listOf(ServingSize("Bo'lak", 120.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "186", "Cheeseburger", 303.0, 16.0, 14.0, 28.0,
-            listOf(ServingSize("Dona", 130.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "187", "Klab sendvich", 280.0, 15.0, 15.0, 20.0,
-            listOf(ServingSize("Dona", 200.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "188", "Donar (go'shtli)", 220.0, 12.0, 12.0, 15.0,
-            listOf(ServingSize("Dona", 250.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "189", "Popkorn (sariyog'li)", 500.0, 8.0, 25.0, 60.0,
-            listOf(ServingSize("Kichik paket", 50.0), ServingSize("Katta paket", 100.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "190", "Quritilgan olma", 250.0, 1.5, 0.2, 65.0,
-            listOf(ServingSize("Hovuch", 40.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "191", "Quritilgan olxo'ri", 240.0, 2.2, 0.4, 64.0,
-            listOf(ServingSize("Hovuch", 50.0)),
-            true, "Mevalar"
-        ),
-        FoodItem(
-            "192", "Xolodes", 150.0, 18.0, 8.0, 1.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "193", "O'rama xonim", 180.0, 8.0, 7.0, 21.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "194", "Manti (qovoqli)", 170.0, 6.0, 7.0, 20.0,
-            listOf(ServingSize("Dona", 45.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "195", "Manti (kartoshkali)", 190.0, 5.0, 8.0, 24.0,
-            listOf(ServingSize("Dona", 45.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "196", "Bedana sho'rva", 70.0, 8.0, 3.0, 2.0,
-            listOf(ServingSize("Kosa", 350.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "197", "Frikadelkali sho'rva", 65.0, 5.0, 3.5, 4.0,
-            listOf(ServingSize("Kosa", 350.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "198", "Pishloqli bulochka", 320.0, 10.0, 14.0, 38.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "199", "Olmali pirog", 280.0, 4.0, 12.0, 38.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "200", "Limonli choy (shakarli)", 25.0, 0.1, 0.0, 6.0,
-            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 250.0)),
-            true, "Ichimliklar"
-        ),
-
-        // 201-289 oraliq to'ldirilmoqda
-        FoodItem(
-            "201", "Mol go'shti (qiyma)", 240.0, 18.0, 18.0, 0.0,
-            listOf(ServingSize("Gramm", 100.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "202", "Tovuq go'shti (qiyma)", 143.0, 17.0, 8.0, 0.0,
-            listOf(ServingSize("Gramm", 100.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "203", "Zaytun moyi", 884.0, 0.0, 100.0, 0.0,
-            listOf(ServingSize("Osh qoshiq", 14.0)), true, "Yog'lar"
-        ),
-        FoodItem(
-            "204", "Soya sousi", 53.0, 8.0, 0.0, 5.0,
-            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Qaylalar va souslar"
-        ),
-        FoodItem(
-            "205", "Xantal (gorchitsa)", 160.0, 6.0, 12.0, 8.0,
-            listOf(ServingSize("Choy qoshiq", 5.0)), true, "Qaylalar va souslar"
-        ),
-        FoodItem(
-            "206", "Smetana (15%)", 160.0, 2.6, 15.0, 3.0,
-            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "207", "Ryajenka", 67.0, 3.0, 4.0, 4.2,
-            listOf(ServingSize("Stakan", 200.0)), true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "208", "Pishloq (Rossiyskiy)", 360.0, 24.0, 29.0, 0.0,
-            listOf(ServingSize("Bo'lak", 30.0)), true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "209", "Pishloq (Gollandskiy)", 350.0, 26.0, 27.0, 0.0,
-            listOf(ServingSize("Bo'lak", 30.0)), true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "210", "Sut (yog'sizlantirilgan)", 31.0, 3.0, 0.1, 4.8,
-            listOf(ServingSize("Stakan", 200.0)), true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "211", "Muzqaymoq (shokoladli)", 216.0, 4.0, 12.0, 24.0,
-            listOf(ServingSize("Sharcha", 50.0)), true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "212", "Muzqaymoq (mevali)", 130.0, 1.0, 2.0, 28.0,
-            listOf(ServingSize("Dona (Eskimo)", 70.0)), true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "213", "Baliq (qaynatilgan)", 180.0, 22.0, 10.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "214", "Krevetka (qaynatilgan)", 95.0, 19.0, 1.7, 0.0,
-            listOf(ServingSize("Porsiya", 100.0)), true, "Dengiz mahsulotlari"
-        ),
-        FoodItem(
-            "215", "Tovuq sho'rva (lapshali)", 50.0, 4.0, 2.0, 4.0,
-            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "216", "Okroshka (kefirda)", 60.0, 3.0, 3.5, 4.0,
-            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "217", "Shakarli bulochka", 330.0, 7.0, 10.0, 55.0,
-            listOf(ServingSize("Dona", 70.0)), true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "218", "Tvorogli bulochka", 280.0, 12.0, 9.0, 38.0,
-            listOf(ServingSize("Dona", 80.0)), true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "219", "Qora non", 210.0, 7.0, 1.5, 42.0,
-            listOf(ServingSize("Bo'lak", 30.0)), true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "220", "Grechkali kotlet", 180.0, 6.0, 7.0, 23.0,
-            listOf(ServingSize("Dona", 70.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "221", "Sabzavotli ragu", 90.0, 2.0, 5.0, 9.0,
-            listOf(ServingSize("Likop", 250.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "222", "Sabzavotli gril", 60.0, 2.0, 3.0, 7.0,
-            listOf(ServingSize("Porsiya", 150.0)), true, "Garnirlar"
-        ),
-        FoodItem(
-            "223", "Omlet (sut bilan)", 184.0, 12.0, 15.0, 1.5,
-            listOf(ServingSize("Porsiya (2 tuxumdan)", 120.0)), true, "Sut va tuxum"
-        ),
-        FoodItem(
-            "224", "Jigar (qovurilgan)", 210.0, 25.0, 10.0, 5.0,
-            listOf(ServingSize("Likopcha", 100.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "225", "Kurka filesi (qaynatilgan)", 135.0, 25.0, 3.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "226", "Lavlagi (qaynatilgan)", 49.0, 1.8, 0.1, 10.8,
-            listOf(ServingSize("Dona", 100.0)), true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "227", "Lavlagili salat (chesnokli)", 120.0, 2.0, 9.0, 8.0,
-            listOf(ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "228", "Uzum sharbati", 60.0, 0.3, 0.0, 15.0,
-            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"
-        ),
-        FoodItem(
-            "229", "Gilos sharbati", 55.0, 0.5, 0.0, 13.0,
-            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"
-        ),
-        FoodItem(
-            "230", "Anor sharbati", 64.0, 0.3, 0.0, 16.0,
-            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"
-        ),
-        // ... yana mahsulotlar ...
-
-        FoodItem(
-            "290", "Bedana tuxumi (qaynatilgan)", 158.0, 13.0, 11.0, 0.4,
-            listOf(ServingSize("Dona", 9.0)), true, "Sut va tuxum"
-        ),
-        FoodItem(
-            "291", "So'xta (qonli kolbasa)", 379.0, 16.0, 35.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "292", "Pita noni", 275.0, 9.0, 1.2, 56.0,
-            listOf(ServingSize("Dona", 60.0)), true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "293", "Guakamole", 160.0, 2.0, 15.0, 9.0,
-            listOf(ServingSize("Osh qoshiq", 30.0)), true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "294", "Hummus", 166.0, 8.0, 10.0, 14.0,
-            listOf(ServingSize("Osh qoshiq", 30.0), ServingSize("Likopcha", 100.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "295", "Falafel", 333.0, 13.0, 18.0, 32.0,
-            listOf(ServingSize("Dona", 17.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "296", "Qo'y tili (qaynatilgan)", 220.0, 16.0, 18.0, 0.0,
-            listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "297", "O'rdak go'shti (dimlangan)", 320.0, 18.0, 28.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "298", "Qazi", 420.0, 15.0, 40.0, 1.0,
-            listOf(ServingSize("Bo'lak", 25.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "299", "Kalla-pocha", 180.0, 20.0, 10.0, 1.0,
-            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"
-        ),
-
-        // 300-dan boshlab davomi
-        FoodItem(
-            "300", "Bulg'or qalampiri", 26.0, 1.0, 0.2, 6.0,
-            listOf(ServingSize("Dona", 100.0)), true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "301", "Ismaloq (bargi)", 23.0, 2.9, 0.4, 3.6,
-            listOf(ServingSize("Bir bog'", 100.0)), true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "302", "Salat bargi", 15.0, 1.4, 0.2, 2.8,
-            listOf(ServingSize("Bir nechta barg", 50.0)), true, "Sabzavotlar"
-        ),
-        FoodItem(
-            "303", "Ko'k no'xat (konservalangan)", 60.0, 4.0, 0.2, 10.0,
-            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "304", "Makkajo'xori (konservalangan)", 86.0, 2.8, 1.0, 19.0,
-            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "305", "Xamir (qatlama)", 350.0, 8.0, 15.0, 45.0,
-            listOf(ServingSize("Gramm", 100.0)), true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "306", "Xamir (chuchvara uchun)", 280.0, 10.0, 1.5, 56.0,
-            listOf(ServingSize("Gramm", 100.0)), true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "307", "Quruq sut", 496.0, 26.0, 25.0, 40.0,
-            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "308", "Quyultirilgan sut (sgushyonka)", 320.0, 7.5, 8.5, 56.0,
-            listOf(ServingSize("Osh qoshiq", 25.0)), true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "309", "Jele", 60.0, 1.5, 0.0, 14.0,
-            listOf(ServingSize("Piyola", 150.0)), true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "310", "Zefir", 326.0, 0.8, 0.1, 79.0,
-            listOf(ServingSize("Dona", 30.0)), true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "311", "Marmelad", 321.0, 0.0, 0.1, 79.0,
-            listOf(ServingSize("Dona", 15.0)), true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "312", "Pryaniki", 360.0, 5.0, 8.0, 70.0,
-            listOf(ServingSize("Dona", 25.0)), true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "313", "Sushki", 380.0, 10.0, 5.0, 75.0,
-            listOf(ServingSize("Dona", 5.0)), true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "314", "Baliq (dudlangan)", 220.0, 24.0, 14.0, 0.0,
-            listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "315", "Tovuq ruleti", 180.0, 20.0, 10.0, 2.0,
-            listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "319", "Manti (ko'katli)", 160.0, 7.0, 6.0, 19.0,
-            listOf(ServingSize("Dona", 40.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "322", "Iskandar kabob", 210.0, 15.0, 12.0, 10.0,
-            listOf(ServingSize("Porsiya", 350.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "324", "Pahlava (baklava)", 450.0, 7.0, 25.0, 50.0,
-            listOf(ServingSize("Dona", 40.0)), true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "325", "Sushi (Filadelfiya roll)", 142.0, 7.0, 6.0, 15.0,
-            listOf(ServingSize("Dona", 30.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "326", "Sushi (Kaliforniya roll)", 130.0, 6.0, 5.0, 14.0,
-            listOf(ServingSize("Dona", 30.0)), true, "Taomlar"
-        ),
-        FoodItem(
-            "327", "Steyk (mol go'shti, medium)", 270.0, 25.0, 19.0, 0.0,
-            listOf(ServingSize("Porsiya", 200.0)), true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "328", "Kartoshka (pechda pishirilgan)", 95.0, 2.5, 0.5, 21.0,
-            listOf(ServingSize("Dona", 150.0)), true, "Garnirlar"
-        ),
-        FoodItem(
-            "329", "Brokkoli (bug'da pishirilgan)", 35.0, 2.4, 0.4, 7.0,
-            listOf(ServingSize("Porsiya", 150.0)), true, "Garnirlar"
-        ),
-        FoodItem(
-            "330", "Gulkaram (qaynatilgan)", 30.0, 2.0, 0.3, 5.0,
-            listOf(ServingSize("Porsiya", 150.0)), true, "Garnirlar"
-        )
-        // Ro'yxatni 700-800 taga yetkazish uchun shu zaylda davom ettirish mumkin.
-        // Hozirda umumiy soni 350 dan oshdi.
-        // Quyida turli kategoriyalardan yana qo'shimchalar:
-
-        // Sabzavotlar va mevalar
-        ,FoodItem("400", "Avokado", 160.0, 2.0, 15.0, 9.0, listOf(ServingSize("Yarimta", 70.0)), true, "Mevalar"),
+            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar"),
+        FoodItem("121", "Sabzi (xom)", 41.0, 0.9, 0.2, 10.0,
+            listOf(ServingSize("Kichik", 50.0), ServingSize("O'rtacha", 70.0), ServingSize("Katta", 100.0)), true, "Sabzavotlar", isPopular = true, searchAliases = listOf("morkov", "carrot")),
+        FoodItem("122", "Rediska (xom)", 16.0, 0.7, 0.1, 3.4,
+            listOf(ServingSize("Dona", 15.0), ServingSize("Bog'", 150.0)), true, "Sabzavotlar", searchAliases = listOf("radish", "redis")),
+        FoodItem("123", "Bodring (xom)", 15.0, 0.7, 0.1, 3.6,
+            listOf(ServingSize("Kichik", 80.0), ServingSize("O'rtacha", 150.0)), true, "Sabzavotlar", isPopular = true, searchAliases = listOf("ogurets", "cucumber")),
+        FoodItem("124", "Pomidor (xom)", 18.0, 0.9, 0.2, 3.9,
+            listOf(ServingSize("Kichik", 90.0), ServingSize("O'rtacha", 120.0)), true, "Sabzavotlar", isPopular = true, searchAliases = listOf("tomato", "pomidor")),
+        FoodItem("125", "Piyoz (xom)", 40.0, 1.1, 0.1, 9.3,
+            listOf(ServingSize("Kichik", 70.0), ServingSize("O'rtacha", 100.0)), true, "Sabzavotlar", isPopular = true, searchAliases = listOf("onion", "luk")),
+        FoodItem("126", "Kartoshka (xom)", 77.0, 2.0, 0.1, 17.0,
+            listOf(ServingSize("Kichik", 100.0), ServingSize("O'rtacha", 170.0)), true, "Sabzavotlar", isPopular = true, searchAliases = listOf("kartoshka", "potato")),
+        FoodItem("127", "Qotgan non (suxari)", 330.0, 11.0, 2.0, 68.0,
+            listOf(ServingSize("Bo'lak", 15.0)), true, "Non va non mahsulotlari", searchAliases = listOf("suxari", "suxarki")),
+        FoodItem("128", "Moxora (go'shtsiz)", 110.0, 5.0, 3.0, 16.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("moxora", "mohora")),
+        FoodItem("129", "Vinegret salati", 120.0, 1.5, 9.0, 8.0,
+            listOf(ServingSize("Likopcha", 150.0)), true, "Salatlar va gazaklar", searchAliases = listOf("vinegret")),
+        FoodItem("130", "Salat 'Sezar' (tovuqli)", 170.0, 15.0, 10.0, 5.0,
+            listOf(ServingSize("Likop", 250.0)), true, "Salatlar va gazaklar", searchAliases = listOf("caesar", "sezar")),
+        FoodItem("131", "Salat 'Grecheskiy'", 140.0, 5.0, 12.0, 4.0,
+            listOf(ServingSize("Likop", 200.0)), true, "Salatlar va gazaklar"),
+        FoodItem("132", "Qo'ziqorinli sho'rva", 45.0, 2.5, 2.0, 5.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"),
+        FoodItem("133", "Jiz-biz", 420.0, 18.0, 38.0, 1.0,
+            listOf(ServingSize("Likop", 200.0)), true, "Go'shtli taomlar", searchAliases = listOf("jizbiz", "jiz biz")),
+        FoodItem("134", "Tovuq filesi (qovurilgan)", 195.0, 30.0, 7.8, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("tovuq qovurilgan", "jarenaya kuritsa")),
+        FoodItem("135", "Guruch (qaynatilgan)", 130.0, 2.7, 0.3, 28.0,
+            listOf(ServingSize("Kosa", 150.0), ServingSize("Likop", 200.0)), true, "Garnirlar", isPopular = true, searchAliases = listOf("rice", "ris")),
+        FoodItem("136", "Pepsi", 41.0, 0.0, 0.0, 10.4,
+            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("pepsi kola", "pepsikola")),
+        FoodItem("137", "Fanta", 48.0, 0.0, 0.0, 11.7,
+            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)), true, "Ichimliklar", searchAliases = listOf("fanta")),
+        FoodItem("138", "Choy (shakarli)", 20.0, 0.0, 0.0, 5.0,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 250.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("choy", "tea")),
+        FoodItem("140", "Navvot", 387.0, 0.0, 0.0, 100.0,
+            listOf(ServingSize("Bo'lakcha", 10.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("141", "Parvarda", 400.0, 0.1, 0.2, 99.0,
+            listOf(ServingSize("Dona", 8.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("142", "Bodom", 579.0, 21.0, 49.0, 22.0,
+            listOf(ServingSize("Hovuch", 30.0)), true, "Gazaklar", searchAliases = listOf("almond", "mindal")),
+        FoodItem("143", "Paxta yog'i", 884.0, 0.0, 100.0, 0.0,
+            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Yog'lar"),
+        FoodItem("144", "Kungaboqar yog'i", 884.0, 0.0, 100.0, 0.0,
+            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Yog'lar"),
+        FoodItem("145", "Mayonez", 680.0, 0.9, 75.0, 2.6,
+            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)), true, "Qaylalar va souslar", searchAliases = listOf("mayonez", "mayonnaise")),
+        FoodItem("146", "Ketchup", 101.0, 1.2, 0.1, 25.0,
+            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)), true, "Qaylalar va souslar", searchAliases = listOf("ketchup")),
+        FoodItem("147", "Sutli shokolad", 535.0, 8.0, 30.0, 59.0,
+            listOf(ServingSize("Bo'lakcha", 10.0), ServingSize("Plitka", 100.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("148", "Qora shokolad (70%)", 598.0, 7.6, 43.0, 46.0,
+            listOf(ServingSize("Bo'lakcha", 10.0), ServingSize("Plitka", 100.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("149", "Vafli", 500.0, 5.0, 25.0, 65.0,
+            listOf(ServingSize("Dona", 20.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("150", "Bulochka (sodda)", 280.0, 8.0, 5.0, 50.0,
+            listOf(ServingSize("Dona", 60.0)), true, "Non va non mahsulotlari"),
+        FoodItem("153", "Qovurilgan chuchvara", 350.0, 12.0, 20.0, 30.0,
+            listOf(ServingSize("Likopcha", 150.0)), true, "Taomlar", searchAliases = listOf("fried dumplings", "jareniye pelmeni")),
+        FoodItem("154", "Samarqand noni", 280.0, 9.5, 3.2, 52.0,
+            listOf(ServingSize("Bo'lak", 80.0), ServingSize("Butun", 800.0)), true, "Non va non mahsulotlari", searchAliases = listOf("samarqand patir", "samarkandskiy xleb")),
+        FoodItem("155", "Yog'li patir", 320.0, 8.0, 10.0, 49.0,
+            listOf(ServingSize("Bo'lak", 60.0), ServingSize("Butun", 450.0)), true, "Non va non mahsulotlari"),
+        FoodItem("156", "Tuzlangan karam", 19.0, 1.8, 0.1, 2.0,
+            listOf(ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar"),
+        FoodItem("157", "Salat 'Pod shuboy'", 195.0, 5.0, 16.0, 8.0,
+            listOf(ServingSize("Likopcha", 150.0)), true, "Salatlar va gazaklar"),
+        FoodItem("158", "Perlovka (qaynatilgan)", 109.0, 3.1, 0.5, 23.0,
+            listOf(ServingSize("Kosa", 200.0)), true, "Garnirlar"),
+        FoodItem("159", "Makkajo'xori (qaynatilgan)", 96.0, 3.4, 1.5, 21.0,
+            listOf(ServingSize("So'ta", 200.0)), true, "Sabzavotlar"),
+        FoodItem("160", "Makkajo'xori uni", 360.0, 7.0, 1.5, 79.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Un mahsulotlari"),
+        FoodItem("161", "Bug'doy uni (oliy nav)", 340.0, 10.0, 1.1, 74.0,
+            listOf(ServingSize("Osh qoshiq", 20.0), ServingSize("Stakan", 130.0)), true, "Un mahsulotlari"),
+        FoodItem("162", "Shakar", 398.0, 0.0, 0.0, 99.8,
+            listOf(ServingSize("Choy qoshiq", 5.0), ServingSize("Osh qoshiq", 15.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("163", "Tuz", 0.0, 0.0, 0.0, 0.0,
+            listOf(ServingSize("Choy qoshiq", 5.0)), true, "Ziravorlar"),
+        FoodItem("164", "Mol go'shti (yog'siz, qaynatilgan)", 200.0, 30.0, 8.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("govyadina", "beef")),
+        FoodItem("165", "Qo'y go'shti (yog'li, qaynatilgan)", 290.0, 25.0, 21.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("baranina", "lamb")),
+        FoodItem("166", "Mineral suv (gazli)", 0.0, 0.0, 0.0, 0.0,
+            listOf(ServingSize("Stakan", 200.0), ServingSize("Shisha idish", 500.0)), true, "Ichimliklar", searchAliases = listOf("water", "voda", "suv", "mineralka")),
+        FoodItem("167", "Limon", 29.0, 1.1, 0.3, 9.0,
+            listOf(ServingSize("Bo'lakcha", 10.0), ServingSize("Dona", 80.0)), true, "Mevalar", searchAliases = listOf("lemon")),
+        FoodItem("168", "Apelsin", 47.0, 0.9, 0.1, 12.0,
+            listOf(ServingSize("Dona", 150.0)), true, "Mevalar", searchAliases = listOf("orange", "apelsin")),
+        FoodItem("169", "Mandarin", 53.0, 0.8, 0.3, 13.0,
+            listOf(ServingSize("Dona", 70.0)), true, "Mevalar", searchAliases = listOf("tangerine", "mandarin")),
+        FoodItem("170", "Kiwi", 61.0, 1.1, 0.5, 15.0,
+            listOf(ServingSize("Dona", 75.0)), true, "Mevalar", searchAliases = listOf("kivi")),
+        FoodItem("171", "Qo'ziqorin (shampinyon, qovurilgan)", 50.0, 5.0, 3.0, 2.0,
+            listOf(ServingSize("Likopcha", 100.0)), true, "Garnirlar"),
+        FoodItem("172", "Baqlajon (qovurilgan)", 90.0, 1.0, 7.0, 6.0,
+            listOf(ServingSize("Likopcha", 150.0)), true, "Garnirlar"),
+        FoodItem("173", "Qovoqcha (kabachki, qovurilgan)", 88.0, 1.0, 6.0, 7.0,
+            listOf(ServingSize("Likopcha", 150.0)), true, "Garnirlar"),
+        FoodItem("174", "Ko'k piyoz", 19.0, 1.3, 0.1, 3.2,
+            listOf(ServingSize("Bog'", 50.0)), true, "Sabzavotlar"),
+        FoodItem("175", "Ukrop (shivit)", 43.0, 2.5, 0.5, 6.3,
+            listOf(ServingSize("Bog'", 30.0)), true, "Sabzavotlar"),
+        FoodItem("176", "Petrushka", 36.0, 3.7, 0.4, 7.6,
+            listOf(ServingSize("Bog'", 30.0)), true, "Sabzavotlar"),
+        FoodItem("177", "Kashnich (kinza)", 23.0, 2.1, 0.5, 3.7,
+            listOf(ServingSize("Bog'", 30.0)), true, "Sabzavotlar"),
+        FoodItem("178", "Xandon pista", 562.0, 20.0, 45.0, 28.0,
+            listOf(ServingSize("Hovuch", 30.0)), true, "Gazaklar"),
+        FoodItem("179", "Turshak (o'rik qoqi)", 241.0, 3.4, 0.5, 63.0,
+            listOf(ServingSize("Hovuch", 50.0)), true, "Mevalar"),
+        FoodItem("180", "Olcha", 50.0, 0.8, 0.2, 12.0,
+            listOf(ServingSize("Piyola", 150.0)), true, "Mevalar"),
+        FoodItem("181", "No'xat (qaynatilgan)", 139.0, 8.4, 2.6, 23.0,
+            listOf(ServingSize("Kosa", 200.0)), true, "Dukkaklilar", searchAliases = listOf("goroh", "nohat")),
+        FoodItem("182", "Loviya (qaynatilgan)", 127.0, 8.5, 0.5, 23.0,
+            listOf(ServingSize("Kosa", 180.0)), true, "Dukkaklilar", searchAliases = listOf("fasol", "beans")),
+        FoodItem("183", "Mosh (qaynatilgan)", 105.0, 7.0, 0.4, 19.0,
+            listOf(ServingSize("Kosa", 200.0)), true, "Dukkaklilar", searchAliases = listOf("mash", "mung bean")),
+        FoodItem("184", "Yasmiq (chechevitsa, qaynatilgan)", 116.0, 9.0, 0.4, 20.0,
+            listOf(ServingSize("Kosa", 200.0)), true, "Dukkaklilar"),
+        FoodItem("185", "Pizza 'Margarita'", 250.0, 10.0, 10.0, 30.0,
+            listOf(ServingSize("Bo'lak", 120.0)), true, "Fastfud"),
+        FoodItem("186", "Cheeseburger", 303.0, 16.0, 14.0, 28.0,
+            listOf(ServingSize("Dona", 130.0)), true, "Fastfud", isPopular = true, searchAliases = listOf("chizburger", "cheese burger")),
+        FoodItem("187", "Klab sendvich", 280.0, 15.0, 15.0, 20.0,
+            listOf(ServingSize("Dona", 200.0)), true, "Fastfud", searchAliases = listOf("sandwich", "sendvich")),
+        FoodItem("188", "Donar (go'shtli)", 220.0, 12.0, 12.0, 15.0,
+            listOf(ServingSize("Dona", 250.0)), true, "Fastfud", isPopular = true, searchAliases = listOf("doner", "donar")),
+        FoodItem("189", "Popkorn (sariyog'li)", 500.0, 8.0, 25.0, 60.0,
+            listOf(ServingSize("Kichik paket", 50.0), ServingSize("Katta paket", 100.0)), true, "Gazaklar"),
+        FoodItem("190", "Quritilgan olma", 250.0, 1.5, 0.2, 65.0,
+            listOf(ServingSize("Hovuch", 40.0)), true, "Mevalar"),
+        FoodItem("191", "Quritilgan olxo'ri", 240.0, 2.2, 0.4, 64.0,
+            listOf(ServingSize("Hovuch", 50.0)), true, "Mevalar"),
+        FoodItem("192", "Xolodes", 150.0, 18.0, 8.0, 1.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"),
+        FoodItem("193", "O'rama xonim", 180.0, 8.0, 7.0, 21.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Taomlar"),
+        FoodItem("194", "Manti (qovoqli)", 170.0, 6.0, 7.0, 20.0,
+            listOf(ServingSize("Dona", 45.0)), true, "Taomlar"),
+        FoodItem("195", "Manti (kartoshkali)", 190.0, 5.0, 8.0, 24.0,
+            listOf(ServingSize("Dona", 45.0)), true, "Taomlar"),
+        FoodItem("196", "Bedana sho'rva", 70.0, 8.0, 3.0, 2.0,
+            listOf(ServingSize("Kosa", 350.0)), true, "Taomlar"),
+        FoodItem("197", "Frikadelkali sho'rva", 65.0, 5.0, 3.5, 4.0,
+            listOf(ServingSize("Kosa", 350.0)), true, "Taomlar"),
+        FoodItem("198", "Pishloqli bulochka", 320.0, 10.0, 14.0, 38.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Non va non mahsulotlari"),
+        FoodItem("199", "Olmali pirog", 280.0, 4.0, 12.0, 38.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("charlotte", "yablochniy pirog")),
+        FoodItem("200", "Limonli choy (shakarli)", 25.0, 0.1, 0.0, 6.0,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 250.0)), true, "Ichimliklar"),
+        FoodItem("201", "Mol go'shti (qiyma)", 240.0, 18.0, 18.0, 0.0,
+            listOf(ServingSize("Gramm", 100.0)), true, "Go'shtli taomlar"),
+        FoodItem("202", "Tovuq go'shti (qiyma)", 143.0, 17.0, 8.0, 0.0,
+            listOf(ServingSize("Gramm", 100.0)), true, "Go'shtli taomlar"),
+        FoodItem("203", "Zaytun moyi", 884.0, 0.0, 100.0, 0.0,
+            listOf(ServingSize("Osh qoshiq", 14.0)), true, "Yog'lar"),
+        FoodItem("204", "Soya sousi", 53.0, 8.0, 0.0, 5.0,
+            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Qaylalar va souslar"),
+        FoodItem("205", "Xantal (gorchitsa)", 160.0, 6.0, 12.0, 8.0,
+            listOf(ServingSize("Choy qoshiq", 5.0)), true, "Qaylalar va souslar"),
+        FoodItem("206", "Smetana (15%)", 160.0, 2.6, 15.0, 3.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("207", "Ryajenka", 67.0, 3.0, 4.0, 4.2,
+            listOf(ServingSize("Stakan", 200.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("209", "Pishloq (sariq / qattiq)", 350.0, 26.0, 27.0, 0.0,
+            listOf(ServingSize("Bo'lak", 30.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("pishloq", "sariq pishloq", "gollandskiy", "rossiyskiy", "sir", "motsarella", "parmezan")),
+        FoodItem("210", "Sut (yog'sizlantirilgan)", 31.0, 3.0, 0.1, 4.8,
+            listOf(ServingSize("Stakan", 200.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("211", "Muzqaymoq (shokoladli)", 216.0, 4.0, 12.0, 24.0,
+            listOf(ServingSize("Sharcha", 50.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("212", "Muzqaymoq (mevali)", 130.0, 1.0, 2.0, 28.0,
+            listOf(ServingSize("Dona (Eskimo)", 70.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("213", "Baliq (qaynatilgan)", 180.0, 22.0, 10.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"),
+        FoodItem("214", "Krevetka (qaynatilgan)", 95.0, 19.0, 1.7, 0.0,
+            listOf(ServingSize("Porsiya", 100.0)), true, "Dengiz mahsulotlari"),
+        FoodItem("215", "Tovuq sho'rva (lapshali)", 50.0, 4.0, 2.0, 4.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"),
+        FoodItem("216", "Okroshka (kefirda)", 60.0, 3.0, 3.5, 4.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"),
+        FoodItem("217", "Shakarli bulochka", 330.0, 7.0, 10.0, 55.0,
+            listOf(ServingSize("Dona", 70.0)), true, "Non va non mahsulotlari"),
+        FoodItem("218", "Tvorogli bulochka", 280.0, 12.0, 9.0, 38.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Non va non mahsulotlari"),
+        FoodItem("219", "Qora non", 210.0, 7.0, 1.5, 42.0,
+            listOf(ServingSize("Bo'lak", 30.0)), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("qora non", "chorniy xleb")),
+        FoodItem("220", "Grechkali kotlet", 180.0, 6.0, 7.0, 23.0,
+            listOf(ServingSize("Dona", 70.0)), true, "Taomlar"),
+        FoodItem("221", "Sabzavotli ragu", 90.0, 2.0, 5.0, 9.0,
+            listOf(ServingSize("Likop", 250.0)), true, "Taomlar"),
+        FoodItem("222", "Sabzavotli gril", 60.0, 2.0, 3.0, 7.0,
+            listOf(ServingSize("Porsiya", 150.0)), true, "Garnirlar"),
+        FoodItem("223", "Omlet (sut bilan)", 184.0, 12.0, 15.0, 1.5,
+            listOf(ServingSize("Porsiya (2 tuxumdan)", 120.0)), true, "Sut va tuxum", searchAliases = listOf("omlet", "omlete")),
+        FoodItem("224", "Jigar (qovurilgan)", 210.0, 25.0, 10.0, 5.0,
+            listOf(ServingSize("Likopcha", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("liver", "jigar")),
+        FoodItem("225", "Kurka filesi (qaynatilgan)", 135.0, 25.0, 3.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("turkey", "kurka")),
+        FoodItem("226", "Lavlagi (qaynatilgan)", 49.0, 1.8, 0.1, 10.8,
+            listOf(ServingSize("Dona", 100.0)), true, "Sabzavotlar"),
+        FoodItem("227", "Lavlagili salat (chesnokli)", 120.0, 2.0, 9.0, 8.0,
+            listOf(ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar"),
+        FoodItem("228", "Uzum sharbati", 60.0, 0.3, 0.0, 15.0,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"),
+        FoodItem("229", "Gilos sharbati", 55.0, 0.5, 0.0, 13.0,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"),
+        FoodItem("230", "Anor sharbati", 64.0, 0.3, 0.0, 16.0,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"),
+        FoodItem("290", "Bedana tuxumi (qaynatilgan)", 158.0, 13.0, 11.0, 0.4,
+            listOf(ServingSize("Dona", 9.0)), true, "Sut va tuxum"),
+        FoodItem("293", "Guakamole", 160.0, 2.0, 15.0, 9.0,
+            listOf(ServingSize("Osh qoshiq", 30.0)), true, "Salatlar va gazaklar"),
+        FoodItem("294", "Hummus", 166.0, 8.0, 10.0, 14.0,
+            listOf(ServingSize("Osh qoshiq", 30.0), ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar"),
+        FoodItem("295", "Falafel", 333.0, 13.0, 18.0, 32.0,
+            listOf(ServingSize("Dona", 17.0)), true, "Taomlar"),
+        FoodItem("296", "Qo'y tili (qaynatilgan)", 220.0, 16.0, 18.0, 0.0,
+            listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"),
+        FoodItem("297", "O'rdak go'shti (dimlangan)", 320.0, 18.0, 28.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"),
+        FoodItem("298", "Qazi", 420.0, 15.0, 40.0, 1.0,
+            listOf(ServingSize("Bo'lak", 25.0)), true, "Go'shtli taomlar", searchAliases = listOf("kazi", "kazy")),
+        FoodItem("299", "Kalla-pocha", 180.0, 20.0, 10.0, 1.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("kallapocha", "kalla pocha")),
+        FoodItem("300", "Bulg'or qalampiri", 26.0, 1.0, 0.2, 6.0,
+            listOf(ServingSize("Dona", 100.0)), true, "Sabzavotlar", searchAliases = listOf("paprika", "bolgarskiy perec")),
+        FoodItem("301", "Ismaloq (bargi)", 23.0, 2.9, 0.4, 3.6,
+            listOf(ServingSize("Bir bog'", 100.0)), true, "Sabzavotlar"),
+        FoodItem("302", "Salat bargi", 15.0, 1.4, 0.2, 2.8,
+            listOf(ServingSize("Bir nechta barg", 50.0)), true, "Sabzavotlar"),
+        FoodItem("303", "Ko'k no'xat (konservalangan)", 60.0, 4.0, 0.2, 10.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Dukkaklilar"),
+        FoodItem("304", "Makkajo'xori (konservalangan)", 86.0, 2.8, 1.0, 19.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Dukkaklilar"),
+        FoodItem("305", "Xamir (qatlama)", 350.0, 8.0, 15.0, 45.0,
+            listOf(ServingSize("Gramm", 100.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("306", "Xamir (chuchvara uchun)", 280.0, 10.0, 1.5, 56.0,
+            listOf(ServingSize("Gramm", 100.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("307", "Quruq sut", 496.0, 26.0, 25.0, 40.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("308", "Quyultirilgan sut (sgushyonka)", 320.0, 7.5, 8.5, 56.0,
+            listOf(ServingSize("Osh qoshiq", 25.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("309", "Jele", 60.0, 1.5, 0.0, 14.0,
+            listOf(ServingSize("Piyola", 150.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("310", "Zefir", 326.0, 0.8, 0.1, 79.0,
+            listOf(ServingSize("Dona", 30.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("311", "Marmelad", 321.0, 0.0, 0.1, 79.0,
+            listOf(ServingSize("Dona", 15.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("312", "Pryaniki", 360.0, 5.0, 8.0, 70.0,
+            listOf(ServingSize("Dona", 25.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("313", "Sushki", 380.0, 10.0, 5.0, 75.0,
+            listOf(ServingSize("Dona", 5.0)), true, "Non va non mahsulotlari"),
+        FoodItem("314", "Baliq (dudlangan)", 220.0, 24.0, 14.0, 0.0,
+            listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"),
+        FoodItem("315", "Tovuq ruleti", 180.0, 20.0, 10.0, 2.0,
+            listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"),
+        FoodItem("319", "Manti (ko'katli)", 160.0, 7.0, 6.0, 19.0,
+            listOf(ServingSize("Dona", 40.0)), true, "Taomlar"),
+        FoodItem("322", "Iskandar kabob", 210.0, 15.0, 12.0, 10.0,
+            listOf(ServingSize("Porsiya", 350.0)), true, "Go'shtli taomlar"),
+        FoodItem("324", "Pahlava (baklava)", 450.0, 7.0, 25.0, 50.0,
+            listOf(ServingSize("Dona", 40.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("325", "Sushi (Filadelfiya roll)", 142.0, 7.0, 6.0, 15.0,
+            listOf(ServingSize("Dona", 30.0)), true, "Taomlar"),
+        FoodItem("326", "Sushi (Kaliforniya roll)", 130.0, 6.0, 5.0, 14.0,
+            listOf(ServingSize("Dona", 30.0)), true, "Taomlar"),
+        FoodItem("327", "Steyk (mol go'shti, medium)", 270.0, 25.0, 19.0, 0.0,
+            listOf(ServingSize("Porsiya", 200.0)), true, "Go'shtli taomlar", searchAliases = listOf("steak", "steyk")),
+        FoodItem("328", "Kartoshka (pechda pishirilgan)", 95.0, 2.5, 0.5, 21.0,
+            listOf(ServingSize("Dona", 150.0)), true, "Garnirlar"),
+        FoodItem("329", "Brokkoli (bug'da pishirilgan)", 35.0, 2.4, 0.4, 7.0,
+            listOf(ServingSize("Porsiya", 150.0)), true, "Garnirlar"),
+        FoodItem("330", "Gulkaram (qaynatilgan)", 30.0, 2.0, 0.3, 5.0,
+            listOf(ServingSize("Porsiya", 150.0)), true, "Garnirlar"),
+        FoodItem("400", "Avokado", 160.0, 2.0, 15.0, 9.0, listOf(ServingSize("Yarimta", 70.0)), true, "Mevalar"),
         FoodItem("401", "Mango", 60.0, 0.8, 0.4, 15.0, listOf(ServingSize("Dona", 200.0)), true, "Mevalar"),
         FoodItem("402", "Ananas", 50.0, 0.5, 0.1, 13.0, listOf(ServingSize("Bo'lak", 100.0)), true, "Mevalar"),
         FoodItem("403", "Malina", 52.0, 1.2, 0.7, 12.0, listOf(ServingSize("Piyola", 120.0)), true, "Mevalar"),
         FoodItem("404", "Qora smorodina", 63.0, 1.4, 0.4, 15.0, listOf(ServingSize("Piyola", 100.0)), true, "Mevalar"),
-
-        // Nonushta uchun
         FoodItem("420", "Suli yormasi (suvda)", 70.0, 2.5, 1.5, 12.0, listOf(ServingSize("Kosa", 200.0)), true, "Bo'tqalar"),
         FoodItem("421", "Guruchli bo'tqa (sutli)", 110.0, 2.5, 3.0, 18.0, listOf(ServingSize("Kosa", 200.0)), true, "Bo'tqalar"),
-        FoodItem("422", "Tost (oq non)", 280.0, 9.0, 4.0, 50.0, listOf(ServingSize("Bo'lak", 25.0)), true, "Non va non mahsulotlari"),
         FoodItem("423", "Granola (yong'oqli)", 470.0, 10.0, 20.0, 60.0, listOf(ServingSize("Osh qoshiq", 15.0)), true, "Bo'tqalar"),
-
-        // Ichimliklar
         FoodItem("440", "Kakao (sut bilan)", 90.0, 3.5, 3.5, 11.0, listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"),
-        FoodItem("441", "Ko'k choy", 1.0, 0.1, 0.0, 0.2, listOf(ServingSize("Piyola", 150.0)), true, "Ichimliklar"),
+        FoodItem("441", "Ko'k choy", 1.0, 0.1, 0.0, 0.2, listOf(ServingSize("Piyola", 150.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("kok choy", "zeleniy chay")),
         FoodItem("442", "Tomat soki", 21.0, 1.0, 0.1, 4.0, listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"),
         FoodItem("443", "Qayin sharbati (beryozoviy sok)", 24.0, 0.1, 0.0, 6.0, listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"),
-
-        // Shirinliklar
         FoodItem("460", "Ekler", 350.0, 6.0, 22.0, 32.0, listOf(ServingSize("Dona", 70.0)), true, "Shirinliklar va desertlar"),
         FoodItem("461", "Profitroli", 340.0, 7.0, 20.0, 33.0, listOf(ServingSize("Dona", 20.0)), true, "Shirinliklar va desertlar"),
         FoodItem("462", "Chizkeyk 'Nyu-York'", 320.0, 6.0, 22.0, 25.0, listOf(ServingSize("Bo'lak", 100.0)), true, "Shirinliklar va desertlar"),
         FoodItem("463", "Tiramisu", 280.0, 5.0, 18.0, 24.0, listOf(ServingSize("Porsiya", 120.0)), true, "Shirinliklar va desertlar"),
         FoodItem("464", "Brauni", 450.0, 5.0, 28.0, 48.0, listOf(ServingSize("Bo'lak", 60.0)), true, "Shirinliklar va desertlar"),
-
-        // Milliy taomlar
         FoodItem("480", "Qaynatma sho'rva", 80.0, 6.0, 5.0, 3.0, listOf(ServingSize("Kosa", 400.0)), true, "Taomlar"),
         FoodItem("481", "Bichak (go'shtli)", 260.0, 10.0, 15.0, 21.0, listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari"),
         FoodItem("482", "Bichak (qovoqli)", 200.0, 5.0, 9.0, 24.0, listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari"),
         FoodItem("483", "Shilpildoq", 220.0, 10.0, 12.0, 18.0, listOf(ServingSize("Kosa", 350.0)), true, "Taomlar"),
         FoodItem("484", "Yaxna (mol tilidan)", 160.0, 18.0, 9.0, 1.0, listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar"),
-        FoodItem("500", "Baget (fransuz noni)", 270.0, 10.0, 1.5, 55.0, listOf(ServingSize("Bo'lak", 30.0)), true, "Non va non mahsulotlari"),
         FoodItem("501", "Kruassan (sariyog'li)", 406.0, 8.0, 21.0, 46.0, listOf(ServingSize("Dona", 50.0)), true, "Non va non mahsulotlari"),
-        FoodItem("502", "Spagetti (qaynatilgan)", 158.0, 5.8, 0.9, 31.0, listOf(ServingSize("Porsiya", 180.0)), true, "Garnirlar"),
-        FoodItem("503", "Pasta Karbonara", 380.0, 15.0, 22.0, 30.0, listOf(ServingSize("Porsiya", 300.0)), true, "Taomlar"),
-        FoodItem("504", "Pasta Bolonyeze", 250.0, 12.0, 10.0, 28.0, listOf(ServingSize("Porsiya", 300.0)), true, "Taomlar"),
+        FoodItem("502", "Spagetti (qaynatilgan)", 158.0, 5.8, 0.9, 31.0, listOf(ServingSize("Porsiya", 180.0)), true, "Garnirlar", searchAliases = listOf("spaghetti")),
+        FoodItem("503", "Pasta Karbonara", 380.0, 15.0, 22.0, 30.0, listOf(ServingSize("Porsiya", 300.0)), true, "Taomlar", searchAliases = listOf("carbonara", "karbonara")),
+        FoodItem("504", "Pasta Bolonyeze", 250.0, 12.0, 10.0, 28.0, listOf(ServingSize("Porsiya", 300.0)), true, "Taomlar", searchAliases = listOf("bolognese", "bolonyeze")),
         FoodItem("505", "Risotto (qo'ziqorinli)", 180.0, 6.0, 7.0, 23.0, listOf(ServingSize("Porsiya", 250.0)), true, "Taomlar"),
         FoodItem("506", "Kuskus (tayyor)", 112.0, 3.8, 0.2, 23.0, listOf(ServingSize("Kosa", 150.0)), true, "Garnirlar"),
         FoodItem("507", "Bulgur (tayyor)", 83.0, 3.1, 0.2, 18.6, listOf(ServingSize("Kosa", 180.0)), true, "Garnirlar"),
         FoodItem("508", "Kinoa (tayyor)", 120.0, 4.4, 1.9, 21.0, listOf(ServingSize("Kosa", 180.0)), true, "Garnirlar"),
-        FoodItem("509", "Tovuqli naggetslar", 290.0, 15.0, 18.0, 16.0, listOf(ServingSize("Dona", 20.0)), true, "Fastfud"),
+        FoodItem("509", "Tovuqli naggetslar", 290.0, 15.0, 18.0, 16.0, listOf(ServingSize("Dona", 20.0)), true, "Fastfud", searchAliases = listOf("nuggets", "naggetsy")),
         FoodItem("510", "Piyoz halqalari (frityurda)", 350.0, 4.0, 20.0, 38.0, listOf(ServingSize("Porsiya", 100.0)), true, "Fastfud"),
         FoodItem("511", "Tovuq qanotchalari (barbekyu)", 280.0, 20.0, 18.0, 8.0, listOf(ServingSize("Dona", 40.0)), true, "Fastfud"),
         FoodItem("512", "Kimchi", 32.0, 2.0, 0.5, 6.0, listOf(ServingSize("Porsiya", 100.0)), true, "Salatlar va gazaklar"),
-        FoodItem("513", "Funchoza salati", 140.0, 1.0, 8.0, 15.0, listOf(ServingSize("Porsiya", 150.0)), true, "Salatlar va gazaklar"),
+        FoodItem("513", "Funchoza salati", 140.0, 1.0, 8.0, 15.0, listOf(ServingSize("Porsiya", 150.0)), true, "Salatlar va gazaklar", searchAliases = listOf("funchoza", "funtchoza")),
         FoodItem("514", "Ramen (tovuqli)", 90.0, 4.0, 3.5, 10.0, listOf(ServingSize("Kosa", 400.0)), true, "Taomlar"),
-        FoodItem("515", "Tom Yam sho'rva", 95.0, 5.0, 6.0, 7.0, listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"),
-        FoodItem("516", "Miso sho'rva", 40.0, 3.0, 1.5, 4.0, listOf(ServingSize("Piyola", 150.0)), true, "Taomlar"),
         FoodItem("517", "Bifshteks (tuxumli)", 320.0, 22.0, 25.0, 2.0, listOf(ServingSize("Porsiya", 180.0)), true, "Go'shtli taomlar"),
-        FoodItem("518", "Gulyash (mol go'shtidan)", 150.0, 12.0, 9.0, 5.0, listOf(ServingSize("Porsiya", 250.0)), true, "Taomlar"),
-        FoodItem("519", "Befstroganov", 220.0, 18.0, 15.0, 4.0, listOf(ServingSize("Porsiya", 200.0)), true, "Taomlar"),
+        FoodItem("518", "Gulyash (mol go'shtidan)", 150.0, 12.0, 9.0, 5.0, listOf(ServingSize("Porsiya", 250.0)), true, "Taomlar", searchAliases = listOf("goulash", "gulyash")),
+        FoodItem("519", "Befstroganov", 220.0, 18.0, 15.0, 4.0, listOf(ServingSize("Porsiya", 200.0)), true, "Taomlar", searchAliases = listOf("stroganoff", "befstroganov")),
         FoodItem("520", "Qo'y qovurg'asi (tandirda)", 350.0, 20.0, 30.0, 0.0, listOf(ServingSize("Dona", 80.0)), true, "Go'shtli taomlar"),
         FoodItem("521", "Tovuq (dudlangan)", 185.0, 25.0, 9.0, 0.0, listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"),
-        FoodItem("522", "Servelat kolbasa", 420.0, 18.0, 38.0, 2.0, listOf(ServingSize("Bo'lak", 20.0)), true, "Go'shtli taomlar"),
-        FoodItem("523", "Pishloq 'Feta'", 264.0, 14.0, 21.0, 4.0, listOf(ServingSize("Bo'lak", 30.0)), true, "Sut va sut mahsulotlari"),
-        FoodItem("524", "Pishloq 'Motsarella'", 280.0, 22.0, 22.0, 2.0, listOf(ServingSize("Sharcha", 50.0)), true, "Sut va sut mahsulotlari"),
-        FoodItem("525", "Pishloq 'Parmezan'", 431.0, 38.0, 29.0, 4.0, listOf(ServingSize("Osh qoshiq (qirilgan)", 10.0)), true, "Sut va sut mahsulotlari"),
-        FoodItem("526", "Eritilgan pishloq", 300.0, 15.0, 25.0, 5.0, listOf(ServingSize("Bo'lakcha", 20.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("522", "Kolbasa (dudlangan)", 420.0, 18.0, 38.0, 2.0, listOf(ServingSize("Bo'lak", 20.0)), true, "Go'shtli taomlar", isPopular = true, searchAliases = listOf("servelat", "dudlangan kolbasa", "kopchenaya kolbasa", "salami")),
+        FoodItem("526", "Eritilgan pishloq", 300.0, 15.0, 25.0, 5.0, listOf(ServingSize("Bo'lakcha", 20.0)), true, "Sut va sut mahsulotlari", isPopular = true, searchAliases = listOf("eritilgan pishloq", "plavleniy sir", "drujba")),
         FoodItem("527", "Tofu", 76.0, 8.0, 5.0, 2.0, listOf(ServingSize("Bo'lak", 100.0)), true, "Dukkaklilar"),
         FoodItem("528", "Keshyu yong'og'i", 553.0, 18.0, 44.0, 30.0, listOf(ServingSize("Hovuch", 30.0)), true, "Gazaklar"),
         FoodItem("529", "Funduk yong'og'i", 628.0, 15.0, 61.0, 17.0, listOf(ServingSize("Hovuch", 30.0)), true, "Gazaklar"),
@@ -1504,7 +737,7 @@ object FoodDatabase {
         FoodItem("532", "Zig'ir urug'i", 534.0, 18.0, 42.0, 29.0, listOf(ServingSize("Osh qoshiq", 10.0)), true, "Gazaklar"),
         FoodItem("533", "Chia urug'i", 486.0, 17.0, 31.0, 42.0, listOf(ServingSize("Osh qoshiq", 10.0)), true, "Gazaklar"),
         FoodItem("534", "Suli kepagi", 246.0, 17.0, 7.0, 66.0, listOf(ServingSize("Osh qoshiq", 10.0)), true, "Bo'tqalar"),
-        FoodItem("535", "Achitqi (droжжи)", 105.0, 12.0, 2.0, 9.0, listOf(ServingSize("Choy qoshiq", 3.0)), true, "Ziravorlar"),
+        FoodItem("535", "Achitqi (droÐ¶Ð¶Ð¸)", 105.0, 12.0, 2.0, 9.0, listOf(ServingSize("Choy qoshiq", 3.0)), true, "Ziravorlar"),
         FoodItem("536", "Jelatin", 335.0, 86.0, 0.4, 0.7, listOf(ServingSize("Osh qoshiq", 10.0)), true, "Ziravorlar"),
         FoodItem("537", "Kakao kukuni", 228.0, 20.0, 14.0, 58.0, listOf(ServingSize("Osh qoshiq", 10.0)), true, "Ziravorlar"),
         FoodItem("538", "Smetanali tort", 350.0, 5.0, 20.0, 38.0, listOf(ServingSize("Bo'lak", 100.0)), true, "Shirinliklar va desertlar"),
@@ -1515,582 +748,348 @@ object FoodDatabase {
         FoodItem("543", "Yogurt (tabiiy)", 65.0, 4.5, 3.5, 4.0, listOf(ServingSize("Idishcha", 125.0)), true, "Sut va sut mahsulotlari"),
         FoodItem("544", "Yogurt (mevali)", 95.0, 3.0, 2.5, 15.0, listOf(ServingSize("Idishcha", 125.0)), true, "Sut va sut mahsulotlari"),
         FoodItem("545", "Grecheskiy yogurt", 97.0, 9.0, 5.0, 4.0, listOf(ServingSize("Idishcha", 150.0)), true, "Sut va sut mahsulotlari"),
-        FoodItem("546", "Xachapuri (imeretinskiy)", 290.0, 12.0, 14.0, 28.0, listOf(ServingSize("Bo'lak", 100.0)), true, "Non va non mahsulotlari"),
+        FoodItem("546", "Xachapuri (imeretinskiy)", 290.0, 12.0, 14.0, 28.0, listOf(ServingSize("Bo'lak", 100.0)), true, "Non va non mahsulotlari", searchAliases = listOf("khachapuri", "xachapuri")),
         FoodItem("547", "Xachapuri (adjaruli)", 320.0, 14.0, 18.0, 26.0, listOf(ServingSize("Dona", 300.0)), true, "Non va non mahsulotlari"),
-        FoodItem("548", "Xinkali", 220.0, 10.0, 12.0, 18.0, listOf(ServingSize("Dona", 70.0)), true, "Taomlar"),
-        FoodItem("549", "Lyulya-kabob", 280.0, 14.0, 24.0, 2.0, listOf(ServingSize("Porsiya", 150.0)), true, "Go'shtli taomlar"),
+        FoodItem("548", "Xinkali", 220.0, 10.0, 12.0, 18.0, listOf(ServingSize("Dona", 70.0)), true, "Taomlar", searchAliases = listOf("khinkali", "xinkali")),
+        FoodItem("549", "Lyulya-kabob", 280.0, 14.0, 24.0, 2.0, listOf(ServingSize("Porsiya", 150.0)), true, "Go'shtli taomlar", searchAliases = listOf("lyulya kabab", "lula kebab")),
         FoodItem("550", "Qo'y go'shti (dimlangan)", 310.0, 22.0, 25.0, 0.0, listOf(ServingSize("Porsiya", 200.0)), true, "Go'shtli taomlar"),
-        // --- START OF NEW FOOD ITEMS ---
+        FoodItem("625", "Tuzlangan pista (semichka)", 601.0, 21.0, 53.0, 20.0,
+            listOf(ServingSize("Stakan (100g)", 100.0), ServingSize("Paketcha (50g)", 50.0)), true, "Gazaklar"),
+        FoodItem("626", "Tuzlangan yer yong'oq", 590.0, 25.0, 48.0, 18.0,
+            listOf(ServingSize("Paketcha (50g)", 50.0)), true, "Gazaklar"),
+        FoodItem("632", "Tovuq striplari", 250.0, 20.0, 12.0, 15.0,
+            listOf(ServingSize("3 dona", 90.0), ServingSize("5 dona", 150.0)), true, "Fastfud"),
+        FoodItem("633", "Pelmeni (muzlatilgan)", 280.0, 12.0, 13.0, 28.0,
+            listOf(ServingSize("Porsiya (150g)", 150.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("634", "Vareniki (kartoshkali, muzlatilgan)", 190.0, 5.0, 4.0, 33.0,
+            listOf(ServingSize("Porsiya (150g)", 150.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("638", "Tushonka (mol go'shti, konserva)", 220.0, 16.0, 17.0, 0.0,
+            listOf(ServingSize("Osh qoshiq (30g)", 30.0), ServingSize("Bankacha (325g)", 325.0)), true, "Go'shtli taomlar"),
+        FoodItem("643", "Rolton (tez tayyorlanadigan lapsha)", 450.0, 9.0, 21.0, 56.0,
+            listOf(ServingSize("Paket (60g)", 60.0)), true, "Bo'tqalar"),
+        FoodItem("644", "Big Bon (tez tayyorlanadigan lapsha)", 460.0, 8.5, 22.0, 55.0,
+            listOf(ServingSize("Konteyner (85g)", 85.0)), true, "Bo'tqalar"),
+        FoodItem("645", "Suli yormasi (tez tayyorlanadigan, paketcha)", 350.0, 11.0, 6.0, 65.0,
+            listOf(ServingSize("Paketcha (40g)", 40.0)), true, "Bo'tqalar"),
+        FoodItem("646", "Nesquik nonushta yormasi", 377.0, 7.5, 3.8, 75.0,
+            listOf(ServingSize("Porsiya (30g)", 30.0)), true, "Bo'tqalar"),
+        FoodItem("648", "Tovuq go'shti gril (do'konniki)", 210.0, 26.0, 12.0, 0.0,
+            listOf(ServingSize("Oyoqcha", 180.0), ServingSize("Yarimta", 500.0), ServingSize("Butun", 1000.0)), true, "Go'shtli taomlar"),
+        FoodItem("649", "Konservalangan makkajo'xori", 86.0, 2.8, 1.0, 19.0,
+            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Bankacha (340g)", 340.0)), true, "Dukkaklilar"),
+        FoodItem("650", "Konservalangan ko'k no'xat", 60.0, 4.0, 0.2, 10.0,
+            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Bankacha (400g)", 400.0)), true, "Dukkaklilar"),
+        FoodItem("651", "Tomat pastasi", 82.0, 4.0, 0.5, 19.0,
+            listOf(ServingSize("Osh qoshiq", 25.0)), true, "Qaylalar va souslar"),
+        FoodItem("662", "Sosiskali bulochka (xamirda)", 340.0, 10.0, 20.0, 30.0,
+            listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari"),
+        FoodItem("663", "Kartoshkali pirojki", 250.0, 6.0, 12.0, 29.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Non va non mahsulotlari"),
+        FoodItem("664", "Go'shtli pirojki (belyash)", 290.0, 12.0, 18.0, 20.0,
+            listOf(ServingSize("Dona", 90.0)), true, "Non va non mahsulotlari"),
+        FoodItem("665", "Karamli pirojki", 220.0, 5.0, 10.0, 27.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Non va non mahsulotlari"),
+        FoodItem("668", "Rulet (jemli)", 360.0, 5.0, 8.0, 68.0,
+            listOf(ServingSize("Bo'lak", 40.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("669", "Pirojniy 'Kartoshka'", 390.0, 6.0, 20.0, 48.0,
+            listOf(ServingSize("Dona", 60.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("670", "Pirojniy 'Korzinka'", 420.0, 5.0, 22.0, 50.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("672", "Tvorogli pirog (vatrushka)", 270.0, 10.0, 11.0, 32.0,
+            listOf(ServingSize("Dona", 90.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("678", "Saqich (shakarli)", 300.0, 0.0, 0.0, 75.0,
+            listOf(ServingSize("Yostiqcha", 2.0)), true, "Shirinliklar va desertlar"),
+        FoodItem("679", "Popkorn (tuzli)", 480.0, 9.0, 22.0, 62.0,
+            listOf(ServingSize("Stakan", 30.0)), true, "Gazaklar"),
+        FoodItem("680", "Makkajo'xori tayoqchalari (kukuruz)", 370.0, 8.0, 2.0, 80.0,
+            listOf(ServingSize("Paket (60g)", 60.0)), true, "Gazaklar"),
+        FoodItem("681", "Baliq konservasi (tuna)", 185.0, 29.0, 7.0, 0.0,
+            listOf(ServingSize("Osh qoshiq", 30.0), ServingSize("Bankacha (180g)", 180.0)), true, "Go'shtli taomlar"),
+        FoodItem("682", "Shprotlar (yog'da)", 360.0, 17.0, 32.0, 0.0,
+            listOf(ServingSize("Dona", 8.0), ServingSize("Bankacha (160g)", 160.0)), true, "Go'shtli taomlar"),
+        FoodItem("683", "Konservalangan zaytun", 115.0, 0.8, 11.0, 6.0,
+            listOf(ServingSize("Dona", 4.0)), true, "Salatlar va gazaklar"),
+        FoodItem("684", "Muzlatilgan kotlet", 250.0, 15.0, 16.0, 12.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("685", "Muzlatilgan baliq filesi", 90.0, 20.0, 1.0, 0.0,
+            listOf(ServingSize("Bo'lak (100g)", 100.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("686", "Xamir (qat-qat, muzlatilgan)", 380.0, 7.0, 22.0, 38.0,
+            listOf(ServingSize("List (100g)", 100.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("687", "Muzlatilgan sabzavotlar aralashmasi", 50.0, 2.5, 0.5, 9.0,
+            listOf(ServingSize("Porsiya (150g)", 150.0)), true, "Yarim tayyor mahsulotlar"),
+        FoodItem("688", "Crab tayoqchalari", 95.0, 7.0, 1.5, 13.0,
+            listOf(ServingSize("Dona", 20.0)), true, "Dengiz mahsulotlari"),
+        FoodItem("692", "Slivki (10% yog'lilikda)", 120.0, 2.7, 10.0, 4.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("693", "Tvorogli massa (mayizli)", 230.0, 12.0, 15.0, 11.0,
+            listOf(ServingSize("Paketcha (100g)", 100.0)), true, "Sut va sut mahsulotlari"),
+        FoodItem("694", "Moxito (alkogolsiz)", 35.0, 0.0, 0.0, 8.5,
+            listOf(ServingSize("Stakan", 250.0)), true, "Ichimliklar"),
+        FoodItem("695", "Tarxun (gazli ichimlik)", 42.0, 0.0, 0.0, 10.5,
+            listOf(ServingSize("Stakan", 250.0), ServingSize("Idish (0.5L)", 500.0)), true, "Ichimliklar"),
+        FoodItem("699", "Montella (gazli suv)", 0.0, 0.0, 0.0, 0.0,
+            listOf(ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1L)", 1000.0)), true, "Ichimliklar"),
+        FoodItem("700", "Gilos kompot (uy sharoitida)", 70.0, 0.3, 0.0, 17.0,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar"),
+        FoodItem("701", "Makaron po-flotski", 280.0, 14.0, 15.0, 22.0,
+            listOf(ServingSize("Likop", 250.0)), true, "Taomlar"),
+        FoodItem("702", "Grechka (go'sht bilan)", 160.0, 10.0, 7.0, 15.0,
+            listOf(ServingSize("Likop", 250.0)), true, "Taomlar"),
+        FoodItem("703", "Qovurma sho'rva", 100.0, 7.0, 6.0, 5.0,
+            listOf(ServingSize("Kosa", 350.0)), true, "Taomlar"),
+        FoodItem("704", "Tuxum quymoq (pomidorli)", 120.0, 8.0, 9.0, 2.0,
+            listOf(ServingSize("Porsiya (2 tuxum)", 150.0)), true, "Sut va tuxum"),
+        FoodItem("705", "Dimlama (behi bilan)", 130.0, 8.0, 7.0, 9.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"),
+        FoodItem("706", "Tovuq (pechda pishirilgan)", 190.0, 25.0, 10.0, 0.0,
+            listOf(ServingSize("Oyoqcha", 150.0), ServingSize("Ko'krak filesi", 120.0)), true, "Go'shtli taomlar"),
+        FoodItem("707", "Baliq (bug'da pishirilgan)", 140.0, 22.0, 6.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar"),
+        FoodItem("708", "Sirnik (tvorogdan)", 185.0, 15.0, 7.0, 15.0,
+            listOf(ServingSize("Dona", 50.0)), true, "Taomlar"),
+        FoodItem("709", "Okroshka (kvassda)", 75.0, 4.0, 4.5, 5.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar"),
+        FoodItem("712", "Achchiq qalampir sousi (Chili)", 40.0, 1.0, 0.2, 8.0,
+            listOf(ServingSize("Choy qoshiq", 5.0)), true, "Qaylalar va souslar"),
+        FoodItem("801", "Somsa (tovuqli)", 220.0, 11.0, 10.0, 21.0, listOf(ServingSize("Dona", 120.0)), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("tovuqli somsa", "somsa tovuq")),
+        FoodItem("802", "Lavash (tovuqli)", 210.0, 13.0, 8.5, 20.0, listOf(ServingSize("Dona", 220.0)), true, "Fastfud", isPopular = true, searchAliases = listOf("tovuqli lavash", "lavash tovuq")),
+        FoodItem("803", "Shashlik (jigar)", 180.0, 22.0, 8.0, 2.0, listOf(ServingSize("Six", 90.0)), true, "Go`shtli taomlar", isPopular = true, searchAliases = listOf("jigar shashlik", "jigar")),
+        FoodItem("804", "Kofe Kapuchino", 65.0, 3.2, 3.0, 6.5, listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("kapuchino", "cappuccino")),
+        FoodItem("805", "Kofe Latte", 70.0, 3.5, 3.2, 7.0, listOf(ServingSize("Stakan", 250.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("latte")),
+        FoodItem("806", "Pitsa (Assorti)", 260.0, 12.0, 11.0, 27.0, listOf(ServingSize("Bo`lak", 120.0)), true, "Fastfud", isPopular = true, searchAliases = listOf("pitsa assorti", "pizza assorti")),
+        FoodItem("807", "Sabzavotli sho`rva", 45.0, 1.8, 1.5, 6.5, listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("veqetarian shorva", "sabzavot shorva")),
+        FoodItem("808", "Suli pechenyesi (Ovsyanoye)", 430.0, 6.5, 14.0, 68.0, listOf(ServingSize("Dona", 25.0)), true, "Shirinliklar va desertlar", isPopular = true, searchAliases = listOf("ovsyanoe pechenye", "suli pechenye")),
+        FoodItem("809", "Tvorogli sirnik", 195.0, 14.0, 7.0, 18.0, listOf(ServingSize("Dona", 60.0)), true, "Sut va tuxum", isPopular = true, searchAliases = listOf("sirnik", "syrniki")),
+        FoodItem("810", "Palov (tovuqli)", 185.0, 10.5, 7.5, 21.0, listOf(ServingSize("Kosa", 250.0), ServingSize("Likop", 350.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("tovuq palov", "tovuqli osh")),
+        FoodItem("811", "Baliq sho`rva (Uxa)", 55.0, 7.0, 2.0, 2.5, listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("uxa", "baliqli shorva", "fish soup")),
+        FoodItem("812", "Kotlet (tovuqli)", 180.0, 18.0, 9.0, 5.0, listOf(ServingSize("Dona", 80.0)), true, "Go`shtli taomlar", isPopular = true, searchAliases = listOf("tovuqli kotlet", "kurinaya kotleta")),
+        FoodItem("813", "Tvorogli zapekanka", 165.0, 13.0, 5.5, 15.0, listOf(ServingSize("Bo`lak", 120.0)), true, "Sut va tuxum", isPopular = true, searchAliases = listOf("zapekanka", "tvorog zapekanka")),
+        FoodItem("814", "Qo`ziqorinli krem-sho`rva", 75.0, 2.5, 4.5, 6.0, listOf(ServingSize("Kosa", 250.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("krem shorva", "gribnoy sup", "cream soup")),
+        FoodItem("815", "Mevali smuzi", 55.0, 1.0, 0.5, 12.0, listOf(ServingSize("Stakan", 250.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("smuzi", "smoothie")),
+        FoodItem("816", "Limonad (uyda tayyorlangan)", 35.0, 0.1, 0.0, 8.5, listOf(ServingSize("Stakan", 250.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("limonad", "lemonade")),
+        FoodItem("817", "Manti (ismaloqli / ko`katli)", 140.0, 5.0, 3.5, 22.0, listOf(ServingSize("Dona", 40.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("ismaloq manti", "kokatli manti")),
+        FoodItem("818", "Sabzavotli gril", 65.0, 2.0, 3.0, 7.5, listOf(ServingSize("Likopcha", 150.0)), true, "Salatlar va gazaklar", isPopular = true, searchAliases = listOf("gril sabzavot", "grilled vegetables")),
+        FoodItem("819", "Tovuqli rulet", 160.0, 22.0, 7.0, 1.0, listOf(ServingSize("Bo`lak", 80.0)), true, "Go`shtli taomlar", isPopular = true, searchAliases = listOf("tovuq rulet", "kuriniy rulet")),
+        FoodItem("820", "Tuxumli omlet (sabzavotlar bilan)", 125.0, 9.0, 8.5, 3.0, listOf(ServingSize("Porsiya", 150.0)), true, "Sut va tuxum", isPopular = true, searchAliases = listOf("sabzavotli omlet", "omlet s ovoshami")),
+        FoodItem("821", "Pirojki (olchali / mevali)", 240.0, 4.5, 6.0, 42.0, listOf(ServingSize("Dona", 90.0)), true, "Shirinliklar va desertlar", isPopular = true, searchAliases = listOf("shirin pirojki", "pirojki s vishney")),
+        FoodItem("822", "Karam sho`rva (Shchi)", 40.0, 2.0, 1.5, 5.0, listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("shchi", "karam shorva")),
+        FoodItem("823", "Guruchli suli bo`tqa (suvda)", 88.0, 2.2, 1.2, 17.5, listOf(ServingSize("Kosa", 200.0)), true, "Bo`tqalar", isPopular = true, searchAliases = listOf("suvda botqa", "kasha na vode")),
+        FoodItem("824", "Lavlagi sho`rva (Svekolnik)", 38.0, 1.5, 1.0, 6.0, listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("svekolnik", "lavlagi shorva")),
+        FoodItem("825", "Tovuq jigari (dimlangan)", 140.0, 19.0, 5.5, 2.5, listOf(ServingSize("Porsiya", 150.0)), true, "Go`shtli taomlar", isPopular = true, searchAliases = listOf("tovuq jigar", "kurinaya pechen")),
+        FoodItem("826", "Tvorogli vatrushka", 260.0, 9.0, 8.0, 38.0, listOf(ServingSize("Dona", 100.0)), true, "Shirinliklar va desertlar", isPopular = true, searchAliases = listOf("vatrushka", "tvorog vatrushka")),
+        FoodItem("827", "Dudlangan tovuq", 190.0, 24.0, 10.0, 0.0, listOf(ServingSize("Bo`lak", 100.0)), true, "Go`shtli taomlar", isPopular = true, searchAliases = listOf("dudlangan tovuq", "kopchenaya kuritsa")),
+        FoodItem("828", "Sabzavotli salat (Pishloq bilan)", 110.0, 4.5, 8.0, 5.0, listOf(ServingSize("Likopcha", 150.0)), true, "Salatlar va gazaklar", isPopular = true, searchAliases = listOf("pishloqli salat", "salat s syrom")),
+        FoodItem("829", "Mol tili (qaynatilgan)", 170.0, 16.0, 12.0, 0.0, listOf(ServingSize("Bo`lak", 70.0)), true, "Go`shtli taomlar", isPopular = true, searchAliases = listOf("mol tili", "govyazhiy yazik")),
+        FoodItem("830", "Makkajo`xori (bug`da pishirilgan)", 96.0, 3.4, 1.5, 19.0, listOf(ServingSize("Dona", 150.0)), true, "Sabzavotlar", isPopular = true, searchAliases = listOf("makkajoxori", "kukuruza")),
+        FoodItem("831", "Grechka palov (Grechka oshi)", 170.0, 5.4, 7.5, 24.5,
+            listOf(ServingSize("Kosa", 250.0), ServingSize("Likop", 350.0)),
+            true, "Taomlar", searchAliases = listOf("grechka palov", "grechka oshi", "dietik osh")
+        ),
+        FoodItem("1001", "Suzma (Chakka)", 120.0, 10.0, 6.0, 4.0,
+            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Kosa", 200.0)), true, "Sut va sut mahsulotlari", searchAliases = listOf("chakka", "susma", "suzma")),
+        FoodItem("1002", "Sirok (tvorogli shirinlik)", 340.0, 8.5, 20.0, 32.0,
+            listOf(ServingSize("Dona", 45.0)), true, "Sut va sut mahsulotlari", searchAliases = listOf("sirok", "shirin tvorog")),
+        FoodItem("1003", "Ovsyanali omlet", 160.0, 11.0, 10.0, 12.0,
+            listOf(ServingSize("Porsiya", 120.0)), true, "Sut va tuxum", searchAliases = listOf("ovsyanali omlet", "avsyankali omlet")),
+        FoodItem("1004", "Karamli omlet", 140.0, 9.0, 9.0, 6.0,
+            listOf(ServingSize("Porsiya", 120.0)), true, "Sut va tuxum", searchAliases = listOf("karamli omlet", "omlet karam bilan")),
+        FoodItem("1005", "Rayhonli omlet", 150.0, 10.0, 11.0, 3.0,
+            listOf(ServingSize("Porsiya", 120.0)), true, "Sut va tuxum", searchAliases = listOf("rayhonli omlet", "omlet rayhon bilan")),
+        FoodItem("1006", "Mol yog'i (kuydirilgan)", 890.0, 0.0, 99.0, 0.0,
+            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Yog'lar", searchAliases = listOf("mol yogi", "dumba yogi", "ich yogi")),
 
-        FoodItem(
-            "601", "Pepsi", 41.0, 0.0, 0.0, 10.4,
-            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1L)", 1000.0), ServingSize("Idish (1.5L)", 1500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "602", "Coca-Cola Zero", 0.3, 0.0, 0.0, 0.0,
-            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1L)", 1000.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "603", "Fanta", 48.0, 0.0, 0.0, 11.7,
-            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1.5L)", 1500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "604", "Sprite", 40.0, 0.0, 0.0, 9.8,
-            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1.5L)", 1500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "605", "Dena sharbati (olchali)", 52.0, 0.2, 0.0, 12.5,
-            listOf(ServingSize("Stakan (200ml)", 200.0), ServingSize("Paket (1L)", 1000.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "606", "Bliss sharbati (olmali)", 46.0, 0.1, 0.1, 11.0,
-            listOf(ServingSize("Stakan (200ml)", 200.0), ServingSize("Paket (1L)", 1000.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "607", "Adrenaline Rush energetik ichimligi", 52.0, 0.0, 0.0, 12.8,
-            listOf(ServingSize("Idish (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "608", "Flash Up energetik ichimligi", 50.0, 0.0, 0.0, 12.0,
-            listOf(ServingSize("Idish (0.5L)", 500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "609", "Lipton sovuq choyi (limonli)", 29.0, 0.0, 0.0, 6.9,
-            listOf(ServingSize("Stakan (250ml)", 250.0), ServingSize("Idish (0.5L)", 500.0)),
-            true, "Ichimliklar"
-        ),
+        // 2. Milliy va issiq taomlar (Sho'rvalar, suyuq va quyuq ovqatlar)
+        FoodItem("1007", "Shovla", 180.0, 7.0, 9.0, 22.0,
+            listOf(ServingSize("Kosa", 250.0), ServingSize("Likop", 350.0)), true, "Taomlar", searchAliases = listOf("shavla", "shovla")),
+        FoodItem("1008", "Xo'rda sho'rva", 95.0, 6.0, 5.0, 8.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("xorda", "xurda", "xorda shorva")),
+        FoodItem("1009", "Atola", 120.0, 3.0, 4.0, 18.0,
+            listOf(ServingSize("Kosa", 250.0)), true, "Taomlar", searchAliases = listOf("atola")),
+        FoodItem("1010", "Piyova", 75.0, 2.0, 4.0, 8.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("piyova", "piyozli shorva")),
+        FoodItem("1011", "No'xatli sho'rva", 110.0, 7.0, 4.0, 12.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("noxatli shorva", "nuxatli shurva")),
+        FoodItem("1012", "Merjimek sho'rva", 120.0, 6.5, 3.5, 16.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("merjimek", "mercimek", "yasmiq shorva")),
+        FoodItem("1013", "Ajabsanda", 110.0, 5.0, 7.0, 8.0,
+            listOf(ServingSize("Kosa", 250.0), ServingSize("Likop", 350.0)), true, "Taomlar", searchAliases = listOf("achabsanda", "ajabsanda")),
+        FoodItem("1014", "Qatiqli osh", 90.0, 3.0, 2.0, 15.0,
+            listOf(ServingSize("Kosa", 250.0)), true, "Taomlar", searchAliases = listOf("qatiqli osh", "chalop oshi")),
+        FoodItem("1015", "Ko'cha oshi", 130.0, 4.0, 3.0, 22.0,
+            listOf(ServingSize("Kosa", 250.0)), true, "Taomlar", searchAliases = listOf("kocha oshi", "koje oshi")),
+        FoodItem("1016", "Karamli manti", 150.0, 4.0, 5.0, 22.0,
+            listOf(ServingSize("Dona", 45.0)), true, "Taomlar", searchAliases = listOf("karamli manti", "karam manti")),
+        FoodItem("1017", "Teftel (dumaloq go'sht)", 210.0, 14.0, 13.0, 8.0,
+            listOf(ServingSize("Dona", 60.0)), true, "Taomlar", searchAliases = listOf("teftel", "tefteli")),
+        FoodItem("1018", "Teftel sho'rva", 75.0, 6.0, 4.0, 5.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("tiftel shorva", "teftel shorva")),
+        FoodItem("1019", "Makaron kabob", 240.0, 12.0, 11.0, 24.0,
+            listOf(ServingSize("Porsiya", 250.0)), true, "Taomlar", searchAliases = listOf("makaron kabob", "makaron kebab")),
+        FoodItem("1020", "Go'shtli bulon", 35.0, 3.0, 2.5, 0.5,
+            listOf(ServingSize("Stakan", 200.0)), true, "Taomlar", searchAliases = listOf("bulon", "shorva suvi")),
+        FoodItem("1021", "Qovurilgan qo'y go'shti", 320.0, 24.0, 25.0, 0.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Go'shtli taomlar", searchAliases = listOf("qovurilgan qoy goshti", "qovurma goʻsht")),
+        FoodItem("1022", "Cho'zma", 150.0, 5.0, 4.0, 24.0,
+            listOf(ServingSize("Porsiya", 150.0)), true, "Taomlar", searchAliases = listOf("chozma")),
 
-        // Shirinliklar va Shokoladlar (Eng ommabop brendlar)
-        FoodItem(
-            "610", "Snickers", 485.0, 8.6, 23.0, 61.0,
-            listOf(ServingSize("Kichik (50g)", 50.0), ServingSize("Katta (95g)", 95.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "611", "Mars", 449.0, 4.4, 17.0, 70.0,
-            listOf(ServingSize("Dona (51g)", 51.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "612", "Bounty", 488.0, 3.8, 26.0, 59.0,
-            listOf(ServingSize("Dona (57g)", 57.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "613", "Twix", 495.0, 4.5, 24.0, 65.0,
-            listOf(ServingSize("Dona (55g)", 55.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "614", "KitKat", 522.0, 6.2, 27.0, 64.0,
-            listOf(ServingSize("Dona (41.5g)", 41.5)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "615", "Alpen Gold (yong'oqli)", 532.0, 6.3, 30.0, 58.0,
-            listOf(ServingSize("Bo'lakcha (5g)", 5.0), ServingSize("Plitka (85g)", 85.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "616", "M&M's (yong'oqli)", 513.0, 10.0, 26.0, 60.0,
-            listOf(ServingSize("Kichik paket (45g)", 45.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "617", "Oreo pechenyesi", 476.0, 5.4, 20.0, 68.0,
-            listOf(ServingSize("Dona (11g)", 11.0), ServingSize("Paket (95g)", 95.0)),
-            true, "Shirinliklar va desertlar"
-        ),
+        // 3. Non va xamir mahsulotlari
+        FoodItem("1023", "Buxonka non", 250.0, 8.0, 1.5, 50.0,
+            listOf(ServingSize("Bo'lak", 30.0)), true, "Non va non mahsulotlari", searchAliases = listOf("buhonka", "buxonka")),
+        FoodItem("1024", "Lepyoshka non", 260.0, 7.5, 2.0, 52.0,
+            listOf(ServingSize("Bo'lak", 40.0)), true, "Non va non mahsulotlari", searchAliases = listOf("lipochka non", "oq lepyoshka")),
+        FoodItem("1025", "Burek", 290.0, 9.0, 14.0, 32.0,
+            listOf(ServingSize("Dona", 100.0)), true, "Non va non mahsulotlari", searchAliases = listOf("burek", "byurek")),
+        FoodItem("1026", "Qovurilgan bo'lka non", 280.0, 8.0, 10.0, 40.0,
+            listOf(ServingSize("Bo'lak", 45.0)), true, "Non va non mahsulotlari", searchAliases = listOf("qovurilgan bolka", "grenka")),
+        FoodItem("1027", "Go'shtli pirog", 310.0, 11.0, 15.0, 32.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Non va non mahsulotlari", searchAliases = listOf("goshtli pirog", "meat pie")),
+        FoodItem("1028", "Pirog (oddiy)", 290.0, 5.0, 10.0, 45.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Non va non mahsulotlari", searchAliases = listOf("pirog")),
+        FoodItem("1029", "Jemli pirog", 320.0, 4.5, 11.0, 50.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Non va non mahsulotlari", searchAliases = listOf("jemli pirog", "pirog murabbo bilan")),
+        FoodItem("1030", "Tuxumli non", 240.0, 10.0, 11.0, 25.0,
+            listOf(ServingSize("Bo'lak", 60.0)), true, "Non va non mahsulotlari", searchAliases = listOf("tuxumli non", "grenki")),
 
-        // Muzqaymoqlar (Marojniy)
-        FoodItem(
-            "618", "Muzqaymoq 'Magnat'", 310.0, 4.0, 20.0, 28.0,
-            listOf(ServingSize("Dona (70g)", 70.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "619", "Muzqaymoq stakanda (plombir)", 220.0, 3.5, 12.0, 24.0,
-            listOf(ServingSize("Dona (70g)", 70.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "620", "Muzqaymoq 'Korovka iz Korenovki'", 230.0, 3.7, 15.0, 21.0,
-            listOf(ServingSize("Stakan (100g)", 100.0), ServingSize("Vanna (400g)", 400.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "621", "Muzqaymoq Eskimo", 280.0, 3.0, 18.0, 26.0,
-            listOf(ServingSize("Dona (65g)", 65.0)),
-            true, "Shirinliklar va desertlar"
-        ),
+        // 4. Mevalar, sabzavotlar, salatlar va ziravorlar
+        FoodItem("1031", "Sarimsoq (Chesnok)", 149.0, 6.5, 0.5, 33.0,
+            listOf(ServingSize("Dona (tish)", 3.0)), true, "Sabzavotlar", searchAliases = listOf("chesnok", "chisnok", "sarimsoq")),
+        FoodItem("1032", "Olxo'ri (ho'l)", 46.0, 0.7, 0.3, 11.4,
+            listOf(ServingSize("Dona", 50.0)), true, "Mevalar", searchAliases = listOf("olxori", "qora olxori", "слива")),
+        FoodItem("1033", "Qovoq (pishirilgan)", 34.0, 1.0, 0.1, 8.0,
+            listOf(ServingSize("Bo'lak", 150.0)), true, "Sabzavotlar", searchAliases = listOf("oshqovoq", "qovoq", "qabaq")),
+        FoodItem("1034", "Karam salati", 50.0, 1.4, 2.5, 6.0,
+            listOf(ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar", searchAliases = listOf("karamli salat", "karam salat", "свежий салат")),
+        FoodItem("1035", "Baqlajon salati", 75.0, 1.2, 5.0, 6.5,
+            listOf(ServingSize("Likopcha", 100.0)), true, "Salatlar va gazaklar", searchAliases = listOf("baqlajon salati", "salat baklajon")),
+        FoodItem("1036", "Dumbul (makkajo'xori)", 96.0, 3.4, 1.5, 21.0,
+            listOf(ServingSize("So'ta", 150.0)), true, "Sabzavotlar", searchAliases = listOf("dumbul", "makkajoxori")),
+        FoodItem("1037", "Mevali salat", 65.0, 1.0, 0.2, 15.0,
+            listOf(ServingSize("Kosa", 150.0)), true, "Salatlar va gazaklar", searchAliases = listOf("mevali salat", "fruit salad")),
+        FoodItem("1038", "Mosh salat", 80.0, 4.5, 2.5, 10.0,
+            listOf(ServingSize("Likopcha", 120.0)), true, "Salatlar va gazaklar", searchAliases = listOf("mosh salat", "moshli salat")),
+        FoodItem("1039", "Kishmish uzum", 72.0, 0.7, 0.2, 18.5,
+            listOf(ServingSize("Shingil", 200.0)), true, "Mevalar", searchAliases = listOf("kishmish", "uzum kishmish")),
+        FoodItem("1040", "Husayni uzumi", 69.0, 0.7, 0.2, 18.0,
+            listOf(ServingSize("Shingil", 200.0)), true, "Mevalar", searchAliases = listOf("husayni", "xusayni")),
+        FoodItem("1041", "Uksusli piyoz", 25.0, 0.8, 0.1, 5.5,
+            listOf(ServingSize("Likopcha", 50.0)), true, "Salatlar va gazaklar", searchAliases = listOf("uksusli piyoz", "marinadlangan piyoz")),
+        FoodItem("1042", "Kunjut", 573.0, 18.0, 50.0, 23.0,
+            listOf(ServingSize("Choy qoshiq", 5.0)), true, "Gazaklar", searchAliases = listOf("kunjut", "sesame")),
+        FoodItem("1043", "Kurkuma (ziravor)", 354.0, 8.0, 10.0, 65.0,
+            listOf(ServingSize("Choy qoshiq", 5.0)), true, "Ziravorlar", searchAliases = listOf("kurkuma", "turmeric")),
 
-        // Gazaklar (Chips, Kirieshki va boshqalar)
-        FoodItem(
-            "622", "Lays chips (piyozli)", 520.0, 6.0, 31.0, 53.0,
-            listOf(ServingSize("Kichik paket (40g)", 40.0), ServingSize("Katta paket (140g)", 140.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "623", "Pringles chips (original)", 530.0, 4.5, 33.0, 52.0,
-            listOf(ServingSize("Bankacha (165g)", 165.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "624", "Kirieshki (qotirilgan non)", 410.0, 11.0, 9.0, 70.0,
-            listOf(ServingSize("Paketcha (40g)", 40.0), ServingSize("Katta paket (100g)", 100.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "625", "Tuzlangan pista (semichka)", 601.0, 21.0, 53.0, 20.0,
-            listOf(ServingSize("Stakan (100g)", 100.0), ServingSize("Paketcha (50g)", 50.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "626", "Tuzlangan yer yong'oq", 590.0, 25.0, 48.0, 18.0,
-            listOf(ServingSize("Paketcha (50g)", 50.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "627", "Lavash (mol go'shtli, pishloqli)", 280.0, 12.0, 16.0, 21.0,
-            listOf(ServingSize("Kichik", 200.0), ServingSize("Standart", 280.0), ServingSize("Katta", 350.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "628", "Shaurma (tovuqli, pishloqli)", 270.0, 14.0, 15.0, 19.0,
-            listOf(ServingSize("Standart", 260.0), ServingSize("Katta", 340.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "629", "Donar (go'shtli, non orasida)", 240.0, 14.0, 11.0, 22.0,
-            listOf(ServingSize("Standart", 250.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "630", "Chizburger", 303.0, 16.0, 14.0, 28.0,
-            listOf(ServingSize("Standart", 160.0), ServingSize("Double", 260.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "631", "Klab sendvich", 280.0, 15.0, 15.0, 20.0,
-            listOf(ServingSize("Dona", 220.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "632", "Tovuq striplari", 250.0, 20.0, 12.0, 15.0,
-            listOf(ServingSize("3 dona", 90.0), ServingSize("5 dona", 150.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "633", "Pelmeni (muzlatilgan)", 280.0, 12.0, 13.0, 28.0,
-            listOf(ServingSize("Porsiya (150g)", 150.0)),
-            true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "634", "Vareniki (kartoshkali, muzlatilgan)", 190.0, 5.0, 4.0, 33.0,
-            listOf(ServingSize("Porsiya (150g)", 150.0)),
-            true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "635", "Sosiska (sutli)", 266.0, 10.0, 24.0, 1.9,
-            listOf(ServingSize("Dona", 50.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "636", "Kolbasa 'Doktorskaya'", 257.0, 12.0, 22.0, 2.0,
-            listOf(ServingSize("Bo'lak (25g)", 25.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "637", "Tovuq naggetslari (muzlatilgan)", 270.0, 14.0, 16.0, 18.0,
-            listOf(ServingSize("Dona (25g)", 25.0)),
-            true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "638", "Tushonka (mol go'shti, konserva)", 220.0, 16.0, 17.0, 0.0,
-            listOf(ServingSize("Osh qoshiq (30g)", 30.0), ServingSize("Bankacha (325g)", 325.0)),
-            true, "Go'shtli taomlar"
-        ),
+        // 5. Fastfud va sanoat gazaklari, shirinliklar
+        FoodItem("1044", "Snikers (Snickers)", 488.0, 8.5, 24.0, 60.0,
+            listOf(ServingSize("Dona", 50.0)), true, "Fastfud", searchAliases = listOf("snikers", "snickers")),
+        FoodItem("1045", "Chococream", 540.0, 6.0, 31.0, 56.0,
+            listOf(ServingSize("Osh qoshiq", 20.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("chococream", "shokoladli pasta", "nutella")),
+        FoodItem("1046", "Geyner (Gainer)", 380.0, 25.0, 3.0, 63.0,
+            listOf(ServingSize("Porsiya", 100.0)), true, "Gazaklar", searchAliases = listOf("geyner", "gainer", "protein")),
+        FoodItem("1047", "KFC (qovurilgan tovuq)", 290.0, 20.0, 17.0, 12.0,
+            listOf(ServingSize("Bo'lak", 100.0)), true, "Fastfud", searchAliases = listOf("kfc", "kfs", "kefsi")),
+        FoodItem("1048", "Sho'rdanak", 450.0, 18.0, 35.0, 15.0,
+            listOf(ServingSize("Dona", 5.0)), true, "Gazaklar", searchAliases = listOf("shordanak", "shurdanaq")),
+        FoodItem("1049", "Ermak (pista)", 580.0, 20.0, 50.0, 15.0,
+            listOf(ServingSize("Paketcha", 50.0)), true, "Gazaklar", searchAliases = listOf("ermak", "ermak pista", "semichka")),
+        FoodItem("1050", "Baliqli tayoqchalar", 250.0, 14.0, 12.0, 22.0,
+            listOf(ServingSize("Dona", 25.0)), true, "Fastfud", searchAliases = listOf("balikli tayoqchalar", "fish sticks")),
+        FoodItem("1051", "Krember (vaflili shokolad)", 510.0, 6.0, 26.0, 62.0,
+            listOf(ServingSize("Dona", 30.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("krember", "vaflili shokolad")),
+        FoodItem("1052", "Buterbrod", 250.0, 10.0, 12.0, 25.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Fastfud", searchAliases = listOf("buterbrod", "buterburod")),
+        FoodItem("1053", "Yer yong'oq (oddiy)", 567.0, 26.0, 49.0, 16.0,
+            listOf(ServingSize("Hovuch", 30.0)), true, "Gazaklar", searchAliases = listOf("yeryongoq", "yer yongoq", "peanut")),
+        FoodItem("1054", "Sazan kallasi (sho'rva uchun)", 120.0, 18.0, 5.0, 0.0,
+            listOf(ServingSize("Dona", 300.0)), true, "Taomlar", searchAliases = listOf("sazan kallasi", "baliq kallasi")),
+        FoodItem("1055", "Shokoladli vafli", 510.0, 5.5, 26.0, 63.0,
+            listOf(ServingSize("Dona", 20.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("shokoladli vafli", "shokolad vafli")),
+        FoodItem("1056", "Til ruleti", 190.0, 18.0, 13.0, 1.0,
+            listOf(ServingSize("Bo'lak", 50.0)), true, "Go'shtli taomlar", searchAliases = listOf("til ruleti", "til rulet")),
+        FoodItem("1057", "Yupqa", 280.0, 8.0, 12.0, 35.0,
+            listOf(ServingSize("Dona", 60.0)), true, "Non va non mahsulotlari", searchAliases = listOf("yupqa", "yupka")),
 
-        // Sut mahsulotlari (Ommabop)
-        FoodItem(
-            "639", "Yogurt (mevali, Activia)", 92.0, 3.5, 2.4, 14.0,
-            listOf(ServingSize("Idishcha (110g)", 110.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "640", "Ichimlik yogurti (Danone)", 75.0, 2.8, 1.5, 12.5,
-            listOf(ServingSize("Idishcha (290g)", 290.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "641", "Tvorogli sirok (vanilli)", 380.0, 8.0, 25.0, 30.0,
-            listOf(ServingSize("Dona (45g)", 45.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "642", "Eritilgan pishloq 'Drujba'", 280.0, 16.0, 23.0, 2.0,
-            listOf(ServingSize("Paketcha (90g)", 90.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
 
-        // Nonushta uchun tez tayyor bo'ladiganlar
-        FoodItem(
-            "643", "Rolton (tez tayyorlanadigan lapsha)", 450.0, 9.0, 21.0, 56.0,
-            listOf(ServingSize("Paket (60g)", 60.0)),
-            true, "Bo'tqalar"
-        ),
-        FoodItem(
-            "644", "Big Bon (tez tayyorlanadigan lapsha)", 460.0, 8.5, 22.0, 55.0,
-            listOf(ServingSize("Konteyner (85g)", 85.0)),
-            true, "Bo'tqalar"
-        ),
-        FoodItem(
-            "645", "Suli yormasi (tez tayyorlanadigan, paketcha)", 350.0, 11.0, 6.0, 65.0,
-            listOf(ServingSize("Paketcha (40g)", 40.0)),
-            true, "Bo'tqalar"
-        ),
-        FoodItem(
-            "646", "Nesquik nonushta yormasi", 377.0, 7.5, 3.8, 75.0,
-            listOf(ServingSize("Porsiya (30g)", 30.0)),
-            true, "Bo'tqalar"
-        ),
+        FoodItem("1058", "Nesquik ichimligi", 80.0, 3.2, 1.8, 12.5,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("nesquik soki", "neskvik")),
+        FoodItem("1059", "O'rik sharbati", 52.0, 0.5, 0.1, 12.4,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("orik sharbati", "orik soki")),
+        FoodItem("1060", "Namatak damlamasi", 18.0, 0.3, 0.1, 4.0,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("namatak damlamasi", "namatak")),
+        FoodItem("1061", "Gorilla (energetik)", 45.0, 0.0, 0.0, 11.0,
+            listOf(ServingSize("Idish", 250.0)), true, "Ichimliklar", searchAliases = listOf("gorilla", "gorilla energetik")),
+        FoodItem("1062", "Mors", 35.0, 0.1, 0.0, 8.5,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("mors", "berry drink")),
+        FoodItem("1063", "Matcha choyi", 2.0, 0.3, 0.0, 0.2,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("matcha choyi", "matcha")),
+        FoodItem("1064", "Olma sirkasi", 21.0, 0.0, 0.0, 0.9,
+            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Qaylalar va souslar", searchAliases = listOf("olma sirkasi", "sirka")),
+        FoodItem("1065", "Zanjabil va kurkuma choyi", 5.0, 0.1, 0.0, 1.2,
+            listOf(ServingSize("Piyola", 150.0)), true, "Ichimliklar", searchAliases = listOf("zanjabil choyi", "kurkuma zanjabl choy")),
+        FoodItem("1066", "Limon sharbati", 22.0, 0.4, 0.2, 6.9,
+            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Qaylalar va souslar", searchAliases = listOf("limon sharbati", "sok limon")),
+        FoodItem("1067", "Sous (qayla)", 80.0, 1.0, 6.0, 5.0,
+            listOf(ServingSize("Osh qoshiq", 15.0)), true, "Qaylalar va souslar", searchAliases = listOf("sous", "sovus")),
+        FoodItem("1068", "Chia urug'li suv", 15.0, 0.5, 0.9, 1.2,
+            listOf(ServingSize("Stakan", 200.0)), true, "Ichimliklar", searchAliases = listOf("chiyali suv", "chia suvi")),
+        FoodItem("1069", "Tuxumli do'lma", 180.0, 14.0, 12.0, 4.0,
+            listOf(ServingSize("Dona", 60.0)), true, "Taomlar", searchAliases = listOf("tuxumli dolma", "tuhumli dolma")),
+        FoodItem("1100", "Suyuq ovqat (umumiy)", 65.0, 3.0, 3.0, 6.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("suyuq ovqat", "suyuq")),
+        FoodItem("1101", "Makaron sho'rva (Vermishel)", 75.0, 3.0, 2.5, 10.0,
+            listOf(ServingSize("Kosa", 350.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("makron suyuq", "makaron shorva", "vermishel shurva")),
+        FoodItem("1102", "Suyak sho'rva", 45.0, 4.0, 3.0, 0.5,
+            listOf(ServingSize("Kosa", 350.0)), true, "Taomlar", searchAliases = listOf("suyak shorva", "suyakli shorva")),
+        FoodItem("1103", "Sutli osh (Shirguruch sho'rva)", 95.0, 3.0, 3.5, 13.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", searchAliases = listOf("sutli osh", "sut osh")),
+        FoodItem("1104", "Kepakli non", 227.0, 8.5, 3.3, 40.0,
+            listOf(ServingSize("Bo'lak", 30.0)), true, "Non va non mahsulotlari", isPopular = true, searchAliases = listOf("kepakli non", "qora kepakli non", "otrubnoy xleb")),
+        FoodItem("1105", "Suli noni (Ovsyanoy non)", 240.0, 9.0, 4.0, 42.0,
+            listOf(ServingSize("Bo'lak", 30.0)), true, "Non va non mahsulotlari", searchAliases = listOf("ovsyanka non", "suli non")),
+        FoodItem("1106", "Chalpak", 320.0, 7.0, 14.0, 41.0,
+            listOf(ServingSize("Dona", 80.0)), true, "Non va non mahsulotlari", searchAliases = listOf("chalpak", "qovurilgan chalpak")),
+        FoodItem("1107", "Sutli choy", 35.0, 1.5, 1.5, 4.0,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)), false, "Ichimliklar", isPopular = true, searchAliases = listOf("sutli choy", "sutchoy", "sut choy")),
+        FoodItem("1108", "Novvot choy", 25.0, 0.0, 0.0, 6.5,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)), false, "Ichimliklar", isPopular = true, searchAliases = listOf("novvot choy", "navvot choy", "novod choy")),
+        FoodItem("1109", "Kofe 3 tasi 1 da (MacCoffee)", 420.0, 3.0, 10.0, 75.0,
+            listOf(ServingSize("Paketcha", 18.0)), false, "Ichimliklar", isPopular = true, searchAliases = listOf("3 in 1", "maccoffee", "mak kofe", "sutli kofe paket", "kofe 3v1")),
+        FoodItem("1110", "Gerbalayf kokteyli (Herbalife)", 95.0, 9.0, 1.0, 11.0,
+            listOf(ServingSize("Porsiya", 250.0)), false, "Ichimliklar", searchAliases = listOf("gerbalayf", "herbalife", "koktel gerbalayf")),
+        FoodItem("1111", "Romashka choyi", 2.0, 0.0, 0.0, 0.4,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Stakan", 200.0)), false, "Ichimliklar", searchAliases = listOf("romashka", "romashka choy", "moychechak choyi")),
+        FoodItem("1112", "Muzli choy (Fuse Tea/Maxi Tea)", 33.0, 0.0, 0.0, 8.0,
+            listOf(ServingSize("Stakan", 200.0), ServingSize("Idish", 500.0)), false, "Ichimliklar", searchAliases = listOf("fuse tea", "fuzetea", "maxi tea", "muzli choy", "ays ti")),
+        FoodItem("1113", "Tuxum oqi (qaynatilgan)", 52.0, 11.0, 0.2, 0.7,
+            listOf(ServingSize("Dona", 35.0)), true, "Sut va tuxum", isPopular = true, searchAliases = listOf("tuxum oqi", "tuxumni oqi")),
+        FoodItem("1114", "Pishloqli omlet", 210.0, 14.0, 16.0, 2.0,
+            listOf(ServingSize("Porsiya", 150.0)), true, "Sut va tuxum", isPopular = true, searchAliases = listOf("sirli omlet", "omlet sir bilan", "pishloqli omlet")),
+        FoodItem("1115", "Tovuqli dimlama", 130.0, 12.0, 7.0, 5.0,
+            listOf(ServingSize("Kosa", 300.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("tovuqli dimlama", "dimlangan tovuq", "tovuq gushti dimlangan")),
+        FoodItem("1116", "Kartoshka va tuxum qovurmasi", 170.0, 6.0, 10.0, 15.0,
+            listOf(ServingSize("Likop", 250.0)), true, "Taomlar", searchAliases = listOf("kartoshka tuxum", "tuxumli kartoshka")),
+        FoodItem("1117", "Go'shtsiz palov (Sabzavotli osh)", 150.0, 3.0, 6.0, 21.0,
+            listOf(ServingSize("Kosa", 250.0), ServingSize("Likop", 350.0)), true, "Taomlar", searchAliases = listOf("goshtsiz osh", "goshtsiz palov", "sabzavotli osh")),
+        FoodItem("1118", "Shnitsel", 240.0, 16.0, 14.0, 11.0,
+            listOf(ServingSize("Dona", 120.0)), true, "Go'shtli taomlar", searchAliases = listOf("shnitsel", "shnitsil", "schnitzel")),
+        FoodItem("1119", "Korjik", 380.0, 6.5, 12.0, 62.0,
+            listOf(ServingSize("Dona", 75.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("korjik", "korzhik")),
+        FoodItem("1120", "Shokoladli pechenye", 460.0, 6.0, 22.0, 60.0,
+            listOf(ServingSize("Dona", 15.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("shkalatli pechenya", "shokoladli pechenye")),
+        FoodItem("1121", "Yangi salat (Miks/Sveji)", 35.0, 1.2, 1.5, 4.0,
+            listOf(ServingSize("Likopcha", 150.0)), true, "Salatlar va gazaklar", isPopular = true, searchAliases = listOf("yangi salat", "sveji salat", "miks salat", "kapres")),
+        FoodItem("1122", "Olma sirkasi qo'shilgan suv", 5.0, 0.0, 0.0, 1.0,
+            listOf(ServingSize("Stakan", 200.0)), false, "Ichimliklar", searchAliases = listOf("olma sirkali suv", "sirka suv", "olma sirkali choy")),
+        FoodItem("1123", "Asalli suv", 20.0, 0.0, 0.0, 5.0,
+            listOf(ServingSize("Stakan", 200.0)), false, "Ichimliklar", isPopular = true, searchAliases = listOf("asalli suv", "asal suv")),
+        FoodItem("1124", "Detoks qatiq (bodringli/ko'katli)", 45.0, 3.0, 2.0, 3.5,
+            listOf(ServingSize("Stakan", 200.0)), false, "Ichimliklar", searchAliases = listOf("detox qatiq", "kefir bodring", "qatiq bodring bilan")),
+        FoodItem("1125", "Qora shokolad (99%)", 530.0, 14.0, 50.0, 8.0,
+            listOf(ServingSize("Bo'lakcha", 10.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("qora shkalad", "99 shokolad")),
+        FoodItem("1126", "Hot-dog noni", 260.0, 8.0, 3.0, 48.0,
+            listOf(ServingSize("Dona", 60.0)), true, "Non va non mahsulotlari", searchAliases = listOf("xodog non", "xotdog noni")),
 
-        // Boshqa ommabop mahsulotlar
-        FoodItem(
-            "647", "Buxanka non", 260.0, 8.0, 1.5, 52.0,
-            listOf(ServingSize("Bo'lak", 25.0), ServingSize("Butun", 500.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "648", "Tovuq go'shti gril (do'konniki)", 210.0, 26.0, 12.0, 0.0,
-            listOf(ServingSize("Oyoqcha", 180.0), ServingSize("Yarimta", 500.0), ServingSize("Butun", 1000.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "649", "Konservalangan makkajo'xori", 86.0, 2.8, 1.0, 19.0,
-            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Bankacha (340g)", 340.0)),
-            true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "650", "Konservalangan ko'k no'xat", 60.0, 4.0, 0.2, 10.0,
-            listOf(ServingSize("Osh qoshiq", 25.0), ServingSize("Bankacha (400g)", 400.0)),
-            true, "Dukkaklilar"
-        ),
-        FoodItem(
-            "651", "Tomat pastasi", 82.0, 4.0, 0.5, 19.0,
-            listOf(ServingSize("Osh qoshiq", 25.0)),
-            true, "Qaylalar va souslar"
-        ),
-        // --- START OF NEW FOOD ITEMS (200+) ---
-
-        // Fastfud va Ko'cha Taomlari (Qo'shimchalar)
-        FoodItem(
-            "652", "Tandir lavash (achchiq)", 290.0, 13.0, 17.0, 22.0,
-            listOf(ServingSize("Standart", 280.0), ServingSize("Katta", 350.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "653", "Pishloqli lavash", 310.0, 14.0, 19.0, 21.0,
-            listOf(ServingSize("Standart", 250.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "654", "Mini lavash", 260.0, 11.0, 15.0, 20.0,
-            listOf(ServingSize("Dona", 160.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "655", "Fransuzcha hot-dog", 320.0, 12.0, 18.0, 28.0,
-            listOf(ServingSize("Dona", 150.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "656", "Pishloqli hot-dog", 340.0, 14.0, 20.0, 26.0,
-            listOf(ServingSize("Dona", 160.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "657", "Pizza (Tovuqli)", 260.0, 14.0, 10.0, 29.0,
-            listOf(ServingSize("Bo'lak", 110.0), ServingSize("O'rtacha (30sm)", 700.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "658", "Pizza (Qo'ziqorinli)", 240.0, 10.0, 9.0, 30.0,
-            listOf(ServingSize("Bo'lak", 110.0), ServingSize("O'rtacha (30sm)", 700.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "659", "Toster (kolbasali)", 290.0, 12.0, 15.0, 26.0,
-            listOf(ServingSize("Dona", 180.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "660", "Toster (tovuqli)", 280.0, 15.0, 13.0, 25.0,
-            listOf(ServingSize("Dona", 180.0)),
-            true, "Fastfud"
-        ),
-        FoodItem(
-            "661", "Trindvich", 300.0, 13.0, 16.0, 25.0,
-            listOf(ServingSize("Dona", 200.0)),
-            true, "Fastfud"
-        ),
-
-        // Non va Pishiriqlar
-        FoodItem(
-            "662", "Sosiskali bulochka (xamirda)", 340.0, 10.0, 20.0, 30.0,
-            listOf(ServingSize("Dona", 100.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "663", "Kartoshkali pirojki", 250.0, 6.0, 12.0, 29.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "664", "Go'shtli pirojki (belyash)", 290.0, 12.0, 18.0, 20.0,
-            listOf(ServingSize("Dona", 90.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "665", "Karamli pirojki", 220.0, 5.0, 10.0, 27.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "666", "Obi non", 250.0, 9.0, 1.5, 50.0,
-            listOf(ServingSize("Chorak", 100.0), ServingSize("Butun", 400.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "667", "Jizzali non", 350.0, 10.0, 15.0, 43.0,
-            listOf(ServingSize("Bo'lak", 50.0)),
-            true, "Non va non mahsulotlari"
-        ),
-        FoodItem(
-            "668", "Rulet (jemli)", 360.0, 5.0, 8.0, 68.0,
-            listOf(ServingSize("Bo'lak", 40.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "669", "Pirojniy 'Kartoshka'", 390.0, 6.0, 20.0, 48.0,
-            listOf(ServingSize("Dona", 60.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "670", "Pirojniy 'Korzinka'", 420.0, 5.0, 22.0, 50.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "671", "Olmali pirog", 280.0, 4.0, 12.0, 38.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "672", "Tvorogli pirog (vatrushka)", 270.0, 10.0, 11.0, 32.0,
-            listOf(ServingSize("Dona", 90.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-
-        // Do'kon Mahsulotlari: Gazaklar, Shirinliklar
-        FoodItem(
-            "673", "Choco-Pie", 430.0, 4.5, 16.0, 70.0,
-            listOf(ServingSize("Dona (28g)", 28.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "674", "Pechene 'Yubileynoye'", 465.0, 7.5, 19.0, 65.0,
-            listOf(ServingSize("Dona (12g)", 12.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "675", "Biskvit 'Barney'", 390.0, 6.0, 15.0, 58.0,
-            listOf(ServingSize("Dona (30g)", 30.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "676", "Shokoladli pasta (Nutella kabi)", 540.0, 6.0, 31.0, 58.0,
-            listOf(ServingSize("Choy qoshiq", 10.0), ServingSize("Osh qoshiq", 25.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "677", "Raffaello konfeti", 620.0, 7.5, 48.0, 38.0,
-            listOf(ServingSize("Dona (10g)", 10.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "678", "Saqich (shakarli)", 300.0, 0.0, 0.0, 75.0,
-            listOf(ServingSize("Yostiqcha", 2.0)),
-            true, "Shirinliklar va desertlar"
-        ),
-        FoodItem(
-            "679", "Popkorn (tuzli)", 480.0, 9.0, 22.0, 62.0,
-            listOf(ServingSize("Stakan", 30.0)),
-            true, "Gazaklar"
-        ),
-        FoodItem(
-            "680", "Makkajo'xori tayoqchalari (kukuruz)", 370.0, 8.0, 2.0, 80.0,
-            listOf(ServingSize("Paket (60g)", 60.0)),
-            true, "Gazaklar"
-        ),
-
-        // Do'kon Mahsulotlari: Yarim-tayyor va Konservalar
-        FoodItem(
-            "681", "Baliq konservasi (tuna)", 185.0, 29.0, 7.0, 0.0,
-            listOf(ServingSize("Osh qoshiq", 30.0), ServingSize("Bankacha (180g)", 180.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "682", "Shprotlar (yog'da)", 360.0, 17.0, 32.0, 0.0,
-            listOf(ServingSize("Dona", 8.0), ServingSize("Bankacha (160g)", 160.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "683", "Konservalangan zaytun", 115.0, 0.8, 11.0, 6.0,
-            listOf(ServingSize("Dona", 4.0)),
-            true, "Salatlar va gazaklar"
-        ),
-        FoodItem(
-            "684", "Muzlatilgan kotlet", 250.0, 15.0, 16.0, 12.0,
-            listOf(ServingSize("Dona", 80.0)),
-            true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "685", "Muzlatilgan baliq filesi", 90.0, 20.0, 1.0, 0.0,
-            listOf(ServingSize("Bo'lak (100g)", 100.0)),
-            true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "686", "Xamir (qat-qat, muzlatilgan)", 380.0, 7.0, 22.0, 38.0,
-            listOf(ServingSize("List (100g)", 100.0)),
-            true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "687", "Muzlatilgan sabzavotlar aralashmasi", 50.0, 2.5, 0.5, 9.0,
-            listOf(ServingSize("Porsiya (150g)", 150.0)),
-            true, "Yarim tayyor mahsulotlar"
-        ),
-        FoodItem(
-            "688", "Crab tayoqchalari", 95.0, 7.0, 1.5, 13.0,
-            listOf(ServingSize("Dona", 20.0)),
-            true, "Dengiz mahsulotlari"
-        ),
-
-        // Sut Mahsulotlari (Qo'shimchalar)
-        FoodItem(
-            "689", "Kolbasali pishloq (dudlangan)", 275.0, 21.0, 20.0, 2.5,
-            listOf(ServingSize("Bo'lak", 25.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "690", "Qaymoqli pishloq (Cream cheese)", 250.0, 6.0, 24.0, 3.0,
-            listOf(ServingSize("Osh qoshiq", 20.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "691", "Qatiq (yog'siz)", 30.0, 3.0, 0.1, 4.0,
-            listOf(ServingSize("Stakan", 200.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "692", "Slivki (10% yog'lilikda)", 120.0, 2.7, 10.0, 4.0,
-            listOf(ServingSize("Osh qoshiq", 20.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "693", "Tvorogli massa (mayizli)", 230.0, 12.0, 15.0, 11.0,
-            listOf(ServingSize("Paketcha (100g)", 100.0)),
-            true, "Sut va sut mahsulotlari"
-        ),
-        FoodItem(
-            "694", "Moxito (alkogolsiz)", 35.0, 0.0, 0.0, 8.5,
-            listOf(ServingSize("Stakan", 250.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "695", "Tarxun (gazli ichimlik)", 42.0, 0.0, 0.0, 10.5,
-            listOf(ServingSize("Stakan", 250.0), ServingSize("Idish (0.5L)", 500.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "696", "Kofe 3 tasi 1 da", 430.0, 2.5, 12.0, 78.0,
-            listOf(ServingSize("Paketcha (18g)", 18.0)), // Kaloriya 100g uchun
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "698", "Shaftoli sharbati", 48.0, 0.4, 0.1, 11.5,
-            listOf(ServingSize("Stakan", 200.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "699", "Montella (gazli suv)", 0.0, 0.0, 0.0, 0.0,
-            listOf(ServingSize("Idish (0.5L)", 500.0), ServingSize("Idish (1L)", 1000.0)),
-            true, "Ichimliklar"
-        ),
-        FoodItem(
-            "700", "Gilos kompot (uy sharoitida)", 70.0, 0.3, 0.0, 17.0,
-            listOf(ServingSize("Stakan", 200.0)),
-            true, "Ichimliklar"
-        ),
-
-        // Uy Taomlari va Boshqalar
-        FoodItem(
-            "701", "Makaron po-flotski", 280.0, 14.0, 15.0, 22.0,
-            listOf(ServingSize("Likop", 250.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "702", "Grechka (go'sht bilan)", 160.0, 10.0, 7.0, 15.0,
-            listOf(ServingSize("Likop", 250.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "703", "Qovurma sho'rva", 100.0, 7.0, 6.0, 5.0,
-            listOf(ServingSize("Kosa", 350.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "704", "Tuxum quymoq (pomidorli)", 120.0, 8.0, 9.0, 2.0,
-            listOf(ServingSize("Porsiya (2 tuxum)", 150.0)),
-            true, "Sut va tuxum"
-        ),
-        FoodItem(
-            "705", "Dimlama (behi bilan)", 130.0, 8.0, 7.0, 9.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "706", "Tovuq (pechda pishirilgan)", 190.0, 25.0, 10.0, 0.0,
-            listOf(ServingSize("Oyoqcha", 150.0), ServingSize("Ko'krak filesi", 120.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "707", "Baliq (bug'da pishirilgan)", 140.0, 22.0, 6.0, 0.0,
-            listOf(ServingSize("Bo'lak", 100.0)),
-            true, "Go'shtli taomlar"
-        ),
-        FoodItem(
-            "708", "Sirnik (tvorogdan)", 185.0, 15.0, 7.0, 15.0,
-            listOf(ServingSize("Dona", 50.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "709", "Okroshka (kvassda)", 75.0, 4.0, 4.5, 5.0,
-            listOf(ServingSize("Kosa", 300.0)),
-            true, "Taomlar"
-        ),
-        FoodItem(
-            "712", "Achchiq qalampir sousi (Chili)", 40.0, 1.0, 0.2, 8.0,
-            listOf(ServingSize("Choy qoshiq", 5.0)),
-            true, "Qaylalar va souslar"
-        )
     )
 }
+
+
+

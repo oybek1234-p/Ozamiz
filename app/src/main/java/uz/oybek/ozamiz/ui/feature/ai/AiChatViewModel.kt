@@ -2,7 +2,7 @@ package uz.oybek.ozamiz.ui.feature.ai
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -12,143 +12,152 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
 import uz.oybek.ozamiz.data.ai.aiChat.ChatMessage
-import uz.oybek.ozamiz.data.ai.aiChat.DietologAnswers
 import uz.oybek.ozamiz.data.config.AppPreference
+import uz.oybek.ozamiz.data.food.limit.FoodLimitManager
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.dateApiFormat
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
-import uz.oybek.ozamiz.ui.utils.showToast
-import java.util.Date
+import java.util.UUID
 
 class AiChatViewModel : ViewModel() {
-
-    companion object {
-        const val FREE_MESSAGE_LIMIT = 0
-    }
-
-    private val todayStr = Date().dateApiFormat()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val loadingMessage = ChatMessage(text = "", isUser = false, isThinking = true)
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
+    val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
 
-    private var chatIdDeferred = CompletableDeferred<String?>()
-    val suggestedQuestions: StateFlow<List<String>> = AiChatRepository.suggestedReplies
+    private var currentChatId: String = generateChatId()
 
-    val messages: StateFlow<List<ChatMessage>> =
-        combine(_messages, _isLoading) { msgs, loading ->
-            if (loading) {
-                msgs + loadingMessage
-            } else {
-                msgs
-            }
-        }.stateIn(
-            viewModelScope,
-            SharingStarted.Lazily,
-            emptyList()
-        )
+    private val _remainingMessages = MutableStateFlow(getRemainingMessages())
+    val remainingMessages: StateFlow<Int> = _remainingMessages.asStateFlow()
 
-    fun canSendMessage(): Boolean {
-        if (user.isPremium()) return true
-        return AppPreference.current.dietologMessageCount < FREE_MESSAGE_LIMIT
+    private var sendJob: Job? = null
+    private var resetJob: Job? = null
+
+    fun getMaxDailyMessages(): Int = FoodLimitManager.getMaxDailyChatMessages(user)
+    fun getTodayMessageCount(): Int = FoodLimitManager.getTodayChatMessageCount()
+    fun getRemainingMessages(): Int = FoodLimitManager.getRemainingChatMessages(user)
+    fun canSendMessage(): Boolean = FoodLimitManager.canSendChatMessage(user)
+
+    fun refreshLimitState() {
+        _remainingMessages.value = getRemainingMessages()
+    }
+
+    private fun generateChatId(): String {
+        return "${user.uid}_${System.currentTimeMillis()}_${UUID.randomUUID().toString().take(8)}"
     }
 
     init {
         UserProfileRepository.setUnreadNotificationsZero()
-    }
-
-    private fun startNewChatSession() {
-        val chatId = "${user.uid}_$todayStr"
-        chatIdDeferred = CompletableDeferred()
-        chatIdDeferred.complete(chatId)
-    }
-
-    init {
-        startNewChat(false)
-        observeNewMessages()
-    }
-
-    private fun observeNewMessages() {
-        viewModelScope.launch {
-            AiChatRepository.newMessagesEvent.collect {
-                val message = ChatMessage(
-                    text = it,
-                    isUser = false,
-                    isThinking = false
-                )
-                _messages.value += message
-            }
+        refreshLimitState()
+        resetJob = viewModelScope.launch {
+            AiChatRepository.clearHistory()
         }
     }
 
-    fun startNewChat(clearHistory: Boolean) {
-        startNewChatSession()
-        viewModelScope.launch {
-            if (clearHistory) {
-                _messages.emit(emptyList())
+    fun startNewChat(clearHistory: Boolean = true) {
+        sendJob?.cancel()
+        resetJob?.cancel()
+        _isLoading.value = false
+        currentChatId = generateChatId()
+        refreshLimitState()
+        if (clearHistory) {
+            _messages.value = emptyList()
+            resetJob = viewModelScope.launch {
                 AiChatRepository.clearHistory()
             }
-            launch {
-                val cached = AiChatRepository.getCachedMessages()
-                if (cached.isNullOrEmpty().not()) {
-                    _messages.value = cached.map {
-                        ChatMessage(
-                            text = it.text,
-                            isUser = it.isUser,
-                            isThinking = false
-                        )
-                    }
-                } else {
-                    _messages.value += ChatMessage(
-                        text = DietologAnswers.getInitialGreeting(),
-                        isUser = false,
-                        isThinking = false
-                    )
-                }
-            }
-
         }
     }
 
     fun sendMessage(
         text: String,
+        ignoreLimit: Boolean = false,
         done: () -> Unit = {}
     ) {
-        if (text.isBlank()) return
-        if (!canSendMessage()) return
+        val trimmed = text.trim()
+        if (trimmed.isBlank() || _isLoading.value) return
+        if (!ignoreLimit && !canSendMessage()) return
 
-        val userMessage = ChatMessage(text = text, isUser = true)
-        _messages.value += userMessage
+        resetJob?.cancel()
+        sendJob?.cancel()
+
+        viewModelScope.launch {
+            AppPreference.incrementAiChatLimitCount()
+            _remainingMessages.value = getRemainingMessages()
+        }
+
+        val userMessage = ChatMessage(
+            id = UUID.randomUUID().toString(),
+            text = trimmed,
+            isUser = true
+        )
+        val aiMessage = ChatMessage(
+            id = UUID.randomUUID().toString(),
+            text = "",
+            isUser = false,
+            isThinking = true
+        )
+        _messages.value = _messages.value + listOf(userMessage, aiMessage)
+        android.util.Log.d("AiChatDebug", "sendMessage: _messages.value SET, new size=${_messages.value.size}")
         AiChatRepository.clearReplies()
         _isLoading.value = true
 
-        viewModelScope.launch {
-            val chatId = chatIdDeferred.await()
-            AiChatRepository.sendMessage(
-                text = text,
-                chatId = chatId
-            ).collect { result ->
-                if (result is DataWrapper.Success) {
-                    _isLoading.value = false
+        val chatId = currentChatId
 
-                    val displayedText = result.data
-                    val currentList = _messages.value.toMutableList()
-                    val lastMsg = currentList.lastOrNull()
-                    if (lastMsg != null && !lastMsg.isUser) {
-                        currentList[currentList.lastIndex] = lastMsg.copy(text = displayedText)
-                    } else {
-                        currentList.add(ChatMessage(text = displayedText, isUser = false))
+        sendJob = viewModelScope.launch {
+            try {
+                AiChatRepository.sendMessage(
+                    text = trimmed,
+                    chatId = chatId
+                ).collect { result ->
+                    if (result is DataWrapper.Success) {
+                        val displayedText = result.data
+                        val currentList = _messages.value.toMutableList()
+                        val lastAiIndex = currentList.indexOfLast { !it.isUser }
+                        if (lastAiIndex != -1) {
+                            currentList[lastAiIndex] = currentList[lastAiIndex].copy(
+                                text = displayedText,
+                                isThinking = false
+                            )
+                        } else {
+                            currentList.add(
+                                ChatMessage(
+                                    id = UUID.randomUUID().toString(),
+                                    text = displayedText,
+                                    isUser = false,
+                                    isThinking = false
+                                )
+                            )
+                        }
+                        _messages.value = currentList
                     }
-                    _messages.value = currentList
-                    done()
-                } else if (result is DataWrapper.Error) {
-                    _isLoading.value = false
-                    done()
                 }
+            } catch (e: Exception) {
+                android.util.Log.e("AiChatViewModel", "Error while sending chat message", e)
+                val currentList = _messages.value.toMutableList()
+                val lastAiIndex = currentList.indexOfLast { !it.isUser }
+                val errorMsg = "Kechirasiz, xatolik yuz berdi. Qaytadan urinib ko'ring."
+                if (lastAiIndex != -1) {
+                    currentList[lastAiIndex] = currentList[lastAiIndex].copy(
+                        text = errorMsg,
+                        isThinking = false
+                    )
+                } else {
+                    currentList.add(
+                        ChatMessage(
+                            id = UUID.randomUUID().toString(),
+                            text = errorMsg,
+                            isUser = false,
+                            isThinking = false
+                        )
+                    )
+                }
+                _messages.value = currentList
+            } finally {
+                _isLoading.value = false
+                done()
             }
         }
     }

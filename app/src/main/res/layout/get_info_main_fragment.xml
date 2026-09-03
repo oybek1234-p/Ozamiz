@@ -10,7 +10,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurfaceContainer"
+        android:background="?attr/colorSurface"
         app:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -38,15 +38,15 @@
             android:paddingHorizontal="20dp"
             android:paddingTop="16dp"
             android:paddingBottom="32dp">
-
-            <!-- 1. Name Input -->
+            
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/name_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Ismingiz"
+                app:hintEnabled="false"
+                app:helperText="Masalan: Oybek"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -56,10 +56,10 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:hint="Yozing"
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- 2. Phone Number -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/mobil_raqam_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -67,6 +67,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:hint="Telefon raqam"
+                app:helperText="Masalan: 971871415"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -145,7 +146,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:hint="Bo'y (sm)"
+                    android:hint="sm"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -366,65 +367,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Ozish tezligi"
+                android:fontFamily="@font/roboto_bold"
+                android:text="Ozish tezligini tanlang"
                 android:textColor="?attr/colorOnSurface" />
 
-            <!-- Speed Options Vertical Container -->
+            <!-- Speed Options Horizontal Container (Side by Side 2 Cards) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:orientation="vertical">
+                android:layout_marginBottom="20dp"
+                android:orientation="horizontal">
 
                 <!-- Normal Speed Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/card_pace_normal"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="?attr/colorPrimaryContainer"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorPrimary"
-                    app:strokeWidth="2dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="14dp">
-
-                        <TextView
-                            android:id="@+id/text_pace_normal_title"
-                            style="@style/TextAppearance.Material3.TitleSmall"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/roboto_medium"
-                            android:text="Normal ozish (-500 kkal)"
-                            android:textColor="?attr/colorOnSurface" />
-
-                        <ImageView
-                            android:id="@+id/icon_pace_normal_check"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/check_circle_ic"
-                            app:tint="?attr/colorPrimary" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Fast Speed Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_pace_fast"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"
                     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="14dp"
+                    app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"
                     app:strokeColor="?attr/colorOutlineVariant"
                     app:strokeWidth="1dp">
@@ -432,41 +396,153 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
+                        android:orientation="vertical"
                         android:padding="14dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp">
+
+                            <!-- Icon Container Circle -->
+                            <FrameLayout
+                                android:id="@+id/frame_pace_normal_icon"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_alignParentStart="true"
+                                android:background="@drawable/bg_circle_filled">
+
+                                <ImageView
+                                    android:id="@+id/icon_pace_normal"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_pace_normal"
+                                    app:tint="?attr/colorOnSurface" />
+                            </FrameLayout>
+
+                        </RelativeLayout>
+
+                        <TextView
+                            android:id="@+id/text_pace_normal_label"
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="Normal"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/text_pace_normal_title"
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="+1.6 kg / oy"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Fast Speed Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_pace_fast"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="?attr/colorOutlineVariant"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp">
+
+                            <!-- Icon Container Circle -->
+                            <FrameLayout
+                                android:id="@+id/frame_pace_fast_icon"
+                                android:layout_width="38dp"
+                                android:layout_height="38dp"
+                                android:layout_alignParentStart="true"
+                                android:background="@drawable/bg_circle_filled">
+
+                                <ImageView
+                                    android:id="@+id/icon_pace_fast"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_pace_fast"
+                                    app:tint="?attr/colorOnSurfaceVariant" />
+                            </FrameLayout>
+                        </RelativeLayout>
+
+                        <TextView
+                            android:id="@+id/text_pace_fast_label"
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="Tezroq"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/text_pace_fast_title"
-                            style="@style/TextAppearance.Material3.TitleSmall"
-                            android:layout_width="0dp"
+                            style="@style/TextAppearance.Material3.BodyMedium"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
+                            android:layout_marginTop="4dp"
                             android:fontFamily="@font/roboto_medium"
-                            android:text="Tezroq ozish (-700 kkal)"
-                            android:textColor="?attr/colorOnSurface" />
-
-                        <ImageView
-                            android:id="@+id/icon_pace_fast_check"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/check_circle_ic"
-                            android:visibility="gone"
-                            app:tint="?attr/colorPrimary" />
+                            android:text="+2.4 kg / oy"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Summary Explanation Text -->
-            <TextView
-                android:id="@+id/text_energy_summary"
-                style="@style/Text1_16"
+            <!-- Summary Explanation Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_energy_summary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:lineSpacingExtra="4dp"
-                android:textColor="?attr/colorOnSurface"
-                tools:text="Sizning tanangiz kuniga taxminan 2025 kkal energiya sarflaydi, 500 kkal kamroq ovqat yeymiz natijada haftasiga 0.5 kg, oyiga 1.8 kg ozasiz. Maqsadga esa 2 oy 5 kunda erishasiz." />
+                android:layout_marginBottom="24dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/text_energy_summary"
+                        style="@style/Text1_16"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="6dp"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="15sp"
+                        tools:text="• Sizning tanangiz kuniga taxminan 2025 kkal energiya sarflaydi,\n\n• 500 kkal kamroq ovqat yeymiz natijada haftasiga 0.5 kg, oyiga 1.8 kg ozasiz.\n\n• Maqsadga esa 2 oy 5 kunda erishasiz." />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroup"
@@ -489,7 +565,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Kunlik kaloriya (kkal)"
+                android:hint="Kunlik kaloriya"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"

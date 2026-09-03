@@ -49,19 +49,19 @@
     <color name="md_theme_light_onError">#FFFFFF</color>
     <color name="md_theme_light_onErrorContainer">#410002</color>
 
-    <color name="md_theme_light_background">#E8EAE8</color>
+    <color name="md_theme_light_background">#FFFFFF</color>
     <color name="md_theme_light_onBackground">#191C1A</color>
-    <color name="md_theme_light_surface">#FBFDF9</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
     <color name="md_theme_light_onSurface">#191C1A</color>
     <color name="md_theme_light_surfaceVariant">#DBE5DD</color>
     <color name="md_theme_light_onSurfaceVariant">#404943</color>
     <color name="md_theme_light_outline">#707973</color>
 
     <color name="md_theme_light_surfaceContainerLowest">#FFFFFF</color>
-    <color name="md_theme_light_surfaceContainerLow">#F8F8F8</color>
-    <color name="md_theme_light_surfaceContainer">#EBEBEB</color>
-    <color name="md_theme_light_surfaceContainerHigh">#F1F1F1</color>
-    <color name="md_theme_light_surfaceContainerHighest">#E6E6E6</color>
+    <color name="md_theme_light_surfaceContainerLow">#F8F9FA</color>
+    <color name="md_theme_light_surfaceContainer">#F3F4F6</color>
+    <color name="md_theme_light_surfaceContainerHigh">#E5E7EB</color>
+    <color name="md_theme_light_surfaceContainerHighest">#D1D5DB</color>
 
     <!-- Vaznim Semantic Colors -->
     <color name="vaznim_primary">@color/md_theme_light_primary</color>
@@ -94,19 +94,19 @@
     <color name="md_theme_dark_onError">#690005</color>
     <color name="md_theme_dark_onErrorContainer">#FFDAD6</color>
 
-    <color name="md_theme_dark_background">#191C1A</color>
+    <color name="md_theme_dark_background">#000000</color>
     <color name="md_theme_dark_onBackground">#E1E3DF</color>
-    <color name="md_theme_dark_surface">#191C1A</color>
+    <color name="md_theme_dark_surface">#000000</color>
     <color name="md_theme_dark_onSurface">#E1E3DF</color>
-    <color name="md_theme_dark_surfaceVariant">#404943</color>
-    <color name="md_theme_dark_onSurfaceVariant">#BFC9C1</color>
+    <color name="md_theme_dark_surfaceVariant">#262B28</color>
+    <color name="md_theme_dark_onSurfaceVariant">#C0C9C2</color>
     <color name="md_theme_dark_outline">#8A938C</color>
 
-    <color name="md_theme_dark_surfaceContainerLowest">#0C0F0D</color>
-    <color name="md_theme_dark_surfaceContainerLow">#191C1A</color>
-    <color name="md_theme_dark_surfaceContainer">#1D201E</color>
-    <color name="md_theme_dark_surfaceContainerHigh">#272B28</color>
-    <color name="md_theme_dark_surfaceContainerHighest">#323632</color>
+    <color name="md_theme_dark_surfaceContainerLowest">#0A0D0B</color>
+    <color name="md_theme_dark_surfaceContainerLow">#121614</color>
+    <color name="md_theme_dark_surfaceContainer">#1A201C</color>
+    <color name="md_theme_dark_surfaceContainerHigh">#262E29</color>
+    <color name="md_theme_dark_surfaceContainerHighest">#343E37</color>
 
     <!-- Analysis Achievement Colors -->
     <color name="analysis_food_bg">#E8F5E9</color>

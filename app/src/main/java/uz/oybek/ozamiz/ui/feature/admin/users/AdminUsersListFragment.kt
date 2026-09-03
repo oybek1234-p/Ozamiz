@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.core.widget.doAfterTextChanged
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
@@ -46,14 +45,14 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
 
     private fun setupToolbar(bind: FragmentAdminUsersListBinding) {
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            navigateUp()
         }
     }
 
     private fun setupRecyclerView(bind: FragmentAdminUsersListBinding) {
         adapter = AdminUsersAdapter { selectedUser ->
             val bundle = bundleOf("userId" to selectedUser.uid)
-            findNavController().navigate(R.id.action_adminUsersListFragment_to_adminUserDetailsFragment, bundle)
+            navigate(R.id.action_adminUsersListFragment_to_adminUserDetailsFragment, bundle)
         }
         bind.recyclerUsers.adapter = adapter
         

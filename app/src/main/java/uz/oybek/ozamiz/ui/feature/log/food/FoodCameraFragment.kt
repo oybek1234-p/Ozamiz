@@ -13,79 +13,184 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
-import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentFoodCameraBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.utils.SystemBarStyle
-import uz.oybek.ozamiz.ui.utils.applySystemBarStyle
-import uz.oybek.ozamiz.ui.utils.restoreSystemBarStyle
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.showToast
 import uz.oybek.ozamiz.util.handleException
+import android.annotation.SuppressLint
+import android.view.MotionEvent
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
+import uz.oybek.ozamiz.data.food.limit.FoodLimitManager
+import uz.oybek.ozamiz.data.user.UserProfileRepository.user
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import java.io.File
 
 class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
 
     private var imageCapture: ImageCapture? = null
     private var cameraProvider: ProcessCameraProvider? = null
-    private var savedSystemBarStyle: SystemBarStyle? = null
     private var isCapturing = false
+
+    private var isFlashOn = false
 
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentFoodCameraBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentFoodCameraBinding) {
-        bind.viewFinder.implementationMode = PreviewView.ImplementationMode.PERFORMANCE
+        ViewCompat.setOnApplyWindowInsetsListener(bind.root) { _, insets ->
+            val navBars = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+            val density = resources.displayMetrics.density
+
+            bind.bottomControlBar.setPadding(
+                bind.bottomControlBar.paddingLeft,
+                (14 * density).toInt(),
+                bind.bottomControlBar.paddingRight,
+                navBars.bottom + (28 * density).toInt()
+            )
+            insets
+        }
+
+        bind.viewFinder.implementationMode = PreviewView.ImplementationMode.COMPATIBLE
         setupClickListeners(bind)
-        startCamera()
+        updateLimitBadge()
+        bind.viewFinder.post {
+            if (isAdded) startCamera()
+        }
     }
+
+    private var camera: androidx.camera.core.Camera? = null
 
     override fun onResume() {
         super.onResume()
-        mainActivity()?.setTopInsetPaddingEnabled(false)
-        savedSystemBarStyle = applySystemBarStyle(
-            statusBarColor = Color.BLACK,
-            navigationBarColor = Color.BLACK,
-            lightStatusBars = false,
-            lightNavigationBars = false,
-        )
+        isCapturing = false
+        binding.buttonCapture.isEnabled = true
+        updateLimitBadge()
+        if (cameraProvider == null || camera == null) {
+            startCamera()
+        }
     }
 
-    override fun onPause() {
-        mainActivity()?.setTopInsetPaddingEnabled(true)
-        savedSystemBarStyle?.let { restoreSystemBarStyle(it) }
-        savedSystemBarStyle = null
-        super.onPause()
+    private fun updateLimitBadge() {
+        if (user.isPremium()) {
+            binding.tvLimitBadge.text = "✨ Cheksiz"
+        } else {
+            val remaining = FoodLimitManager.getRemainingLogs(user)
+            val total = FoodLimitManager.FREE_DAILY_AI_LIMIT
+            binding.tvLimitBadge.text = "$remaining/$total ta limit qoldi"
+        }
     }
 
     override fun onDestroyView() {
         cameraProvider?.unbindAll()
         cameraProvider = null
         imageCapture = null
+        camera = null
+        isCapturing = false
         super.onDestroyView()
     }
 
+    private fun getSelectedTimestamp(): Long {
+        val ts = arguments?.getLong("timestamp", -1L) ?: -1L
+        return if (ts > 0) ts else System.currentTimeMillis()
+    }
+
+    private fun getSelectedMealType(): String {
+        val raw = arguments?.getString("mealType") ?: arguments?.getString("meal")
+        return uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(raw, getSelectedTimestamp())
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     private fun setupClickListeners(bind: FragmentFoodCameraBinding) = with(bind) {
+        buttonCapture.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    v.animate()
+                        .scaleX(0.88f)
+                        .scaleY(0.88f)
+                        .setDuration(100)
+                        .setInterpolator(DecelerateInterpolator())
+                        .start()
+                }
+
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    v.animate()
+                        .scaleX(1.0f)
+                        .scaleY(1.0f)
+                        .setDuration(180)
+                        .setInterpolator(OvershootInterpolator(2.5f))
+                        .start()
+                }
+            }
+            false
+        }
         buttonCapture.setOnSafeClickListener { takePhoto() }
-        buttonWrite.setOnSafeClickListener { deliverAction(ACTION_WRITE) }
-        buttonList.setOnSafeClickListener { deliverAction(ACTION_LIST) }
-        buttonBack.setOnSafeClickListener { findNavController().popBackStack() }
+        buttonWrite.setOnSafeClickListener {
+            val mealType = getSelectedMealType()
+            val timestamp = getSelectedTimestamp()
+            if (!uz.oybek.ozamiz.data.food.limit.FoodLimitManager.canLogFood()) {
+                activity?.let { act ->
+                    uz.oybek.ozamiz.data.food.limit.FoodLimitManager.showLimitReachedSheet(
+                        activity = act,
+                        title = "Bugungi rasmga olish limitingiz tugadi"
+                    ) {
+                        navigate(
+                            R.id.action_foodCameraFragment_to_searchFoodFragment,
+                            bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+                        )
+                    }
+                }
+                return@setOnSafeClickListener
+            }
+            navigate(
+                R.id.action_foodCameraFragment_to_writeFoodFragment,
+                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+            )
+        }
+        buttonList.setOnSafeClickListener {
+            val mealType = getSelectedMealType()
+            val timestamp = getSelectedTimestamp()
+            navigate(
+                R.id.action_foodCameraFragment_to_searchFoodFragment,
+                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+            )
+        }
+        buttonSaved.setOnSafeClickListener {
+            val mealType = getSelectedMealType()
+            val timestamp = getSelectedTimestamp()
+            navigate(
+                R.id.savedFoodsFragment,
+                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+            )
+        }
+        buttonFlash.setOnSafeClickListener {
+            isFlashOn = !isFlashOn
+            imageCapture?.flashMode =
+                if (isFlashOn) ImageCapture.FLASH_MODE_ON else ImageCapture.FLASH_MODE_OFF
+            camera?.cameraControl?.enableTorch(isFlashOn)
+            buttonFlash.setImageResource(if (isFlashOn) R.drawable.ic_flash_on else R.drawable.ic_flash_off)
+        }
+        buttonBack.setOnSafeClickListener { popBackStack() }
     }
 
     private fun startCamera() {
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        val ctx = context ?: return
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
         cameraProviderFuture.addListener({
-            if (!isAdded) return@addListener
+            if (!isAdded || context == null) return@addListener
             try {
                 bindCameraUseCases(cameraProviderFuture.get())
             } catch (e: Exception) {
                 handleException(e)
-                showToast(getString(R.string.error_opening_camera))
+                context?.let { showToast(it.getString(R.string.error_opening_camera)) }
             }
-        }, ContextCompat.getMainExecutor(requireContext()))
+        }, ContextCompat.getMainExecutor(ctx))
     }
 
     private fun bindCameraUseCases(provider: ProcessCameraProvider) {
@@ -99,7 +204,7 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
 
         try {
             provider.unbindAll()
-            provider.bindToLifecycle(
+            camera = provider.bindToLifecycle(
                 viewLifecycleOwner,
                 CameraSelector.DEFAULT_BACK_CAMERA,
                 preview,
@@ -107,7 +212,7 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
             )
         } catch (e: Exception) {
             handleException(e)
-            showToast(getString(R.string.error_opening_camera))
+            context?.let { showToast(it.getString(R.string.error_opening_camera)) }
         }
     }
 
@@ -115,17 +220,36 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
 
     private fun takePhoto() {
         if (isCapturing) return
+        if (!uz.oybek.ozamiz.data.food.limit.FoodLimitManager.canLogFood()) {
+            activity?.let { act ->
+                uz.oybek.ozamiz.data.food.limit.FoodLimitManager.showLimitReachedSheet(
+                    activity = act,
+                    title = "Bugungi rasmga olish limitingiz tugadi"
+                ) {
+                    val mealType = getSelectedMealType()
+                    val timestamp = getSelectedTimestamp()
+                    navigate(
+                        R.id.action_foodCameraFragment_to_searchFoodFragment,
+                        bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+                    )
+                }
+            }
+            return
+        }
+
         val capture = imageCapture ?: return
+        val ctx = context ?: return
 
         isCapturing = true
         binding.buttonCapture.isEnabled = false
 
-        val photoFile = File(requireContext().cacheDir, "food_${System.currentTimeMillis()}.jpg")
+        val photoFile =
+            File(ctx.cacheDir, "food_${System.currentTimeMillis()}.jpg")
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
         capture.takePicture(
             outputOptions,
-            ContextCompat.getMainExecutor(requireContext()),
+            ContextCompat.getMainExecutor(ctx),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     if (!isAdded) return
@@ -137,62 +261,28 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     if (!isAdded) return
+                    isCapturing = false
+                    binding.buttonCapture.isEnabled = true
                     val photoUri = Uri.fromFile(photoFile)
                     capturedPhotoUri = photoUri
-                    showPhotoReview(photoUri)
+                    val mealType = getSelectedMealType()
+                    val timestamp = getSelectedTimestamp()
+                    val bundle = bundleOf(
+                        "imageUri" to photoUri.toString(),
+                        "mealType" to mealType,
+                        "meal" to mealType,
+                        "timestamp" to timestamp
+                    )
+                    navigate(
+                        R.id.action_foodCameraFragment_to_foodPhotoReviewFragment,
+                        bundle
+                    )
                 }
             }
         )
     }
 
-    private fun showPhotoReview(uri: Uri) = with(binding) {
-        layoutPhotoPreview.isVisible = true
-        imageViewPhotoPreview.setImageURI(uri)
-        editTextFoodDescription.setText("")
-        editTextFoodDescription.requestFocus()
-
-        val imm = ContextCompat.getSystemService(requireContext(), android.view.inputmethod.InputMethodManager::class.java)
-        editTextFoodDescription.postDelayed({
-            if (isAdded && layoutPhotoPreview.isVisible) {
-                imm?.showSoftInput(editTextFoodDescription, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
-            }
-        }, 100)
-
-        buttonTekshirish.setOnClickListener {
-            val userDescription = editTextFoodDescription.text?.toString()?.trim().orEmpty()
-            imm?.hideSoftInputFromWindow(editTextFoodDescription.windowToken, 0)
-            deliverAction(
-                ACTION_PHOTO,
-                bundleOf(
-                    RESULT_URI to uri.toString(),
-                    RESULT_DESCRIPTION to userDescription
-                )
-            )
-        }
-
-        buttonRetakePhoto.setOnClickListener {
-            imm?.hideSoftInputFromWindow(editTextFoodDescription.windowToken, 0)
-            layoutPhotoPreview.isVisible = false
-            isCapturing = false
-            buttonCapture.isEnabled = true
-        }
-    }
-
-    private fun deliverAction(action: String, extras: Bundle = bundleOf()) {
-        setFragmentResult(REQUEST_KEY, bundleOf(RESULT_ACTION to action).apply {
-            putAll(extras)
-        })
-        findNavController().popBackStack()
-    }
-
     companion object {
         const val REQUEST_KEY = "food_camera_request"
-        const val RESULT_ACTION = "action"
-        const val RESULT_URI = "uri"
-        const val RESULT_DESCRIPTION = "description"
-
-        const val ACTION_PHOTO = "action_photo"
-        const val ACTION_WRITE = "action_write"
-        const val ACTION_LIST = "action_list"
     }
 }

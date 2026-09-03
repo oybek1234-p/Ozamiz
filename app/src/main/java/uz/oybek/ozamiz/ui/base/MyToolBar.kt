@@ -31,17 +31,21 @@ class MyToolBar @JvmOverloads constructor(
 
     fun setUpBackButton(fragment: Fragment) {
         setNavigationOnClickListener {
-            fragment.findNavController().popBackStack()
+            if (fragment is BaseFragment<*>) {
+                fragment.popBackStack()
+            } else {
+                try {
+                    fragment.findNavController().popBackStack()
+                } catch (e: Exception) {
+                    // ignore
+                }
+            }
         }
     }
 
     init {
         showArrowBack = true
         setTitleTextAppearance(context, R.style.ToolbarTitleApearence)
-        background = MaterialColors.getColor(
-            this,
-            com.google.android.material.R.attr.colorSurfaceContainer
-        ).toDrawable()
     }
 
 }

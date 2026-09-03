@@ -18,6 +18,7 @@ data class CommunityPost(
     var protein: Double? = null,
     var fat: Double? = null,
     var carbs: Double? = null,
+    var weightLoss: Double? = null,
     var likesCount: Int = 0,
     val likedBy: List<String> = emptyList(),
     var viewsCount: Int = 0,

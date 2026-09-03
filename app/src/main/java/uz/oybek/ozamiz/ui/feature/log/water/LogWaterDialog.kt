@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import uz.oybek.ozamiz.databinding.DialogLogWaterBinding
@@ -38,25 +39,71 @@ class LogWaterDialog : BottomSheetDialogFragment() {
         return binding.root
     }
 
+    private val waterTips = listOf(
+        "Suv moddalar almashinuvini (metabolizm) 30% gacha tezlashtiradi.",
+        "Suv terining elastikligini oshiradi va ajinlar tushishining oldini oladi.",
+        "Etarlicha suv ichish bosh og'rig'i va charchoqni kamaytiradi.",
+        "Suv organizmdan toksinlar va ortiqcha tuzlarni chiqarib yuboradi.",
+        "Ovqatdan oldin 1 stakan suv ichish ortiqcha yeyishning oldini oladi.",
+        "Suv bo'g'inlar harakatchanligini va mushaklar salomatligini ta'minlaydi.",
+        "Etarli suv ichish miya faoliyatini va diqqatni jamlashni oshiradi.",
+        "Suv buyraklar va ovqat hazm qilish tizimining to'g'ri ishlashiga yordam beradi."
+    )
+
+    private var currentTipIndex = (0..7).random()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupClickListeners()
+        updateTipText()
+    }
+
+    private fun updateTipText() {
+        if (_binding != null) {
+            val tip = waterTips[currentTipIndex % waterTips.size]
+            currentTipIndex++
+            binding.tvWaterTip.text = tip
+        }
+    }
+
+    private fun animateButton(view: View, onEnd: () -> Unit) {
+        view.animate()
+            .scaleX(0.92f)
+            .scaleY(0.92f)
+            .setDuration(70)
+            .withEndAction {
+                view.animate()
+                    .scaleX(1.0f)
+                    .scaleY(1.0f)
+                    .setDuration(90)
+                    .withEndAction { onEnd() }
+                    .start()
+            }
+            .start()
     }
 
     private fun setupClickListeners() {
         binding.apply {
-            cardCup100.setOnClickListener { addWater(100) }
-            cardGlass250.setOnClickListener { addWater(250) }
-            cardBottle500.setOnClickListener { addWater(500) }
-            cardBottle1000.setOnClickListener { addWater(1000) }
-            btnClose.setOnClickListener { dismiss() }
+            cardGlass250.setOnClickListener { animateButton(it) { addWater(250) } }
+            cardBottle500.setOnClickListener { animateButton(it) { addWater(500) } }
+            cardBottle1000.setOnClickListener { animateButton(it) { addWater(1000) } }
+            btnCloseWater.setOnClickListener { dismiss() }
         }
         
         // Observe ViewModel state
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 homeViewModel.uiState.collect { state ->
-                    binding.tvWaterProgress.text = "${state.waterConsumed} / ${state.waterTarget} ml"
+                    val target = if (state.waterTarget > 0) state.waterTarget else 2500
+                    binding.progressWaterCircular.max = target
+                    binding.progressWaterCircular.setProgressCompat(
+                        state.waterConsumed.coerceAtMost(target),
+                        true
+                    )
+                    binding.tvWaterProgress.text = "${state.waterConsumed} ml"
+                    binding.tvWaterTarget.text = "/ $target ml"
+
+                    binding.cardWaterGoalReached.isVisible = state.waterConsumed >= target
                 }
             }
         }
@@ -67,6 +114,7 @@ class LogWaterDialog : BottomSheetDialogFragment() {
     private fun addWater(amountMl: Int) {
         homeViewModel.addWater(amountMl)
         waterAdded = true
+        updateTipText()
     }
 
     override fun onDestroyView() {

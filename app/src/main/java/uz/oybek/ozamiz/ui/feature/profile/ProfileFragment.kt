@@ -12,12 +12,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.analytics.AnalyticsManager
 import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.databinding.FragmentProfileBinding
 import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
@@ -52,7 +52,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         setupSection(
             bind.sectionMyInfo, R.drawable.person_filled, getString(R.string.my_information)
         ) {
-            findNavController().navigate(R.id.getMainInfoFragment)
+            navigate(R.id.getMainInfoFragment)
         }
 
         setupSection(
@@ -64,6 +64,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         setupSection(
             bind.sectionRateApp, R.drawable.star_ic, getString(R.string.rate_app)
         ) {
+            AnalyticsManager.logFeatureUsed("profile_rate_app_clicked")
             openAppInPlayStore()
         }
 
@@ -78,45 +79,31 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             R.drawable.admin_ic,
             getString(R.string.premium_tekshiruv)
         ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
-            }
+            navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
         }
 
         setupSection(
             bind.sectionAdminAllUsers, R.drawable.group_ic, getString(R.string.foydalanuvchilar)
         ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.action_profileFragment_to_adminUsersListFragment)
-            }
+            navigate(R.id.action_profileFragment_to_adminUsersListFragment)
         }
 
         setupSection(
             bind.sectionAdminPosts, R.drawable.post_ic, getString(R.string.postlar)
         ) {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.action_profileFragment_to_adminPostManagerFragment)
-            }
+            navigate(R.id.action_profileFragment_to_adminPostManagerFragment)
         }
 
         bind.premiumButton.setOnClickListener {
-            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(
-                childFragmentManager,
-                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG
-            )
+            navigate(R.id.premiumFragment)
         }
 
         bind.premiumView.setOnClickListener {
-            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog().show(
-                childFragmentManager,
-                uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.TAG
-            )
+            navigate(R.id.premiumFragment)
         }
 
         bind.cardUserLevel.setOnClickListener {
-            if (findNavController().currentDestination?.id == R.id.profileFragment) {
-                navigate(R.id.levelFragment)
-            }
+            navigate(R.id.levelFragment)
         }
 
         setupPaymentCheckListener()
@@ -124,21 +111,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
     }
 
     private fun setupPaymentCheckListener() {
-        childFragmentManager.setFragmentResultListener(
-            uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.REQUEST_KEY,
-            viewLifecycleOwner
-        ) { _, bundle ->
-            val result =
-                bundle.getString(uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog.RESULT_ACTION)
-            if (result == "go_to_payment") {
-                val price = bundle.getLong("selected_price", 29000L)
-                val isYearly = bundle.getBoolean("is_yearly", false)
-                val args = androidx.core.os.bundleOf("price" to price, "is_yearly" to isYearly)
-                findNavController().navigate(
-                    R.id.action_profileFragment_to_paymentGetCheckFragment, args
-                )
-            }
-        }
     }
 
     private fun setupSection(
@@ -208,18 +180,28 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
         val context = context ?: return
         val appPackageName = context.packageName
         try {
-            startActivity(
-                Intent(
-                    Intent.ACTION_VIEW, "market://details?id=$appPackageName".toUri()
-                )
-            )
-        } catch (anfe: ActivityNotFoundException) {
-            startActivity(
-                Intent(
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName")).apply {
+                setPackage("com.android.vending")
+                addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            try {
+                val webIntent = Intent(
                     Intent.ACTION_VIEW,
                     Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                ).apply {
+                    setPackage("com.android.vending")
+                }
+                startActivity(webIntent)
+            } catch (e2: Exception) {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+                    )
                 )
-            )
+            }
         }
     }
 

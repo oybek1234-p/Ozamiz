@@ -5,9 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.FoodLogFeedbackRepository
 import uz.oybek.ozamiz.databinding.DialogFoodLogFeedbackBinding
@@ -37,7 +35,7 @@ class FoodLogFeedbackDialogFragment : BaseFragment<DialogFoodLogFeedbackBinding>
     private fun setupListeners() {
         binding.apply {
             btnBack.setOnClickListener {
-                findNavController().popBackStack()
+                popBackStack()
             }
             btnOption1.setOnClickListener { selectOption(btnOption1.text.toString()) }
             btnOption2.setOnClickListener { selectOption(btnOption2.text.toString()) }
@@ -45,13 +43,12 @@ class FoodLogFeedbackDialogFragment : BaseFragment<DialogFoodLogFeedbackBinding>
             btnOption4.setOnClickListener { selectOption(btnOption4.text.toString()) }
 
             btnAddNow.setOnClickListener {
-                findNavController().popBackStack()
+                popBackStack()
             }
         }
     }
 
     private fun selectOption(option: String) {
-        AppPreference.lastFoodFeedbackDate = dateStr
         lifecycleScope.launch {
             try {
                 FoodLogFeedbackRepository.saveFeedback(dateStr, option)

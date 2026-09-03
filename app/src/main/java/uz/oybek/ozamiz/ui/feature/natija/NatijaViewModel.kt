@@ -7,10 +7,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.data.firebase.FirebasePaths
+import uz.oybek.ozamiz.data.firebase.getValueSafe
+import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
+import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
 
 data class NatijaUiState(
@@ -43,7 +49,18 @@ data class NatijaUiState(
     val goalDateFormatted: String = "",
     val isSurplus: Boolean = false,
     val isGainGoal: Boolean = false,
-    val isPredictionLoading: Boolean = true
+    val isPredictionLoading: Boolean = true,
+    val idealWeightText: String = "",
+    val userHeightCm: Int = 0,
+
+    // Water & Exercise metrics
+    val todayWaterMl: Int = 0,
+    val targetWaterMl: Int = 2500,
+    val waterActiveDays: Int = 0,
+    val todayExerciseCalories: Int = 0,
+    val totalExerciseCalories: Int = 0,
+    val fatBurnedGrams: Int = 0,
+    val exerciseActiveDays: Int = 0
 )
 
 enum class BmiCategory {
@@ -76,8 +93,7 @@ class NatijaViewModel : ViewModel() {
         if (!user.valid) return
 
         _uiState.update { it.copy(isLoading = true, error = null) }
-        
-
+        loadWaterAndExerciseData(user.uid)
 
         viewModelScope.launch {
             WeightLogRepository.getLogsFlow(user.uid).collect { result ->
@@ -223,6 +239,9 @@ class NatijaViewModel : ViewModel() {
         val showTop = timeSinceLastLog > sevenDaysMs
         val showBottom = !showTop
 
+        val idealPair = if (user.height > 0) uz.oybek.ozamiz.data.food.DietController.getIdealWeight(user.height.toDouble()) else null
+        val idealText = if (idealPair != null) "${idealPair.first} - ${idealPair.second} kg" else ""
+
         _uiState.update {
             it.copy(
                 isLoading = false,
@@ -243,7 +262,9 @@ class NatijaViewModel : ViewModel() {
                 estimatedGoalDate = predictionDate,
                 error = null,
                 bmi = bmiData.first,
-                bmiCategory = bmiCategoryFromBmi(bmiData.first)
+                bmiCategory = bmiData.second,
+                idealWeightText = idealText,
+                userHeightCm = user.height
             )
         }
         
@@ -299,6 +320,68 @@ class NatijaViewModel : ViewModel() {
         }
 
         return bmi to category
+    }
+
+    private fun loadWaterAndExerciseData(userId: String) {
+        viewModelScope.launch {
+            try {
+                val user = LocalUser.user
+                val targetWater = if (user.targetWaterMl > 0) user.targetWaterMl else 2500
+                val formattedToday = Date().dateApiFormat()
+
+                val logsSnapshot = try {
+                    FirebasePaths.Database.logs(userId).get().await()
+                } catch (e: Exception) {
+                    null
+                }
+
+                var todayWater = 0
+                var todayExerciseCals = 0
+                var totalExerciseCals = 0
+                var waterDaysCount = 0
+                var exerciseDaysCount = 0
+
+                if (logsSnapshot != null && logsSnapshot.exists()) {
+                    for (dateSnap in logsSnapshot.children) {
+                        val dateKey = dateSnap.key ?: ""
+                        val dailyLogs = dateSnap.getValueSafe(DailyLogs::class.java) ?: continue
+                        val summary = LogRepository.calculateSummary(dailyLogs)
+
+                        val waterInDay = if (summary.consumedWaterMl > 0) summary.consumedWaterMl else (dailyLogs.waterLogs?.values?.sumOf { it.amountMl } ?: 0)
+                        val exerciseInDay = if (summary.burnedCalories > 0) summary.burnedCalories else (dailyLogs.exerciseLogs?.values?.sumOf { it.caloriesBurned } ?: 0)
+
+                        if (waterInDay > 0) {
+                            waterDaysCount++
+                        }
+                        if (exerciseInDay > 0) {
+                            exerciseDaysCount++
+                            totalExerciseCals += exerciseInDay
+                        }
+
+                        if (dateKey == formattedToday) {
+                            todayWater = waterInDay
+                            todayExerciseCals = exerciseInDay
+                        }
+                    }
+                }
+
+                val fatGrams = (totalExerciseCals / 7.7).toInt().coerceAtLeast(0)
+
+                _uiState.update {
+                    it.copy(
+                        todayWaterMl = todayWater,
+                        targetWaterMl = targetWater,
+                        waterActiveDays = waterDaysCount,
+                        todayExerciseCalories = todayExerciseCals,
+                        totalExerciseCalories = totalExerciseCals,
+                        fatBurnedGrams = fatGrams,
+                        exerciseActiveDays = exerciseDaysCount
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("NatijaViewModel", "Error loading water/exercise data", e)
+            }
+        }
     }
 }
 

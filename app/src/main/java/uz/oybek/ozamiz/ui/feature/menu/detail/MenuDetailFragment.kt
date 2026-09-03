@@ -39,27 +39,35 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
 
     override fun viewCreated(bind: FragmentMenuDetailBinding) {
         if (menu == null) {
-            findNavController().popBackStack()
+            popBackStack()
             return
         }
         setupViews(bind, menu!!)
         setupListeners(bind)
         setupScrollBehavior(bind)
         
-        findNavController().currentBackStackEntry?.savedStateHandle
-            ?.getLiveData<Menu>("updated_menu")
-            ?.observe(viewLifecycleOwner) { updatedMenu ->
-                if (updatedMenu != null) {
-                    menu = updatedMenu
-                    setupViews(bind, updatedMenu)
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set("updated_menu", updatedMenu)
+        try {
+            findNavController().currentBackStackEntry?.savedStateHandle
+                ?.getLiveData<Menu>("updated_menu")
+                ?.observe(viewLifecycleOwner) { updatedMenu ->
+                    if (updatedMenu != null) {
+                        menu = updatedMenu
+                        setupViews(bind, updatedMenu)
+                        findNavController().previousBackStackEntry?.savedStateHandle?.set("updated_menu", updatedMenu)
+                    }
                 }
-            }
+        } catch (e: Exception) {
+            // ignore
+        }
         
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.deleteSuccess.collect {
-                findNavController().previousBackStackEntry?.savedStateHandle?.set("deleted_menu_id", menu?.id)
-                findNavController().popBackStack()
+                try {
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set("deleted_menu_id", menu?.id)
+                } catch (e: Exception) {
+                    // ignore
+                }
+                popBackStack()
             }
         }
     }
@@ -185,14 +193,14 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
         bind.btnEdit.visibility = if (isAdmin) android.view.View.VISIBLE else android.view.View.GONE
 
         bind.btnBack.setOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
 
         bind.btnEdit.setOnClickListener {
             val bundle = android.os.Bundle().apply {
                 putParcelable("menuToEdit", menu)
             }
-            findNavController().navigate(R.id.action_menuDetailFragment_to_addMenuFragment, bundle)
+            navigate(R.id.action_menuDetailFragment_to_addMenuFragment, bundle)
         }
 
         bind.btnDelete.setOnClickListener {

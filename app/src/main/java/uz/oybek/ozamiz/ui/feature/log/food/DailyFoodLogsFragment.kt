@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.collectLatest
@@ -42,7 +41,7 @@ class DailyFoodLogsFragment : BaseFragment<FragmentDailyFoodLogsBinding>() {
         val date = Date(timestamp)
 
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
 
         bind.recyclerView.layoutManager = LinearLayoutManager(context)

@@ -68,4 +68,8 @@
         android:id="@+id/phoneOnboardFragment"
         android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.PhoneOnboardFragment"
         android:label="PhoneOnboardFragment" />
+    <fragment
+        android:id="@+id/goalPaceOnboardFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.onboarding.screens.GoalPaceOnboardFragment"
+        android:label="GoalPaceOnboardFragment" />
 </navigation>

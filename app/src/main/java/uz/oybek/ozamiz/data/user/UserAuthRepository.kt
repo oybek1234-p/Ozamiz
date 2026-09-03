@@ -34,35 +34,40 @@ object UserAuthRepository {
         val firebaseUser = auth.currentUser ?: return User()
         val id = firebaseUser.uid
         val networkUser: User? = UserProfileRepository.loadUser(id)
-
-        if (networkUser != null && networkUser.valid) {
-            LocalUser.user = networkUser
-            LocalUser.saveUser()
-            return networkUser
-        }
+        val existingLocal = LocalUser.user
 
         var userEmail = firebaseUser.email
         if (userEmail.isNullOrBlank()) {
             userEmail = firebaseUser.providerData.firstNotNullOfOrNull { it.email }
         }
 
-        val newUser = User(
-            uid = id,
-            phoneNumber = firebaseUser.phoneNumber ?: "",
-            gmail = userEmail.orEmpty(),
-            lastSeenTime = System.currentTimeMillis(),
-            registerDate = System.currentTimeMillis()
-        )
+        val currentUser = if (networkUser != null && networkUser.valid) {
+            networkUser.copy(
+                uid = id,
+                phoneNumber = if (networkUser.phoneNumber.isNotBlank()) networkUser.phoneNumber else (if (firebaseUser.phoneNumber.isNullOrBlank()) existingLocal.phoneNumber else firebaseUser.phoneNumber!!),
+                gmail = if (networkUser.gmail.isNotBlank()) networkUser.gmail else (if (userEmail.isNullOrBlank()) existingLocal.gmail else userEmail)
+            )
+        } else {
+            existingLocal.copy(
+                uid = id,
+                phoneNumber = if (firebaseUser.phoneNumber.isNullOrBlank()) existingLocal.phoneNumber else firebaseUser.phoneNumber!!,
+                gmail = if (userEmail.isNullOrBlank()) existingLocal.gmail else userEmail,
+                lastSeenTime = System.currentTimeMillis(),
+                registerDate = if (existingLocal.registerDate < 500000) System.currentTimeMillis() else existingLocal.registerDate
+            )
+        }
 
-        LocalUser.user = newUser
+        LocalUser.user = currentUser
         LocalUser.saveUser()
 
-        val map = UserMapper.toMap(newUser)
+        val map = UserMapper.toMap(currentUser)
         database.userReference(id).setValue(map).await()
 
-        val publicMap = UserMapper.toPublicMap(newUser)
+        val publicMap = UserMapper.toPublicMap(currentUser)
         firestore.publicUsersCollection.document(id).set(publicMap).await()
 
-        return newUser
+        UserProfileRepository.observeCurrentUser()
+
+        return currentUser
     }
 }

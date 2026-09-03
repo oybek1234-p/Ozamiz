@@ -6,7 +6,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.menu.FilterItem
@@ -38,10 +37,10 @@ class CategorySelectionFragment : BaseFragment<FragmentCategorySelectBinding>() 
         bind.rvCategories.layoutManager = LinearLayoutManager(requireContext())
         bind.rvCategories.adapter = adapter
 
-        bind.btnBack.setOnClickListener { findNavController().popBackStack() }
+        bind.btnBack.setOnClickListener { popBackStack() }
         bind.btnDone.setOnClickListener {
             viewModel.setSelectedCategories(selectedCategories.toList())
-            findNavController().popBackStack()
+            popBackStack()
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

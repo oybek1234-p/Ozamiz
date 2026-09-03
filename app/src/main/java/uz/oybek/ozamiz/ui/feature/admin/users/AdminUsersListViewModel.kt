@@ -15,6 +15,10 @@ import uz.oybek.ozamiz.data.user.model.UserSortType
 
 class AdminUsersListViewModel : ViewModel() {
 
+    companion object {
+        private const val PAGE_SIZE = 8
+    }
+
     private val _users = MutableStateFlow<List<User>>(emptyList())
     private val _isPremiumFilterActive = MutableStateFlow(false)
     val isPremiumFilterActive = _isPremiumFilterActive.asStateFlow()
@@ -55,8 +59,8 @@ class AdminUsersListViewModel : ViewModel() {
 
         _isLoading.value = true
         viewModelScope.launch {
-            AdminRepository.getUsersFromDatabase(
-                limit = 20,
+            AdminRepository.getUsers(
+                limit = PAGE_SIZE,
                 lastUserId = lastUserId,
                 sortBy = UserSortType.RECENT_ACTIVITY,
                 premiumOnly = _isPremiumFilterActive.value
@@ -71,7 +75,7 @@ class AdminUsersListViewModel : ViewModel() {
                     } else {
                         _users.value = _users.value + newList
                     }
-                    if (newList.size < 20) isLastPage = true
+                    if (newList.size < PAGE_SIZE) isLastPage = true
                 }
             }.onFailure {
                 // Handle error

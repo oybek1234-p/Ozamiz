@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
@@ -43,7 +42,7 @@ class CommunityUsersFragment : BaseFragment<FragmentCommunityUsersBinding>() {
                 putString("userId", user.uid)
                 putString("userName", user.name)
             }
-            findNavController().navigate(
+            navigate(
                 R.id.action_communityFragment_to_communityProfileFragment,
                 bundle
             )

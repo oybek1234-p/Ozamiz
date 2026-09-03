@@ -23,12 +23,6 @@ class ProfileViewModel : ViewModel() {
     private val _cashbackProgress = MutableStateFlow(0)
     val cashbackProgress = _cashbackProgress.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            UserProfileRepository.observeCurrentUser { }
-        }
-    }
-
     val userState: StateFlow<User> = LocalUser.userLive.asFlow()
         .map { user -> user }
         .stateIn(

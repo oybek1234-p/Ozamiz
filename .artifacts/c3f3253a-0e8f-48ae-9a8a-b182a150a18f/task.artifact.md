@@ -1,0 +1,4 @@
+- [x] Fix Save Button Keyboard Issue in Add Exercise
+    - [x] Move `save_button_container` inside `NestedScrollView`
+    - [x] Adjust `NestedScrollView` constraints to fill parent bottom
+- [x] Verify scrolling and button visibility with keyboard open

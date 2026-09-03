@@ -4,9 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-    app:cardCornerRadius="12dp"
+    android:layout_marginBottom="10dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+    app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
     app:strokeColor="?attr/colorOutlineVariant"
     app:strokeWidth="1dp">
@@ -16,21 +16,23 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="12dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp">
 
         <TextView
             android:id="@+id/text_emoji"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:background="@drawable/bg_emoji_circle"
             android:gravity="center"
-            android:textSize="20sp"
+            android:includeFontPadding="false"
+            android:textSize="22sp"
             tools:text="🥒" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -40,16 +42,19 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_bold"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 tools:text="Bodring va ko'katlar" />
 
             <TextView
                 android:id="@+id/text_food_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:fontFamily="@font/roboto_regular"
+                android:lineSpacingExtra="2dp"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="13sp"
-                tools:text="Deyarli kaloriyasiz va oshqozonni to'ldiradi" />
+                android:textSize="14sp"
+                tools:text="Deyarli 0 kkal — oshqozonni to'ldiradi va ochlikni bostiradi" />
         </LinearLayout>
 
     </LinearLayout>

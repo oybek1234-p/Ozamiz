@@ -5,7 +5,7 @@
     android:id="@+id/chatRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurfaceContainer"
+    android:background="?attr/colorSurfaceContainerLowest"
     android:fitsSystemWindows="false">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -20,7 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorSurfaceContainer"
+            android:background="?attr/colorSurfaceContainerLowest"
             app:title="Dietolog"
             app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge">
@@ -44,43 +44,53 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/banner_ad_container_dietolog"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="gone"
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingHorizontal="8dp"
-        android:paddingVertical="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/quick_questions_scroll"
-        app:layout_constraintTop_toBottomOf="@+id/banner_ad_container_dietolog"
+        android:paddingTop="0dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
         tools:listitem="@layout/item_chat_message" />
 
-    <HorizontalScrollView
-        android:id="@+id/quick_questions_scroll"
+    <LinearLayout
+        android:id="@+id/emptyStateLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:scrollbars="none"
-        android:clipToPadding="false"
-        android:paddingHorizontal="12dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomContainer">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="32dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chip_group_questions"
+        <TextView
             android:layout_width="wrap_content"
-            android:paddingHorizontal="@dimen/dimen_8"
             android:layout_height="wrap_content"
-            app:singleLine="true">
-        </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
+            android:text="🥗"
+            android:textSize="52sp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/emptyStateTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/roboto_medium"
+            android:gravity="center"
+            android:text="Salom! Bugun nima haqida bilmoqchisiz?"
+            android:textAlignment="center"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="20sp" />
+
+    </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottomContainer"
@@ -89,7 +99,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_marginBottom="12dp"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer"
         app:cardCornerRadius="28dp"
         app:cardElevation="0dp"
         app:strokeColor="?attr/colorOutlineVariant"

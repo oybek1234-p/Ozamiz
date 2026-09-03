@@ -2,30 +2,26 @@ package uz.oybek.ozamiz.ui.feature.ai
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.SimpleItemAnimator
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.databinding.FragmentAiChatBinding
-import uz.oybek.ozamiz.databinding.ItemSuggestionChipBinding
-import uz.oybek.ozamiz.data.ads.AdsConfig
-import uz.oybek.ozamiz.data.ads.AdsManager
-import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.premium.PremiumBottomSheetDialog
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.utils.logMessage
+import uz.oybek.ozamiz.databinding.FragmentAiChatBinding
+import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.toDp
 
 class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
@@ -35,73 +31,103 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
 
     private val viewModel: AiChatViewModel by viewModels()
     private lateinit var chatAdapter: AiChatAdapter
-    private var currentChipsQuestions: List<String>? = null
+    private var isSendButtonActive: Boolean? = null
+    private var shouldAnchorNewQuestion = false
+    private var capturedParentHeight: Int = 0
 
     override fun inflateBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
     ) = FragmentAiChatBinding.inflate(inflater, container, false)
 
-    override fun onResume() {
-        super.onResume()
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        activity?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-    }
-
-    private var isSendButtonActive: Boolean? = null
-
     override fun viewCreated(bind: FragmentAiChatBinding) {
-        setupRecyclerViews(bind)
+        setupRecyclerView(bind)
         setupListeners(bind)
         handleInitialArguments()
         setupKeyboardListener(bind)
         observeState(bind)
-        setupPremiumListener()
-        initBannerAd(bind)
+
         bind.sendButton.scaleX = 0.85f
         bind.sendButton.scaleY = 0.85f
         bind.sendButton.alpha = 0.5f
+
+        focusMessageInput(bind)
     }
 
-    private fun initBannerAd(bind: FragmentAiChatBinding) {
-        if (user.isPremium()) return
-        val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_DIETOLOG)
-        bind.bannerAdContainerDietolog.removeAllViews()
-        bind.bannerAdContainerDietolog.addView(bannerView)
-        bind.bannerAdContainerDietolog.visibility = android.view.View.VISIBLE
-    }
-
-    private fun setupPremiumListener() {
-        setFragmentResultListener(PremiumBottomSheetDialog.REQUEST_KEY) { _, bundle ->
-            val result = bundle.getString(PremiumBottomSheetDialog.RESULT_ACTION)
-            if (result == "go_to_payment") {
-                val price = bundle.getLong("selected_price", 29000L)
-                val isYearly = bundle.getBoolean("is_yearly", false)
-                val args = androidx.core.os.bundleOf("price" to price, "is_yearly" to isYearly)
-                findNavController().navigate(R.id.paymentGetCheckFragment, args)
+    private fun setupRecyclerView(bind: FragmentAiChatBinding) {
+        chatAdapter = AiChatAdapter()
+        bind.chatRecyclerView.apply {
+            adapter = chatAdapter
+            layoutManager = LinearLayoutManager(requireContext()).apply {
+                stackFromEnd = false
             }
-        }
-        setFragmentResultListener("payment_check_submitted") { _, bundle ->
-            if (bundle.getBoolean("submitted")) {
-                PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
-            }
+            (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         }
     }
 
-    private fun checkPremium(action: () -> Unit) {
+    private fun focusMessageInput(bind: FragmentAiChatBinding) {
+        bind.messageEditText.post {
+            if (isAdded) {
+                bind.messageEditText.requestFocus()
+                val imm =
+                    requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+                imm?.showSoftInput(
+                    bind.messageEditText,
+                    android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
+                )
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshLimitState()
+    }
+
+    private fun showChatLimitReachedDialog() {
+        val act = activity ?: return
+        if (act.isFinishing || act.isDestroyed) return
+        val isPremium = user.isPremium()
+
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(act)
+        val limitBinding = uz.oybek.ozamiz.databinding.BottomSheetLimitReachedBinding.inflate(act.layoutInflater)
+        dialog.setContentView(limitBinding.root)
+
+        limitBinding.textLimitTitle.text = getString(uz.oybek.ozamiz.R.string.ai_chat_limit_title)
+        limitBinding.textLimitMessage.text = if (isPremium) {
+            getString(uz.oybek.ozamiz.R.string.ai_chat_limit_msg_premium)
+        } else {
+            getString(uz.oybek.ozamiz.R.string.ai_chat_limit_msg_free)
+        }
+
+        limitBinding.btnManualSearch.isVisible = false
+        limitBinding.btnBuyPremium.isVisible = !isPremium
+        limitBinding.btnBuyPremium.setOnClickListener {
+            try {
+                if (dialog.isShowing) dialog.dismiss()
+            } catch (_: Exception) {}
+            val navHostFragment = act.supportFragmentManager.findFragmentById(uz.oybek.ozamiz.R.id.container) as? androidx.navigation.fragment.NavHostFragment
+            try {
+                navHostFragment?.navController?.navigate(uz.oybek.ozamiz.R.id.premiumFragment)
+            } catch (_: Exception) {}
+        }
+
+        if (!act.isFinishing && !act.isDestroyed) {
+            dialog.show()
+        }
+    }
+
+    private fun checkCanSend(action: () -> Unit) {
         if (viewModel.canSendMessage()) {
             action()
-            return
         } else {
-            PremiumBottomSheetDialog().show(parentFragmentManager, PremiumBottomSheetDialog.TAG)
+            showChatLimitReachedDialog()
         }
     }
 
     private fun setupKeyboardListener(bind: FragmentAiChatBinding) {
+        var isImeAnimationRunning = false
+
         val applyPadding = { insets: WindowInsetsCompat ->
             val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -111,23 +137,50 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
             } else {
                 maxOf(0, imeInsets.bottom - bottomMarginOffset - systemBars.bottom)
             }
+            logMessage("KeyboardInsets -> ime.bottom: ${imeInsets.bottom}, systemBars.bottom: ${systemBars.bottom}, bottomMarginOffset: $bottomMarginOffset, final bottomPadding: $bottomPadding", tag = "AiChatKeyboard")
             bind.root.setPadding(0, 0, 0, bottomPadding)
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(bind.root) { v, insets ->
-            applyPadding(insets)
+        ViewCompat.setOnApplyWindowInsetsListener(bind.root) { _, insets ->
+            if (!isImeAnimationRunning) {
+                applyPadding(insets)
+            }
             insets
         }
 
         ViewCompat.setWindowInsetsAnimationCallback(
             bind.root,
             object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+                override fun onPrepare(animation: WindowInsetsAnimationCompat) {
+                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
+                        isImeAnimationRunning = true
+                    }
+                    super.onPrepare(animation)
+                }
+
+                override fun onStart(
+                    animation: WindowInsetsAnimationCompat,
+                    bounds: WindowInsetsAnimationCompat.BoundsCompat
+                ): WindowInsetsAnimationCompat.BoundsCompat {
+                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
+                        isImeAnimationRunning = true
+                    }
+                    return super.onStart(animation, bounds)
+                }
+
                 override fun onProgress(
                     insets: WindowInsetsCompat,
                     runningAnimations: MutableList<WindowInsetsAnimationCompat>
                 ): WindowInsetsCompat {
                     applyPadding(insets)
                     return insets
+                }
+
+                override fun onEnd(animation: WindowInsetsAnimationCompat) {
+                    super.onEnd(animation)
+                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
+                        isImeAnimationRunning = false
+                    }
                 }
             }
         )
@@ -140,28 +193,21 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
             showBottomSheet = false
             binding.toolbar.setNavigationIcon(R.drawable.arrow_back)
             binding.toolbar.setNavigationOnClickListener {
-                findNavController().popBackStack()
+                popBackStack()
             }
             if (!prompt.isNullOrBlank()) {
-                viewModel.run {
-                    startNewChat(true)
-                    sendMessage(prompt) {}
+                val visibleHeight = binding.chatRecyclerView.height
+                chatAdapter.activeTurnMinHeight = maxOf(0, visibleHeight - toDp(60f, requireContext()))
+                shouldAnchorNewQuestion = true
+                if (viewModel.canSendMessage()) {
+                    viewModel.sendMessage(prompt) {}
+                } else {
+                    showChatLimitReachedDialog()
                 }
                 arguments?.remove("initialPrompt")
             }
         } else {
             binding.toolbar.navigationIcon = null
-        }
-    }
-
-    private fun setupRecyclerViews(bind: FragmentAiChatBinding) {
-        chatAdapter = AiChatAdapter()
-        bind.chatRecyclerView.apply {
-            adapter = chatAdapter
-            layoutManager = LinearLayoutManager(requireContext()).apply {
-                stackFromEnd = true
-            }
-            (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
         }
     }
 
@@ -209,7 +255,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                 .setDuration(200)
                 .setInterpolator(android.view.animation.DecelerateInterpolator())
                 .start()
-        }
+                }
     }
 
     private fun setupListeners(bind: FragmentAiChatBinding) {
@@ -223,64 +269,118 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
 
+        bind.messageEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEND) {
+                bind.sendButton.performClick()
+                true
+            } else {
+                false
+            }
+        }
+
         bind.sendButton.setOnClickListener {
-            checkPremium {
-                val text = bind.messageEditText.text.toString()
-                if (text.isNotBlank()) {
-                    viewModel.sendMessage(text, done = {})
+            val text = bind.messageEditText.text.toString()
+            if (text.isNotBlank() && !viewModel.isLoading.value) {
+                checkCanSend {
+                    // 1. Parent (RecyclerView) balandligini klaviatura yopilishidan OLDIN hisoblab olamiz
+                    capturedParentHeight = bind.chatRecyclerView.height
+                    shouldAnchorNewQuestion = true
+
+                    viewModel.sendMessage(text, ignoreLimit = false, done = {})
                     bind.messageEditText.text.clear()
 
-                    bind.chatRecyclerView.postDelayed({
-                        val smoothScroller = object : LinearSmoothScroller(requireContext()) {
-                            override fun getVerticalSnapPreference(): Int {
-                                return SNAP_TO_START
-                            }
-                        }
-
-                        val lastPos = chatAdapter.itemCount - 1
-                        if (lastPos >= 0) {
-                            smoothScroller.targetPosition = lastPos
-                            bind.chatRecyclerView.layoutManager?.startSmoothScroll(smoothScroller)
-                        }
-                    }, 100)
+                    // 2. Klaviatura o'lchov olingandan keyin yopiladi
+                    hideKeyboardAndClearFocus(bind)
                 }
             }
         }
 
         bind.btnNewChat.setOnClickListener {
-            checkPremium {
-                viewModel.startNewChat(true)
-            }
+            viewModel.startNewChat(true)
+            chatAdapter.activeTurnMinHeight = 0
+            focusMessageInput(bind)
         }
     }
 
+    private fun hideKeyboardAndClearFocus(bind: FragmentAiChatBinding) {
+        bind.messageEditText.clearFocus()
+        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+        imm?.hideSoftInputFromWindow(bind.messageEditText.windowToken, 0)
+    }
+
+    private val centerGreetings = listOf(
+        "Bugun sizga qanday yordam bera olaman?",
+        "Ovqatlanish yoki vazn haqida istalgan savolingizni bering",
+        "Savolingiz bormi? Maslahat berishga tayyorman",
+        "Ratsioningiz yoki kaloriyangiz haqida gaplashamizmi?",
+        "Sog'lom turmush tarzi bo'yicha qanday yordam kerak?"
+    )
+
     private fun observeState(bind: FragmentAiChatBinding) {
+        // Messages collector — mustaqil launch blokda
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.messages.collect { messages ->
+                android.util.Log.d("AiChatDebug", ">>> messages.collect FIRED: size=${messages.size}")
+                val isEmpty = messages.isEmpty()
+                if (isEmpty && !bind.emptyStateLayout.isVisible) {
+                    bind.emptyStateTitle.text = centerGreetings.random()
+                }
+                bind.emptyStateLayout.isVisible = isEmpty
+                bind.chatRecyclerView.isVisible = !isEmpty
+
+                val wasEmpty = chatAdapter.itemCount == 0
+                chatAdapter.submitList(messages.toList()) {
+                    if (shouldAnchorNewQuestion && messages.isNotEmpty()) {
+                        shouldAnchorNewQuestion = false
+                        val userPos = messages.indexOfLast { it.isUser }
+                        val aiPos = messages.indexOfLast { !it.isUser }
+
+                        if (userPos >= 0) {
+                            bind.chatRecyclerView.post {
+                                val lm = bind.chatRecyclerView.layoutManager as? LinearLayoutManager
+                                val userView = lm?.findViewByPosition(userPos)
+                                val userHeight = userView?.height ?: toDp(60f, requireContext())
+                                val rv = bind.chatRecyclerView
+
+                                val fullOpenRvHeight = rv.height + bind.root.paddingBottom
+                                val availableHeight = maxOf(0, fullOpenRvHeight - userHeight - rv.paddingBottom - rv.paddingTop)
+
+                                logMessage("FullOpenCalc -> rv.height: ${rv.height}, rootPaddingBottom: ${bind.root.paddingBottom}, fullOpenRvHeight: $fullOpenRvHeight, userHeight: $userHeight, availableHeight: $availableHeight", tag = "AiChatKeyboard")
+
+                                chatAdapter.activeTurnMinHeight = availableHeight
+
+                                if (aiPos >= 0) {
+                                    chatAdapter.notifyItemChanged(aiPos)
+                                }
+
+                                bind.chatRecyclerView.post {
+                                    logMessage("Scrolling -> smooth scroll to userPos: $userPos", tag = "AiChatKeyboard")
+                                    val smoothScroller = object : LinearSmoothScroller(requireContext()) {
+                                        override fun getVerticalSnapPreference(): Int {
+                                            return SNAP_TO_START
+                                        }
+                                    }
+                                    smoothScroller.targetPosition = userPos
+                                    lm?.startSmoothScroll(smoothScroller)
+                                }
+                            }
+                        }
+                    } else if (wasEmpty && messages.isNotEmpty()) {
+                        bind.chatRecyclerView.scrollToPosition(messages.size - 1)
+                    }
+                }
+            }
+        }
+
+        // Remaining va isLoading — repeatOnLifecycle ichida
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.messages.collect { messages ->
-                        val layoutManager =
-                            bind.chatRecyclerView.layoutManager as? LinearLayoutManager
-                        val lastVisibleItem = layoutManager?.findLastVisibleItemPosition() ?: -1
-                        val itemCount = chatAdapter.itemCount
-                        val shouldScrollToBottom =
-                            lastVisibleItem >= itemCount - 3 || lastVisibleItem == -1
-
-                        chatAdapter.submitList(messages) {
-                            if (messages.isNotEmpty() && shouldScrollToBottom) {
-                                val lastIndex = messages.size - 1
-                                val lastViewHolder =
-                                    bind.chatRecyclerView.findViewHolderForAdapterPosition(lastIndex)
-                                if (lastViewHolder != null) {
-                                    val topOfLastItem = lastViewHolder.itemView.top
-                                    val minTopMargin = toDp(16f, requireContext())
-                                    if (topOfLastItem > minTopMargin) {
-                                        bind.chatRecyclerView.smoothScrollToPosition(lastIndex)
-                                    }
-                                } else {
-                                    bind.chatRecyclerView.smoothScrollToPosition(lastIndex)
-                                }
-                            }
+                    viewModel.remainingMessages.collect { remaining ->
+                        if (remaining <= 0) {
+                            bind.messageEditText.hint = getString(uz.oybek.ozamiz.R.string.ai_chat_limit_hint)
+                        } else {
+                            bind.messageEditText.hint = "Xabar yozing..."
                         }
                     }
                 }
@@ -289,51 +389,6 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                     viewModel.isLoading.collect { isLoading ->
                         val hasText = !bind.messageEditText.text.isNullOrBlank()
                         updateSendButtonState(bind, hasText, isLoading)
-                    }
-                }
-
-                launch {
-                    viewModel.suggestedQuestions.collect { questions ->
-                        bind.quickQuestionsScroll.isVisible = questions.isNotEmpty()
-                        if (questions.isNotEmpty()) {
-                            if (questions != currentChipsQuestions) {
-                                currentChipsQuestions = questions
-                                bind.chipGroupQuestions.removeAllViews()
-                                questions.forEach { question ->
-                                    val chip =
-                                        ItemSuggestionChipBinding.inflate(layoutInflater).apply {
-                                            textView.text = question
-                                            root.setOnClickListener {
-                                                checkPremium {
-                                                    viewModel.sendMessage(question)
-                                                    bind.chatRecyclerView.postDelayed({
-                                                        val smoothScroller = object :
-                                                            LinearSmoothScroller(requireContext()) {
-                                                            override fun getVerticalSnapPreference(): Int {
-                                                                return SNAP_TO_START
-                                                            }
-                                                        }
-                                                        val lastPos = chatAdapter.itemCount - 1
-                                                        if (lastPos >= 0) {
-                                                            smoothScroller.targetPosition =
-                                                                lastPos
-                                                            bind.chatRecyclerView.layoutManager?.startSmoothScroll(
-                                                                smoothScroller
-                                                            )
-                                                        }
-                                                    }, 100)
-                                                }
-                                            }
-                                        }
-                                    bind.chipGroupQuestions.addView(chip.root)
-                                }
-                            }
-                        } else {
-                            if (currentChipsQuestions != null) {
-                                currentChipsQuestions = null
-                                bind.chipGroupQuestions.removeAllViews()
-                            }
-                        }
                     }
                 }
             }

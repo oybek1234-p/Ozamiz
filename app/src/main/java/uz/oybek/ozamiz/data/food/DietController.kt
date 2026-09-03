@@ -30,6 +30,33 @@ object DietController {
         return calendar.time
     }
 
+    fun getGoalDurationText(user: User = LocalUser.user): String {
+        val currentWeight = user.weight
+        val targetWeight = user.targetWeight ?: currentWeight
+        if (currentWeight == targetWeight || currentWeight <= 0.0) return "1 oy"
+
+        val isGain = user.goal == "gain_weight"
+        val diffKg = kotlin.math.abs(currentWeight - targetWeight)
+
+        val tdee = calculateTDEE(user)
+        val targetCals = if (user.targetCalories > 0) user.targetCalories else calculateTargetCalories(user)
+
+        val deltaCals = if (isGain) {
+            maxOf(200, targetCals - tdee.toInt())
+        } else {
+            maxOf(200, tdee.toInt() - targetCals)
+        }
+
+        val totalDays = maxOf(7, ((diffKg * 7700.0) / deltaCals).roundToInt())
+        val months = totalDays / 30
+        val days = totalDays % 30
+
+        val monthStr = if (months > 0) "$months oy " else ""
+        val dayStr = if (days > 0) "$days kun" else ""
+        val result = (monthStr + dayStr).trim()
+        return if (result.isNotEmpty()) result else "1 oy"
+    }
+
     fun getIdealWeight(heightCm: Double): Pair<Int, Int> {
         val heightM = heightCm / 100.0
         val low = (18.5 * heightM * heightM).toInt()
@@ -64,7 +91,7 @@ object DietController {
         } else {
             tdee - DEFICIT_CALORIES
         }
-        val minimumCalories = if (user.gender == Gender.MALE) 1500.0 else 1200.0
+        val minimumCalories = if (user.gender == Gender.MALE) 1200.0 else 1000.0
         return maxOf(target, minimumCalories).roundToInt()
     }
 

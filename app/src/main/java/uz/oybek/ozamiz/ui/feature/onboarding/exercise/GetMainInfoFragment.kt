@@ -11,7 +11,6 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.android.material.color.MaterialColors
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.DietController
@@ -57,7 +56,7 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
     private fun setupToolbar(bind: GetInfoMainFragmentBinding) {
         bind.toolbar.apply {
             setNavigationIcon(R.drawable.arrow_back)
-            setNavigationOnClickListener { findNavController().popBackStack() }
+            setNavigationOnClickListener { popBackStack() }
         }
     }
 
@@ -79,14 +78,14 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         val activityAdapter = ArrayAdapter(
             requireContext(),
             R.layout.list_item,
-            UserActivityLevel.entries.map { "${it.title} (${it.subtitle})" }
+            UserActivityLevel.entries.map { "${it.title} - ${it.subtitle}" }
         )
 
         (harakatView.editText as? AutoCompleteTextView)?.apply {
             setAdapter(activityAdapter)
             UserActivityLevel.entries.find { it.name == user.activityLevel }?.let {
                 activityLevelSelected = it.name
-                setText("${it.title} (${it.subtitle})", false)
+                setText("${it.title} - ${it.subtitle}", false)
             }
             onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
                 activityLevelSelected = UserActivityLevel.entries[position].name
@@ -191,42 +190,70 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
 
         bind.cardLoseWeight.strokeWidth = if (isLose) 2.dpToPx() else 1.dpToPx()
         bind.cardLoseWeight.strokeColor = if (isLose) primaryColor else outlineColor
-        bind.cardLoseWeight.setCardBackgroundColor(if (isLose) primaryContainer else cardBgLowest)
+        bind.cardLoseWeight.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(if (isLose) primaryContainer else cardBgLowest))
+        bind.cardLoseWeight.cardElevation = if (isLose) 6.dpToPx().toFloat() else 0f
 
         bind.cardGainWeight.strokeWidth = if (!isLose) 2.dpToPx() else 1.dpToPx()
         bind.cardGainWeight.strokeColor = if (!isLose) primaryColor else outlineColor
-        bind.cardGainWeight.setCardBackgroundColor(if (!isLose) primaryContainer else cardBgLowest)
+        bind.cardGainWeight.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(if (!isLose) primaryContainer else cardBgLowest))
+        bind.cardGainWeight.cardElevation = if (!isLose) 6.dpToPx().toFloat() else 0f
     }
 
     private fun updatePaceCardsUI(bind: GetInfoMainFragmentBinding) {
-        val primaryColor = MaterialColors.getColor(requireContext(), androidx.appcompat.R.attr.colorPrimary, 0)
-        val outlineColor = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOutlineVariant, 0)
-        val cardBgUnselected = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainer, 0)
-        val primaryContainer = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorPrimaryContainer, 0)
+        val selectedBg = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerHigh, 0)
+        val unselectedBg = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerLowest, 0)
+
+        val selectedStroke = MaterialColors.getColor(requireContext(), androidx.appcompat.R.attr.colorPrimary, 0)
+        val unselectedStroke = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOutlineVariant, 0)
+
+        val onSurfaceColor = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOnSurface, 0)
+        val onSurfaceVariant = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOnSurfaceVariant, 0)
+        val surfaceContainerHighest = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerHighest, 0)
 
         val isGain = selectedGoal == "gain_weight"
         val isNormalSelected = selectedPace == 500 || selectedPace == 400
 
-        bind.textSpeedSectionTitle.text = if (isGain) "Semirish tezligi" else "Ozish tezligi"
+        bind.textSpeedSectionTitle.text = if (isGain) "Semirish tezligini tanlang" else "Ozish tezligini tanlang"
 
-        // Normal card
+        // --- NORMAL CARD ---
+        val normalBg = if (isNormalSelected) selectedBg else unselectedBg
+        bind.cardPaceNormal.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(normalBg))
         bind.cardPaceNormal.strokeWidth = if (isNormalSelected) 2.dpToPx() else 1.dpToPx()
-        bind.cardPaceNormal.strokeColor = if (isNormalSelected) primaryColor else outlineColor
-        bind.cardPaceNormal.setCardBackgroundColor(if (isNormalSelected) primaryContainer else cardBgUnselected)
-        bind.iconPaceNormalCheck.isVisible = isNormalSelected
+        bind.cardPaceNormal.strokeColor = if (isNormalSelected) selectedStroke else unselectedStroke
+        bind.cardPaceNormal.cardElevation = if (isNormalSelected) 2.dpToPx().toFloat() else 0f
 
-        // Fast card
+        bind.framePaceNormalIcon.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            if (isNormalSelected) surfaceContainerHighest else unselectedBg
+        )
+        bind.iconPaceNormal.imageTintList = android.content.res.ColorStateList.valueOf(
+            if (isNormalSelected) onSurfaceColor else onSurfaceVariant
+        )
+        bind.textPaceNormalLabel.setTextColor(if (isNormalSelected) onSurfaceColor else onSurfaceVariant)
+        bind.textPaceNormalTitle.setTextColor(if (isNormalSelected) onSurfaceColor else onSurfaceVariant)
+
+        // --- FAST CARD ---
+        val fastBg = if (!isNormalSelected) selectedBg else unselectedBg
+        bind.cardPaceFast.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(fastBg))
         bind.cardPaceFast.strokeWidth = if (!isNormalSelected) 2.dpToPx() else 1.dpToPx()
-        bind.cardPaceFast.strokeColor = if (!isNormalSelected) primaryColor else outlineColor
-        bind.cardPaceFast.setCardBackgroundColor(if (!isNormalSelected) primaryContainer else cardBgUnselected)
-        bind.iconPaceFastCheck.isVisible = !isNormalSelected
+        bind.cardPaceFast.strokeColor = if (!isNormalSelected) selectedStroke else unselectedStroke
+        bind.cardPaceFast.cardElevation = if (!isNormalSelected) 2.dpToPx().toFloat() else 0f
 
+        bind.framePaceFastIcon.backgroundTintList = android.content.res.ColorStateList.valueOf(
+            if (!isNormalSelected) surfaceContainerHighest else unselectedBg
+        )
+        bind.iconPaceFast.imageTintList = android.content.res.ColorStateList.valueOf(
+            if (!isNormalSelected) onSurfaceColor else onSurfaceVariant
+        )
+        bind.textPaceFastLabel.setTextColor(if (!isNormalSelected) onSurfaceColor else onSurfaceVariant)
+        bind.textPaceFastTitle.setTextColor(if (!isNormalSelected) onSurfaceColor else onSurfaceVariant)
+
+        // Update Subtitle Texts
         if (isGain) {
-            bind.textPaceNormalTitle.text = "Normal semirish (+400 kkal)"
-            bind.textPaceFastTitle.text = "Tezroq semirish (+600 kkal)"
+            bind.textPaceNormalTitle.text = "+1.6 kg / oy"
+            bind.textPaceFastTitle.text = "+2.4 kg / oy"
         } else {
-            bind.textPaceNormalTitle.text = "Normal ozish (-500 kkal)"
-            bind.textPaceFastTitle.text = "Tezroq ozish (-700 kkal)"
+            bind.textPaceNormalTitle.text = "-1.8 kg / oy"
+            bind.textPaceFastTitle.text = "-2.8 kg / oy"
         }
     }
 
@@ -250,10 +277,11 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         val isGain = selectedGoal == "gain_weight"
         val deltaCals = if (selectedPace > 0) selectedPace else (if (isGain) 400 else 500)
 
+        val minCals = if (tempUser.gender == Gender.MALE) 1200 else 1000
         val targetCals = if (isGain) {
             tdee + deltaCals
         } else {
-            maxOf(tdee - deltaCals, if (tempUser.gender == Gender.MALE) 1500 else 1200)
+            maxOf(tdee - deltaCals, minCals)
         }
 
         bind.editCalories.setText(targetCals.toString())
@@ -268,28 +296,36 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
         bind.editFat.setText(macros.fat.toString())
         bind.editCarbs.setText(macros.carbs.toString())
 
+        val actualDeficit = if (isGain) deltaCals else maxOf(0, tdee - targetCals)
+
         val weeklyKg = if (isGain) {
             if (deltaCals == 600) 0.6 else 0.4
         } else {
-            if (deltaCals == 700) 0.7 else 0.5
+            val calcW = (actualDeficit * 7.0) / 7700.0
+            if (calcW > 0) calcW else 0.5
         }
 
         val (weeklyStr, monthlyStr) = if (isGain) {
             if (deltaCals == 600) Pair("0.6", "2.4") else Pair("0.4", "1.6")
         } else {
-            if (deltaCals == 700) Pair("0.7", "2.8") else Pair("0.5", "1.8")
+            val calcW = (actualDeficit * 7.0) / 7700.0
+            val calcM = (actualDeficit * 30.0) / 7700.0
+            Pair(
+                String.format(java.util.Locale.US, "%.1f", calcW),
+                String.format(java.util.Locale.US, "%.1f", calcM)
+            )
         }
 
         val durationStr = getDurationText(curW, tarW, weeklyKg)
 
         if (isGain) {
             bind.textEnergySummary.text =
-                "Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi, $deltaCals kkal ortiqcha yesak vazn yig'ish boshlanadi. Natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg semirasiz. Maqsadga esa $durationStr erishasiz."
+                "• Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi,\n\n• $deltaCals kkal ortiqcha yesak vazn yig'ish boshlanadi.\n\n• Natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg semirasiz.\n\n• Maqsadga esa $durationStr erishasiz."
         } else {
             val deficitAmount = tdee - targetCals
             val defVal = if (deficitAmount > 0) deficitAmount else deltaCals
             bind.textEnergySummary.text =
-                "Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi, $defVal kkal kamroq ovqat yeymiz natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg ozasiz. Maqsadga esa $durationStr erishasiz."
+                "• Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi,\n\n• $defVal kkal kamroq ovqat yeymiz natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg ozasiz.\n\n• Maqsadga esa $durationStr erishasiz."
         }
     }
 
@@ -439,11 +475,11 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             when (event) {
                 is GetInfoNavigationEvent.ShowToast -> showToast(event.message)
                 is GetInfoNavigationEvent.NavigateToHome -> {
-                    findNavController().popBackStack()
+                    popBackStack()
                 }
 
                 is GetInfoNavigationEvent.NavigateToCongratulation -> {
-                    findNavController().popBackStack()
+                    popBackStack()
                 }
             }
         }

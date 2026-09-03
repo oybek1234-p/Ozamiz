@@ -49,6 +49,16 @@ class CommunityUsersAdapter(
             val level = LevelRepository.getCurrentLevel(user.scorePoints)
             binding.tvLevel.text = "${level.emoji} ${level.name} • ${user.scorePoints} ball"
 
+            val startWeight = user.startWeight ?: 0.0
+            val currentWeight = user.weight
+            if (startWeight > currentWeight && currentWeight > 0) {
+                val lost = startWeight - currentWeight
+                binding.tvWeightLoss.isVisible = true
+                binding.tvWeightLoss.text = String.format(java.util.Locale.US, "-%.1f kg", lost)
+            } else {
+                binding.tvWeightLoss.isVisible = false
+            }
+
             binding.tvLastSeen.text = formatLastSeen(user.lastSeenTime)
 
             Glide.with(binding.imgAvatar)

@@ -58,12 +58,14 @@
         android:layout_marginVertical="16dp"
         android:background="?attr/colorOutlineVariant" />
 
+    <!-- Porsiya bo'yicha tanlash qismi -->
     <LinearLayout
+        android:id="@+id/layout_portion_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <!-- Miqdor kiritish va +/- tugmalari (TextInputLayout bilan bir xil chiziqda) -->
+        <!-- Miqdor kiritish va +/- tugmalari -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -122,12 +124,49 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
+    <!-- Gramm kiritish qismi (Gramni kiritish tugmasi bosilganda) -->
+    <LinearLayout
+        android:id="@+id/layout_gram_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Taom vazni (grammda)"
+            app:suffixText="g"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_text_grams"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- Rejimni almashtirish tugmasi -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button_toggle_mode"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/roboto_medium"
+        android:text="Gramni kiritish"
+        android:textColor="?attr/colorPrimary"
+        app:icon="@drawable/edit" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_log_food"
         style="@style/FilledButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/roboto_bold"
         android:text="Qo'shish"
         android:textSize="16sp"

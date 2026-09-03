@@ -5,38 +5,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
-    android:layout_marginHorizontal="@dimen/dimen_12"
     android:background="@drawable/bg_rounded_16"
+    android:backgroundTint="?attr/colorSurfaceContainerLowest"
     android:clickable="true"
     android:focusable="true"
-    android:backgroundTint="?attr/colorSurfaceContainerLowest"
+    android:foreground="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
+    android:paddingStart="0dp"
+    android:paddingEnd="16dp"
     android:paddingVertical="12dp">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/imageView_food"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:scaleType="centerCrop"
+        android:layout_marginEnd="12dp"
         app:shapeAppearanceOverlay="@style/RadiusImageView12"
         tools:src="@drawable/placeholder_food" />
 
     <LinearLayout
+        android:id="@+id/layout_food_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/textView_food_name"
-            style="@style/Text1_14"
+            style="@style/Headline3_15"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="1"
+            android:maxLines="2"
             android:textColor="?colorOnSurface"
             tools:text="Grilda Pishirilgan Losos" />
 
@@ -49,7 +51,7 @@
 
             <TextView
                 android:id="@+id/textView_food_calories"
-                style="@style/Caption2_12"
+                style="@style/Caption1_13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?colorOnSurfaceVariant"
@@ -66,7 +68,7 @@
 
             <TextView
                 android:id="@+id/textView_timestamp"
-                style="@style/Caption2_12"
+                style="@style/Caption1_13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
@@ -76,28 +78,47 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/btn_like_food"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+    <LinearLayout
+        android:id="@+id/layout_actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:padding="6dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/ic_heart_outline"
-        app:tint="?colorOnSurfaceVariant" />
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/btn_delete_food"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginStart="8dp"
-        android:padding="6dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/delete_ic"
-        app:tint="?colorOnSurfaceVariant" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_delete_food"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="6dp"
+            android:text="@string/delete"
+            android:textColor="?attr/colorError"
+            android:textSize="12sp"
+            android:fontFamily="@font/roboto_medium"
+            app:backgroundTint="?attr/colorErrorContainer"
+            app:cornerRadius="10dp"
+            app:icon="@drawable/delete_ic"
+            app:iconGravity="textStart"
+            app:iconSize="16dp"
+            app:iconTint="?attr/colorError"
+            app:iconPadding="4dp"
+            app:rippleColor="?attr/colorError" />
+
+        <TextView
+            android:id="@+id/textView_edit_food"
+            style="@style/Caption2_12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="O'zgartirish"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
+    </LinearLayout>
 
 </LinearLayout>

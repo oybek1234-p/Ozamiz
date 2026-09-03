@@ -112,7 +112,7 @@ class LogFoodViewModel() : ViewModel() {
 
     fun deleteFoodLog(foodLog: FoodLog, date: Date) {
         viewModelScope.launch {
-            FoodLogRepository.delete(foodLog.logId, date)
+            FoodLogRepository.delete(foodLog, date)
         }
     }
 
@@ -130,7 +130,7 @@ class LogFoodViewModel() : ViewModel() {
                 timestamp = System.currentTimeMillis(),
                 mealType = state.value.meal
             )
-            FoodLogRepository.add(null, log, state.value.date, shouldShare = false)
+            FoodLogRepository.add(log, state.value.date)
             StreakRepository.updateStreak()
             _loadingFoodIds.update { it - foodLog.logId }
         }
@@ -153,16 +153,7 @@ class LogFoodViewModel() : ViewModel() {
     }
 
     fun canAddLog(canAdd: (can: Boolean, limited: Boolean) -> Unit) {
-        if (user.isPremium()) {
-            canAdd.invoke(true, false)
-        } else {
-            if (AppPreference.getFoodLogLimitCount() <= 6 && (user.streakInfo?.bestStreak
-                    ?: 0) < 7
-            ) {
-                canAdd.invoke(true, true)
-            } else {
-                canAdd.invoke(false, true)
-            }
-        }
+        val can = uz.oybek.ozamiz.data.food.limit.FoodLimitManager.canLogFood(user)
+        canAdd.invoke(can, !user.isPremium())
     }
 }

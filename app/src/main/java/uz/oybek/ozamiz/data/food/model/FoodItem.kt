@@ -9,7 +9,9 @@ data class FoodItem(
     val carbsPer100g: Double = 0.0,
     val servingSizes: List<ServingSize> = emptyList(),
     val isVerified: Boolean = false,
-    val category: String = ""
+    val category: String = "",
+    val isPopular: Boolean = false,
+    val searchAliases: List<String> = emptyList()
 )
 
 data class ServingSize(

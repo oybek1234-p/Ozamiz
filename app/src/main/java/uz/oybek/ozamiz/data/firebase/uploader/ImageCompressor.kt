@@ -27,7 +27,7 @@ object ImageCompressor {
             val file = fromUri(uri) ?: return@withContext null
 
             val compressedFile = Compressor.compress(appContext, file) {
-                resolution(500, 500)
+                resolution(512, 512)
                 quality(85)
                 format(Bitmap.CompressFormat.WEBP)
                 size(maxSizeKb * 1024L)
@@ -51,7 +51,7 @@ object ImageCompressor {
             val file = fromUri(uri) ?: return@withContext DataWrapper.Error()
 
             val compressedFile = Compressor.compress(appContext, file) {
-                resolution(500, 500)
+                resolution(512, 512)
                 quality(85)
                 format(Bitmap.CompressFormat.WEBP)
                 size(maxSizeKb * 1024L)
@@ -72,8 +72,8 @@ object ImageCompressor {
 
     suspend fun compressImageToUri(
         uri: Uri,
-        maxWidth: Int = 1024,
-        maxHeight: Int = 1024,
+        maxWidth: Int = 512,
+        maxHeight: Int = 512,
         quality: Int = 80,
         maxSizeKb: Int = 50
     ): Uri? = withContext(Dispatchers.IO) {
@@ -99,8 +99,8 @@ object ImageCompressor {
 
     suspend fun compressImageToFile(
         uri: Uri,
-        maxWidth: Int = 1024,
-        maxHeight: Int = 1024,
+        maxWidth: Int = 512,
+        maxHeight: Int = 512,
         quality: Int = 80,
         maxSizeKb: Int = 50
     ): File? = withContext(Dispatchers.IO) {
@@ -130,7 +130,7 @@ object ImageCompressor {
     ): File? = withContext(Dispatchers.IO) {
         try {
             val compressedFile = Compressor.compress(appContext, file) {
-                resolution(500, 500)
+                resolution(512, 512)
                 quality(85)
                 format(Bitmap.CompressFormat.WEBP)
                 size(maxSizeKb * 1024L)

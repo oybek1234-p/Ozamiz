@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
@@ -59,7 +58,7 @@ class WeightHistoryFragment : BaseFragment<FragmentWeightHistoryBinding>() {
 
     private fun initToolbar(bind: FragmentWeightHistoryBinding) {
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
         
         bind.btnAddWeightHistory.setOnClickListener {

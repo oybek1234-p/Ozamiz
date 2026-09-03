@@ -21,6 +21,9 @@
         "admin": {
           ".validate": "newData.isBoolean() && (root.child('users').child(auth.uid).child('admin').val() === true || (auth.uid === $uid && (newData.val() === false || newData.val() === data.val())))"
         },
+        "isRated": {
+          ".validate": "newData.isBoolean()"
+        },
         "$other": {
           ".validate": "data.exists() || newData.exists()"
         }

@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.ui.feature.home
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.DietController
@@ -24,9 +23,11 @@ class WeeklyPredictionFragment : BaseFragment<FragmentWeeklyPredictionBinding>()
     }
 
     override fun viewCreated(bind: FragmentWeeklyPredictionBinding) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val u = user
             val todaySummary = LogRepository.getDailySummarySync(Date())
+            if (!isAdded || isDetached || context == null) return@launch
+
             val target = if (u.targetCalories > 0) u.targetCalories else DietController.calculateTargetCalories(u)
             val tdee = DietController.calculateTDEE(u)
             val netConsumed = maxOf(target.toDouble(), todaySummary.consumedCalories.toDouble() - todaySummary.burnedCalories.toDouble())
@@ -35,11 +36,13 @@ class WeeklyPredictionFragment : BaseFragment<FragmentWeeklyPredictionBinding>()
             val formattedLoss = String.format(Locale.US, "%.1f", minOf(1.0, maxOf(0.3, weeklyLossKg)))
 
             bind.imgIllustration.setImageResource(R.drawable.girl_weight)
-            bind.txtMessage.text = getString(R.string.weekly_prediction_screen_text, formattedLoss)
+            context?.let { ctx ->
+                bind.txtMessage.text = ctx.getString(R.string.weekly_prediction_screen_text, formattedLoss)
+            }
         }
 
         bind.btnAction.setOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
     }
 }

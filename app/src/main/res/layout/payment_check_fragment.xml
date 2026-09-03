@@ -20,6 +20,7 @@
             app:title="Tarifga to'lov" />
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_view_form"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
@@ -292,8 +293,9 @@
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
 
-        <!-- Bottom Buttons -->
+        <!-- Bottom Buttons Container -->
         <LinearLayout
+            android:id="@+id/layout_form_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -330,6 +332,55 @@
                 android:fontFamily="@font/roboto_bold"
                 android:text="@string/yuborish"
                 app:cornerRadius="14dp" />
+        </LinearLayout>
+
+        <!-- Verification Submitted State Container -->
+        <LinearLayout
+            android:id="@+id/layout_verification_submitted"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⌛"
+                android:textSize="56sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="Chek yuborildi!"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="22sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/roboto_regular"
+                android:gravity="center"
+                android:lineSpacingExtra="3dp"
+                android:text="24 soat ichida chekni tekshirib, premiumga o'tkazamiz."
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="15sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_submitted_home"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="32dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="Tushundim"
+                android:textSize="16sp"
+                app:cornerRadius="16dp" />
         </LinearLayout>
 
     </LinearLayout>

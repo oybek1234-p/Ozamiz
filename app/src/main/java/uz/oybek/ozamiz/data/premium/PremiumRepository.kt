@@ -1,9 +1,9 @@
 package uz.oybek.ozamiz.data.premium
 
 import kotlinx.coroutines.tasks.await
-import uz.oybek.ozamiz.data.firebase.crashlytics
 import uz.oybek.ozamiz.data.firebase.database
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.data.utils.recordException
 
 object PremiumRepository {
 
@@ -24,7 +24,7 @@ object PremiumRepository {
                 DataWrapper.Error("Narx ma'lumotlari topilmadi")
             }
         } catch (e: Exception) {
-            crashlytics.recordException(e)
+            recordException(e)
             DataWrapper.Error("")
         }
 

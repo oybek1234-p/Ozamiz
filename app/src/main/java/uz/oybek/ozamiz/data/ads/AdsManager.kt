@@ -52,6 +52,25 @@ object AdsManager {
     }
 
     fun loadAndShowInterstitial(context: Context, adUnitId: String, onFinished: () -> Unit) {
+        if (context !is Activity || context.isFinishing || context.isDestroyed) {
+            onFinished()
+            return
+        }
+
+        var isFinishedCalled = false
+        val safeFinished = {
+            if (!isFinishedCalled) {
+                isFinishedCalled = true
+                onFinished()
+            }
+        }
+
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        val timeoutRunnable = Runnable {
+            safeFinished()
+        }
+        handler.postDelayed(timeoutRunnable, 6000)
+
         val config = AdRequest.Builder(adUnitId).build()
 
         InterstitialAdLoader(context).apply {
@@ -59,31 +78,80 @@ object AdsManager {
                 config,
                 object : InterstitialAdLoadListener {
                     override fun onAdLoaded(ad: InterstitialAd) {
+                        handler.removeCallbacks(timeoutRunnable)
                         ad.setAdEventListener(object : InterstitialAdEventListener {
                             override fun onAdShown() {}
                             override fun onAdFailedToShow(error: AdError) {
-                                onFinished()
+                                safeFinished()
                             }
 
                             override fun onAdDismissed() {
-                                onFinished()
+                                safeFinished()
                             }
 
                             override fun onAdClicked() {}
                             override fun onAdImpression(data: ImpressionData?) {}
                         })
 
-                        if (context is Activity) {
+                        if (!context.isFinishing && !context.isDestroyed) {
                             ad.show(context)
                         } else {
-                            onFinished()
+                            safeFinished()
                         }
                     }
 
                     override fun onAdFailedToLoad(error: AdRequestError) {
-                        onFinished()
+                        handler.removeCallbacks(timeoutRunnable)
+                        safeFinished()
                     }
                 })
         }
+    }
+
+    fun loadAndShowRewarded(
+        context: Context,
+        adUnitId: String,
+        onFinished: (rewarded: Boolean) -> Unit
+    ) {
+        val config = AdRequest.Builder(adUnitId).build()
+        var isRewardedGranted = false
+
+        val loader = com.yandex.mobile.ads.rewarded.RewardedAdLoader(context)
+
+        loader.loadAd(
+            config,
+            object : com.yandex.mobile.ads.rewarded.RewardedAdLoadListener {
+                override fun onAdLoaded(rewarded: com.yandex.mobile.ads.rewarded.RewardedAd) {
+                    rewarded.setAdEventListener(object :
+                        com.yandex.mobile.ads.rewarded.RewardedAdEventListener {
+                        override fun onAdShown() {}
+                        override fun onAdFailedToShow(error: AdError) {
+                            onFinished(isRewardedGranted || true)
+                        }
+
+                        override fun onAdDismissed() {
+                            onFinished(isRewardedGranted || true)
+                        }
+
+                        override fun onRewarded(reward: com.yandex.mobile.ads.rewarded.Reward) {
+                            isRewardedGranted = true
+                        }
+
+                        override fun onAdClicked() {}
+                        override fun onAdImpression(data: ImpressionData?) {}
+                    })
+
+                    if (context is Activity && !context.isFinishing && !context.isDestroyed) {
+                        rewarded.show(context)
+                    } else {
+                        onFinished(true)
+                    }
+                }
+
+                override fun onAdFailedToLoad(error: AdRequestError) {
+                    onFinished(true)
+                }
+            }
+        )
     }
 }

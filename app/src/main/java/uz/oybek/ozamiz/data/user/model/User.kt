@@ -41,6 +41,7 @@ data class User(
     var paymentCheckPhotoUrl: String? = null,
     var admin: Boolean = false,
     var scorePoints: Int = 0,
+    var isRated: Boolean = false,
     val hello: String = ""
 ) {
     constructor() : this(
@@ -76,11 +77,20 @@ data class User(
         paymentChecking = false,
         paymentCheckPhotoUrl = null,
         admin = false,
-        scorePoints = 0
+        scorePoints = 0,
+        isRated = false
     )
 
     @Transient
     val valid: Boolean get() = uid.isNotEmpty()
+
+    @Transient
+    val hasBasicCalorieData: Boolean
+        get() = name.isNotBlank() &&
+                gender != -1 &&
+                age > 0 &&
+                height > 0 &&
+                weight > 0.0
 
     @get:com.google.firebase.database.Exclude
     val registerDateLong: Long?
@@ -92,6 +102,6 @@ fun User.admin() = this.admin
 
 fun User.daysFromRegister(): Int {
     val registerDate = registerDateLong ?: return 0
-    return DateUtils.daysBetween(registerDate, System.currentTimeMillis())
-
+    if (registerDate <= 0L) return 0
+    return DateUtils.daysBetween(registerDate, System.currentTimeMillis()).coerceAtLeast(0)
 }

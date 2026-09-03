@@ -1,208 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+    android:orientation="vertical">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewFinder"
+    <!-- Top Camera View Area -->
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <uz.oybek.ozamiz.ui.feature.log.food.CameraOverlayView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/text_instruction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="120dp"
-        android:fontFamily="@font/roboto_bold"
-        android:shadowColor="#80000000"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="4"
-        android:text="@string/log_food_camera_instruction"
-        android:textColor="@android:color/white"
-        android:textSize="24sp" />
+        <uz.oybek.ozamiz.ui.feature.log.food.CameraOverlayView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="48dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="24dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_write"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="1"
-            android:text="@string/log_food_text_title"
-            android:textColor="@android:color/white"
-            app:icon="@drawable/edit"
-            app:iconPadding="8dp"
-            app:iconTint="@android:color/white" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/button_capture"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:backgroundTint="@android:color/white"
-            android:contentDescription="@string/log_food_camera_title"
-            android:src="@drawable/camera_ic"
-            app:fabCustomSize="80dp"
-            app:maxImageSize="40dp"
-            app:tint="?attr/colorPrimary" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_list"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_weight="1"
-            android:text="@string/log_food_camera_list"
-            android:textColor="@android:color/white"
-            app:icon="@drawable/ic_search"
-            app:iconPadding="8dp"
-            app:iconTint="@android:color/white" />
-
-    </LinearLayout>
-
-    <ImageButton
-        android:id="@+id/button_back"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="48dp"
-        android:layout_marginStart="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/cancel"
-        android:src="@drawable/arrow_back"
-        app:tint="@android:color/white" />
-
-    <!-- Photo Review Overlay State -->
-    <LinearLayout
-        android:id="@+id/layout_photo_preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="?colorSurfaceContainer"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="vertical"
-        android:visibility="gone">
-
-        <FrameLayout
+        <!-- Top Header Bar -->
+        <LinearLayout
+            android:id="@+id/header_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:paddingHorizontal="16dp"
-            android:paddingTop="48dp"
-            android:paddingBottom="12dp">
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
 
             <ImageButton
-                android:id="@+id/button_retake_photo"
+                android:id="@+id/button_back"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:layout_gravity="start|center_vertical"
-                android:background="?selectableItemBackgroundBorderless"
+                android:background="@drawable/bg_circle_dark_translucent"
                 android:contentDescription="@string/cancel"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
                 android:src="@drawable/arrow_back"
-                app:tint="?colorOnSurface" />
-
-            <TextView
-                style="@style/Title3_17"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/roboto_bold"
-                android:text="@string/camera_review_title"
-                android:textColor="?colorOnSurface" />
-        </FrameLayout>
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipToPadding="false"
-            android:fillViewport="true"
-            android:paddingHorizontal="20dp">
+                app:tint="@android:color/white" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/imageView_photo_preview"
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="16dp"
-                    android:scaleType="centerCrop"
-                    app:shapeAppearance="@style/RadiusImageView12" />
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingHorizontal="4dp">
 
                 <TextView
-                    android:id="@+id/textView_about_food_label"
-                    style="@style/Title3_17"
-                    android:layout_width="match_parent"
+                    android:id="@+id/text_instruction"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="@string/about_food_label"
-                    android:textColor="?colorOnSurface" />
+                    android:gravity="center"
+                    android:shadowColor="#80000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="4"
+                    android:text="@string/log_food_camera_instruction"
+                    android:textColor="@android:color/white"
+                    android:textSize="17sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tv_limit_badge"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:hintEnabled="false">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/editText_food_description"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="top|start"
-                        android:hint="@string/camera_food_description_hint"
-                        android:imeOptions="actionDone"
-                        android:inputType="textCapSentences|textMultiLine"
-                        android:minLines="3"
-                        android:maxLines="5"
-                        android:textColor="?colorOnSurface" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_tekshirish"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="24dp"
-                    android:backgroundTint="?colorPrimary"
-                    android:fontFamily="@font/roboto_bold"
-                    android:text="@string/btn_check_analyze"
-                    android:textColor="?colorSurface"
-                    android:textSize="16sp"
-                    app:cornerRadius="16dp"
-                    app:icon="@drawable/arrow_right"
-                    app:iconGravity="textStart"
-                    app:iconPadding="10dp"
-                    app:iconTint="?colorSurface" />
+                    android:layout_marginTop="3dp"
+                    android:background="@drawable/bg_camera_limit_badge"
+                    android:fontFamily="@font/roboto_medium"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="2dp"
+                    android:text="3/3 ta limit qoldi"
+                    android:textColor="#E0E0E0"
+                    android:textSize="12sp" />
 
             </LinearLayout>
-        </androidx.core.widget.NestedScrollView>
+
+            <ImageButton
+                android:id="@+id/button_flash"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_circle_dark_translucent"
+                android:contentDescription="Flash"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_flash_off"
+                app:tint="@android:color/white" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Bottom Solid Black Control Bar -->
+    <LinearLayout
+        android:id="@+id/bottom_control_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/black"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="14dp"
+        android:paddingBottom="36dp">
+
+        <!-- Variant Options List (Scrollable horizontal buttons row) -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="22dp"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <!-- 1. Yozish -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_write"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:layout_marginEnd="10dp"
+                    android:backgroundTint="#242424"
+                    android:fontFamily="@font/roboto_bold"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/log_food_text_title"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:cornerRadius="23dp"
+                    app:icon="@drawable/edit"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconSize="18dp"
+                    app:iconTint="@android:color/white"
+                    app:strokeColor="#40FFFFFF"
+                    app:strokeWidth="1dp" />
+
+                <!-- 2. Qidirish / Ro'yxat -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_list"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:layout_marginEnd="10dp"
+                    android:backgroundTint="#242424"
+                    android:fontFamily="@font/roboto_bold"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/log_food_camera_list"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:cornerRadius="23dp"
+                    app:icon="@drawable/ic_search"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconSize="18dp"
+                    app:iconTint="@android:color/white"
+                    app:strokeColor="#40FFFFFF"
+                    app:strokeWidth="1dp" />
+
+                <!-- 3. Saqlanganlar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button_saved"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:backgroundTint="#242424"
+                    android:fontFamily="@font/roboto_bold"
+                    android:paddingHorizontal="16dp"
+                    android:text="Saqlanganlar"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    app:cornerRadius="23dp"
+                    app:icon="@drawable/ic_bookmark_filled"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconSize="18dp"
+                    app:iconTint="@android:color/white"
+                    app:strokeColor="#40FFFFFF"
+                    app:strokeWidth="1dp" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Record Button (Oppoq) -->
+        <ImageButton
+            android:id="@+id/button_capture"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_camera_shutter"
+            android:contentDescription="@string/log_food_camera_title" />
 
     </LinearLayout>
 
-</FrameLayout>
+</LinearLayout>

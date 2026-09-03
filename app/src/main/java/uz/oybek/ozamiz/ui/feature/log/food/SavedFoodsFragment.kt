@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
@@ -34,10 +33,14 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
 
     private fun setupUI(bind: FragmentSavedFoodsBinding) {
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
         adapter = SavedFoodAdapter(
             onItemClick = { foodLog ->
+                val rawTs = arguments?.getLong("timestamp", -1L) ?: -1L
+                val timestamp = if (rawTs > 0) rawTs else System.currentTimeMillis()
+                val rawMeal = arguments?.getString("mealType") ?: arguments?.getString("meal") ?: foodLog.mealType
+                val mealType = uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(rawMeal, timestamp)
                 navigate(
                     R.id.analyzeResultFragment,
                     Bundle().apply {
@@ -47,15 +50,17 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
                         putDouble(AnalyzeResultFragment.KEY_FAT, foodLog.fat ?: 0.0)
                         putDouble(AnalyzeResultFragment.KEY_CARBS, foodLog.carbs ?: 0.0)
                         putString(AnalyzeResultFragment.KEY_PHOTO_URL, foodLog.photoUrl)
-                        putString(AnalyzeResultFragment.KEY_MEAL_TYPE, arguments?.getString("mealType") ?: foodLog.mealType)
+                        putString(AnalyzeResultFragment.KEY_MEAL_TYPE, mealType)
                         putBoolean(AnalyzeResultFragment.KEY_IS_FROM_FAVORITE, true)
-                        putLong(AnalyzeResultFragment.KEY_TIMESTAMP, arguments?.getLong("timestamp") ?: System.currentTimeMillis())
+                        putLong(AnalyzeResultFragment.KEY_TIMESTAMP, timestamp)
                         putString(AnalyzeResultFragment.KEY_LOG_ID, foodLog.logId)
                     }
                 )
             },
             onAddButtonClick = { foodLog ->
-                viewModel.relogFood(foodLog)
+                checkLimitAndProceed {
+                    viewModel.relogFood(foodLog)
+                }
             },
             onDeleteButtonClick = { foodLog ->
                 viewModel.removeFavorite(foodLog)

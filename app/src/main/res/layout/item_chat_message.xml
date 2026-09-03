@@ -24,18 +24,67 @@
             android:layout_marginEnd="8dp"
             android:background="@drawable/bg_chat_ai"
             android:backgroundTint="?attr/colorSurfaceContainerLowest"
-            android:lineSpacingExtra="5sp"
-            android:lineSpacingMultiplier="1.2"
+            android:lineSpacingMultiplier="1.15"
             android:paddingHorizontal="16dp"
             android:paddingVertical="14dp"
             android:textColor="?attr/colorOnSurface"
             android:textSize="16sp"
             android:fontFamily="@font/roboto_regular"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Salom! Men sizning AI diyetologingizman." />
 
+        <LinearLayout
+            android:id="@+id/thinkingContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_chat_ai"
+            android:backgroundTint="?attr/colorSurfaceContainer"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:text="O'ylayapman"
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/dot1"
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="."
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/dot2"
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="."
+                android:textColor="?attr/colorOnSurface" />
+
+            <TextView
+                android:id="@+id/dot3"
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="."
+                android:textColor="?attr/colorOnSurface" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -54,12 +103,12 @@
             android:layout_marginStart="64dp"
             android:layout_marginEnd="4dp"
             android:background="@drawable/bg_chat_user"
-            android:backgroundTint="?attr/colorPrimary"
+            android:backgroundTint="?attr/colorSurfaceContainerHigh"
             android:lineSpacingExtra="3sp"
             android:paddingHorizontal="16dp"
             android:paddingVertical="12dp"
-            android:textColor="?attr/colorOnPrimary"
-            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp"
             android:fontFamily="@font/roboto_regular"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

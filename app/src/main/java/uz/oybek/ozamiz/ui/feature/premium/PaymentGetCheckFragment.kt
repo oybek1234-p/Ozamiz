@@ -60,17 +60,21 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
                     viewModel.clearError()
                 }
                 state.successMessage?.let {
-                    showToast(it)
                     setFragmentResult(REQUEST_KEY, androidx.core.os.bundleOf(RESULT_SUBMITTED to true))
-                    closeFragment()
+                    scrollViewForm.isVisible = false
+                    layoutFormButtons.isVisible = false
+                    layoutVerificationSubmitted.isVisible = true
                     viewModel.clearSuccess()
                 }
+            }
+
+            btnSubmittedHome.setOnClickListener {
+                popBackStack()
             }
 
             checkButton.setOnClickListener {
                 pickImageLauncher.launch("image/*")
             }
-
             copyButton.setOnClickListener {
                 val clipboard: ClipboardManager? =
                     requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?

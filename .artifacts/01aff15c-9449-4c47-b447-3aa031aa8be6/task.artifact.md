@@ -1,0 +1,4 @@
+- [ ] Implement automatic keyboard opening with delay in `WriteFoodFragment.kt`
+- [ ] Add IME insets listener to `WriteFoodFragment.kt` to push the button up
+- [ ] Refine `fragment_write_food.xml` for better keyboard interaction
+- [ ] Verify the floating button behavior

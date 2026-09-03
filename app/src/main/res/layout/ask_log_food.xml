@@ -33,19 +33,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Har bir ovqatinigni ilovada saqlab boring, qancha ovqat yeganigizni nazorat qiling"
+        android:text="Har bir ovqatingizni ilovada saqlab boring, qancha ovqat yeganingizni nazorat qiling"
+        android:textColor="?attr/colorOnSurfaceVariant"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button"
+        style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ovqatni kiritish"
+        android:layout_height="54dp"
         android:layout_marginTop="@dimen/dimen_12"
+        android:backgroundTint="?colorPrimary"
+        android:fontFamily="@font/roboto_bold"
+        android:text="Ovqatni kiritish"
+        android:textColor="?colorSurface"
+        android:textSize="16sp"
+        app:cornerRadius="27dp"
         app:icon="@drawable/arrow_right"
         app:iconGravity="textEnd"
-        app:layout_constraintTop_toBottomOf="@+id/textView7"
-        tools:layout_editor_absoluteX="18dp" />
+        app:iconTint="?colorSurface"
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
 </androidx.constraintlayout.widget.ConstraintLayout>

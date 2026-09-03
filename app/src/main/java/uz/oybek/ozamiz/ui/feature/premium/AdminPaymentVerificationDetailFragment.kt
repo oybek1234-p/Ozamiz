@@ -8,7 +8,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
@@ -36,7 +35,7 @@ class AdminPaymentVerificationDetailFragment :
         viewModel.loadUserDetails(args.userId)
 
         bind.toolbarAdminPaymentDetail.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            popBackStack()
         }
 
         bind.imageViewPaymentCheckAdmin.setOnClickListener {
@@ -89,7 +88,7 @@ class AdminPaymentVerificationDetailFragment :
 
                     if (state.verificationComplete) {
                         showToast(if (state.user?.premium == true) "To'lov tasdiqlandi" else "To'lov rad etildi")
-                        findNavController().popBackStack()
+                        popBackStack()
                         viewModel.resetVerificationCompleteFlag()
                     }
                 }

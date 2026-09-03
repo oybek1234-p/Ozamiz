@@ -38,7 +38,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/carbs_ic" />
+                        android:src="@drawable/bread" />
                 </com.google.android.material.card.MaterialCardView>
             </FrameLayout>
 
@@ -267,15 +267,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -368,44 +359,6 @@
                                 android:textColor="?colorOnSurface"/>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/premiumOverlay"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/round_lay"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="24dp"
-                    android:visibility="gone">
-
-                    <ImageView
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
-                        android:src="@drawable/lock_ic"
-                        app:tint="?colorOnSurface" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:gravity="center"
-                        android:text="@string/premium_overlay_text"
-                        android:textColor="?colorOnSurface"
-                        android:textSize="18sp" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnGetPremium"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
-                        android:paddingHorizontal="32dp"
-                        android:text="@string/premiumga_o_tish"
-                        app:cornerRadius="24dp" />
-                </LinearLayout>
-            </FrameLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

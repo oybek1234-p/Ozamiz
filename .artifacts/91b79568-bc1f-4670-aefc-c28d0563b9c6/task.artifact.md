@@ -1,0 +1,4 @@
+- [x] Modify `fragment_add_exercise_log.xml`: Remove progress card, add exercise info section
+- [x] Update `AddExerciseLogFragment.kt`: Bind exercise specific benefit, remove progress binding
+- [x] Update `AddExerciseLogViewModel.kt`: Remove redundant observation and state fields
+- [x] Verify the changes

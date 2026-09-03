@@ -8,9 +8,17 @@ import uz.oybek.ozamiz.data.firebase.postsCollection
 import uz.oybek.ozamiz.data.firebase.toObjectsList
 import uz.oybek.ozamiz.data.firebase.firestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.FirebaseFirestoreException
+import android.util.Log
 import uz.oybek.ozamiz.data.firebase.toObjectSafe
 
 import uz.oybek.ozamiz.util.returnResult
+
+data class PostsFetchResult(
+    val posts: List<CommunityPost>,
+    val lastSnapshot: com.google.firebase.firestore.DocumentSnapshot?,
+    val hasReachedEnd: Boolean
+)
 
 object CommunityPostRepository {
 
@@ -38,79 +46,42 @@ object CommunityPostRepository {
 
     suspend fun getPosts(
         limit: Long = DEFAULT_LIMIT,
-        lastVisiblePostId: String? = null,
-        verifiedOnly: Boolean = true,
-        filter: CommunityPostFilter = CommunityPostFilter.ALL
-    ): Result<List<CommunityPost>> {
-        return returnResult {
-            val resultList = mutableListOf<CommunityPost>()
-            var currentLastPostId = lastVisiblePostId
-            var reachedSnapshotEnd = false
-            val batchSize = 50L
+        lastSnapshot: com.google.firebase.firestore.DocumentSnapshot? = null,
+        filter: CommunityPostFilter = CommunityPostFilter.WEIGHT_LOSS
+    ): Result<PostsFetchResult> {
+        return try {
+            var query: Query = firestore.postsCollection
+                .whereNotEqualTo("photos", emptyList<String>())
 
-            while (resultList.size < limit && !reachedSnapshotEnd) {
-                var query: Query = firestore.postsCollection
-                    .orderBy(CommunityPost::timestamp.name, Query.Direction.DESCENDING)
-
-                if (verifiedOnly) {
-                    query = query.whereEqualTo(CommunityPost::verified.name, true)
+            when (filter) {
+                CommunityPostFilter.WEIGHT_LOSS -> {
+                    query = query.whereEqualTo("type", PostType.WEIGHT_LOSS)
                 }
-
-                when (filter) {
-                    CommunityPostFilter.WEIGHT_LOSS -> {
-                        query = query.whereEqualTo(CommunityPost::type.name, PostType.WEIGHT_LOSS)
-                    }
-                    CommunityPostFilter.FOOD -> {
-                        query = query.whereEqualTo(CommunityPost::type.name, PostType.FOOD)
-                    }
-                    else -> {}
+                CommunityPostFilter.FOOD -> {
+                    query = query.whereEqualTo("type", PostType.FOOD)
                 }
-
-                query = query.limit(batchSize)
-
-                if (currentLastPostId != null) {
-                    val lastDocument = firestore.postsCollection.document(currentLastPostId).get().await()
-                    if (lastDocument.exists()) {
-                        query = query.startAfter(lastDocument)
-                    } else {
-                        break
-                    }
-                }
-
-                val snapshot = query.get().await()
-                val documents = snapshot.documents
-                if (documents.isEmpty()) {
-                    break
-                }
-
-                currentLastPostId = documents.last().id
-                if (documents.size < batchSize) {
-                    reachedSnapshotEnd = true
-                }
-
-                val rawPosts = documents.mapNotNull { it.toObjectSafe<CommunityPost>() }
-                val filteredPosts = if (filter == CommunityPostFilter.ALL || filter == CommunityPostFilter.FOOD) {
-                    rawPosts.filter { post ->
-                        val hasPhoto = (post.photos.isNotEmpty() && post.photos.any { it.isNotBlank() }) || post.photoUrl.isNotBlank()
-                        post.type == PostType.FOOD && post.healthScore >= 8 && hasPhoto
-                    }
-                } else if (filter == CommunityPostFilter.WEIGHT_LOSS) {
-                    rawPosts.filter { post ->
-                        val photoList = (if (post.photos.isNotEmpty()) post.photos else if (post.photoUrl.isNotBlank()) listOf(post.photoUrl) else emptyList()).filter { it.isNotBlank() }
-                        (post.type == PostType.WEIGHT_LOSS || post.type == "ACHIEVEMENT") && photoList.isNotEmpty()
-                    }
-                } else {
-                    rawPosts
-                }
-
-                resultList.addAll(filteredPosts)
+                else -> {}
             }
 
-            if (limit > 0 && resultList.size > limit.toInt()) {
-                resultList.take(limit.toInt())
-            } else {
-                resultList
+            query = query.orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(limit)
+
+            if (lastSnapshot != null) {
+                query = query.startAfter(lastSnapshot)
             }
+
+            val snapshot = query.get().await()
+            val posts = snapshot.toObjectsList<CommunityPost>()
+            val lastDoc = snapshot.documents.lastOrNull()
+
+            Result.success(PostsFetchResult(
+                posts = posts,
+                lastSnapshot = lastDoc,
+                hasReachedEnd = posts.size < limit
+            ))
+        } catch (e: Exception) {
+            Log.e("CommunityRepo", "Error: ${e.message}")
+            Result.failure(e)
         }
     }
 

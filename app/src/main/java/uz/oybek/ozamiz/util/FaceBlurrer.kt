@@ -15,6 +15,8 @@ import kotlinx.coroutines.tasks.await
 
 object FaceBlurrer {
 
+    private const val MAX_DETECTION_DIMENSION = 1024
+
     private val detectorOptions = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
         .build()
@@ -22,18 +24,48 @@ object FaceBlurrer {
     private val detector = FaceDetection.getClient(detectorOptions)
 
     suspend fun blurFaces(bitmap: Bitmap): Bitmap {
-        val image = InputImage.fromBitmap(bitmap, 0)
         return try {
+            val width = bitmap.width
+            val height = bitmap.height
+
+            // Downscale for detection if needed to prevent ML Kit NV21 buffer OutOfMemoryError
+            val (detectionBitmap, scaleFactor) = if (width > MAX_DETECTION_DIMENSION || height > MAX_DETECTION_DIMENSION) {
+                val scale = MAX_DETECTION_DIMENSION.toFloat() / maxOf(width, height)
+                val targetW = (width * scale).toInt().coerceAtLeast(1)
+                val targetH = (height * scale).toInt().coerceAtLeast(1)
+                val scaled = Bitmap.createScaledBitmap(bitmap, targetW, targetH, true)
+                scaled to (1.0f / scale)
+            } else {
+                bitmap to 1.0f
+            }
+
+            val image = InputImage.fromBitmap(detectionBitmap, 0)
             val faces = detector.process(image).await()
+
+            if (detectionBitmap != bitmap) {
+                detectionBitmap.recycle()
+            }
+
             if (faces.isEmpty()) return bitmap
 
-            val mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+            val mutableBitmap = if (bitmap.isMutable) bitmap else bitmap.copy(Bitmap.Config.ARGB_8888, true)
             for (face in faces) {
-                val bounds = face.boundingBox
-                applyBlur(mutableBitmap, bounds)
+                val b = face.boundingBox
+                val scaledRect = if (scaleFactor != 1.0f) {
+                    Rect(
+                        (b.left * scaleFactor).toInt().coerceAtLeast(0),
+                        (b.top * scaleFactor).toInt().coerceAtLeast(0),
+                        (b.right * scaleFactor).toInt().coerceAtMost(mutableBitmap.width),
+                        (b.bottom * scaleFactor).toInt().coerceAtMost(mutableBitmap.height)
+                    )
+                } else {
+                    b
+                }
+                applyBlur(mutableBitmap, scaledRect)
             }
             mutableBitmap
-        } catch (e: Exception) {
+        } catch (t: Throwable) {
+            t.printStackTrace()
             bitmap
         }
     }

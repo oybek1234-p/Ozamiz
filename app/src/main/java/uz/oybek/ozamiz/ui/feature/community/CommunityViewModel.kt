@@ -22,14 +22,14 @@ data class CommunityState(
     val isPaging: Boolean = false,
     val hasReachedEnd: Boolean = false,
     val error: String? = null,
-    val filter: CommunityPostFilter = ALL
+    val filter: CommunityPostFilter = CommunityPostFilter.WEIGHT_LOSS
 )
 
 class CommunityViewModel : ViewModel() {
     private val _state = MutableStateFlow(CommunityState())
     val state: StateFlow<CommunityState> = _state
 
-    private var lastVisiblePostId: String? = null
+    private var lastSnapshot: com.google.firebase.firestore.DocumentSnapshot? = null
 
     init {
         loadPosts()
@@ -38,12 +38,12 @@ class CommunityViewModel : ViewModel() {
     fun setFilter(filter: CommunityPostFilter) {
         if (_state.value.filter == filter) return
         _state.update { it.copy(filter = filter, posts = emptyList(), hasReachedEnd = false) }
-        lastVisiblePostId = null
+        lastSnapshot = null
         loadPosts()
     }
 
     fun refresh() {
-        lastVisiblePostId = null
+        lastSnapshot = null
         _state.update { it.copy(hasReachedEnd = false) }
         loadPosts()
     }
@@ -51,7 +51,7 @@ class CommunityViewModel : ViewModel() {
     fun loadPosts() {
         if (_state.value.isLoading || _state.value.isPaging || _state.value.hasReachedEnd) return
 
-        val isFirstLoad = lastVisiblePostId == null
+        val isFirstLoad = lastSnapshot == null
         _state.update { it.copy(isLoading = isFirstLoad, isPaging = !isFirstLoad, error = null) }
 
         val requestLimit = 10L
@@ -59,30 +59,20 @@ class CommunityViewModel : ViewModel() {
         viewModelScope.launch {
             val result = CommunityPostRepository.getPosts(
                 limit = requestLimit,
-                lastVisiblePostId = lastVisiblePostId,
-                verifiedOnly = true,
+                lastSnapshot = lastSnapshot,
                 filter = _state.value.filter
             )
-            result.onSuccess { newPosts ->
-                if (newPosts.isEmpty()) {
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            isPaging = false,
-                            hasReachedEnd = true
-                        )
-                    }
-                } else {
-                    lastVisiblePostId = newPosts.last().id
-                    val updatedPosts = if (isFirstLoad) newPosts else _state.value.posts + newPosts
-                    _state.update {
-                        it.copy(
-                            posts = updatedPosts,
-                            isLoading = false,
-                            isPaging = false,
-                            hasReachedEnd = newPosts.size < requestLimit
-                        )
-                    }
+            result.onSuccess { fetchResult ->
+                lastSnapshot = fetchResult.lastSnapshot
+                val newPosts = fetchResult.posts
+                val updatedPosts = if (isFirstLoad) newPosts else _state.value.posts + newPosts
+                _state.update {
+                    it.copy(
+                        posts = updatedPosts,
+                        isLoading = false,
+                        isPaging = false,
+                        hasReachedEnd = fetchResult.hasReachedEnd
+                    )
                 }
             }.onFailure { e ->
                 _state.update { it.copy(isLoading = false, isPaging = false, error = e.message) }

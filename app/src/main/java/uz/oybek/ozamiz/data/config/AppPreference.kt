@@ -16,25 +16,15 @@ import java.io.OutputStream
 
 @Serializable
 data class AppSettings(
-    val isFirstRegistration: Boolean = false,
     val isAppReviewShown: Boolean = false,
-    val dietologMessageCount: Int = 0,
     val foodLogLimitDate: String = "",
     val foodLogLimitCount: Int = 0,
-    val lastDailyAnalysisDate: String = "",
-    val lastWaterBenefitsDate: String = "",
-    val lastWater60AnalysisDate: String = "",
-    val lastExerciseBenefitsDate: String = "",
-    val lastExercise50AnalysisDate: String = "",
-    val currentTaskId: String? = null,
-    val todayAiMenuJson: String = "",
-    val todayAiMenuDate: String = "",
-    val aiMenuGenerationCount: Int = 0,
-    val lastFoodLogTime: Long = 0L,
-    val lastFoodFeedbackDate: String = "",
-    val isAppFeedbackCompleted: Boolean = false,
     val firstAppOpenTimestamp: Long = 0L,
-    val lastYesterdayEvalClosedDate: String = ""
+    val bonusFoodLogDate: String = "",
+    val bonusFoodLogCount: Int = 0,
+    val lastDailyGoalReachedDate: String = "",
+    val aiChatLimitDate: String = "",
+    val aiChatLimitCount: Int = 0
 )
 
 object AppSettingsSerializer : Serializer<AppSettings> {
@@ -61,15 +51,7 @@ object AppPreference {
 
     private val dataStore: DataStore<AppSettings> = appContext.appSettingsDataStore
 
-    val settingsFlow: Flow<AppSettings> = dataStore.data
-
     val current: AppSettings get() = runBlocking { dataStore.data.first() }
-
-    fun updateSync(block: (AppSettings) -> AppSettings) {
-        runBlocking {
-            dataStore.updateData { block(it) }
-        }
-    }
 
     suspend fun update(block: (AppSettings) -> AppSettings) {
         dataStore.updateData { block(it) }
@@ -79,76 +61,89 @@ object AppPreference {
         get() = current.isAppReviewShown
         set(value) = runBlocking { update { it.copy(isAppReviewShown = value) } }
 
-    var lastDailyAnalysisDate: String
-        get() = current.lastDailyAnalysisDate
-        set(value) = runBlocking { update { it.copy(lastDailyAnalysisDate = value) } }
-
-    var lastWaterBenefitsDate: String
-        get() = current.lastWaterBenefitsDate
-        set(value) = runBlocking { update { it.copy(lastWaterBenefitsDate = value) } }
-
-    var lastWater60AnalysisDate: String
-        get() = current.lastWater60AnalysisDate
-        set(value) = runBlocking { update { it.copy(lastWater60AnalysisDate = value) } }
-
-    var lastExerciseBenefitsDate: String
-        get() = current.lastExerciseBenefitsDate
-        set(value) = runBlocking { update { it.copy(lastExerciseBenefitsDate = value) } }
-
-    var lastExercise50AnalysisDate: String
-        get() = current.lastExercise50AnalysisDate
-        set(value) = runBlocking { update { it.copy(lastExercise50AnalysisDate = value) } }
-
-    var lastYesterdayEvalClosedDate: String
-        get() = current.lastYesterdayEvalClosedDate
-        set(value) = runBlocking { update { it.copy(lastYesterdayEvalClosedDate = value) } }
-
-    var todayAiMenuJson: String
-        get() = current.todayAiMenuJson
-        set(value) = runBlocking { update { it.copy(todayAiMenuJson = value) } }
-
-    var todayAiMenuDate: String
-        get() = current.todayAiMenuDate
-        set(value) = runBlocking { update { it.copy(todayAiMenuDate = value) } }
-
-    var aiMenuGenerationCount: Int
-        get() = current.aiMenuGenerationCount
-        set(value) = runBlocking { update { it.copy(aiMenuGenerationCount = value) } }
-
-    var lastFoodLogTime: Long
-        get() = current.lastFoodLogTime
-        set(value) = runBlocking { update { it.copy(lastFoodLogTime = value) } }
-
-    var lastFoodFeedbackDate: String
-        get() = current.lastFoodFeedbackDate
-        set(value) = runBlocking { update { it.copy(lastFoodFeedbackDate = value) } }
-
-    var isAppFeedbackCompleted: Boolean
-        get() = current.isAppFeedbackCompleted
-        set(value) = runBlocking { update { it.copy(isAppFeedbackCompleted = value) } }
-
     var firstAppOpenTimestamp: Long
         get() = current.firstAppOpenTimestamp
         set(value) = runBlocking { update { it.copy(firstAppOpenTimestamp = value) } }
 
-    suspend fun incrementDietologMessageCount() {
-        update { s ->
-            val count = s.dietologMessageCount + 1
-            s.copy(dietologMessageCount = count)
-        }
-    }
+    var lastDailyGoalReachedDate: String
+        get() = current.lastDailyGoalReachedDate
+        set(value) = runBlocking { update { it.copy(lastDailyGoalReachedDate = value) } }
+
+    private var inMemoryLogCount: Int = -1
+    private var inMemoryLogDate: String = ""
+    private var inMemoryBonusLogs: Int = -1
+    private var inMemoryBonusDate: String = ""
+    private var inMemoryAiChatCount: Int = -1
+    private var inMemoryAiChatDate: String = ""
 
     fun getFoodLogLimitCount(): Int {
-        val s = current
         val dateStr = DateUtils.todayString()
-        return if (s.foodLogLimitDate == dateStr) s.foodLogLimitCount else 0
+        if (inMemoryLogDate == dateStr && inMemoryLogCount >= 0) {
+            return inMemoryLogCount
+        }
+        val s = current
+        val count = if (s.foodLogLimitDate == dateStr) s.foodLogLimitCount else 0
+        inMemoryLogDate = dateStr
+        inMemoryLogCount = count
+        return count
     }
 
     suspend fun incrementFoodLogLimitCount() {
         val dateStr = DateUtils.todayString()
+        val currentCount = getFoodLogLimitCount()
+        val newCount = currentCount + 1
+        inMemoryLogDate = dateStr
+        inMemoryLogCount = newCount
         update { s ->
-            val count = if (s.foodLogLimitDate == dateStr) s.foodLogLimitCount + 1 else 1
-            s.copy(foodLogLimitDate = dateStr, foodLogLimitCount = count)
+            s.copy(foodLogLimitDate = dateStr, foodLogLimitCount = newCount)
+        }
+    }
+
+    fun getBonusFoodLogs(): Int {
+        val dateStr = DateUtils.todayString()
+        if (inMemoryBonusDate == dateStr && inMemoryBonusLogs >= 0) {
+            return inMemoryBonusLogs
+        }
+        val s = current
+        val count = if (s.bonusFoodLogDate == dateStr) s.bonusFoodLogCount else 0
+        inMemoryBonusDate = dateStr
+        inMemoryBonusLogs = count
+        return count
+    }
+
+    fun incrementBonusFoodLogs(amount: Int = 2) {
+        val dateStr = DateUtils.todayString()
+        val currentCount = getBonusFoodLogs()
+        val newCount = currentCount + amount
+        inMemoryBonusDate = dateStr
+        inMemoryBonusLogs = newCount
+        runBlocking {
+            update { s ->
+                s.copy(bonusFoodLogDate = dateStr, bonusFoodLogCount = newCount)
+            }
+        }
+    }
+
+    fun getAiChatLimitCount(): Int {
+        val dateStr = DateUtils.todayString()
+        if (inMemoryAiChatDate == dateStr && inMemoryAiChatCount >= 0) {
+            return inMemoryAiChatCount
+        }
+        val s = current
+        val count = if (s.aiChatLimitDate == dateStr) s.aiChatLimitCount else 0
+        inMemoryAiChatDate = dateStr
+        inMemoryAiChatCount = count
+        return count
+    }
+
+    suspend fun incrementAiChatLimitCount() {
+        val dateStr = DateUtils.todayString()
+        val currentCount = getAiChatLimitCount()
+        val newCount = currentCount + 1
+        inMemoryAiChatDate = dateStr
+        inMemoryAiChatCount = newCount
+        update { s ->
+            s.copy(aiChatLimitDate = dateStr, aiChatLimitCount = newCount)
         }
     }
 }

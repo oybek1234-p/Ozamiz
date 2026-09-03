@@ -14,36 +14,7 @@ import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 object CommunityShareHelper {
 
     fun shareFoodLogIfNeeded(foodLog: FoodLog) {
-        val score = foodLog.healthLevel ?: 0
-        val photo = foodLog.photoUrl.orEmpty()
-        if (score < 8 || photo.isBlank()) return
-
-        val user = UserProfileRepository.user
-        val userId = Firebase.auth.currentUser?.uid ?: return
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val post = CommunityPost(
-                userId = userId,
-                userName = user.name.ifBlank { "Foydalanuvchi" },
-                userAvatarUrl = user.avatarUrl,
-                photoUrl = foodLog.photoUrl ?: "",
-                photos = if (foodLog.photoUrl != null) listOf(foodLog.photoUrl!!) else emptyList(),
-                title = foodLog.description,
-                description = foodLog.aiInsights ?: "",
-                foodName = foodLog.description,
-                calories = foodLog.calories,
-                protein = foodLog.protein,
-                fat = foodLog.fat,
-                carbs = foodLog.carbs,
-                healthScore = score,
-                userScore = user.scorePoints,
-                verified = true,
-                isVisible = true,
-                type = PostType.FOOD,
-                isPremiumUser = PremiumUtils.isPremium(user),
-                mealType = foodLog.mealType
-            )
-            CommunityPostRepository.addPost(post)
-        }
+        // Disabled per user directive: Food logs are no longer posted to community feed
+        return
     }
 }

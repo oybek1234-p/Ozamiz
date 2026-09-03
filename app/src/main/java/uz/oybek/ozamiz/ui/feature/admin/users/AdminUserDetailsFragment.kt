@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.launch
@@ -64,7 +63,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
 
     private fun setupToolbar(bind: FragmentAdminUserDetailsBinding) {
         bind.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
+            navigateUp()
         }
     }
 
@@ -72,14 +71,14 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
         bind.buttonWeightLogs.setOnClickListener {
             argUserId?.let { userId ->
                 val bundle = androidx.core.os.bundleOf("userId" to userId)
-                findNavController().navigate(R.id.weightPhotoHistoryFragment, bundle)
+                navigate(R.id.weightPhotoHistoryFragment, bundle)
             }
         }
 
         bind.buttonRecentFoodLogs.setOnClickListener {
             argUserId?.let { userId ->
                 val bundle = androidx.core.os.bundleOf("userId" to userId)
-                findNavController().navigate(
+                navigate(
                     R.id.action_adminUserDetailsFragment_to_adminFoodLogsFragment,
                     bundle
                 )
@@ -400,7 +399,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                                                 R.string.profile_deleted_success,
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                            findNavController().navigateUp()
+                                            navigateUp()
                                         },
                                         onError = { exp ->
                                             dialog.dismiss()

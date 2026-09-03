@@ -5,12 +5,11 @@ import uz.oybek.ozamiz.R
 sealed class OnBoardingDirection {
     data class SingleScreen(val id: Int) : OnBoardingDirection()
 
-    data class MultipleAnswer(val type: MultipleAnswersQuestion)
-        : OnBoardingDirection()
+    data class MultipleAnswer(val type: MultipleAnswersQuestion) : OnBoardingDirection()
 
     data object Back : OnBoardingDirection()
 
-    data object Finished: OnBoardingDirection()
+    data object Finished : OnBoardingDirection()
 }
 
 object OnBoardingDirections {
@@ -25,9 +24,8 @@ object OnBoardingDirections {
         OnBoardingDirection.SingleScreen(R.id.activityLevelFragment),
         OnBoardingDirection.SingleScreen(R.id.weightFragment),
         OnBoardingDirection.SingleScreen(R.id.targetWeightFragment),
+        OnBoardingDirection.SingleScreen(R.id.goalPaceOnboardFragment),
         OnBoardingDirection.SingleScreen(R.id.photosOnboardFragment),
-        OnBoardingDirection.SingleScreen(R.id.calorieInfoFragment),
-        OnBoardingDirection.SingleScreen(R.id.seeEffectFragment),
         OnBoardingDirection.SingleScreen(R.id.planFragment)
     )
 }

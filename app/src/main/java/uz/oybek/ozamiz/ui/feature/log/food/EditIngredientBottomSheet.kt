@@ -8,6 +8,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
+import kotlin.math.roundToInt
 import uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient
 import uz.oybek.ozamiz.databinding.DialogEditIngredientBinding
 
@@ -62,20 +63,51 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
         binding.editTextIngredientAmount.setText(
             item.amount?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: ""
         )
-        binding.editTextIngredientUnit.setText(item.unit ?: "")
         binding.editTextIngredientCalories.setText(item.calories?.toString() ?: "")
+
+        binding.buttonClose.setOnClickListener { dismiss() }
+
+        val initialAmount = item.amount ?: 100.0
+        val initialCalories = item.calories?.toDouble() ?: 0.0
+        val calPerUnit = if (initialAmount > 0) initialCalories / initialAmount else 0.0
+
+        binding.editTextIngredientAmount.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (binding.editTextIngredientAmount.hasFocus()) {
+                    val newAmount = s?.toString()?.toDoubleOrNull() ?: 0.0
+                    if (calPerUnit > 0) {
+                        val newCal = (calPerUnit * newAmount).roundToInt()
+                        binding.editTextIngredientCalories.setText(newCal.toString())
+                    }
+                }
+            }
+        })
+        binding.editTextIngredientAmount.postDelayed({
+            if (isAdded && _binding != null) {
+                binding.editTextIngredientAmount.requestFocus()
+                val textLength = binding.editTextIngredientAmount.text?.length ?: 0
+                binding.editTextIngredientAmount.setSelection(textLength)
+                val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
+                imm?.showSoftInput(binding.editTextIngredientAmount, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+            }
+        }, 150)
 
         binding.buttonSave.setOnClickListener {
             val newName = binding.editTextIngredientName.text.toString().trim()
             val newAmount = binding.editTextIngredientAmount.text.toString().toDoubleOrNull()
-            val newUnit = binding.editTextIngredientUnit.text.toString().trim()
             val newCalories = binding.editTextIngredientCalories.text.toString().toIntOrNull()
+            val ratio = if (initialAmount > 0 && newAmount != null) newAmount / initialAmount else 1.0
 
             val updatedIngredient = item.copy(
                 name = newName.ifEmpty { item.name },
                 amount = newAmount,
-                unit = newUnit.ifEmpty { null },
-                calories = newCalories
+                unit = "g",
+                calories = newCalories,
+                protein = item.protein?.let { it * ratio },
+                fat = item.fat?.let { it * ratio },
+                carbs = item.carbs?.let { it * ratio }
             )
 
             setFragmentResult(REQUEST_KEY, bundleOf(
@@ -93,8 +125,12 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
             ))
             dismiss()
         }
+    }
 
-        binding.buttonCancel.setOnClickListener { dismiss() }
+    override fun onStart() {
+        super.onStart()
+        dialog?.window?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            ?.setBackgroundResource(android.R.color.transparent)
     }
 
     override fun onDestroyView() {

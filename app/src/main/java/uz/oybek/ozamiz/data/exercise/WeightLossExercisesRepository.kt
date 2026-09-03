@@ -45,8 +45,7 @@ object WeightLossExercisesRepository {
                     "Yumshoq harakat qiling",
                     "Boshlang'ich holatga qayting"
                 )
-            ),
-            HomeExercise(
+            ), HomeExercise(
                 imageRes = R.drawable.cobra_stretch,
                 id = "kobra_holati",
                 name = "Kobra holati",
@@ -67,51 +66,7 @@ object WeightLossExercisesRepository {
                     "Yuqori tanani sekin ko'taring",
                     "Tana cho'zilishini his qilib 30 soniya turing"
                 )
-            ),
-            HomeExercise(
-                imageRes = R.drawable.t_plank,
-                id = "t_planka",
-                name = "T-planka",
-                difficulty = "hard",
-                category = "Umumiy",
-                calories = 5,
-                durationSeconds = 30,
-                benefits = listOf(
-                    "Tana barqarorligini oshiradi",
-                    "Yelka va qo'l kuchini oshiradi",
-                    "Yon qorin mushaklarini rivojlantiradi"
-                ),
-                instructions = listOf(
-                    "Planka holatiga o'ting",
-                    "Bir qo'lga suyanib tanani yonga buring",
-                    "Ikkinchi qo'lingizni yuqoriga cho'zing",
-                    "Tana T-shaklini olishi kerak",
-                    "Har tomonga 15 soniyadan ushhab turing"
-                )
-            ),
-            HomeExercise(
-                imageRes = R.drawable.burpe_jump,
-                id = "burpi_va_sakrash",
-                name = "Burpi va sakrash",
-                difficulty = "hard",
-                category = "Kardio",
-                calories = 14,
-                durationSeconds = 45,
-                benefits = listOf(
-                    "Kaloriyalarni tez yoqadi",
-                    "Yurak urishini tezlashtiradi",
-                    "Chidamlilikni oshiradi",
-                    "Butun tana mushaklarini ishlatadi"
-                ),
-                instructions = listOf(
-                    "Tik turing, so'ngra chuqur o'tiring",
-                    "Qo'llarni yerga tirab, oyoqlarni orqaga otib plankaga o'ting",
-                    "Otjimaniya qiling",
-                    "Oyoqlarni yana qo'llarga yaqin keltiring",
-                    "Yuqoriga baland sakrang va qo'llarni yuqoriga ko'taring"
-                )
-            ),
-            HomeExercise(
+            ), HomeExercise(
                 id = "jamping_cek",
                 imageRes = R.drawable.jumping_j,
                 name = "Jamping cek",
@@ -129,8 +84,7 @@ object WeightLossExercisesRepository {
                     "Sakrab, oyoqlaringizni kengroq oching va qo'llarni tepaga ko'taring",
                     "Yana sakrab boshlang'ich holatga qayting"
                 )
-            ),
-            HomeExercise(
+            ), HomeExercise(
                 id = "otjimaniya",
                 imageRes = R.drawable.otjim,
                 name = "Otjimaniya",
@@ -150,26 +104,7 @@ object WeightLossExercisesRepository {
                     "Qo'l kuchi bilan yana yuqoriga ko'taring"
                 )
             ),
-            HomeExercise(
-                id = "prisedaniya",
-                imageRes = R.drawable.prisidan,
-                name = "Prisedaniya",
-                difficulty = "beginner",
-                category = "Kuch",
-                calories = 6,
-                durationSeconds = 45,
-                benefits = listOf(
-                    "Oyoq va dumba mushaklarini kuchaytiradi",
-                    "Bo'g'inlar sog'lig'ini yaxshilaydi",
-                    "Metabolizmni tezlashtiradi"
-                ),
-                instructions = listOf(
-                    "Oyoqlarni yelka kengligida ochib turing",
-                    "Orqaga o'tirganday tos suyagini pastga tushiring",
-                    "Tizzalar oyoq uchidan o'tib ketmasin",
-                    "Boshlang'ich holatga qaytish uchun oyoqlarga kuch bering"
-                )
-            ),
+
             HomeExercise(
                 id = "alpinist_mashqi",
                 imageRes = R.drawable.alpinist,
@@ -189,8 +124,7 @@ object WeightLossExercisesRepository {
                     "Ikkinchi oyoqni orqaga cho'zing",
                     "Oyoqlarni navbatma-navbat yugurish kabi o'zgartiring"
                 )
-            ),
-            HomeExercise(
+            ), HomeExercise(
                 id = "yugurish_joyida",
                 imageRes = R.drawable.knees,
                 name = "Yugurish joyida",
@@ -209,8 +143,7 @@ object WeightLossExercisesRepository {
                     "Tizzalarni son darajasigacha yuqoriga ko'taring",
                     "Qo'llar bilan harakatga yordam bering"
                 )
-            ),
-            HomeExercise(
+            ), HomeExercise(
                 id = "yondosh_dumba_koprigi",
                 imageRes = R.drawable.glutge,
                 name = "Yondosh dumba ko'prigi",
@@ -230,25 +163,7 @@ object WeightLossExercisesRepository {
                     "Elkalar va tizzalar bir chiziqda bo'lishi kerak"
                 )
             ),
-            HomeExercise(
-                id = "qaychi_pressi",
-                imageRes = R.drawable.scissor,
-                name = "Qaychi pressi",
-                difficulty = "medium",
-                category = "Kuch",
-                calories = 6,
-                durationSeconds = 30,
-                benefits = listOf(
-                    "Pastki qorin mushaklariga kuch beradi",
-                    "Oyoqlarni tortadi",
-                    "Chidamlilikni oshiradi"
-                ),
-                instructions = listOf(
-                    "Orqa bilan erga yoting, qo'llarni dumba ostiga qo'ying",
-                    "Oyoqlarni erdan 15-20 sm balandlikda ko'taring",
-                    "Oyoqlarni navbat bilan yuqoriga va pastga qaychi kabi harakatlantiring"
-                )
-            ),
+
             HomeExercise(
                 id = "yon_planka",
                 imageRes = R.drawable.sid_plan,
@@ -267,8 +182,7 @@ object WeightLossExercisesRepository {
                     "Tosni yerdan ko'tarib tana tekis bo'lishini ta'minlang",
                     "Ushbu holatni 15 soniya ushlab turing, keyin tomonga o'zgartiring"
                 )
-            ),
-            HomeExercise(
+            ), HomeExercise(
                 id = "yarim_burpi",
                 imageRes = R.drawable.half_burpee,
                 name = "Yarim burpi",
@@ -277,34 +191,14 @@ object WeightLossExercisesRepository {
                 calories = 12,
                 durationSeconds = 45,
                 benefits = listOf(
-                    "Yuqori intensivlik evaziga yog' yoqadi",
-                    "Portlovchi kuchni oshiradi"
+                    "Yuqori intensivlik evaziga yog' yoqadi", "Portlovchi kuchni oshiradi"
                 ),
                 instructions = listOf(
                     "O'tirish holatidan boshlang, qo'llar yerda",
                     "Sakrab oyoqlarni orqaga itaring, planka holatiga o'ting",
                     "Yana sakrab oyoqlarni qo'l yoniga qaytaring va tik turing"
                 )
-            ),
-            HomeExercise(
-                id = "devorga_suyanib_otirish",
-                imageRes = R.drawable.wall_sit,
-                name = "Devorga suyanib o'tirish",
-                difficulty = "medium",
-                category = "Kuch",
-                calories = 5,
-                durationSeconds = 30,
-                benefits = listOf(
-                    "Son oldi mushaklarini chiniqtiradi",
-                    "Statik chidamlilikni mustahkamlaydi"
-                ),
-                instructions = listOf(
-                    "Devorga suyanib turing va sekin pastga sirpaning",
-                    "Tizzalaringiz 90 daraja burchak hosil qilsin",
-                    "Ushbu holatni belirlangan vaqt davomida saqlab turing"
-                )
-            ),
-            HomeExercise(
+            ), HomeExercise(
                 id = "superman",
                 imageRes = R.drawable.supermen,
                 name = "Superman",
@@ -313,8 +207,7 @@ object WeightLossExercisesRepository {
                 calories = 3,
                 durationSeconds = 30,
                 benefits = listOf(
-                    "Bel va orqa mushaklarini mustahkamlaydi",
-                    "Osanka uchun foydali"
+                    "Bel va orqa mushaklarini mustahkamlaydi", "Osanka uchun foydali"
                 ),
                 instructions = listOf(
                     "Qorin bilan yoting, qo'llarni oldinga va oyoqlarni orqaga cho'zing",
@@ -336,38 +229,29 @@ object WeightLossExercisesRepository {
                 name = "10 daqiqalik intensiv vazn yo'qotish mashqi",
                 calories = 120,
                 benefits = listOf(
-                    "Metabolizmni tezlashtiradi",
-                    "Tez kkal yoqish",
-                    "Chidamlilikni oshirish"
+                    "Metabolizmni tezlashtiradi", "Tez kkal yoqish", "Chidamlilikni oshirish"
                 ),
                 youtubeVideoId = "fUJjsUn9bCo",
                 durationSeconds = 600
-            ),
-            HomeVideo(
+            ), HomeVideo(
                 id = "video_butun_tana",
                 name = "Butun tana yog'ini eritish mashg'uloti",
                 calories = 180,
                 benefits = listOf(
-                    "Tana reliesini yaxshilash",
-                    "Yog'larni yo'q qilish",
-                    "Kuchni oshirish"
+                    "Tana reliesini yaxshilash", "Yog'larni yo'q qilish", "Kuchni oshirish"
                 ),
                 youtubeVideoId = "k-dcaDbToYM",
                 durationSeconds = 900
-            ),
-            HomeVideo(
+            ), HomeVideo(
                 id = "video_tabata_cardio",
                 name = "Tabata - 20 daqiqalik yuqori kardio",
                 calories = 240,
                 benefits = listOf(
-                    "Yurakni chiniqtiradi",
-                    "Tezkor kkal sarflash",
-                    "To'liq kardio chidamlilik"
+                    "Yurakni chiniqtiradi", "Tezkor kkal sarflash", "To'liq kardio chidamlilik"
                 ),
                 youtubeVideoId = "qiPWEgO-bJc",
                 durationSeconds = 1200
-            ),
-            HomeVideo(
+            ), HomeVideo(
                 id = "video_qorin_yoqotish",
                 name = "Uydan chiqmay qorinni yo'qotish",
                 calories = 150,
@@ -378,8 +262,7 @@ object WeightLossExercisesRepository {
                 ),
                 youtubeVideoId = "f2Nggh-3-8s",
                 durationSeconds = 720
-            ),
-            HomeVideo(
+            ), HomeVideo(
                 id = "video_tezkor_kardio",
                 name = "Tezkor 15 daqiqalik kardio mashg'ulot",
                 calories = 160,

@@ -32,6 +32,17 @@ object StreakRepository {
         UserProfileRepository.updateStreakInfo(updatedStreakInfo)
     }
 
+    fun resetStreak() {
+        val currentUser = UserProfileRepository.user
+        if (!currentUser.valid) return
+        val streakInfo = currentUser.streakInfo ?: StreakInfo()
+
+        val updatedStreakInfo = streakInfo.copy(
+            currentStreak = 0
+        )
+        UserProfileRepository.updateStreakInfo(updatedStreakInfo)
+    }
+
     fun updateStreak() {
         val currentUser = UserProfileRepository.user
         if (!currentUser.valid) return

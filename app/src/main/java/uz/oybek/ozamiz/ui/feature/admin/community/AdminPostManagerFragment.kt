@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.databinding.FragmentAdminPostManagerBinding
@@ -32,7 +31,7 @@ class AdminPostManagerFragment : BaseFragment<FragmentAdminPostManagerBinding>()
     }
 
     private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener { findNavController().navigateUp() }
+        binding.toolbar.setNavigationOnClickListener { navigateUp() }
         binding.btnDeleteAll.setOnClickListener {
             viewModel.deleteAllLoadedPosts()
         }

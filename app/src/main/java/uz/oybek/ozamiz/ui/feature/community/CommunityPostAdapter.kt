@@ -21,7 +21,6 @@ class CommunityPostAdapter(
     private val onDeleteClick: (CommunityPost) -> Unit,
     private val onViewed: (String) -> Unit,
     private val onVerifyClick: ((CommunityPost) -> Unit)? = null,
-    private val showProfileLink: Boolean = true,
     private val showPremiumBadge: Boolean = true
 ) : ListAdapter<CommunityPost, CommunityPostAdapter.PostViewHolder>(PostDiffCallback()) {
 
@@ -47,6 +46,7 @@ class CommunityPostAdapter(
                 onViewed(post.id)
             }
             binding.tvUserName.text = post.userName
+            binding.tvUserName.isVisible = true
 
             if (showPremiumBadge) {
                 Glide.with(binding.root)
@@ -56,47 +56,48 @@ class CommunityPostAdapter(
                     .circleCrop()
                     .into(binding.imgUserAvatar)
             }
-            binding.tvPremiumStatus.isVisible = (post.isPremiumUser && showPremiumBadge).also {
-                binding.imgUserAvatar.isVisible = showPremiumBadge
-                binding.tvUserName.isVisible = showPremiumBadge
+            binding.imgUserAvatar.isVisible = showPremiumBadge
+            binding.tvPremiumStatus.isVisible = post.isPremiumUser && showPremiumBadge
+
+            // Extract weight loss for achievement posts and show it next to name
+            val isWeightLoss = post.type == WEIGHT_LOSS || post.type == "ACHIEVEMENT"
+            val weightLossValue = post.weightLoss
+
+            if (isWeightLoss) {
+                if (weightLossValue != null && weightLossValue > 0.0) {
+                    val formatted = if (weightLossValue % 1.0 == 0.0) {
+                        "${weightLossValue.toInt()} kg"
+                    } else {
+                        String.format(java.util.Locale.US, "%.1f kg", weightLossValue)
+                    }
+                    binding.tvWeightLossTag.isVisible = true
+                    binding.tvWeightLossTag.text = "-$formatted ozildi"
+                } else {
+                    val match = Regex("""(\d+([.,]\d+)?)\s*kg""").find(post.title)
+                    if (match != null) {
+                        val numStr = match.groupValues[1].replace(',', '.')
+                        binding.tvWeightLossTag.isVisible = true
+                        binding.tvWeightLossTag.text = "-$numStr kg ozildi"
+                    } else {
+                        binding.tvWeightLossTag.isVisible = false
+                    }
+                }
+            } else {
+                binding.tvWeightLossTag.isVisible = false
             }
 
-            // Hide calories and food name if not a food post
+            // Hide calories if not a food post
             val isFoodPost = post.type == FOOD || post.foodName.isNotBlank()
             binding.tvFoodCalories.isVisible = isFoodPost && post.calories > 0
-            val mealLabel = getMealTimeLabel(post.mealType)
-            val foodTitle = post.foodName.ifBlank { post.title }
-
+            
             if (isFoodPost) {
-                binding.tvFoodName.text = if (mealLabel.isNotEmpty()) "$mealLabel • $foodTitle" else foodTitle
                 val scoreText = if (post.healthScore > 0) "  •  ⭐ ${post.healthScore}/10" else ""
                 binding.tvFoodCalories.text = "${post.calories} kkal$scoreText"
-            } else {
-                binding.tvFoodName.text = if (mealLabel.isNotEmpty()) "$mealLabel • $foodTitle" else foodTitle
             }
 
             binding.layoutViews.isVisible = post.viewsCount > 0
             binding.tvViewsCount.text = post.viewsCount.toString()
 
-            var description = if (post.description.isNotEmpty()) post.description else post.comment
-            if (isFoodPost && description != null) {
-                val chatIndex = description.indexOf("💬")
-                if (chatIndex != -1) {
-                    description = description.substring(0, chatIndex).trim()
-                }
-            }
-
-            if (description.isNullOrBlank()) {
-                binding.tvComment.isVisible = false
-            } else {
-                binding.tvComment.isVisible = true
-                val formattedDesc = if (isFoodPost && !description.startsWith("💡") && !description.startsWith("✅")) {
-                    "💡 Foydalari: $description"
-                } else {
-                    description
-                }
-                binding.tvComment.text = formattedDesc
-            }
             val timestamp = post.timestamp
             if (timestamp != null) {
                 val diff = System.currentTimeMillis() - timestamp.time
@@ -113,13 +114,13 @@ class CommunityPostAdapter(
                 binding.tvTime.text = ""
             }
 
-            val isWeightLoss = post.type == WEIGHT_LOSS || post.type == "ACHIEVEMENT"
+            val isWeightLossType = post.type == WEIGHT_LOSS || post.type == "ACHIEVEMENT"
             val photos =
                 (if (post.photos.isNotEmpty()) post.photos else if (post.photoUrl.isNotEmpty()) listOf(
                     post.photoUrl
                 ) else emptyList()).filter { it.isNotBlank() }
 
-            if (photos.size >= 2 && isWeightLoss) {
+            if (photos.size >= 2 && isWeightLossType) {
                 binding.imgFoodPhoto.isVisible = false
                 binding.layoutPhotoComparison.isVisible = true
 
@@ -184,8 +185,6 @@ class CommunityPostAdapter(
             }
             binding.imgUserAvatar.setOnClickListener(userClickListener)
             binding.tvUserName.setOnClickListener(userClickListener)
-            binding.btnViewProfile.setOnClickListener(userClickListener)
-            binding.btnViewProfile.isVisible = showProfileLink
 
             // Admin features
             val isAdmin = UserProfileRepository.user.admin
@@ -207,16 +206,6 @@ class CommunityPostAdapter(
                 }
                 popup.show()
             }
-        }
-    }
-
-    private fun getMealTimeLabel(mealType: String?): String {
-        return when (mealType?.lowercase()?.trim()) {
-            "breakfast", "nonushta" -> "Nonushta 🌅"
-            "lunch", "tushlik" -> "Tushlik ☀️"
-            "dinner", "kechki_ovqat", "kechki", "kechki ovqat" -> "Kechki ovqat 🌙"
-            "snack", "tamaddi", "orada" -> "Tamaddi 🍎"
-            else -> ""
         }
     }
 }

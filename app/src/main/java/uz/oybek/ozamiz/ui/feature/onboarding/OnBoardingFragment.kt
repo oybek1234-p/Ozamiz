@@ -22,6 +22,9 @@ class OnBoardingFragment : BaseFragment<FragmentOnboardingBinding>() {
             backButton.setOnClickListener {
                 viewModel.moveBack()
             }
+            viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+                backButton.isEnabled = !loading
+            }
             setupProgress()
             setupNavigation()
         }
@@ -46,7 +49,6 @@ class OnBoardingFragment : BaseFragment<FragmentOnboardingBinding>() {
             .observe(viewLifecycleOwner) {
                 when (it) {
                     is OnBoardingDirection.Finished -> {
-                        viewModel.finishOnboarding()
                         mainActivity()?.recreateUi()
                     }
 

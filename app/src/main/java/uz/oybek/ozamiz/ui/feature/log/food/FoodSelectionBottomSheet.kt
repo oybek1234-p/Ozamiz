@@ -11,6 +11,7 @@ import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.food.model.ServingSize
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.BottomSheetFoodSelectionDetailBinding
+import uz.oybek.ozamiz.ui.utils.showKeyboard
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -23,8 +24,12 @@ class FoodSelectionBottomSheet(
     private var _binding: BottomSheetFoodSelectionDetailBinding? = null
     private val binding get() = _binding!!
 
+    private var servings: List<ServingSize> = emptyList()
     private var selectedServingSize: ServingSize? = null
     private var quantity: Double = 1.0
+
+    private var isGramMode: Boolean = false
+    private var customGrams: Double = 100.0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,10 +48,11 @@ class FoodSelectionBottomSheet(
     private fun setupUI() {
         binding.textViewFoodNameDetail.text = foodItem.name
 
-        val servings = foodItem.servingSizes.ifEmpty {
-            listOf(ServingSize("Gramm", 1.0), ServingSize("100g", 100.0))
+        servings = foodItem.servingSizes.ifEmpty {
+            listOf(ServingSize("Porsiya", 100.0))
         }
         selectedServingSize = servings.first()
+        customGrams = selectedServingSize?.grams ?: 100.0
 
         val adapter = ArrayAdapter(
             requireContext(),
@@ -58,6 +64,7 @@ class FoodSelectionBottomSheet(
 
         binding.autoCompleteServingSize.setOnItemClickListener { _, _, position, _ ->
             selectedServingSize = servings[position]
+            customGrams = (selectedServingSize?.grams ?: 100.0) * quantity
             updateNutrition()
         }
 
@@ -65,6 +72,15 @@ class FoodSelectionBottomSheet(
             val input = it.toString().toDoubleOrNull() ?: 0.0
             if (quantity != input) {
                 quantity = input
+                customGrams = (selectedServingSize?.grams ?: 100.0) * quantity
+                updateNutrition()
+            }
+        }
+
+        binding.editTextGrams.addTextChangedListener {
+            val input = it.toString().toDoubleOrNull() ?: 0.0
+            if (customGrams != input) {
+                customGrams = input
                 updateNutrition()
             }
         }
@@ -83,11 +99,45 @@ class FoodSelectionBottomSheet(
             }
         }
 
+        // Gramni kiritish / Porsiya bo'yicha rejim almashtirish
+        binding.buttonToggleMode.setOnClickListener {
+            if (!isGramMode) {
+                // Gram rejimiga o'tish
+                isGramMode = true
+                binding.layoutPortionContainer.visibility = View.GONE
+                binding.layoutGramContainer.visibility = View.VISIBLE
+                binding.buttonToggleMode.text = "Porsiya bo'yicha tanlash"
+
+                val gramsText = if (customGrams % 1.0 == 0.0) customGrams.toInt().toString() else customGrams.toString()
+                binding.editTextGrams.setText(gramsText)
+                binding.editTextGrams.setSelection(gramsText.length)
+                binding.editTextGrams.requestFocus()
+                binding.editTextGrams.showKeyboard()
+            } else {
+                // Porsiya rejimiga qaytish
+                isGramMode = false
+                binding.layoutGramContainer.visibility = View.GONE
+                binding.layoutPortionContainer.visibility = View.VISIBLE
+                binding.buttonToggleMode.text = "Gramni kiritish"
+
+                val sGrams = selectedServingSize?.grams ?: 100.0
+                if (sGrams > 0) {
+                    val converted = customGrams / sGrams
+                    quantity = if (converted > 0) (Math.round(converted * 10.0) / 10.0) else 1.0
+                    updateQuantityText()
+                }
+            }
+            updateNutrition()
+        }
+
         binding.buttonLogFood.setOnClickListener {
-            if (quantity <= 0.0) return@setOnClickListener
-            val log = createFoodLog()
-            onLogAdded(log)
-            dismiss()
+            val currentWeight = if (isGramMode) customGrams else (selectedServingSize?.grams ?: 100.0) * quantity
+            if (currentWeight <= 0.0) return@setOnClickListener
+            if (isAdded && !isRemoving) {
+                val log = createFoodLog()
+                onLogAdded(log)
+                dismiss()
+            }
         }
 
         updateNutrition()
@@ -97,12 +147,16 @@ class FoodSelectionBottomSheet(
         val text = if (quantity % 1.0 == 0.0) quantity.toInt().toString() else quantity.toString()
         binding.editTextQuantity.setText(text)
         binding.editTextQuantity.setSelection(text.length)
+        customGrams = (selectedServingSize?.grams ?: 100.0) * quantity
         updateNutrition()
     }
 
     private fun updateNutrition() {
-        val serving = selectedServingSize ?: return
-        val weight = serving.grams * quantity
+        val weight = if (isGramMode) {
+            customGrams
+        } else {
+            (selectedServingSize?.grams ?: 100.0) * quantity
+        }
 
         val calories = (foodItem.caloriesPer100g * weight / 100).roundToInt()
         val carbs = (foodItem.carbsPer100g * weight / 100)
@@ -125,18 +179,28 @@ class FoodSelectionBottomSheet(
     }
 
     private fun createFoodLog(): FoodLog {
-        val serving = selectedServingSize!!
-        val weight = serving.grams * quantity
+        val weight = if (isGramMode) {
+            customGrams
+        } else {
+            (selectedServingSize?.grams ?: 100.0) * quantity
+        }
 
         val calories = (foodItem.caloriesPer100g * weight / 100).roundToInt()
         val carbs = (foodItem.carbsPer100g * weight / 100)
         val protein = (foodItem.proteinPer100g * weight / 100)
         val fat = (foodItem.fatPer100g * weight / 100)
 
-        val displayQuantity = if (quantity % 1.0 == 0.0) quantity.toInt().toString() else quantity.toString()
+        val portionDescription = if (isGramMode) {
+            val gramsFormatted = if (customGrams % 1.0 == 0.0) customGrams.toInt().toString() else customGrams.toString()
+            "${gramsFormatted} g"
+        } else {
+            val serving = selectedServingSize ?: servings.first()
+            val displayQuantity = if (quantity % 1.0 == 0.0) quantity.toInt().toString() else quantity.toString()
+            "$displayQuantity ${serving.description.lowercase()}"
+        }
 
         return FoodLog(
-            description = "${foodItem.name} ($displayQuantity ${serving.description})",
+            description = "${foodItem.name} ($portionDescription)",
             calories = calories,
             protein = protein,
             fat = fat,
