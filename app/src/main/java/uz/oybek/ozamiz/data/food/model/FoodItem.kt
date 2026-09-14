@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.data.food.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class FoodItem(
     val id: String = "",
     val name: String = "",
@@ -14,6 +17,7 @@ data class FoodItem(
     val searchAliases: List<String> = emptyList()
 )
 
+@Keep
 data class ServingSize(
     val description: String = "",
     val grams: Double = 0.0

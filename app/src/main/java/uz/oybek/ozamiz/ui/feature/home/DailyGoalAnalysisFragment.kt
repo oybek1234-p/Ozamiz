@@ -42,7 +42,7 @@ class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>
         viewLifecycleOwner.lifecycleScope.launch {
             val user = UserProfileRepository.user
             val isGainWeight = user.goal == "gain_weight"
-            val summary = LogRepository.getDailySummarySync(Date())
+            val summary = LogRepository.getDailySummarySync(Date(), forceRefresh = true)
             if (!isAdded || isDetached || context == null) return@launch
 
             val targetCals = if (user.targetCalories > 0) user.targetCalories else 2000

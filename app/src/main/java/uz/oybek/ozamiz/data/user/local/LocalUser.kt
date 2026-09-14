@@ -55,6 +55,14 @@ object LocalUser {
         user.block()
         saveUser()
     }
+
+    fun clear() {
+        user = User()
+        preference(appContext).edit {
+            clear()
+        }
+        _userLive.postVal(user)
+    }
 }
 
 val user: User get() = LocalUser.user

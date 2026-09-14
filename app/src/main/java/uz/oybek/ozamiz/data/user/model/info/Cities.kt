@@ -1,8 +1,10 @@
 package uz.oybek.ozamiz.data.user.model.info
 
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
 
+@Keep
 enum class Cities(val resId: Int) {
     Hammasi(R.string.butun_uzbekiston),
     Toshkent(R.string.toshkent),

@@ -190,6 +190,10 @@ object LogRepository {
 
     private val localSummaryCache = java.util.concurrent.ConcurrentHashMap<String, DailySummary>()
 
+    fun clearCache() {
+        localSummaryCache.clear()
+    }
+
     fun cacheSummary(dateStr: String, summary: DailySummary) {
         localSummaryCache[dateStr] = summary
     }
@@ -241,14 +245,22 @@ object LogRepository {
         return resultMap
     }
 
-    suspend fun getDailySummarySync(date: Date): DailySummary {
+    suspend fun getDailySummarySync(date: Date, forceRefresh: Boolean = false): DailySummary {
         val userId = currentUserId
         if (userId.isBlank()) return DailySummary()
         val formattedDate = date.dateApiFormat()
-        val cached = localSummaryCache[formattedDate]
-        if (cached != null) return cached
+        if (!forceRefresh) {
+            val cached = localSummaryCache[formattedDate]
+            if (cached != null) return cached
+        }
 
         return try {
+            val summarySnapshot = FirebasePaths.Database.summary(userId, formattedDate).get().await()
+            val summaryFromDb = summarySnapshot.getValue(DailySummary::class.java)
+            if (summaryFromDb != null) {
+                localSummaryCache[formattedDate] = summaryFromDb
+                return summaryFromDb
+            }
             val snapshot = FirebasePaths.Database.dailyLogs(userId, formattedDate).get().await()
             val dailyLogs = snapshot.getValueSafe(DailyLogs::class.java)
             val summary = calculateSummary(dailyLogs)
@@ -283,7 +295,11 @@ object LogRepository {
                     for (child in snapshot.children) {
                         val summary = child.getValue(DailySummary::class.java)
                         if (summary != null) {
-                            map[child.key ?: ""] = summary
+                            val key = child.key ?: ""
+                            map[key] = summary
+                            if (key.isNotBlank()) {
+                                localSummaryCache[key] = summary
+                            }
                         }
                     }
                     trySend(map)
@@ -338,6 +354,12 @@ object LogRepository {
                 committed: Boolean,
                 currentData: DataSnapshot?
             ) {
+                if (committed && currentData != null) {
+                    val updated = currentData.getValue(DailySummary::class.java)
+                    if (updated != null) {
+                        localSummaryCache[dateStr] = updated
+                    }
+                }
                 it.resume(Unit)
                 if (error != null) {
                     recordException(error.toException())

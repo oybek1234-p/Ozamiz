@@ -4,12 +4,14 @@ import uz.oybek.ozamiz.data.premium.PremiumRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.utils.DataWrapper.Success
 
+import androidx.annotation.Keep
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
+@Keep
 data class PremiumSheetUiState(
     val isLoading: Boolean = false,
     val monthlyPrice: Long = 0L,

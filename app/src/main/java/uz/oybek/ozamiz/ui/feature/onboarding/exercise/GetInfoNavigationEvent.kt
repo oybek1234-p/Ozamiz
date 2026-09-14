@@ -61,7 +61,12 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
         problems: List<String>?,
         phoneNumber: String,
         activityLevel: String,
-        manzil: String?
+        manzil: String?,
+        goal: String = "lose_weight",
+        targetCalories: Int = 0,
+        targetProtein: Int = 0,
+        targetFat: Int = 0,
+        targetCarbs: Int = 0
     ) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -74,14 +79,23 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
                     height = height,
                     weight = weight,
                     targetWeight = targetWeight,
+                    goal = goal,
                     problems = problems ?: emptyList(),
                     phoneNumber = phoneNumber,
                     activityLevel = activityLevel,
+                    region = manzil ?: existingUser.region,
+                    targetCalories = targetCalories,
+                    targetProtein = targetProtein,
+                    targetFat = targetFat,
+                    targetCarbs = targetCarbs,
                     registerDate = existingUser.registerDate
                 )
 
-                // Centralized calculation for calories, macros, and water
-                DietController.updateTargetValues(userToUpdate)
+                // Centralized calculation for calories, macros, and water if not already specified
+                DietController.updateTargetValues(userToUpdate, if (targetCalories > 0) targetCalories else null)
+                if (targetProtein > 0) userToUpdate.targetProtein = targetProtein
+                if (targetFat > 0) userToUpdate.targetFat = targetFat
+                if (targetCarbs > 0) userToUpdate.targetCarbs = targetCarbs
 
                 UserProfileRepository.updateUser {
                     this.name = userToUpdate.name
@@ -91,6 +105,7 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
                     this.weight = userToUpdate.weight
                     this.targetWeight = userToUpdate.targetWeight
                     this.startWeight = userToUpdate.startWeight
+                    this.goal = userToUpdate.goal
                     this.problems = userToUpdate.problems
                     this.targetCalories = userToUpdate.targetCalories
                     this.targetProtein = userToUpdate.targetProtein

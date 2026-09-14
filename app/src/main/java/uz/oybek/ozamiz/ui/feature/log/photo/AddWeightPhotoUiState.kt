@@ -10,12 +10,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.community.AchievementPostHelper
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
 
+@Keep
 data class AddWeightPhotoUiState(
     val isLoading: Boolean = false,
     val error: String? = null,

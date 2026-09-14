@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.exercises
 
+import androidx.annotation.Keep
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.exercise.WeightLossExercisesRepository
 import uz.oybek.ozamiz.data.exercise.model.HomeExercise
 
+@Keep
 data class WeightLossExerciseDetailUiState(
     val exercise: HomeExercise? = null,
     val timeLeftSeconds: Int = 0,

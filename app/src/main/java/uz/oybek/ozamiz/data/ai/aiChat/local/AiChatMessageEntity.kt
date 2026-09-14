@@ -1,8 +1,10 @@
 package uz.oybek.ozamiz.data.ai.aiChat.local
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Keep
 @Entity(tableName = "ai_chat_messages")
 data class AiChatMessageEntity(
     @PrimaryKey(autoGenerate = true)

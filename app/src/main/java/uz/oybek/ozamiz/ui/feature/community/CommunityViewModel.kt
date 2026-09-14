@@ -12,10 +12,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.community.CommunityPostRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.CommunityPostFilter
 import uz.oybek.ozamiz.data.notification.model.NotificationModel.Companion.TYPE_LIKE
 
+@Keep
 data class CommunityState(
     val posts: List<CommunityPost> = emptyList(),
     val isLoading: Boolean = false,

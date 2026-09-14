@@ -443,11 +443,28 @@
         <action
             android:id="@+id/action_foodCameraFragment_to_writeFoodFragment"
             app:destination="@id/writeFoodFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit"
             app:popUpTo="@id/foodCameraFragment"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_foodCameraFragment_to_searchFoodFragment"
             app:destination="@id/searchFoodFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit"
+            app:popUpTo="@id/foodCameraFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_foodCameraFragment_to_savedFoodsFragment"
+            app:destination="@id/savedFoodsFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit"
             app:popUpTo="@id/foodCameraFragment"
             app:popUpToInclusive="true" />
     </fragment>

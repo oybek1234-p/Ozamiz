@@ -14,12 +14,21 @@ import com.yandex.mobile.ads.interstitial.InterstitialAd
 import com.yandex.mobile.ads.interstitial.InterstitialAdEventListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoadListener
 import com.yandex.mobile.ads.interstitial.InterstitialAdLoader
+import com.yandex.mobile.ads.rewarded.Reward
+import com.yandex.mobile.ads.rewarded.RewardedAd
+import com.yandex.mobile.ads.rewarded.RewardedAdEventListener
+import com.yandex.mobile.ads.rewarded.RewardedAdLoadListener
+import com.yandex.mobile.ads.rewarded.RewardedAdLoader
 import kotlin.math.roundToInt
 
 object AdsManager {
 
     fun initialize(context: Context) {
-        YandexAds.initialize(context) {}
+        try {
+            YandexAds.initialize(context) {}
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     fun createBannerView(
@@ -28,27 +37,28 @@ object AdsManager {
         listener: BannerAdEventListener? = null
     ): BannerAdView {
         val bannerAdView = BannerAdView(context)
+        try {
+            val adSize = getAdSize(context)
+            bannerAdView.setAdSize(adSize)
+            bannerAdView.setBannerAdEventListener(listener)
 
-        val adSize = getAdSize(context)
-        bannerAdView.setAdSize(adSize)
-        bannerAdView.setBannerAdEventListener(listener)
-
-        val adRequest = AdRequest.Builder(adUnitId).build()
-        bannerAdView.loadAd(adRequest)
-
+            val adRequest = AdRequest.Builder(adUnitId).build()
+            bannerAdView.loadAd(adRequest)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         return bannerAdView
     }
 
     private fun getAdSize(context: Context): BannerAdSize {
         var adWidthPixels = context.resources.displayMetrics.widthPixels
-        if (adWidthPixels == 0) {
-            adWidthPixels = context.resources.displayMetrics.widthPixels
+        if (adWidthPixels <= 0) {
+            adWidthPixels = 320
         }
-
         val density = context.resources.displayMetrics.density
-        val adWidth = (adWidthPixels / density).roundToInt()
+        val adWidth = if (density > 0) (adWidthPixels / density).roundToInt() else 320
 
-        return BannerAdSize.inline(context, adWidth, 150)
+        return BannerAdSize.sticky(context, adWidth)
     }
 
     fun loadAndShowInterstitial(context: Context, adUnitId: String, onFinished: () -> Unit) {
@@ -61,7 +71,13 @@ object AdsManager {
         val safeFinished = {
             if (!isFinishedCalled) {
                 isFinishedCalled = true
-                onFinished()
+                if (!context.isFinishing && !context.isDestroyed) {
+                    context.runOnUiThread {
+                        onFinished()
+                    }
+                } else {
+                    onFinished()
+                }
             }
         }
 
@@ -69,12 +85,12 @@ object AdsManager {
         val timeoutRunnable = Runnable {
             safeFinished()
         }
-        handler.postDelayed(timeoutRunnable, 6000)
+        handler.postDelayed(timeoutRunnable, 5000)
 
-        val config = AdRequest.Builder(adUnitId).build()
-
-        InterstitialAdLoader(context).apply {
-            loadAd(
+        try {
+            val config = AdRequest.Builder(adUnitId).build()
+            val loader = InterstitialAdLoader(context)
+            loader.loadAd(
                 config,
                 object : InterstitialAdLoadListener {
                     override fun onAdLoaded(ad: InterstitialAd) {
@@ -104,7 +120,11 @@ object AdsManager {
                         handler.removeCallbacks(timeoutRunnable)
                         safeFinished()
                     }
-                })
+                }
+            )
+        } catch (e: Exception) {
+            handler.removeCallbacks(timeoutRunnable)
+            safeFinished()
         }
     }
 
@@ -113,45 +133,74 @@ object AdsManager {
         adUnitId: String,
         onFinished: (rewarded: Boolean) -> Unit
     ) {
-        val config = AdRequest.Builder(adUnitId).build()
+        if (context !is Activity || context.isFinishing || context.isDestroyed) {
+            onFinished(true)
+            return
+        }
+
         var isRewardedGranted = false
-
-        val loader = com.yandex.mobile.ads.rewarded.RewardedAdLoader(context)
-
-        loader.loadAd(
-            config,
-            object : com.yandex.mobile.ads.rewarded.RewardedAdLoadListener {
-                override fun onAdLoaded(rewarded: com.yandex.mobile.ads.rewarded.RewardedAd) {
-                    rewarded.setAdEventListener(object :
-                        com.yandex.mobile.ads.rewarded.RewardedAdEventListener {
-                        override fun onAdShown() {}
-                        override fun onAdFailedToShow(error: AdError) {
-                            onFinished(isRewardedGranted || true)
-                        }
-
-                        override fun onAdDismissed() {
-                            onFinished(isRewardedGranted || true)
-                        }
-
-                        override fun onRewarded(reward: com.yandex.mobile.ads.rewarded.Reward) {
-                            isRewardedGranted = true
-                        }
-
-                        override fun onAdClicked() {}
-                        override fun onAdImpression(data: ImpressionData?) {}
-                    })
-
-                    if (context is Activity && !context.isFinishing && !context.isDestroyed) {
-                        rewarded.show(context)
-                    } else {
-                        onFinished(true)
+        var isFinishedCalled = false
+        val safeFinished = { granted: Boolean ->
+            if (!isFinishedCalled) {
+                isFinishedCalled = true
+                if (!context.isFinishing && !context.isDestroyed) {
+                    context.runOnUiThread {
+                        onFinished(granted)
                     }
-                }
-
-                override fun onAdFailedToLoad(error: AdRequestError) {
-                    onFinished(true)
+                } else {
+                    onFinished(granted)
                 }
             }
-        )
+        }
+
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        val timeoutRunnable = Runnable {
+            safeFinished(true)
+        }
+        handler.postDelayed(timeoutRunnable, 6000)
+
+        try {
+            val config = AdRequest.Builder(adUnitId).build()
+            val loader = RewardedAdLoader(context)
+            loader.loadAd(
+                config,
+                object : RewardedAdLoadListener {
+                    override fun onAdLoaded(rewarded: RewardedAd) {
+                        handler.removeCallbacks(timeoutRunnable)
+                        rewarded.setAdEventListener(object : RewardedAdEventListener {
+                            override fun onAdShown() {}
+                            override fun onAdFailedToShow(error: AdError) {
+                                safeFinished(isRewardedGranted || true)
+                            }
+
+                            override fun onAdDismissed() {
+                                safeFinished(isRewardedGranted || true)
+                            }
+
+                            override fun onRewarded(reward: Reward) {
+                                isRewardedGranted = true
+                            }
+
+                            override fun onAdClicked() {}
+                            override fun onAdImpression(data: ImpressionData?) {}
+                        })
+
+                        if (!context.isFinishing && !context.isDestroyed) {
+                            rewarded.show(context)
+                        } else {
+                            safeFinished(true)
+                        }
+                    }
+
+                    override fun onAdFailedToLoad(error: AdRequestError) {
+                        handler.removeCallbacks(timeoutRunnable)
+                        safeFinished(true)
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            handler.removeCallbacks(timeoutRunnable)
+            safeFinished(true)
+        }
     }
 }

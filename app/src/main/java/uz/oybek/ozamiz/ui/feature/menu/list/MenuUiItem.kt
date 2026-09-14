@@ -1,8 +1,10 @@
 package uz.oybek.ozamiz.ui.feature.menu.list
 
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.menu.CalorieFilter
 import uz.oybek.ozamiz.data.menu.FilterItem
 
+@Keep
 sealed interface MenuUiItem {
     
     data class Header(val titleResId: Int) : MenuUiItem

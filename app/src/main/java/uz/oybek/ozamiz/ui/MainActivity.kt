@@ -53,6 +53,7 @@ import uz.oybek.ozamiz.data.user.UserAuthRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.user.model.daysFromRegister
 import uz.oybek.ozamiz.data.utils.CompanyLinks
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
@@ -84,9 +85,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleSignOut() {
-        UserAuthRepository.signOut()
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
+        lifecycleScope.launch {
+            UserAuthRepository.signOut()
+            val intent = Intent(this@MainActivity, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
+        }
     }
 
     init {
@@ -116,7 +122,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
@@ -147,12 +153,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun checkCurrentUser(graph: NavGraph) {
         if (!user.valid) {
-            UserAuthRepository.signOut()
+            lifecycleScope.launch { UserAuthRepository.signOut() }
             graph.setStartDestination(R.id.authFragment)
-        } else if (!user.hasBasicCalorieData) {
-            graph.setStartDestination(R.id.onboarding)
         } else {
-            graph.setStartDestination(R.id.home)
+            val isExistingUser = user.name.isNotBlank()
+                    && (user.daysFromRegister() > 0)
+            if (AppPreference.isOnboardingCompleted || isExistingUser) {
+                graph.setStartDestination(R.id.home)
+            } else {
+                graph.setStartDestination(R.id.onboarding)
+            }
         }
     }
 

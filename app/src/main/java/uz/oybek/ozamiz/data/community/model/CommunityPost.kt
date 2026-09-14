@@ -1,9 +1,11 @@
 package uz.oybek.ozamiz.data.community.model
 
+import androidx.annotation.Keep
 import com.google.firebase.firestore.PropertyName
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
+@Keep
 data class CommunityPost(
     var id: String = "",
     var userId: String = "",

@@ -1,8 +1,10 @@
 package uz.oybek.ozamiz.data.notification.model
 
+import androidx.annotation.Keep
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
+@Keep
 data class NotificationModel(
     var id: String = "",
     var type: String = "", // "like", "comment", etc.

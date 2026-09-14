@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.data.user.model
 
+import androidx.annotation.Keep
+
+@Keep
 enum class UserSortType {
     MOST_ACTIVE,
     MOST_POINTS,

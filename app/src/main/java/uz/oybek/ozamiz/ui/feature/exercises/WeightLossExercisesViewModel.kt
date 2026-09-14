@@ -1,10 +1,12 @@
 package uz.oybek.ozamiz.ui.feature.exercises
 
+import androidx.annotation.Keep
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import uz.oybek.ozamiz.data.exercise.WeightLossExercisesRepository
 
+@Keep
 data class WeightLossExercisesUiState(
     val exercises: List<WeightLossExerciseUiModel> = emptyList(),
     val videos: List<WeightLossVideoUiModel> = emptyList()

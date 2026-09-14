@@ -84,14 +84,6 @@ data class User(
     @Transient
     val valid: Boolean get() = uid.isNotEmpty()
 
-    @Transient
-    val hasBasicCalorieData: Boolean
-        get() = name.isNotBlank() &&
-                gender != -1 &&
-                age > 0 &&
-                height > 0 &&
-                weight > 0.0
-
     @get:com.google.firebase.database.Exclude
     val registerDateLong: Long?
         get() = registerDate?.let { DateUtils.toLongTimestamp(it) }

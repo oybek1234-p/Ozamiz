@@ -17,6 +17,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
+import androidx.navigation.NavOptions
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentFoodCameraBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -106,6 +107,16 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
         return uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(raw, getSelectedTimestamp())
     }
 
+    private val popCameraNavOptions by lazy {
+        NavOptions.Builder()
+            .setEnterAnim(R.anim.fragment_open_anim)
+            .setExitAnim(R.anim.fragment_close_anim)
+            .setPopEnterAnim(R.anim.fragment_pop_enter)
+            .setPopExitAnim(R.anim.fragment_pop_exit)
+            .setPopUpTo(R.id.foodCameraFragment, true)
+            .build()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupClickListeners(bind: FragmentFoodCameraBinding) = with(bind) {
         buttonCapture.setOnTouchListener { v, event ->
@@ -134,31 +145,38 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
         buttonWrite.setOnSafeClickListener {
             val mealType = getSelectedMealType()
             val timestamp = getSelectedTimestamp()
-            if (!uz.oybek.ozamiz.data.food.limit.FoodLimitManager.canLogFood()) {
+            if (!FoodLimitManager.canLogFood()) {
                 activity?.let { act ->
-                    uz.oybek.ozamiz.data.food.limit.FoodLimitManager.showLimitReachedSheet(
+                    FoodLimitManager.showLimitReachedSheet(
                         activity = act,
                         title = "Bugungi rasmga olish limitingiz tugadi"
                     ) {
                         navigate(
-                            R.id.action_foodCameraFragment_to_searchFoodFragment,
-                            bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+                            R.id.searchFoodFragment,
+                            bundleOf(
+                                "mealType" to mealType,
+                                "meal" to mealType,
+                                "timestamp" to timestamp
+                            ),
+                            popCameraNavOptions
                         )
                     }
                 }
                 return@setOnSafeClickListener
             }
             navigate(
-                R.id.action_foodCameraFragment_to_writeFoodFragment,
-                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+                R.id.writeFoodFragment,
+                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp),
+                popCameraNavOptions
             )
         }
         buttonList.setOnSafeClickListener {
             val mealType = getSelectedMealType()
             val timestamp = getSelectedTimestamp()
             navigate(
-                R.id.action_foodCameraFragment_to_searchFoodFragment,
-                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+                R.id.searchFoodFragment,
+                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp),
+                popCameraNavOptions
             )
         }
         buttonSaved.setOnSafeClickListener {
@@ -166,7 +184,8 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
             val timestamp = getSelectedTimestamp()
             navigate(
                 R.id.savedFoodsFragment,
-                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+                bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp),
+                popCameraNavOptions
             )
         }
         buttonFlash.setOnSafeClickListener {
@@ -229,8 +248,13 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
                     val mealType = getSelectedMealType()
                     val timestamp = getSelectedTimestamp()
                     navigate(
-                        R.id.action_foodCameraFragment_to_searchFoodFragment,
-                        bundleOf("mealType" to mealType, "meal" to mealType, "timestamp" to timestamp)
+                        R.id.searchFoodFragment,
+                        bundleOf(
+                            "mealType" to mealType,
+                            "meal" to mealType,
+                            "timestamp" to timestamp
+                        ),
+                        popCameraNavOptions
                     )
                 }
             }

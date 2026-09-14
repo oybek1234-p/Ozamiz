@@ -21,7 +21,7 @@ object AiPromptBuilder {
             }.joinToString("\n")
     }
 
-    suspend fun buildDietologInstruction(): String {
+    suspend fun buildUserContext(): String {
         val today = java.util.Date()
         val dailySummary = LogRepository.getDailySummarySync(today)
         val genderText = if (user.gender == 1) "Ayol" else "Erkak"
@@ -29,17 +29,10 @@ object AiPromptBuilder {
             (user.targetCalories - dailySummary.consumedCalories).coerceAtLeast(0)
 
         return """
-            Siz foydalanuvchining samimiy, qiziqarli va do'stona shaxsiy maslahatchisisiz (dietolog-yordamchi). Quruq, rasmiy yoki qattiqqo'l bo'lmang, oddiy, samimiy va jonli tilda gapiring.
-
-            FOYDALANUVCHI: ${user.age} yosh, $genderText, ${user.weight} kg, ${user.height} sm. Maqsadi: ${if (user.goal == "gain_weight") "Vazn yig'ish" else "Ozish"}.
-            BUGUNGI HOLAT: Kaloriya: ${dailySummary.consumedCalories}/${user.targetCalories} kkal (Qolgan: $remainingCalories kkal), Suv: ${dailySummary.consumedWaterMl}/${user.targetWaterMl} ml, Oqsil: ${dailySummary.consumedProtein}g, Yog': ${dailySummary.consumedFat}g, Uglevod: ${dailySummary.consumedCarbs}g.
-            BUGUN YEYILGANLAR: ${getGroupedFoodLogs()}
-
-            ASOSIY QOIDALAR:
-            1. QAT'IY TALAB: Javoblaringiz juda qisqa, ixcham, lo'nda va aniq bo'lsin (maksimal 2-4 ta qisqa gap yoki qisqagina punktlar). Hech qachon cho'zib, uzun doston yoki keraksiz umumiy gaplar yozmang.
-            2. Foydalanuvchining maqsadi va bugungi ko'rsatkichlaridan kelib chiqib, darhol to'g'ridan-to'g'ri amaliy maslahat bering.
-            3. Muhim so'zlarni **qalin** qilib, mos emojilar bilan bezating. Sarlavha panjaralari (#, ##, ###) umuman ishlatmang.
-            4. Har doim hurmat bilan ("Siz" deb), samimiy, do'stona va dalda beruvchi ohangda javob bering.
+            Profil: ${user.age} yosh, $genderText, ${user.weight} kg, ${user.height} sm. Maqsad: ${if (user.goal == "gain_weight") "Vazn yig'ish" else "Ozish"}.
+            Bugungi holat: Kaloriya: ${dailySummary.consumedCalories}/${user.targetCalories} kkal (Qoldi: $remainingCalories kkal), Suv: ${dailySummary.consumedWaterMl}/${user.targetWaterMl} ml, Oqsil: ${dailySummary.consumedProtein}g, Yog': ${dailySummary.consumedFat}g, Uglevod: ${dailySummary.consumedCarbs}g.
+            Bugun yeyilganlar:
+            ${getGroupedFoodLogs()}
         """.trimIndent()
     }
 }

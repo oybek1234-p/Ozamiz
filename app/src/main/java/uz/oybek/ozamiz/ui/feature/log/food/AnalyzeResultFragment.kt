@@ -19,9 +19,11 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
@@ -45,9 +47,9 @@ import uz.oybek.ozamiz.ui.utils.VaznimColors
 import uz.oybek.ozamiz.ui.utils.playSuccessSound
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 
 class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
-
 
     private val viewModel: AnalyzeResultViewModel by viewModels()
     private lateinit var ingredientsAdapter: IngredientsAdapter
@@ -59,9 +61,9 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
         if (loadingTextJob?.isActive == true) return
         loadingTextJob = viewLifecycleOwner.lifecycleScope.launch {
             binding.loadingText.text = "Ovqatni aniqlayapmiz..."
-            delay(2000)
+            delay(2000.milliseconds)
             binding.loadingText.text = "Kaloriyasini hisoblayapmiz..."
-            delay(2000)
+            delay(2000.milliseconds)
             binding.loadingText.text = "Tayyor!"
         }
     }
@@ -177,7 +179,18 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
     }
 
     private fun loadBanner() {
-        binding.bannerContainer.visibility = View.GONE
+        if (user.isPremium()) {
+            binding.bannerContainer.isVisible = false
+            return
+        }
+        try {
+            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_HOME)
+            binding.bannerContainer.removeAllViews()
+            binding.bannerContainer.addView(bannerView)
+            binding.bannerContainer.isVisible = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun showAnalyzing(isAnalyzing: Boolean) {
@@ -285,7 +298,6 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
 
                 showLoading(state.isLoading || state.isSaving)
 
-                // --- Error holati: calorie/macros/tarkib yashiriladi, retry card ko'rsatiladi ---
                 if (state.isError) {
                     binding.cardErrorState.isVisible = true
                     binding.cardCalorieBanner.isVisible = false
@@ -430,7 +442,6 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
                 binding.buttonCancel.icon = ContextCompat.getDrawable(
                     requireContext(), R.drawable.delete_ic
                 )
-
                 binding.layoutRecallActions.isVisible = state.isRecallMode
                 binding.buttonReLogFull.isVisible = state.isRecallMode
                 binding.buttonDelete.isVisible =
@@ -442,21 +453,18 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
             viewModel.event.collect { event ->
                 when (event) {
                     is AnalyzeResultEvent.Saved -> {
-                        val todaySummary = LogRepository.getDailySummarySync(Date())
+                        val todaySummary = withContext(Dispatchers.IO) {
+                            LogRepository.getDailySummarySync(Date(), forceRefresh = true)
+                        }
                         if (!isAdded || isDetached || context == null) return@collect
-
+                        val currentFoodCals = viewModel.state.value.result?.result?.getEffectiveCalories() ?: 0
+                        val effectiveConsumed = maxOf(todaySummary.consumedCalories, currentFoodCals)
                         val targetCalories =
                             if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(
                                 user
                             )
                         val isGoalReached =
-                            targetCalories > 0 && todaySummary.consumedCalories >= targetCalories
-
-                        val currentStreak = user.streakInfo?.currentStreak ?: 0
-                        if (!AppPreference.isAppReviewShown && currentStreak >= 3) {
-                            (activity as? MainActivity)?.requestAppReview()
-                            AppPreference.isAppReviewShown = true
-                        }
+                            targetCalories > 0 && effectiveConsumed >= (targetCalories - 100)
 
                         val todayStr = DateUtils.todayString()
                         if (isGoalReached && AppPreference.lastDailyGoalReachedDate != todayStr) {
@@ -574,7 +582,7 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
                 .setPositiveButton(R.string.yes) { _, _ ->
                     AnalyticsManager.logFeatureUsed("analyze_food_deleted")
                     viewModel.deleteLog { success ->
-                        if (success) {
+                        if (success && isAdded && !isDetached && view != null) {
                             popBackStack()
                         }
                     }
@@ -601,11 +609,16 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner, object : androidx.activity.OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
+                    isEnabled = false
                     val isRecall = viewModel.state.value.isRecallMode
                     if (isRecall) {
-                        popBackStack()
+                        if (!popBackStack()) {
+                            isEnabled = true
+                        }
                     } else {
-                        popBackStack(R.id.home, false)
+                        if (!popBackStack(R.id.home, false)) {
+                            isEnabled = true
+                        }
                     }
                 }
             })
@@ -714,6 +727,19 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
     }
 
     private fun shareFoodAnalysis(event: AnalyzeResultEvent.PromptShare) {
+        val cleanTitle = event.name.replace(
+            Regex("^[\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\uFE0F\\u200D\\s]+"), ""
+        ).trim()
+
+        AnalyticsManager.logFeatureUsed(
+            featureName = "food_shared",
+            extraParams = mapOf(
+                "user_id" to user.uid,
+                "user_name" to user.name,
+                "food_name" to cleanTitle
+            )
+        )
+
         val timeStr = if (event.timestamp > 0) {
             android.text.format.DateFormat.getTimeFormat(requireContext())
                 .format(Date(event.timestamp))
@@ -730,65 +756,70 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
             advice = event.advice
         )
 
-        val rawUri: Uri? = event.photoUrl?.takeIf { it.isNotBlank() && it != "null" }?.toUri()
-            ?: (arguments?.getParcelable(KEY_IMAGE_URI) ?: arguments?.getString(KEY_IMAGE_URI)?.toUri())
+        val imageSource: Any? = event.photoUrl?.takeIf { it.isNotBlank() && it != "null" }
+            ?: viewModel.state.value.pendingImageUri
+            ?: arguments?.getParcelable<Uri>(KEY_IMAGE_URI)
+            ?: arguments?.getString(KEY_IMAGE_URI)?.takeIf { it.isNotBlank() && it != "null" }
 
-        val shareUri: Uri? = rawUri?.let { uri ->
-            try {
-                if (uri.scheme == "file" || uri.scheme == null) {
-                    val filePath = uri.path ?: uri.toString()
-                    val file = File(filePath)
-                    if (file.exists()) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val shareUri: Uri? = withContext(Dispatchers.IO) {
+                if (imageSource != null) {
+                    try {
+                        val bitmap = Glide.with(requireContext().applicationContext)
+                            .asBitmap()
+                            .load(imageSource)
+                            .submit()
+                            .get()
+
+                        val shareFile = File(requireContext().cacheDir, "shared_food.jpg")
+                        shareFile.outputStream().use { out ->
+                            bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+                        }
                         FileProvider.getUriForFile(
                             requireContext(),
                             "${requireContext().packageName}.provider",
-                            file
+                            shareFile
                         )
-                    } else {
-                        uri
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        null
                     }
+                } else null
+            }
+
+            if (!isAdded || isDetached || context == null) return@launch
+
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                putExtra(Intent.EXTRA_TEXT, shareText)
+                putExtra(Intent.EXTRA_SUBJECT, cleanTitle)
+                putExtra(Intent.EXTRA_TITLE, cleanTitle)
+
+                if (shareUri != null) {
+                    type = "image/jpeg"
+                    putExtra(Intent.EXTRA_STREAM, shareUri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    val clipData = android.content.ClipData.newUri(requireContext().contentResolver, cleanTitle, shareUri)
+                    clipData.addItem(android.content.ClipData.Item(shareText))
+                    this.clipData = clipData
                 } else {
-                    uri
+                    type = "text/plain"
+                    this.clipData = android.content.ClipData.newPlainText(cleanTitle, shareText)
                 }
+            }
+
+            try {
+                val clipboard = requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
+                val clip = android.content.ClipData.newPlainText("Food Analysis", shareText)
+                clipboard?.setPrimaryClip(clip)
             } catch (e: Exception) {
-                uri
+                // Ignore
             }
-        }
 
-        val cleanTitle = event.name.replace(
-            Regex("^[\\uD83C-\\uDBFF\\uDC00-\\uDFFF\\u2600-\\u27BF\\uFE0F\\u200D\\s]+"), ""
-        ).trim()
-
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            putExtra(Intent.EXTRA_TEXT, shareText)
-            putExtra(Intent.EXTRA_SUBJECT, cleanTitle)
-            putExtra(Intent.EXTRA_TITLE, cleanTitle)
-
-            if (shareUri != null) {
-                type = "image/*"
-                putExtra(Intent.EXTRA_STREAM, shareUri)
+            val chooser = Intent.createChooser(intent, "Ovqat tahlilini ulashish").apply {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                val clipData = android.content.ClipData.newUri(requireContext().contentResolver, cleanTitle, shareUri)
-                clipData.addItem(android.content.ClipData.Item(shareText))
-                this.clipData = clipData
-            } else {
-                type = "text/plain"
-                this.clipData = android.content.ClipData.newPlainText(cleanTitle, shareText)
             }
+            startActivity(chooser)
         }
-
-        try {
-            val clipboard = requireContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE) as? android.content.ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Food Analysis", shareText)
-            clipboard?.setPrimaryClip(clip)
-        } catch (e: Exception) {
-            // Ignore
-        }
-
-        val chooser = Intent.createChooser(intent, "Ovqat tahlilini ulashish").apply {
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        startActivity(chooser)
     }
 
     private fun buildShareText(

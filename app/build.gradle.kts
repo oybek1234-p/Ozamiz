@@ -24,12 +24,12 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 37
-        versionCode = 105
-        versionName = "11"
+        versionCode = 109
+        versionName = "12"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "ru", "uz"))
     }
-    
+
     buildTypes {
         debug {
             isDebuggable = true
@@ -41,7 +41,8 @@ android {
         }
         release {
             isDebuggable = false
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )

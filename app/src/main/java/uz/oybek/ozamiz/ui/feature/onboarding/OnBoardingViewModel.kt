@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
@@ -63,18 +64,24 @@ class OnBoardingViewModel : ViewModel() {
         _isLoading.postVal(true)
         viewModelScope.launch {
             try {
+                val currentUid = uz.oybek.ozamiz.data.firebase.auth.currentUser?.uid
+                if (LocalUser.user.uid.isEmpty() && !currentUid.isNullOrEmpty()) {
+                    LocalUser.user.uid = currentUid
+                }
+                DietController.updateTargetValues(LocalUser.user)
                 UserProfileRepository.updateUser()
+
                 val success = UserProfileRepository.saveUserNetworkSuspend(LocalUser.user)
-                UserProfileRepository.onboardingStarted = false
                 _isLoading.postVal(false)
                 if (success) {
+                    AppPreference.isOnboardingCompleted = true
+                    UserProfileRepository.onboardingStarted = false
                     onSuccess()
                 } else {
                     onError()
                 }
             } catch (e: Exception) {
                 handleException(e)
-                UserProfileRepository.onboardingStarted = false
                 _isLoading.postVal(false)
                 onError()
             }

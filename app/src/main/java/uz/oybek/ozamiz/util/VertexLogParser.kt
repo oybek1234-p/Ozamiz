@@ -8,6 +8,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
+import androidx.annotation.Keep
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileInputStream
@@ -31,6 +32,7 @@ object VertexLogParser {
     private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
     private val urlPattern = Pattern.compile("(https?://[^\\s\"'<>]+|gs://[^\\s\"'<>]+)")
 
+    @Keep
     enum class LogCategory {
         USER_MESSAGE,
         AI_RESPONSE,
@@ -44,6 +46,7 @@ object VertexLogParser {
         OTHER_SYSTEM_LOG
     }
 
+    @Keep
     data class RawLogItem(
         val logIndex: Int = 0,
         val insertId: String = "",
@@ -68,6 +71,7 @@ object VertexLogParser {
         var category: LogCategory = LogCategory.OTHER_SYSTEM_LOG
     )
 
+    @Keep
     data class UserSentData(
         val type: String,
         val text: String,
@@ -75,6 +79,7 @@ object VertexLogParser {
         val sizeKb: Double
     )
 
+    @Keep
     data class AiResponseData(
         val foodName: String,
         val healthScore: String,
@@ -85,6 +90,7 @@ object VertexLogParser {
         val rawResponse: String
     )
 
+    @Keep
     data class FoodAnalysisItem(
         val index: Int,
         val timestamp: String,
@@ -94,12 +100,14 @@ object VertexLogParser {
         val aiResponse: AiResponseData
     )
 
+    @Keep
     data class ChatMessageEntry(
         val time: String,
         val role: String,
         val text: String
     )
 
+    @Keep
     data class ChatSession(
         val sessionIndex: Int,
         val traceId: String,
@@ -628,6 +636,7 @@ object VertexLogParser {
         return result
     }
 
+    @Keep
     private data class ParsedFoodData(
         val name: String = "",
         val healthScore: String = "",

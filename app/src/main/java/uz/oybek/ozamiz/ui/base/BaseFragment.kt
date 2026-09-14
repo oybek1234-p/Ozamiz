@@ -33,7 +33,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     fun navigate(
         @IdRes resId: Int,
         args: Bundle? = null,
-        navOptions: NavOptions? = animNavOptions
+        navOptions: NavOptions? = null
     ) {
         if (!isAdded || isDetached) return
         val navController = try {
@@ -46,11 +46,13 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
             val currentDestination = navController.currentDestination
             if (currentDestination != null) {
                 val action = currentDestination.getAction(resId)
-                if (action != null || currentDestination.id != resId) {
+                if (action != null) {
                     navController.navigate(resId, args, navOptions)
+                } else if (currentDestination.id != resId) {
+                    navController.navigate(resId, args, navOptions ?: animNavOptions)
                 }
             } else {
-                navController.navigate(resId, args, navOptions)
+                navController.navigate(resId, args, navOptions ?: animNavOptions)
             }
         } catch (e: Exception) {
             handleException(e)
@@ -59,7 +61,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     fun navigate(
         directions: androidx.navigation.NavDirections,
-        navOptions: NavOptions? = animNavOptions
+        navOptions: NavOptions? = null
     ) {
         if (!isAdded || isDetached) return
         val navController = try {
@@ -74,9 +76,11 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
                 val action = currentDestination.getAction(directions.actionId)
                 if (action != null) {
                     navController.navigate(directions, navOptions)
+                } else {
+                    navController.navigate(directions, navOptions ?: animNavOptions)
                 }
             } else {
-                navController.navigate(directions, navOptions)
+                navController.navigate(directions, navOptions ?: animNavOptions)
             }
         } catch (e: Exception) {
             handleException(e)
@@ -84,80 +88,54 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     }
 
     fun popBackStack(): Boolean {
-        if (!isAdded || isDetached) return false
+        if (!isAdded || isDetached || view == null) return false
         val navController = try {
             findNavController()
         } catch (e: Exception) {
             null
-        }
-
-        if (navController != null) {
-            try {
-                val popped = navController.popBackStack()
-                if (popped) return true
-            } catch (e: Exception) {
-                handleException(e)
-            }
-        }
+        } ?: return false
 
         return try {
-            activity?.onBackPressedDispatcher?.onBackPressed()
-            true
+            navController.popBackStack()
         } catch (e: Exception) {
+            handleException(e)
             false
         }
     }
 
     fun popBackStack(@IdRes destinationId: Int, inclusive: Boolean = false): Boolean {
-        if (!isAdded || isDetached) return false
+        if (!isAdded || isDetached || view == null) return false
         val navController = try {
             findNavController()
         } catch (e: Exception) {
             null
-        }
-
-        if (navController != null) {
-            try {
-                val popped = navController.popBackStack(destinationId, inclusive)
-                if (popped) return true
-            } catch (e: Exception) {
-                handleException(e)
-            }
-        }
+        } ?: return false
 
         return try {
-            if (navController?.popBackStack() == true) {
+            val currentDest = navController.currentDestination
+            if (currentDest != null && currentDest.id == destinationId && !inclusive) {
                 true
             } else {
-                activity?.onBackPressedDispatcher?.onBackPressed()
-                true
+                navController.popBackStack(destinationId, inclusive)
             }
         } catch (e: Exception) {
+            handleException(e)
             false
         }
     }
 
     fun navigateUp(): Boolean {
-        if (!isAdded || isDetached) return false
+        if (!isAdded || isDetached || view == null) return false
         val navController = try {
             findNavController()
         } catch (e: Exception) {
             null
-        }
-
-        if (navController != null) {
-            try {
-                val popped = navController.navigateUp()
-                if (popped) return true
-            } catch (e: Exception) {
-                handleException(e)
-            }
-        }
+        } ?: return false
 
         return try {
-            activity?.onBackPressedDispatcher?.onBackPressed()
-            true
+            navController.navigateUp()
         } catch (e: Exception) {
+            handleException(e)
             false
         }
     }

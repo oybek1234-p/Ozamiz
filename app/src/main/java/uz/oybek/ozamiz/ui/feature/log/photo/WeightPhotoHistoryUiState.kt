@@ -8,12 +8,14 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
+import androidx.annotation.Keep
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
+@Keep
 data class WeightPhotoHistoryUiState(
     val isLoading: Boolean = true,
     val logs: List<WeightLog> = emptyList(),

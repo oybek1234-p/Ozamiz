@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.level.PointsEvent
 import uz.oybek.ozamiz.data.level.PointsRepository
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
@@ -20,6 +21,7 @@ import uz.oybek.ozamiz.data.utils.DateUtils
 import uz.oybek.ozamiz.ui.feature.home.LogFragment
 import java.util.Date
 
+@Keep
 sealed class AddExerciseUiState {
     object Loading : AddExerciseUiState()
     data class Input(

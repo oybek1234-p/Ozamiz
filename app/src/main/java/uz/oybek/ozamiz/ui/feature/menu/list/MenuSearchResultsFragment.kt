@@ -18,7 +18,7 @@ import uz.oybek.ozamiz.data.menu.MenuCategories
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.databinding.FragmentMenuSearchResultsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>() {
@@ -148,7 +148,18 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
     }
 
     private fun loadBanner() {
-        binding.bannerContainer.visibility = View.GONE
+        if (user.isPremium()) {
+            binding.bannerContainer.visibility = View.GONE
+            return
+        }
+        try {
+            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_HOME)
+            binding.bannerContainer.removeAllViews()
+            binding.bannerContainer.addView(bannerView)
+            binding.bannerContainer.visibility = View.VISIBLE
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun inflateBinding(

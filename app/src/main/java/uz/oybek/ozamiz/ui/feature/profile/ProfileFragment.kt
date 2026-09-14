@@ -211,7 +211,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             .setTitle(getString(R.string.logout_confirmation_title))
             .setMessage(getString(R.string.logout_confirmation_message))
             .setPositiveButton(getString(R.string.logout)) { _, _ ->
-                viewModel.logout()
                 MainActivity.signOut?.run()
             }
             .setNegativeButton(getString(R.string.cancel), null)

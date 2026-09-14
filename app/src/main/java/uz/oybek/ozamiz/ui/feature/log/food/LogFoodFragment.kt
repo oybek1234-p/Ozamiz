@@ -101,14 +101,28 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private fun setupUI(bind: FragmentLogFoodBinding) = with(bind) {
         toolbarLogFood.setNavigationOnClickListener { navigateToHome() }
-        
         val meal = MealTime.fromId(fragmentArgs.meal)
         val mealName = meal?.let { getString(it.nameRes) } ?: ""
         toolbarLogFood.title = mealName
 
-        bannerAdContainerLogFood.visibility = android.view.View.GONE
+        loadBanner()
         setupActionButtons()
         setupRecentLogsList()
+    }
+
+    private fun loadBanner() {
+        if (user.isPremium()) {
+            binding.bannerAdContainerLogFood.isVisible = false
+            return
+        }
+        try {
+            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_LOG_FOOD)
+            binding.bannerAdContainerLogFood.removeAllViews()
+            binding.bannerAdContainerLogFood.addView(bannerView)
+            binding.bannerAdContainerLogFood.isVisible = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 

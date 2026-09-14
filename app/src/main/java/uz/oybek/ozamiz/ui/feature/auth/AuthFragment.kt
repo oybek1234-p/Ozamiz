@@ -144,13 +144,7 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
                 return@launch
             }
             isSigning = false
-            closeFragment()
-            isSigning = false
-            if (user.name.isEmpty()) {
-                navigate(R.id.onboarding)
-            } else {
-                mainActivity()?.recreateUi(true)
-            }
+            mainActivity()?.recreateUi(true)
         }
     }
 

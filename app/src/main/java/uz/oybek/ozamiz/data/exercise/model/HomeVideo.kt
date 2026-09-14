@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.data.exercise.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class HomeVideo(
     val id: String,
     val name: String,

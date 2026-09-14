@@ -8,12 +8,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.logs.model.UserExercise
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import java.util.Date
 
+@Keep
 sealed class SelectExerciseUiState {
     object Loading : SelectExerciseUiState()
     data class Success(

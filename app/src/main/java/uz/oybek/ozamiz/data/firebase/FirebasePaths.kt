@@ -52,6 +52,7 @@ object FirebasePaths {
         private const val WEIGHT_LOGS = "weightLogs"
         private const val FOOD_LOG_FEEDBACK = "foodLogFeedback"
         private const val APP_FEEDBACK = "appFeedback"
+        private const val AI_CHAT_FEEDBACK = "aiChatFeedback"
 
         fun posts() = firestore.collection(POSTS)
         fun post(postId: String) = posts().document(postId)
@@ -75,6 +76,7 @@ object FirebasePaths {
         fun menuCategories() = firestore.collection(MENU_CATS)
         fun foodLogFeedback() = firestore.collection(FOOD_LOG_FEEDBACK)
         fun appFeedback() = firestore.collection(APP_FEEDBACK)
+        fun aiChatFeedback() = firestore.collection(AI_CHAT_FEEDBACK)
     }
 
     object Storage {

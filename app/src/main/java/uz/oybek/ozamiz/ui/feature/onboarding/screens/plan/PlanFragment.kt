@@ -22,15 +22,33 @@ class PlanFragment : OnBoardingChildFragment<FragmentPlanBinding>() {
         }
 
         bind.buttonLoveIt.setOnClickListener {
-            viewModel.completeOnboarding(
-                onSuccess = {
-                    mainActivity()?.recreateUi()
-                },
-                onError = {
-                    showToast(getString(R.string.food_add_error))
-                }
-            )
+            savePlanAndComplete()
         }
+    }
+
+    private fun savePlanAndComplete() {
+        viewModel.completeOnboarding(
+            onSuccess = {
+                mainActivity()?.recreateUi()
+            },
+            onError = {
+                showRetryDialog()
+            }
+        )
+    }
+
+    private fun showRetryDialog() {
+        if (!isAdded || isDetached) return
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Xatolik yuz berdi")
+            .setMessage("Ma'lumotlarni saqlashda xatolik yuz berdi. Iltimos, internet aloqangizni tekshirib, qayta urinib ko'ring.")
+            .setPositiveButton("Qayta urinish") { dialog, _ ->
+                dialog.dismiss()
+                savePlanAndComplete()
+            }
+            .setNegativeButton("Bekor qilish", null)
+            .setCancelable(false)
+            .show()
     }
 
     override fun inflateBinding(

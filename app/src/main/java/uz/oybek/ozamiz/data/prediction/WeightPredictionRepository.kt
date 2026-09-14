@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.prediction
 
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.data.user.model.User
 import java.text.SimpleDateFormat
@@ -9,6 +10,7 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
+@Keep
 data class WeightPredictionResult(
     val avgDailyDeficit: Int = 0,
     val dailyFatGrams: Int = 0,

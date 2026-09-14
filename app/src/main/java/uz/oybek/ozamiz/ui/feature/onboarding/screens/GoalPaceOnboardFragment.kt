@@ -153,14 +153,13 @@ class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardB
         val customCarbs = bind.editTargetCarbs.text.toString().toIntOrNull()
         val customFat = bind.editTargetFat.text.toString().toIntOrNull()
 
-        LocalUser.update {
-            this.targetCalories = customCals
-            DietController.updateTargetValues(this)
+        val u = LocalUser.user
+        u.targetCalories = customCals
+        DietController.updateTargetValues(u, customCals)
 
-            if (customProtein != null && customProtein > 0) this.targetProtein = customProtein
-            if (customCarbs != null && customCarbs > 0) this.targetCarbs = customCarbs
-            if (customFat != null && customFat > 0) this.targetFat = customFat
-        }
+        if (customProtein != null && customProtein > 0) u.targetProtein = customProtein
+        if (customCarbs != null && customCarbs > 0) u.targetCarbs = customCarbs
+        if (customFat != null && customFat > 0) u.targetFat = customFat
     }
 
     private fun getDurationText(currentWeight: Double, targetWeight: Double, weeklyKg: Double): String {

@@ -4,9 +4,13 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
 import androidx.datastore.dataStore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import uz.oybek.ozamiz.appContext
@@ -14,9 +18,11 @@ import uz.oybek.ozamiz.data.utils.DateUtils
 import java.io.InputStream
 import java.io.OutputStream
 
+@Keep
 @Serializable
 data class AppSettings(
     val isAppReviewShown: Boolean = false,
+    val isOnboardingCompleted: Boolean = false,
     val foodLogLimitDate: String = "",
     val foodLogLimitCount: Int = 0,
     val firstAppOpenTimestamp: Long = 0L,
@@ -60,6 +66,10 @@ object AppPreference {
     var isAppReviewShown: Boolean
         get() = current.isAppReviewShown
         set(value) = runBlocking { update { it.copy(isAppReviewShown = value) } }
+
+    var isOnboardingCompleted: Boolean
+        get() = current.isOnboardingCompleted
+        set(value) = runBlocking { update { it.copy(isOnboardingCompleted = value) } }
 
     var firstAppOpenTimestamp: Long
         get() = current.firstAppOpenTimestamp
@@ -145,5 +155,15 @@ object AppPreference {
         update { s ->
             s.copy(aiChatLimitDate = dateStr, aiChatLimitCount = newCount)
         }
+    }
+
+    suspend fun clear() {
+        inMemoryLogCount = -1
+        inMemoryLogDate = ""
+        inMemoryBonusLogs = -1
+        inMemoryBonusDate = ""
+        inMemoryAiChatCount = -1
+        inMemoryAiChatDate = ""
+        update { AppSettings() }
     }
 }

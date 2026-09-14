@@ -1,10 +1,12 @@
 package uz.oybek.ozamiz.ui.feature.log.voice
 
+import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+@Keep
 sealed class VoiceUiState {
     data object Idle : VoiceUiState()
     data object Recording : VoiceUiState()

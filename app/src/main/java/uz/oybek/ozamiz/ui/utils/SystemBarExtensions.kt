@@ -1,9 +1,11 @@
 package uz.oybek.ozamiz.ui.utils
 
+import androidx.annotation.Keep
 import android.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 
+@Keep
 data class SystemBarStyle(
     val statusBarColor: Int,
     val navigationBarColor: Int,

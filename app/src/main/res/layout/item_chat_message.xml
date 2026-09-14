@@ -37,6 +37,42 @@
             tools:text="Salom! Men sizning AI diyetologingizman." />
 
         <LinearLayout
+            android:id="@+id/feedbackContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/aiMessageText"
+            tools:visibility="visible">
+
+            <ImageView
+                android:id="@+id/btnLike"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Like"
+                android:padding="5dp"
+                android:src="@drawable/like_hand"
+                app:tint="?attr/colorOutline" />
+
+            <ImageView
+                android:id="@+id/btnDislike"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Dislike"
+                android:padding="5dp"
+                android:src="@drawable/hand_dilike"
+                app:tint="?attr/colorOutline" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/thinkingContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

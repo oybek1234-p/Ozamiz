@@ -1,21 +1,15 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Stack trace va Line numberlar (Crashlytics xatolik qatorini to'g'ri ko'rsatishi uchun)
+-keepattributes SourceFile,LineNumberTable,*Annotation*,Signature
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Gson model maydonlari (agar data klasslarda @SerializedName ishlatilgan bo'lsa)
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# R8 warninglarni e'tiborsiz qoldirish (Google Auth, OkHttp va boshqa tashqi kutubxonalar build paytida to'xtab qolmasligi uchun)
+-dontwarn javax.annotation.**
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.openjsse.**
+-dontwarn com.google.auth.**
+-dontwarn com.google.api.client.**

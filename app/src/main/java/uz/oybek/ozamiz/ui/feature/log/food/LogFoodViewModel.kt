@@ -24,8 +24,10 @@ import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.streak.StreakRepository
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import androidx.annotation.Keep
 import java.util.Date
 
+@Keep
 data class LogFoodState(
     val isAnalyzing: Boolean = false,
     val description: String = "",

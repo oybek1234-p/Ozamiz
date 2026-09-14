@@ -104,7 +104,13 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             val targetW = user.targetWeight ?: 65.0
             if (targetW > user.weight) "gain_weight" else "lose_weight"
         }
-        selectedPace = if (selectedGoal == "gain_weight") 400 else 500
+        val tdee = DietController.calculateTDEE(user).roundToInt()
+        val diff = if (selectedGoal == "gain_weight") (user.targetCalories - tdee) else (tdee - user.targetCalories)
+        selectedPace = if (selectedGoal == "gain_weight") {
+            if (diff >= 500) 600 else 400
+        } else {
+            if (diff >= 600) 700 else 500
+        }
 
         updateGoalCardsUI(bind)
         updatePaceCardsUI(bind)
@@ -409,16 +415,13 @@ class GetMainInfoFragment : BaseFragment<GetInfoMainFragmentBinding>() {
             problems = selectedProblems.ifEmpty { null },
             phoneNumber = phone.toString(),
             activityLevel = activityLevelSelected,
-            manzil = manzilSelected
+            manzil = manzilSelected,
+            goal = selectedGoal,
+            targetCalories = calories,
+            targetProtein = protein,
+            targetFat = fat,
+            targetCarbs = carbs
         )
-
-        uz.oybek.ozamiz.data.user.UserProfileRepository.updateUser {
-            if (calories > 0) this.targetCalories = calories
-            if (protein > 0) this.targetProtein = protein
-            if (fat > 0) this.targetFat = fat
-            if (carbs > 0) this.targetCarbs = carbs
-            this.goal = selectedGoal
-        }
     }
 
     private fun calculateAndDisplayIdealWeightIfNeeded(bind: GetInfoMainFragmentBinding) {

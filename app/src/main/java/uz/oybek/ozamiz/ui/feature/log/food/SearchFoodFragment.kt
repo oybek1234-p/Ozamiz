@@ -24,7 +24,11 @@ import uz.oybek.ozamiz.data.food.limit.FoodLimitManager
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
+import uz.oybek.ozamiz.data.ads.AdsConfig
+import uz.oybek.ozamiz.data.ads.AdsManager
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import java.util.Date
@@ -69,7 +73,18 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
     }
 
     private fun loadBanner() {
-        binding.bannerContainer.visibility = View.GONE
+        if (user.isPremium()) {
+            binding.bannerContainer.isVisible = false
+            return
+        }
+        try {
+            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_LOG_FOOD)
+            binding.bannerContainer.removeAllViews()
+            binding.bannerContainer.addView(bannerView)
+            binding.bannerContainer.isVisible = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun setupUI(bind: FragmentSearchFoodBinding) = with(bind) {

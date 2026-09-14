@@ -29,6 +29,7 @@ object PointsRepository {
     }
 }
 
+@androidx.annotation.Keep
 sealed class PointsEvent {
 
     data class AddWater(val milliliters: Int) : PointsEvent() {

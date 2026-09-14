@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.premium
 
+import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +12,7 @@ import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.user.AdminRepository
 import uz.oybek.ozamiz.data.user.model.User
 
+@Keep
 data class AdminPaymentVerificationListUiState(
     val isLoading: Boolean = true,
     val pendingUsers: List<User> = emptyList(),

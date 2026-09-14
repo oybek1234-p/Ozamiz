@@ -5,6 +5,7 @@ import android.util.Log
 import android.util.Patterns
 import uz.oybek.ozamiz.data.firebase.crashlytics
 import java.util.Locale
+import kotlin.coroutines.cancellation.CancellationException
 
 fun Double.formatToDecimal(digits: Int = 1): String {
     return String.format(Locale.US, "%.${digits}f", this)
@@ -54,7 +55,7 @@ fun logMessage(message: Any?, tag: String = "OzamizLog") {
 }
 
 fun recordException(throwable: Throwable?) {
-    if (throwable == null) return
+    if (throwable == null || throwable is CancellationException) return
     try {
         crashlytics.recordException(throwable)
     } catch (_: Exception) {

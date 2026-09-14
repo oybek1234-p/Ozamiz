@@ -128,18 +128,33 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         initFeaturesCards()
         initMealRecommendation()
         initCustomCards()
-        initAppFeedbackCard(bind)
         observeUiState()
         observeStreakUpdate()
         observeExerciseAdded()
         checkNotificationPermission()
         setupLimitExceededResultListener()
         setupExerciseAddedResultListener()
+        loadBanner()
         if (animateProgress) {
             lifecycleScope.launch {
                 delay(200)
                 animateProgress = false
             }
+        }
+    }
+
+    private fun loadBanner() {
+        if (user.isPremium()) {
+            binding.bannerAdContainerHome.isVisible = false
+            return
+        }
+        try {
+            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_HOME)
+            binding.bannerAdContainerHome.removeAllViews()
+            binding.bannerAdContainerHome.addView(bannerView)
+            binding.bannerAdContainerHome.isVisible = true
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -365,6 +380,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                         updateWater(state)
                         updateExercise(state)
                         updateStreak(state)
+                        updateAppFeedbackCard(state)
                         binding.cardWeightLog.isVisible = state.showWeightLogCard
                         binding.cardPremiumChecking.isVisible = state.paymentChecking
                     }
@@ -763,26 +779,15 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         // Exercise added praise screen disabled per user requirement
     }
 
-    private fun initAppFeedbackCard(bind: FragmentHomeBinding) {
-        val firstOpen = AppPreference.firstAppOpenTimestamp
-        if (firstOpen == 0L) {
-            AppPreference.firstAppOpenTimestamp = System.currentTimeMillis()
-        }
-
-        val daysFromReg = user.daysFromRegister()
-        val daysFromFirstOpen = DateUtils.daysBetween(
-            AppPreference.firstAppOpenTimestamp,
-            System.currentTimeMillis()
-        )
-        val daysUsed = maxOf(daysFromReg, daysFromFirstOpen)
-
+    private fun updateAppFeedbackCard(state: HomeUiState) {
+        val currentStreak = state.streakInfo?.currentStreak ?: 0
         val isFeedbackDone = UserProfileRepository.user.isRated
-        val shouldShow = daysUsed >= 3 && !isFeedbackDone
+        val shouldShow = currentStreak >= 3 && !isFeedbackDone
 
-        bind.cardAppFeedback.isVisible = shouldShow
+        binding.cardAppFeedback.isVisible = shouldShow
 
         if (shouldShow) {
-            bind.cardAppFeedback.setOnSafeClickListener {
+            binding.cardAppFeedback.setOnSafeClickListener {
                 showAppFeedbackDialog()
             }
         }

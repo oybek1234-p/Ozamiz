@@ -437,6 +437,7 @@ object DailyTipUtil {
         return if (newIndex >= tips.size) 0 else newIndex
     }
 
+    @androidx.annotation.Keep
     @Parcelize
     data class Tip(
         val title: String,

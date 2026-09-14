@@ -11,22 +11,59 @@ import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.mapper.UserMapper
 import uz.oybek.ozamiz.data.user.model.User
 
+import com.bumptech.glide.Glide
+import uz.oybek.ozamiz.appContext
+import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatDatabase
+import uz.oybek.ozamiz.data.config.AppPreference
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
 object UserAuthRepository {
 
-    fun signOut() {
-        UserProfileRepository.stopObserving()
-        auth.signOut()
-        LocalUser.user = User()
-        LocalUser.saveUser()
+    suspend fun signOut() {
+        runCatching { UserProfileRepository.stopObserving() }
+        runCatching { auth.signOut() }
+        runCatching { LocalUser.clear() }
+        runCatching { AppPreference.clear() }
+        clearAppCache()
     }
 
-    fun deleteAccount() {
+    private suspend fun clearAppCache() {
+        withContext(Dispatchers.Main) {
+            runCatching {
+                Glide.get(appContext).clearMemory()
+            }
+        }
+        withContext(Dispatchers.IO) {
+            runCatching {
+                uz.oybek.ozamiz.data.logs.LogRepository.clearCache()
+            }
+            runCatching {
+                AiChatDatabase.getDatabase(appContext).clearAllTables()
+            }
+            runCatching {
+                Glide.get(appContext).clearDiskCache()
+            }
+            runCatching {
+                appContext.cacheDir?.deleteRecursively()
+            }
+            runCatching {
+                appContext.externalCacheDir?.deleteRecursively()
+            }
+            runCatching {
+                appContext.codeCacheDir?.deleteRecursively()
+            }
+        }
+    }
+
+    suspend fun deleteAccount() {
         val uid = LocalUser.user.uid
         if (uid.isNotBlank()) {
-            runCatching { FirebasePaths.Database.user(uid).removeValue() }
-            runCatching { FirebasePaths.Firestore.publicUser(uid).delete() }
+            runCatching { FirebasePaths.Database.user(uid).removeValue().await() }
+            runCatching { FirebasePaths.Firestore.publicUser(uid).delete().await() }
         }
-        runCatching { auth.currentUser?.delete() }
+        runCatching { auth.currentUser?.delete()?.await() }
         signOut()
     }
 
@@ -60,11 +97,21 @@ object UserAuthRepository {
         LocalUser.user = currentUser
         LocalUser.saveUser()
 
-        val map = UserMapper.toMap(currentUser)
-        database.userReference(id).setValue(map).await()
+        if (networkUser != null && networkUser.name.isNotBlank() && networkUser.targetCalories > 0) {
+            uz.oybek.ozamiz.data.config.AppPreference.isOnboardingCompleted = true
+        } else {
+            uz.oybek.ozamiz.data.config.AppPreference.isOnboardingCompleted = false
+        }
 
-        val publicMap = UserMapper.toPublicMap(currentUser)
-        firestore.publicUsersCollection.document(id).set(publicMap).await()
+        val map = UserMapper.toMap(currentUser)
+        database.userReference(id).updateChildren(map).await()
+
+        try {
+            val publicMap = UserMapper.toPublicMap(currentUser)
+            firestore.publicUsersCollection.document(id).set(publicMap).await()
+        } catch (e: Exception) {
+            uz.oybek.ozamiz.util.handleException(e)
+        }
 
         UserProfileRepository.observeCurrentUser()
 

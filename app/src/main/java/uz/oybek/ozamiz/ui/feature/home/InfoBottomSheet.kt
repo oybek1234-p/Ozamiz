@@ -67,6 +67,7 @@ class InfoBottomSheet : BottomSheetDialogFragment() {
         binding.btnClose.setOnClickListener { dismiss() }
     }
 
+    @androidx.annotation.Keep
     data class HungryFood(val emoji: String, val name: String, val desc: String)
 
     inner class HungryFoodAdapter(private val items: List<HungryFood>) :

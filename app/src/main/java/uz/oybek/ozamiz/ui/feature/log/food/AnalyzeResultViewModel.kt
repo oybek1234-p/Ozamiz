@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysisResult
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
@@ -21,13 +22,16 @@ import uz.oybek.ozamiz.data.food.SavedFoodRepository
 import uz.oybek.ozamiz.data.food.model.MealTime
 import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.logs.model.FoodLog
+import androidx.annotation.Keep
 import java.util.Date
 
+@Keep
 sealed interface AnalyzeInput {
     data class Image(val uri: Uri?, val description: String, val meal: String) : AnalyzeInput
     data class Voice(val audioUri: Uri, val meal: String) : AnalyzeInput
 }
 
+@Keep
 data class AnalyzeResultState(
     val result: FoodAnalysis? = null,
     val logId: String? = null,
@@ -53,6 +57,7 @@ data class AnalyzeResultState(
         get() = (input as? AnalyzeInput.Image)?.uri
 }
 
+@Keep
 sealed interface AnalyzeResultEvent {
     data object Saved : AnalyzeResultEvent
     data class PromptShare(
@@ -398,7 +403,9 @@ class AnalyzeResultViewModel : ViewModel() {
             _state.update { it.copy(isLoading = true) }
             val success = FoodLogRepository.delete(foodLog, date, currentState.userId)
             _state.update { it.copy(isLoading = false, isSaved = false, logId = null) }
-            onComplete(success)
+            withContext(Dispatchers.Main) {
+                onComplete(success)
+            }
         }
     }
 

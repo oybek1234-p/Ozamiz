@@ -5,10 +5,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentWriteFoodBinding
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import uz.oybek.ozamiz.ui.utils.showToast
@@ -23,6 +26,25 @@ class WriteFoodFragment : BaseFragment<FragmentWriteFoodBinding>() {
     override fun viewCreated(binding: FragmentWriteFoodBinding) {
         setupUI(binding)
         setupKeyboardListener(binding)
+        loadBanner(binding)
+    }
+
+    private fun loadBanner(binding: FragmentWriteFoodBinding) {
+        if (user.isPremium()) {
+            binding.bannerContainer.isVisible = false
+            return
+        }
+        try {
+            val bannerView = uz.oybek.ozamiz.data.ads.AdsManager.createBannerView(
+                requireContext(),
+                uz.oybek.ozamiz.data.ads.AdsConfig.BANNER_LOG_FOOD
+            )
+            binding.bannerContainer.removeAllViews()
+            binding.bannerContainer.addView(bannerView)
+            binding.bannerContainer.isVisible = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun setupKeyboardListener(binding: FragmentWriteFoodBinding) {

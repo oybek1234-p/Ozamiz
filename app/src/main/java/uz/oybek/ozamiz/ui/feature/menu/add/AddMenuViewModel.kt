@@ -15,9 +15,11 @@ import uz.oybek.ozamiz.data.menu.CalorieFilter
 import uz.oybek.ozamiz.data.menu.MenuCategories
 import uz.oybek.ozamiz.data.menu.MenuRepository
 import uz.oybek.ozamiz.data.menu.model.Menu
+import androidx.annotation.Keep
 import java.util.Date
 import java.util.UUID
 
+@Keep
 data class AddMenuUiState(
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,

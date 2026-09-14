@@ -100,8 +100,14 @@ object DietController {
         return (waterMl / 100).roundToInt() * 100
     }
 
-    fun updateTargetValues(user: User) {
-        val targetCals = calculateTargetCalories(user)
+    fun updateTargetValues(user: User, customCalories: Int? = null) {
+        val targetCals = if (customCalories != null && customCalories > 0) {
+            customCalories
+        } else if (user.targetCalories > 0) {
+            user.targetCalories
+        } else {
+            calculateTargetCalories(user)
+        }
         user.targetCalories = targetCals
 
         val macros = if (user.goal == "gain_weight") {
@@ -140,6 +146,7 @@ object DietController {
         )
     }
 
+    @androidx.annotation.Keep
     data class Macros(
         val calories: Int = 0,
         val protein: Int = 0,

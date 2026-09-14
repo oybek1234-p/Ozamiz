@@ -14,7 +14,9 @@ import uz.oybek.ozamiz.databinding.FragmentCommunityBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
 import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.WEIGHT_LOSS
+import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.user.model.UserSortType
+import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
@@ -52,6 +54,25 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
         observeViewModel()
         observeNotifications()
+        loadBanner()
+    }
+
+    private fun loadBanner() {
+        if (user.isPremium()) {
+            binding.bannerContainer.isVisible = false
+            return
+        }
+        try {
+            val bannerView = uz.oybek.ozamiz.data.ads.AdsManager.createBannerView(
+                requireContext(),
+                uz.oybek.ozamiz.data.ads.AdsConfig.BANNER_HOME
+            )
+            binding.bannerContainer.removeAllViews()
+            binding.bannerContainer.addView(bannerView)
+            binding.bannerContainer.isVisible = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun restoreFilterState() {

@@ -55,7 +55,13 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     }
 
     private fun setupRecyclerView(bind: FragmentAiChatBinding) {
-        chatAdapter = AiChatAdapter()
+        chatAdapter = AiChatAdapter().apply {
+            onFeedbackClick = { message, isLiked, userQuestion ->
+                viewModel.onFeedbackClick(message, isLiked, userQuestion)
+                val toastText = if (isLiked) "Fikringiz uchun rahmat!" else "Fikringiz qabul qilindi"
+                android.widget.Toast.makeText(requireContext(), toastText, android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
         bind.chatRecyclerView.apply {
             adapter = chatAdapter
             layoutManager = LinearLayoutManager(requireContext()).apply {

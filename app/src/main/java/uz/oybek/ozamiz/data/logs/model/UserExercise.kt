@@ -1,7 +1,9 @@
 package uz.oybek.ozamiz.data.logs.model
 
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.user.model.info.Gender
 
+@Keep
 enum class UserExercise(
     val caloriesPerMin: Int,
     val exerciseName: String,

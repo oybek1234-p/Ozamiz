@@ -78,10 +78,14 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun logout() {
-        UserAuthRepository.signOut()
+        viewModelScope.launch {
+            UserAuthRepository.signOut()
+        }
     }
 
     fun deleteAccount() {
-        UserAuthRepository.deleteAccount()
+        viewModelScope.launch {
+            UserAuthRepository.deleteAccount()
+        }
     }
 }

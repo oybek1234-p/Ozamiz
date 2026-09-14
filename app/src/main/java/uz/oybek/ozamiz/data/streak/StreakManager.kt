@@ -9,6 +9,7 @@ object StreakManager {
 
     private val dateFormatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE
 
+    @androidx.annotation.Keep
     data class StreakUpdateResult(
         val updatedUser: User,
         val streakContinued: Boolean = false,

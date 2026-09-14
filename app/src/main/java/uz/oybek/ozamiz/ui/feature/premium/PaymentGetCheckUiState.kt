@@ -7,12 +7,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.premium.PaymentInfo
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
 
+@Keep
 data class PaymentGetCheckUiState(
     val isLoading: Boolean = true,
     val premiumPrice: Long? = null,

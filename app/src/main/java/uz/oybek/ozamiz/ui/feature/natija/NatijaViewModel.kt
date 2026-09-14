@@ -14,11 +14,13 @@ import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.WeightLog
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
 
+@Keep
 data class NatijaUiState(
     val isLoading: Boolean = false,
     val logs: List<WeightLog> = emptyList(),
@@ -63,6 +65,7 @@ data class NatijaUiState(
     val exerciseActiveDays: Int = 0
 )
 
+@Keep
 enum class BmiCategory {
     UNDERWEIGHT, HEALTHY, OVERWEIGHT, OBESE, NONE
 }

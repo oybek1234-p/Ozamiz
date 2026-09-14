@@ -70,6 +70,7 @@ object FoodAnalyzer {
                 )
             }
         }.onFailure {
+            if (it is kotlinx.coroutines.CancellationException) throw it
             android.util.Log.e("FoodAnalyzer", "Error in FoodAnalyzer.analyze: ${it.message}", it)
             recordException(it)
         }.getOrNull()
@@ -96,6 +97,7 @@ object FoodAnalyzer {
                 )
             }
         }.onFailure {
+            if (it is kotlinx.coroutines.CancellationException) throw it
             android.util.Log.e(
                 "FoodAnalyzer",
                 "Error in FoodAnalyzer.analyzeAudio: ${it.message}",
@@ -111,6 +113,7 @@ object FoodAnalyzer {
                 val textResponse = callAnalyzeFoodFunction(description = input.trim())
                 textResponse?.parseSingleIngredientResult()
             }.onFailure {
+                if (it is kotlinx.coroutines.CancellationException) throw it
                 recordException(it)
             }.getOrNull()
         }

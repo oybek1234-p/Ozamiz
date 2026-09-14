@@ -41,16 +41,29 @@ object UserProfileRepository {
             observeCurrentUser()
         }
     }
-    
+
     suspend fun saveUserNetworkSuspend(user: User): Boolean {
+        val currentUid = auth.currentUser?.uid
+        if (user.uid.isEmpty() && !currentUid.isNullOrEmpty()) {
+            user.uid = currentUid
+        }
         if (!user.valid) return false
+
         return try {
             val children = UserMapper.toMap(user)
             val publicChildren = UserMapper.toPublicMap(user)
+
             FirebasePaths.Database.user(user.uid).updateChildren(children).await()
-            FirebasePaths.Firestore.publicUser(user.uid).set(publicChildren).await()
+
+            try {
+                FirebasePaths.Firestore.publicUser(user.uid).set(publicChildren).await()
+            } catch (e: Exception) {
+                handleException(e)
+            }
+
             true
         } catch (e: Exception) {
+            // Realtime Database xatosi: Crashlytics ga yoziladi va false qaytadi
             handleException(e)
             false
         }

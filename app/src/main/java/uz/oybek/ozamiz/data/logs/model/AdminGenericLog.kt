@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.data.logs.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class AdminGenericLog(
     val id: String,
     val title: String,

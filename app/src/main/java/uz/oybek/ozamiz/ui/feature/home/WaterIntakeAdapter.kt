@@ -54,6 +54,7 @@ class WaterIntakeAdapter(
     }
 }
 
+@androidx.annotation.Keep
 data class WaterGlassState(
     val id: Int,
     val isFilled: Boolean,

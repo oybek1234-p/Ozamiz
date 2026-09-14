@@ -846,6 +846,14 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <FrameLayout
+                        android:id="@+id/banner_ad_container_home"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="32dp"
+                        android:visibility="gone" />
+
                 </LinearLayout>
             </androidx.core.widget.NestedScrollView>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

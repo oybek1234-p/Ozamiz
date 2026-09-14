@@ -12,8 +12,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException
 import android.util.Log
 import uz.oybek.ozamiz.data.firebase.toObjectSafe
 
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.util.returnResult
 
+@Keep
 data class PostsFetchResult(
     val posts: List<CommunityPost>,
     val lastSnapshot: com.google.firebase.firestore.DocumentSnapshot?,

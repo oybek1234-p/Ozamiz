@@ -1,5 +1,8 @@
 package uz.oybek.ozamiz.data.user.model.info
 
+import androidx.annotation.Keep
+
+@Keep
 enum class UserActivityLevel(
     val title: String,
     val subtitle: String,

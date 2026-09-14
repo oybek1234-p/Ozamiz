@@ -7,11 +7,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.utils.sortByRecent
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.utils.DataWrapper
 
+@Keep
 data class WeightHistoryUiState(
     val isLoading: Boolean = false,
     val logs: List<WeightLog> = emptyList(),

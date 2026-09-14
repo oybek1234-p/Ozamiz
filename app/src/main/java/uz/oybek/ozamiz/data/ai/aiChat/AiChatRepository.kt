@@ -3,6 +3,7 @@ package uz.oybek.ozamiz.data.ai.aiChat
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.functions.functions
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.R
@@ -78,12 +80,13 @@ object AiChatRepository {
     private suspend fun callChatFunction(
         message: String,
         history: List<Map<String, String>>,
-        systemInstruction: String
+        userContext: String
     ): String? = withContext(Dispatchers.IO) {
         val data = hashMapOf(
             "message" to message.trim(),
             "history" to history,
-            "systemInstruction" to systemInstruction
+            "userContext" to userContext,
+            "systemInstruction" to userContext
         )
 
         val result = Firebase.functions("europe-west1")
@@ -117,27 +120,18 @@ object AiChatRepository {
     }
 
     fun sendMessage(
-        text: String, chatId: String?
+        text: String,
+        chatId: String?,
+        scope: CoroutineScope
     ): Flow<DataWrapper<String>> = flow {
 
         val delimiterRegex = Regex("---+\\s*suggestions?\\s*---+", RegexOption.IGNORE_CASE)
+        val now = System.currentTimeMillis()
+
         try {
-            try {
-                saveCachedMessage(text, true)
-            } catch (e: Exception) {
-                android.util.Log.e("DietologAI", "Error caching user message", e)
-            }
-
-            if (chatId != null) {
-                try {
-                    saveMessageToFirestore(chatId, text, true, System.currentTimeMillis())
-                } catch (e: Exception) {
-                    android.util.Log.e("DietologAI", "Error saving to Firestore", e)
-                }
-            }
-
+            // 1. Avvalgi xabarlar tarixini o'qib olish (maksimum 4 ta xabar)
             val cached = getCachedMessages().orEmpty()
-            val recentCached = cached.takeLast(3).dropWhile { !it.isUser }
+            val recentCached = cached.takeLast(4)
             val historyList = recentCached.map { msg ->
                 mapOf(
                     "role" to if (msg.isUser) "user" else "model",
@@ -145,38 +139,61 @@ object AiChatRepository {
                 )
             }
 
-            val instruction = AiPromptBuilder.buildDietologInstruction()
-            val fullResponse = callChatFunction(text, historyList, instruction) ?: ""
+            // 2. Foydalanuvchi xabarini saqlash
+            scope.launch(Dispatchers.IO) {
+                try {
+                    saveCachedMessage(text, true)
+                } catch (e: Exception) {
+                    android.util.Log.e("DietologAI", "Error caching user message", e)
+                }
+
+                if (chatId != null) {
+                    try {
+                        saveMessageToFirestore(chatId, text, true, now)
+                    } catch (e: Exception) {
+                        android.util.Log.e("DietologAI", "Error saving to Firestore", e)
+                    }
+                }
+            }
+
+            val userContext = AiPromptBuilder.buildUserContext()
+            val fullResponse = callChatFunction(text, historyList, userContext) ?: ""
 
             val finalCleanText =
                 fullResponse.split(delimiterRegex).firstOrNull()?.trim() ?: fullResponse.trim()
             android.util.Log.d("DietologAI", "[AI RESPONSE FINAL]:\n$finalCleanText")
 
             if (finalCleanText.isNotBlank()) {
-                try {
-                    saveCachedMessage(finalCleanText, false)
-                } catch (e: Exception) {
-                    android.util.Log.e("DietologAI", "Error caching final AI response", e)
-                }
+                // 2. DARHOL xabarni chiqarish (hech qanday kutishsiz)
+                emit(DataWrapper.Success(finalCleanText))
+
                 extractAndEmitSuggestions(fullResponse, delimiterRegex)
 
-                if (chatId != null) {
+                // 3. Tashqi scope'da bazaga yozish (UI ni ushlamaydi)
+                scope.launch(Dispatchers.IO) {
                     try {
-                        saveMessageToFirestore(
-                            chatId,
-                            finalCleanText,
-                            false,
-                            System.currentTimeMillis()
-                        )
+                        saveCachedMessage(finalCleanText, false)
                     } catch (e: Exception) {
-                        android.util.Log.e(
-                            "DietologAI",
-                            "Error saving final AI response to Firestore",
-                            e
-                        )
+                        android.util.Log.e("DietologAI", "Error caching final AI response", e)
+                    }
+
+                    if (chatId != null) {
+                        try {
+                            saveMessageToFirestore(
+                                chatId,
+                                finalCleanText,
+                                false,
+                                System.currentTimeMillis()
+                            )
+                        } catch (e: Exception) {
+                            android.util.Log.e(
+                                "DietologAI",
+                                "Error saving final AI response to Firestore",
+                                e
+                            )
+                        }
                     }
                 }
-                emit(DataWrapper.Success(finalCleanText))
             } else {
                 throw IllegalStateException("Bo'sh javob qaytdi")
             }
@@ -185,9 +202,11 @@ object AiChatRepository {
             android.util.Log.e("DietologAI", "[ERROR OCCURRED]: ${e.message}", e)
             val errorMsg =
                 "Kechirasiz, javob tayyorlanishida xatolik yuz berdi. Qaytadan so'rashingiz mumkin."
-            try {
-                saveCachedMessage(errorMsg, false)
-            } catch (_: Exception) {
+            scope.launch(Dispatchers.IO) {
+                try {
+                    saveCachedMessage(errorMsg, false)
+                } catch (_: Exception) {
+                }
             }
             emit(DataWrapper.Success(errorMsg))
         }
@@ -205,6 +224,28 @@ object AiChatRepository {
                 _suggestedReplies.value = questions
                 android.util.Log.d("DietologAI", "[SUGGESTIONS EXTRACTED]: $questions")
             }
+        }
+    }
+
+    suspend fun saveFeedback(
+        userQuestion: String,
+        aiResponse: String,
+        isLiked: Boolean
+    ) = withContext(Dispatchers.IO) {
+        try {
+            val map = hashMapOf(
+                "userId" to user.uid,
+                "userName" to user.name,
+                "userQuestion" to userQuestion,
+                "aiResponse" to aiResponse,
+                "feedbackType" to if (isLiked) "like" else "dislike",
+                "isLiked" to isLiked,
+                "timestamp" to System.currentTimeMillis()
+            )
+            FirebasePaths.Firestore.aiChatFeedback().document().set(map).await()
+            android.util.Log.d("DietologAI", "Saved feedback to root aiChatFeedback collection: isLiked=$isLiked")
+        } catch (e: Exception) {
+            android.util.Log.e("DietologAI", "Error saving feedback to Firestore", e)
         }
     }
 }

@@ -8,12 +8,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.menu.MenuRepository
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.data.utils.DataWrapper
 
 class MenuSearchViewModel : ViewModel() {
 
+    @Keep
     data class MenuSearchState(
         val categoryId: String? = null,
         val query: String? = null,

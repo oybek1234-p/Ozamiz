@@ -110,7 +110,8 @@ class AiChatViewModel : ViewModel() {
             try {
                 AiChatRepository.sendMessage(
                     text = trimmed,
-                    chatId = chatId
+                    chatId = chatId,
+                    scope = this
                 ).collect { result ->
                     if (result is DataWrapper.Success) {
                         val displayedText = result.data
@@ -159,6 +160,24 @@ class AiChatViewModel : ViewModel() {
                 _isLoading.value = false
                 done()
             }
+        }
+    }
+
+    fun onFeedbackClick(message: ChatMessage, isLiked: Boolean, userQuestion: String) {
+        val feedbackType = if (isLiked) "like" else "dislike"
+        val currentList = _messages.value.toMutableList()
+        val index = currentList.indexOfFirst { it.id == message.id || (it.timestamp == message.timestamp && !it.isUser) }
+        if (index != -1) {
+            currentList[index] = currentList[index].copy(feedback = feedbackType)
+            _messages.value = currentList
+        }
+
+        viewModelScope.launch {
+            AiChatRepository.saveFeedback(
+                userQuestion = userQuestion,
+                aiResponse = message.text,
+                isLiked = isLiked
+            )
         }
     }
 }

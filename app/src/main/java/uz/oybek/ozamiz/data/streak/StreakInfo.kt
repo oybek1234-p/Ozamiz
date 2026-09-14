@@ -1,7 +1,9 @@
 package uz.oybek.ozamiz.data.streak
 
+import androidx.annotation.Keep
 import java.io.Serializable
 
+@Keep
 data class StreakInfo constructor(
     val lastActionDate: String = "",
     val currentStreak: Int = 0,

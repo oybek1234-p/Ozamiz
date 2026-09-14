@@ -3,6 +3,7 @@ package uz.oybek.ozamiz.ui.feature.ai
 import android.animation.ObjectAnimator
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.R
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -18,6 +19,7 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
     }
 
     var activeTurnMinHeight: Int = 0
+    var onFeedbackClick: ((message: ChatMessage, isLiked: Boolean, userQuestion: String) -> Unit)? = null
 
     private var lastAnimatedPosition = -1
     private var isInitialLoad = true
@@ -54,8 +56,6 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
         val item = getItem(position)
         val isLastItem = position == itemCount - 1
 
-        // Faqat eng oxirgi faol AI xabariga to'liq ekran bo'shlig'i beriladi.
-        // Oldingi barcha xabarlar o'zining tabiiy wrap_content hajmiga qaytadi.
         if (isLastItem && !item.isUser && activeTurnMinHeight > 0) {
             holder.itemView.minimumHeight = activeTurnMinHeight
         } else {
@@ -97,7 +97,7 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
         holder.stopThinkingAnimation()
     }
 
-    class MessageViewHolder(
+    inner class MessageViewHolder(
         private val binding: ItemChatMessageBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -115,12 +115,54 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
                 if (message.isThinking || message.text.isBlank()) {
                     binding.thinkingContainer.isVisible = true
                     binding.aiMessageText.isVisible = false
+                    binding.feedbackContainer.isVisible = false
                     startThinkingAnimation()
                 } else {
                     stopThinkingAnimation()
                     binding.thinkingContainer.isVisible = false
                     binding.aiMessageText.isVisible = true
                     binding.aiMessageText.text = MarkdownUtils.formatMarkdown(message.text)
+                    binding.feedbackContainer.isVisible = true
+
+                    val defaultColor = com.google.android.material.color.MaterialColors.getColor(
+                        binding.root,
+                        com.google.android.material.R.attr.colorOutline
+                    )
+                    val activeColor = com.google.android.material.color.MaterialColors.getColor(
+                        binding.root,
+                        R.attr.colorPrimary
+                    )
+
+                    when (message.feedback) {
+                        "like" -> {
+                            binding.btnLike.imageTintList = android.content.res.ColorStateList.valueOf(activeColor)
+                            binding.btnDislike.imageTintList = android.content.res.ColorStateList.valueOf(defaultColor)
+                        }
+                        "dislike" -> {
+                            binding.btnLike.imageTintList = android.content.res.ColorStateList.valueOf(defaultColor)
+                            binding.btnDislike.imageTintList = android.content.res.ColorStateList.valueOf(activeColor)
+                        }
+                        else -> {
+                            binding.btnLike.imageTintList = android.content.res.ColorStateList.valueOf(defaultColor)
+                            binding.btnDislike.imageTintList = android.content.res.ColorStateList.valueOf(defaultColor)
+                        }
+                    }
+
+                    binding.btnLike.setOnClickListener {
+                        val pos = bindingAdapterPosition
+                        val userQuestion = if (pos != RecyclerView.NO_POSITION) {
+                            currentList.take(pos).findLast { it.isUser }?.text.orEmpty()
+                        } else ""
+                        onFeedbackClick?.invoke(message, true, userQuestion)
+                    }
+
+                    binding.btnDislike.setOnClickListener {
+                        val pos = bindingAdapterPosition
+                        val userQuestion = if (pos != RecyclerView.NO_POSITION) {
+                            currentList.take(pos).findLast { it.isUser }?.text.orEmpty()
+                        } else ""
+                        onFeedbackClick?.invoke(message, false, userQuestion)
+                    }
                 }
             }
         }
@@ -224,7 +266,7 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
         }
 
         override fun getChangePayload(oldItem: ChatMessage, newItem: ChatMessage): Any? {
-            return if (oldItem.id == newItem.id && (oldItem.text != newItem.text || oldItem.isThinking != newItem.isThinking)) {
+            return if (oldItem.id == newItem.id && (oldItem.text != newItem.text || oldItem.isThinking != newItem.isThinking || oldItem.feedback != newItem.feedback)) {
                 PAYLOAD_TEXT_UPDATE
             } else {
                 null

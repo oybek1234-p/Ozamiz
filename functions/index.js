@@ -10,6 +10,25 @@ const vertexAI = new VertexAI({
   apiEndpoint: "aiplatform.googleapis.com",
 });
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function retryOperation(fn, maxRetries = 3, delayMs = 2000) {
+  let lastError;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+      console.warn(`[Retry] Urinish ${attempt}/${maxRetries} xatolik:`, error.message || error);
+      if (attempt < maxRetries) {
+        await wait(delayMs);
+      }
+    }
+  }
+  throw lastError;
+}
+
+
 exports.analyzeFood = onCall(
   {
     region: "europe-west1",
@@ -57,8 +76,11 @@ exports.analyzeFood = onCall(
         model: "gemini-3.1-flash-lite",
         generationConfig: {
           temperature: 0.2,
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2048,
           responseMimeType: "application/json",
+          thinkingConfig: {
+            thinkingLevel: "MEDIUM",
+          },
           responseSchema: {
             type: "OBJECT",
             properties: {
@@ -146,12 +168,28 @@ Qoidalar:
         },
       });
 
-      const response = await generativeModel.generateContent({
-        contents: [{ role: "user", parts }],
-      });
+      const response = await retryOperation(
+        () =>
+          generativeModel.generateContent({
+            contents: [{ role: "user", parts }],
+          }),
+        3,
+        2000
+      );
 
       const responseText =
         response.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+      console.log("[analyzeFood] Log:", {
+        user: {
+          description: description || null,
+          hasImage: !!imageBase64,
+          imageMimeType: mimeType || null,
+          hasAudio: !!audioBase64,
+          audioMimeType: audioMimeType || null,
+        },
+        ai: responseText,
+      });
 
       return { text: responseText };
     } catch (error) {
@@ -172,7 +210,7 @@ exports.chatWithDietolog = onCall(
   },
   async (request) => {
     try {
-      const { message, history, systemInstruction } = request.data || {};
+      const { message, history, userContext, systemInstruction } = request.data || {};
 
       if (!message || !message.trim()) {
         throw new HttpsError("invalid-argument", "Xabar matni kiritilmadi.");
@@ -180,9 +218,8 @@ exports.chatWithDietolog = onCall(
 
       const contents = [];
 
-      // Agar oldingi xabarlar tarixi yuborilgan bo'lsa (oxirgi 3 tasi olinadi)
       if (Array.isArray(history)) {
-        const recentHistory = history.slice(-3);
+        const recentHistory = history.slice(-4);
         for (const item of recentHistory) {
           if (item && item.text && item.text.trim()) {
             contents.push({
@@ -193,38 +230,49 @@ exports.chatWithDietolog = onCall(
         }
       }
 
-      // Yangi foydalanuvchi xabari
+      // Gemini birinchi navbatda 'user' xabarini kutadi
+      while (contents.length > 0 && contents[0].role !== "user") {
+        contents.shift();
+      }
+
       contents.push({
         role: "user",
         parts: [{ text: message.trim() }],
       });
 
-      const defaultInstruction = `Siz foydalanuvchining samimiy, qiziqarli va do'stona shaxsiy maslahatchisisiz (dietolog-yordamchi). Quruq, rasmiy yoki qattiqqo'l bo'lmang, oddiy, samimiy va jonli tilda gapiring.
+      const rawContext = (userContext || systemInstruction || "").trim();
 
-ASOSIY QOIDALAR:
-1. QAT'IY TALAB: Javoblaringiz juda qisqa, ixcham, lo'nda va aniq bo'lsin (maksimal 2-4 ta qisqa gap yoki qisqagina punktlar). Hech qachon cho'zib, uzun doston yoki keraksiz umumiy gaplar yozmang.
-2. Foydalanuvchining maqsadi va bugungi ko'rsatkichlaridan kelib chiqib, darhol to'g'ridan-to'g'ri amaliy maslahat bering.
-3. Muhim so'zlarni **qalin** qilib, mos emojilar bilan bezating. Sarlavha panjaralari (#, ##, ###) umuman ishlatmang.
-4. Har doim hurmat bilan ("Siz" deb), samimiy, do'stona va dalda beruvchi ohangda javob bering.`;
+      const finalSystemInstruction = `Rol: Shaxsiy samimiy ekspert-diyetolog.
+
+Qoidalar:
+2. Ohang: Muloyim va professional javob bering.
+3. Mazmun: Savolga to'g'ridan-to'g'ri, aniq, lo'nda javob bering. Tekst uzunligi vaziyatga qarab iloji boricha qisqaroq(2-3 gap) bo'lsin,
+4. Format: Muhim so'z/raqamlarni **qalin** qiling, mos emoji ishlating, o'qishga oson styling ishlating. Ro'yxatlar uchun punktlar (•) ishlating. Sarlavha (#) ishlatmang.
+${rawContext ? `\nFoydalanuvchi ma'lumotlari:\n${rawContext}` : ""}`.trim();
 
       const generativeModel = vertexAI.getGenerativeModel({
         model: "gemini-3.1-flash-lite",
         generationConfig: {
-          temperature: 0.35,
-          maxOutputTokens: 600,
+          temperature: 0.3,
+          maxOutputTokens: 400,
         },
         systemInstruction: {
           parts: [
             {
-              text: (systemInstruction && systemInstruction.trim()) || defaultInstruction,
+              text: finalSystemInstruction,
             },
           ],
         },
       });
 
-      const response = await generativeModel.generateContent({
-        contents,
-      });
+      const response = await retryOperation(
+        () =>
+          generativeModel.generateContent({
+            contents,
+          }),
+        3,
+        2000
+      );
 
       const responseText =
         response.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";

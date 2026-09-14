@@ -61,38 +61,33 @@ object FoodLogRepository {
     }
 
     fun getAllLogs(date: Date): Flow<List<FoodLog>> = callbackFlow {
-        try {
-            val userId = currentUserId
-            if (userId.isBlank()) {
-                trySend(emptyList())
-                close()
-                return@callbackFlow
-            }
-            val dateStr = date.dateApiFormat()
-            val query = FirebasePaths.Database.foodLogs(userId, dateStr)
-
-            val listener = object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val logs = snapshot.children.mapNotNull {
-                        it.getValue(FoodLog::class.java)
-                    }
-                    trySend(logs)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    if (error.code == DatabaseError.PERMISSION_DENIED) {
-                        close()
-                    } else {
-                        close(error.toException())
-                    }
-                }
-            }
-            query.addValueEventListener(listener)
-            awaitClose { query.removeEventListener(listener) }
-        } catch (e: Exception) {
-            recordException(e)
-            close(e)
+        val userId = currentUserId
+        if (userId.isBlank()) {
+            trySend(emptyList())
+            close()
+            return@callbackFlow
         }
+        val dateStr = date.dateApiFormat()
+        val query = FirebasePaths.Database.foodLogs(userId, dateStr)
+
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val logs = snapshot.children.mapNotNull {
+                    it.getValue(FoodLog::class.java)
+                }
+                trySend(logs)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                if (error.code == DatabaseError.PERMISSION_DENIED) {
+                    close()
+                } else {
+                    close(error.toException())
+                }
+            }
+        }
+        query.addValueEventListener(listener)
+        awaitClose { query.removeEventListener(listener) }
     }
 
     suspend fun getFoodLog(logId: String, date: Date, uid: String? = null): FoodLog? {

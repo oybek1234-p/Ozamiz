@@ -1,7 +1,9 @@
 package uz.oybek.ozamiz.data.menu
 
+import androidx.annotation.Keep
 import uz.oybek.ozamiz.R
 
+@Keep
 enum class FilterId {
     BREAKFAST, LUNCH, DINNER, SNACK,
 
@@ -19,6 +21,7 @@ enum class FilterId {
     CAL_50_100, CAL_100_200, CAL_200_300, CAL_300_400, CAL_400_500, CAL_500_600,
 }
 
+@Keep
 data class FilterItem(
     val id: FilterId,
     val name: String,
