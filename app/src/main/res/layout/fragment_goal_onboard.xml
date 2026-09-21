@@ -14,7 +14,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="@dimen/dimen_48"
         android:layout_marginEnd="24dp"
-        android:text="Asosiy maqsadingiz nima?"
+        android:text="@string/onboarding_goal_title"
         android:textColor="?attr/colorOnSurface"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -60,7 +60,7 @@
                     style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ozish"
+                    android:text="@string/onboarding_goal_lose_weight"
                     android:textColor="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -95,7 +95,7 @@
                     style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Semirish"
+                    android:text="@string/onboarding_goal_gain_weight"
                     android:textColor="?attr/colorOnSurface" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

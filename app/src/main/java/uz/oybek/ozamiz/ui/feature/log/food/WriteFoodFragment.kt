@@ -85,7 +85,7 @@ class WriteFoodFragment : BaseFragment<FragmentWriteFoodBinding>() {
                     putString(AnalyzeResultFragment.KEY_MEAL_TYPE, meal)
                     putLong(AnalyzeResultFragment.KEY_TIMESTAMP, ts)
                 }
-                navigate(R.id.action_writeFoodFragment_to_analyzeResultFragment, bundle)
+                navigate(R.id.analyzeResultFragment, bundle)
             }
         }
     }

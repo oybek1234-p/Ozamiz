@@ -21,7 +21,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingDirection
 import uz.oybek.ozamiz.util.handleException
 
 fun View.visibleOrGone(visible: Boolean) {

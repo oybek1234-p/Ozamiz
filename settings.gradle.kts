@@ -12,4 +12,4 @@ plugins {
 
 rootProject.name = "Ozamiz"
 include(":app")
- 
+include(":data")

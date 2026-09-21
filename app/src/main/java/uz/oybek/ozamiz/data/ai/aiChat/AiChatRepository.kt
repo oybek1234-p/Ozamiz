@@ -8,31 +8,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.data.ai.AiPromptBuilder
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatDatabase
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatMessageEntity
-import uz.oybek.ozamiz.data.config.AppPreference
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.logs.LogRepository
-import uz.oybek.ozamiz.data.logs.model.DailySummary
-import uz.oybek.ozamiz.data.logs.model.FoodLog
 import uz.oybek.ozamiz.data.user.UserProfileRepository.user
-import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.data.utils.DateUtils
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
-import java.util.Calendar
-import java.util.Date
 
 object AiChatRepository {
 
@@ -129,7 +118,6 @@ object AiChatRepository {
         val now = System.currentTimeMillis()
 
         try {
-            // 1. Avvalgi xabarlar tarixini o'qib olish (maksimum 4 ta xabar)
             val cached = getCachedMessages().orEmpty()
             val recentCached = cached.takeLast(4)
             val historyList = recentCached.map { msg ->
@@ -139,7 +127,6 @@ object AiChatRepository {
                 )
             }
 
-            // 2. Foydalanuvchi xabarini saqlash
             scope.launch(Dispatchers.IO) {
                 try {
                     saveCachedMessage(text, true)
@@ -164,12 +151,10 @@ object AiChatRepository {
             android.util.Log.d("DietologAI", "[AI RESPONSE FINAL]:\n$finalCleanText")
 
             if (finalCleanText.isNotBlank()) {
-                // 2. DARHOL xabarni chiqarish (hech qanday kutishsiz)
                 emit(DataWrapper.Success(finalCleanText))
 
                 extractAndEmitSuggestions(fullResponse, delimiterRegex)
 
-                // 3. Tashqi scope'da bazaga yozish (UI ni ushlamaydi)
                 scope.launch(Dispatchers.IO) {
                     try {
                         saveCachedMessage(finalCleanText, false)

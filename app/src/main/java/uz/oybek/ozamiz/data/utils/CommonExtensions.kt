@@ -50,7 +50,7 @@ fun String.capitalizeUz(): String {
     return this.substring(0, 1).uppercase(Locale.getDefault()) + this.substring(1)
 }
 
-fun logMessage(message: Any?, tag: String = "OzamizLog") {
+fun logMessage(message: Any?, tag: String = "XLogs") {
     Log.d(tag, message?.toString() ?: "null")
 }
 

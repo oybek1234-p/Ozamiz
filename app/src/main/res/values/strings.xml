@@ -33,6 +33,7 @@
     <string name="yopish">Yopish</string>
     <string name="akkauntga_kirish">Akkauntga kirish</string>
     <string name="google_orqali_kirish">Google orqali kirish</string>
+    <string name="auth_logging_in">Akkauntga kirilmoqda…</string>
     <string name="keyinroq">Keyinroq</string>
     <string name="davom_etish">Davom etish</string>
     <string name="your_web_client_id">730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com</string>
@@ -44,7 +45,23 @@
     <string name="retry_later">Keyinroq urinib ko\'ring!</string>
     <string name="weak_password">Havfsiz paroq kiriting!</string>
     <string name="o_tkazib_yuborish">O\'tkazib yuborish</string>
-    <string name="email_or_pass_not_valid">Email yoki parol notogri</string>
+    <string name="email_or_pass_not_valid">Email yoki parol noto\'g\'ri</string>
+    <string name="auth_error_user_not_found">Foydalanuvchi topilmadi yoki hisob o\'chirilgan</string>
+    <string name="auth_error_user_disabled">Akkaunt bloklangan yoki faolsizlantirilgan</string>
+    <string name="auth_error_user_collision">Bu email manzili allaqachon ro\'yxatdan o\'tgan</string>
+    <string name="auth_error_recent_login_required">Xavfsizlik uchun qaytadan tizimga kiring</string>
+    <string name="auth_error_action_code">Havola yoki kod muddati tugagan yoki yaroqsiz</string>
+    <string name="auth_error_multi_factor">Ikki bosqichli tasdiqlash talab etiladi</string>
+    <string name="auth_error_invalid_email">Email manzili noto\'g\'ri kiritilgan</string>
+    <string name="auth_error_operation_not_allowed">Ushbu amalga ruxsat berilmagan</string>
+    <string name="auth_error_google_services">Google Play xizmatlarida nosozlik yuz berdi</string>
+    <string name="common_error_permission_denied">Ruxsat berilmagan</string>
+    <string name="common_error_not_found">Ma\'lumot topilmadi</string>
+    <string name="common_error_server_unavailable">Server bilan aloqa yo\'q, keyinroq urinib ko\'ring</string>
+    <string name="common_error_database">Ma\'lumotlar bazasida xatolik yuz berdi</string>
+    <string name="common_error_file_not_found">Fayl topilmadi</string>
+    <string name="common_error_storage_quota_exceeded">Xotira to\'lib qoldi</string>
+    <string name="common_error_unknown">Noma\'lum xatolik yuz berdi</string>
     <string name="operator">Admin bilan bog\'lanish</string>
     <string name="boshlash">Boshlash</string>
     <string name="ismingizni_kiriting">Izmingizni kiriting</string>
@@ -209,7 +226,7 @@
 
     <string name="select_exercises">Mashqlarni Tanlash</string>
     <string name="search_exercises_hint">Mashqlarni qidirish...</string>
-    <string name="done">Tayyor</string>
+    <string name="start_plan">Boshlayman</string>
     <string name="selected_count_format">%d ta mashq tanlandi</string>
 
     <string name="skip">O\'tkazish</string>
@@ -588,7 +605,7 @@
 
     <string name="card_tracking_title">Kaloriya hisobi</string>
     <string name="card_tracking_desc">Yegan ovqatingizni kiritib, kunlik me’yorni kuzating.</string>
-    <string name="love_it">Ajoyib</string>
+    <string name="love_it">Boshlash</string>
     <string name="error_height">Bo\'yingizni to\'g\'ri kiriting</string>
     <string name="error_weight">Vazn notog\'ri</string>
     <string name="name_error">Ismingizni tog\'ri kiriting</string>
@@ -1182,9 +1199,7 @@
     <string name="feedback_option_4">Hammasini kiritdim</string>
     <string name="feedback_encouragement">Hech qisi yo\'q, bugun qo\'shishni unutmang, ozish uchun sog\'lom ovqatlarni tanlashingiz, va kaloriya meyoridan oshirmaslik kerak</string>
     <string name="feedback_action_add">Albatta qo\'shaman</string>
-    <string name="limit_congrats_title">Bugun zo\'r shug\'ullandingiz!</string>
-    <string name="limit_congrats_desc">Bugun boshqa ovqat yemasangiz, 1 haftada %s kgga ozasiz.</string>
-    <string name="limit_action_stop">Boshqa yemayman</string>
+
     <string name="exercise_summary_calories_format">Yoqilgan kaloriya: %1$d kkal</string>
     <string name="exercise_summary_fat_format">Yoqilgan yog\': %1$.1f g</string>
     <string name="exercise_summary_food_format">Teng keladigan yegulik: %1$s</string>
@@ -1216,9 +1231,7 @@
     <string name="streak_desc_day_6">Hali to\'xtash niyatimiz yo\'q, shunday emasmi? Ertaga ham kutaman!</string>
     <string name="streak_desc_weekly">%1$d kunlik natija! Haqiqiy mo\'jizakor intizom egasisiz!</string>
     <string name="streak_desc_default">%1$d kunlik ajoyib muntazamlik! Ertaga ham kutib qolaman!</string>
-    <string name="weekly_prediction_title">Haftalik natija taxmini 🎯</string>
-    <string name="weekly_prediction_desc_format">Bugungi ko\'rsatkichlaringiz va ma\'lumotlaringiz asosida: Shu zaylda davom etsangiz, 1 haftada maksimum %1$s kg vazn yo\'qotishingiz mumkin! 🔥</string>
-    <string name="weekly_prediction_screen_text">Shunday davom etsangiz, 1 haftada %1$s kilogram vazn tashlaysiz.</string>
+
     <string name="about_food_label">Ovqat haqida yozing (Ixtiyoriy)</string>
     <string name="camera_review_title">Tahlil qilish</string>
     <string name="camera_food_description_hint">Masalan: 100 gram osh,\n1 bo\'lak non, 1 piyola qatiq...</string>
@@ -1256,5 +1269,90 @@
     <string name="exercise_tip_18">🍃 Tabiat qo\'ynida sayr qilish ruhni orom oldiradi va kaloriyalarni yoqadi.</string>
     <string name="exercise_tip_19">🚀 Ozishni istasangiz, harakatni hoziroq boshlang, natija sizni kuttirmaydi.</string>
     <string name="exercise_tip_20">🏆 Eng qiyini — boshlash, qolgani intizom va vaqt masalasidir.</string>
+
+    <!-- Onboarding Goal Pace -->
+    <string name="onboarding_goalpace_title_gain">Semirish tezligini tanlang</string>
+    <string name="onboarding_goalpace_title_loss">Ozish tezligini tanlang</string>
+    <string name="onboarding_goalpace_normal">Normal</string>
+    <string name="onboarding_goalpace_fast">Tezroq</string>
+    <string name="onboarding_goalpace_rate_format_gain">+%1$.1f kg / oy</string>
+    <string name="onboarding_goalpace_rate_format_loss">-%1$.1f kg / oy</string>
+    <string name="onboarding_goalpace_summary_gain">• Sizning tanangiz kuniga taxminan %1$d kkal energiya sarflaydi,\n\n• %2$d kkal ortiqcha yesak vazn yig\'ish boshlanadi.\n\n• Natijada haftasiga %3$s kg, oyiga %4$s kg semirasiz.\n\n• Maqsadga esa %5$s erishasiz.</string>
+    <string name="onboarding_goalpace_summary_loss">• Sizning tanangiz kuniga taxminan %1$d kkal energiya sarflaydi,\n\n• %2$d kkal kamroq ovqat yeymiz natijada haftasiga %3$s kg, oyiga %4$s kg ozasiz.\n\n• Maqsadga esa %5$s erishasiz.</string>
+    <string name="onboarding_goalpace_duration_months_days">%1$d oy %2$d kunda</string>
+    <string name="onboarding_goalpace_duration_months">%1$d oyda</string>
+    <string name="onboarding_goalpace_duration_days">%1$d kunda</string>
+    <string name="onboarding_goalpace_duration_reached">erishgansiz</string>
+    <string name="onboarding_goalpace_daily_targets_title">Kunlik me\'yorlar</string>
+    <string name="onboarding_goalpace_hint_calories">Kunlik kaloriya</string>
+    <string name="onboarding_goalpace_hint_protein">Oqsil (g)</string>
+    <string name="onboarding_goalpace_hint_carbs">Uglevod (g)</string>
+    <string name="onboarding_goalpace_hint_fat">Yog\' (g)</string>
+
+    <!-- Onboarding Goals -->
+    <string name="onboarding_goal_title">Asosiy maqsadingiz nima?</string>
+    <string name="onboarding_goal_lose_weight">Ozish</string>
+    <string name="onboarding_goal_gain_weight">Semirish</string>
+
+    <!-- Onboarding Activity Level -->
+    <string name="onboarding_activity_item_format">%1$s - %2$s</string>
+    <string name="onboarding_activity_sedentary_title">Kamharakat</string>
+    <string name="onboarding_activity_sedentary_subtitle">Ofis ishi yoki uyda</string>
+    <string name="onboarding_activity_lightly_active_title">Yengil faol</string>
+    <string name="onboarding_activity_lightly_active_subtitle">Yurish, uy ishlar</string>
+    <string name="onboarding_activity_moderately_active_title">O‘rtacha faol</string>
+    <string name="onboarding_activity_moderately_active_subtitle">Kunlik yengil ish</string>
+    <string name="onboarding_activity_very_active_title">Juda faol</string>
+    <string name="onboarding_activity_very_active_subtitle">Doimiy jismoniy ish</string>
+
+    <!-- Onboarding Multiple Answers -->
+    <string name="onboarding_multiple_goal_title">Nima uchun ozmoqchisiz?</string>
+    <string name="onboarding_multiple_goal_1">O\'zimga ishonchni oshirish uchun</string>
+    <string name="onboarding_multiple_goal_2">Salomatligimni yaxshilash uchun</string>
+    <string name="onboarding_multiple_goal_3">Jismoniy holatimni yaxshilash uchun</string>
+    <string name="onboarding_multiple_goal_4">Muhim tadbirga tayyorgarlik uchun</string>
+    <string name="onboarding_multiple_goal_5">Boshqa sabab</string>
+
+    <string name="onboarding_multiple_history_title">Ozish bo\'yicha tajribangiz qanday?</string>
+    <string name="onboarding_multiple_history_1">Avval ozganman va yana ozmoqchiman</string>
+    <string name="onboarding_multiple_history_2">Harakat qilib ko\'rganman, o\'xshamagan</string>
+    <string name="onboarding_multiple_history_3">Ozganman, lekin vaznim yana qaytgan</string>
+    <string name="onboarding_multiple_history_4">Avval ozishga harakat qilmaganman</string>
+
+    <string name="onboarding_multiple_struggles_title">Qanday qiyinchiliklarga duch keldingiz?</string>
+    <string name="onboarding_multiple_struggles_1">Ishtahani jilovlash</string>
+    <string name="onboarding_multiple_struggles_2">Motivatsiyani saqlash</string>
+    <string name="onboarding_multiple_struggles_3">Ovqat miqdorini kamaytirish</string>
+    <string name="onboarding_multiple_struggles_4">Nima yeyishni bilmaslik</string>
+    <string name="onboarding_multiple_struggles_5">Vaqt yo\'q</string>
+
+    <string name="onboarding_multiple_calories_title">Avval kaloriyalarni sanaganmisiz?</string>
+    <string name="onboarding_multiple_calories_1">Ha</string>
+    <string name="onboarding_multiple_calories_2">Yo\'q</string>
+
+    <string name="onboarding_multiple_fasting_title">Hech interval ochlik usulini sinab ko\'rganmisiz?</string>
+    <string name="onboarding_multiple_fasting_1">Ha, menga yoqdi</string>
+    <string name="onboarding_multiple_fasting_2">Ha, lekin bu men uchun emas ekan</string>
+    <string name="onboarding_multiple_fasting_3">Yo\'q, lekin sinab ko\'rmoqchiman</string>
+    <string name="onboarding_multiple_fasting_4">Yo\'q, menga qiziq emas</string>
+    <string name="onboarding_multiple_fasting_5">Interval ochlik nima degani?</string>
+
+    <string name="onboarding_multiple_challenge_title">O\'zingizni sinab ko\'ring! Necha kun uzluksiz davom eta olasiz?</string>
+    <string name="onboarding_multiple_challenge_1">50 kun (Afsona 🔥)</string>
+    <string name="onboarding_multiple_challenge_2">30 kun (Qoyilmaqom 🚀)</string>
+    <string name="onboarding_multiple_challenge_3">14 kun (Ajoyib 👌)</string>
+    <string name="onboarding_multiple_challenge_4">7 kun (Yaxshi 👍)</string>
+
+    <!-- Onboarding Target Weight -->
+    <string name="onboarding_target_weight_ideal_format">Siz uchun ideal vazn: %1$d - %2$d kg</string>
+
+    <!-- Onboarding Name & Phone Helpers -->
+    <string name="onboarding_name_helper">Masalan: Oybek</string>
+    <string name="onboarding_phone_helper">Masalan: 971871415</string>
+
+    <!-- Onboarding Plan Dialogs -->
+    <string name="onboarding_plan_error_title">Xatolik yuz berdi</string>
+    <string name="onboarding_plan_error_message">Ma\'lumotlarni saqlashda xatolik yuz berdi. Iltimos, internet aloqangizni tekshirib, qayta urinib ko\'ring.</string>
+    <string name="onboarding_plan_retry">Qayta urinish</string>
 </resources>
 

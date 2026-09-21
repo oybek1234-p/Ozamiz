@@ -4,8 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.user.model.info.UserActivityLevel
+import uz.oybek.ozamiz.data.profile.model.UserActivityLevel
 import uz.oybek.ozamiz.databinding.ActivityLevelItemBinding
 import uz.oybek.ozamiz.databinding.FragmentActivityLevelBinding
 import uz.oybek.ozamiz.ui.base.EmptyDiffUtil
@@ -24,9 +23,8 @@ class ActivityLevelFragment : OnBoardingChildFragment<FragmentActivityLevelBindi
             diffUtil = EmptyDiffUtil()
         ) {
             override fun onSelected(pos: Int, selected: Boolean) {
-                LocalUser.update {
-                    activityLevel = UserActivityLevel.entries[pos].name
-                }
+                val item = getItem(pos)
+                viewModel.setActivityLevel(item)
                 moveToNextScreen()
             }
 
@@ -38,7 +36,13 @@ class ActivityLevelFragment : OnBoardingChildFragment<FragmentActivityLevelBindi
             ) {
                 holder.binding.apply {
                     (this as ActivityLevelItemBinding)
-                    titleView.text = "${model.title} - ${model.subtitle}"
+                    val title = root.context.getString(model.titleRes)
+                    val subtitle = root.context.getString(model.subtitleRes)
+                    titleView.text = root.context.getString(
+                        R.string.onboarding_activity_item_format,
+                        title,
+                        subtitle
+                    )
                 }
             }
 

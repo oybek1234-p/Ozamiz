@@ -19,7 +19,7 @@ class MultipleAnswerFragment :
 
     private var adapter =
         object : SelectableAdapter<
-                String,
+                Int,
                 OnboardMultipleAnwerItemBinding
                 >(
             multiple = true,
@@ -32,13 +32,13 @@ class MultipleAnswerFragment :
 
             override fun bind(
                 holder: ViewHolder<*>,
-                model: String,
+                model: Int,
                 pos: Int,
                 selected: Boolean
             ) {
                 holder.binding.apply {
                     (this as OnboardMultipleAnwerItemBinding)
-                    textView.text = model
+                    textView.setText(model)
                 }
             }
 
@@ -57,7 +57,7 @@ class MultipleAnswerFragment :
     override fun viewCreated(bind: FragmentMultipleAnswerBinding) {
         question = getArgs(arguments)
         if (question == null) return
-        binding.questionText.text = question!!.title
+        binding.questionText.setText(question!!.titleRes)
         setupRecycler()
     }
 
@@ -70,7 +70,7 @@ class MultipleAnswerFragment :
                     LinearLayoutManager.VERTICAL,
                     false
                 )
-            adapter.submitList(question?.answers)
+            adapter.submitList(question?.answersRes)
         }
     }
 

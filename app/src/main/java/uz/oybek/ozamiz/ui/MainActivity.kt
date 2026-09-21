@@ -2,70 +2,63 @@ package uz.oybek.ozamiz.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.IntentSender
 import android.content.res.Configuration
 import android.graphics.Color
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
-import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import com.google.android.material.color.MaterialColors
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.play.core.appupdate.AppUpdateManagerFactory
-import com.google.android.play.core.appupdate.AppUpdateOptions
-import com.google.android.play.core.install.InstallStateUpdatedListener
-import com.google.android.play.core.install.model.AppUpdateType
-import com.google.android.play.core.install.model.InstallStatus
-import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.android.material.color.MaterialColors
 import com.google.android.play.core.review.ReviewManagerFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
-import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.level.Level
-import uz.oybek.ozamiz.data.level.LevelRepository
-import uz.oybek.ozamiz.data.level.PointsRepository
+import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.motivation.NotificationSchedular
-import uz.oybek.ozamiz.data.user.UserAuthRepository
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.user.model.daysFromRegister
 import uz.oybek.ozamiz.data.utils.CompanyLinks
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
 import uz.oybek.ozamiz.databinding.SupportSheetBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.utils.showToast
 import uz.oybek.ozamiz.ui.utils.visibleOrGone
 import uz.oybek.ozamiz.util.PhoneUtils
+import uz.oybek.ozamiz.util.connectivity.ConnectivityObserver
 import uz.oybek.ozamiz.util.handleException
+import uz.oybek.ozamiz.util.update.AppUpdateHelper
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    
+
+    private val viewModel: MainViewModel by viewModels()
+
+    @Inject
+    lateinit var connectivityObserver: ConnectivityObserver
+
+    @Inject
+    lateinit var appUpdateHelper: AppUpdateHelper
+
     lateinit var navController: NavController
     private lateinit var navHost: NavHostFragment
 
@@ -77,28 +70,8 @@ class MainActivity : AppCompatActivity() {
         val insets = systemInsets ?: return
         val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
         binding.root.setPadding(
-            systemBars.left,
-            0,
-            systemBars.right,
-            0
+            systemBars.left, 0, systemBars.right, 0
         )
-    }
-
-    private fun handleSignOut() {
-        lifecycleScope.launch {
-            UserAuthRepository.signOut()
-            val intent = Intent(this@MainActivity, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            startActivity(intent)
-            finish()
-        }
-    }
-
-    init {
-        signOut = Runnable {
-            handleSignOut()
-        }
     }
 
     private val updateLauncher = registerForActivityResult(
@@ -107,18 +80,30 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    companion object {
-        var signOut: Runnable? = null
-    }
-
     private fun initInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             systemInsets = insets
             updateRootPadding()
-            binding.bottomNavView.setPadding(0, 0, 0, insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom)
+            binding.bottomNavView.setPadding(
+                0, 0, 0,
+                insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+            )
             updateContainerPadding()
             insets
         }
+    }
+
+    private fun setupNavGraph() {
+        binding.apply {
+            navHost = (supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment)
+            navController = navHost.navController
+            NavigationUI.setupWithNavController(
+                navigationBarView = binding.bottomNavView, navController = navController
+            )
+        }
+        val inflater = navHost.navController.navInflater
+        val graph = inflater.inflate(R.navigation.main_navigation)
+        navHost.navController.graph = graph
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,112 +115,69 @@ class MainActivity : AppCompatActivity() {
         initInsets()
 
         setContentView(binding.root)
-        initUser()
+        setupNavGraph()
 
-        binding.apply {
-            navHost = (supportFragmentManager.findFragmentById(R.id.container) as NavHostFragment)
-            navController = navHost.navController
-            NavigationUI.setupWithNavController(
-                navigationBarView = binding.bottomNavView, navController = navController
-            )
-
-        }
-        val inflater = navHost.navController.navInflater
-        val graph = inflater.inflate(R.navigation.main_navigation)
-
-        checkCurrentUser(graph)
-        navHost.navController.graph = graph
-
-        initChatBadgeObserving()
-        initUpdateManager(updateLauncher)
-        initInternetConnectivity()
+        observeInternetConnectivity()
+        observeAuthState()
+        appUpdateHelper.checkForAppUpdate(this, updateLauncher)
     }
 
-    private fun checkCurrentUser(graph: NavGraph) {
-        if (!user.valid) {
-            lifecycleScope.launch { UserAuthRepository.signOut() }
-            graph.setStartDestination(R.id.authFragment)
-        } else {
-            val isExistingUser = user.name.isNotBlank()
-                    && (user.daysFromRegister() > 0)
-            if (AppPreference.isOnboardingCompleted || isExistingUser) {
-                graph.setStartDestination(R.id.home)
-            } else {
-                graph.setStartDestination(R.id.onboarding)
-            }
-        }
-    }
-
-    private fun initChatBadgeObserving() {
+    private fun observeAuthState() {
         lifecycleScope.launch {
-            AiChatRepository.newMessagesEvent.collect { advice ->
-                if (advice.isNotBlank() && navController.currentDestination?.id != R.id.aiChatFragment) {
-                    binding.bottomNavView.post {
-                        val badge = binding.bottomNavView.getOrCreateBadge(R.id.aiChatFragment)
-                        badge.isVisible = true
-                        badge.number = if (badge.number == 0) 1 else badge.number + 1
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.navigationCommand.collect { command ->
+                    when (command) {
+                        is MainNavCommand.NavigateToAuth -> {
+                            navigateToRootDestination(R.id.authFragment)
+                        }
+
+                        is MainNavCommand.NavigateToHome -> {
+                            navigateToRootDestination(R.id.home)
+                        }
+
+                        is MainNavCommand.NavigateToOnboarding -> {
+                            navigateToRootDestination(R.id.onboarding)
+                        }
                     }
                 }
             }
         }
-        binding.bottomNavView.post {
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                if (destination.id == R.id.aiChatFragment) {
-                    val badge = binding.bottomNavView.getBadge(R.id.aiChatFragment)
-                    if (badge != null) {
-                        badge.isVisible = false
-                        badge.clearNumber()
-                    }
+    }
+
+    private fun navigateToRootDestination(@IdRes targetDestId: Int) {
+        if (navController.currentDestination?.id == targetDestId) return
+
+        navController.navigate(
+            targetDestId,
+            null,
+            navOptions {
+                popUpTo(R.id.main_navigation) {
+                    inclusive = true
                 }
-                updateStatusBarForDestination(destination.id)
+                launchSingleTop = true
             }
-        }
+        )
     }
 
     override fun onResume() {
         super.onResume()
-        UserProfileRepository.updateLastSeen()
+
+        viewModel.updateLastSeenTime()
+        viewModel.checkPremium()
         NotificationSchedular.rescheduleToday(this)
-        if (::navController.isInitialized) {
-            updateStatusBarForDestination()
-        }
+        appUpdateHelper.completeUpdateIfDownloaded()
     }
 
-    fun updateStatusBarForDestination(destinationId: Int? = if (::navController.isInitialized) navController.currentDestination?.id else null) {
-        if (destinationId == R.id.foodCameraFragment) {
-            binding.root.setBackgroundColor(Color.BLACK)
-            enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.dark(Color.BLACK),
-                navigationBarStyle = SystemBarStyle.dark(Color.BLACK)
-            )
-        } else {
-            val colorSurfaceContainerLowest = MaterialColors.getColor(
-                this,
-                com.google.android.material.R.attr.colorSurfaceContainerLowest,
-                Color.WHITE
-            )
-            binding.root.setBackgroundColor(colorSurfaceContainerLowest)
-            val isNightMode = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-            if (isNightMode) {
-                enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.dark(colorSurfaceContainerLowest),
-                    navigationBarStyle = SystemBarStyle.dark(colorSurfaceContainerLowest)
-                )
-            } else {
-                enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.light(colorSurfaceContainerLowest, colorSurfaceContainerLowest),
-                    navigationBarStyle = SystemBarStyle.light(colorSurfaceContainerLowest, colorSurfaceContainerLowest)
-                )
-            }
-        }
-    }
-
-    private fun initUser() {
-        UserProfileRepository.init()
-        if (LocalUser.user.valid) {
-            LocalUser.userLive.observe(this) {
-                if (it == null || it.valid.not()) {
-                    signOut?.run()
+    private fun observeInternetConnectivity() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                connectivityObserver.observe().collect { isConnected ->
+                    if (isConnected) {
+                        internetBottomSheet.dismiss()
+                        (navHost.childFragmentManager.fragments.firstOrNull() as? BaseFragment<*>)?.onInternetAvailable()
+                    } else {
+                        internetBottomSheet.show()
+                    }
                 }
             }
         }
@@ -262,108 +204,13 @@ class MainActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    @SuppressLint("UnsafeIntentLaunch")
-    fun recreateUi(isNew: Boolean = false) {
-        finish()
-        this.startActivity(intent.also {
-            it.putExtra("new", isNew)
-        })
-    }
-
-    private fun initUpdateManager(launcher: ActivityResultLauncher<IntentSenderRequest>) {
-        try {
-            val appUpdateManager = AppUpdateManagerFactory.create(applicationContext)
-            val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-            val listener = InstallStateUpdatedListener {
-                if (it.installStatus() == InstallStatus.DOWNLOADED) {
-                    appUpdateManager.completeUpdate()
-                }
-            }
-            appUpdateManager.registerListener(listener)
-
-            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-                if (isDestroyed || isFinishing) return@addOnSuccessListener
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
-                    && appUpdateInfo.isUpdateTypeAllowed(
-                        AppUpdateType.IMMEDIATE
-                    )
-                ) {
-                    try {
-                        appUpdateManager.startUpdateFlowForResult(
-                            appUpdateInfo,
-                            launcher,
-                            AppUpdateOptions.newBuilder(AppUpdateType.IMMEDIATE).build()
-                        )
-                    } catch (e: IntentSender.SendIntentException) {
-                        handleException(e)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            handleException(e)
-        }
-    }
-
-    private fun initInternetConnectivity() {
-        val networkRequest =
-            NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR).build()
-        val connectivityManager =
-            getSystemService(ConnectivityManager::class.java) as ConnectivityManager
-        var hasInternet = connectivityManager.activeNetwork != null
-        if (connectivityManager.activeNetwork == null) {
-            lifecycleScope.launch(Dispatchers.Main) {
-                if (!isFinishing && !isDestroyed) internetBottomSheet.show()
-            }
-        }
-        val networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                super.onAvailable(network)
-                lifecycleScope.launch(Dispatchers.Main) {
-                    if (isFinishing || isDestroyed) return@launch
-                    if (hasInternet) {
-                        return@launch
-                    }
-                    hasInternet = true
-                    if (internetBottomSheet.isShowing) {
-                        try {
-                            if (!isFinishing && !isDestroyed) {
-                                internetBottomSheet.dismiss()
-                            }
-                        } catch (_: Exception) {
-                        }
-                    }
-                    try {
-                        val currentFragment = navHost.childFragmentManager.fragments.getOrNull(0)
-                        if (currentFragment is BaseFragment<*>) currentFragment.onInternetAvailable()
-                    } catch (e: Exception) {
-                        handleException(e)
-                    }
-                }
-            }
-
-            override fun onLost(network: Network) {
-                super.onLost(network)
-                lifecycleScope.launch(Dispatchers.Main) {
-                    if (isFinishing || isDestroyed) return@launch
-                    if (window.decorView.isAttachedToWindow && !internetBottomSheet.isShowing) {
-                        internetBottomSheet.show()
-                    }
-                }
-            }
-        }
-        connectivityManager.requestNetwork(networkRequest, networkCallback)
-    }
-
     private val internetBottomSheet: BottomSheetDialog by lazy {
         BottomSheetDialog(this).apply {
-            val dialogBinding =
-                NoInternetDialogBinding.inflate(
-                    LayoutInflater.from(
-                        this@MainActivity
-                    ), null, false
-                )
+            val dialogBinding = NoInternetDialogBinding.inflate(
+                LayoutInflater.from(
+                    this@MainActivity
+                ), null, false
+            )
             setContentView(dialogBinding.root)
             dialogBinding.button.setOnClickListener {
                 dismiss()
@@ -410,8 +257,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
     fun requestAppReview() {
         try {

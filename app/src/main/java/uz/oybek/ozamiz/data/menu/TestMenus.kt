@@ -1,3 +1,5 @@
+package uz.oybek.ozamiz.data.menu
+
 import uz.oybek.ozamiz.data.menu.model.Menu
 
 val menuList = listOf(

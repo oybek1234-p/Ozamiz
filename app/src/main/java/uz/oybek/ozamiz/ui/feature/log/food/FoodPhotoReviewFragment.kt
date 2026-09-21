@@ -70,7 +70,7 @@ class FoodPhotoReviewFragment : BaseFragment<FragmentFoodPhotoReviewBinding>() {
                 AnalyzeResultFragment.KEY_PENDING_DESCRIPTION to userDescription
             )
             navigate(
-                R.id.action_foodPhotoReviewFragment_to_analyzeResultFragment,
+                R.id.analyzeResultFragment,
                 bundle
             )
         }

@@ -3,7 +3,6 @@ package uz.oybek.ozamiz.ui.feature.onboarding.screens
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.databinding.FragmentNameBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
 import uz.oybek.ozamiz.ui.utils.showKeyboard
@@ -11,6 +10,12 @@ import uz.oybek.ozamiz.ui.utils.showKeyboard
 class NameFragment
     : OnBoardingChildFragment<FragmentNameBinding>() {
     override fun viewCreated(bind: FragmentNameBinding) {
+        val currentName = viewModel.uiState.value.user.name
+        if (!currentName.isNullOrEmpty()) {
+            bind.textInput.editText?.setText(currentName)
+            bind.textInput.editText?.setSelection(currentName.length)
+        }
+
         bind.apply {
             button.setOnClickListener {
                 val inputName =
@@ -20,7 +25,7 @@ class NameFragment
                     textInput.error = getString(R.string.name_error)
                     return@setOnClickListener
                 } else {
-                    LocalUser.update { this.name = inputName }
+                    viewModel.setName(inputName)
                     moveToNextScreen()
                 }
             }

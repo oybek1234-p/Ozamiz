@@ -23,8 +23,10 @@ import uz.oybek.ozamiz.databinding.FragmentProfileBinding
 import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
 import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
 
+@AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
     private val viewModel: ProfileViewModel by viewModels()
@@ -79,19 +81,19 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             R.drawable.admin_ic,
             getString(R.string.premium_tekshiruv)
         ) {
-            navigate(R.id.action_profileFragment_to_adminPaymentVerificationListFragment)
+            navigate(R.id.adminPaymentVerificationListFragment)
         }
 
         setupSection(
             bind.sectionAdminAllUsers, R.drawable.group_ic, getString(R.string.foydalanuvchilar)
         ) {
-            navigate(R.id.action_profileFragment_to_adminUsersListFragment)
+            navigate(R.id.adminUsersListFragment)
         }
 
         setupSection(
             bind.sectionAdminPosts, R.drawable.post_ic, getString(R.string.postlar)
         ) {
-            navigate(R.id.action_profileFragment_to_adminPostManagerFragment)
+            navigate(R.id.adminPostManagerFragment)
         }
 
         bind.premiumButton.setOnClickListener {
@@ -123,53 +125,55 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
     private fun observeViewModel(bind: FragmentProfileBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.userState.collect { user ->
-                    if (user.valid) {
-                        bind.textViewUserName.text =
-                            user.name.ifEmpty { getString(R.string.default_user_name) }
-                        Glide.with(this@ProfileFragment).load(user.avatarUrl)
-                            .error(R.drawable.user_photo_placeholder)
-                            .placeholder(R.drawable.user_photo_placeholder)
-                            .apply(RequestOptions.circleCropTransform())
-                            .into(bind.imageViewUserAvatar)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.userState.collect { user ->
+                        if (user.valid) {
+                            bind.textViewUserName.text =
+                                user.name.ifEmpty { getString(R.string.default_user_name) }
+                            Glide.with(this@ProfileFragment).load(user.avatarUrl)
+                                .error(R.drawable.user_photo_placeholder)
+                                .placeholder(R.drawable.user_photo_placeholder)
+                                .apply(RequestOptions.circleCropTransform())
+                                .into(bind.imageViewUserAvatar)
 
-                        val level = LevelRepository.getCurrentLevel(user.scorePoints, true)
-                        bind.textProfileLevelEmoji.text = level.emoji
-                        bind.textProfileLevelName.text = level.name
-                        bind.textProfilePoints.text =
-                            getString(R.string.text_profile_points_format, user.scorePoints)
+                            val level = LevelRepository.getCurrentLevel(user.scorePoints, true)
+                            bind.textProfileLevelEmoji.text = level.emoji
+                            bind.textProfileLevelName.text = level.name
+                            bind.textProfilePoints.text =
+                                getString(R.string.text_profile_points_format, user.scorePoints)
 
-                        bind.cardUserLevel.isVisible = true
+                            bind.cardUserLevel.isVisible = true
 
-                        val isPremiumActive = PremiumUtils.isPremium(user)
+                            val isPremiumActive = PremiumUtils.isPremium(user)
 
-                        when {
-                            isPremiumActive -> {
-                                bind.premiumStatusText.isVisible = true
-                                bind.premiumStatusText.text = "Premium"
-                                bind.premiumView.isVisible = false
+                            when {
+                                isPremiumActive -> {
+                                    bind.premiumStatusText.isVisible = true
+                                    bind.premiumStatusText.text = "Premium"
+                                    bind.premiumView.isVisible = false
+                                }
+
+                                user.paymentChecking -> {
+                                    bind.premiumStatusText.isVisible = true
+                                    bind.premiumStatusText.text = getString(R.string.premium_checking)
+                                    bind.premiumView.isVisible = false
+                                }
+
+                                else -> {
+                                    bind.premiumStatusText.isVisible = false
+                                    bind.premiumView.isVisible = true
+                                }
                             }
-
-                            user.paymentChecking -> {
-                                bind.premiumStatusText.isVisible = true
-                                bind.premiumStatusText.text = getString(R.string.premium_checking)
-                                bind.premiumView.isVisible = false
-                            }
-
-                            else -> {
-                                bind.premiumStatusText.isVisible = false
-                                bind.premiumView.isVisible = true
-                            }
+                            bind.sectionAdminPremiumUsers.isVisible = user.admin
+                        } else {
+                            bind.textViewUserName.text = getString(R.string.default_user_name)
+                            bind.imageViewUserAvatar.setImageResource(R.drawable.user_photo_placeholder)
+                            bind.cardUserLevel.isVisible = false
+                            bind.premiumStatusText.isVisible = false
+                            bind.premiumView.isVisible = false
+                            bind.sectionAdminPremiumUsers.isVisible = false
                         }
-                        bind.sectionAdminPremiumUsers.isVisible = user.admin
-                    } else {
-                        bind.textViewUserName.text = getString(R.string.default_user_name)
-                        bind.imageViewUserAvatar.setImageResource(R.drawable.user_photo_placeholder)
-                        bind.cardUserLevel.isVisible = false
-                        bind.premiumStatusText.isVisible = false
-                        bind.premiumView.isVisible = false
-                        bind.sectionAdminPremiumUsers.isVisible = false
                     }
                 }
             }
@@ -207,11 +211,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
 
     private fun showLogoutConfirmationDialog() {
         if (!isAdded) return
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.logout_confirmation_title))
             .setMessage(getString(R.string.logout_confirmation_message))
             .setPositiveButton(getString(R.string.logout)) { _, _ ->
-                MainActivity.signOut?.run()
+                viewModel.logout()
             }
             .setNegativeButton(getString(R.string.cancel), null)
             .show()

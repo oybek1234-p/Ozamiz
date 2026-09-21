@@ -3,52 +3,51 @@ package uz.oybek.ozamiz.ui.feature.onboarding.screens.plan
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.food.DietController
 import uz.oybek.ozamiz.databinding.FragmentPlanBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
-import uz.oybek.ozamiz.ui.utils.showToast
 
 class PlanFragment : OnBoardingChildFragment<FragmentPlanBinding>() {
 
     override fun viewCreated(bind: FragmentPlanBinding) {
-        val durationText = DietController.getGoalDurationText()
+        val goalDuration = viewModel.uiState.value.goalDuration
+        val durationText = when {
+            goalDuration.isTargetReached -> getString(R.string.onboarding_goalpace_duration_reached)
+            goalDuration.months > 0 && goalDuration.days > 0 -> getString(
+                R.string.onboarding_goalpace_duration_months_days,
+                goalDuration.months,
+                goalDuration.days
+            )
+
+            goalDuration.months > 0 -> getString(
+                R.string.onboarding_goalpace_duration_months,
+                goalDuration.months
+            )
+
+            else -> getString(
+                R.string.onboarding_goalpace_duration_days,
+                goalDuration.totalDays
+            )
+        }
         bind.tvPlanTitle.text = getString(R.string.plan_estimated_title, durationText)
 
-        viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
-            bind.buttonLoveIt.isEnabled = !loading
-            bind.progressBarLoveIt.isVisible = loading
-            bind.buttonLoveIt.text = if (loading) "" else getString(R.string.love_it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    bind.buttonDone.isEnabled = !state.isSaving
+                    bind.progressBarDone.isVisible = state.isSaving
+                    bind.buttonDone.text = if (state.isSaving) "" else getString(R.string.done)
+                }
+            }
         }
 
-        bind.buttonLoveIt.setOnClickListener {
-            savePlanAndComplete()
+        bind.buttonDone.setOnClickListener {
+            viewModel.saveOnboardingInfo()
         }
-    }
-
-    private fun savePlanAndComplete() {
-        viewModel.completeOnboarding(
-            onSuccess = {
-                mainActivity()?.recreateUi()
-            },
-            onError = {
-                showRetryDialog()
-            }
-        )
-    }
-
-    private fun showRetryDialog() {
-        if (!isAdded || isDetached) return
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Xatolik yuz berdi")
-            .setMessage("Ma'lumotlarni saqlashda xatolik yuz berdi. Iltimos, internet aloqangizni tekshirib, qayta urinib ko'ring.")
-            .setPositiveButton("Qayta urinish") { dialog, _ ->
-                dialog.dismiss()
-                savePlanAndComplete()
-            }
-            .setNegativeButton("Bekor qilish", null)
-            .setCancelable(false)
-            .show()
     }
 
     override fun inflateBinding(

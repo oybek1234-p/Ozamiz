@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="24dp">
+            android:paddingBottom="100dp">
 
             <TextView
                 android:id="@+id/tv_plan_title"
@@ -300,15 +300,15 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_love_it"
+            android:id="@+id/button_done"
             style="@style/FilledButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/love_it"
+            android:text="@string/start_plan"
             android:textColor="?colorSurface" />
 
         <ProgressBar
-            android:id="@+id/progress_bar_love_it"
+            android:id="@+id/progress_bar_done"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_gravity="center"

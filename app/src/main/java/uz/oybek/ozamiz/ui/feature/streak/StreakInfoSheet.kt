@@ -205,7 +205,7 @@ class StreakInfoSheet : BottomSheetDialogFragment() {
         binding.progressTopUsers.visibility = View.VISIBLE
         binding.recyclerTopUsers.visibility = View.GONE
 
-        val currentUserGoal = UserProfileRepository.user.goal.ifBlank { "lose_weight" }
+        val currentUserGoal = UserProfileRepository.user.goal.ifBlank { uz.oybek.ozamiz.data.profile.model.UserGoal.LOSE_WEIGHT.key }
 
         viewLifecycleOwner.lifecycleScope.launch {
             val result = AdminRepository.getUsers(

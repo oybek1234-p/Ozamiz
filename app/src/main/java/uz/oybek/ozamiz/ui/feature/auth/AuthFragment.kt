@@ -1,173 +1,38 @@
 package uz.oybek.ozamiz.ui.feature.auth
 
-import android.app.Activity
-import android.content.Intent
-import android.content.IntentSender
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.firebase.auth.GoogleAuthProvider
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAuthBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.utils.postVal
+import uz.oybek.ozamiz.ui.utils.getMessage
 import uz.oybek.ozamiz.ui.utils.showToast
-import uz.oybek.ozamiz.util.PermissionController
-import uz.oybek.ozamiz.util.handleException
 
+@AndroidEntryPoint
 class AuthFragment : BaseFragment<FragmentAuthBinding>() {
 
-    override fun inflateBinding(
-        inflater: LayoutInflater, container: ViewGroup?
-    ): FragmentAuthBinding {
-        return FragmentAuthBinding.inflate(inflater)
-    }
-
     private val viewModel: AuthViewModel by viewModels()
-
-    private var splash = true
-
-    private var signInRequest: BeginSignInRequest? = null
-    private var oneTapClient: SignInClient? = null
-
-    private var isSigning = false
-
-    private val intentSenderLauncher =
-        registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                if (data != null) {
-                    try {
-                        val credential = oneTapClient?.getSignInCredentialFromIntent(data)
-                        val idToken = credential?.googleIdToken
-                        if (idToken != null) {
-                            val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-
-                            if (context != null && activity != null) {
-                                viewModel.sendState.postVal(SendState.Sending)
-                                viewModel.signInGoogle(firebaseCredential) {
-                                    if (it) {
-                                        verified()
-                                    } else {
-                                        viewModel.sendState.postVal(SendState.Input())
-                                        isSigning = false
-                                    }
-                                }
-                            } else {
-                                isSigning = false
-                            }
-                        }
-                    } catch (e: Exception) {
-                        handleException(e)
-                        isSigning = false
-                    }
-                } else {
-                    isSigning = false
-                }
-            } else {
-                isSigning = false
-            }
-        }
-
-    private fun loginGoogle() {
-        if (activity == null) return
-        if (isSigning) return
-        isSigning = true
-
-        PermissionController.getInstance()
-            .doOnActivityResult(PermissionController.ANY_REQUEST_CODE) { res, resultOk ->
-                if (resultOk) {
-                    if (res is Intent) {
-                        try {
-                            val credential = oneTapClient?.getSignInCredentialFromIntent(res)
-                            val idToken = credential?.googleIdToken
-                            if (idToken != null) {
-                                val firebaseCredential =
-                                    GoogleAuthProvider.getCredential(idToken, null)
-                                if (context != null && activity != null) {
-                                    viewModel.sendState.postVal(SendState.Sending)
-                                    viewModel.signInGoogle(firebaseCredential) {
-                                        if (it) {
-                                            verified()
-                                        } else {
-                                            viewModel.sendState.postVal(SendState.Input())
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (e: Exception) {
-                            handleException(e)
-                        }
-                    }
-                }
-            }
-        signInRequest?.let { request ->
-            oneTapClient?.beginSignIn(request)?.addOnSuccessListener { result ->
-                try {
-                    if (isDetached || isRemoving || isVisible.not()) return@addOnSuccessListener
-                    intentSenderLauncher.launch(
-                        IntentSenderRequest.Builder(result.pendingIntent).build()
-                    )
-                } catch (e: IntentSender.SendIntentException) {
-                    showToast(e.message ?: "")
-                }
-            }?.addOnFailureListener { e ->
-                showToast("Google One Tap error: ${e.localizedMessage}")
-                android.util.Log.e("AuthFragment", "One Tap sign in failed", e)
-            }
-        }
-    }
-
-    private fun verified() {
-        viewModel.sendState.postVal(SendState.Sending)
-        isSigning = true
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (activity == null) {
-                isSigning = false
-                return@launch
-            }
-            val user = viewModel.authFirebaseUser()
-            if (isRemoving || user.valid.not()) {
-                isSigning = false
-                return@launch
-            }
-            isSigning = false
-            mainActivity()?.recreateUi(true)
-        }
-    }
-
-    private fun initGoogleAuth() {
-        if (activity == null) return
-        oneTapClient = Identity.getSignInClient(requireActivity())
-
-        val clientId = getString(R.string.your_web_client_id)
-        signInRequest = BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                .setSupported(true)
-                .setServerClientId(clientId)
-                .setFilterByAuthorizedAccounts(false)
-                .build()
-        ).build()
-    }
+    private lateinit var credentialManager: CredentialManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        splash = arguments?.getBoolean("splash", false) ?: false
-        initGoogleAuth()
-        loginGoogle()
+        credentialManager = CredentialManager.create(requireContext())
     }
 
     override fun viewCreated(bind: FragmentAuthBinding) {
@@ -176,39 +41,82 @@ class AuthFragment : BaseFragment<FragmentAuthBinding>() {
             toolbar.isVisible = false
 
             Glide.with(requireContext()).load(R.drawable.splash_icon).into(photo)
+
             gmailButton.setOnClickListener {
                 loginGoogle()
             }
-            viewModel.sendState.observe(viewLifecycleOwner) {
-                when (it) {
-                    is SendState.Input -> {
-                        progressBar.isVisible = false
-                        gmailButton.isEnabled = true
-                        emailButton.isEnabled = true
-                        gmailButton.alpha = 1f
-                        emailButton.alpha = 1f
-                    }
 
-                    is SendState.Sending -> {
-                        progressBar.isVisible = true
-                        gmailButton.isEnabled = false
-                        emailButton.isEnabled = false
-                        gmailButton.alpha = 0.5f
-                        emailButton.alpha = 0.5f
-                    }
-
-                    else -> {}
-                }
-            }
             emailButton.setOnClickListener {
                 navigate(R.id.loginGmailFragment)
             }
         }
+
+        observeState()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        intentSenderLauncher.unregister()
-        PermissionController.getInstance().removeCallback(PermissionController.ANY_REQUEST_CODE)
+    private fun observeState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.uiState.collect { state ->
+                        binding.progressBar.isVisible = state.isLoading
+                        binding.gmailButton.text = if (state.isLoading) "" else getString(R.string.google_orqali_kirish)
+                        binding.gmailButton.icon = if (state.isLoading) null else ContextCompat.getDrawable(requireContext(), R.drawable.google_ic)
+                        binding.gmailButton.isEnabled = !state.isLoading
+                        binding.gmailButton.alpha = 1f
+                        binding.emailButton.isEnabled = !state.isLoading
+                        binding.emailButton.alpha = if (state.isLoading) 0.5f else 1f
+                    }
+                }
+
+                launch {
+                    viewModel.uiEffect.collect { effect ->
+                        when (effect) {
+                            is AuthUiEffect.ShowError -> {
+                                showToast(effect.error.getMessage(requireContext()))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loginGoogle() {
+        if (viewModel.uiState.value.isLoading) return
+        val activity = activity ?: return
+
+        val clientId = getString(R.string.your_web_client_id)
+        val googleIdOption = GetSignInWithGoogleOption.Builder(clientId)
+            .build()
+
+        val request = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    request = request, context = activity
+                )
+
+                val credential = result.credential
+                if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    val googleIdTokenCredential =
+                        GoogleIdTokenCredential.createFrom(credential.data)
+                    val idToken = googleIdTokenCredential.idToken
+                    viewModel.signInWithGoogle(idToken)
+                } else {
+                    viewModel.onGoogleSignInError()
+                }
+            } catch (_: GetCredentialCancellationException) {
+            } catch (e: Exception) {
+                viewModel.onGoogleSignInError(e)
+            }
+        }
+    }
+
+    override fun inflateBinding(
+        inflater: LayoutInflater, container: ViewGroup?
+    ): FragmentAuthBinding {
+        return FragmentAuthBinding.inflate(inflater, container, false)
     }
 }

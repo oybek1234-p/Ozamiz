@@ -1,16 +1,22 @@
 package uz.oybek.ozamiz.ui.feature.onboarding.exercise
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.food.DietController
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.data.diet.DietEngine
+import uz.oybek.ozamiz.data.profile.api.ProfileManagerRepo
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.data.profile.model.User
+import uz.oybek.ozamiz.data.profile.model.UserGoal
 import uz.oybek.ozamiz.data.user.model.info.Gender
+import javax.inject.Inject
 
 sealed class GetInfoNavigationEvent {
     data class ShowToast(val message: String) : GetInfoNavigationEvent()
@@ -18,16 +24,24 @@ sealed class GetInfoNavigationEvent {
     object NavigateToHome : GetInfoNavigationEvent()
 }
 
-class GetInfoViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class GetInfoViewModel @Inject constructor(
+    private val profileRepo: ProfileRepo,
+    private val profileManagerRepo: ProfileManagerRepo,
+    private val dietEngine: DietEngine
+) : ViewModel() {
 
-    private val _isLoading = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _idealWeightRangeText = MutableLiveData<String?>(null)
-    val idealWeightRangeText: LiveData<String?> = _idealWeightRangeText
+    private val _idealWeightRangeText = MutableStateFlow<String?>(null)
+    val idealWeightRangeText: StateFlow<String?> = _idealWeightRangeText.asStateFlow()
 
-    private val _navigationEvent = MutableLiveData<GetInfoNavigationEvent>()
-    val navigationEvent: LiveData<GetInfoNavigationEvent> = _navigationEvent
+    private val _navigationEvent = Channel<GetInfoNavigationEvent>(Channel.BUFFERED)
+    val navigationEvent: Flow<GetInfoNavigationEvent> = _navigationEvent.receiveAsFlow()
+
+    val user: User
+        get() = profileRepo.currentUser
 
     private var isNewUserSetup: Boolean = true
 
@@ -37,17 +51,15 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
 
     fun calculateAndSetIdealWeight(heightCm: Int?, gender: Int) {
         if (heightCm != null && heightCm > 0 && (gender == Gender.MALE || gender == Gender.FEMALE)) {
-            val idealWeight = DietController.getIdealWeight(heightCm.toDouble())
+            val idealWeight = dietEngine.getIdealWeight(heightCm.toDouble())
 
-            _idealWeightRangeText.postValue(
-                String.format(
-                    "%.0f kg - %.0f kg",
-                    idealWeight.first.toDouble(),
-                    idealWeight.second.toDouble()
-                )
+            _idealWeightRangeText.value = String.format(
+                "%.0f kg - %.0f kg",
+                idealWeight.first.toDouble(),
+                idealWeight.second.toDouble()
             )
         } else {
-            _idealWeightRangeText.postValue(null)
+            _idealWeightRangeText.value = null
         }
     }
 
@@ -62,16 +74,17 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
         phoneNumber: String,
         activityLevel: String,
         manzil: String?,
-        goal: String = "lose_weight",
+        goal: String = UserGoal.LOSE_WEIGHT.key,
         targetCalories: Int = 0,
         targetProtein: Int = 0,
         targetFat: Int = 0,
         targetCarbs: Int = 0
     ) {
+        if (_isLoading.value) return
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                val existingUser = LocalUser.user
+                val existingUser = profileRepo.currentUser
                 val userToUpdate = existingUser.copy(
                     name = name,
                     gender = gender,
@@ -91,36 +104,22 @@ class GetInfoViewModel(application: Application) : AndroidViewModel(application)
                     registerDate = existingUser.registerDate
                 )
 
-                // Centralized calculation for calories, macros, and water if not already specified
-                DietController.updateTargetValues(userToUpdate, if (targetCalories > 0) targetCalories else null)
-                if (targetProtein > 0) userToUpdate.targetProtein = targetProtein
-                if (targetFat > 0) userToUpdate.targetFat = targetFat
-                if (targetCarbs > 0) userToUpdate.targetCarbs = targetCarbs
+                val plan = dietEngine.calculateDietPlan(userToUpdate)
+                val finalUser = userToUpdate.copy(
+                    targetCalories = if (targetCalories > 0) targetCalories else plan.targetCalories,
+                    targetProtein = if (targetProtein > 0) targetProtein else plan.macros.protein,
+                    targetFat = if (targetFat > 0) targetFat else plan.macros.fat,
+                    targetCarbs = if (targetCarbs > 0) targetCarbs else plan.macros.carbs
+                )
 
-                UserProfileRepository.updateUser {
-                    this.name = userToUpdate.name
-                    this.gender = userToUpdate.gender
-                    this.age = userToUpdate.age
-                    this.height = userToUpdate.height
-                    this.weight = userToUpdate.weight
-                    this.targetWeight = userToUpdate.targetWeight
-                    this.startWeight = userToUpdate.startWeight
-                    this.goal = userToUpdate.goal
-                    this.problems = userToUpdate.problems
-                    this.targetCalories = userToUpdate.targetCalories
-                    this.targetProtein = userToUpdate.targetProtein
-                    this.targetFat = userToUpdate.targetFat
-                    this.targetCarbs = userToUpdate.targetCarbs
-                    this.targetWaterMl = userToUpdate.targetWaterMl
-                    this.phoneNumber = userToUpdate.phoneNumber
-                    this.activityLevel = userToUpdate.activityLevel
-                    this.region = userToUpdate.region
+                profileManagerRepo.updateUser(onlyLocal = false) {
+                    finalUser
                 }
-                _navigationEvent.postValue(GetInfoNavigationEvent.NavigateToHome)
+                _navigationEvent.send(GetInfoNavigationEvent.NavigateToHome)
             } catch (e: Exception) {
-                _navigationEvent.postValue(GetInfoNavigationEvent.ShowToast("Xatolik yuz berdi: ${e.message}"))
+                _navigationEvent.send(GetInfoNavigationEvent.ShowToast("Xatolik yuz berdi: ${e.message}"))
             } finally {
-                _isLoading.postValue(false)
+                _isLoading.value = false
             }
         }
     }

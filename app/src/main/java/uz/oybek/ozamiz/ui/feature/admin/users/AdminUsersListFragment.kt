@@ -52,7 +52,7 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
     private fun setupRecyclerView(bind: FragmentAdminUsersListBinding) {
         adapter = AdminUsersAdapter { selectedUser ->
             val bundle = bundleOf("userId" to selectedUser.uid)
-            navigate(R.id.action_adminUsersListFragment_to_adminUserDetailsFragment, bundle)
+            navigate(R.id.adminUserDetailsFragment, bundle)
         }
         bind.recyclerUsers.adapter = adapter
         

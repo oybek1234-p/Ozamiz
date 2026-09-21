@@ -1,63 +1,66 @@
 package uz.oybek.ozamiz.ui.feature.onboarding
 
+import androidx.annotation.StringRes
+import uz.oybek.ozamiz.R
+
 enum class MultipleAnswersQuestion(
-    val title: String,
-    val answers: List<String>
+    @StringRes val titleRes: Int,
+    val answersRes: List<Int>
 ) {
     GOAL(
-        title = "Nima uchun ozmoqchisiz?",
-        answers = listOf(
-            "O'zimga ishonchni oshirish uchun",
-            "Salomatligimni yaxshilash uchun",
-            "Jismoniy holatimni yaxshilash uchun",
-            "Muhim tadbirga tayyorgarlik uchun",
-            "Boshqa sabab"
+        titleRes = R.string.onboarding_multiple_goal_title,
+        answersRes = listOf(
+            R.string.onboarding_multiple_goal_1,
+            R.string.onboarding_multiple_goal_2,
+            R.string.onboarding_multiple_goal_3,
+            R.string.onboarding_multiple_goal_4,
+            R.string.onboarding_multiple_goal_5
         )
     ),
     HISTORY(
-        title = "Ozish bo'yicha tajribangiz qanday?",
-        answers = listOf(
-            "Avval ozganman va yana ozmoqchiman",
-            "Harakat qilib ko'rganman, o'xshamagan",
-            "Ozganman, lekin vaznim yana qaytgan",
-            "Avval ozishga harakat qilmaganman"
+        titleRes = R.string.onboarding_multiple_history_title,
+        answersRes = listOf(
+            R.string.onboarding_multiple_history_1,
+            R.string.onboarding_multiple_history_2,
+            R.string.onboarding_multiple_history_3,
+            R.string.onboarding_multiple_history_4
         )
     ),
 
     STRUGGLES(
-        title = "Qanday qiyinchiliklarga duch keldingiz?",
-        answers = listOf(
-            "Ishtahani jilovlash",
-            "Motivatsiyani saqlash",
-            "Ovqat miqdorini kamaytirish",
-            "Nima yeyishni bilmaslik",
-            "Vaqt yo’q"
+        titleRes = R.string.onboarding_multiple_struggles_title,
+        answersRes = listOf(
+            R.string.onboarding_multiple_struggles_1,
+            R.string.onboarding_multiple_struggles_2,
+            R.string.onboarding_multiple_struggles_3,
+            R.string.onboarding_multiple_struggles_4,
+            R.string.onboarding_multiple_struggles_5
         )
     ),
     CALORIES(
-        title = "Avval kaloriyalarni sanaganmisiz?",
-        answers = listOf(
-            "Ha",
-            "Yo'q"
+        titleRes = R.string.onboarding_multiple_calories_title,
+        answersRes = listOf(
+            R.string.onboarding_multiple_calories_1,
+            R.string.onboarding_multiple_calories_2
         )
     ),
     FASTING(
-        title = "Hech interval ochlik usulini sinab ko'rganmisiz?",
-        answers = listOf(
-            "Ha, menga yoqdi",
-            "Ha, lekin bu men uchun emas ekan",
-            "Yo'q, lekin sinab ko'rmoqchiman",
-            "Yo'q, menga qiziq emas",
-            "Interval ochlik nima degani?"
+        titleRes = R.string.onboarding_multiple_fasting_title,
+        answersRes = listOf(
+            R.string.onboarding_multiple_fasting_1,
+            R.string.onboarding_multiple_fasting_2,
+            R.string.onboarding_multiple_fasting_3,
+            R.string.onboarding_multiple_fasting_4,
+            R.string.onboarding_multiple_fasting_5
         )
     ),
     CHALLENGE(
-        title = "O'zingizni sinab ko'ring! Necha kun uzluksiz davom eta olasiz?",
-        answers = listOf(
-            "50 kun (Afsona 🔥)",
-            "30 kun (Qoyilmaqom 🚀)",
-            "14 kun (Ajoyib 👌)",
-            "7 kun (Yaxshi 👍)"
+        titleRes = R.string.onboarding_multiple_challenge_title,
+        answersRes = listOf(
+            R.string.onboarding_multiple_challenge_1,
+            R.string.onboarding_multiple_challenge_2,
+            R.string.onboarding_multiple_challenge_3,
+            R.string.onboarding_multiple_challenge_4
         )
     )
 }

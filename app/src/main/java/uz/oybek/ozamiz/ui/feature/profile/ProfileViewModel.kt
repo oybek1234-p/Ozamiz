@@ -2,90 +2,53 @@ package uz.oybek.ozamiz.ui.feature.profile
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.user.UserAuthRepository
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.profile.api.ProfileAuthRepo
+import uz.oybek.ozamiz.data.profile.api.ProfileManagerRepo
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.data.profile.model.User
+import javax.inject.Inject
 
-class ProfileViewModel : ViewModel() {
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    private val profileRepo: ProfileRepo,
+    private val profileManagerRepo: ProfileManagerRepo,
+    private val profileAuthRepo: ProfileAuthRepo
+) : ViewModel() {
 
-    private val _cashbackProgress = MutableStateFlow(0)
-    val cashbackProgress = _cashbackProgress.asStateFlow()
+    private val _uiEffect = Channel<ProfileUiEffect>(Channel.BUFFERED)
+    val uiEffect: Flow<ProfileUiEffect> = _uiEffect.receiveAsFlow()
 
-    val userState: StateFlow<User> = LocalUser.userLive.asFlow()
-        .map { user -> user }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = LocalUser.user ?: User()
-        )
-
-    val userProfile: StateFlow<User> get() = userState
+    val userState: StateFlow<User> = profileRepo.user
 
     val user: User
-        get() = UserProfileRepository.user
-
-    fun updateCalorieSettings(
-        calories: Int,
-        protein: Int,
-        fat: Int,
-        carbs: Int,
-        goal: String,
-        targetWeight: Double? = null,
-        activityLevel: String? = null,
-        currentWeight: Double? = null
-    ) {
-        UserProfileRepository.updateUser {
-            targetCalories = calories
-            targetProtein = protein
-            targetFat = fat
-            targetCarbs = carbs
-            this.goal = goal
-            if (targetWeight != null && targetWeight > 0) {
-                this.targetWeight = targetWeight
-            }
-            if (currentWeight != null && currentWeight > 0) {
-                this.weight = currentWeight
-            }
-            if (!activityLevel.isNullOrBlank()) {
-                this.activityLevel = activityLevel
-            }
-        }
-    }
+        get() = profileRepo.currentUser
 
     fun updateAvatar(uri: Uri) {
         viewModelScope.launch {
-            val userId = LocalUser.user.uid
-            if (userId.isBlank()) return@launch
+            profileManagerRepo.updateAvatar(uri)
+        }
+    }
 
-            val url = ImageUploader.uploadImage(uri, FirebasePaths.Storage.avatars(userId))
-
-            if (url != null) {
-                UserProfileRepository.updateAvatarUrl(url)
-            }
+    fun updateUser(
+        onlyLocal: Boolean = false,
+        recalculateUserPlan: Boolean = false,
+        transform: (User) -> User
+    ) {
+        viewModelScope.launch {
+            profileManagerRepo.updateUser(onlyLocal, recalculateUserPlan, transform)
         }
     }
 
     fun logout() {
         viewModelScope.launch {
-            UserAuthRepository.signOut()
-        }
-    }
-
-    fun deleteAccount() {
-        viewModelScope.launch {
-            UserAuthRepository.deleteAccount()
+            profileAuthRepo.signOut()
         }
     }
 }

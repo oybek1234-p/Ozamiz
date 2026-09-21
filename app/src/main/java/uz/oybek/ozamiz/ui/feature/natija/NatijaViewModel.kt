@@ -75,7 +75,7 @@ class NatijaViewModel : ViewModel() {
     private fun getInitialIsGainGoal(): Boolean {
         val user = LocalUser.user
         if (!user.goal.isNullOrBlank()) {
-            return user.goal == "gain_weight"
+            return user.goal == uz.oybek.ozamiz.data.profile.model.UserGoal.GAIN_WEIGHT.key
         }
         val targetW = user.targetWeight ?: 0.0
         val currentW = if (user.weight > 0) user.weight else 70.0
@@ -103,7 +103,7 @@ class NatijaViewModel : ViewModel() {
                 when (result) {
                     is DataWrapper.Success -> {
                         val logs = result.data.sortedBy { it.timestampLong }
-                        Log.e("Kot",logs.toString())
+                        Log.e("Kot", logs.toString())
                         val validLogs = logs.filter { it.weightKg > 0 }
 
                         if (validLogs.isNotEmpty()) {
@@ -133,7 +133,8 @@ class NatijaViewModel : ViewModel() {
         val user = LocalUser.user
         val validLogs = logs.filter { it.weightKg > 0 }
 
-        val currentW = validLogs.lastOrNull()?.weightKg ?: (if (user.weight > 0) user.weight else null)
+        val currentW =
+            validLogs.lastOrNull()?.weightKg ?: (if (user.weight > 0) user.weight else null)
         val startW = (if ((user.startWeight
                 ?: 0.0) > 0
         ) user.startWeight else null) ?: validLogs.firstOrNull()?.weightKg
@@ -185,7 +186,7 @@ class NatijaViewModel : ViewModel() {
             .sortedByDescending { it.timestampLong }
 
         // Group by day to get the latest photo from each day
-        val dailyPhotos = photoLogs.groupBy { 
+        val dailyPhotos = photoLogs.groupBy {
             val cal = java.util.Calendar.getInstance()
             cal.timeInMillis = it.timestampLong
             cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
@@ -241,36 +242,36 @@ class NatijaViewModel : ViewModel() {
         val timeSinceLastLog = System.currentTimeMillis() - lastLogTime
         val showTop = timeSinceLastLog > sevenDaysMs
         val showBottom = !showTop
+//
+//        val idealPair = if (user.height > 0) DietEngine.getIdealWeight(user.height.toDouble()) else null
+//        val idealText = if (idealPair != null) "${idealPair.first} - ${idealPair.second} kg" else ""
+//
+//        _uiState.update {
+//            it.copy(
+//                isLoading = false,
+//                logs = logs,
+//                startWeight = startW,
+//                currentWeight = currentW,
+//                goalWeight = targetWeight,
+//                weightDiff = diff,
+//                weeklyRate = weeklyRate,
+//                photoBefore = firstPhoto,
+//                photoAfter = lastPhoto,
+//                photoBeforeDate = firstPhotoDate,
+//                photoAfterDate = lastPhotoDate,
+//                photoBeforeWeight = prevPhotoWeight,
+//                photoAfterWeight = lastPhotoWeight,
+//                showTopBanner = showTop,
+//                showBottomBanner = showBottom,
+//                estimatedGoalDate = predictionDate,
+//                error = null,
+//                bmi = bmiData.first,
+//                bmiCategory = bmiData.second,
+//                idealWeightText = idealText,
+//                userHeightCm = user.height
+//            )
+//        }
 
-        val idealPair = if (user.height > 0) uz.oybek.ozamiz.data.food.DietController.getIdealWeight(user.height.toDouble()) else null
-        val idealText = if (idealPair != null) "${idealPair.first} - ${idealPair.second} kg" else ""
-
-        _uiState.update {
-            it.copy(
-                isLoading = false,
-                logs = logs,
-                startWeight = startW,
-                currentWeight = currentW,
-                goalWeight = targetWeight,
-                weightDiff = diff,
-                weeklyRate = weeklyRate,
-                photoBefore = firstPhoto,
-                photoAfter = lastPhoto,
-                photoBeforeDate = firstPhotoDate,
-                photoAfterDate = lastPhotoDate,
-                photoBeforeWeight = prevPhotoWeight,
-                photoAfterWeight = lastPhotoWeight,
-                showTopBanner = showTop,
-                showBottomBanner = showBottom,
-                estimatedGoalDate = predictionDate,
-                error = null,
-                bmi = bmiData.first,
-                bmiCategory = bmiData.second,
-                idealWeightText = idealText,
-                userHeightCm = user.height
-            )
-        }
-        
         calculateDeficitAndGoalForecast(currentW, targetWeight)
     }
 
@@ -287,22 +288,81 @@ class NatijaViewModel : ViewModel() {
     private fun calculateDeficitAndGoalForecast(currentW: Double?, targetW: Double?) {
         viewModelScope.launch {
             val currentUser = LocalUser.user
-            val prediction = uz.oybek.ozamiz.data.prediction.WeightPredictionRepository.calculatePrediction(
-                user = currentUser,
-                currentWeightOverride = currentW,
-                targetWeightOverride = targetW
-            )
+            if (!currentUser.valid) {
+                _uiState.update { it.copy(isPredictionLoading = false) }
+                return@launch
+            }
+
+            val tdee = 0.0
+            val targetCalories =
+                if (currentUser.targetCalories > 0) currentUser.targetCalories else tdee.toInt()
+            val effectiveDailyDeficit = tdee - targetCalories
+            val avgDeficitInt = effectiveDailyDeficit.toInt()
+            val fatGrams =
+                (kotlin.math.abs(effectiveDailyDeficit) / 7.7).let { kotlin.math.round(it).toInt() }
+            val isSurplus = effectiveDailyDeficit < 0
+
+            val current = currentW ?: (if (currentUser.weight > 0) currentUser.weight else 70.0)
+            val target = targetW ?: currentUser.targetWeight ?: 0.0
+            val isGainGoal = if (!currentUser.goal.isNullOrBlank()) {
+                currentUser.isGainWeight
+            } else {
+                target > 0.0 && target > current
+            }
+
+            val (weeklyLossKg, monthlyLossKg, weeklyLossStr, monthlyLossStr) = if (isGainGoal) {
+                val dailySurplus = -effectiveDailyDeficit
+                val safeSurplus = if (dailySurplus > 0) dailySurplus else 500.0
+                val rawWeeklyGain = (safeSurplus * 7.0) / 7700.0
+                val clampedWeekly = minOf(2.0, maxOf(0.1, rawWeeklyGain))
+                val clampedMonthly = clampedWeekly * 4.0
+                val wStr = String.format(java.util.Locale.US, "+%.1f kg", clampedWeekly)
+                val mStr = String.format(java.util.Locale.US, "+%.1f kg", clampedMonthly)
+                listOf(clampedWeekly, clampedMonthly, wStr, mStr)
+            } else {
+                val safeDeficit = if (effectiveDailyDeficit > 0) effectiveDailyDeficit else 500.0
+                val rawWeeklyKg = (safeDeficit * 7.0) / 7700.0
+                val clampedWeekly = minOf(2.0, maxOf(0.1, rawWeeklyKg))
+                val clampedMonthly = clampedWeekly * 4.0
+                val wStr = String.format(java.util.Locale.US, "-%.1f kg", clampedWeekly)
+                val mStr = String.format(java.util.Locale.US, "-%.1f kg", clampedMonthly)
+                listOf(clampedWeekly, clampedMonthly, wStr, mStr)
+            }
+
+            val weeklyKg = weeklyLossKg as Double
+            val remainingKg = if (isGainGoal) target - current else current - target
+
+            val (remainingTimeStr, targetDateFormatted) = if (target <= 0.0 || remainingKg <= 0.05) {
+                val remStr = if (target <= 0.0) "Maqsad ko'rsatilmagan" else "Maqsad bajarildi"
+                remStr to ""
+            } else {
+                val safeWeeklyRate = if (weeklyKg > 0.01) weeklyKg else 0.5
+                val weeksNeeded = remainingKg / safeWeeklyRate
+                val totalDaysNeeded =
+                    (weeksNeeded * 7.0).let { kotlin.math.round(it).toInt() }.coerceAtLeast(1)
+                val months = totalDaysNeeded / 30
+                val days = totalDaysNeeded % 30
+                val remStr = when {
+                    months > 0 && days > 0 -> "$months oy $days kun qoldi"
+                    months > 0 -> "$months oy qoldi"
+                    else -> "$days kun qoldi"
+                }
+                val targetCal = java.util.Calendar.getInstance()
+                targetCal.add(java.util.Calendar.DAY_OF_YEAR, totalDaysNeeded)
+                val sdf = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                remStr to sdf.format(targetCal.time)
+            }
 
             _uiState.update {
                 it.copy(
-                    avgDailyDeficit = prediction.avgDailyDeficit,
-                    dailyFatGrams = prediction.dailyFatGrams,
-                    weeklyPredictedLoss = prediction.weeklyLossStr,
-                    monthlyPredictedLoss = prediction.monthlyLossStr,
-                    goalDurationText = prediction.remainingTimeStr,
-                    goalDateFormatted = prediction.targetDateFormatted,
-                    isSurplus = prediction.isSurplus,
-                    isGainGoal = prediction.isGainGoal,
+                    avgDailyDeficit = avgDeficitInt,
+                    dailyFatGrams = fatGrams,
+                    weeklyPredictedLoss = weeklyLossStr as String,
+                    monthlyPredictedLoss = monthlyLossStr as String,
+                    goalDurationText = remainingTimeStr,
+                    goalDateFormatted = targetDateFormatted,
+                    isSurplus = isSurplus,
+                    isGainGoal = isGainGoal,
                     isPredictionLoading = false
                 )
             }
@@ -350,8 +410,12 @@ class NatijaViewModel : ViewModel() {
                         val dailyLogs = dateSnap.getValueSafe(DailyLogs::class.java) ?: continue
                         val summary = LogRepository.calculateSummary(dailyLogs)
 
-                        val waterInDay = if (summary.consumedWaterMl > 0) summary.consumedWaterMl else (dailyLogs.waterLogs?.values?.sumOf { it.amountMl } ?: 0)
-                        val exerciseInDay = if (summary.burnedCalories > 0) summary.burnedCalories else (dailyLogs.exerciseLogs?.values?.sumOf { it.caloriesBurned } ?: 0)
+                        val waterInDay =
+                            if (summary.consumedWaterMl > 0) summary.consumedWaterMl else (dailyLogs.waterLogs?.values?.sumOf { it.amountMl }
+                                ?: 0)
+                        val exerciseInDay =
+                            if (summary.burnedCalories > 0) summary.burnedCalories else (dailyLogs.exerciseLogs?.values?.sumOf { it.caloriesBurned }
+                                ?: 0)
 
                         if (waterInDay > 0) {
                             waterDaysCount++

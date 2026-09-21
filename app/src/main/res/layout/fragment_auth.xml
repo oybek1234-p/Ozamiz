@@ -54,27 +54,41 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/gmail_button"
-                style="@style/Widget.Material3.Button.ElevatedButton"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_bold"
                 android:layout_marginHorizontal="@dimen/dimen_24"
-                android:layout_marginTop="@dimen/dimen_24"
-                android:drawablePadding="@dimen/dimen_12"
-                android:textSize="17sp"
-                android:gravity="center"
-                android:paddingHorizontal="@dimen/dimen_18"
-                android:paddingVertical="@dimen/dimen_12"
-                app:iconGravity="textStart"
-                android:text="@string/google_orqali_kirish"
-                app:icon="@drawable/google_ic"
-                app:iconPadding="@dimen/dimen_12"
-                app:iconTint="@null"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/phone_view" />
+                android:layout_marginTop="@dimen/dimen_24">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/gmail_button"
+                    style="@style/Widget.Material3.Button.ElevatedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_bold"
+                    android:drawablePadding="@dimen/dimen_12"
+                    android:textSize="17sp"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/dimen_18"
+                    android:paddingVertical="@dimen/dimen_12"
+                    app:iconGravity="textStart"
+                    android:text="@string/google_orqali_kirish"
+                    app:icon="@drawable/google_ic"
+                    app:iconPadding="@dimen/dimen_12"
+                    app:iconTint="@null" />
+                
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:elevation="6dp"
+                    app:indicatorSize="24dp"
+                    app:trackThickness="2.5dp"
+                    android:visibility="gone" />
+
+            </FrameLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/email_button"
@@ -132,17 +146,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progress_bar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:indeterminate="true"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

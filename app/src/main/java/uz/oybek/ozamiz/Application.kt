@@ -22,10 +22,13 @@ import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.util.handleException
 
+import dagger.hilt.android.HiltAndroidApp
+
 lateinit var appContext: Context
 
 val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+@HiltAndroidApp
 class Application : Application() {
 
 

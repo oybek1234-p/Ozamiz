@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.diet.DietEngine
 import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.databinding.FragmentCommunityProfileBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -62,10 +63,8 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
                     val targetWeight = user.targetWeight
                     val targetCalories = user.targetCalories
                     val streakInfo = user.streakInfo
-                    
-                    // Defitsitni hisoblash: TDEE - targetCalories
-                    val tdee = uz.oybek.ozamiz.data.food.DietController.calculateTDEE(user)
-                    val deficit = (tdee - targetCalories).toInt()
+
+                    val deficit = (1.2 - targetCalories).toInt()
 
                     bind.tvUserNameProfile.text = name.ifEmpty { initialUserName }
 

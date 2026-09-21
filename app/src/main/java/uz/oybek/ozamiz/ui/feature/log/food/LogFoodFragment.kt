@@ -263,7 +263,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
 
     private fun navigateToSearchFood() {
         navigate(
-            R.id.action_logFoodFragment_to_searchFoodFragment,
+            R.id.searchFoodFragment,
             bundleOf(
                 SearchFoodFragment.ARG_MEAL_TYPE to currentMeal(),
                 SearchFoodFragment.ARG_TIMESTAMP to logDate.time
@@ -276,7 +276,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             "mealType" to currentMeal(),
             "timestamp" to logDate.time
         )
-        navigate(R.id.action_logFoodFragment_to_writeFoodFragment, bundle)
+        navigate(R.id.writeFoodFragment, bundle)
     }
 
     private fun checkPremiumAndRun(action: () -> Unit) {
@@ -333,7 +333,7 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             "meal" to currentMeal(),
             "timestamp" to logDate.time
         )
-        navigate(R.id.action_logFoodFragment_to_foodCameraFragment, bundle)
+        navigate(R.id.foodCameraFragment, bundle)
     }
 
     companion object {

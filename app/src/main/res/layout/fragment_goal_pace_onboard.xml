@@ -27,14 +27,14 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="Ozish tezligini tanlang"
+                tools:text="Ozish tezligini tanlang"
                 android:textColor="?attr/colorOnSurface" />
 
             <!-- Speed Options Horizontal Container (Side by Side 2 Cards) -->
             <LinearLayout
-                android:layout_marginTop="@dimen/dimen_12"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dimen_12"
                 android:layout_marginBottom="24dp"
                 android:orientation="horizontal">
 
@@ -87,7 +87,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="Normal"
+                            android:text="@string/onboarding_goalpace_normal"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="16sp" />
 
@@ -98,7 +98,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/roboto_medium"
-                            android:text="-1.8 kg / oy"
+                            tools:text="-1.8 kg / oy"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -153,7 +153,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="Tezroq"
+                            android:text="@string/onboarding_goalpace_fast"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="16sp" />
 
@@ -164,7 +164,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/roboto_medium"
-                            android:text="-2.8 kg / oy"
+                            tools:text="-2.8 kg / oy"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -179,7 +179,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="Kunlik me'yorlar"
+                android:text="@string/onboarding_goalpace_daily_targets_title"
                 android:textColor="?attr/colorOnSurface" />
 
             <!-- Calorie Input Field -->
@@ -188,7 +188,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:hint="Kunlik kaloriya"
+                android:hint="@string/onboarding_goalpace_hint_calories"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -199,8 +199,11 @@
                     android:id="@+id/edit_target_calories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:cursorVisible="false"
+                    android:focusable="false"
                     android:fontFamily="@font/roboto_bold"
-                    android:inputType="number"
+                    android:inputType="none"
                     android:textSize="18sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -218,7 +221,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
                     android:layout_weight="1"
-                    android:hint="Oqsil (g)"
+                    android:hint="@string/onboarding_goalpace_hint_protein"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -228,8 +231,11 @@
                         android:id="@+id/edit_target_protein"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
                         android:fontFamily="@font/roboto_medium"
-                        android:inputType="number"
+                        android:inputType="none"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -240,7 +246,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="2dp"
                     android:layout_weight="1"
-                    android:hint="Uglevod (g)"
+                    android:hint="@string/onboarding_goalpace_hint_carbs"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -250,8 +256,11 @@
                         android:id="@+id/edit_target_carbs"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
                         android:fontFamily="@font/roboto_medium"
-                        android:inputType="number"
+                        android:inputType="none"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -262,7 +271,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_weight="1"
-                    android:hint="Yog' (g)"
+                    android:hint="@string/onboarding_goalpace_hint_fat"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -272,8 +281,11 @@
                         android:id="@+id/edit_target_fat"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:cursorVisible="false"
+                        android:focusable="false"
                         android:fontFamily="@font/roboto_medium"
-                        android:inputType="number"
+                        android:inputType="none"
                         android:textSize="15sp" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -317,7 +329,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:text="Davom etish"
+        android:text="@string/davom_etish"
         android:textColor="?attr/colorSurface"
         app:layout_constraintBottom_toBottomOf="parent" />
 

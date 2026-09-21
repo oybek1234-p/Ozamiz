@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.R
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -119,11 +120,8 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
 
     private fun setupResultsList(bind: FragmentMenuSearchResultsBinding) {
         menuAdapter = MenuAdapter({ menu ->
-            val action =
-                MenuSearchResultsFragmentDirections.actionMenuSearchResultsFragmentToMenuDetailFragment(
-                    menu
-                )
-            navigate(action)
+            val bundle = androidx.core.os.bundleOf("menu" to menu)
+          //  navigate(R.id.menuDetailFragment, bundle)
         }, {
             viewModel.loadNext()
         })

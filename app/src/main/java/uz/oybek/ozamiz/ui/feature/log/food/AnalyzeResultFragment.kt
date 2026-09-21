@@ -32,7 +32,7 @@ import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysisResult
 import uz.oybek.ozamiz.data.analytics.AnalyticsManager
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.food.DietController
+import uz.oybek.ozamiz.data.diet.DietEngine
 import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
@@ -459,20 +459,20 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
                         if (!isAdded || isDetached || context == null) return@collect
                         val currentFoodCals = viewModel.state.value.result?.result?.getEffectiveCalories() ?: 0
                         val effectiveConsumed = maxOf(todaySummary.consumedCalories, currentFoodCals)
-                        val targetCalories =
-                            if (user.targetCalories > 0) user.targetCalories else DietController.calculateTargetCalories(
-                                user
-                            )
-                        val isGoalReached =
-                            targetCalories > 0 && effectiveConsumed >= (targetCalories - 100)
-
-                        val todayStr = DateUtils.todayString()
-                        if (isGoalReached && AppPreference.lastDailyGoalReachedDate != todayStr) {
-                            AppPreference.lastDailyGoalReachedDate = todayStr
-                            navigate(R.id.action_analyzeResultFragment_to_dailyGoalAnalysisFragment)
-                        } else {
-                            popBackStack(R.id.home, false)
-                        }
+//                        val targetCalories =
+//                            if (user.targetCalories > 0) user.targetCalories else DietEngine.calculateTargetCalories(
+//                                user
+//                            )
+//                        val isGoalReached =
+//                            targetCalories > 0 && effectiveConsumed >= (targetCalories - 100)
+//
+//                        val todayStr = DateUtils.todayString()
+//                        if (isGoalReached && AppPreference.lastDailyGoalReachedDate != todayStr) {
+//                            AppPreference.lastDailyGoalReachedDate = todayStr
+//                            navigate(R.id.dailyGoalAnalysisFragment)
+//                        } else {
+//                            popBackStack(R.id.home, false)
+//                        }
                     }
 
                     is AnalyzeResultEvent.PromptShare -> {

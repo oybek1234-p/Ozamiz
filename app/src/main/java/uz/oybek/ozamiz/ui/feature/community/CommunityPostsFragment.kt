@@ -60,7 +60,7 @@ class CommunityPostsFragment : BaseFragment<FragmentCommunityPostsBinding>() {
                     putString("userName", userName)
                 }
                 navigate(
-                    R.id.action_communityFragment_to_communityProfileFragment,
+                    R.id.communityProfileFragment,
                     bundle
                 )
             },

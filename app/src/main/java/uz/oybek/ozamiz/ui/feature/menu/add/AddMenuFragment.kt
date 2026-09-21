@@ -135,7 +135,7 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
         }
 
         bind.btnSelectCategories.setOnClickListener {
-            navigate(R.id.action_addMenuFragment_to_categorySelectionFragment)
+            navigate(R.id.categorySelectionFragment)
         }
 
         bind.radioGroupType.setOnCheckedChangeListener { _, checkedId ->

@@ -3,13 +3,19 @@ package uz.oybek.ozamiz.ui.feature.onboarding.screens
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.databinding.FragmentAgeBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 
 class AgeFragment : OnBoardingChildFragment<FragmentAgeBinding>() {
     override fun viewCreated(bind: FragmentAgeBinding) {
+        val currentAge = viewModel.uiState.value.user.age
+        if (currentAge != null && currentAge > 0) {
+            val ageStr = currentAge.toString()
+            bind.textInput.editText?.setText(ageStr)
+            bind.textInput.editText?.setSelection(ageStr.length)
+        }
+
         bind.apply {
             button.setOnClickListener {
                 val age = textInput.editText?.text.toString()
@@ -17,9 +23,7 @@ class AgeFragment : OnBoardingChildFragment<FragmentAgeBinding>() {
                     textInput.error = getString(R.string.age_error)
                     return@setOnClickListener
                 }
-                LocalUser.update {
-                    this.age = age.toInt()
-                }
+                viewModel.setAge(age.toInt())
                 moveToNextScreen()
             }
         }

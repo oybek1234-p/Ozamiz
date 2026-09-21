@@ -49,17 +49,8 @@ class NatijaFragment : BaseFragment<FragmentNatijaBinding>() {
             navigate(R.id.addWeightPhotoFragment)
         }
         bind.btnWeightHistory.setOnClickListener {
-            navigate(R.id.action_natijaFragment_to_weightHistoryFragment)
+            navigate(R.id.weightHistoryFragment)
         }
-        val openEditGoal = View.OnClickListener {
-            val sheet = EditWeightGoalsBottomSheet.newInstance()
-            sheet.onSavedListener = {
-                viewModel.loadData()
-            }
-            sheet.show(childFragmentManager, EditWeightGoalsBottomSheet.TAG)
-        }
-        bind.btnEditGoalWeight.setOnClickListener(openEditGoal)
-        bind.layoutGoalWeight.setOnClickListener(openEditGoal)
     }
 
     private fun observeState(bind: FragmentNatijaBinding) {

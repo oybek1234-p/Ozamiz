@@ -79,7 +79,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
             argUserId?.let { userId ->
                 val bundle = androidx.core.os.bundleOf("userId" to userId)
                 navigate(
-                    R.id.action_adminUserDetailsFragment_to_adminFoodLogsFragment,
+                    R.id.adminFoodLogsFragment,
                     bundle
                 )
             }

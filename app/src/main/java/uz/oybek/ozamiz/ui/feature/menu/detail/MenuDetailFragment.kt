@@ -200,7 +200,7 @@ class MenuDetailFragment : BaseFragment<FragmentMenuDetailBinding>() {
             val bundle = android.os.Bundle().apply {
                 putParcelable("menuToEdit", menu)
             }
-            navigate(R.id.action_menuDetailFragment_to_addMenuFragment, bundle)
+            navigate(R.id.addMenuFragment, bundle)
         }
 
         bind.btnDelete.setOnClickListener {

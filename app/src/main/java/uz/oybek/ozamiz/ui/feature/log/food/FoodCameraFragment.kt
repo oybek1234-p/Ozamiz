@@ -298,7 +298,7 @@ class FoodCameraFragment : BaseFragment<FragmentFoodCameraBinding>() {
                         "timestamp" to timestamp
                     )
                     navigate(
-                        R.id.action_foodCameraFragment_to_foodPhotoReviewFragment,
+                        R.id.foodPhotoReviewFragment,
                         bundle
                     )
                 }

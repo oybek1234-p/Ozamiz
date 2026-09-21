@@ -1,21 +1,23 @@
 package uz.oybek.ozamiz.ui.feature.onboarding.screens
 
-import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import com.google.android.material.color.MaterialColors
-import uz.oybek.ozamiz.data.food.DietController
-import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.user.model.info.Gender
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.card.MaterialCardView
+import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.diet.model.DietPlanSpeed
 import uz.oybek.ozamiz.databinding.FragmentGoalPaceOnboardBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
-import kotlin.math.roundToInt
+import uz.oybek.ozamiz.ui.utils.appColors
+import java.util.Locale
 
 class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardBinding>() {
-
-    private var selectedPace: Int = 500
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -25,156 +27,148 @@ class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardB
     }
 
     override fun viewCreated(bind: FragmentGoalPaceOnboardBinding) {
-        val isGain = user.goal == "gain_weight"
-        selectedPace = if (isGain) 400 else 500
+        viewModel.initDietPlan()
 
         bind.cardPaceNormal.setOnClickListener {
-            selectedPace = if (user.goal == "gain_weight") 400 else 500
-            updateUI(bind)
+            viewModel.setPlanSpeed(DietPlanSpeed.NORMAL)
         }
 
         bind.cardPaceFast.setOnClickListener {
-            selectedPace = if (user.goal == "gain_weight") 600 else 700
-            updateUI(bind)
+            viewModel.setPlanSpeed(DietPlanSpeed.FAST)
         }
 
         bind.buttonContinue.setOnClickListener {
-            savePaceAndTargetCalories()
             moveToNextScreen()
         }
 
-        updateUI(bind)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    renderUI(bind, state.dietPlanState)
+                }
+            }
+        }
     }
 
-    private fun updateUI(bind: FragmentGoalPaceOnboardBinding) {
-        val selectedBg = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerHigh, 0)
-        val unselectedBg = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerLowest, 0)
-        val selectedStroke = MaterialColors.getColor(requireContext(), androidx.appcompat.R.attr.colorPrimary, 0)
-        val unselectedStroke = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOutlineVariant, 0)
-        val onSurfaceColor = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOnSurface, 0)
-        val onSurfaceVariant = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorOnSurfaceVariant, 0)
-        val surfaceContainerHighest = MaterialColors.getColor(requireContext(), com.google.android.material.R.attr.colorSurfaceContainerHighest, 0)
+    private fun renderUI(bind: FragmentGoalPaceOnboardBinding, state: DietPlanUiState) =
+        with(bind) {
+            val plan = state.selectedPlan ?: return@with
+            val isNormal = state.selectedSpeed == DietPlanSpeed.NORMAL
+            val isGain = plan.goal.isGain
 
-        val isGain = user.goal == "gain_weight"
-        val isNormalSelected = selectedPace == 500 || selectedPace == 400
-
-        bind.textSpeedTitle.text = if (isGain) "Semirish tezligini tanlang" else "Ozish tezligini tanlang"
-
-        // Normal card
-        val normalBg = if (isNormalSelected) selectedBg else unselectedBg
-        bind.cardPaceNormal.setCardBackgroundColor(ColorStateList.valueOf(normalBg))
-        bind.cardPaceNormal.strokeWidth = if (isNormalSelected) 2.dpToPx() else 1.dpToPx()
-        bind.cardPaceNormal.strokeColor = if (isNormalSelected) selectedStroke else unselectedStroke
-        bind.cardPaceNormal.cardElevation = if (isNormalSelected) 2.dpToPx().toFloat() else 0f
-        bind.framePaceNormalIcon.backgroundTintList = ColorStateList.valueOf(if (isNormalSelected) surfaceContainerHighest else unselectedBg)
-        bind.iconPaceNormal.imageTintList = ColorStateList.valueOf(if (isNormalSelected) onSurfaceColor else onSurfaceVariant)
-        bind.textPaceNormalLabel.setTextColor(if (isNormalSelected) onSurfaceColor else onSurfaceVariant)
-        bind.textPaceNormalRate.setTextColor(if (isNormalSelected) onSurfaceColor else onSurfaceVariant)
-
-        // Fast card
-        val fastBg = if (!isNormalSelected) selectedBg else unselectedBg
-        bind.cardPaceFast.setCardBackgroundColor(ColorStateList.valueOf(fastBg))
-        bind.cardPaceFast.strokeWidth = if (!isNormalSelected) 2.dpToPx() else 1.dpToPx()
-        bind.cardPaceFast.strokeColor = if (!isNormalSelected) selectedStroke else unselectedStroke
-        bind.cardPaceFast.cardElevation = if (!isNormalSelected) 2.dpToPx().toFloat() else 0f
-        bind.framePaceFastIcon.backgroundTintList = ColorStateList.valueOf(if (!isNormalSelected) surfaceContainerHighest else unselectedBg)
-        bind.iconPaceFast.imageTintList = ColorStateList.valueOf(if (!isNormalSelected) onSurfaceColor else onSurfaceVariant)
-        bind.textPaceFastLabel.setTextColor(if (!isNormalSelected) onSurfaceColor else onSurfaceVariant)
-        bind.textPaceFastRate.setTextColor(if (!isNormalSelected) onSurfaceColor else onSurfaceVariant)
-
-        bind.textPaceNormalRate.text = if (isGain) "+1.6 kg / oy" else "-1.8 kg / oy"
-        bind.textPaceFastRate.text = if (isGain) "+2.4 kg / oy" else "-2.8 kg / oy"
-
-        // Calculations
-        val tdee = DietController.calculateTDEE(user).roundToInt()
-        val deltaCals = if (selectedPace > 0) selectedPace else (if (isGain) 400 else 500)
-        val minCals = if (user.gender == Gender.MALE) 1200 else 1000
-
-        val targetCals = if (isGain) {
-            tdee + deltaCals
-        } else {
-            maxOf(tdee - deltaCals, minCals)
-        }
-
-        val macros = if (isGain) {
-            DietController.calculateMacrosByPercent(targetCals, proteinPercent = 0.25, fatPercent = 0.25, carbPercent = 0.50)
-        } else {
-            DietController.calculateMacrosByPercent(targetCals, proteinPercent = 0.35, fatPercent = 0.25, carbPercent = 0.40)
-        }
-
-        bind.editTargetCalories.setText(targetCals.toString())
-        bind.editTargetProtein.setText(macros.protein.toString())
-        bind.editTargetCarbs.setText(macros.carbs.toString())
-        bind.editTargetFat.setText(macros.fat.toString())
-
-        val actualDeficit = if (isGain) deltaCals else maxOf(0, tdee - targetCals)
-        val weeklyKg = if (isGain) {
-            if (deltaCals == 600) 0.6 else 0.4
-        } else {
-            val calcW = (actualDeficit * 7.0) / 7700.0
-            if (calcW > 0) calcW else 0.5
-        }
-
-        val (weeklyStr, monthlyStr) = if (isGain) {
-            if (deltaCals == 600) Pair("0.6", "2.4") else Pair("0.4", "1.6")
-        } else {
-            val calcW = (actualDeficit * 7.0) / 7700.0
-            val calcM = (actualDeficit * 30.0) / 7700.0
-            Pair(
-                String.format(java.util.Locale.US, "%.1f", calcW),
-                String.format(java.util.Locale.US, "%.1f", calcM)
+            textSpeedTitle.setText(
+                if (isGain) R.string.onboarding_goalpace_title_gain
+                else R.string.onboarding_goalpace_title_loss
             )
+
+            val rateRes = if (isGain) R.string.onboarding_goalpace_rate_format_gain
+            else R.string.onboarding_goalpace_rate_format_loss
+
+            state.normalPlan?.let {
+                textPaceNormalRate.text = getString(rateRes, it.monthlyRateKg)
+            }
+            state.fastPlan?.let {
+                textPaceFastRate.text = getString(rateRes, it.monthlyRateKg)
+            }
+
+            // Cards UI selection
+            bindPaceCard(
+                cardPaceNormal,
+                framePaceNormalIcon,
+                iconPaceNormal,
+                textPaceNormalLabel,
+                textPaceNormalRate,
+                isNormal
+            )
+            bindPaceCard(
+                cardPaceFast,
+                framePaceFastIcon,
+                iconPaceFast,
+                textPaceFastLabel,
+                textPaceFastRate,
+                !isNormal
+            )
+
+            // Inputs
+            editTargetCalories.setText(plan.targetCalories.toString())
+            editTargetProtein.setText(plan.macros.protein.toString())
+            editTargetCarbs.setText(plan.macros.carbs.toString())
+            editTargetFat.setText(plan.macros.fat.toString())
+
+            // Duration string
+            val duration = plan.duration
+            val durationStr = when {
+                duration.isTargetReached -> getString(R.string.onboarding_goalpace_duration_reached)
+                duration.months > 0 && duration.days > 0 ->
+                    getString(
+                        R.string.onboarding_goalpace_duration_months_days,
+                        duration.months,
+                        duration.days
+                    )
+
+                duration.months > 0 ->
+                    getString(R.string.onboarding_goalpace_duration_months, duration.months)
+
+                else ->
+                    getString(
+                        R.string.onboarding_goalpace_duration_days,
+                        duration.totalDays
+                    )
+            }
+
+            val weeklyStr = String.format(Locale.US, "%.1f", plan.weeklyRateKg)
+            val monthlyStr = String.format(Locale.US, "%.1f", plan.monthlyRateKg)
+
+            textEnergySummary.text = if (isGain) {
+                getString(
+                    R.string.onboarding_goalpace_summary_gain,
+                    plan.tdee,
+                    plan.deltaCalories,
+                    weeklyStr,
+                    monthlyStr,
+                    durationStr
+                )
+            } else {
+                val defVal = if (plan.tdee - plan.targetCalories > 0) {
+                    plan.tdee - plan.targetCalories
+                } else {
+                    plan.deltaCalories
+                }
+                getString(
+                    R.string.onboarding_goalpace_summary_loss,
+                    plan.tdee,
+                    defVal,
+                    weeklyStr,
+                    monthlyStr,
+                    durationStr
+                )
+            }
         }
 
-        val durationStr = getDurationText(user.weight, user.targetWeight ?: user.weight, weeklyKg)
+    private fun bindPaceCard(
+        card: MaterialCardView,
+        frameIcon: View,
+        icon: ImageView,
+        label: TextView,
+        rate: TextView,
+        isSelected: Boolean
+    ) {
+        val colors = appColors
+        val bg =
+            if (isSelected) colors.colorSurfaceContainerHigh else colors.colorSurfaceContainerLowest
+        val stroke = if (isSelected) colors.colorPrimary else colors.colorOutlineVariant
+        val textColor = if (isSelected) colors.colorOnSurface else colors.colorOnSurfaceVariant
+        val iconBg =
+            if (isSelected) colors.colorSurfaceContainerHighest else colors.colorSurfaceContainerLowest
 
-        if (isGain) {
-            bind.textEnergySummary.text =
-                "• Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi,\n\n• $deltaCals kkal ortiqcha yesak vazn yig'ish boshlanadi.\n\n• Natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg semirasiz.\n\n• Maqsadga esa $durationStr erishasiz."
-        } else {
-            val deficitAmount = tdee - targetCals
-            val defVal = if (deficitAmount > 0) deficitAmount else deltaCals
-            bind.textEnergySummary.text =
-                "• Sizning tanangiz kuniga taxminan $tdee kkal energiya sarflaydi,\n\n• $defVal kkal kamroq ovqat yeymiz natijada haftasiga $weeklyStr kg, oyiga $monthlyStr kg ozasiz.\n\n• Maqsadga esa $durationStr erishasiz."
-        }
-    }
-
-    private fun savePaceAndTargetCalories() {
-        val bind = bindingT ?: return
-        val isGain = user.goal == "gain_weight"
-        val tdee = DietController.calculateTDEE(user).roundToInt()
-        val deltaCals = if (selectedPace > 0) selectedPace else (if (isGain) 400 else 500)
-        val minCals = if (user.gender == Gender.MALE) 1200 else 1000
-
-        val calcCals = if (isGain) (tdee + deltaCals) else maxOf(tdee - deltaCals, minCals)
-
-        val customCals = bind.editTargetCalories.text.toString().toIntOrNull() ?: calcCals
-        val customProtein = bind.editTargetProtein.text.toString().toIntOrNull()
-        val customCarbs = bind.editTargetCarbs.text.toString().toIntOrNull()
-        val customFat = bind.editTargetFat.text.toString().toIntOrNull()
-
-        val u = LocalUser.user
-        u.targetCalories = customCals
-        DietController.updateTargetValues(u, customCals)
-
-        if (customProtein != null && customProtein > 0) u.targetProtein = customProtein
-        if (customCarbs != null && customCarbs > 0) u.targetCarbs = customCarbs
-        if (customFat != null && customFat > 0) u.targetFat = customFat
-    }
-
-    private fun getDurationText(currentWeight: Double, targetWeight: Double, weeklyKg: Double): String {
-        val diff = kotlin.math.abs(currentWeight - targetWeight)
-        if (diff <= 0.1 || weeklyKg <= 0.0) return "erishgansiz"
-        val weeksNeeded = diff / weeklyKg
-        val daysNeeded = (weeksNeeded * 7).roundToInt()
-
-        val months = daysNeeded / 30
-        val remainingDays = daysNeeded % 30
-        return when {
-            months > 0 && remainingDays > 0 -> "$months oy $remainingDays kunda"
-            months > 0 -> "$months oyda"
-            else -> "$daysNeeded kunda"
-        }
+        card.setCardBackgroundColor(colors.colorStateList(bg))
+        card.strokeWidth = if (isSelected) 2.dpToPx() else 1.dpToPx()
+        card.strokeColor = stroke
+        card.cardElevation = if (isSelected) 2.dpToPx().toFloat() else 0f
+        frameIcon.backgroundTintList = colors.colorStateList(iconBg)
+        icon.imageTintList = colors.colorStateList(textColor)
+        label.setTextColor(textColor)
+        rate.setTextColor(textColor)
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()

@@ -102,10 +102,10 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
             binding.toolbar.navigationIcon = null
         }
         binding.btnNotifications.setOnClickListener {
-            navigate(R.id.action_communityFragment_to_notificationsFragment)
+            navigate(R.id.notificationsFragment)
         }
         binding.fabAddPost.setOnClickListener {
-            navigate(R.id.action_communityFragment_to_addPostFragment)
+            navigate(R.id.addPostFragment)
         }
     }
 
@@ -120,7 +120,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
                     putString("userName", userName)
                 }
                 navigate(
-                    R.id.action_communityFragment_to_communityProfileFragment,
+                    R.id.communityProfileFragment,
                     bundle
                 )
             },
@@ -160,7 +160,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
                 putString("userName", user.name)
             }
             navigate(
-                R.id.action_communityFragment_to_communityProfileFragment,
+                R.id.communityProfileFragment,
                 bundle
             )
         }

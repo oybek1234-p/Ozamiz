@@ -223,7 +223,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
                 putLong(ARG_TIMESTAMP, timestamp)
             }
             fragment.navigate(
-                R.id.action_logFoodFragment_to_searchFoodFragment,
+                R.id.searchFoodFragment,
                 bundle
             )
         }
@@ -239,7 +239,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             }
             try {
                 navController.navigate(
-                    R.id.action_logFoodFragment_to_searchFoodFragment,
+                    R.id.searchFoodFragment,
                     bundle
                 )
             } catch (e: Exception) {

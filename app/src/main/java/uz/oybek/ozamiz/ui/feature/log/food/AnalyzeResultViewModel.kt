@@ -15,14 +15,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
 import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysisResult
-import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
 import uz.oybek.ozamiz.data.ai.analyzer.SingleIngredientResult
-import uz.oybek.ozamiz.data.firebase.uploader.ImageCompressor
-import uz.oybek.ozamiz.data.food.SavedFoodRepository
 import uz.oybek.ozamiz.data.food.model.MealTime
-import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import uz.oybek.ozamiz.data.logs.model.FoodLog
 import androidx.annotation.Keep
+import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalyzer
+import uz.oybek.ozamiz.data.food.SavedFoodRepository
+import uz.oybek.ozamiz.data.logs.FoodLogRepository
 import java.util.Date
 
 @Keep
@@ -100,7 +99,7 @@ class AnalyzeResultViewModel : ViewModel() {
         autoSaveJob = viewModelScope.launch(Dispatchers.IO) {
             val success = FoodLogRepository.add(
                 foodLog = log,
-                targetDate
+                date = targetDate
             )
             _state.update {
                 if (success) {
@@ -135,32 +134,8 @@ class AnalyzeResultViewModel : ViewModel() {
             )
         }
         viewModelScope.launch(Dispatchers.IO) {
-            val uri = imageUri?.let {
-                ImageCompressor.compressImageToUri(it, 512, 512)
-            }
-
-            var result =
-                FoodAnalyzer.analyze(description = description, meal = normalizedMeal, image = uri)
-            if (result == null) {
-                kotlinx.coroutines.delay(1500)
-                result = FoodAnalyzer.analyze(
-                    description = description,
-                    meal = normalizedMeal,
-                    image = uri
-                )
-            }
-            if (result == null) {
-                kotlinx.coroutines.delay(2000)
-                result = FoodAnalyzer.analyze(
-                    description = description,
-                    meal = normalizedMeal,
-                    image = uri
-                )
-            }
-
+            val result = FoodAnalyzer.analyze(description, normalizedMeal, imageUri)
             if (result != null) {
-                result.photoUrl = uri?.toString()
-                result.mealType = normalizedMeal
                 autoSaveFood(result)
             }
 
@@ -192,18 +167,8 @@ class AnalyzeResultViewModel : ViewModel() {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            var result = FoodAnalyzer.analyzeAudio(audioUri, normalizedMeal)
-            if (result == null) {
-                kotlinx.coroutines.delay(1500)
-                result = FoodAnalyzer.analyzeAudio(audioUri, normalizedMeal)
-            }
-            if (result == null) {
-                kotlinx.coroutines.delay(2000)
-                result = FoodAnalyzer.analyzeAudio(audioUri, normalizedMeal)
-            }
-
+            val result = FoodAnalyzer.analyzeAudio(audioUri, normalizedMeal)
             if (result != null) {
-                result.mealType = normalizedMeal
                 autoSaveFood(result)
             }
             _state.update {
@@ -347,7 +312,7 @@ class AnalyzeResultViewModel : ViewModel() {
         viewModelScope.launch {
             val isFav = SavedFoodRepository.isFoodSavedByDescription(foodLog.description)
             if (isFav) {
-                SavedFoodRepository.removeSavedFoodByDescription(foodLog.description)
+                SavedFoodRepository.removeSavedFood(foodLog.description)
             } else {
                 SavedFoodRepository.saveFood(foodLog)
             }

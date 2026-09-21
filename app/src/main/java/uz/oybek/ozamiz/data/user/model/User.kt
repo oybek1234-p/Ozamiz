@@ -2,8 +2,8 @@ package uz.oybek.ozamiz.data.user.model
 
 import androidx.annotation.Keep
 import kotlinx.serialization.Transient
+import uz.oybek.ozamiz.data.profile.model.UserActivityLevel
 import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.user.model.info.UserActivityLevel
 import uz.oybek.ozamiz.data.utils.DateUtils
 
 @Keep
@@ -25,7 +25,7 @@ data class User(
     var weight: Double = -1.0,
     var targetWeight: Double? = null,
     var startWeight: Double? = null,
-    var goal: String = "lose_weight",
+    var goal: String = uz.oybek.ozamiz.data.profile.model.UserGoal.LOSE_WEIGHT.key,
     var activityLevel: String = UserActivityLevel.LIGHTLY_ACTIVE.name,
     var targetCalories: Int = 0,
     var targetProtein: Int = 0,
@@ -42,8 +42,18 @@ data class User(
     var admin: Boolean = false,
     var scorePoints: Int = 0,
     var isRated: Boolean = false,
-    val hello: String = ""
+    val hello: String = "",
+    var userInfoAdded: Boolean = false
 ) {
+    val userGoal: uz.oybek.ozamiz.data.profile.model.UserGoal
+        get() = uz.oybek.ozamiz.data.profile.model.UserGoal.fromKey(goal)
+
+    val userGender: uz.oybek.ozamiz.data.profile.model.UserGender
+        get() = uz.oybek.ozamiz.data.profile.model.UserGender.fromId(gender)
+
+    val isGainWeight: Boolean
+        get() = userGoal.isGain
+
     constructor() : this(
         uid = "",
         name = "",
@@ -62,7 +72,7 @@ data class User(
         weight = -1.0,
         targetWeight = null,
         startWeight = null,
-        goal = "lose_weight",
+        goal = uz.oybek.ozamiz.data.profile.model.UserGoal.LOSE_WEIGHT.key,
         activityLevel = UserActivityLevel.LIGHTLY_ACTIVE.name,
         targetCalories = 0,
         targetProtein = 0,

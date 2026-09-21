@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_24"
-        android:text="Belgilash" />
+        android:text="@string/done" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_cancel"

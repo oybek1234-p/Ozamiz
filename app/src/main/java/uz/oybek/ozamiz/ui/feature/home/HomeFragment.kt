@@ -102,7 +102,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
         if (isGranted) {
             val bundle = viewModel.pendingCameraArgs
             if (bundle != null) {
-                navigate(R.id.action_home_to_foodCameraFragment, bundle)
+                navigate(R.id.foodCameraFragment, bundle)
                 viewModel.setPendingCameraArgs(null)
             }
         }
@@ -264,7 +264,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
                     android.Manifest.permission.CAMERA
                 ) == android.content.pm.PackageManager.PERMISSION_GRANTED
             ) {
-                navigate(R.id.action_home_to_foodCameraFragment, cameraBundle)
+                navigate(R.id.foodCameraFragment, cameraBundle)
             } else {
                 viewModel.setPendingCameraArgs(cameraBundle)
                 cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
@@ -511,7 +511,7 @@ class LogFragment : BaseFragment<FragmentHomeBinding>() {
 
             val currentUser = user
             val targetW = currentUser.targetWeight ?: 0.0
-            val isGainWeight = currentUser.goal == "gain_weight" || (targetW > 0.0 && currentUser.weight > 0.0 && targetW > currentUser.weight)
+            val isGainWeight = currentUser.isGainWeight || (targetW > 0.0 && currentUser.weight > 0.0 && targetW > currentUser.weight)
 
             val reachedLimit =
                 state.caloriesTarget > 0 && effectiveConsumed >= state.caloriesTarget - 100

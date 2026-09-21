@@ -43,7 +43,7 @@ class CommunityUsersFragment : BaseFragment<FragmentCommunityUsersBinding>() {
                 putString("userName", user.name)
             }
             navigate(
-                R.id.action_communityFragment_to_communityProfileFragment,
+                R.id.communityProfileFragment,
                 bundle
             )
         }

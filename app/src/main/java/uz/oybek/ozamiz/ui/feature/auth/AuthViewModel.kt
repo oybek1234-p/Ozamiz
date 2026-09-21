@@ -1,80 +1,68 @@
 package uz.oybek.ozamiz.ui.feature.auth
 
-import androidx.annotation.Keep
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.AuthCredential
-import uz.oybek.ozamiz.data.auth.AuthRepository
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.user.UserAuthRepository
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.ui.utils.postVal
+import uz.oybek.ozamiz.data.common.onFailure
+import uz.oybek.ozamiz.data.common.onSuccess
+import uz.oybek.ozamiz.data.profile.api.ProfileAuthRepo
+import javax.inject.Inject
 
-@Keep
-sealed class SendState {
-    data class Input(val input: String? = null) : SendState()
-    data object Sending : SendState()
-    data class Success(val code: String?) : SendState()
-    data class Error(val exception: Exception) : SendState()
-}
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val profileAuthRepo: ProfileAuthRepo
+) : ViewModel() {
 
-@Keep
-data class InputCode(val code: String?) {
-    fun isValid() = code?.length == 6
-}
+    private val _uiState = MutableStateFlow(AuthUiState())
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
-@Keep
-data class SendInfo(val code: String, val phone: String)
+    private val _uiEffect = Channel<AuthUiEffect>(Channel.BUFFERED)
+    val uiEffect: Flow<AuthUiEffect> = _uiEffect.receiveAsFlow()
 
-@Keep
-sealed class VerifyState {
-    data class Input(val input: InputCode? = null) : VerifyState()
-    data object Verifying : VerifyState()
-    data object Success : VerifyState()
-    data class Error(val exception: Exception) : VerifyState()
-}
-
-class AuthViewModel : ViewModel() {
-
-    val sendState = MutableLiveData<SendState>(SendState.Input(""))
-    val verifyState = MutableLiveData<VerifyState>(VerifyState.Input(null))
-
-    fun signInGoogle(
-        credential: AuthCredential, verified: (done: Boolean) -> Unit
-    ) {
-        verifyState.postVal(VerifyState.Verifying)
+    fun onGoogleSignInError(exception: Exception? = null) {
+        _uiState.update { it.copy(isLoading = false) }
         viewModelScope.launch {
-            val result = AuthRepository.signInWithCredential(credential)
-            if (result.isSuccess) {
-                verified.invoke(true)
-            } else {
-                verified.invoke(false)
-            }
+            _uiEffect.send(AuthUiEffect.ShowError(exception))
         }
     }
 
-    fun signInEmail(
-        email: String, password: String, result: (Result<Any>) -> Unit
-    ) {
+    fun signInWithGoogle(idToken: String) {
+        if (_uiState.value.isLoading) return
+        _uiState.update { it.copy(isLoading = true) }
+
         viewModelScope.launch {
-            val res = AuthRepository.signInWithEmailAndPassword(email, password)
-            if (res.isSuccess) result.invoke(Result.success(Any()))
-            else result.invoke(Result.failure(res.exceptionOrNull() ?: Exception("Unknown fail")))
+            profileAuthRepo.loginGmail(idToken)
+                .onSuccess {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+                .onFailure { exception ->
+                    _uiState.update { it.copy(isLoading = false) }
+                    _uiEffect.send(AuthUiEffect.ShowError(exception))
+                }
         }
     }
 
-    fun signUpEmail(
-        email: String, password: String, result: (Result<Any>) -> Unit
-    ) {
-        viewModelScope.launch {
-            val res = AuthRepository.createUserWithEmailAndPassword(email, password)
-            if (res.isSuccess) result.invoke(Result.success(Any()))
-            else result.invoke(Result.failure(res.exceptionOrNull() ?: Exception("Unknown fail")))
-        }
-    }
+    fun signInEmail(email: String, password: String) {
+        if (_uiState.value.isLoading) return
+        _uiState.update { it.copy(isLoading = true) }
 
-    suspend fun authFirebaseUser(): User {
-        return UserAuthRepository.authFirebaseUser()
+        viewModelScope.launch {
+            profileAuthRepo.loginEmail(email, password)
+                .onSuccess {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+                .onFailure { exception ->
+                    _uiState.update { it.copy(isLoading = false) }
+                    _uiEffect.send(AuthUiEffect.ShowError(exception))
+                }
+        }
     }
 }

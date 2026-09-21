@@ -41,7 +41,7 @@ class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>
     private fun loadData(bind: FragmentDailyGoalAnalysisBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
             val user = UserProfileRepository.user
-            val isGainWeight = user.goal == "gain_weight"
+            val isGainWeight = user.isGainWeight
             val summary = LogRepository.getDailySummarySync(Date(), forceRefresh = true)
             if (!isAdded || isDetached || context == null) return@launch
 
