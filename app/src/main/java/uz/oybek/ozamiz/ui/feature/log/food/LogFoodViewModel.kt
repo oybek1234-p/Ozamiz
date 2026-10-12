@@ -1,161 +1,133 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
-import android.net.Uri
+import androidx.annotation.Keep
+import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.ai.analyzer.FoodAnalysis
-import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.food.SavedFoodRepository
-import uz.oybek.ozamiz.data.food.model.MealTime
-import uz.oybek.ozamiz.data.logs.FoodLogRepository
-import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.data.streak.StreakRepository
-import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
-import androidx.annotation.Keep
+import uz.oybek.ozamiz.ui.modelUtils.MealTime
+import uz.oybek.ozamiz.data.limit.api.LimitManagerRepo
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.data.tracker.api.FoodTrackerRepo
+import uz.oybek.ozamiz.data.tracker.model.FoodModel
+import uz.oybek.ozamiz.data.tracker.session.SelectedDateManager
+import uz.oybek.ozamiz.common.util.currentTime
+import uz.oybek.ozamiz.ui.utils.getArgs
 import java.util.Date
+import javax.inject.Inject
 
 @Keep
-data class LogFoodState(
-    val isAnalyzing: Boolean = false,
-    val description: String = "",
-    val image: Uri? = null,
-    val meal: String = MealTime.Breakfast.id,
-    val result: FoodAnalysis? = null,
-    val editing: FoodLog? = null,
-    val uploadUrl: String? = null,
-    val date: Date = Date(),
-    val logs: List<FoodLog> = emptyList(),
-    val savedFoodIds: Set<String> = emptySet()
+data class LogFoodUiState(
+    val date: Date = currentTime(),
+    val mealType: String = MealTime.Breakfast.id,
+    val logs: List<FoodModel> = emptyList(),
+    val isPremium: Boolean = false,
+    val isLoaded: Boolean = false
 )
 
-sealed interface LogEvent {
-    sealed class Error : LogEvent {
-        object EmptyInput : Error()
-    }
-
-    data class Analyzed(
-        val data: FoodAnalysis
-    ) : LogEvent
-
-
-    data class Message(val text: String) : LogEvent
+sealed interface LogFoodUiEffect {
+    data class ShowToastRes(@param:StringRes val messageResId: Int) : LogFoodUiEffect
+    data class NavigateToCamera(val mealType: String) : LogFoodUiEffect
+    data class ShowLimitSheet(
+        val remainingLimit: Int,
+        val targetLimit: Int,
+        val mealType: String
+    ) : LogFoodUiEffect
 }
 
-class LogFoodViewModel() : ViewModel() {
+@HiltViewModel
+class LogFoodViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val selectedDateManager: SelectedDateManager,
+    private val foodTrackerRepo: FoodTrackerRepo,
+    private val limitManagerRepo: LimitManagerRepo,
+    private val profileRepo: ProfileRepo
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(LogFoodState())
-    val state = _state.asStateFlow()
+    private val args = savedStateHandle.getArgs<LogFoodArgs>()
 
-    private val _event = Channel<LogEvent>()
-    val event = _event.receiveAsFlow()
+    private val _uiState = MutableStateFlow(createInitialState())
+    val uiState: StateFlow<LogFoodUiState> = _uiState.asStateFlow()
 
-    private val _loadingFoodIds = MutableStateFlow<Set<String>>(emptySet())
-    val loadingFoodIds = _loadingFoodIds.asStateFlow()
+    private val _effects = Channel<LogFoodUiEffect>(Channel.BUFFERED)
+    val effects = _effects.receiveAsFlow()
 
-    val savedFoods = SavedFoodRepository.getSavedFoods()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
-    private var analyzeJob: Job? = null
     private var logsJob: Job? = null
 
-    fun setDateAndMeal(date: Date, meal: String) {
-        _state.update { it.copy(date = date, meal = meal) }
-        observeLogsAndFavorites(date)
-    }
+    init {
+        val date = selectedDateManager.getSelectedDate()
+        val meal = _uiState.value.mealType
+        observeLogs(date, meal)
 
-    private fun observeLogsAndFavorites(date: Date) {
-        logsJob?.cancel()
-        logsJob = viewModelScope.launch {
-            launch {
-                combine(
-                    FoodLogRepository.getAllLogs(date),
-                    _state.map { it.meal }.distinctUntilChanged()
-                ) { allLogs, mealId ->
-                    allLogs
-                        .filter { it.mealType == mealId }
-                        .sortedByDescending { log ->
-                            (log.timestamp as? Number)?.toLong() ?: 0L
-                        }
-                }.collect { filteredLogs ->
-                    _state.update { it.copy(logs = filteredLogs) }
+        viewModelScope.launch {
+            profileRepo.user.collect { user ->
+                _uiState.update {
+                    it.copy(isPremium = user.isPremiumActive)
                 }
             }
+        }
+    }
 
-            launch {
-                SavedFoodRepository.getSavedFoods()
-                    .map { it.map { food -> food.description.lowercase().trim() }.toSet() }
-                    .collect { descriptions ->
-                        _state.update { it.copy(savedFoodIds = descriptions) }
+    private fun createInitialState(): LogFoodUiState {
+        val selectedDate = selectedDateManager.getSelectedDate()
+        val rawMealType = args?.mealType
+        val validMeal = rawMealType ?: MealTime.getMealByTime().id
+        return LogFoodUiState(
+            date = selectedDate,
+            mealType = validMeal
+        )
+    }
+
+    private fun observeLogs(date: Date, meal: String) {
+        logsJob?.cancel()
+        logsJob = viewModelScope.launch {
+            foodTrackerRepo.observeFoodLogs(date, meal)
+                .collect { logs ->
+                    _uiState.update { current ->
+                        current.copy(
+                            logs = logs.sortedByDescending { it.timestamp },
+                            isLoaded = true
+                        )
                     }
-            }
+                }
         }
     }
 
-    fun updateMeal(meal: String) {
-        _state.update { it.copy(meal = meal) }
-    }
-
-    fun deleteFoodLog(foodLog: FoodLog, date: Date) {
+    fun deleteFoodLog(foodLog: FoodModel) {
         viewModelScope.launch {
-            FoodLogRepository.delete(foodLog, date)
+            foodTrackerRepo.deleteFoodLog(foodLog)
         }
     }
 
-    fun removeFavorite(foodLog: FoodLog) {
-        viewModelScope.launch {
-            SavedFoodRepository.removeSavedFood(foodLog.logId)
-        }
-    }
+    fun onAddFoodClicked() {
+        val limits = limitManagerRepo.getLimits()
+        val state = _uiState.value
 
-    fun relogFood(foodLog: FoodLog) {
         viewModelScope.launch {
-            _loadingFoodIds.update { it + foodLog.logId }
-            val log = foodLog.copy(
-                logId = "",
-                timestamp = System.currentTimeMillis(),
-                mealType = state.value.meal
-            )
-            FoodLogRepository.add(log, state.value.date)
-            StreakRepository.updateStreak()
-            _loadingFoodIds.update { it - foodLog.logId }
-        }
-    }
-
-    fun updateDescription(text: String?) {
-        _state.update { it.copy(description = text.toString()) }
-    }
-
-    fun toggleFavorite(foodLog: FoodLog) {
-        viewModelScope.launch {
-            val isSaved = SavedFoodRepository.isFoodSaved(foodLog.description)
-            if (isSaved) {
-                SavedFoodRepository.removeSavedFood(foodLog.description)
+            if (limits.canLogFood) {
+                _effects.send(
+                    LogFoodUiEffect.NavigateToCamera(
+                        mealType = state.mealType
+                    )
+                )
             } else {
-                val toSave = foodLog.copy(logId = "")
-                SavedFoodRepository.saveFood(toSave)
+                _effects.send(
+                    LogFoodUiEffect.ShowLimitSheet(
+                        remainingLimit = limits.remainingFoodLimit,
+                        targetLimit = limits.foodLimit,
+                        mealType = state.mealType
+                    )
+                )
             }
         }
-    }
-
-    fun canAddLog(canAdd: (can: Boolean, limited: Boolean) -> Unit) {
-        val can = uz.oybek.ozamiz.data.food.limit.FoodLimitManager.canLogFood(user)
-        canAdd.invoke(can, !user.isPremium())
     }
 }

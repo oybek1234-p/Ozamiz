@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.data.logs.model.UserExercise
 import uz.oybek.ozamiz.databinding.ItemExerciseTypeSelectableBinding
+import uz.oybek.ozamiz.ui.utils.getTitle
 
 class ExerciseTypeSelectableAdapter(
     private val listener: (UserExercise) -> Unit
@@ -35,7 +36,7 @@ class ExerciseTypeSelectableAdapter(
         }
 
         fun bind(item: UserExercise) {
-            binding.tvExerciseNameSelectable.text = item.exerciseName
+            binding.tvExerciseNameSelectable.text = item.getTitle(binding.root.context)
             binding.ivExerciseIconSelectable.text = item.emoji
         }
     }

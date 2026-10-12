@@ -5,11 +5,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.databinding.FragmentMenuListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.loadBannerAd
+import uz.oybek.ozamiz.ui.utils.toBundle
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 
 class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
@@ -23,12 +26,11 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
     override fun viewCreated(bind: FragmentMenuListBinding) {
         val discoveryAdapter = MenuDiscoveryAdapter(
             onFilterClick = { type, item ->
-                navigate(
-                    MenuListFragmentDirections.actionMenuListFragmentToMenuSearchResultsFragment(
-                        filterType = type.name,
-                        filterValue = item.id.name
-                    )
+                val args = MenuSearchResultsArgs(
+                    filterType = type.name,
+                    filterValue = item.id.name
                 )
+                navigate(R.id.menuSearchResultsFragment, args.toBundle())
             },
             onDietitianClick = {}
         )
@@ -44,27 +46,14 @@ class MenuListFragment : BaseFragment<FragmentMenuListBinding>() {
         if (isAdmin) {
             bind.fabAddFood.visibility = View.VISIBLE
             bind.fabAddFood.setOnClickListener {
-                navigate(
-                    MenuListFragmentDirections.actionMenuListFragmentToAddMenuFragment()
-                )
+                navigate(R.id.addMenuFragment)
             }
         }
         loadBanner()
     }
 
     private fun loadBanner() {
-        if (user.isPremium()) {
-            binding.bannerContainer.visibility = View.GONE
-            return
-        }
-        try {
-            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_HOME)
-            binding.bannerContainer.removeAllViews()
-            binding.bannerContainer.addView(bannerView)
-            binding.bannerContainer.visibility = View.VISIBLE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        binding.bannerContainer.loadBannerAd(AdsConfig.BANNER_HOME)
     }
 
     override fun inflateBinding(

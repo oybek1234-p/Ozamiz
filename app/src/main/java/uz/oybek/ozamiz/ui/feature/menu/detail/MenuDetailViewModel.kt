@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
 import uz.oybek.ozamiz.data.menu.MenuRepository
-import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.common.result.BaseResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -21,7 +21,7 @@ class MenuDetailViewModel : ViewModel() {
             Log.d("MenuDetailViewModel", "deleteMenu start: $menuId")
             val result = MenuRepository.deleteMenu(menuId)
             Log.d("MenuDetailViewModel", "deleteMenu result: $result")
-            if (result is DataWrapper.Success) {
+            if (result is BaseResult.Success) {
                 _deleteSuccess.emit(true)
             }
         }

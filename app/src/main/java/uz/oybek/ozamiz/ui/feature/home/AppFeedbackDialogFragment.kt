@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.feedback.AppFeedbackRepository
 import uz.oybek.ozamiz.databinding.DialogAppFeedbackBinding
 import uz.oybek.ozamiz.ui.MainActivity
+import uz.oybek.ozamiz.ui.utils.openAppInPlayStore
+import uz.oybek.ozamiz.ui.utils.showKeyboard
 
 class AppFeedbackDialogFragment : DialogFragment() {
 
@@ -90,13 +92,7 @@ class AppFeedbackDialogFragment : DialogFragment() {
         binding.layoutStep2Positive.isVisible = false
         binding.layoutStep2Negative.isVisible = true
 
-        binding.editTextFeedback.requestFocus()
-        binding.editTextFeedback.postDelayed({
-            context?.let { ctx ->
-                val imm = ctx.getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
-                imm?.showSoftInput(binding.editTextFeedback, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
-            }
-        }, 150)
+        binding.editTextFeedback.showKeyboard(150)
     }
 
     private fun showStep2Positive() {
@@ -106,23 +102,7 @@ class AppFeedbackDialogFragment : DialogFragment() {
     }
 
     private fun openPlayStoreFallback() {
-        val packageName = context?.packageName ?: return
-        try {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")).apply {
-                setPackage("com.android.vending")
-                addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
-            }
-            startActivity(intent)
-        } catch (_: Exception) {
-            try {
-                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")).apply {
-                    setPackage("com.android.vending")
-                }
-                startActivity(webIntent)
-            } catch (_: Exception) {
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
-            }
-        }
+        openAppInPlayStore()
     }
 
     override fun onDestroyView() {

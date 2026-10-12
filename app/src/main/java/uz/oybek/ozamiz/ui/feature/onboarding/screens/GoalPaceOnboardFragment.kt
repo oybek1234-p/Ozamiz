@@ -1,23 +1,28 @@
 package uz.oybek.ozamiz.ui.feature.onboarding.screens
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.common.util.readableFormat
 import uz.oybek.ozamiz.data.diet.model.DietPlanSpeed
 import uz.oybek.ozamiz.databinding.FragmentGoalPaceOnboardBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
+import uz.oybek.ozamiz.ui.feature.profile.goal.DietPlanTypeAdapter
+import uz.oybek.ozamiz.ui.modelUtils.getFormattedDuration
 import uz.oybek.ozamiz.ui.utils.appColors
-import java.util.Locale
 
 class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardBinding>() {
+
+    private lateinit var planTypeAdapter: DietPlanTypeAdapter
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -28,6 +33,11 @@ class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardB
 
     override fun viewCreated(bind: FragmentGoalPaceOnboardBinding) {
         viewModel.initDietPlan()
+
+        planTypeAdapter = DietPlanTypeAdapter { selectedPlanType ->
+            viewModel.setPlanType(selectedPlanType)
+        }
+        bind.recyclerDietPlanTypes.adapter = planTypeAdapter
 
         bind.cardPaceNormal.setOnClickListener {
             viewModel.setPlanSpeed(DietPlanSpeed.NORMAL)
@@ -56,6 +66,9 @@ class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardB
             val isNormal = state.selectedSpeed == DietPlanSpeed.NORMAL
             val isGain = plan.goal.isGain
 
+            planTypeAdapter.submitList(state.availablePlanTypes)
+            planTypeAdapter.setSelectedPlanType(state.selectedPlanType)
+
             textSpeedTitle.setText(
                 if (isGain) R.string.onboarding_goalpace_title_gain
                 else R.string.onboarding_goalpace_title_loss
@@ -74,7 +87,6 @@ class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardB
             // Cards UI selection
             bindPaceCard(
                 cardPaceNormal,
-                framePaceNormalIcon,
                 iconPaceNormal,
                 textPaceNormalLabel,
                 textPaceNormalRate,
@@ -82,7 +94,6 @@ class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardB
             )
             bindPaceCard(
                 cardPaceFast,
-                framePaceFastIcon,
                 iconPaceFast,
                 textPaceFastLabel,
                 textPaceFastRate,
@@ -95,80 +106,61 @@ class GoalPaceOnboardFragment : OnBoardingChildFragment<FragmentGoalPaceOnboardB
             editTargetCarbs.setText(plan.macros.carbs.toString())
             editTargetFat.setText(plan.macros.fat.toString())
 
-            // Duration string
-            val duration = plan.duration
-            val durationStr = when {
-                duration.isTargetReached -> getString(R.string.onboarding_goalpace_duration_reached)
-                duration.months > 0 && duration.days > 0 ->
-                    getString(
-                        R.string.onboarding_goalpace_duration_months_days,
-                        duration.months,
-                        duration.days
-                    )
+            val durationStr = plan.duration.getFormattedDuration(requireContext())
+            val weeklyRateStr = plan.weeklyRateKg.readableFormat()
+            val monthlyRateStr = plan.monthlyRateKg.readableFormat()
 
-                duration.months > 0 ->
-                    getString(R.string.onboarding_goalpace_duration_months, duration.months)
-
-                else ->
-                    getString(
-                        R.string.onboarding_goalpace_duration_days,
-                        duration.totalDays
-                    )
-            }
-
-            val weeklyStr = String.format(Locale.US, "%.1f", plan.weeklyRateKg)
-            val monthlyStr = String.format(Locale.US, "%.1f", plan.monthlyRateKg)
-
-            textEnergySummary.text = if (isGain) {
-                getString(
-                    R.string.onboarding_goalpace_summary_gain,
-                    plan.tdee,
-                    plan.deltaCalories,
-                    weeklyStr,
-                    monthlyStr,
-                    durationStr
-                )
+            val deltaVal = if (!isGain && plan.tdee - plan.targetCalories > 0) {
+                plan.tdee - plan.targetCalories
             } else {
-                val defVal = if (plan.tdee - plan.targetCalories > 0) {
-                    plan.tdee - plan.targetCalories
-                } else {
-                    plan.deltaCalories
-                }
-                getString(
-                    R.string.onboarding_goalpace_summary_loss,
-                    plan.tdee,
-                    defVal,
-                    weeklyStr,
-                    monthlyStr,
-                    durationStr
-                )
+                plan.deltaCalories
             }
+
+            val summaryFormatRes = if (isGain) {
+                R.string.goal_summary_gain_format
+            } else {
+                R.string.goal_summary_loss_format
+            }
+
+            val summaryHtml = getString(
+                summaryFormatRes,
+                plan.tdee,
+                deltaVal,
+                plan.targetCalories,
+                weeklyRateStr,
+                monthlyRateStr,
+                durationStr
+            )
+            textEnergySummary.text = HtmlCompat.fromHtml(summaryHtml, HtmlCompat.FROM_HTML_MODE_COMPACT)
         }
 
     private fun bindPaceCard(
         card: MaterialCardView,
-        frameIcon: View,
         icon: ImageView,
         label: TextView,
         rate: TextView,
         isSelected: Boolean
     ) {
         val colors = appColors
-        val bg =
-            if (isSelected) colors.colorSurfaceContainerHigh else colors.colorSurfaceContainerLowest
-        val stroke = if (isSelected) colors.colorPrimary else colors.colorOutlineVariant
-        val textColor = if (isSelected) colors.colorOnSurface else colors.colorOnSurfaceVariant
-        val iconBg =
-            if (isSelected) colors.colorSurfaceContainerHighest else colors.colorSurfaceContainerLowest
+        if (isSelected) {
+            card.setCardBackgroundColor(colors.colorSelectedCard)
+            card.strokeWidth = 2.dpToPx()
+            card.strokeColor = colors.colorPrimary
+            card.cardElevation = 0f
 
-        card.setCardBackgroundColor(colors.colorStateList(bg))
-        card.strokeWidth = if (isSelected) 2.dpToPx() else 1.dpToPx()
-        card.strokeColor = stroke
-        card.cardElevation = if (isSelected) 2.dpToPx().toFloat() else 0f
-        frameIcon.backgroundTintList = colors.colorStateList(iconBg)
-        icon.imageTintList = colors.colorStateList(textColor)
-        label.setTextColor(textColor)
-        rate.setTextColor(textColor)
+            icon.imageTintList = ColorStateList.valueOf(colors.colorPrimary)
+            label.setTextColor(colors.colorPrimary)
+            rate.setTextColor(colors.colorPrimary)
+        } else {
+            card.setCardBackgroundColor(colors.colorSurfaceContainerLowest)
+            card.strokeWidth = 1.dpToPx()
+            card.strokeColor = colors.colorOutlineVariant
+            card.cardElevation = 0f
+
+            icon.imageTintList = ColorStateList.valueOf(colors.colorOnSurfaceVariant)
+            label.setTextColor(colors.colorOnSurface)
+            rate.setTextColor(colors.colorOnSurfaceVariant)
+        }
     }
 
     private fun Int.dpToPx(): Int = (this * resources.displayMetrics.density).toInt()

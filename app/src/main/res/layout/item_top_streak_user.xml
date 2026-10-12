@@ -31,7 +31,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_gravity="top|start"
-            android:background="@drawable/bg_streak_fire_circle"
+            android:background="@drawable/circle_shape"
             android:backgroundTint="?attr/colorPrimary"
             android:fontFamily="@font/roboto_bold"
             android:gravity="center"

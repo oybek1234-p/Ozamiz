@@ -9,9 +9,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAdminPaymentVerificationListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.showToast
+import uz.oybek.ozamiz.ui.utils.toBundle
 
 class AdminPaymentVerificationListFragment :
     BaseFragment<FragmentAdminPaymentVerificationListBinding>() {
@@ -41,11 +43,8 @@ class AdminPaymentVerificationListFragment :
     private fun setupRecyclerView(bind: FragmentAdminPaymentVerificationListBinding) {
         adapter = AdminPaymentVerificationAdapter { user ->
             // Navigate to detail screen
-            val action = AdminPaymentVerificationListFragmentDirections
-                .actionAdminPaymentVerificationListFragmentToAdminPaymentVerificationDetailFragment(
-                    user.uid
-                )
-            navigate(action)
+            val args = AdminPaymentVerificationDetailArgs(user.uid)
+            navigate(R.id.adminPaymentVerificationDetailFragment, args.toBundle())
         }
         bind.recyclerViewAdminPayments.layoutManager = LinearLayoutManager(requireContext())
         bind.recyclerViewAdminPayments.adapter = adapter

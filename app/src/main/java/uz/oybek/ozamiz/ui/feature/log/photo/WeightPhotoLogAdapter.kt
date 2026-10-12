@@ -5,12 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.model.WeightLog
-import uz.oybek.ozamiz.data.utils.formatToLogPhotoDateTime
+import uz.oybek.ozamiz.common.util.DateFormatter
 import uz.oybek.ozamiz.databinding.ItemWeightPhotoLogBinding
-import java.util.Locale
+import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
+import uz.oybek.ozamiz.ui.utils.loadPhoto
 
 class WeightPhotoLogAdapter(
     private val onItemClick: (WeightLog) -> Unit
@@ -39,14 +38,11 @@ class WeightPhotoLogAdapter(
         }
 
         fun bind(log: WeightLog) {
-            binding.textViewLogWeight.text = String.format(Locale.US, "%.1f kg", log.weightKg)
-            binding.textViewLogDate.text = log.timestampLong.formatToLogPhotoDateTime()
+            binding.textViewLogWeight.text = NutritionFormatter.kg(log.weightKg)
+            binding.textViewLogDate.text =
+                DateFormatter.format(log.timestampLong, DateFormatter.PATTERN_DATE_TIME)
 
-            Glide.with(itemView.context)
-                .load(log.photoUrl)
-                .placeholder(R.drawable.woman_placeholder)
-                .error(R.drawable.woman_placeholder)       // Error placeholder
-                .into(binding.imageViewLogPhoto)
+            binding.imageViewLogPhoto.loadPhoto(log.photoUrl)
         }
     }
 

@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import androidx.annotation.Keep
 import uz.oybek.ozamiz.data.menu.MenuRepository
 import uz.oybek.ozamiz.data.menu.model.Menu
-import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.common.result.BaseResult
 
 class MenuSearchViewModel : ViewModel() {
 
@@ -73,7 +73,7 @@ class MenuSearchViewModel : ViewModel() {
                 pageSize = 10
             )
 
-            if (result is DataWrapper.Success) {
+            if (result is BaseResult.Success) {
                 val newList = currentList + result.data
                 cacheMap[catId] = newList
 

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.common.result.BaseResult
 import androidx.annotation.Keep
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,13 +47,13 @@ class WeightPhotoHistoryViewModel : ViewModel() {
                 }
                 .collectLatest { result ->
                     when (result) {
-                        is DataWrapper.Success -> {
+                        is BaseResult.Success -> {
                             _uiState.update {
                                 it.copy(isLoading = false, logs = result.data, error = null)
                             }
                         }
 
-                        is DataWrapper.Error -> {
+                        is BaseResult.Failure -> {
                             _uiState.update {
                                 it.copy(isLoading = false, error = result.error, logs = emptyList())
                             }

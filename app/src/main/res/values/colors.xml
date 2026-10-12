@@ -14,6 +14,7 @@
 
     <color name="grey_alpha_50">#808080</color>
     <color name="green_alpha_10">#E0F2F1</color>
+    <color name="bottom_nav_indicator">#BCECCB</color>
     <color name="yellow_alpha_10">#FFF3E0</color>
     <color name="red_alpha_10">#FFE0E0</color>
     <color name="white_alpha_50">#80FFFFFF</color>
@@ -24,6 +25,35 @@
     <color name="grey_line">#E0E0E0</color>
     <color name="orange">#FF9800</color>
     <color name="orange_alpha_10">#FFF3E0</color>
+    <color name="streak_active">#FF9800</color>
+    <color name="streak_frozen">#00B0FF</color>
+    <color name="streak_inactive">#9E9E9E</color>
+    <color name="calorie_progress">#006D42</color>
+    <color name="calorie_exceeded">#D97706</color>
+
+    <!-- Macro Palette (Distinct & Harmonious Nutrition Palette) -->
+    <color name="macro_protein_light">#2563EB</color>
+    <color name="macro_protein_dark">#60A5FA</color>
+    <color name="macro_fat_light">#EAB308</color>
+    <color name="macro_fat_dark">#FDE047</color>
+    <color name="macro_carbs_light">#B45309</color>
+    <color name="macro_carbs_dark">#FCD34D</color>
+
+    <!-- Meal Times Palette -->
+    <color name="meal_breakfast_light">#FF7043</color>
+    <color name="meal_breakfast_dark">#FF8A65</color>
+    <color name="meal_lunch_light">#F59E0B</color>
+    <color name="meal_lunch_dark">#FBBF24</color>
+    <color name="meal_dinner_light">#1D4ED8</color>
+    <color name="meal_dinner_dark">#60A5FA</color>
+    <color name="meal_snack_light">#EF4444</color>
+    <color name="meal_snack_dark">#F87171</color>
+
+    <!-- Water & Exercise Palette -->
+    <color name="water_progress_light">#00B0FF</color>
+    <color name="water_progress_dark">#38BDF8</color>
+    <color name="exercise_progress_light">#FB8C00</color>
+    <color name="exercise_progress_dark">#FFA726</color>
 
     <!-- NEW MATERIAL 3 PRO HEALTH THEME (Deep Green) -->
     <!-- Seed: #006D42 -->
@@ -96,7 +126,7 @@
 
     <color name="md_theme_dark_background">#000000</color>
     <color name="md_theme_dark_onBackground">#E1E3DF</color>
-    <color name="md_theme_dark_surface">#000000</color>
+    <color name="md_theme_dark_surface">#0A0D0B</color>
     <color name="md_theme_dark_onSurface">#E1E3DF</color>
     <color name="md_theme_dark_surfaceVariant">#262B28</color>
     <color name="md_theme_dark_onSurfaceVariant">#C0C9C2</color>

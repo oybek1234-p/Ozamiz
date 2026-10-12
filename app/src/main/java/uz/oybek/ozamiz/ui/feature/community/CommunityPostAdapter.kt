@@ -2,31 +2,41 @@ package uz.oybek.ozamiz.ui.feature.community
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.community.model.CommunityPost
-import uz.oybek.ozamiz.data.community.model.PostType.FOOD
-import uz.oybek.ozamiz.data.community.model.PostType.WEIGHT_LOSS
-import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.community.model.PostStatus
+import uz.oybek.ozamiz.data.community.model.PostType
 import uz.oybek.ozamiz.databinding.ItemCommunityPostBinding
-import java.util.concurrent.TimeUnit
+import uz.oybek.ozamiz.ui.utils.DateExtensions
+import uz.oybek.ozamiz.ui.utils.loadPhoto
+import uz.oybek.ozamiz.ui.utils.loadUserPhoto
 
 class CommunityPostAdapter(
-    private val onLikeClick: (String) -> Unit,
-    private val onUserClick: (String, String) -> Unit,
-    private val onDeleteClick: (CommunityPost) -> Unit,
-    private val onViewed: (String) -> Unit,
-    private val onVerifyClick: ((CommunityPost) -> Unit)? = null,
-    private val showPremiumBadge: Boolean = true
+    private var currentUserId: String,
+    private val onLikeClick: (CommunityPost) -> Unit,
+    private val onCommentClick: (CommunityPost) -> Unit,
+    private val onUserClick: (userId: String, userName: String) -> Unit,
+    private val onDeleteClick: (CommunityPost) -> Unit
 ) : ListAdapter<CommunityPost, CommunityPostAdapter.PostViewHolder>(PostDiffCallback()) {
+
+    fun updateCurrentUserId(userId: String) {
+        if (this.currentUserId != userId) {
+            this.currentUserId = userId
+            notifyItemRangeChanged(0, itemCount, PAYLOAD_LIKE)
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = ItemCommunityPostBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
         return PostViewHolder(binding)
     }
@@ -35,187 +45,188 @@ class CommunityPostAdapter(
         holder.bind(getItem(position))
     }
 
-    inner class PostViewHolder(private val binding: ItemCommunityPostBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        private val currentUserId = UserProfileRepository.user.uid.ifEmpty { null }
-        private var viewed = false
+    override fun onBindViewHolder(
+        holder: PostViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        if (payloads.isEmpty()) {
+            super.onBindViewHolder(holder, position, payloads)
+        } else {
+            val item = getItem(position)
+            for (payload in payloads) {
+                if (payload is Set<*>) {
+                    if (payload.contains(PAYLOAD_LIKE)) {
+                        holder.updateLikes(item)
+                    }
+                    if (payload.contains(PAYLOAD_COMMENTS)) {
+                        holder.updateComments(item)
+                    }
+                } else if (payload == PAYLOAD_LIKE) {
+                    holder.updateLikes(item)
+                } else if (payload == PAYLOAD_COMMENTS) {
+                    holder.updateComments(item)
+                }
+            }
+        }
+    }
+
+    inner class PostViewHolder(
+        private val binding: ItemCommunityPostBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        private var currentPost: CommunityPost? = null
+        private var isItemLiked: Boolean = false
+        private var itemLikesCount: Int = 0
 
         fun bind(post: CommunityPost) {
-            if (!viewed) {
-                viewed = true
-                onViewed(post.id)
-            }
-            binding.tvUserName.text = post.userName
-            binding.tvUserName.isVisible = true
+            currentPost = post
+            val context = binding.root.context
 
-            if (showPremiumBadge) {
-                Glide.with(binding.root)
-                    .load(post.userAvatarUrl)
-                    .placeholder(R.drawable.user_photo_placeholder)
-                    .error(R.drawable.user_photo_placeholder)
-                    .circleCrop()
-                    .into(binding.imgUserAvatar)
-            }
-            binding.imgUserAvatar.isVisible = showPremiumBadge
-            binding.tvPremiumStatus.isVisible = post.isPremiumUser && showPremiumBadge
+            // User info
+            binding.tvUserName.text = post.userName.ifBlank { context.getString(R.string.default_user_name) }
+            binding.imgUserAvatar.loadUserPhoto(post.userAvatarUrl)
+            binding.imgPremium.isVisible = post.isPremiumUser
 
-            // Extract weight loss for achievement posts and show it next to name
-            val isWeightLoss = post.type == WEIGHT_LOSS || post.type == "ACHIEVEMENT"
-            val weightLossValue = post.weightLoss
+            // Pending badge
+            val isPending = post.status == PostStatus.PENDING.name
+            binding.tvPendingBadge.isVisible = isPending
 
-            if (isWeightLoss) {
-                if (weightLossValue != null && weightLossValue > 0.0) {
-                    val formatted = if (weightLossValue % 1.0 == 0.0) {
-                        "${weightLossValue.toInt()} kg"
-                    } else {
-                        String.format(java.util.Locale.US, "%.1f kg", weightLossValue)
-                    }
-                    binding.tvWeightLossTag.isVisible = true
-                    binding.tvWeightLossTag.text = "-$formatted ozildi"
-                } else {
-                    val match = Regex("""(\d+([.,]\d+)?)\s*kg""").find(post.title)
-                    if (match != null) {
-                        val numStr = match.groupValues[1].replace(',', '.')
-                        binding.tvWeightLossTag.isVisible = true
-                        binding.tvWeightLossTag.text = "-$numStr kg ozildi"
-                    } else {
-                        binding.tvWeightLossTag.isVisible = false
-                    }
-                }
-            } else {
-                binding.tvWeightLossTag.isVisible = false
-            }
+            // Time formatting via DateExtensions / DateFormatter
+            binding.tvPostTime.text = DateExtensions.formatRelativeTime(context, post.createdAt)
 
-            // Hide calories if not a food post
-            val isFoodPost = post.type == FOOD || post.foodName.isNotBlank()
-            binding.tvFoodCalories.isVisible = isFoodPost && post.calories > 0
-            
-            if (isFoodPost) {
-                val scoreText = if (post.healthScore > 0) "  •  ⭐ ${post.healthScore}/10" else ""
-                binding.tvFoodCalories.text = "${post.calories} kkal$scoreText"
-            }
+            // Post Title & Description
+            binding.tvPostTitle.isVisible = post.title.isNotBlank()
+            binding.tvPostTitle.text = post.title
+            binding.tvPostDescription.isVisible = post.description.isNotBlank()
+            binding.tvPostDescription.text = post.description
 
-            binding.layoutViews.isVisible = post.viewsCount > 0
-            binding.tvViewsCount.text = post.viewsCount.toString()
+            // Photos
+            val isWeightLoss = post.type == PostType.WEIGHT_LOSS.name
+            val photos = post.photos.filter { it.isNotBlank() }
 
-            val timestamp = post.timestamp
-            if (timestamp != null) {
-                val diff = System.currentTimeMillis() - timestamp.time
-                val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
-                val hours = TimeUnit.MILLISECONDS.toHours(diff)
-                val days = TimeUnit.MILLISECONDS.toDays(diff)
-                binding.tvTime.text = when {
-                    days > 0 -> "$days ${binding.root.context.getString(R.string.kun_oldin)}"
-                    hours > 0 -> "$hours ${binding.root.context.getString(R.string.sohat_oldin)}"
-                    minutes > 0 -> "$minutes minut oldin"
-                    else -> binding.root.context.getString(R.string.yaqinda)
-                }
-            } else {
-                binding.tvTime.text = ""
-            }
-
-            val isWeightLossType = post.type == WEIGHT_LOSS || post.type == "ACHIEVEMENT"
-            val photos =
-                (if (post.photos.isNotEmpty()) post.photos else if (post.photoUrl.isNotEmpty()) listOf(
-                    post.photoUrl
-                ) else emptyList()).filter { it.isNotBlank() }
-
-            if (photos.size >= 2 && isWeightLossType) {
-                binding.imgFoodPhoto.isVisible = false
+            if (isWeightLoss && photos.size >= 2) {
+                binding.layoutMediaContainer.isVisible = true
                 binding.layoutPhotoComparison.isVisible = true
+                binding.imgSinglePhoto.isVisible = false
 
-                Glide.with(binding.root).load(photos.first())
-                    .placeholder(R.drawable.user_photo_placeholder).into(binding.imgBefore)
-                Glide.with(binding.root).load(photos.last())
-                    .placeholder(R.drawable.user_photo_placeholder).into(binding.imgAfter)
+                binding.imgBefore.loadPhoto(photos.first())
+                binding.imgAfter.loadPhoto(photos.last())
             } else if (photos.isNotEmpty()) {
-                binding.imgFoodPhoto.isVisible = true
+                binding.layoutMediaContainer.isVisible = true
                 binding.layoutPhotoComparison.isVisible = false
-                Glide.with(binding.root).load(photos.last())
-                    .placeholder(R.drawable.placeholder_food)
-                    .into(binding.imgFoodPhoto)
+                binding.imgSinglePhoto.isVisible = true
+
+                binding.imgSinglePhoto.loadPhoto(photos.first())
             } else {
-                binding.imgFoodPhoto.isVisible = false
+                binding.layoutMediaContainer.isVisible = false
                 binding.layoutPhotoComparison.isVisible = false
+                binding.imgSinglePhoto.isVisible = false
             }
 
-            var isLiked = currentUserId != null && post.likedBy.contains(currentUserId)
-            var currentLikes = post.likesCount
-
-            fun updateLikeUI(liked: Boolean, count: Int) {
-                if (liked) {
-                    binding.imgLike.setImageResource(R.drawable.like_active_ic)
-                    binding.imgLike.setColorFilter(binding.root.context.getColor(R.color.likeColor))
-                } else {
-                    binding.imgLike.setImageResource(R.drawable.like_ic)
-                    binding.imgLike.setColorFilter(binding.root.context.getColor(R.color.grey))
-                }
-                binding.tvLikesCount.text = count.toString()
-                binding.tvLikesCount.isVisible = count > 0
-            }
-
-            updateLikeUI(isLiked, currentLikes)
+            // Likes
+            updateLikes(post)
 
             binding.btnLike.setOnClickListener {
-                if (currentUserId == null) return@setOnClickListener
-                isLiked = !isLiked
-                currentLikes = if (isLiked) currentLikes + 1 else currentLikes - 1
-                updateLikeUI(isLiked, currentLikes)
+                val target = currentPost ?: return@setOnClickListener
+                val newLikedState = !isItemLiked
+                val newCount = if (newLikedState) itemLikesCount + 1 else (itemLikesCount - 1).coerceAtLeast(0)
 
-                binding.imgLike.scaleX = 0.8f
-                binding.imgLike.scaleY = 0.8f
+                isItemLiked = newLikedState
+                itemLikesCount = newCount
+                applyLikeUi(newLikedState, newCount)
+
+                // Heart bounce animation
                 binding.imgLike.animate()
-                    .scaleX(1.2f)
-                    .scaleY(1.2f)
-                    .setDuration(150)
+                    .scaleX(1.35f)
+                    .scaleY(1.35f)
+                    .setDuration(120)
                     .withEndAction {
                         binding.imgLike.animate()
                             .scaleX(1.0f)
                             .scaleY(1.0f)
-                            .setDuration(100)
+                            .setDuration(120)
                             .start()
                     }
                     .start()
 
-                onLikeClick(post.id)
+                onLikeClick(target)
             }
 
-            val userClickListener = android.view.View.OnClickListener {
-                onUserClick(post.userId, post.userName)
+            // Comments
+            updateComments(post)
+            binding.btnComments.setOnClickListener {
+                currentPost?.let { onCommentClick(it) }
             }
-            binding.imgUserAvatar.setOnClickListener(userClickListener)
-            binding.tvUserName.setOnClickListener(userClickListener)
 
-            // Admin features
-            val isAdmin = UserProfileRepository.user.admin
-            val isOwner = currentUserId != null && post.userId == currentUserId
-
-            // Only show more button if user is owner or admin
-            binding.btnMore.isVisible = isOwner || isAdmin
-
-            binding.btnMore.setOnClickListener { view ->
-                val popup = android.widget.PopupMenu(view.context, view)
-                if (isOwner || isAdmin) popup.menu.add("O'chirish")
-                if (isAdmin && !post.verified) popup.menu.add("Tasdiqlash")
-                popup.setOnMenuItemClickListener { item ->
-                    when (item.title) {
-                        "O'chirish" -> onDeleteClick(post)
-                        "Tasdiqlash" -> onVerifyClick?.invoke(post)
-                    }
+            // More Options (Author delete)
+            val isAuthor = currentUserId.isNotBlank() && post.userId == currentUserId
+            binding.btnPostMore.isVisible = isAuthor
+            binding.btnPostMore.setOnClickListener { view ->
+                val popup = PopupMenu(view.context, view)
+                popup.menu.add(context.getString(R.string.delete))
+                popup.setOnMenuItemClickListener {
+                    currentPost?.let { onDeleteClick(it) }
                     true
                 }
                 popup.show()
             }
+
+            binding.layoutUserInfo.setOnClickListener {
+                currentPost?.let { onUserClick(it.userId, it.userName) }
+            }
         }
+
+        fun updateLikes(post: CommunityPost) {
+            currentPost = post
+            isItemLiked = currentUserId.isNotBlank() && post.likedBy.contains(currentUserId)
+            itemLikesCount = post.likesCount
+            applyLikeUi(isItemLiked, itemLikesCount)
+        }
+
+        fun updateComments(post: CommunityPost) {
+            currentPost = post
+            binding.tvCommentsCount.text = post.commentsCount.toString()
+            binding.tvCommentsCount.isVisible = post.commentsCount > 0
+        }
+
+        private fun applyLikeUi(liked: Boolean, count: Int) {
+            val context = binding.root.context
+            if (liked) {
+                binding.imgLike.setImageResource(R.drawable.like_active_ic)
+                binding.imgLike.setColorFilter(ContextCompat.getColor(context, R.color.likeColor))
+            } else {
+                binding.imgLike.setImageResource(R.drawable.like_ic)
+                binding.imgLike.setColorFilter(ContextCompat.getColor(context, R.color.grey))
+            }
+            binding.tvLikesCount.text = count.toString()
+            binding.tvLikesCount.isVisible = count > 0
+        }
+    }
+
+    companion object {
+        const val PAYLOAD_LIKE = "PAYLOAD_LIKE"
+        const val PAYLOAD_COMMENTS = "PAYLOAD_COMMENTS"
     }
 }
 
-class PostDiffCallback : DiffUtil.ItemCallback<CommunityPost>() {
+private class PostDiffCallback : DiffUtil.ItemCallback<CommunityPost>() {
     override fun areItemsTheSame(oldItem: CommunityPost, newItem: CommunityPost): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: CommunityPost, newItem: CommunityPost): Boolean {
         return oldItem == newItem
+    }
+
+    override fun getChangePayload(oldItem: CommunityPost, newItem: CommunityPost): Any? {
+        val bundle = mutableSetOf<String>()
+        if (oldItem.likesCount != newItem.likesCount || oldItem.likedBy != newItem.likedBy) {
+            bundle.add(CommunityPostAdapter.PAYLOAD_LIKE)
+        }
+        if (oldItem.commentsCount != newItem.commentsCount) {
+            bundle.add(CommunityPostAdapter.PAYLOAD_COMMENTS)
+        }
+        return if (bundle.isNotEmpty()) bundle else null
     }
 }

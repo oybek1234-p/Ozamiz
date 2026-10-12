@@ -6,59 +6,70 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_bottom_sheet_top_rounded"
-        android:backgroundTint="?colorSurfaceContainerLowest"
-        android:layout_height="wrap_content">
+        android:backgroundTint="?attr/colorSurfaceContainer"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="24dp">
 
-        <LinearLayout
-            android:id="@+id/phone_View"
-            android:layout_width="match_parent"
+        <!-- Drag Handle -->
+        <View
+            android:layout_width="36dp"
+            android:layout_height="4dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_rounded_8"
+            android:backgroundTint="?attr/colorOutlineVariant" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/boglanish"
+            style="@style/TextAppearance.Material3.TitleMedium"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="@dimen/dimen_24"
-            android:paddingVertical="@dimen/dimen_24"
-            android:clipToPadding="false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:layout_marginBottom="20dp"
+            android:drawableStart="@drawable/help_ic"
+            android:drawablePadding="10dp"
+            android:fontFamily="@font/roboto_bold"
+            android:gravity="center"
+            android:text="@string/help_and_support"
+            android:textColor="?attr/colorOnSurface"
+            app:drawableTint="?attr/colorOnSurface" />
 
-            <TextView
-                android:id="@+id/boglanish"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/help_and_support"
-                android:drawableStart="@drawable/admin_ic"
-                android:drawablePadding="@dimen/dimen_12"
-                android:layout_gravity="center_horizontal"
-                style="@style/Title2_20"
-                android:layout_marginBottom="@dimen/dimen_18"
-                android:textColor="?colorOnSurface" />
+        <!-- Call Operator Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/callview"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/support_sheet_call"
+            android:textSize="15sp"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/call_ic"
+            app:iconGravity="textStart"
+            app:iconPadding="10dp"
+            app:iconSize="20dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/callview"
-                style="@style/FilledButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:iconPadding="12dp"
-                android:text="@string/operator"
-                android:padding="@dimen/dimen_12"
-                app:icon="@drawable/call_ic"
-                app:iconGravity="textStart"
-                app:tint="@color/white" />
+        <!-- Telegram Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/request_button"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/support_sheet_telegram"
+            android:textSize="15sp"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/telegram_ic"
+            app:iconGravity="textStart"
+            app:iconPadding="10dp"
+            app:iconSize="20dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/request_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableTint="@color/white"
-                android:text="Telegram orqali"
-                style="@style/Widget.Material3.Button.TonalButton"
-                app:icon="@drawable/telegram_ic"
-                app:iconGravity="textStart" />
-
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </layout>

@@ -8,7 +8,6 @@ import uz.oybek.ozamiz.R
 class PremiumBottomSheetDialog : DialogFragment() {
 
     companion object {
-        const val TAG = "PremiumBottomSheetDialog"
         const val REQUEST_KEY = "PremiumBottomSheetRequestKey"
         const val RESULT_ACTION = "PremiumResultAction"
         const val KEY_SELECTED_PRICE = "selected_price"

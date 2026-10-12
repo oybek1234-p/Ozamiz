@@ -22,7 +22,7 @@ import kotlinx.coroutines.withContext
 object UserAuthRepository {
 
     suspend fun signOut() {
-        runCatching { UserProfileRepository.stopObserving() }
+        // runCatching { UserProfileRepository.stopObserving() }
         runCatching { auth.signOut() }
         runCatching { LocalUser.clear() }
         runCatching { AppPreference.clear() }
@@ -70,7 +70,8 @@ object UserAuthRepository {
     suspend fun authFirebaseUser(): User {
         val firebaseUser = auth.currentUser ?: return User()
         val id = firebaseUser.uid
-        val networkUser: User? = UserProfileRepository.loadUser(id)
+        // val networkUser: User? = UserProfileRepository.loadUser(id)
+        val networkUser: User? = null
         val existingLocal = LocalUser.user
 
         var userEmail = firebaseUser.email
@@ -113,7 +114,7 @@ object UserAuthRepository {
             uz.oybek.ozamiz.util.handleException(e)
         }
 
-        UserProfileRepository.observeCurrentUser()
+        // UserProfileRepository.observeCurrentUser()
 
         return currentUser
     }

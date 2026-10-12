@@ -5,8 +5,7 @@
     android:id="@+id/card_exercise_type"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="6dp"
-    android:layout_marginBottom="6dp"
+    android:layout_marginVertical="4dp"
     android:clickable="true"
     android:focusable="true"
     app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
@@ -19,32 +18,55 @@
         android:id="@+id/constraint_layout_exercise_type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
-        <TextView
-            android:id="@+id/iv_exercise_icon_selectable"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_exercise_emoji"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:gravity="center"
-            android:textSize="26sp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="🚶" />
+            app:strokeWidth="0dp">
+
+            <TextView
+                android:id="@+id/iv_exercise_icon_selectable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="20sp"
+                tools:text="🚶" />
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/tv_exercise_name_selectable"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginEnd="12dp"
             android:fontFamily="@font/roboto_bold"
             android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="@id/iv_exercise_icon_selectable"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/iv_exercise_icon_selectable"
-            app:layout_constraintTop_toTopOf="@id/iv_exercise_icon_selectable"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv_chevron"
+            app:layout_constraintStart_toEndOf="@id/card_exercise_emoji"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Piyoda yurish" />
+
+        <ImageView
+            android:id="@+id/iv_chevron"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:contentDescription="@null"
+            android:src="@drawable/arrow_right"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="?attr/colorOutline" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

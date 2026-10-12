@@ -99,7 +99,6 @@ class InfoBottomSheet : BottomSheetDialogFragment() {
     }
 
     companion object {
-        const val TAG = "InfoBottomSheet"
         private const val ARG_TITLE = "arg_title"
         private const val ARG_CONTENT = "arg_content"
 

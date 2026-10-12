@@ -158,7 +158,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/person_filled"
+                            android:src="@drawable/person_ic"
                             app:tint="?attr/colorPrimary" />
                     </com.google.android.material.card.MaterialCardView>
 
@@ -310,7 +310,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="?attr/colorSurfaceContainerLowest"
+        android:background="?attr/colorSurfaceContainer"
         android:orientation="vertical"
         android:paddingHorizontal="24dp"
         android:paddingTop="12dp"

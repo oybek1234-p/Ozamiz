@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.user
 
+import uz.oybek.ozamiz.common.util.orZero
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
 import kotlinx.coroutines.tasks.await
@@ -10,7 +11,7 @@ import uz.oybek.ozamiz.data.firebase.toObjectsList
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.data.user.model.UserSortType
-import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.util.handleException
 import uz.oybek.ozamiz.util.returnResult
 
@@ -42,7 +43,7 @@ object AdminRepository {
         FirebasePaths.Firestore.publicUser(userId).update(User::premium.name, premium)
     }
 
-    suspend fun getPendingPremiumUsers(): DataWrapper<List<User>> {
+    suspend fun getPendingPremiumUsers(): BaseResult<List<User>, String> {
         return try {
             val snapshot =
                 FirebasePaths.Database.users().orderByChild(User::paymentChecking.name)
@@ -52,10 +53,10 @@ object AdminRepository {
             val users = snapshot.children.mapNotNull {
                 it.getValueSafe(User::class.java)
             }
-            DataWrapper.Success(users)
+            BaseResult.Success(users)
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error()
+            BaseResult.Failure(e.message ?: "Xatolik")
         }
     }
 
@@ -108,9 +109,9 @@ object AdminRepository {
             UserSortType.MOST_POINTS -> list.sortedByDescending { it.scorePoints }
             UserSortType.RECENT_ACTIVITY -> list.sortedByDescending { it.lastSeenTime }
             UserSortType.MOST_ACTIVE -> list.sortedByDescending { it.scorePoints }
-            UserSortType.TOP_STREAK -> list.sortedByDescending { it.streakInfo?.currentStreak ?: 0 }
+            UserSortType.TOP_STREAK -> list.sortedByDescending { it.streakInfo?.currentStreak.orZero() }
             UserSortType.TOP_WEIGHT_LOSS -> list.sortedByDescending { 
-                val start = it.startWeight ?: 0.0
+                val start = it.startWeight.orZero()
                 val current = it.weight
                 if (start > current && current > 0) start - current else -1.0
             }

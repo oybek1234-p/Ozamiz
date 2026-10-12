@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://tools.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bottom_sheet_background"
+    android:background="@drawable/bg_bottom_sheet_top_rounded"
+    android:backgroundTint="?attr/colorSurfaceContainer"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:paddingHorizontal="20dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="24dp">
 
+    <!-- Drag Handle -->
     <View
-        android:layout_width="40dp"
+        android:layout_width="36dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/round_lay"
-        android:backgroundTint="?attr/colorOutlineVariant" />
+        android:layout_marginBottom="16dp"
+        android:alpha="0.3"
+        android:background="@drawable/drag_handle" />
 
+    <!-- Food Title & Calories Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,149 +32,285 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto_bold"
             android:textColor="?attr/colorOnSurface"
-            style="@style/Title3_17"
-            android:text="Osh" />
+            android:textSize="20sp"
+            tools:text="Osh (Palov)" />
 
         <TextView
             android:id="@+id/text_view_calories_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_bold"
-            android:textColor="?attr/colorOnSurface"
-            style="@style/Title3_17"
-            android:text="450 kkal" />
+            android:textColor="?attr/colorPrimary"
+            android:textSize="20sp"
+            tools:text="450 kkal" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginVertical="16dp"
+        android:layout_marginTop="16dp"
         android:background="?attr/colorOutlineVariant" />
 
-    <include android:id="@+id/row_calories" layout="@layout/item_nutrition_row" />
-    <include android:id="@+id/row_carbs" layout="@layout/item_nutrition_row" />
-    <include android:id="@+id/row_protein" layout="@layout/item_nutrition_row" />
-    <include android:id="@+id/row_fat" layout="@layout/item_nutrition_row" />
-
-    <View
+    <!-- Mode Selector: Porsiya vs Gramm -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/toggle_group_unit_mode"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginVertical="16dp"
-        android:background="?attr/colorOutlineVariant" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:checkedButton="@id/btn_mode_portion"
+        app:selectionRequired="true"
+        app:singleSelection="true">
 
-    <!-- Porsiya bo'yicha tanlash qismi -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_mode_portion"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/food_detail_portion_mode"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            app:cornerRadius="14dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_mode_grams"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/food_detail_grams_mode"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            app:cornerRadius="14dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- 1. Portion Mode Container -->
     <LinearLayout
         android:id="@+id/layout_portion_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <!-- Miqdor kiritish va +/- tugmalari -->
+        <!-- Unified Portion Stepper: [- 1 +] -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.2"
-            android:layout_marginEnd="8dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/round_lay_stroke"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingHorizontal="4dp">
 
-            <com.google.android.material.button.MaterialButton
+            <ImageButton
                 android:id="@+id/button_minus"
-                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="4dp"
-                app:icon="@android:drawable/ic_input_delete" />
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/food_detail_decrease_amount"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_minus"
+                app:tint="?attr/colorOnSurface" />
 
-            <com.google.android.material.textfield.TextInputLayout
+            <EditText
+                android:id="@+id/edit_text_quantity"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:hint="Miqdori"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:background="@null"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="17sp"
+                tools:text="1" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_text_quantity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:inputType="numberDecimal"
-                    android:text="1" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
+            <ImageButton
                 android:id="@+id/button_plus"
-                style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="4dp"
-                app:icon="@android:drawable/ic_input_add" />
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/food_detail_increase_amount"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/add_ic"
+                app:tint="?attr/colorOnSurface" />
         </LinearLayout>
 
-        <!-- O'lchov birligi -->
+        <!-- Serving Size Dropdown -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:hint="Birlik"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1.2"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
 
             <AutoCompleteTextView
                 android:id="@+id/auto_complete_serving_size"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
+                android:layout_height="52dp"
+                android:fontFamily="@font/roboto_medium"
+                android:inputType="none"
+                android:paddingVertical="0dp"
+                android:paddingHorizontal="12dp"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <!-- Gramm kiritish qismi (Gramni kiritish tugmasi bosilganda) -->
+    <!-- 2. Grams Mode Container -->
     <LinearLayout
         android:id="@+id/layout_gram_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:orientation="horizontal">
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-        <com.google.android.material.textfield.TextInputLayout
+        <!-- Unified Stepper for Grams -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:background="@drawable/round_lay_stroke"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="6dp">
+
+            <ImageButton
+                android:id="@+id/button_minus_grams"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/food_detail_decrease_amount"
+                android:padding="11dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_minus"
+                app:tint="?attr/colorOnSurface" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edit_text_grams"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@null"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:inputType="numberDecimal"
+                    android:minWidth="50dp"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="20sp"
+                    tools:text="150" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/food_detail_grams_suffix"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/button_plus_grams"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/food_detail_increase_amount"
+                android:padding="11dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/add_ic"
+                app:tint="?attr/colorOnSurface" />
+        </LinearLayout>
+
+        <!-- Quick Gram Chips -->
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Taom vazni (grammda)"
-            app:suffixText="g"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            android:layout_marginTop="10dp"
+            android:scrollbars="none">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_text_grams"
-                android:layout_width="match_parent"
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_quick_grams"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
-                android:textSize="16sp" />
-        </com.google.android.material.textfield.TextInputLayout>
+                app:singleLine="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_50g"
+                    style="@style/Widget.Material3.Chip.Suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/food_detail_chip_50g" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_100g"
+                    style="@style/Widget.Material3.Chip.Suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/food_detail_chip_100g" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_150g"
+                    style="@style/Widget.Material3.Chip.Suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/food_detail_chip_150g" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_200g"
+                    style="@style/Widget.Material3.Chip.Suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/food_detail_chip_200g" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_250g"
+                    style="@style/Widget.Material3.Chip.Suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/food_detail_chip_250g" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_300g"
+                    style="@style/Widget.Material3.Chip.Suggestion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/food_detail_chip_300g" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
     </LinearLayout>
 
-    <!-- Rejimni almashtirish tugmasi -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/button_toggle_mode"
-        style="@style/Widget.Material3.Button.TextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/roboto_medium"
-        android:text="Gramni kiritish"
-        android:textColor="?attr/colorPrimary"
-        app:icon="@drawable/edit" />
-
+    <!-- Log Food Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/button_log_food"
-        style="@style/FilledButton"
+        style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/roboto_bold"
-        android:text="Qo'shish"
+        android:text="@string/add"
+        android:textAllCaps="false"
+        android:textColor="?attr/colorOnPrimary"
         android:textSize="16sp"
-        app:cornerRadius="12dp" />
+        app:backgroundTint="?attr/colorPrimary"
+        app:cornerRadius="18dp" />
 
 </LinearLayout>

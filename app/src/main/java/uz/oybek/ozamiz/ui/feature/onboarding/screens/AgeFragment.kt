@@ -3,14 +3,16 @@ package uz.oybek.ozamiz.ui.feature.onboarding.screens
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.profile.model.UserMetricsLimits
 import uz.oybek.ozamiz.databinding.FragmentAgeBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
+import uz.oybek.ozamiz.ui.utils.intOrNull
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 
 class AgeFragment : OnBoardingChildFragment<FragmentAgeBinding>() {
     override fun viewCreated(bind: FragmentAgeBinding) {
         val currentAge = viewModel.uiState.value.user.age
-        if (currentAge != null && currentAge > 0) {
+        if (currentAge > 0) {
             val ageStr = currentAge.toString()
             bind.textInput.editText?.setText(ageStr)
             bind.textInput.editText?.setSelection(ageStr.length)
@@ -18,13 +20,13 @@ class AgeFragment : OnBoardingChildFragment<FragmentAgeBinding>() {
 
         bind.apply {
             button.setOnClickListener {
-                val age = textInput.editText?.text.toString()
-                if (age.length < 2) {
-                    textInput.error = getString(R.string.age_error)
-                    return@setOnClickListener
+                val age = textInput.intOrNull()
+                if (UserMetricsLimits.isValidAge(age)) {
+                    viewModel.setAge(age!!)
+                    moveToNextScreen()
+                } else {
+                    textInput.error = getString(R.string.error_invalid_age)
                 }
-                viewModel.setAge(age.toInt())
-                moveToNextScreen()
             }
         }
     }
@@ -44,6 +46,4 @@ class AgeFragment : OnBoardingChildFragment<FragmentAgeBinding>() {
             false
         )
     }
-
-
 }

@@ -6,11 +6,10 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.R
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.menu.CategoryType
@@ -21,11 +20,12 @@ import uz.oybek.ozamiz.databinding.FragmentMenuSearchResultsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.ui.utils.getArgs
+import uz.oybek.ozamiz.ui.utils.loadBannerAd
 
 class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>() {
 
     private val viewModel: MenuSearchViewModel by viewModels()
-    private val args: MenuSearchResultsFragmentArgs by navArgs()
 
     private lateinit var filterAdapter: MenuListSquareAdapter
     private lateinit var menuAdapter: MenuAdapter
@@ -63,8 +63,12 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
     }
 
     private fun setupFilters(bind: FragmentMenuSearchResultsBinding) {
+        val searchArgs = arguments.getArgs<MenuSearchResultsArgs>()
+        val filterTypeStr = searchArgs?.filterType ?: arguments?.getString("filterType").orEmpty()
+        val filterValStr = searchArgs?.filterValue ?: arguments?.getString("filterValue").orEmpty()
+
         val categoryType = try {
-            CategoryType.valueOf(args.filterType)
+            CategoryType.valueOf(filterTypeStr)
         } catch (e: Exception) {
             CategoryType.MAIN_MEALS
         }
@@ -102,7 +106,7 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
         val targetId = if (savedCategoryId != null) {
             try { FilterId.valueOf(savedCategoryId) } catch (e: Exception) { null }
         } else {
-            try { FilterId.valueOf(args.filterValue) } catch (e: Exception) { null }
+            try { FilterId.valueOf(filterValStr) } catch (e: Exception) { null }
         }
 
         filterAdapter.setSelectedId(targetId)
@@ -146,18 +150,7 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
     }
 
     private fun loadBanner() {
-        if (user.isPremium()) {
-            binding.bannerContainer.visibility = View.GONE
-            return
-        }
-        try {
-            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_HOME)
-            binding.bannerContainer.removeAllViews()
-            binding.bannerContainer.addView(bannerView)
-            binding.bannerContainer.visibility = View.VISIBLE
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        binding.bannerContainer.loadBannerAd(AdsConfig.BANNER_HOME)
     }
 
     override fun inflateBinding(

@@ -4,7 +4,7 @@ import androidx.annotation.Keep
 import kotlinx.serialization.Transient
 import uz.oybek.ozamiz.data.profile.model.UserActivityLevel
 import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.common.util.DateFormatter
 
 @Keep
 data class User(
@@ -96,7 +96,7 @@ data class User(
 
     @get:com.google.firebase.database.Exclude
     val registerDateLong: Long?
-        get() = registerDate?.let { DateUtils.toLongTimestamp(it) }
+        get() = registerDate?.let { DateFormatter.toLongTimestamp(it) }
 
 }
 
@@ -105,5 +105,5 @@ fun User.admin() = this.admin
 fun User.daysFromRegister(): Int {
     val registerDate = registerDateLong ?: return 0
     if (registerDate <= 0L) return 0
-    return DateUtils.daysBetween(registerDate, System.currentTimeMillis()).coerceAtLeast(0)
+    return DateFormatter.daysBetween(registerDate, System.currentTimeMillis()).coerceAtLeast(0)
 }

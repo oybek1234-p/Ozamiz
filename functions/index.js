@@ -73,14 +73,11 @@ exports.analyzeFood = onCall(
       }
 
       const generativeModel = vertexAI.getGenerativeModel({
-        model: "gemini-3.1-flash-lite",
+        model: "gemini-3.5-flash-lite",
         generationConfig: {
           temperature: 0.2,
           maxOutputTokens: 2048,
           responseMimeType: "application/json",
-          thinkingConfig: {
-            thinkingLevel: "MEDIUM",
-          },
           responseSchema: {
             type: "OBJECT",
             properties: {
@@ -251,7 +248,7 @@ Qoidalar:
 ${rawContext ? `\nFoydalanuvchi ma'lumotlari:\n${rawContext}` : ""}`.trim();
 
       const generativeModel = vertexAI.getGenerativeModel({
-        model: "gemini-3.1-flash-lite",
+        model: "gemini-3.5-flash-lite",
         generationConfig: {
           temperature: 0.3,
           maxOutputTokens: 400,
@@ -284,3 +281,16 @@ ${rawContext ? `\nFoydalanuvchi ma'lumotlari:\n${rawContext}` : ""}`.trim();
     }
   }
 );
+
+// --- Bildirishnomalar (Notifications Triggers) ---
+const {
+  onPostLiked,
+  onCommentCreated,
+  onCommentLiked,
+  onUserStatusChanged,
+} = require("./src/notifications");
+
+exports.onPostLiked = onPostLiked;
+exports.onCommentCreated = onCommentCreated;
+exports.onCommentLiked = onCommentLiked;
+exports.onUserStatusChanged = onUserStatusChanged;

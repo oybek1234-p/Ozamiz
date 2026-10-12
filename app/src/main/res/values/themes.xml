@@ -51,7 +51,29 @@
 
         <!-- Custom Theme Colors -->
         <item name="customGreen">#006D42</item>
-        <item name="customYellow">#FFB116</item>
+        <item name="customYellow">#FF7A00</item>
+
+        <!-- Calorie & Streak Semantic Colors -->
+        <item name="colorCalorieProgress">@color/md_theme_light_primary</item>
+        <item name="colorCalorieExceeded">#D97706</item>
+        <item name="colorStreakActive">#FF9800</item>
+        <item name="colorStreakFrozen">#00B0FF</item>
+        <item name="colorStreakInactive">#9E9E9E</item>
+
+        <!-- Macro Semantic Colors -->
+        <item name="colorMacroProtein">@color/macro_protein_light</item>
+        <item name="colorMacroFat">@color/macro_fat_light</item>
+        <item name="colorMacroCarbs">@color/macro_carbs_light</item>
+
+        <!-- Meal Time Semantic Colors -->
+        <item name="colorMealBreakfast">@color/meal_breakfast_light</item>
+        <item name="colorMealLunch">@color/meal_lunch_light</item>
+        <item name="colorMealDinner">@color/meal_dinner_light</item>
+        <item name="colorMealSnack">@color/meal_snack_light</item>
+
+        <!-- Water & Exercise Semantic Colors -->
+        <item name="colorWaterProgress">@color/water_progress_light</item>
+        <item name="colorExerciseProgress">@color/exercise_progress_light</item>
     </style>
 
     <style name="Theme.Ozamiz" parent="Base.Ozamiz" />

@@ -1,30 +1,21 @@
 package uz.oybek.ozamiz.ui.feature.log.food.history
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.data.utils.formatToHhMm
+import uz.oybek.ozamiz.common.util.DateFormatter
+import uz.oybek.ozamiz.data.tracker.model.FoodModel
 import uz.oybek.ozamiz.databinding.ItemTodaysFoodBinding
+import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
+import uz.oybek.ozamiz.ui.utils.loadPhoto
 
 class RecentLogsAdapter(
-    private val onItemClick: (FoodLog) -> Unit,
-    private val onAddClick: ((FoodLog) -> Unit)? = null,
-    private val onDeleteClick: ((FoodLog) -> Unit)? = null
-) : ListAdapter<FoodLog, RecentLogsAdapter.FoodLogViewHolder>(FOOD_LOG_DIFF_CALLBACK) {
-
-    private var savedFoodIds: Set<String> = emptySet()
-
-    fun setSavedFoodIds(ids: Set<String>) {
-        if (savedFoodIds == ids) return
-        savedFoodIds = ids
-        notifyDataSetChanged()
-    }
+    private val onItemClick: (FoodModel) -> Unit,
+    private val onDeleteClick: (FoodModel) -> Unit
+) : ListAdapter<FoodModel, RecentLogsAdapter.FoodLogViewHolder>(FOOD_LOG_DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodLogViewHolder {
         val binding = ItemTodaysFoodBinding.inflate(
@@ -44,49 +35,56 @@ class RecentLogsAdapter(
 
         init {
             itemView.setOnClickListener {
-                if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
-                    getItem(bindingAdapterPosition)?.let { log -> onItemClick(log) }
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { log -> onItemClick(log) }
+                }
+            }
+            binding.btnEditFood.setOnClickListener {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { log -> onItemClick(log) }
                 }
             }
             binding.btnDeleteFood.setOnClickListener {
-                if (bindingAdapterPosition != RecyclerView.NO_POSITION) {
-                    getItem(bindingAdapterPosition)?.let { log -> onDeleteClick?.invoke(log) }
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { log -> onDeleteClick(log) }
                 }
             }
         }
 
-        fun bind(foodLog: FoodLog) {
+        fun bind(foodLog: FoodModel) {
             binding.textViewFoodName.text = foodLog.description
-            binding.textViewFoodCalories.text =
-                itemView.context.getString(R.string.calories_format, foodLog.calories)
+            binding.textViewFoodCalories.text = NutritionFormatter.kcal(foodLog.calories)
 
-            val timestamp = (foodLog.timestamp as? Number)?.toLong()
-            if (timestamp != null) {
-                binding.textViewTimestamp.text = timestamp.formatToHhMm()
-                binding.textViewTimestamp.visibility = View.VISIBLE
+            val timestamp = foodLog.timestamp
+            if (timestamp > 0) {
+                binding.textViewTimestamp.text = DateFormatter.format(timestamp, DateFormatter.PATTERN_HOUR_MINUTE)
+                binding.textViewTimestamp.isVisible = true
+                binding.textViewDotSeparator.isVisible = true
             } else {
-                binding.textViewTimestamp.visibility = View.GONE
+                binding.textViewTimestamp.isVisible = false
+                binding.textViewDotSeparator.isVisible = false
             }
 
-            if (!foodLog.photoUrl.isNullOrEmpty() && foodLog.photoUrl != "null") {
-                binding.imageViewFood.visibility = View.VISIBLE
-                Glide.with(itemView.context)
-                    .load(foodLog.photoUrl)
-                    .placeholder(R.drawable.placeholder_food)
-                    .into(binding.imageViewFood)
+            if (!foodLog.photoUrl.isNullOrEmpty()) {
+                binding.imageViewFood.isVisible = true
+                binding.imageViewFood.loadPhoto(foodLog.photoUrl)
             } else {
-                binding.imageViewFood.visibility = View.GONE
+                binding.imageViewFood.isVisible = false
             }
         }
     }
 
     companion object {
-        private val FOOD_LOG_DIFF_CALLBACK = object : DiffUtil.ItemCallback<FoodLog>() {
-            override fun areItemsTheSame(oldItem: FoodLog, newItem: FoodLog): Boolean =
+        private val FOOD_LOG_DIFF_CALLBACK = object : DiffUtil.ItemCallback<FoodModel>() {
+            override fun areItemsTheSame(oldItem: FoodModel, newItem: FoodModel): Boolean =
                 oldItem.logId == newItem.logId
 
-            override fun areContentsTheSame(oldItem: FoodLog, newItem: FoodLog): Boolean =
+            override fun areContentsTheSame(oldItem: FoodModel, newItem: FoodModel): Boolean =
                 oldItem == newItem
         }
     }
 }
+

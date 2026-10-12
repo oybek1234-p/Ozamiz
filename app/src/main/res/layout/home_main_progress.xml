@@ -3,19 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="@dimen/dimen_2"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/dimen_18">
+    android:orientation="vertical">
 
+    <!-- Unified Solid Hero Card (Calories + Macros) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_main_calories"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:strokeColor="?attr/colorOutlineVariant"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="2dp"
         app:strokeWidth="0dp">
 
         <FrameLayout
@@ -23,18 +24,17 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/layout_normal_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="20dp">
 
+                <!-- Top Row: Yeyildi, Main Ring, Yoqildi -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingVertical="4dp">
+                    android:orientation="horizontal">
 
                     <!-- Left: Yeyildi -->
                     <LinearLayout
@@ -57,14 +57,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="3dp"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Yeyildi"
+                            android:text="@string/home_progress_eaten"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="14sp" />
                     </LinearLayout>
 
-                    <!-- Center: Progress Circle -->
+                    <!-- Center: Calorie Circular Ring -->
                     <FrameLayout
                         android:id="@+id/layout_calorie_text"
                         android:layout_width="wrap_content"
@@ -75,11 +75,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
+                            app:indicatorColor="?attr/colorPrimary"
                             app:indicatorSize="120dp"
                             app:indicatorTrackGapSize="0dp"
-                            app:trackColor="?attr/colorSurfaceContainerHigh"
+                            app:trackColor="?attr/colorSurfaceVariant"
                             app:trackCornerRadius="8dp"
-                            app:trackThickness="6dp"
+                            app:trackThickness="8dp"
                             tools:progress="40" />
 
                         <LinearLayout
@@ -96,7 +97,7 @@
                                 android:fontFamily="@font/roboto_bold"
                                 android:includeFontPadding="false"
                                 android:textColor="?attr/colorOnSurface"
-                                android:textSize="24sp"
+                                android:textSize="26sp"
                                 tools:text="1200" />
 
                             <TextView
@@ -132,266 +133,180 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="3dp"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Yoqildi"
+                            android:text="@string/home_progress_burned"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="14sp" />
                     </LinearLayout>
 
                 </LinearLayout>
 
+                <!-- Subtle Internal Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="18dp"
+                    android:background="?attr/colorSurfaceVariant" />
 
-                <!-- Simple Limit Status -->
+                <!-- Bottom Row: 3 Sleek Linear Macro Indicators -->
                 <LinearLayout
-                    android:id="@+id/layout_limit_info"
+                    android:id="@+id/macros_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="gone">
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/text_limit_title"
-                        style="@style/Title3_17"
-                        android:layout_width="wrap_content"
+                    <!-- Protein -->
+                    <LinearLayout
+                        android:id="@+id/card_protein"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="18sp"
-                        tools:text="🔥 Yog' yoqilyapti" />
+                        android:layout_weight="1"
+                        android:background="?selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/text_limit_subtitle"
-                        style="@style/Text2_15"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="@string/protein_short"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="13sp" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress_protein"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackColor="?attr/colorSurfaceVariant"
+                            app:trackCornerRadius="3dp"
+                            app:trackStopIndicatorSize="0dp"
+                            app:trackThickness="5dp"
+                            tools:progress="65" />
+
+                        <TextView
+                            android:id="@+id/text_protein_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp"
+                            tools:text="47 qoldi" />
+                    </LinearLayout>
+
+                    <!-- Fat -->
+                    <LinearLayout
+                        android:id="@+id/card_fat"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/roboto_regular"
-                        android:textColor="?attr/colorOnSurface"
-                        tools:text="Me'yordan oshdi" />
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:background="?selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="@string/fat_short"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="13sp" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress_fat"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackColor="?attr/colorSurfaceVariant"
+                            app:trackCornerRadius="3dp"
+                            app:trackStopIndicatorSize="0dp"
+                            app:trackThickness="5dp"
+                            tools:progress="45" />
+
+                        <TextView
+                            android:id="@+id/text_fat_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp"
+                            tools:text="20 qoldi" />
+                    </LinearLayout>
+
+                    <!-- Carbs -->
+                    <LinearLayout
+                        android:id="@+id/card_carbs"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:background="?selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="@string/carbs_short"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="13sp" />
+
+                        <com.google.android.material.progressindicator.LinearProgressIndicator
+                            android:id="@+id/progress_carbs"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:indicatorTrackGapSize="0dp"
+                            app:trackColor="?attr/colorSurfaceVariant"
+                            app:trackCornerRadius="3dp"
+                            app:trackStopIndicatorSize="0dp"
+                            app:trackThickness="5dp"
+                            tools:progress="30" />
+
+                        <TextView
+                            android:id="@+id/text_carbs_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp"
+                            tools:text="85 qoldi" />
+                    </LinearLayout>
 
                 </LinearLayout>
 
             </LinearLayout>
 
+            <ImageButton
+                android:id="@+id/btn_settings_hero"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/home_hero_settings_desc"
+                android:padding="7dp"
+                android:src="@drawable/settings_ic"
+                app:tint="?attr/colorOnSurfaceVariant" />
+
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <LinearLayout
-        android:id="@+id/macros_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        android:baselineAligned="false"
-        android:orientation="horizontal">
-
-        <!-- Protein Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_protein"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?selectableItemBackground"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <FrameLayout
-                    android:layout_width="48dp"
-                    android:layout_height="48dp">
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:id="@+id/progress_protein"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        app:indicatorColor="@color/orange"
-                        app:indicatorSize="48dp"
-                        app:indicatorTrackGapSize="0dp"
-                        app:trackColor="?colorSurfaceContainerHigh"
-                        app:trackCornerRadius="3dp"
-                        app:trackThickness="4dp"
-                        tools:progress="70" />
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/egg_ic" />
-                </FrameLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:text="@string/protein_short"
-                    android:textColor="?colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/text_protein_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="12sp"
-                    tools:text="47 qoldi" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Fat Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_fat"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="4dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?selectableItemBackground"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <FrameLayout
-                    android:layout_width="48dp"
-                    android:layout_height="48dp">
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:id="@+id/progress_fat"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        app:indicatorColor="@color/yellow"
-                        app:indicatorSize="48dp"
-                        app:indicatorTrackGapSize="0dp"
-                        app:trackColor="?colorSurfaceContainerHigh"
-                        app:trackCornerRadius="3dp"
-                        app:trackThickness="4dp"
-                        tools:progress="50" />
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/fat_ic" />
-                </FrameLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:text="@string/fat_short"
-                    android:textColor="?colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/text_fat_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="12sp"
-                    tools:text="20 qoldi" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Carbs Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/card_carbs"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            android:focusable="true"
-            android:foreground="?selectableItemBackground"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeWidth="0dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <FrameLayout
-                    android:layout_width="48dp"
-                    android:layout_height="48dp">
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:id="@+id/progress_carbs"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        app:indicatorColor="?colorPrimary"
-                        app:indicatorSize="48dp"
-                        app:indicatorTrackGapSize="0dp"
-                        app:trackColor="?colorSurfaceContainerHigh"
-                        app:trackCornerRadius="3dp"
-                        app:trackThickness="4dp"
-                        tools:progress="30" />
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
-                        android:layout_gravity="center"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/bread" />
-                </FrameLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:fontFamily="@font/roboto_regular"
-                    android:text="@string/carbs_short"
-                    android:textColor="?colorOnSurfaceVariant"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/text_carbs_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="12sp"
-                    tools:text="109 qoldi" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-    </LinearLayout>
-
 
     <!-- Limit Reached Standalone Card -->
     <com.google.android.material.card.MaterialCardView
@@ -401,11 +316,11 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="12dp"
         android:visibility="gone"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer"
         app:cardCornerRadius="20dp"
         app:cardElevation="0dp"
-        app:strokeColor="?attr/colorOutlineVariant"
-        app:strokeWidth="1dp">
+        app:strokeWidth="0dp"
+        tools:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -423,7 +338,6 @@
                     android:id="@+id/text_limit_emoji"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
                     android:includeFontPadding="false"
                     android:textSize="28sp"
                     tools:text="🔥" />
@@ -432,41 +346,48 @@
                     android:id="@+id/text_limit_reached_message"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:fontFamily="@font/roboto_medium"
-                    android:lineSpacingExtra="2dp"
+                    android:lineSpacingExtra="3dp"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     tools:text="Maqsad bajarildi, tez orada tanangiz yog' yoqishga o'tadi, ertagacha faqat suv ichishingiz mumkin" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_how_fat_burned"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_gravity="end"
                 android:layout_marginTop="12dp"
-                android:gravity="end"
-                android:orientation="horizontal">
+                android:fontFamily="@font/roboto_medium"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/home_progress_fat_burned_btn"
+                android:textAllCaps="false"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="13sp"
+                android:visibility="gone" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_how_fat_burned"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Qanday qilib yog\' yoqiladi?"
-                    android:textColor="?attr/colorPrimary"
-                    android:visibility="gone" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_hungry_what_to_eat"
-                    style="@style/Widget.Material3.Button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="?attr/colorPrimary"
-                    android:fontFamily="@font/roboto_bold"
-                    android:text="Qornim ochdi"
-                    android:textColor="?attr/colorOnPrimary"
-                    app:cornerRadius="12dp" />
-            </LinearLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_hungry_what_to_eat"
+                style="@style/Widget.Material3.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="?attr/colorPrimary"
+                android:fontFamily="@font/roboto_bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:paddingHorizontal="14dp"
+                android:text="@string/home_progress_hungry_btn"
+                android:textAllCaps="false"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="13sp"
+                app:cornerRadius="12dp" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

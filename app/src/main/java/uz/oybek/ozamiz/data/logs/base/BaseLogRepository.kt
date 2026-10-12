@@ -4,7 +4,7 @@ import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.tasks.await
 import uz.oybek.ozamiz.data.firebase.currentUserId
 import uz.oybek.ozamiz.data.firebase.generateKey
-import uz.oybek.ozamiz.data.utils.dateApiFormat
+import uz.oybek.ozamiz.common.util.dateApiFormat
 import java.util.Date
 
 abstract class BaseLogRepository<T : LogItem> {

@@ -5,9 +5,9 @@ import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.menu.model.Menu
-import uz.oybek.ozamiz.data.utils.DataWrapper
 import java.util.Date
 
 object MenuRepository {
@@ -17,7 +17,7 @@ object MenuRepository {
         lastMenuId: String? = null,
         lastTimestamp: Long? = null,
         pageSize: Int = 12
-    ): DataWrapper<List<Menu>> = withContext(Dispatchers.IO) {
+    ): BaseResult<List<Menu>, String> = withContext(Dispatchers.IO) {
         try {
             var query = FirebasePaths.Firestore.menus()
                 .orderBy(Menu::createdAt.name, Query.Direction.DESCENDING).limit(pageSize.toLong())
@@ -33,9 +33,9 @@ object MenuRepository {
 
             val snapshot = query.get().await()
             val list = snapshot.toObjects(Menu::class.java)
-            DataWrapper.Success(list)
+            BaseResult.Success(list)
         } catch (e: Exception) {
-            DataWrapper.Error(e.message ?: "Unknown error")
+            BaseResult.Failure(e.message ?: "Unknown error")
         }
     }
 
@@ -43,7 +43,7 @@ object MenuRepository {
         queryText: String = "",
         lastName: String? = null,
         pageSize: Int = 12
-    ): DataWrapper<List<Menu>> = withContext(Dispatchers.IO) {
+    ): BaseResult<List<Menu>, String> = withContext(Dispatchers.IO) {
         try {
             val snapshot = FirebasePaths.Firestore.menus().get().await()
             val allMenus = snapshot.toObjects(Menu::class.java)
@@ -66,27 +66,27 @@ object MenuRepository {
             } else {
                 filtered.take(pageSize)
             }
-            DataWrapper.Success(paged)
+            BaseResult.Success(paged)
         } catch (e: Exception) {
-            DataWrapper.Error(e.message ?: "Unknown error")
+            BaseResult.Failure(e.message ?: "Unknown error")
         }
     }
 
-    suspend fun searchMenus(query: String): DataWrapper<List<Menu>> =
+    suspend fun searchMenus(query: String): BaseResult<List<Menu>, String> =
         searchMenus(queryText = query)
 
-    suspend fun getMenuById(menuId: String): DataWrapper<Menu> =
+    suspend fun getMenuById(menuId: String): BaseResult<Menu, String> =
         withContext(Dispatchers.IO) {
             try {
                 val doc = FirebasePaths.Firestore.menus().document(menuId).get().await()
                 val menu = doc.toObject(Menu::class.java)
                 if (menu != null) {
-                    DataWrapper.Success(menu)
+                    BaseResult.Success(menu)
                 } else {
-                    DataWrapper.Error("Menu not found")
+                    BaseResult.Failure("Menu not found")
                 }
             } catch (e: Exception) {
-                DataWrapper.Error(e.message ?: "Unknown error")
+                BaseResult.Failure(e.message ?: "Unknown error")
             }
         }
 
@@ -108,12 +108,12 @@ object MenuRepository {
         }
     }
 
-    suspend fun deleteMenu(menuId: String): DataWrapper<Unit> = withContext(Dispatchers.IO) {
+    suspend fun deleteMenu(menuId: String): BaseResult<Unit, String> = withContext(Dispatchers.IO) {
         try {
             FirebasePaths.Firestore.menus().document(menuId).delete().await()
-            DataWrapper.Success(Unit)
+            BaseResult.Success(Unit)
         } catch (e: Exception) {
-            DataWrapper.Error(e.message ?: "Unknown error")
+            BaseResult.Failure(e.message ?: "Unknown error")
         }
     }
 }

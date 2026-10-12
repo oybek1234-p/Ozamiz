@@ -32,23 +32,17 @@ class ProfileViewModel @Inject constructor(
 
     fun updateAvatar(uri: Uri) {
         viewModelScope.launch {
+            profileManagerRepo.updateUser(onlyLocal = true) {
+                it.copy(avatarUrl = uri.toString())
+            }
             profileManagerRepo.updateAvatar(uri)
-        }
-    }
-
-    fun updateUser(
-        onlyLocal: Boolean = false,
-        recalculateUserPlan: Boolean = false,
-        transform: (User) -> User
-    ) {
-        viewModelScope.launch {
-            profileManagerRepo.updateUser(onlyLocal, recalculateUserPlan, transform)
         }
     }
 
     fun logout() {
         viewModelScope.launch {
             profileAuthRepo.signOut()
+            _uiEffect.send(ProfileUiEffect.NavigateToAuth)
         }
     }
 }

@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.premium
 
+import uz.oybek.ozamiz.common.util.orZero
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -77,17 +78,17 @@ class PremiumFragment : BaseFragment<FragmentPremiumBinding>() {
         }
 
         bind.cardMonthly.setOnClickListener {
-            val price = viewModel.uiState.value?.monthlyPrice ?: 0L
+            val price = viewModel.uiState.value?.monthlyPrice.orZero()
             if (price > 0) viewModel.updateSelectedPrice(price)
         }
 
         bind.cardYearly.setOnClickListener {
-            val price = viewModel.uiState.value?.yearlyPrice ?: 0L
+            val price = viewModel.uiState.value?.yearlyPrice.orZero()
             if (price > 0) viewModel.updateSelectedPrice(price)
         }
 
         bind.button.setOnClickListener {
-            val selectedPrice = viewModel.uiState.value?.selectedPrice ?: 0L
+            val selectedPrice = viewModel.uiState.value?.selectedPrice.orZero()
             if (selectedPrice <= 0) {
                 showToast("Ma'lumot yuklanmoqda...")
                 return@setOnClickListener

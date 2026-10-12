@@ -1,445 +1,453 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest"
-    android:orientation="vertical"
+    android:background="?attr/colorSurfaceContainerLowest"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:paddingBottom="120dp"
     tools:context=".ui.feature.profile.ProfileFragment">
 
-    <androidx.core.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:fillViewport="true"
-        android:paddingBottom="120dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp">
 
-        <LinearLayout
+        <!-- User Header Card -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
 
-            <!-- User Header Card -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="20dp">
 
-                <LinearLayout
+                <!-- Centered Avatar with Photo Button to its right -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:layout_height="wrap_content">
 
-                    <!-- Centered Avatar -->
-                    <FrameLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/imageView_user_avatar"
-                            android:layout_width="140dp"
-                            android:layout_height="140dp"
-                            android:scaleType="centerCrop"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-                            app:strokeWidth="0dp"
-                            tools:src="@drawable/user_photo_placeholder" />
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:id="@+id/btn_edit_avatar"
-                            android:layout_width="34dp"
-                            android:layout_height="34dp"
-                            android:layout_gravity="bottom|end"
-                            android:clickable="true"
-                            android:focusable="true"
-                            app:cardBackgroundColor="?attr/colorPrimary"
-                            app:cardCornerRadius="17dp"
-                            app:cardElevation="0dp"
-                            app:strokeColor="@color/white"
-                            app:strokeWidth="2.5dp">
-
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="18dp"
-                                android:layout_gravity="center"
-                                android:src="@drawable/add_ic"
-                                app:tint="?attr/colorOnPrimary" />
-                        </com.google.android.material.card.MaterialCardView>
-                    </FrameLayout>
-
-                    <!-- User Name -->
-                    <TextView
-                        android:id="@+id/textView_user_name"
-                        style="@style/TextAppearance.Material3.TitleLarge"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface"
-                        tools:text="Ali Valiyev" />
-
-                    <!-- Premium Status Badge -->
-                    <TextView
-                        android:id="@+id/premiumStatusText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_rounded_16"
-                        android:backgroundTint="#FFB800"
-                        android:fontFamily="@font/roboto_bold"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        android:text="PREMIUM"
-                        android:textColor="#1C1B1F"
-                        android:textSize="11sp"
-                        android:visibility="gone"
-                        tools:visibility="visible" />
-
-                    <!-- Compact Centered Level & Points Text-Pill under Name -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_user_level"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                    <!-- Avatar (Markazda) -->
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imageView_user_avatar"
+                        android:layout_width="140dp"
+                        android:layout_height="140dp"
                         android:clickable="true"
                         android:focusable="true"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="0dp"
-                        app:strokeWidth="0dp">
+                        android:scaleType="centerCrop"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                        app:strokeColor="?attr/colorOutline"
+                        app:strokeWidth="4dp"
+                        android:padding="6dp"
+                        tools:src="@drawable/user_photo_placeholder" />
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:orientation="horizontal"
-                            android:paddingHorizontal="14dp"
-                            android:paddingVertical="6dp">
+                    <!-- Rasm Button (O'ng tomonida) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_edit_avatar"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_marginStart="8dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:paddingHorizontal="14dp"
+                        android:text="@string/profile_photo_button"
+                        android:textSize="13sp"
+                        app:cornerRadius="19dp"
+                        app:icon="@drawable/add_ic"
+                        app:iconGravity="textStart"
+                        app:iconPadding="6dp"
+                        app:iconSize="16dp"
+                        app:layout_constraintBottom_toBottomOf="@id/imageView_user_avatar"
+                        app:layout_constraintStart_toEndOf="@id/imageView_user_avatar"
+                        app:layout_constraintTop_toTopOf="@id/imageView_user_avatar" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                            <TextView
-                                android:id="@+id/text_profile_level_emoji"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="4dp"
-                                android:textSize="13sp"
-                                tools:text="🔥" />
-
-                            <TextView
-                                android:id="@+id/text_profile_level_name"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/roboto_medium"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="13sp"
-                                tools:text="Irodali" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginHorizontal="5dp"
-                                android:text="•"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:id="@+id/text_profile_points"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/roboto_medium"
-                                android:textColor="?attr/colorPrimary"
-                                android:textSize="13sp"
-                                tools:text="120 ball" />
-
-                            <ImageView
-                                android:layout_width="14dp"
-                                android:layout_height="14dp"
-                                android:layout_marginStart="4dp"
-                                android:rotation="180"
-                                android:src="@drawable/arrow_back"
-                                app:tint="?attr/colorOnSurfaceVariant" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Premium Promo View Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/premium_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="#00000000"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp"
-                tools:visibility="visible">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <!-- User Name -->
+                <TextView
+                    android:id="@+id/textView_user_name"
+                    style="@style/TextAppearance.Material3.TitleLarge"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/bg_premium_card"
-                    android:orientation="vertical"
-                    android:padding="20dp">
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="20sp"
+                    tools:text="Ali Valiyev" />
+
+                <!-- Premium Status Badge -->
+                <TextView
+                    android:id="@+id/premiumStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/bg_rounded_16"
+                    android:backgroundTint="#FFB800"
+                    android:fontFamily="@font/roboto_bold"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:text="@string/premium_badge"
+                    android:textColor="#1C1B1F"
+                    android:textSize="11sp"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <!-- Level Pill -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/card_user_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    android:visibility="gone"
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp">
+
+                        <TextView
+                            android:id="@+id/text_profile_level_emoji"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
+                            android:textSize="13sp"
+                            tools:text="👑" />
+
+                        <TextView
+                            android:id="@+id/text_profile_level_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="13sp"
+                            tools:text="Ozamiz Qahramoni" />
 
                         <ImageView
-                            android:layout_width="26dp"
-                            android:layout_height="26dp"
-                            android:src="@drawable/star_ic"
-                            app:tint="#FFB800" />
-
-                        <TextView
-                            style="@style/TextAppearance.Material3.TitleMedium"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="10dp"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Shaxsiy ozish rejasi"
-                            android:textColor="#FFFFFF"
-                            android:textSize="17sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_rounded_16"
-                            android:backgroundTint="#33FFB800"
-                            android:fontFamily="@font/roboto_bold"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="3dp"
-                            android:text="PRO"
-                            android:textColor="#FFB800"
-                            android:textSize="11sp" />
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_marginStart="6dp"
+                            android:contentDescription="@null"
+                            android:rotation="180"
+                            android:src="@drawable/arrow_back"
+                            app:tint="?attr/colorOnSurfaceVariant" />
                     </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="14dp"
-                        android:background="#26FFFFFF" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+        <!-- Premium Promo View Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/premium_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="#00000000"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            tools:visibility="visible">
 
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@drawable/check_ic"
-                                app:tint="#FFB800" />
-
-                            <TextView
-                                style="@style/Text1_16"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Shaxsiy dietolog"
-                                android:textColor="#EAEAEA" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@drawable/check_ic"
-                                app:tint="#FFB800" />
-
-                            <TextView
-                                style="@style/Text1_16"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Oson ozish"
-                                android:textColor="#EAEAEA" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@drawable/check_ic"
-                                app:tint="#FFB800" />
-
-                            <TextView
-                                style="@style/Text1_16"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Ovqat foydasi va zararlari"
-                                android:textColor="#EAEAEA" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <ImageView
-                                android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:src="@drawable/check_ic"
-                                app:tint="#FFB800" />
-
-                            <TextView
-                                style="@style/Text1_16"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:text="Kunlik tavsiyalar"
-                                android:textColor="#EAEAEA" />
-                        </LinearLayout>
-                    </LinearLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/premium_button"
-                        style="@style/Widget.Material3.Button"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:layout_marginTop="18dp"
-                        android:backgroundTint="#FFB800"
-                        android:fontFamily="@font/roboto_bold"
-                        android:text="Sotib olish"
-                        android:textColor="#1C1B1F"
-                        android:textSize="15sp"
-                        app:cornerRadius="14dp"
-                        app:rippleColor="#33000000" />
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Unified Single Menu Card Container -->
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp">
+                android:background="@drawable/bg_premium_card"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="26dp"
+                        android:layout_height="26dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/star_ic"
+                        app:tint="#FFB800" />
+
+                    <TextView
+                        style="@style/TextAppearance.Material3.TitleMedium"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="@string/premium_plan_title"
+                        android:textColor="#FFFFFF"
+                        android:textSize="17sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_rounded_16"
+                        android:backgroundTint="#33FFB800"
+                        android:fontFamily="@font/roboto_bold"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="3dp"
+                        android:text="@string/pro_badge"
+                        android:textColor="#FFB800"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="14dp"
+                    android:background="#26FFFFFF" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- 1: Ma'lumotlarim -->
-                    <include
-                        android:id="@+id/section_my_info"
-                        layout="@layout/item_profile_section" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="18dp"
-                        android:background="?attr/colorSurfaceContainer" />
-
-                    <!-- 2: Yordam va Qo'llab-quvvatlash -->
-                    <include
-                        android:id="@+id/section_support"
-                        layout="@layout/item_profile_section" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginHorizontal="18dp"
-                        android:background="?attr/colorSurfaceContainer" />
-
-                    <!-- 3: Ilovani baholash -->
-                    <include
-                        android:id="@+id/section_rate_app"
-                        layout="@layout/item_profile_section" />
-
-                    <!-- Admin Container -->
                     <LinearLayout
-                        android:id="@+id/section_admin_premium_users"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="gone"
-                        tools:visibility="visible">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginHorizontal="18dp"
-                            android:background="?attr/colorSurfaceContainer" />
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/check_ic"
+                            app:tint="#FFB800" />
 
-                        <include
-                            android:id="@+id/section_admin_premium_users_content"
-                            layout="@layout/item_profile_section" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginHorizontal="18dp"
-                            android:background="?attr/colorSurfaceContainer" />
-
-                        <include
-                            android:id="@+id/section_admin_all_users"
-                            layout="@layout/item_profile_section" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginHorizontal="18dp"
-                            android:background="?attr/colorSurfaceContainer" />
-
-                        <include
-                            android:id="@+id/section_admin_posts"
-                            layout="@layout/item_profile_section" />
-
+                        <TextView
+                            style="@style/Text1_16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="@string/premium_benefit_dietitian"
+                            android:textColor="#EAEAEA" />
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/check_ic"
+                            app:tint="#FFB800" />
+
+                        <TextView
+                            style="@style/Text1_16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="@string/premium_benefit_easy_weight_loss"
+                            android:textColor="#EAEAEA" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/check_ic"
+                            app:tint="#FFB800" />
+
+                        <TextView
+                            style="@style/Text1_16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="@string/premium_benefit_food_analysis"
+                            android:textColor="#EAEAEA" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/check_ic"
+                            app:tint="#FFB800" />
+
+                        <TextView
+                            style="@style/Text1_16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="@string/premium_benefit_daily_tips"
+                            android:textColor="#EAEAEA" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/premium_button"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="#FFB800"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/sotib_olish"
+                    android:textColor="#1C1B1F"
+                    android:textSize="15sp"
+                    app:cornerRadius="14dp"
+                    app:rippleColor="#33000000" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Unified Single Menu Card Container -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainer"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- 1: Ma'lumotlarim -->
+                <include
+                    android:id="@+id/section_my_info"
+                    layout="@layout/item_profile_section" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorSurfaceContainer" />
+
+                <!-- 2: Maqsadim -->
+                <include
+                    android:id="@+id/section_my_goal"
+                    layout="@layout/item_profile_section" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorSurfaceContainer" />
+
+                <!-- 3: Yordam va Qo'llab-quvvatlash -->
+                <include
+                    android:id="@+id/section_support"
+                    layout="@layout/item_profile_section" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorSurfaceContainer" />
+
+                <!-- 3: Ilovani baholash -->
+                <include
+                    android:id="@+id/section_rate_app"
+                    layout="@layout/item_profile_section" />
+
+                <!-- Admin Container -->
+                <LinearLayout
+                    android:id="@+id/section_admin_premium_users"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:layout_marginHorizontal="18dp"
+                        android:layout_marginHorizontal="16dp"
                         android:background="?attr/colorSurfaceContainer" />
 
-                    <!-- 4: Chiqish -->
                     <include
-                        android:id="@+id/section_logout"
+                        android:id="@+id/section_admin_premium_users_content"
+                        layout="@layout/item_profile_section" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/colorSurfaceContainer" />
+
+                    <include
+                        android:id="@+id/section_admin_all_users"
+                        layout="@layout/item_profile_section" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="?attr/colorSurfaceContainer" />
+
+                    <include
+                        android:id="@+id/section_admin_posts"
                         layout="@layout/item_profile_section" />
 
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="?attr/colorSurfaceContainer" />
 
-</LinearLayout>
+                <!-- 4: Chiqish -->
+                <include
+                    android:id="@+id/section_logout"
+                    layout="@layout/item_profile_section" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

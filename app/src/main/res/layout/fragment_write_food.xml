@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest">
+    android:background="?attr/colorSurfaceContainerLowest">
 
     <uz.oybek.ozamiz.ui.base.MyToolBar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurfaceContainerLowest"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/arrow_back"
-        app:title="Nima yedingiz?" />
+        app:title="@string/write_food_title" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -25,103 +25,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="12dp">
 
             <EditText
                 android:id="@+id/input_food_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:background="@null"
                 android:fontFamily="@font/roboto_regular"
                 android:gravity="top"
-                android:hint="Masalan: 1 o'rtacha kosa moshxurda va 1 tarelka pomidor salat..."
+                android:hint="@string/write_food_input_hint"
                 android:imeOptions="actionDone"
                 android:inputType="textMultiLine|textCapSentences"
                 android:minLines="4"
                 android:textColor="?attr/colorOnSurface"
                 android:textColorHint="?attr/colorOnSurfaceVariant"
                 android:textSize="18sp" />
-
-            <!-- Example guidelines (Noto'g'ri / To'g'ri) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:orientation="vertical">
-
-                <!-- Noto'g'ri row -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    app:cardBackgroundColor="?attr/colorErrorContainer"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="14dp"
-                        android:paddingVertical="12dp">
-
-                        <View
-                            android:layout_width="4dp"
-                            android:layout_height="32dp"
-                            android:layout_marginEnd="12dp"
-                            android:background="?attr/colorError" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/roboto_regular"
-                            android:text="Noto'g'ri: Moshxurda va pomidor salat"
-                            android:textColor="?attr/colorOnErrorContainer"
-                            android:textSize="14sp" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- To'g'ri row -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardBackgroundColor="?attr/colorPrimaryContainer"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingHorizontal="14dp"
-                        android:paddingVertical="12dp">
-
-                        <View
-                            android:layout_width="4dp"
-                            android:layout_height="32dp"
-                            android:layout_marginEnd="12dp"
-                            android:background="?attr/colorPrimary" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/roboto_regular"
-                            android:text="To'g'ri: 1 o'rtacha kosa moshxurda va 1 tarelka pomidor salat"
-                            android:textColor="?attr/colorOnPrimaryContainer"
-                            android:textSize="14sp" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
 
             <FrameLayout
                 android:id="@+id/banner_container"
@@ -138,7 +59,7 @@
         android:id="@+id/layout_bottom_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorSurfaceContainerLowest"
+        android:background="?attr/colorSurfaceContainerLowest"
         android:paddingHorizontal="20dp"
         android:paddingVertical="14dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -152,7 +73,7 @@
             android:layout_height="54dp"
             android:backgroundTint="?colorPrimary"
             android:fontFamily="@font/roboto_bold"
-            android:text="Tahlil qilish"
+            android:text="@string/write_food_btn_analyze"
             android:textColor="?colorSurface"
             android:textSize="16sp"
             app:cornerRadius="27dp"

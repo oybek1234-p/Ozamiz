@@ -2,15 +2,15 @@ package uz.oybek.ozamiz.ui.feature.admin.users
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
-import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.ItemAdminUserBinding
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.utils.formatLastSeen
+import uz.oybek.ozamiz.ui.utils.DateExtensions
+import uz.oybek.ozamiz.ui.utils.loadPhoto
+import uz.oybek.ozamiz.ui.utils.loadUserPhoto
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,22 +31,17 @@ class AdminUsersAdapter(private val onUserClicked: (User) -> Unit) :
         fun bind(user: User) {
             binding.textViewName.text = user.name.ifEmpty { "Noma'lum foydalanuvchi" }
             
-            Glide.with(itemView.context)
-                .load(user.avatarUrl)
-                .error(R.drawable.user_photo_placeholder)
-                .placeholder(R.drawable.user_photo_placeholder)
-                .apply(RequestOptions.circleCropTransform())
-                .into(binding.imageViewAvatar)
+            binding.imageViewAvatar.loadUserPhoto(user.avatarUrl)
 
-            binding.textViewLastSeen.text = formatLastSeen(user.lastSeenTime)
+            binding.textViewLastSeen.text = DateExtensions.formatRelativeTime(itemView.context, user.lastSeenTime)
 
-            binding.textViewPremiumBadge.visibility = if (user.premium) android.view.View.VISIBLE else android.view.View.GONE
+            binding.textViewPremiumBadge.isVisible = user.premium
             
             if (user.premium && user.premiumDate > 0) {
-                binding.textViewPremiumDate.visibility = android.view.View.VISIBLE
+                binding.textViewPremiumDate.isVisible = true
                 binding.textViewPremiumDate.text = "Premium: ${formatDate(user.premiumDate)}"
             } else {
-                binding.textViewPremiumDate.visibility = android.view.View.GONE
+                binding.textViewPremiumDate.isVisible = false
             }
 
             binding.root.setOnClickListener {

@@ -7,12 +7,15 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.common.util.orZero
 import uz.oybek.ozamiz.data.level.LevelRepository
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.utils.formatLastSeen
+import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.databinding.ItemCommunityUserBinding
+import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
+import uz.oybek.ozamiz.ui.utils.DateExtensions
+import uz.oybek.ozamiz.ui.utils.loadPhoto
+import uz.oybek.ozamiz.ui.utils.loadUserPhoto
 
 class CommunityUsersAdapter(
     private val onUserClick: (User) -> Unit
@@ -34,7 +37,7 @@ class CommunityUsersAdapter(
 
         init {
             binding.root.setOnClickListener {
-                val position = adapterPosition
+                val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     onUserClick(getItem(position))
                 }
@@ -43,31 +46,26 @@ class CommunityUsersAdapter(
 
         @SuppressLint("SetTextI18n")
         fun bind(user: User) {
-            binding.tvName.text = user.name.ifBlank { "Ismsiz foydalanuvchi" }
+            binding.tvName.text = user.name.ifBlank { binding.root.context.getString(R.string.default_user_name) }
             binding.imgPremium.isVisible = user.premium
 
             val level = LevelRepository.getCurrentLevel(user.scorePoints)
             binding.tvLevel.text = "${level.emoji} ${level.name} • ${user.scorePoints} ball"
 
-            val startWeight = user.startWeight ?: 0.0
+            val startWeight = user.startWeight.orZero()
             val currentWeight = user.weight
             if (startWeight > currentWeight && currentWeight > 0) {
-                val lost = startWeight - currentWeight
+                val lost = currentWeight - startWeight
                 binding.tvWeightLoss.isVisible = true
-                binding.tvWeightLoss.text = String.format(java.util.Locale.US, "-%.1f kg", lost)
+                binding.tvWeightLoss.text = NutritionFormatter.kgChange(lost)
             } else {
                 binding.tvWeightLoss.isVisible = false
             }
 
-            binding.tvLastSeen.text = formatLastSeen(user.lastSeenTime)
+            binding.tvLastSeen.text = DateExtensions.formatLastSeen(binding.root.context, user.lastSeenTime)
 
-            Glide.with(binding.imgAvatar)
-                .load(user.avatarUrl)
-                .placeholder(R.drawable.user_photo_placeholder)
-                .circleCrop()
-                .into(binding.imgAvatar)
+            binding.imgAvatar.loadUserPhoto(user.avatarUrl)
         }
-
     }
 
     class UserDiffCallback : DiffUtil.ItemCallback<User>() {

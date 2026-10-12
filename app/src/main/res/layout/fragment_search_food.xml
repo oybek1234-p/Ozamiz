@@ -4,21 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainerLowest"
+    android:background="?attr/colorSurfaceContainerLowest"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:elevation="0dp"
-        android:background="@android:color/transparent">
+        android:background="?attr/colorSurfaceContainerLowest">
 
         <uz.oybek.ozamiz.ui.base.MyToolBar
             android:id="@+id/toolbar_search_food"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorSurfaceContainerLowest"
             app:navigationIcon="@drawable/arrow_back"
-            app:title="Ovqat qidirish" />
+            app:title="@string/search_food_title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -41,7 +42,7 @@
             android:id="@+id/input_search_food"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Ovqat nomini kiriting..."
+            android:hint="@string/search_food_input_hint"
             android:imeOptions="actionSearch"
             android:inputType="text"
             android:paddingVertical="12dp" />
@@ -72,7 +73,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingHorizontal="16dp"
-            android:paddingBottom="100dp"
+            android:paddingBottom="16dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/item_food_search_result" />
 
@@ -97,7 +98,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Hech narsa topilmadi"
+                android:text="@string/search_food_empty_title"
                 android:textColor="?attr/colorOnSurface"
                 android:alpha="0.5"
                 android:textSize="16sp" />
@@ -110,13 +111,22 @@
             android:indeterminate="true"
             android:visibility="gone" />
 
+        <ProgressBar
+            android:id="@+id/progress_loading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:indeterminateTint="?attr/colorPrimary"
+            android:visibility="visible"
+            tools:visibility="visible" />
+
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/banner_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="50dp"
-        android:background="?colorSurfaceContainer" />
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -40,7 +40,8 @@ class PlanFragment : OnBoardingChildFragment<FragmentPlanBinding>() {
                 viewModel.uiState.collect { state ->
                     bind.buttonDone.isEnabled = !state.isSaving
                     bind.progressBarDone.isVisible = state.isSaving
-                    bind.buttonDone.text = if (state.isSaving) "" else getString(R.string.done)
+                    bind.buttonDone.text = if (state.isSaving) "" else
+                        getString(R.string.start_plan)
                 }
             }
         }

@@ -8,6 +8,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.databinding.FragmentLevelBinding
@@ -15,6 +17,7 @@ import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.home.HomeViewModel
 import kotlin.math.min
 
+@dagger.hilt.android.AndroidEntryPoint
 class LevelFragment : BaseFragment<FragmentLevelBinding>() {
 
     private val viewModel: HomeViewModel by activityViewModels()
@@ -30,9 +33,12 @@ class LevelFragment : BaseFragment<FragmentLevelBinding>() {
         bind.toolbarLevel.setNavigationOnClickListener { closeFragment() }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    updateLevelUi(bind, state.userPoints)
-                }
+                viewModel.uiState
+                    .map { it.profile.userPoints }
+                    .distinctUntilChanged()
+                    .collect { userPoints ->
+                        updateLevelUi(bind, userPoints)
+                    }
             }
         }
     }

@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.menu.add
 
+import uz.oybek.ozamiz.common.util.orZero
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -87,7 +88,7 @@ class AddMenuViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, isValidationError = false)
 
-            val cals = calories.toIntOrNull() ?: 0
+            val cals = calories.toIntOrNull().orZero()
             val finalCategoryIds = selectedCategoryIds.filterNot { it.startsWith("CAL_") }.toMutableList()
             val matchingCalorieFilter = CalorieFilter.entries.find {
                 cals >= it.min && cals <= it.max
@@ -104,12 +105,12 @@ class AddMenuViewModel : ViewModel() {
                 ingredients = ingredients,
                 categoryIds = finalCategoryIds,
                 calories = cals,
-                protein = protein.toDoubleOrNull() ?: 0.0,
-                fat = fat.toDoubleOrNull() ?: 0.0,
-                carbs = carbs.toDoubleOrNull() ?: 0.0,
-                fiber = fiber.toDoubleOrNull() ?: 0.0,
-                sugar = sugar.toDoubleOrNull() ?: 0.0,
-                salt = salt.toDoubleOrNull() ?: 0.0,
+                protein = protein.toDoubleOrNull().orZero(),
+                fat = fat.toDoubleOrNull().orZero(),
+                carbs = carbs.toDoubleOrNull().orZero(),
+                fiber = fiber.toDoubleOrNull().orZero(),
+                sugar = sugar.toDoubleOrNull().orZero(),
+                salt = salt.toDoubleOrNull().orZero(),
                 servingSize = servingSize,
                 type = type,
                 preparationMethod = preparationMethod,

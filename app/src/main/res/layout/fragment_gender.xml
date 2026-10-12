@@ -71,7 +71,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="12dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="@string/ayol"
+                    android:text="@string/gender_female"
                     android:textColor="?attr/colorOnSurface" />
 
             </LinearLayout>
@@ -112,7 +112,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="12dp"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="@string/erkak"
+                    android:text="@string/gender_male"
                     android:textColor="?attr/colorOnSurface" />
 
             </LinearLayout>

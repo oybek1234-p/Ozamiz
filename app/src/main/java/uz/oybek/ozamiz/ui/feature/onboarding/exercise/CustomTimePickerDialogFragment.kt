@@ -17,7 +17,6 @@ class CustomTimePickerDialogFragment : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
     companion object {
-        const val TAG = "CustomTimePickerDialog"
         const val REQUEST_KEY = "CustomTimePickerRequestKey"
         const val RESULT_HOUR = "ResultHour"
         const val RESULT_MINUTE = "ResultMinute"
@@ -25,7 +24,11 @@ class CustomTimePickerDialogFragment : BottomSheetDialogFragment() {
         const val INITIAL_MINUTE = "InitialMinute"
         const val DIALOG_TITLE = "DialogTitle"
 
-        fun newInstance(initialHour: Int?, initialMinute: Int?, title: String? = null): CustomTimePickerDialogFragment {
+        fun newInstance(
+            initialHour: Int?,
+            initialMinute: Int?,
+            title: String? = null
+        ): CustomTimePickerDialogFragment {
             val fragment = CustomTimePickerDialogFragment()
             val calendar = Calendar.getInstance()
             fragment.arguments = bundleOf(
@@ -47,8 +50,10 @@ class CustomTimePickerDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val initialHour = arguments?.getInt(INITIAL_HOUR) ?: Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val initialMinute = arguments?.getInt(INITIAL_MINUTE) ?: Calendar.getInstance().get(Calendar.MINUTE)
+        val initialHour =
+            arguments?.getInt(INITIAL_HOUR) ?: Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        val initialMinute =
+            arguments?.getInt(INITIAL_MINUTE) ?: Calendar.getInstance().get(Calendar.MINUTE)
         val title = arguments?.getString(DIALOG_TITLE) ?: "Vaqtni tanlang"
 
         binding.tvDialogTitle.text = title
@@ -60,22 +65,25 @@ class CustomTimePickerDialogFragment : BottomSheetDialogFragment() {
         binding.pickerHour.setFormatter { String.Companion.format(Locale.getDefault(), "%02d", it) }
 
         // Minute Picker (5 daqiqalik interval)
-        val minuteValues = Array(12) { String.Companion.format(Locale.getDefault(), "%02d", it * 5) }
+        val minuteValues =
+            Array(12) { String.Companion.format(Locale.getDefault(), "%02d", it * 5) }
         binding.pickerMinute.minValue = 0
         binding.pickerMinute.maxValue = minuteValues.size - 1
         binding.pickerMinute.displayedValues = minuteValues
         // Qiymatni o'rnatishda ehtiyot bo'lish: initialMinute 5 ga bo'linmasligi mumkin
-        val initialMinuteIndex = (initialMinute + 2) / 5 // Eng yaqin 5 ga karraliga yaxlitlash (taxminiy)
+        val initialMinuteIndex =
+            (initialMinute + 2) / 5 // Eng yaqin 5 ga karraliga yaxlitlash (taxminiy)
         binding.pickerMinute.value = initialMinuteIndex.coerceIn(0, minuteValues.size - 1)
 
 
         binding.btnSetTime.setOnClickListener {
             val selectedHour = binding.pickerHour.value
             val selectedMinute = binding.pickerMinute.value * 5
-            setFragmentResult(REQUEST_KEY, bundleOf(
-                RESULT_HOUR to selectedHour,
-                RESULT_MINUTE to selectedMinute
-            )
+            setFragmentResult(
+                REQUEST_KEY, bundleOf(
+                    RESULT_HOUR to selectedHour,
+                    RESULT_MINUTE to selectedMinute
+                )
             )
             dismiss()
         }

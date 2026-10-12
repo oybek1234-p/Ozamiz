@@ -12,6 +12,7 @@
 
     <!-- Specific night colors -->
     <color name="green">#7ADB9E</color>
+    <color name="bottom_nav_indicator">#275C3E</color>
     <color name="yellow">#FFE082</color>
 
     <!-- Analysis Achievement Colors (Dark Mode) -->

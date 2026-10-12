@@ -86,15 +86,15 @@ class MultipleAnswerFragment :
     }
 
     companion object {
-        const val TAG = "question"
+        private const val ARG_QUESTION = "question"
 
         fun getBundle(question: MultipleAnswersQuestion): Bundle {
-            return Bundle().apply { putString(TAG, question.name) }
+            return Bundle().apply { putString(ARG_QUESTION, question.name) }
         }
 
         fun getArgs(arguments: Bundle?): MultipleAnswersQuestion? {
             return arguments
-                ?.getString(TAG)
+                ?.getString(ARG_QUESTION)
                 ?.let { MultipleAnswersQuestion.valueOf(it) }
         }
     }

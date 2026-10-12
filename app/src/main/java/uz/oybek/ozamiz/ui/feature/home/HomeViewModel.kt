@@ -1,324 +1,219 @@
 package uz.oybek.ozamiz.ui.feature.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.level.PointsEvent
-import uz.oybek.ozamiz.data.level.PointsRepository
-import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
-import uz.oybek.ozamiz.data.logs.FoodLogRepository
-import uz.oybek.ozamiz.data.logs.LogRepository
-import uz.oybek.ozamiz.data.logs.WaterLogRepository
-import uz.oybek.ozamiz.data.logs.WeightLogRepository
-import uz.oybek.ozamiz.data.logs.model.DailySummary
-import uz.oybek.ozamiz.data.logs.model.ExerciseLog
-import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.data.logs.model.WaterLog
-import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.user.local.LocalUser
+import uz.oybek.ozamiz.common.util.DateFormatter
+import uz.oybek.ozamiz.common.util.dateApiFormat
+import uz.oybek.ozamiz.common.util.isToday
+import uz.oybek.ozamiz.common.util.orZero
+import uz.oybek.ozamiz.common.util.toDayOfMonth
+import uz.oybek.ozamiz.data.limit.api.LimitManagerRepo
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.data.tracker.api.DailyTrackerRepo
+import uz.oybek.ozamiz.data.tracker.api.FoodTrackerRepo
+import uz.oybek.ozamiz.data.tracker.model.DailyCalorieMacroSummary
+import uz.oybek.ozamiz.data.tracker.model.DailyCalorieProgress
+import uz.oybek.ozamiz.data.tracker.session.SelectedDateManager
 import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.DateUtils
-import uz.oybek.ozamiz.data.utils.dateApiFormat
-import uz.oybek.ozamiz.data.utils.isToday
+import uz.oybek.ozamiz.ui.feature.limit.FoodLimitArgs
+import uz.oybek.ozamiz.ui.utils.showToast
 import java.util.Date
-import kotlin.math.roundToInt
+import javax.inject.Inject
 
-import uz.oybek.ozamiz.data.user.model.daysFromRegister
+sealed interface HomeUiEffect {
+    data class NavigateToFoodCamera(val mealType: String) : HomeUiEffect
+    data class ShowFoodLimitSheet(val args: FoodLimitArgs) : HomeUiEffect
+}
 
-class HomeViewModel : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val dailyTrackerRepo: DailyTrackerRepo,
+    private val foodTrackerRepo: FoodTrackerRepo,
+    private val profileRepo: ProfileRepo,
+    private val selectedDateManager: SelectedDateManager,
+    private val limitManagerRepo: LimitManagerRepo
+) : ViewModel() {
+
+    private val _effects = Channel<HomeUiEffect>(Channel.BUFFERED)
+    val effects = _effects.receiveAsFlow()
+
+    fun onAddMealClicked(mealId: String) {
+        val limits = limitManagerRepo.getLimits()
+        viewModelScope.launch {
+            if (limits.canLogFood) {
+                _effects.send(HomeUiEffect.NavigateToFoodCamera(mealId))
+            } else {
+                _effects.send(
+                    HomeUiEffect.ShowFoodLimitSheet(
+                        FoodLimitArgs(
+                            remainingLimit = limits.remainingFoodLimit,
+                            targetLimit = limits.foodLimit,
+                            mealType = mealId
+                        )
+                    )
+                )
+            }
+        }
+    }
+
+    private val scrollerDates = DateFormatter.generateRangeDays(7)
 
     private val _uiState = MutableStateFlow(
-        HomeUiState(isInitialLoading = false)
+        HomeUiState(
+            calendar = CalendarUiState(
+                selectedDate = selectedDateManager.getSelectedDate(),
+                items = scrollerDates.map { date ->
+                    createDateItem(date, selectedDateManager.getSelectedDate())
+                }
+            ),
+            isLoading = true
+        )
     )
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private val _showRateAppEvent = MutableSharedFlow<Unit>()
-    val showRateAppEvent = _showRateAppEvent.asSharedFlow()
-
-    private val _showStreakSheetEvent =
-        MutableSharedFlow<Pair<StreakInfo, Boolean>>()
-    val showStreakSheetEvent = _showStreakSheetEvent.asSharedFlow()
-
-    private val _showWeightLogEvent = MutableSharedFlow<Unit>()
-    val showWeightLogEvent = _showWeightLogEvent.asSharedFlow()
-
-    var lastCaloriesEaten: Int? = null
-    var lastCaloriesRemaining: Int? = null
-    var lastCaloriesBurned: Int? = null
-    var lastProteinConsumed: Int? = null
-    var lastFatConsumed: Int? = null
-    var lastCarbsConsumed: Int? = null
-    private var lastDate: Date? = null
-
-    fun checkDateReset(newDate: Date) {
-        if (lastDate == null || !DateUtils.isSameDay(lastDate, newDate)) {
-            lastDate = newDate
-            lastCaloriesEaten = null
-            lastCaloriesRemaining = null
-            lastCaloriesBurned = null
-            lastProteinConsumed = null
-            lastFatConsumed = null
-            lastCarbsConsumed = null
-        }
-    }
-
-    private val _exerciseAddedEvent = MutableSharedFlow<Int>()
-    val exerciseAddedEvent = _exerciseAddedEvent.asSharedFlow()
-
-    private val _showStreakFreezeEvent = MutableSharedFlow<Unit>()
-    val showStreakFreezeEvent = _showStreakFreezeEvent.asSharedFlow()
-
-    private var hasCheckedFreezeThisSession = false
-    
-    var pendingCameraArgs: android.os.Bundle? = null
-        private set
-
-    fun setPendingCameraArgs(args: android.os.Bundle?) {
-        pendingCameraArgs = args
-    }
-
-    private fun checkStreakFrozen(user: User) {
-        if (hasCheckedFreezeThisSession) return
-        if (uz.oybek.ozamiz.data.streak.StreakManager.isStreakFrozen(user.streakInfo)) {
-            hasCheckedFreezeThisSession = true
-            viewModelScope.launch {
-                _showStreakFreezeEvent.emit(Unit)
-            }
-        }
-    }
-
-    private var dataCollectionJob: Job? = null
-
     init {
-        val initialDates = DateUtils.generateDatesForScroller()
-        val initialSelectedDate = DateUtils.getStartOfDay(Date())
-        _uiState.update {
-            it.copy(
-                datesForScroller = initialDates,
-                selectedDate = initialSelectedDate
-            )
-        }
-        viewModelScope.launch {
-            LocalUser.userLive.asFlow().collect { user ->
-                if (user.valid) {
-                    val daysFromRegister = user.daysFromRegister()
-                    
-                    _uiState.update { state ->
-                        state.copy(
-                            streakInfo = user.streakInfo,
-                            userPoints = user.scorePoints,
-                            daysFromRegister = daysFromRegister,
-                            paymentChecking = user.paymentChecking
-                        )
-                    }
-                    checkStreakFrozen(user)
-                }
-            }
-        }
-        startLoadingData(initialSelectedDate)
-        observeScrollerSummaries()
-        checkWeightLog()
+        viewModelScope.launch { loadCalendarSummaries() }
+        observeSelectedDate()
+        observeUser()
     }
 
-    private fun observeScrollerSummaries() {
-        val dates = _uiState.value.datesForScroller
-        if (dates.isEmpty()) return
+    fun checkDateCalendar() = selectedDateManager.checkDate()
 
-        // Observe only selected date and adjacent dates to keep home screen smooth and fast
-        val selectedDate = _uiState.value.selectedDate
-        val datesToObserve = dates.filter {
-            kotlin.math.abs(it.time - selectedDate.time) <= 3 * 86400000L
-        }
+    fun onDateSelected(date: Date) = selectedDateManager.updateDate(date)
 
-        val flows = datesToObserve.map { date ->
-            LogRepository.observeDailySummary(date).map { date to it }
-        }
-
-        viewModelScope.launch {
-            combine(flows) { array ->
-                array.filter { it.second is DataWrapper.Success }
-                    .associate { it.first.dateApiFormat() to (it.second as DataWrapper.Success).data }
-            }.collect { map ->
-                _uiState.update { state ->
-                    state.copy(dailySummaries = state.dailySummaries + map)
-                }
-            }
-        }
-    }
-
-    private fun checkWeightLog() {
-        WeightLogRepository.needShowWeightLog(user.uid).onEach { needShow ->
-            _uiState.update { it.copy(showWeightLogCard = needShow) }
-        }.launchIn(viewModelScope)
-    }
-
-    private data class FlowData(
-        val summary: DataWrapper<DailySummary>,
-        val exerciseLogs: List<ExerciseLog>,
-        val foodLogs: List<FoodLog>,
-        val waterLogs: List<WaterLog>
+    private fun createDateItem(
+        date: Date, selectedDate: Date, progress: DailyCalorieProgress? = null
+    ) = DateScrollerItem(
+        date = date,
+        dayOfMonth = date.toDayOfMonth(),
+        isToday = date.isToday(),
+        isSelected = DateFormatter.isSameDay(date, selectedDate),
+        progressPercent = progress?.progressPercent.orZero(),
+        isExceeded = progress?.isExceededWarning ?: false,
+        isCompleted = progress?.isCompleted ?: false
     )
 
-    private fun startLoadingData(date: Date) {
-        dataCollectionJob?.cancel()
-        dataCollectionJob = viewModelScope.launch {
-            try {
-                combine(
-                    LogRepository.observeDailySummary(date),
-                    ExerciseLogRepository.getLogs(date),
-                    FoodLogRepository.getAllLogs(date),
-                    WaterLogRepository.getLogs(date)
-                ) { s, e, f, w -> FlowData(s, e, f, w) }
-                    .collect { data ->
-                        processStateUpdate(date, data.summary, data.exerciseLogs, data.foodLogs, data.waterLogs)
-                    }
-            } catch (e: Exception) {
-                e.printStackTrace()
+    private suspend fun loadCalendarSummaries() {
+        if (scrollerDates.isEmpty()) return
+        val summaries =
+            dailyTrackerRepo.getDailySummaries(scrollerDates.first(), scrollerDates.last())
+        _uiState.update { state ->
+            val items = scrollerDates.map { date ->
+                createDateItem(
+                    date, state.calendar.selectedDate, summaries[date.dateApiFormat()]
+                )
             }
+            state.copy(calendar = state.calendar.copy(items = items))
         }
     }
 
-    private suspend fun processStateUpdate(
-        date: Date,
-        summaryWrapper: DataWrapper<DailySummary>,
-        exerciseLogs: List<ExerciseLog>,
-        foodLogs: List<FoodLog>,
-        waterLogs: List<WaterLog>
-    ) {
-        if (!user.valid) {
-            _uiState.update { it.copy(isInitialLoading = false, isRefreshing = false) }
-            return
+    private fun observeUser() {
+        viewModelScope.launch {
+            profileRepo.user.map { user ->
+                if (user.valid) {
+                    HomeProfileUiState(
+                        userGoal = user.userGoal,
+                        showWeightLogCard = user.shouldLogWeight,
+                        paymentChecking = user.paymentChecking,
+                        userPoints = user.scorePoints,
+                        daysFromRegister = user.daysFromRegister,
+                        isRated = user.isRated,
+                        unreadMessages = user.unreadMessages
+                    )
+                } else {
+                    HomeProfileUiState()
+                }
+            }.distinctUntilChanged()
+                .collect { profile -> _uiState.update { it.copy(profile = profile) } }
         }
-        when (summaryWrapper) {
-            is DataWrapper.Success -> {
-                val summary = summaryWrapper.data
-                val targetCals = user.targetCalories
-                val daysFromRegister = user.daysFromRegister()
+    }
 
-                val currentWater = summary.consumedWaterMl
-                val currentExerciseBurnt = summary.burnedCalories
-                val waterTarget = user.targetWaterMl
-
-                val remaining = targetCals - summary.consumedCalories
-
+    private fun observeSelectedDate() {
+        viewModelScope.launch {
+            selectedDateManager.selectedDate.distinctUntilChanged { old, new ->
+                DateFormatter.isSameDay(
+                    old,
+                    new
+                )
+            }.collectLatest { date ->
                 _uiState.update {
                     it.copy(
-                        isInitialLoading = false,
-                        isRefreshing = false,
-                        selectedDate = date,
-                        caloriesRemaining = remaining,
-                        caloriesConsumed = summary.consumedCalories,
-                        caloriesTarget = targetCals,
-                        waterConsumed = currentWater,
-                        waterTarget = waterTarget,
-                        exerciseBurnt = currentExerciseBurnt,
-                        exerciseTarget = 300,
-                        carbsConsumed = summary.consumedCarbs.roundToInt(),
-                        proteinConsumed = summary.consumedProtein.roundToInt(),
-                        fatConsumed = summary.consumedFat.roundToInt(),
-                        proteinTarget = user.targetProtein,
-                        fatTarget = user.targetFat,
-                        carbsTarget = user.targetCarbs,
-                        exerciseLogs = exerciseLogs,
-                        waterLogs = waterLogs,
-                        dailyFoodLogs = foodLogs
+                        calendar = it.calendar.selectDate(date),
+                        isLoading = true
                     )
                 }
+
+                coroutineScope {
+                    launch {
+                        dailyTrackerRepo.observeDailyCalMacros(date).collect { macro ->
+                            _uiState.update { state ->
+                                state.copy(
+                                    calorieMacro = macro,
+                                    water = macro.waterSummary,
+                                    exercise = macro.exerciseSummary,
+                                    calendar = state.calendar.updateProgress(date, macro),
+                                    isLoading = false
+                                )
+                            }
+                        }
+                    }
+                    launch {
+                        foodTrackerRepo.observeDailyMeals(date).collect { meals ->
+                            _uiState.update { state ->
+                                state.copy(meals = meals)
+                            }
+                        }
+                    }
+                }
             }
-
-            is DataWrapper.Error -> {
-                _uiState.update { it.copy(isInitialLoading = false, isRefreshing = false) }
-            }
         }
     }
 
-    fun deleteExerciseLog(log: ExerciseLog) {
-        viewModelScope.launch {
-            val date = uiState.value.selectedDate
-            ExerciseLogRepository.delete(log.logId, date)
+    private fun CalendarUiState.selectDate(date: Date): CalendarUiState {
+        val updated = items.map { item ->
+            val isSelected = DateFormatter.isSameDay(item.date, date)
+            if (item.isSelected != isSelected) item.copy(isSelected = isSelected) else item
         }
+        return copy(selectedDate = date, items = updated)
     }
 
-    fun deleteWaterLog(log: WaterLog) {
-        viewModelScope.launch {
-            val date = uiState.value.selectedDate
-            WaterLogRepository.delete(log.logId, date)
-        }
-    }
+    private fun CalendarUiState.updateProgress(
+        date: Date, macro: DailyCalorieMacroSummary
+    ): CalendarUiState {
+        val current = items.find { DateFormatter.isSameDay(it.date, date) } ?: return this
+        if (current.progressPercent == macro.progressPercent && current.isExceeded == macro.isExceededWarning && current.isCompleted == macro.isCompleted) return this
 
-    fun onDateSelected(date: Date) {
-        _uiState.update { it.copy(selectedDate = date, isInitialLoading = false) }
-        startLoadingData(date)
+        val updated = items.map { item ->
+            if (item === current) {
+                item.copy(
+                    progressPercent = macro.progressPercent,
+                    isExceeded = macro.isExceededWarning,
+                    isCompleted = macro.isCompleted
+                )
+            } else item
+        }
+        return copy(items = updated)
     }
 
     fun refresh() {
-        _uiState.update { it.copy(isRefreshing = true) }
         viewModelScope.launch {
-            delay(600)
-            _uiState.update { it.copy(isRefreshing = false) }
-        }
-        startLoadingData(_uiState.value.selectedDate)
-    }
-
-    fun addWater(amount: Int) {
-        val currentWater = _uiState.value.waterConsumed
-
-        if (currentWater + amount > 4000) {
-            return
-        }
-        viewModelScope.launch {
-            _uiState.update {
-                it.copy(
-                    waterConsumed = currentWater + amount
-                )
-            }
-            PointsRepository.onEvent(PointsEvent.AddWater(currentWater + amount))
-            val date = uiState.value.selectedDate
-            WaterLogRepository.add(
-                WaterLog(
-                    amountMl = amount,
-                    timestamp = System.currentTimeMillis(),
-                    timestampLong = System.currentTimeMillis()
-                ),
-                date
-            )
-        }
-    }
-
-    fun addExercise(exerciseType: String, durationMin: Int, caloriesBurned: Int) {
-        viewModelScope.launch {
-            val date = uiState.value.selectedDate
-            val log = ExerciseLog(
-                exerciseType = exerciseType,
-                durationMin = durationMin,
-                caloriesBurned = caloriesBurned,
-                timestamp = System.currentTimeMillis(),
-                timestampLong = System.currentTimeMillis()
-            )
-            val success = ExerciseLogRepository.add(log, date)
-            if (success) {
-                PointsRepository.onEvent(PointsEvent.Exercise(caloriesBurned))
-                _exerciseAddedEvent.emit(caloriesBurned)
+            _uiState.update { it.copy(calendar = it.calendar.copy(isRefreshing = true)) }
+            try {
+                loadCalendarSummaries()
+            } finally {
+                _uiState.update { it.copy(calendar = it.calendar.copy(isRefreshing = false)) }
             }
         }
     }

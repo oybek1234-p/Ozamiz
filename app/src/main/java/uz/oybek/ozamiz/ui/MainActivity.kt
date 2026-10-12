@@ -1,18 +1,11 @@
 package uz.oybek.ozamiz.ui
 
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.animation.DecelerateInterpolator
-import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -24,23 +17,24 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.color.MaterialColors
 import com.google.android.play.core.review.ReviewManagerFactory
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.firebase.auth
 import uz.oybek.ozamiz.data.motivation.NotificationSchedular
+import uz.oybek.ozamiz.data.notification.FcmTokenManager
 import uz.oybek.ozamiz.data.utils.CompanyLinks
 import uz.oybek.ozamiz.databinding.ActivityMainBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
 import uz.oybek.ozamiz.databinding.SupportSheetBinding
+import uz.oybek.ozamiz.notification.NotificationDisplayManager
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.showAppSnackBar
 import uz.oybek.ozamiz.ui.utils.visibleOrGone
 import uz.oybek.ozamiz.util.PhoneUtils
 import uz.oybek.ozamiz.util.connectivity.ConnectivityObserver
@@ -58,6 +52,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var appUpdateHelper: AppUpdateHelper
+
+    @Inject
+    lateinit var fcmTokenManager: FcmTokenManager
 
     lateinit var navController: NavController
     private lateinit var navHost: NavHostFragment
@@ -85,8 +82,7 @@ class MainActivity : AppCompatActivity() {
             systemInsets = insets
             updateRootPadding()
             binding.bottomNavView.setPadding(
-                0, 0, 0,
-                insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
+                0, 0, 0, insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
             )
             updateContainerPadding()
             insets
@@ -103,6 +99,7 @@ class MainActivity : AppCompatActivity() {
         }
         val inflater = navHost.navController.navInflater
         val graph = inflater.inflate(R.navigation.main_navigation)
+        graph.setStartDestination(viewModel.getStartDestination())
         navHost.navController.graph = graph
     }
 
@@ -120,22 +117,27 @@ class MainActivity : AppCompatActivity() {
         observeInternetConnectivity()
         observeAuthState()
         appUpdateHelper.checkForAppUpdate(this, updateLauncher)
+        fcmTokenManager.syncToken()
     }
 
     private fun observeAuthState() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.navigationCommand.collect { command ->
-                    when (command) {
-                        is MainNavCommand.NavigateToAuth -> {
-                            navigateToRootDestination(R.id.authFragment)
-                        }
+            viewModel.navigationCommand.collect { command ->
+                when (command) {
+                    is MainNavCommand.NavigateToAuth -> {
+                        navigateToRootDestination(R.id.authFragment)
+                    }
 
-                        is MainNavCommand.NavigateToHome -> {
+                    is MainNavCommand.NavigateToHome -> {
+                        val currentId = navController.currentDestination?.id
+                        if (currentId == R.id.authFragment || currentId == R.id.onboarding) {
                             navigateToRootDestination(R.id.home)
                         }
+                    }
 
-                        is MainNavCommand.NavigateToOnboarding -> {
+                    is MainNavCommand.NavigateToOnboarding -> {
+                        val currentId = navController.currentDestination?.id
+                        if (currentId == R.id.authFragment) {
                             navigateToRootDestination(R.id.onboarding)
                         }
                     }
@@ -148,15 +150,12 @@ class MainActivity : AppCompatActivity() {
         if (navController.currentDestination?.id == targetDestId) return
 
         navController.navigate(
-            targetDestId,
-            null,
-            navOptions {
+            targetDestId, null, navOptions {
                 popUpTo(R.id.main_navigation) {
                     inclusive = true
                 }
                 launchSingleTop = true
-            }
-        )
+            })
     }
 
     override fun onResume() {
@@ -181,6 +180,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun showSnackbar(message: String) {
+        binding.root.showAppSnackBar(message)
     }
 
     fun showSupportSheet() {
@@ -277,12 +280,17 @@ class MainActivity : AppCompatActivity() {
     fun updateContainerPadding() {
         val insets = systemInsets ?: return
         val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-        val show = bottomNavShown
+        val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+        val imeBottom = imeInsets.bottom
+        val systemBottom = systemBars.bottom
+        val bottomPadding =
+            if (imeBottom > 0) imeBottom else if (bottomNavShown) 0 else systemBottom
+
         binding.container.setPadding(
             0,
             if (topInsetPaddingEnabled) systemBars.top else 0,
             0,
-            if (show) 0 else systemBars.bottom
+            bottomPadding
         )
     }
 }

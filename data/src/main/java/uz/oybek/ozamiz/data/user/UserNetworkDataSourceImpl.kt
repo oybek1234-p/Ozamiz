@@ -1,6 +1,6 @@
 package uz.oybek.ozamiz.data.user
 
-import com.google.firebase.FirebaseNetworkException
+import uz.oybek.ozamiz.common.util.orZero
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -8,10 +8,11 @@ import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
-import uz.oybek.ozamiz.data.common.BaseResult
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.data.firebase.DatabasePaths
 import uz.oybek.ozamiz.data.profile.mapper.UserMapper
 import uz.oybek.ozamiz.data.profile.model.User
+import uz.oybek.ozamiz.data.utils.awaitResult
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,25 +22,19 @@ internal class UserNetworkDataSourceImpl @Inject constructor(
     private val publicUsersNetworkSource: PublicUsersNetworkSource
 ) : UserNetworkDataSource {
 
-    companion object {
-        private const val USERS_PATH = "users"
-    }
-
     override suspend fun getUser(userId: String): BaseResult<User, Exception?> {
         if (userId.isBlank()) return BaseResult.Failure()
-        return try {
-            val snapshot = database.getReference(USERS_PATH)
-                .child(userId)
-                .get()
-                .await()
-            if (snapshot.exists()) {
-                val user = UserMapper.fromSnapshot(snapshot)
-                BaseResult.Success(user)
-            } else {
-                BaseResult.Failure(UserNotFoundException())
+        return when (val result = database.getReference(DatabasePaths.Realtime.USERS).child(userId).get().awaitResult()) {
+            is BaseResult.Success -> {
+                val snapshot = result.data
+                if (snapshot.exists()) {
+                    val user = UserMapper.fromSnapshot(snapshot)
+                    BaseResult.Success(user)
+                } else {
+                    BaseResult.Failure(UserNotFoundException())
+                }
             }
-        } catch (e: Exception) {
-            BaseResult.Failure(e)
+            is BaseResult.Failure -> BaseResult.Failure(result.error)
         }
     }
 
@@ -47,16 +42,16 @@ internal class UserNetworkDataSourceImpl @Inject constructor(
         limit: Int,
         lastUserId: String?
     ): BaseResult<List<User>, Exception?> {
-        return try {
-            var query = database.getReference(USERS_PATH).orderByKey().limitToFirst(limit)
-            if (!lastUserId.isNullOrBlank()) {
-                query = query.startAfter(lastUserId)
+        var query = database.getReference(DatabasePaths.Realtime.USERS).orderByKey().limitToFirst(limit)
+        if (!lastUserId.isNullOrBlank()) {
+            query = query.startAfter(lastUserId)
+        }
+        return when (val result = query.get().awaitResult()) {
+            is BaseResult.Success -> {
+                val users = result.data.children.mapNotNull { UserMapper.fromSnapshot(it) }
+                BaseResult.Success(users)
             }
-            val snapshot = query.get().await()
-            val users = snapshot.children.mapNotNull { UserMapper.fromSnapshot(it) }
-            BaseResult.Success(users)
-        } catch (e: Exception) {
-            BaseResult.Failure(e)
+            is BaseResult.Failure -> BaseResult.Failure(result.error)
         }
     }
 
@@ -66,12 +61,13 @@ internal class UserNetworkDataSourceImpl @Inject constructor(
             close()
             return@callbackFlow
         }
-        val ref = database.getReference(USERS_PATH)
+        val ref = database.getReference(DatabasePaths.Realtime.USERS)
             .child(userId)
             .child(User::unreadMessages.name)
+        ref.keepSynced(true)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val count = (snapshot.value as? Number)?.toInt() ?: 0
+                val count = (snapshot.value as? Number)?.toInt().orZero()
                 trySend(count)
             }
 
@@ -87,18 +83,39 @@ internal class UserNetworkDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun setUnreadMessages(userId: String, count: Int): Boolean {
+        if (userId.isBlank()) return false
+        val task = database.getReference(DatabasePaths.Realtime.USERS)
+            .child(userId)
+            .child(User::unreadMessages.name)
+            .setValue(count)
+        return when (task.awaitResult()) {
+            is BaseResult.Success -> true
+            is BaseResult.Failure -> false
+        }
+    }
+
+    override suspend fun updateLastSeenTime(userId: String, timestamp: Long): Boolean {
+        if (userId.isBlank()) return false
+        val rtdbResult = database.getReference(DatabasePaths.Realtime.USERS)
+            .child(userId)
+            .child(User::lastSeenTime.name)
+            .setValue(timestamp)
+            .awaitResult()
+
+        val firestoreSuccess = publicUsersNetworkSource.updateLastSeenTime(userId, timestamp)
+        return rtdbResult is BaseResult.Success || firestoreSuccess
+    }
+
     override suspend fun syncUser(user: User): Boolean {
         if (user.uid.isBlank()) return false
-        return try {
-            val userMap = UserMapper.toMap(user)
-            database.getReference(USERS_PATH)
-                .child(user.uid)
-                .updateChildren(userMap)
-                .await()
-            publicUsersNetworkSource.updatePublicUser(user)
-            true
-        } catch (_: Exception) {
-            false
-        }
+        val userMap = UserMapper.toMap(user)
+        val rtdbResult = database.getReference(DatabasePaths.Realtime.USERS)
+            .child(user.uid)
+            .updateChildren(userMap)
+            .awaitResult()
+
+        publicUsersNetworkSource.updatePublicUser(user)
+        return rtdbResult is BaseResult.Success
     }
 }

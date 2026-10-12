@@ -4,71 +4,44 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
-import androidx.fragment.app.setFragmentResult
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.gson.Gson
-import kotlin.math.roundToInt
-import uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient
+import uz.oybek.ozamiz.common.util.orZero
+import uz.oybek.ozamiz.common.util.readableFormat
+import uz.oybek.ozamiz.data.analyzer.model.AnalyzedIngredient
 import uz.oybek.ozamiz.databinding.DialogEditIngredientBinding
+import uz.oybek.ozamiz.ui.utils.showKeyboard
+import kotlin.math.roundToInt
 
-class EditIngredientBottomSheet : BottomSheetDialogFragment() {
+class EditIngredientBottomSheet(
+    private val args: EditIngredientArgs? = null,
+    private val onSave: ((AnalyzedIngredient) -> Unit)? = null,
+    private val onDelete: (() -> Unit)? = null
+) : BottomSheetDialogFragment() {
 
     private var _binding: DialogEditIngredientBinding? = null
     private val binding get() = _binding!!
-    private var ingredient: AnalyzedIngredient? = null
-    private var position: Int = -1
 
-    companion object {
-        const val TAG = "EditIngredientSheet"
-        const val REQUEST_KEY = "EditIngredientResult"
-        const val RESULT_INGREDIENT = "ingredient"
-        const val RESULT_POSITION = "position"
-        const val RESULT_ACTION = "action"
-        const val ACTION_SAVE = "save"
-        const val ACTION_DELETE = "delete"
-
-        private const val ARG_INGREDIENT_JSON = "arg_ingredient"
-        private const val ARG_POSITION = "arg_position"
-
-        fun newInstance(ingredient: AnalyzedIngredient, position: Int): EditIngredientBottomSheet {
-            return EditIngredientBottomSheet().apply {
-                arguments = bundleOf(
-                    ARG_INGREDIENT_JSON to Gson().toJson(ingredient),
-                    ARG_POSITION to position
-                )
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            val json = it.getString(ARG_INGREDIENT_JSON)
-            ingredient = Gson().fromJson(json, AnalyzedIngredient::class.java)
-            position = it.getInt(ARG_POSITION, -1)
-        }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = DialogEditIngredientBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val item = ingredient ?: return dismiss()
+        val item = args?.ingredient ?: return dismiss()
 
         binding.editTextIngredientName.setText(item.name)
-        binding.editTextIngredientAmount.setText(
-            item.amount?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: ""
-        )
+        binding.editTextIngredientAmount.setText(item.amount.readableFormat(default = ""))
         binding.editTextIngredientCalories.setText(item.calories?.toString() ?: "")
 
         binding.buttonClose.setOnClickListener { dismiss() }
 
         val initialAmount = item.amount ?: 100.0
-        val initialCalories = item.calories?.toDouble() ?: 0.0
+        val initialCalories = item.calories?.toDouble().orZero()
         val calPerUnit = if (initialAmount > 0) initialCalories / initialAmount else 0.0
 
         binding.editTextIngredientAmount.addTextChangedListener(object : android.text.TextWatcher {
@@ -76,7 +49,7 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: android.text.Editable?) {
                 if (binding.editTextIngredientAmount.hasFocus()) {
-                    val newAmount = s?.toString()?.toDoubleOrNull() ?: 0.0
+                    val newAmount = s?.toString()?.toDoubleOrNull().orZero()
                     if (calPerUnit > 0) {
                         val newCal = (calPerUnit * newAmount).roundToInt()
                         binding.editTextIngredientCalories.setText(newCal.toString())
@@ -84,15 +57,9 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
                 }
             }
         })
-        binding.editTextIngredientAmount.postDelayed({
-            if (isAdded && _binding != null) {
-                binding.editTextIngredientAmount.requestFocus()
-                val textLength = binding.editTextIngredientAmount.text?.length ?: 0
-                binding.editTextIngredientAmount.setSelection(textLength)
-                val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
-                imm?.showSoftInput(binding.editTextIngredientAmount, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
-            }
-        }, 150)
+        val textLength = binding.editTextIngredientAmount.text?.length.orZero()
+        binding.editTextIngredientAmount.setSelection(textLength)
+        binding.editTextIngredientAmount.showKeyboard(150)
 
         binding.buttonSave.setOnClickListener {
             val newName = binding.editTextIngredientName.text.toString().trim()
@@ -110,19 +77,12 @@ class EditIngredientBottomSheet : BottomSheetDialogFragment() {
                 carbs = item.carbs?.let { it * ratio }
             )
 
-            setFragmentResult(REQUEST_KEY, bundleOf(
-                RESULT_ACTION to ACTION_SAVE,
-                RESULT_INGREDIENT to Gson().toJson(updatedIngredient),
-                RESULT_POSITION to position
-            ))
+            onSave?.invoke(updatedIngredient)
             dismiss()
         }
 
         binding.buttonDelete.setOnClickListener {
-            setFragmentResult(REQUEST_KEY, bundleOf(
-                RESULT_ACTION to ACTION_DELETE,
-                RESULT_POSITION to position
-            ))
+            onDelete?.invoke()
             dismiss()
         }
     }

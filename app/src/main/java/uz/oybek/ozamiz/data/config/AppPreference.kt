@@ -14,7 +14,7 @@ import androidx.annotation.Keep
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.common.util.DateFormatter
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -87,7 +87,7 @@ object AppPreference {
     private var inMemoryAiChatDate: String = ""
 
     fun getFoodLogLimitCount(): Int {
-        val dateStr = DateUtils.todayString()
+        val dateStr = DateFormatter.todayString()
         if (inMemoryLogDate == dateStr && inMemoryLogCount >= 0) {
             return inMemoryLogCount
         }
@@ -99,7 +99,7 @@ object AppPreference {
     }
 
     suspend fun incrementFoodLogLimitCount() {
-        val dateStr = DateUtils.todayString()
+        val dateStr = DateFormatter.todayString()
         val currentCount = getFoodLogLimitCount()
         val newCount = currentCount + 1
         inMemoryLogDate = dateStr
@@ -110,7 +110,7 @@ object AppPreference {
     }
 
     fun getBonusFoodLogs(): Int {
-        val dateStr = DateUtils.todayString()
+        val dateStr = DateFormatter.todayString()
         if (inMemoryBonusDate == dateStr && inMemoryBonusLogs >= 0) {
             return inMemoryBonusLogs
         }
@@ -122,7 +122,7 @@ object AppPreference {
     }
 
     fun incrementBonusFoodLogs(amount: Int = 2) {
-        val dateStr = DateUtils.todayString()
+        val dateStr = DateFormatter.todayString()
         val currentCount = getBonusFoodLogs()
         val newCount = currentCount + amount
         inMemoryBonusDate = dateStr
@@ -135,7 +135,7 @@ object AppPreference {
     }
 
     fun getAiChatLimitCount(): Int {
-        val dateStr = DateUtils.todayString()
+        val dateStr = DateFormatter.todayString()
         if (inMemoryAiChatDate == dateStr && inMemoryAiChatCount >= 0) {
             return inMemoryAiChatCount
         }
@@ -147,7 +147,7 @@ object AppPreference {
     }
 
     suspend fun incrementAiChatLimitCount() {
-        val dateStr = DateUtils.todayString()
+        val dateStr = DateFormatter.todayString()
         val currentCount = getAiChatLimitCount()
         val newCount = currentCount + 1
         inMemoryAiChatDate = dateStr

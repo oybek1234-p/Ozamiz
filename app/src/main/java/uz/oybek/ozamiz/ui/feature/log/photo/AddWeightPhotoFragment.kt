@@ -15,7 +15,12 @@ import androidx.fragment.app.setFragmentResultListener
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAddWeightPhotoBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.collectFlowOnStart
+import uz.oybek.ozamiz.ui.utils.createTempCameraUri
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
+import uz.oybek.ozamiz.ui.utils.registerCameraLauncher
+import uz.oybek.ozamiz.ui.utils.registerImagePicker
+import uz.oybek.ozamiz.ui.utils.showKeyboard
 import uz.oybek.ozamiz.ui.utils.showToast
 
 class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
@@ -23,21 +28,15 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
     private val viewModel: AddWeightPhotoViewModel by viewModels()
     private var photoUri: Uri? = null
 
-    private val pickImageLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.GetContent()
-        ) { uri: Uri? ->
-            uri?.let { viewModel.onImageSelected(it) }
-        }
+    private val pickImageLauncher = registerImagePicker { uri ->
+        viewModel.onImageSelected(uri)
+    }
 
-    private val takePictureLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.TakePicture()
-        ) { success: Boolean ->
-            if (success) {
-                photoUri?.let { viewModel.onImageSelected(it) }
-            }
+    private val takePictureLauncher = registerCameraLauncher { success ->
+        if (success) {
+            photoUri?.let { viewModel.onImageSelected(it) }
         }
+    }
 
     private val cameraPermissionLauncher =
         registerForActivityResult(
@@ -46,7 +45,7 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
             if (isGranted) {
                 openCamera()
             } else {
-                showToast("Kameradan foydalanish uchun ruxsat berilmagan")
+                showToast(getString(R.string.permission_denied_camera))
             }
         }
 
@@ -61,14 +60,8 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
             popBackStack()
         }
 
-        // Auto focus editTextWeight & open soft keyboard immediately
-        bind.editTextWeight.requestFocus()
-        bind.editTextWeight.postDelayed({
-            if (isAdded) {
-                val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
-                imm?.showSoftInput(bind.editTextWeight, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
-            }
-        }, 150)
+        // Auto focus editTextWeight & open soft keyboard
+        bind.editTextWeight.showKeyboard(150)
 
         val openPhotoUploadFlow = {
             hideSoftInput(requireActivity())
@@ -83,7 +76,10 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
         }
 
         // Handle return from photo rules screen
-        parentFragmentManager.setFragmentResultListener("photo_info_confirmed", viewLifecycleOwner) { _, bundle ->
+        parentFragmentManager.setFragmentResultListener(
+            "photo_info_confirmed",
+            viewLifecycleOwner
+        ) { _, bundle ->
             if (bundle.getBoolean("confirmed", false)) {
                 showImageSourceChooser()
             }
@@ -95,12 +91,12 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
 
         bind.buttonSaveWeightPhoto.setOnClickListener {
             val weightStr = bind.editTextWeight.text.toString()
-            
+
             if (weightStr.isEmpty()) {
                 showToast(getString(R.string.error_invalid_weight))
                 return@setOnClickListener
             }
-            
+
             if (_uiState().selectedImageUri == null) {
                 showPhotoPromptSheet(weightStr)
             } else {
@@ -135,52 +131,45 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
             return
         }
 
-        val photoFile = java.io.File(
-            requireContext().cacheDir,
-            "temp_photo_${System.currentTimeMillis()}.jpg"
-        )
-        photoUri = androidx.core.content.FileProvider.getUriForFile(
-            requireContext(),
-            "${requireContext().packageName}.provider",
-            photoFile
-        )
-        takePictureLauncher.launch(photoUri)
+        val uri = createTempCameraUri()
+        photoUri = uri
+        if (uri != null) {
+            takePictureLauncher.launch(uri)
+        } else {
+            showToast(getString(R.string.permission_denied_camera))
+        }
     }
 
     private fun observeViewModel(bind: FragmentAddWeightPhotoBinding) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    bind.progressBarSaveWeightPhoto.isVisible = state.isLoading
-                    bind.buttonSaveWeightPhoto.isEnabled = !state.isLoading
-                    bind.buttonSaveWeightPhoto.text =
-                        if (state.isLoading) "" else getString(R.string.save)
+        collectFlowOnStart(viewModel.uiState) { state ->
+            bind.progressBarSaveWeightPhoto.isVisible = state.isLoading
+            bind.buttonSaveWeightPhoto.isEnabled = !state.isLoading
+            bind.buttonSaveWeightPhoto.text =
+                if (state.isLoading) "" else getString(R.string.save)
 
-                    if (state.selectedImageUri != null) {
-                        bind.layoutAddImagePlaceholder.isVisible = false
-                        Glide.with(this@AddWeightPhotoFragment)
-                            .load(state.selectedImageUri)
-                            .into(bind.imageViewPicked)
-                        bind.imageViewPicked.isVisible = true
-                        bind.buttonRemoveImage.isVisible = true
-                    } else {
-                        bind.layoutAddImagePlaceholder.isVisible = true
-                        bind.imageViewPicked.isVisible = false
-                        bind.imageViewPicked.setImageDrawable(null)
-                        bind.buttonRemoveImage.isVisible = false
-                    }
+            if (state.selectedImageUri != null) {
+                bind.layoutAddImagePlaceholder.isVisible = false
+                Glide.with(this@AddWeightPhotoFragment)
+                    .load(state.selectedImageUri)
+                    .into(bind.imageViewPicked)
+                bind.imageViewPicked.isVisible = true
+                bind.buttonRemoveImage.isVisible = true
+            } else {
+                bind.layoutAddImagePlaceholder.isVisible = true
+                bind.imageViewPicked.isVisible = false
+                bind.imageViewPicked.setImageDrawable(null)
+                bind.buttonRemoveImage.isVisible = false
+            }
 
-                    state.error?.let {
-                        showToast(it)
-                        viewModel.clearError()
-                    }
+            state.error?.let {
+                showToast(it)
+                viewModel.clearError()
+            }
 
-                    if (state.logAddedSuccessfully) {
-                        showToast(getString(R.string.info_saved_success))
-                        closeFragment()
-                        viewModel.resetSuccessFlag()
-                    }
-                }
+            if (state.logAddedSuccessfully) {
+                showToast(getString(R.string.info_saved_success))
+                closeFragment()
+                viewModel.resetSuccessFlag()
             }
         }
     }
@@ -190,7 +179,8 @@ class AddWeightPhotoFragment : BaseFragment<FragmentAddWeightPhotoBinding>() {
     private fun showPhotoPromptSheet(weightStr: String) {
         hideSoftInput(requireActivity())
         val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
-        val sheetBinding = uz.oybek.ozamiz.databinding.BottomSheetWeightPhotoPromptBinding.inflate(layoutInflater)
+        val sheetBinding =
+            uz.oybek.ozamiz.databinding.BottomSheetWeightPhotoPromptBinding.inflate(layoutInflater)
         dialog.setContentView(sheetBinding.root)
 
         sheetBinding.btnUploadPhoto.setOnClickListener {

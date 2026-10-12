@@ -6,12 +6,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.utils.sortByRecent
+import uz.oybek.ozamiz.common.util.sortByRecent
 import androidx.annotation.Keep
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.utils.DataWrapper
 
 @Keep
 data class WeightHistoryUiState(
@@ -35,7 +35,7 @@ class WeightHistoryViewModel : ViewModel() {
         viewModelScope.launch {
             WeightLogRepository.getLogsFlow(user.uid).collect { result ->
                 when (result) {
-                    is DataWrapper.Success -> {
+                    is BaseResult.Success -> {
                         val sortedLogs = result.data
                             .filter { it.weightKg > 0 }
                             .sortByRecent { it.timestamp }
@@ -43,7 +43,7 @@ class WeightHistoryViewModel : ViewModel() {
                             it.copy(isLoading = false, logs = sortedLogs)
                         }
                     }
-                    is DataWrapper.Error -> {
+                    is BaseResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false, error = result.error) }
                     }
                     else -> {}
@@ -62,10 +62,10 @@ class WeightHistoryViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             when (val result = WeightLogRepository.deleteLog(log)) {
-                is DataWrapper.Success -> {
+                is BaseResult.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
                 }
-                is DataWrapper.Error -> {
+                is BaseResult.Failure -> {
                     _uiState.update { it.copy(isLoading = false, error = result.error) }
                 }
                 else -> {}

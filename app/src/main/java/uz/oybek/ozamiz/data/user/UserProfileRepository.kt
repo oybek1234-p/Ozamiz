@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.user
 
+import uz.oybek.ozamiz.common.util.orZero
 import android.net.Uri
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -21,11 +22,12 @@ import uz.oybek.ozamiz.data.firebase.usersReference
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.mapper.UserMapper
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.common.util.DateFormatter
+import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.util.handleException
 import kotlin.coroutines.resume
+
 
 object UserProfileRepository {
 
@@ -33,7 +35,7 @@ object UserProfileRepository {
     private var userListener: ValueEventListener? = null
     var onboardingStarted = false
 
-    val user: User get() = LocalUser.user
+    val user: uz.oybek.ozamiz.data.user.model.User get() = LocalUser.user
 
     fun init() {
         LocalUser.getUser()
@@ -43,36 +45,13 @@ object UserProfileRepository {
     }
 
     suspend fun saveUserNetworkSuspend(user: User): Boolean {
-        val currentUid = auth.currentUser?.uid
-        if (user.uid.isEmpty() && !currentUid.isNullOrEmpty()) {
-            user.uid = currentUid
-        }
-        if (!user.valid) return false
-
-        return try {
-            val children = UserMapper.toMap(user)
-            val publicChildren = UserMapper.toPublicMap(user)
-
-            FirebasePaths.Database.user(user.uid).updateChildren(children).await()
-
-            try {
-                FirebasePaths.Firestore.publicUser(user.uid).set(publicChildren).await()
-            } catch (e: Exception) {
-                handleException(e)
-            }
-
-            true
-        } catch (e: Exception) {
-            // Realtime Database xatosi: Crashlytics ga yoziladi va false qaytadi
-            handleException(e)
-            false
-        }
+       return true
     }
 
     suspend fun uploadPremiumCheckData(
         userId: String, checkImageUri: Uri, isYearly: Boolean
-    ): DataWrapper<Unit> {
-        if (userId.isBlank()) return DataWrapper.Error()
+    ): BaseResult<Unit, String> {
+        if (userId.isBlank()) return BaseResult.Failure("User ID bo'sh")
 
         return try {
             val imageUrl = ImageUploader.uploadImage(
@@ -87,32 +66,22 @@ object UserProfileRepository {
                     isPremiumYearly = isYearly
                     isMonthlyPremium = !isYearly
                 }
-                DataWrapper.Success(Unit)
+                BaseResult.Success(Unit)
             } else {
-                DataWrapper.Error("Rasm yuklanmadi")
+                BaseResult.Failure("Rasm yuklanmadi")
             }
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error("Xatolik yuz berdi")
+            BaseResult.Failure("Xatolik yuz berdi")
         }
     }
 
     fun updateUser(work: User.() -> Unit = {}) {
-        work(user)
-        LocalUser.saveUser()
 
-        if (user.valid) {
-            saveUserNetworkForce(user)
-        }
     }
 
     fun saveUserNetworkForce(user: User) {
-        if (user.valid) {
-            val children = UserMapper.toMap(user)
-            val publicChildren = UserMapper.toPublicMap(user)
-            FirebasePaths.Database.user(user.uid).updateChildren(children)
-            FirebasePaths.Firestore.publicUser(user.uid).set(publicChildren)
-        }
+
     }
 
     fun updateLastSeen() {
@@ -136,7 +105,7 @@ object UserProfileRepository {
         updateField(User::lastWeightLogTimestamp.name, value) { lastWeightLogTimestamp = value }
 
     fun updateStreakInfo(value: StreakInfo?) =
-        updateField(User::streakInfo.name, value) { streakInfo = value }
+        updateField(User::streakInfo.name, value) { }
 
     private val PUBLIC_FIELDS = setOf(
         User::uid.name,
@@ -162,7 +131,7 @@ object UserProfileRepository {
     )
 
     private fun <T> updateField(fieldName: String, value: T, work: User.() -> Unit) {
-        work(user)
+
         LocalUser.saveUser()
         if (!user.valid) return
 
@@ -240,7 +209,7 @@ object UserProfileRepository {
             .addValueEventListener(object : ValueEventListener {
                 override fun onCancelled(error: DatabaseError) {}
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val value = snapshot.getValueSafe(Int::class.java, 0) ?: 0
+                    val value = snapshot.getValueSafe(Int::class.java, 0).orZero()
                     LocalUser.user.unreadMessages = value
                     LocalUser.saveUser()
                     onChange.invoke(value)
@@ -253,7 +222,7 @@ object UserProfileRepository {
         FirebasePaths.Database.unreadMessages(userId)
             .runTransaction(object : Transaction.Handler {
                 override fun doTransaction(currentData: MutableData): Transaction.Result {
-                    val current = currentData.getValue(Int::class.java) ?: 0
+                    val current = currentData.getValue(Int::class.java).orZero()
                     currentData.value = current + 1
                     return Transaction.success(currentData)
                 }
@@ -267,3 +236,4 @@ object UserProfileRepository {
             })
     }
 }
+

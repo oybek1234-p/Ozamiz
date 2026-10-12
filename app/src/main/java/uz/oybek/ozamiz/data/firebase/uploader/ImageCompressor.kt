@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.util.handleException
 import java.io.File
 import java.io.FileOutputStream
@@ -46,9 +46,9 @@ object ImageCompressor {
     suspend fun compressImage(
         uri: Uri,
         maxSizeKb: Int = 150
-    ): DataWrapper<ByteArray> = withContext(Dispatchers.IO) {
+    ): BaseResult<ByteArray, Unit> = withContext(Dispatchers.IO) {
         try {
-            val file = fromUri(uri) ?: return@withContext DataWrapper.Error()
+            val file = fromUri(uri) ?: return@withContext BaseResult.Failure(Unit)
 
             val compressedFile = Compressor.compress(appContext, file) {
                 resolution(512, 512)
@@ -63,10 +63,10 @@ object ImageCompressor {
                 if (file.exists()) file.delete()
                 if (compressedFile.exists() && compressedFile != file) compressedFile.delete()
             }
-            DataWrapper.Success(byteArray)
+            BaseResult.Success(byteArray)
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error()
+            BaseResult.Failure(Unit)
         }
     }
 

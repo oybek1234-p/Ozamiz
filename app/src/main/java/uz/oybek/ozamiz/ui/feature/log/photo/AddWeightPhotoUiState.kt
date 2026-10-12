@@ -11,11 +11,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import androidx.annotation.Keep
-import uz.oybek.ozamiz.data.community.AchievementPostHelper
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.utils.DataWrapper
 
 @Keep
 data class AddWeightPhotoUiState(
@@ -56,7 +55,7 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
             val result = WeightLogRepository.add(userId, weightKg, imageUri, shouldBlur = true)
 
             when (result) {
-                is DataWrapper.Success -> {
+                is BaseResult.Success -> {
                     val newLog = result.data
                     val previousWeight = LocalUser.user.weight
                     val newAvatarUrl = newLog.photoUrl
@@ -70,14 +69,10 @@ class AddWeightPhotoViewModel(application: Application) : AndroidViewModel(appli
                         UserProfileRepository.updateStartWeight(weightKg)
                     }
 
-                    if (previousWeight > 0.0 && previousWeight != weightKg) {
-                        AchievementPostHelper.onWeightDropped(previousWeight, weightKg)
-                    }
-
                     _uiState.update { it.copy(isLoading = false, logAddedSuccessfully = true) }
                 }
 
-                is DataWrapper.Error -> {
+                is BaseResult.Failure -> {
                     _uiState.update { it.copy(isLoading = false, error = result.error) }
                 }
 

@@ -11,7 +11,7 @@ class NameFragment
     : OnBoardingChildFragment<FragmentNameBinding>() {
     override fun viewCreated(bind: FragmentNameBinding) {
         val currentName = viewModel.uiState.value.user.name
-        if (!currentName.isNullOrEmpty()) {
+        if (currentName.isNotEmpty()) {
             bind.textInput.editText?.setText(currentName)
             bind.textInput.editText?.setSelection(currentName.length)
         }

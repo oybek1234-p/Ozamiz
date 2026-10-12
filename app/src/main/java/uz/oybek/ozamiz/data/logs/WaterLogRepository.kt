@@ -7,7 +7,7 @@ import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.currentUserId
 import uz.oybek.ozamiz.data.logs.base.BaseLogRepository
 import uz.oybek.ozamiz.data.logs.model.WaterLog
-import uz.oybek.ozamiz.data.utils.dateApiFormat
+import uz.oybek.ozamiz.common.util.dateApiFormat
 import java.util.Date
 
 object WaterLogRepository : BaseLogRepository<WaterLog>() {

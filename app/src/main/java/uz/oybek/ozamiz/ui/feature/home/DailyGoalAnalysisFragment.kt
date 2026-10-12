@@ -8,8 +8,10 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.logs.LogRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.common.util.readableFormat
 import uz.oybek.ozamiz.databinding.FragmentDailyGoalAnalysisBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
 import java.util.Date
 import kotlin.math.abs
 
@@ -84,7 +86,7 @@ class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>
                 }
 
                 // --- Kaloriya ---
-                tvCalorieLine1.text = "$consumedCals / $targetCals kkal"
+                tvCalorieLine1.text = NutritionFormatter.kcalProgress(consumedCals, targetCals)
                 progressCalorie.progress = caloriePercent
 
                 if (isGainWeight) {
@@ -93,27 +95,27 @@ class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>
                     tvCalorieLine2.text = if (goodCalorie)
                         "Ajoyib! Kaloriya maqsadingiz to'g'ri bajarildi \uD83D\uDCAA"
                     else
-                        "Kunlik profitsit: $surplus kkal • Oyiga ~$monthlyKg kg semirish kutiladi"
+                        "Kunlik profitsit: ${NutritionFormatter.kcal(surplus)} • Oyiga ~$monthlyKg kg semirish kutiladi"
                     cardCalorieExceededWarning.isVisible = false
                 } else {
                     if (consumedCals >= targetCals + 100) {
                         val exceededCals = consumedCals - targetCals
                         cardCalorieExceededWarning.isVisible = true
-                        tvWarningLine1.text = "Maqsaddan $exceededCals kkal oshib ketdi"
+                        tvWarningLine1.text = "Maqsaddan ${NutritionFormatter.kcal(exceededCals)} oshib ketdi"
                         tvWarningLine2.text = "Vazningiz o'zgarmasligi uchun keyingi taomlarda e'tiborli bo'ling."
                     } else {
                         cardCalorieExceededWarning.isVisible = false
                     }
                     val deficit = if (targetCals in 1..2500) abs(2200 - targetCals) else 500
-                    val monthlyKg = String.format(java.util.Locale.US, "%.1f", (deficit * 30) / 7700.0)
+                    val monthlyKg = ((deficit * 30) / 7700.0).readableFormat()
                     tvCalorieLine2.text = if (goodCalorie)
                         "Zo'r! Bugun kaloriyaga a'lo amal qildingiz \uD83D\uDCAA"
                     else
-                        "Kunlik defitsit: $deficit kkal • Oyiga ~$monthlyKg kg ozish kutiladi"
+                        "Kunlik defitsit: ${NutritionFormatter.kcal(deficit)} • Oyiga ~$monthlyKg kg ozish kutiladi"
                 }
 
                 // --- Oqsil ---
-                tvProteinLine1.text = "${proteinConsumed}g / ${proteinTarget}g"
+                tvProteinLine1.text = NutritionFormatter.grProgress(proteinConsumed, proteinTarget)
                 progressProtein.progress = proteinPercent
                 tvProteinLine2.text = when {
                     goodProtein && proteinPercent >= 100 ->
@@ -127,7 +129,7 @@ class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>
                 }
 
                 // --- Suv ---
-                tvWaterLine1.text = "$waterConsumed ml / $waterTarget ml"
+                tvWaterLine1.text = NutritionFormatter.waterProgress(waterConsumed, waterTarget)
                 progressWater.progress = waterPercent
                 tvWaterLine2.text = when {
                     waterConsumed >= waterTarget ->
@@ -141,7 +143,7 @@ class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>
                 }
 
                 // --- Mashq ---
-                tvExerciseLine1.text = "$exerciseBurnt kkal yoqildi"
+                tvExerciseLine1.text = "${NutritionFormatter.kcal(exerciseBurnt)} yoqildi"
                 progressExercise.progress = exercisePercent
                 tvExerciseLine2.text = when {
                     exerciseBurnt >= exerciseTarget ->

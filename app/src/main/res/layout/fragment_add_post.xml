@@ -4,66 +4,171 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface"
+    android:background="?attr/colorSurfaceContainerLowest"
     android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurfaceContainerLowest"
         app:navigationIcon="@drawable/arrow_back"
-        app:title="Yangi post" />
-    
+        app:title="@string/community_add_post_title"
+        app:titleCentered="true">
+
+        <ImageView
+            android:id="@+id/btnToolbarSubmit"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="@string/community_add_post_submit"
+            android:focusable="true"
+            android:padding="8dp"
+            app:srcCompat="@drawable/send_ic"
+            app:tint="?attr/colorPrimary" />
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        app:dividerColor="?attr/colorSurfaceContainerHigh" />
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="24dp">
 
+            <!-- Photos Section Label -->
             <TextView
+                android:id="@+id/tvPhotoSectionLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Post sarlavhasi"
                 android:fontFamily="@font/roboto_bold"
-                android:textSize="16sp"
-                android:textColor="?attr/colorOnSurface" />
+                android:text="@string/community_add_post_photos_label"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            <!-- Photo Preview Banner (shown ONLY when image is selected) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPickPhoto"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="320dp"
                 android:layout_marginTop="8dp"
-                app:placeholderText="Masalan: Bugungi nonushtam"
-                app:hintEnabled="false">
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorSurfaceContainerHigh"
+                app:strokeWidth="1dp"
+                tools:visibility="visible">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etTitle"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Masalan: Bugungi nonushtam"
-                    android:inputType="textCapSentences" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="match_parent">
 
+                    <ImageView
+                        android:id="@+id/imgPhotoPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        tools:src="@drawable/placeholder_food" />
+
+                    <!-- Delete Selected Photo Button -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/btnRemovePhoto"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="12dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        app:cardBackgroundColor="@color/red"
+                        app:cardCornerRadius="21dp"
+                        app:cardElevation="4dp"
+                        app:strokeWidth="1dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@string/delete"
+                            app:srcCompat="@drawable/delete_ic"
+                            app:tint="@color/white" />
+                    </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Photo Selection Buttons (shown when no photo is selected) -->
+            <LinearLayout
+                android:id="@+id/layoutPhotoButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSelectGallery"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/community_add_post_gallery"
+                    android:textSize="15sp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/photo_ic"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSelectCamera"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="56dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/community_add_post_camera"
+                    android:textSize="15sp"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/camera_ic"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp" />
+            </LinearLayout>
+
+            <!-- Description Label & Input -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Tavsifi"
+                android:layout_marginTop="20dp"
                 android:fontFamily="@font/roboto_bold"
-                android:textSize="16sp"
-                android:textColor="?attr/colorOnSurface" />
+                android:text="@string/community_add_post_desc_label"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="15sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:placeholderText="Masalan: Juda mazali va foydali bo'ldi"
+                app:boxCornerRadiusBottomEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusTopStart="14dp"
                 app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -71,73 +176,45 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="top"
-                    android:hint="Masalan: Juda mazali va foydali bo'ldi"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:minLines="3" />
+                    android:hint="@string/community_add_post_desc_hint"
+                    android:imeOptions="actionDone"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:minLines="5"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Rasmlar"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="16sp" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvSelectedImages"
+            <!-- Submit Button & ProgressBar -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/item_selected_image" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginTop="24dp">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSelectImages"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Galereya"
-                    app:icon="@drawable/photo_ic" />
+                    android:id="@+id/btnSubmitPost"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/community_add_post_submit"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:textSize="15sp"
+                    app:backgroundTint="?attr/colorPrimary"
+                    app:cornerRadius="14dp"
+                    app:icon="@drawable/send_ic"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:iconTint="?attr/colorOnPrimary" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCamera"
-                    style="@style/Widget.Material3.Button.TonalButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:text="Kamera"
-                    app:icon="@drawable/camera_ic" />
-
-            </LinearLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSave"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginTop="40dp"
-                android:text="Yuborish"
-                app:cornerRadius="16dp" />
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="16dp"
-                android:visibility="gone" />
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="?attr/colorOnPrimary"
+                    android:visibility="gone" />
+            </FrameLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

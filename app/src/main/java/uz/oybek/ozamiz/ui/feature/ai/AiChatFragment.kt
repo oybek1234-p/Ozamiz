@@ -11,19 +11,23 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.SimpleItemAnimator
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.utils.logMessage
+import uz.oybek.ozamiz.util.logMessage
 import uz.oybek.ozamiz.databinding.FragmentAiChatBinding
+import dagger.hilt.android.AndroidEntryPoint
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.ui.utils.hideKeyboard
+import uz.oybek.ozamiz.ui.utils.showKeyboard
 import uz.oybek.ozamiz.ui.utils.toDp
 
+@AndroidEntryPoint
 class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     init {
         showBottomSheet = true
@@ -58,8 +62,13 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         chatAdapter = AiChatAdapter().apply {
             onFeedbackClick = { message, isLiked, userQuestion ->
                 viewModel.onFeedbackClick(message, isLiked, userQuestion)
-                val toastText = if (isLiked) "Fikringiz uchun rahmat!" else "Fikringiz qabul qilindi"
-                android.widget.Toast.makeText(requireContext(), toastText, android.widget.Toast.LENGTH_SHORT).show()
+                val toastText =
+                    if (isLiked) "Fikringiz uchun rahmat!" else "Fikringiz qabul qilindi"
+                android.widget.Toast.makeText(
+                    requireContext(),
+                    toastText,
+                    android.widget.Toast.LENGTH_SHORT
+                ).show()
             }
         }
         bind.chatRecyclerView.apply {
@@ -72,17 +81,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     }
 
     private fun focusMessageInput(bind: FragmentAiChatBinding) {
-        bind.messageEditText.post {
-            if (isAdded) {
-                bind.messageEditText.requestFocus()
-                val imm =
-                    requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
-                imm?.showSoftInput(
-                    bind.messageEditText,
-                    android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT
-                )
-            }
-        }
+        bind.messageEditText.showKeyboard()
     }
 
     override fun onResume() {
@@ -96,7 +95,8 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         val isPremium = user.isPremium()
 
         val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(act)
-        val limitBinding = uz.oybek.ozamiz.databinding.BottomSheetLimitReachedBinding.inflate(act.layoutInflater)
+        val limitBinding =
+            uz.oybek.ozamiz.databinding.BottomSheetLimitReachedBinding.inflate(act.layoutInflater)
         dialog.setContentView(limitBinding.root)
 
         limitBinding.textLimitTitle.text = getString(uz.oybek.ozamiz.R.string.ai_chat_limit_title)
@@ -111,11 +111,14 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         limitBinding.btnBuyPremium.setOnClickListener {
             try {
                 if (dialog.isShowing) dialog.dismiss()
-            } catch (_: Exception) {}
-            val navHostFragment = act.supportFragmentManager.findFragmentById(uz.oybek.ozamiz.R.id.container) as? androidx.navigation.fragment.NavHostFragment
+            } catch (_: Exception) {
+            }
+            val navHostFragment =
+                act.supportFragmentManager.findFragmentById(uz.oybek.ozamiz.R.id.container) as? androidx.navigation.fragment.NavHostFragment
             try {
                 navHostFragment?.navController?.navigate(uz.oybek.ozamiz.R.id.premiumFragment)
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+            }
         }
 
         if (!act.isFinishing && !act.isDestroyed) {
@@ -143,7 +146,10 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
             } else {
                 maxOf(0, imeInsets.bottom - bottomMarginOffset - systemBars.bottom)
             }
-            logMessage("KeyboardInsets -> ime.bottom: ${imeInsets.bottom}, systemBars.bottom: ${systemBars.bottom}, bottomMarginOffset: $bottomMarginOffset, final bottomPadding: $bottomPadding", tag = "AiChatKeyboard")
+            logMessage(
+                "KeyboardInsets -> ime.bottom: ${imeInsets.bottom}, systemBars.bottom: ${systemBars.bottom}, bottomMarginOffset: $bottomMarginOffset, final bottomPadding: $bottomPadding",
+                tag = "AiChatKeyboard"
+            )
             bind.root.setPadding(0, 0, 0, bottomPadding)
         }
 
@@ -195,7 +201,13 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
     private fun handleInitialArguments() {
         val prompt = arguments?.getString("initialPrompt")
         val showBackButton = arguments?.getBoolean("showBackButton", false) ?: false
-        if (!prompt.isNullOrBlank() || showBackButton) {
+        val hasBackStack = try {
+            findNavController().previousBackStackEntry != null
+        } catch (_: Exception) {
+            false
+        }
+
+        if (!prompt.isNullOrBlank() || showBackButton || hasBackStack) {
             showBottomSheet = false
             binding.toolbar.setNavigationIcon(R.drawable.arrow_back)
             binding.toolbar.setNavigationOnClickListener {
@@ -203,7 +215,8 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
             }
             if (!prompt.isNullOrBlank()) {
                 val visibleHeight = binding.chatRecyclerView.height
-                chatAdapter.activeTurnMinHeight = maxOf(0, visibleHeight - toDp(60f, requireContext()))
+                chatAdapter.activeTurnMinHeight =
+                    maxOf(0, visibleHeight - toDp(60f, requireContext()))
                 shouldAnchorNewQuestion = true
                 if (viewModel.canSendMessage()) {
                     viewModel.sendMessage(prompt) {}
@@ -261,7 +274,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                 .setDuration(200)
                 .setInterpolator(android.view.animation.DecelerateInterpolator())
                 .start()
-                }
+        }
     }
 
     private fun setupListeners(bind: FragmentAiChatBinding) {
@@ -310,8 +323,7 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
 
     private fun hideKeyboardAndClearFocus(bind: FragmentAiChatBinding) {
         bind.messageEditText.clearFocus()
-        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as? android.view.inputmethod.InputMethodManager
-        imm?.hideSoftInputFromWindow(bind.messageEditText.windowToken, 0)
+        bind.messageEditText.hideKeyboard()
     }
 
     private val centerGreetings = listOf(
@@ -326,7 +338,10 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         // Messages collector — mustaqil launch blokda
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.messages.collect { messages ->
-                android.util.Log.d("AiChatDebug", ">>> messages.collect FIRED: size=${messages.size}")
+                android.util.Log.d(
+                    "AiChatDebug",
+                    ">>> messages.collect FIRED: size=${messages.size}"
+                )
                 val isEmpty = messages.isEmpty()
                 if (isEmpty && !bind.emptyStateLayout.isVisible) {
                     bind.emptyStateTitle.text = centerGreetings.random()
@@ -349,9 +364,15 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                                 val rv = bind.chatRecyclerView
 
                                 val fullOpenRvHeight = rv.height + bind.root.paddingBottom
-                                val availableHeight = maxOf(0, fullOpenRvHeight - userHeight - rv.paddingBottom - rv.paddingTop)
+                                val availableHeight = maxOf(
+                                    0,
+                                    fullOpenRvHeight - userHeight - rv.paddingBottom - rv.paddingTop
+                                )
 
-                                logMessage("FullOpenCalc -> rv.height: ${rv.height}, rootPaddingBottom: ${bind.root.paddingBottom}, fullOpenRvHeight: $fullOpenRvHeight, userHeight: $userHeight, availableHeight: $availableHeight", tag = "AiChatKeyboard")
+                                logMessage(
+                                    "FullOpenCalc -> rv.height: ${rv.height}, rootPaddingBottom: ${bind.root.paddingBottom}, fullOpenRvHeight: $fullOpenRvHeight, userHeight: $userHeight, availableHeight: $availableHeight",
+                                    tag = "AiChatKeyboard"
+                                )
 
                                 chatAdapter.activeTurnMinHeight = availableHeight
 
@@ -360,12 +381,16 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                                 }
 
                                 bind.chatRecyclerView.post {
-                                    logMessage("Scrolling -> smooth scroll to userPos: $userPos", tag = "AiChatKeyboard")
-                                    val smoothScroller = object : LinearSmoothScroller(requireContext()) {
-                                        override fun getVerticalSnapPreference(): Int {
-                                            return SNAP_TO_START
+                                    logMessage(
+                                        "Scrolling -> smooth scroll to userPos: $userPos",
+                                        tag = "AiChatKeyboard"
+                                    )
+                                    val smoothScroller =
+                                        object : LinearSmoothScroller(requireContext()) {
+                                            override fun getVerticalSnapPreference(): Int {
+                                                return SNAP_TO_START
+                                            }
                                         }
-                                    }
                                     smoothScroller.targetPosition = userPos
                                     lm?.startSmoothScroll(smoothScroller)
                                 }
@@ -384,7 +409,8 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                 launch {
                     viewModel.remainingMessages.collect { remaining ->
                         if (remaining <= 0) {
-                            bind.messageEditText.hint = getString(uz.oybek.ozamiz.R.string.ai_chat_limit_hint)
+                            bind.messageEditText.hint =
+                                getString(uz.oybek.ozamiz.R.string.ai_chat_limit_hint)
                         } else {
                             bind.messageEditText.hint = "Xabar yozing..."
                         }

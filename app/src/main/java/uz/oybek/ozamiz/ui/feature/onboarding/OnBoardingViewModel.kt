@@ -12,21 +12,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.common.onFailure
-import uz.oybek.ozamiz.data.common.onSuccess
+import uz.oybek.ozamiz.common.result.onFailure
+import uz.oybek.ozamiz.common.result.onSuccess
 import uz.oybek.ozamiz.data.diet.DietEngine
 import uz.oybek.ozamiz.data.diet.model.DietPlan
 import uz.oybek.ozamiz.data.diet.model.DietPlanSpeed
+import uz.oybek.ozamiz.data.diet.model.DietPlanType
 import uz.oybek.ozamiz.data.diet.model.GoalDuration
 import uz.oybek.ozamiz.data.profile.api.ProfileManagerRepo
 import uz.oybek.ozamiz.data.profile.api.ProfileRepo
 import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.data.profile.model.UserActivityLevel
+import uz.oybek.ozamiz.data.profile.model.UserGender
 import uz.oybek.ozamiz.data.profile.model.UserGoal
-import uz.oybek.ozamiz.data.user.model.info.Gender
 import uz.oybek.ozamiz.ui.feature.onboarding.screens.DietPlanUiState
-import uz.oybek.ozamiz.util.handleException
 import javax.inject.Inject
 
 data class OnBoardingUiState(
@@ -39,7 +38,7 @@ data class OnBoardingUiState(
     val idealWeight: Pair<Int, Int> = Pair(0, 0),
     val goalDuration: GoalDuration = GoalDuration()
 ) {
-    val isMale: Boolean get() = user.gender == Gender.MALE
+    val isMale: Boolean get() = user.gender == UserGender.MALE.id
 }
 
 sealed interface OnBoardingEffect {
@@ -72,14 +71,21 @@ class OnBoardingViewModel @Inject constructor(
         updateProgress(0)
     }
 
-    fun initDietPlan(speed: DietPlanSpeed = DietPlanSpeed.NORMAL) {
+    fun initDietPlan(
+        speed: DietPlanSpeed = DietPlanSpeed.NORMAL,
+        planType: DietPlanType? = null
+    ) {
         _uiState.update { state ->
-            val normalPlan = dietEngine.calculateDietPlan(state.user, DietPlanSpeed.NORMAL)
-            val fastPlan = dietEngine.calculateDietPlan(state.user, DietPlanSpeed.FAST)
+            val effectivePlanType = planType ?: state.user.userDietPlanType
+            val normalPlan = dietEngine.calculateDietPlan(state.user, DietPlanSpeed.NORMAL, effectivePlanType)
+            val fastPlan = dietEngine.calculateDietPlan(state.user, DietPlanSpeed.FAST, effectivePlanType)
             val selectedPlan = if (speed == DietPlanSpeed.NORMAL) normalPlan else fastPlan
+            val availablePlans = DietPlanType.getDietPlans(state.user.userGoal)
 
             val dietPlanUiState = DietPlanUiState(
                 selectedSpeed = speed,
+                selectedPlanType = effectivePlanType,
+                availablePlanTypes = availablePlans,
                 normalPlan = normalPlan,
                 fastPlan = fastPlan,
                 selectedPlan = selectedPlan
@@ -110,23 +116,45 @@ class OnBoardingViewModel @Inject constructor(
         }
     }
 
+    fun setPlanType(planType: DietPlanType) {
+        _uiState.update { state ->
+            val currentSpeed = state.dietPlanState.selectedSpeed
+            val normalPlan = dietEngine.calculateDietPlan(state.user, DietPlanSpeed.NORMAL, planType)
+            val fastPlan = dietEngine.calculateDietPlan(state.user, DietPlanSpeed.FAST, planType)
+            val selectedPlan = if (currentSpeed == DietPlanSpeed.NORMAL) normalPlan else fastPlan
+
+            val updatedDietPlan = state.dietPlanState.copy(
+                selectedPlanType = planType,
+                normalPlan = normalPlan,
+                fastPlan = fastPlan,
+                selectedPlan = selectedPlan
+            )
+            state.copy(
+                dietPlanState = updatedDietPlan,
+                goalDuration = selectedPlan.duration,
+                user = state.user.applyDietPlan(selectedPlan)
+            )
+        }
+    }
+
     private fun User.applyDietPlan(plan: DietPlan?): User {
         if (plan == null) return this
         return copy(
             targetCalories = plan.targetCalories,
             targetProtein = plan.macros.protein,
             targetFat = plan.macros.fat,
-            targetCarbs = plan.macros.carbs
+            targetCarbs = plan.macros.carbs,
+            dietPlanType = plan.planType.id
         )
     }
 
     fun setGender(isMale: Boolean) {
-        updateUser { it.copy(gender = if (isMale) Gender.MALE else Gender.FEMALE) }
+        updateUser { it.copy(gender = if (isMale) UserGender.MALE.id else UserGender.FEMALE.id) }
     }
 
-    fun setGoal(isLoseWeight: Boolean) {
+    fun setGoal(goal: UserGoal) {
         updateUser {
-            it.copy(goal = if (isLoseWeight) UserGoal.LOSE_WEIGHT.key else UserGoal.GAIN_WEIGHT.key)
+            it.copy(goal = goal.key)
         }
     }
 
@@ -222,7 +250,6 @@ class OnBoardingViewModel @Inject constructor(
                 .onFailure {
                     _uiState.update { it.copy(isSaving = false) }
                     _effect.send(OnBoardingEffect.ShowError)
-                    it?.let { handleException(it) }
                 }
         }
     }

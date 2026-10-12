@@ -8,13 +8,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.user.model.User
 import uz.oybek.ozamiz.databinding.FragmentAdminPaymentVerificationDetailBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.getArgs
 import uz.oybek.ozamiz.ui.utils.showToast
 import java.text.SimpleDateFormat
 import java.util.*
@@ -23,7 +23,6 @@ class AdminPaymentVerificationDetailFragment :
     BaseFragment<FragmentAdminPaymentVerificationDetailBinding>() {
 
     private val viewModel: AdminPaymentVerificationDetailViewModel by viewModels()
-    private val args: AdminPaymentVerificationDetailFragmentArgs by navArgs()
 
     override fun inflateBinding(
         inflater: LayoutInflater, container: ViewGroup?
@@ -32,7 +31,9 @@ class AdminPaymentVerificationDetailFragment :
     }
     
     override fun viewCreated(bind: FragmentAdminPaymentVerificationDetailBinding) {
-        viewModel.loadUserDetails(args.userId)
+        val userId = arguments.getArgs<AdminPaymentVerificationDetailArgs>()?.userId
+            ?: arguments?.getString("userId").orEmpty()
+        viewModel.loadUserDetails(userId)
 
         bind.toolbarAdminPaymentDetail.setNavigationOnClickListener {
             popBackStack()

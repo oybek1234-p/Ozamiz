@@ -22,6 +22,7 @@ import uz.oybek.ozamiz.databinding.FragmentAddMenuBinding
 import uz.oybek.ozamiz.databinding.ItemDynamicInputBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.loadPhoto
+import uz.oybek.ozamiz.ui.utils.registerImagePicker
 
 class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
 
@@ -29,15 +30,11 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
     private var selectedImageUri: Uri? = null
     private val selectedCategories = mutableSetOf<FilterItem>()
 
-    private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let {
-            selectedImageUri = it
-            binding.imagePreview.isVisible = true
-            binding.containerUploadInfo.isVisible = false
-            binding.imagePreview.loadPhoto(it.toString())
-        }
+    private val imagePickerLauncher = registerImagePicker { uri ->
+        selectedImageUri = uri
+        binding.imagePreview.isVisible = true
+        binding.containerUploadInfo.isVisible = false
+        binding.imagePreview.loadPhoto(uri.toString())
     }
 
     override fun inflateBinding(

@@ -9,10 +9,10 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.annotation.Keep
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.premium.PaymentInfo
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.utils.DataWrapper
 
 @Keep
 data class PaymentGetCheckUiState(
@@ -68,7 +68,7 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
                 _uiState.value?.isYearly ?: false
             )
             when (result) {
-                is DataWrapper.Success -> {
+                is BaseResult.Success -> {
                     _uiState.postValue(
                         _uiState.value?.copy(
                             isLoading = false,
@@ -77,7 +77,7 @@ class PaymentGetCheckViewModel(application: Application) : AndroidViewModel(appl
                     )
                 }
 
-                is DataWrapper.Error -> {
+                is BaseResult.Failure -> {
                     _uiState.postValue(
                         _uiState.value?.copy(
                             isLoading = false,

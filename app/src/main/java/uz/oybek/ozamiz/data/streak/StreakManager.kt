@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.streak
 
+import uz.oybek.ozamiz.common.util.orZero
 import uz.oybek.ozamiz.data.user.model.User
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -37,7 +38,7 @@ object StreakManager {
     fun isStreakFrozen(streakInfo: StreakInfo?): Boolean {
         val daysDiff = getDaysSinceLastAction(streakInfo)
         // If user missed 1 or 2 days (daysDiff is 2 or 3) and had an existing streak
-        return daysDiff in 2L..3L && (streakInfo?.currentStreak ?: 0) > 0
+        return daysDiff in 2L..3L && (streakInfo?.currentStreak.orZero()) > 0
     }
 
     fun isStreakActive(streakInfo: StreakInfo?): Boolean {

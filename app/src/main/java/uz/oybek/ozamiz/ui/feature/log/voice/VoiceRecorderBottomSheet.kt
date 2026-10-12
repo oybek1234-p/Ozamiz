@@ -34,7 +34,6 @@ class VoiceRecorderBottomSheet : BottomSheetDialogFragment() {
     private var startTime = 0L
 
     companion object {
-        const val TAG = "VoiceRecorderSheet"
         const val REQUEST_KEY = "VoiceResult"
         const val RESULT_URI = "uri"
     }

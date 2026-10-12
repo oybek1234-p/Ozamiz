@@ -1,35 +1,30 @@
 package uz.oybek.ozamiz.ui.feature.notification
 
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.notification.NotificationRepository
+import uz.oybek.ozamiz.data.notification.api.NotificationRepository
 import uz.oybek.ozamiz.data.notification.model.NotificationModel
-import uz.oybek.ozamiz.data.user.local.LocalUser
+import javax.inject.Inject
 
-class NotificationsViewModel : ViewModel() {
-    private val _notifications = MutableStateFlow<List<NotificationModel>>(emptyList())
-    val notifications = _notifications.asStateFlow()
+@HiltViewModel
+class NotificationsViewModel @Inject constructor(
+    private val notificationRepository: NotificationRepository
+) : ViewModel() {
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    fun loadNotifications() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val result = NotificationRepository.getNotifications(LocalUser.user.uid)
-            if (result.isSuccess) {
-                _notifications.value = result.getOrDefault(emptyList())
-            }
-            _isLoading.value = false
-        }
-    }
+    val notificationsFlow: Flow<PagingData<NotificationModel>> =
+        notificationRepository.getNotificationsPaging()
+            .cachedIn(viewModelScope)
 
     fun markAllAsRead() {
-        UserProfileRepository.setUnreadNotificationsZero()
+        viewModelScope.launch {
+            notificationRepository.clearUnreadBadge()
+        }
     }
 }
+
+

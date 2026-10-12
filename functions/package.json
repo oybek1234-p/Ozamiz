@@ -9,6 +9,7 @@
     "deploy": "firebase deploy --only functions",
     "deploy:analyzeFood": "firebase deploy --only functions:analyzeFood",
     "deploy:chat": "firebase deploy --only functions:chatWithDietolog",
+    "deploy:notifications": "firebase deploy --only functions:onPostLiked,functions:onCommentCreated,functions:onCommentLiked,functions:onUserStatusChanged",
     "logs": "firebase functions:log"
   },
   "engines": {

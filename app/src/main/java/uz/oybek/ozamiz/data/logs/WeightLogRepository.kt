@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.data.logs
 
+import uz.oybek.ozamiz.common.util.orZero
 import android.net.Uri
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
@@ -9,13 +10,13 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.generateKey
 import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.util.handleException
 import java.util.concurrent.TimeUnit
 
@@ -28,7 +29,7 @@ object WeightLogRepository {
         weightKg: Double,
         photoUri: Uri?,
         shouldBlur: Boolean = false
-    ): DataWrapper<WeightLog> {
+    ): BaseResult<WeightLog, String> {
         val uploadedUrl = if (photoUri != null) {
             ImageUploader.uploadImage(
                 photoUri,
@@ -55,14 +56,14 @@ object WeightLogRepository {
                 .document(logId)
                 .set(newLog)
                 .await()
-            DataWrapper.Success(newLog)
+            BaseResult.Success(newLog)
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error("")
+            BaseResult.Failure(e.message ?: "")
         }
     }
 
-    fun getLogsFlow(userId: String): Flow<DataWrapper<List<WeightLog>>> = flow {
+    fun getLogsFlow(userId: String): Flow<BaseResult<List<WeightLog>, String>> = flow {
         if (userId.isEmpty()) return@flow
         emitAll(callbackFlow {
             val registration = FirebasePaths.Firestore.weightLogs(userId)
@@ -72,16 +73,16 @@ object WeightLogRepository {
                         if (error.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED) {
                             close()
                         } else {
-                            trySend(DataWrapper.Error(error.message))
+                            trySend(BaseResult.Failure(error.message ?: "Xatolik"))
                         }
                         return@addSnapshotListener
                     }
 
                     if (snapshot != null) {
                         val logs = snapshot.toObjects(WeightLog::class.java)
-                        trySend(DataWrapper.Success(logs))
+                        trySend(BaseResult.Success(logs))
                     } else {
-                        trySend(DataWrapper.Success(emptyList()))
+                        trySend(BaseResult.Success(emptyList()))
                     }
                 }
 
@@ -90,9 +91,9 @@ object WeightLogRepository {
     }
 
     fun needShowWeightLog(userId: String): Flow<Boolean> {
-        val hasStreak = (user.streakInfo?.currentStreak ?: 0) > 1
+        val hasStreak = (user.streakInfo?.currentStreak.orZero()) > 1
         return getLogsFlow(userId).map { result ->
-            if (result is DataWrapper.Success) {
+            if (result is BaseResult.Success) {
                 val logs = result.data.sortedBy { it.timestampLong }
                 if (logs.isNotEmpty()) {
                     val lastLog = logs.last()
@@ -131,7 +132,7 @@ object WeightLogRepository {
         return daysSince >= INTERVAL_DAYS
     }
 
-    suspend fun deleteLog(log: WeightLog): DataWrapper<Unit> {
+    suspend fun deleteLog(log: WeightLog): BaseResult<Unit, String> {
         return try {
             FirebasePaths.Firestore.weightLogs(log.userId)
                 .document(log.logId)
@@ -143,10 +144,10 @@ object WeightLogRepository {
                 ImageUploader.deleteImage(photoUrl)
             }
 
-            DataWrapper.Success(Unit)
+            BaseResult.Success(Unit)
         } catch (e: Exception) {
             handleException(e)
-            DataWrapper.Error("")
+            BaseResult.Failure(e.message ?: "")
         }
     }
 }

@@ -2,6 +2,7 @@ package uz.oybek.ozamiz.ui.feature.ai
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,15 +13,20 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
 import uz.oybek.ozamiz.data.ai.aiChat.ChatMessage
-import uz.oybek.ozamiz.data.config.AppPreference
-import uz.oybek.ozamiz.data.food.limit.FoodLimitManager
+import uz.oybek.ozamiz.data.limit.api.LimitManagerRepo
+import uz.oybek.ozamiz.data.limit.api.LimitUpdater
 import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.data.utils.DataWrapper
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import java.util.UUID
+import javax.inject.Inject
 
-class AiChatViewModel : ViewModel() {
+@HiltViewModel
+class AiChatViewModel @Inject constructor(
+    private val limitManagerRepo: LimitManagerRepo,
+    private val limitUpdater: LimitUpdater
+) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
@@ -36,10 +42,8 @@ class AiChatViewModel : ViewModel() {
     private var sendJob: Job? = null
     private var resetJob: Job? = null
 
-    fun getMaxDailyMessages(): Int = FoodLimitManager.getMaxDailyChatMessages(user)
-    fun getTodayMessageCount(): Int = FoodLimitManager.getTodayChatMessageCount()
-    fun getRemainingMessages(): Int = FoodLimitManager.getRemainingChatMessages(user)
-    fun canSendMessage(): Boolean = FoodLimitManager.canSendChatMessage(user)
+    fun getRemainingMessages(): Int = limitManagerRepo.getLimits().remainingChatLimit
+    fun canSendMessage(): Boolean = limitManagerRepo.getLimits().canSendMessages
 
     fun refreshLimitState() {
         _remainingMessages.value = getRemainingMessages()
@@ -84,7 +88,7 @@ class AiChatViewModel : ViewModel() {
         sendJob?.cancel()
 
         viewModelScope.launch {
-            AppPreference.incrementAiChatLimitCount()
+            limitUpdater.incrementChatMessageCount()
             _remainingMessages.value = getRemainingMessages()
         }
 
@@ -100,7 +104,10 @@ class AiChatViewModel : ViewModel() {
             isThinking = true
         )
         _messages.value = _messages.value + listOf(userMessage, aiMessage)
-        android.util.Log.d("AiChatDebug", "sendMessage: _messages.value SET, new size=${_messages.value.size}")
+        android.util.Log.d(
+            "AiChatDebug",
+            "sendMessage: _messages.value SET, new size=${_messages.value.size}"
+        )
         AiChatRepository.clearReplies()
         _isLoading.value = true
 
@@ -113,7 +120,7 @@ class AiChatViewModel : ViewModel() {
                     chatId = chatId,
                     scope = this
                 ).collect { result ->
-                    if (result is DataWrapper.Success) {
+                    if (result is BaseResult.Success) {
                         val displayedText = result.data
                         val currentList = _messages.value.toMutableList()
                         val lastAiIndex = currentList.indexOfLast { !it.isUser }
@@ -166,7 +173,8 @@ class AiChatViewModel : ViewModel() {
     fun onFeedbackClick(message: ChatMessage, isLiked: Boolean, userQuestion: String) {
         val feedbackType = if (isLiked) "like" else "dislike"
         val currentList = _messages.value.toMutableList()
-        val index = currentList.indexOfFirst { it.id == message.id || (it.timestamp == message.timestamp && !it.isUser) }
+        val index =
+            currentList.indexOfFirst { it.id == message.id || (it.timestamp == message.timestamp && !it.isUser) }
         if (index != -1) {
             currentList[index] = currentList[index].copy(feedback = feedbackType)
             _messages.value = currentList

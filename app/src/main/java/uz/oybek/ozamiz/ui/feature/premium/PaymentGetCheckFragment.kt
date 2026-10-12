@@ -1,12 +1,10 @@
 package uz.oybek.ozamiz.ui.feature.premium
 
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
+import uz.oybek.ozamiz.common.util.orZero
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
@@ -14,6 +12,8 @@ import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.databinding.PaymentCheckFragmentBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.NumberFormattingUtils
+import uz.oybek.ozamiz.ui.utils.copyToClipboard
+import uz.oybek.ozamiz.ui.utils.registerImagePicker
 import uz.oybek.ozamiz.ui.utils.showToast
 
 class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
@@ -28,18 +28,15 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
     private var selectedCheckUri: Uri? = null
     private val viewModel: PaymentGetCheckViewModel by viewModels()
 
-    private val pickImageLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-            uri?.let {
-                selectedCheckUri = it
-                binding.checkImage.isVisible = true
-                Glide.with(this).load(it).into(binding.checkImage)
-                binding.nextButton.isEnabled = true
-            }
-        }
+    private val pickImageLauncher = registerImagePicker { uri ->
+        selectedCheckUri = uri
+        binding.checkImage.isVisible = true
+        Glide.with(this).load(uri).into(binding.checkImage)
+        binding.nextButton.isEnabled = true
+    }
 
     override fun viewCreated(bind: PaymentCheckFragmentBinding) {
-        val price = arguments?.getLong(ARG_PRICE, 0L) ?: 0L
+        val price = arguments?.getLong(ARG_PRICE, 0L).orZero()
         val isYearly = arguments?.getBoolean(ARG_IS_YEARLY, false) ?: false
         if (price > 0L) {
             viewModel.initData(price, isYearly)
@@ -60,7 +57,7 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
                     viewModel.clearError()
                 }
                 state.successMessage?.let {
-                    setFragmentResult(REQUEST_KEY, androidx.core.os.bundleOf(RESULT_SUBMITTED to true))
+                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_SUBMITTED to true))
                     scrollViewForm.isVisible = false
                     layoutFormButtons.isVisible = false
                     layoutVerificationSubmitted.isVisible = true
@@ -76,12 +73,8 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
                 pickImageLauncher.launch("image/*")
             }
             copyButton.setOnClickListener {
-                val clipboard: ClipboardManager? =
-                    requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                 val text = cardNumber.text.toString().replace(" ", "")
-                val clip = ClipData.newPlainText("Karta raqami", text)
-                clipboard?.setPrimaryClip(clip)
-                showToast("Karta raqami nusxalandi")
+                copyToClipboard(text, "Karta raqami", "Karta raqami nusxalandi")
             }
 
             nextButton.setOnClickListener {
@@ -93,7 +86,6 @@ class PaymentGetCheckFragment : BaseFragment<PaymentCheckFragmentBinding>() {
             }
         }
     }
-
 
     override fun inflateBinding(
         inflater: LayoutInflater,

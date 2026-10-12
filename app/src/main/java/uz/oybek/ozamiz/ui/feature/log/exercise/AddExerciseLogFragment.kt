@@ -2,7 +2,9 @@ package uz.oybek.ozamiz.ui.feature.log.exercise
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.setFragmentResult
@@ -10,37 +12,32 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAddExerciseLogBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.getBenefit
+import uz.oybek.ozamiz.ui.utils.getTitle
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
+import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import uz.oybek.ozamiz.ui.utils.showToast
-import java.util.Locale
 
+@AndroidEntryPoint
 class AddExerciseLogFragment : BaseFragment<FragmentAddExerciseLogBinding>() {
 
     private val viewModel: AddExerciseLogViewModel by viewModels()
 
     override fun inflateBinding(
-        inflater: LayoutInflater, container: ViewGroup?
-    ): FragmentAddExerciseLogBinding {
-        return FragmentAddExerciseLogBinding.inflate(
-            inflater,
-            container,
-            false
-        )
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.loadArguments(arguments)
-    }
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentAddExerciseLogBinding =
+        FragmentAddExerciseLogBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentAddExerciseLogBinding) {
-        setupListeners(bind)
-        observeViewModel(bind)
+        setupListeners()
+        observeState()
     }
 
     override fun onResume() {
@@ -48,59 +45,115 @@ class AddExerciseLogFragment : BaseFragment<FragmentAddExerciseLogBinding>() {
         binding.editTextDuration.showKeyboard()
     }
 
-    private fun setupListeners(bind: FragmentAddExerciseLogBinding) {
-        bind.toolbarAddExercise.setNavigationOnClickListener {
+    private fun setupListeners() = with(binding) {
+        toolbarAddExercise.setNavigationOnClickListener {
             popBackStack()
         }
-        bind.buttonSaveExerciseLog.setOnClickListener {
-            val durationStr = bind.editTextDuration.text.toString()
-            viewModel.saveExerciseLog(durationStr)
+
+        buttonSaveExerciseLog.setOnSafeClickListener {
             hideSoftInput(requireActivity())
+            viewModel.saveExerciseLog()
         }
-        bind.editTextDuration.doAfterTextChanged {
-            viewModel.onDurationChanged(it.toString())
+
+        editTextDuration.doAfterTextChanged { text ->
+            viewModel.onDurationChanged(text?.toString().orEmpty())
+        }
+
+        editTextDuration.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (viewModel.uiState.value.isSaveButtonVisible) {
+                    hideSoftInput(requireActivity())
+                    viewModel.saveExerciseLog()
+                    true
+                } else false
+            } else false
         }
     }
 
-    private fun observeViewModel(bind: FragmentAddExerciseLogBinding) {
+    private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    val isProcessing = state is AddExerciseUiState.Saving
-                    bind.progressBarExercise.isVisible = isProcessing
-                    bind.buttonSaveExerciseLog.isEnabled = !isProcessing
-                    bind.editTextDuration.isEnabled = !isProcessing
-                    bind.buttonSaveExerciseLog.text = if (isProcessing) "" else "Saqlash"
-
-                    when (state) {
-                        is AddExerciseUiState.Input -> {
-                            bind.tvExerciseName.text = state.selectedExercise.exerciseName
-                            bind.textSelectedExerciseEmoji.text = state.selectedExercise.emoji
-                            bind.tvExerciseBenefit.text = state.selectedExercise.benefit
-
-                            val calories = state.caloriesBurned
-                            if (calories > 0) {
-                                val fatGrams = String.format(Locale.US, "%.1f", calories / 7.7)
-                                bind.cardExerciseResult.isVisible = true
-                                bind.tvBurnedCalories.text = "🔥 $calories kkal • $fatGrams g yog' yoqildi"
-                                bind.tvPraiseMessage.text = "Barakalla! Ajoyib natija 👏"
-                            } else {
-                                bind.cardExerciseResult.isVisible = false
-                            }
-                        }
-                        is AddExerciseUiState.Success -> {
-                            setFragmentResult("exercise_added_request", Bundle().apply {
-                                putString("exerciseId", state.exerciseId)
-                                putInt("caloriesBurned", state.caloriesBurned)
-                            })
-                            popBackStack(R.id.home, false)
-                        }
-                        is AddExerciseUiState.Error -> {
-                            showToast(state.message)
-                        }
-                        else -> {}
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.uiState.collect { state ->
+                        renderUi(state)
                     }
                 }
+                launch {
+                    viewModel.effects.collect { effect ->
+                        handleEffect(effect)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun renderUi(state: AddExerciseUiState) = with(binding) {
+        progressBarExercise.isVisible = state.isSaving
+        buttonSaveExerciseLog.isEnabled = !state.isSaving
+        editTextDuration.isEnabled = !state.isSaving
+        buttonSaveExerciseLog.text = if (state.isSaving) "" else getString(R.string.save)
+
+        val exercise = state.selectedExercise
+        if (exercise != null) {
+            tvExerciseName.text = exercise.getTitle(requireContext())
+            textSelectedExerciseEmoji.text = exercise.emoji
+            tvExerciseBenefit.text = exercise.getBenefit(requireContext())
+        }
+
+        val showResult = state.durationMinutes > 0 && state.caloriesBurned > 0
+        if (showResult) {
+            tvBurnedCalories.text = getString(
+                R.string.exercise_add_burned_result_format,
+                state.caloriesBurned,
+                state.fatBurnedGrams
+            )
+        }
+
+        setViewVisibleAnimated(tvBurnedCalories, showResult)
+        setViewVisibleAnimated(saveButtonContainer, state.isSaveButtonVisible)
+    }
+
+    private fun setViewVisibleAnimated(view: View, isTargetVisible: Boolean) {
+        if (isTargetVisible) {
+            if (!view.isVisible || view.alpha < 1f) {
+                view.isVisible = true
+                view.animate().cancel()
+                if (view.alpha == 0f) {
+                    view.translationY = 24f
+                }
+                view.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(220L)
+                    .start()
+            }
+        } else {
+            if (view.isVisible && view.alpha > 0f) {
+                view.animate().cancel()
+                view.animate()
+                    .alpha(0f)
+                    .translationY(16f)
+                    .setDuration(180L)
+                    .withEndAction {
+                        view.isVisible = false
+                    }
+                    .start()
+            }
+        }
+    }
+
+    private fun handleEffect(effect: AddExerciseUiEffect) {
+        when (effect) {
+            is AddExerciseUiEffect.ExerciseSaved -> {
+                popBackStack()
+            }
+
+            is AddExerciseUiEffect.ShowToastRes -> {
+                context?.let { ctx -> showToast(ctx.getString(effect.messageResId)) }
+            }
+
+            is AddExerciseUiEffect.NavigateBack -> {
+                popBackStack()
             }
         }
     }

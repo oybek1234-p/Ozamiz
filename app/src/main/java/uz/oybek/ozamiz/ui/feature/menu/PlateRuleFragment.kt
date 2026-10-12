@@ -7,6 +7,7 @@ import uz.oybek.ozamiz.data.menu.CategoryType
 import uz.oybek.ozamiz.data.menu.FilterId
 import uz.oybek.ozamiz.databinding.FragmentPlateRuleBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.toBundle
 
 class PlateRuleFragment : BaseFragment<FragmentPlateRuleBinding>() {
 
@@ -38,9 +39,7 @@ class PlateRuleFragment : BaseFragment<FragmentPlateRuleBinding>() {
     }
 
     private fun navigateToSection(sectionType: String) {
-        val action = PlateRuleFragmentDirections.actionPlateRuleFragmentToPlateSectionDetailFragment(
-            sectionType = sectionType
-        )
-        navigate(action)
+        val args = PlateSectionDetailArgs(sectionType = sectionType)
+        navigate(R.id.plateSectionDetailFragment, args.toBundle())
     }
 }

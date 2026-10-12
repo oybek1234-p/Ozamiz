@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.common.onFailure
-import uz.oybek.ozamiz.data.common.onSuccess
+import uz.oybek.ozamiz.common.result.onFailure
+import uz.oybek.ozamiz.common.result.onSuccess
 import uz.oybek.ozamiz.data.profile.api.ProfileAuthRepo
 import javax.inject.Inject
 

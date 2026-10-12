@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.admin.users
 
+import uz.oybek.ozamiz.common.util.orZero
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.common.util.DateFormatter
 import uz.oybek.ozamiz.databinding.FragmentAdminUserDetailsBinding
 import uz.oybek.ozamiz.databinding.ItemAdminUserFieldBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -204,12 +205,11 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
 
                 FieldType.INT -> {
                     itemBinding.textFieldValue.text =
-                        formatIntDisplay(fieldName, value as? Int ?: 0)
+                        formatIntDisplay(fieldName, (value as? Int).orZero())
                     itemBinding.checkboxFieldValue.isVisible = false
                     itemBinding.inputLayoutField.isVisible = true
                     itemBinding.editTextField.inputType =
                         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED
-                    itemBinding.editTextField.setText((value as? Int ?: 0).toString())
                 }
 
                 FieldType.DOUBLE -> {
@@ -234,7 +234,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                 }
 
                 FieldType.LONG -> {
-                    val lVal = value as? Long ?: 0L
+                    val lVal = (value as? Long).orZero()
                     itemBinding.textFieldValue.text = lVal.toString()
                     itemBinding.checkboxFieldValue.isVisible = false
                     itemBinding.inputLayoutField.isVisible = true
@@ -253,8 +253,8 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
     private fun formatIntDisplay(fieldName: String, value: Int): String {
         if (fieldName == User::gender.name) {
             return when (value) {
-                0 -> getString(R.string.admin_gender_male)
-                1 -> getString(R.string.admin_gender_female)
+                0 -> getString(R.string.gender_male)
+                1 -> getString(R.string.gender_female)
                 else -> getString(R.string.admin_gender_unknown)
             } + " ($value)"
         }
@@ -263,7 +263,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
 
     private fun extractDateLong(value: Any?): Long {
         if (value == null) return 0L
-        return DateUtils.toLongTimestamp(value)
+        return DateFormatter.toLongTimestamp(value, 0L)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -356,12 +356,12 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
 
     private fun showDeleteFirstConfirmation() {
         AlertDialog.Builder(requireContext())
-            .setTitle(R.string.admin_delete_confirm_title_1)
+            .setTitle(R.string.admin_delete_profile)
             .setMessage(R.string.admin_delete_confirm_msg_1)
-            .setPositiveButton(R.string.delete_confirm) { _, _ ->
+            .setPositiveButton(R.string.delete) { _, _ ->
                 showDeleteSecondConfirmation()
             }
-            .setNegativeButton(R.string.delete_cancel, null)
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -371,7 +371,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
             .setTitle(R.string.admin_delete_confirm_title_2)
             .setMessage(R.string.admin_delete_confirm_msg_2)
             .setPositiveButton(getString(R.string.wait_seconds, secondsLeft), null)
-            .setNegativeButton(R.string.delete_cancel, null)
+            .setNegativeButton(R.string.cancel, null)
             .create()
 
         dialog.setOnShowListener {
@@ -386,7 +386,7 @@ class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>()
                             secondsLeft--
                             dialog.window?.decorView?.postDelayed(this, 1000)
                         } else {
-                            deleteButton.text = getString(R.string.delete_confirm)
+                            deleteButton.text = getString(R.string.delete)
                             deleteButton.isEnabled = true
                             deleteButton.setOnClickListener {
                                 argUserId?.let { userId ->

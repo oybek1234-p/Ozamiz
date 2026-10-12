@@ -10,7 +10,6 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
         app:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -18,7 +17,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:title="Ma'lumotlarim" />
+            app:title="@string/profile_edit_toolbar_title" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -38,49 +37,8 @@
             android:paddingHorizontal="20dp"
             android:paddingTop="16dp"
             android:paddingBottom="32dp">
-            
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/name_view"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:hintEnabled="false"
-                app:helperText="Masalan: Oybek"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:startIconDrawable="@drawable/person_filled">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Yozing"
-                    android:inputType="textCapWords" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/mobil_raqam_view"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Telefon raqam"
-                app:helperText="Masalan: 971871415"
-                app:boxCornerRadiusBottomEnd="12dp"
-                app:boxCornerRadiusBottomStart="12dp"
-                app:boxCornerRadiusTopEnd="12dp"
-                app:boxCornerRadiusTopStart="12dp"
-                app:startIconDrawable="@drawable/call_ic">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="phone" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- 3. Gender Row -->
+            <!-- 1. Gender Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,7 +52,7 @@
                     android:layout_height="52dp"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:text="Erkak"
+                    android:text="@string/gender_male"
                     app:cornerRadius="12dp"
                     app:icon="@drawable/man_ic"
                     app:iconGravity="textStart" />
@@ -106,13 +64,13 @@
                     android:layout_height="52dp"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:text="Ayol"
+                    android:text="@string/gender_female"
                     app:cornerRadius="12dp"
                     app:icon="@drawable/woman_ic"
                     app:iconGravity="textStart" />
             </LinearLayout>
 
-            <!-- 4. Yosh & Bo'y Row -->
+            <!-- 2. Age & Height Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,7 +84,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:hint="Yoshingiz"
+                    android:hint="@string/age_hint_asterisk"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -135,6 +93,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="3" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -146,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:hint="sm"
+                    android:hint="@string/profile_edit_height_hint"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -155,12 +114,13 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
                         android:inputType="number"
                         android:maxLength="3" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
-            <!-- 5. Hozirgi vazn & Maqsad vazn Row -->
+            <!-- 3. Current Weight & Target Weight Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -174,7 +134,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
                     android:layout_weight="1"
-                    android:hint="Hozirgi vazn (kg)"
+                    android:hint="@string/profile_edit_current_weight_hint"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -183,6 +143,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
                         android:inputType="numberDecimal"
                         android:maxLength="5" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -194,7 +155,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
                     android:layout_weight="1"
-                    android:hint="Maqsad vazn (kg)"
+                    android:hint="@string/profile_edit_target_weight_hint"
                     app:boxCornerRadiusBottomEnd="12dp"
                     app:boxCornerRadiusBottomStart="12dp"
                     app:boxCornerRadiusTopEnd="12dp"
@@ -203,6 +164,7 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:imeOptions="actionNext"
                         android:inputType="numberDecimal"
                         android:maxLength="5" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -216,34 +178,34 @@
                 android:layout_marginTop="-10dp"
                 android:layout_marginBottom="14dp"
                 android:paddingHorizontal="4dp"
-                android:textColor="?colorError"
+                android:textColor="?attr/colorError"
                 android:visibility="gone"
                 tools:text="Bu maqsad juda keskin"
                 tools:visibility="visible" />
 
-            <!-- 6. Ideal Weight Badge -->
+            <!-- 4. Ideal Weight Badge -->
             <TextView
                 android:id="@+id/textView_ideal_weight_range"
-                style="@style/Headline2_16"
+                style="@style/Text2_15"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_rounded_card"
-                android:backgroundTint="?attr/colorSurfaceContainer"
+                android:backgroundTint="?attr/colorSurfaceContainerHigh"
                 android:padding="14dp"
                 android:textColor="?attr/colorOnSurface"
                 android:visibility="gone"
-                tools:text="Sizning ideal vazningiz: 60.5 - 75.2 kg"
+                tools:text="Ideal vazn: 60 kg - 75 kg"
                 tools:visibility="visible" />
 
-            <!-- 7. Activity Level Dropdown -->
+            <!-- 5. Activity Level Dropdown -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/harakat_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:hint="Kundalik harakat va faollik"
+                android:layout_marginBottom="24dp"
+                android:hint="@string/profile_edit_activity_level_hint"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
@@ -255,32 +217,20 @@
                     android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Dummy containers for code compatibility -->
-            <View
-                android:id="@+id/idealWeight_con"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-            <View
-                android:id="@+id/textView_ideal_weight_info"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
-
-            <!-- Section Title 2 -->
+            <!-- 6. Maqsad Section -->
             <TextView
                 style="@style/Title3_17"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="Maqsad"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/profile_edit_goal_section_title"
                 android:textColor="?attr/colorOnSurface" />
 
-            <!-- Goal Selection Cards -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="24dp"
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
@@ -308,6 +258,7 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginEnd="6dp"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/trending_down"
                             app:tint="?attr/colorPrimary" />
 
@@ -316,7 +267,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_medium"
-                            android:text="Ozish"
+                            android:text="@string/onboarding_goal_lose_weight"
                             android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -346,6 +297,7 @@
                             android:layout_width="20dp"
                             android:layout_height="20dp"
                             android:layout_marginEnd="6dp"
+                            android:importantForAccessibility="no"
                             android:src="@drawable/trending"
                             app:tint="?attr/colorPrimary" />
 
@@ -354,339 +306,96 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_medium"
-                            android:text="Semirish"
+                            android:text="@string/onboarding_goal_gain_weight"
                             android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
 
-            <!-- Speed Section Title -->
+            <!-- 7. Section Title: Shaxsiy ma'lumotlar -->
             <TextView
-                android:id="@+id/text_speed_section_title"
                 style="@style/Title3_17"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="Ozish tezligini tanlang"
+                android:text="@string/profile_edit_personal_info_section_title"
                 android:textColor="?attr/colorOnSurface" />
 
-            <!-- Speed Options Horizontal Container (Side by Side 2 Cards) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:orientation="horizontal">
-
-                <!-- Normal Speed Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_pace_normal"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp">
-
-                            <!-- Icon Container Circle -->
-                            <FrameLayout
-                                android:id="@+id/frame_pace_normal_icon"
-                                android:layout_width="38dp"
-                                android:layout_height="38dp"
-                                android:layout_alignParentStart="true"
-                                android:background="@drawable/bg_circle_filled">
-
-                                <ImageView
-                                    android:id="@+id/icon_pace_normal"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_pace_normal"
-                                    app:tint="?attr/colorOnSurface" />
-                            </FrameLayout>
-
-                        </RelativeLayout>
-
-                        <TextView
-                            android:id="@+id/text_pace_normal_label"
-                            style="@style/TextAppearance.Material3.TitleMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Normal"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/text_pace_normal_title"
-                            style="@style/TextAppearance.Material3.BodyMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:fontFamily="@font/roboto_medium"
-                            android:text="+1.6 kg / oy"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Fast Speed Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/card_pace_fast"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_weight="1"
-                    android:clickable="true"
-                    android:focusable="true"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="14dp">
-
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp">
-
-                            <!-- Icon Container Circle -->
-                            <FrameLayout
-                                android:id="@+id/frame_pace_fast_icon"
-                                android:layout_width="38dp"
-                                android:layout_height="38dp"
-                                android:layout_alignParentStart="true"
-                                android:background="@drawable/bg_circle_filled">
-
-                                <ImageView
-                                    android:id="@+id/icon_pace_fast"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_pace_fast"
-                                    app:tint="?attr/colorOnSurfaceVariant" />
-                            </FrameLayout>
-                        </RelativeLayout>
-
-                        <TextView
-                            android:id="@+id/text_pace_fast_label"
-                            style="@style/TextAppearance.Material3.TitleMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_bold"
-                            android:text="Tezroq"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/text_pace_fast_title"
-                            style="@style/TextAppearance.Material3.BodyMedium"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:fontFamily="@font/roboto_medium"
-                            android:text="+2.4 kg / oy"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-            </LinearLayout>
-
-            <!-- Summary Explanation Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_energy_summary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:id="@+id/text_energy_summary"
-                        style="@style/Text1_16"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:lineSpacingExtra="6dp"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="15sp"
-                        tools:text="• Sizning tanangiz kuniga taxminan 2025 kkal energiya sarflaydi,\n\n• 500 kkal kamroq ovqat yeymiz natijada haftasiga 0.5 kg, oyiga 1.8 kg ozasiz.\n\n• Maqsadga esa 2 oy 5 kunda erishasiz." />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipGroup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <!-- Section Title 3 -->
-            <TextView
-                style="@style/Title3_17"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="Kunlik me'yor"
-                android:textColor="?attr/colorOnSurface" />
-
-            <!-- Calories Input -->
+            <!-- Ism View -->
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/name_view"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Kunlik kaloriya"
+                android:layout_marginBottom="12dp"
+                android:hint="@string/name_hint_asterisk"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusTopStart="12dp"
-                app:startIconDrawable="@drawable/fire_ic">
+                app:startIconDrawable="@drawable/person_ic">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_calories"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="number" />
+                    android:imeOptions="actionNext"
+                    android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Protein, Fat, Carbs Inputs Row -->
-            <LinearLayout
+            <!-- Telefon raqam View -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/mobil_raqam_view"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:orientation="horizontal">
+                android:hint="@string/profile_edit_phone_hint"
+                app:boxCornerRadiusBottomEnd="12dp"
+                app:boxCornerRadiusBottomStart="12dp"
+                app:boxCornerRadiusTopEnd="12dp"
+                app:boxCornerRadiusTopStart="12dp"
+                app:startIconDrawable="@drawable/call_ic">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
-                    android:layout_weight="1"
-                    android:hint="Oqsil (g)"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_protein"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    android:layout_weight="1"
-                    android:hint="Yog' (g)"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_fat"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:layout_weight="1"
-                    android:hint="Uglevod (g)"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusTopStart="12dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_carbs"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="number" />
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
-
-            <!-- Dummy for code compatibility -->
-            <View
-                android:id="@+id/tv_macro_summary"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone" />
+                    android:imeOptions="actionDone"
+                    android:inputType="phone" />
+            </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <!-- Footer Action -->
-    <com.google.android.material.card.MaterialCardView
+    <FrameLayout
         android:id="@+id/save_button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="8dp"
+        android:elevation="@dimen/dimen_2"
+        android:background="?attr/colorSurfaceContainer"
+        android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <FrameLayout
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/save"
+            style="@style/Widget.Material3.Button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:layout_height="52dp"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/save"
+            android:textSize="16sp"
+            app:cornerRadius="14dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/save"
-                style="@style/Widget.Material3.Button"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="@string/save"
-                android:textSize="16sp"
-                app:cornerRadius="14dp" />
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                tools:visibility="visible" />
-        </FrameLayout>
-    </com.google.android.material.card.MaterialCardView>
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:elevation="4dp"
+            android:indeterminateTint="?attr/colorPrimary"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

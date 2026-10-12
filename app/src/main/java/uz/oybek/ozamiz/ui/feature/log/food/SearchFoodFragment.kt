@@ -1,90 +1,62 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
-import android.os.Bundle
-import android.util.Log
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.progressindicator.CircularProgressIndicator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.food.limit.FoodLimitManager
-import uz.oybek.ozamiz.data.food.model.FoodItem
-import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.ads.AdsManager
-import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.food.model.FoodItem
+import uz.oybek.ozamiz.databinding.FragmentSearchFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
+import uz.oybek.ozamiz.ui.utils.loadBannerAd
+import uz.oybek.ozamiz.ui.utils.showAppSnackBar
 import uz.oybek.ozamiz.ui.utils.showKeyboard
-import java.util.Date
+import uz.oybek.ozamiz.ui.utils.showToast
+import kotlin.time.Duration.Companion.milliseconds
 
+@AndroidEntryPoint
 class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
 
     private val viewModel: SearchFoodViewModel by viewModels()
 
     private val adapter by lazy {
-        FoodSearchAdapter(
-            onAddClick = { food, btn, progress ->
-                directAdd(food, btn, progress)
-            },
-            onItemClick = { food ->
-                showSelectionSheet(food)
-            }
-        )
+        FoodSearchAdapter(onAddClick = { food, btn, progress ->
+            directAdd(food, btn, progress)
+        }, onItemClick = { food ->
+            showSelectionSheet(food)
+        })
     }
 
-    private var mealType: String = ""
-    private var timestamp: Long = System.currentTimeMillis()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            val rawTs = it.getLong(ARG_TIMESTAMP, -1L)
-            timestamp = if (rawTs > 0) rawTs else System.currentTimeMillis()
-            val rawMeal = it.getString(ARG_MEAL_TYPE) ?: it.getString("meal")
-            mealType = uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(rawMeal, timestamp)
-        }
-    }
+    private var shouldScrollToTopOnSearch = false
 
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentSearchFoodBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentSearchFoodBinding) {
         setupUI(bind)
-        observeData(bind)
-        viewModel.updateMealType(mealType)
+        observeState()
         bind.inputSearchFood.showKeyboard()
-        loadBanner()
-    }
-
-    private fun loadBanner() {
-        if (user.isPremium()) {
-            binding.bannerContainer.isVisible = false
-            return
-        }
-        try {
-            val bannerView = AdsManager.createBannerView(requireContext(), AdsConfig.BANNER_LOG_FOOD)
-            binding.bannerContainer.removeAllViews()
-            binding.bannerContainer.addView(bannerView)
-            binding.bannerContainer.isVisible = true
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     private fun setupUI(bind: FragmentSearchFoodBinding) = with(bind) {
@@ -92,18 +64,41 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
             popBackStack()
         }
 
-        recyclerSearchResults.layoutManager = SafeLinearLayoutManager(requireContext())
+        val layoutManager = LinearLayoutManager(requireContext())
+        recyclerSearchResults.layoutManager = layoutManager
+        recyclerSearchResults.setHasFixedSize(true)
         recyclerSearchResults.adapter = adapter
 
+        adapter.addOnPagesUpdatedListener {
+            if (shouldScrollToTopOnSearch) {
+                recyclerSearchResults.scrollToPosition(0)
+                shouldScrollToTopOnSearch = false
+            }
+        }
+
         adapter.addLoadStateListener { loadState ->
-            val isLoading = loadState.refresh is LoadState.Loading
-            bind.progressSearch.isVisible = isLoading
-            val isEmpty = loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
+            val isRefreshLoading = loadState.refresh is LoadState.Loading
+            val isInitialLoading = isRefreshLoading && adapter.itemCount == 0
+            val isSearching = isRefreshLoading && adapter.itemCount > 0
+            val isNotLoading = loadState.refresh is LoadState.NotLoading
+            val isEmpty = isNotLoading && adapter.itemCount == 0
+
+            bind.progressLoading.isVisible = isInitialLoading
+            bind.progressSearch.isVisible = isSearching
             bind.layoutEmptyState.isVisible = isEmpty
+            bind.recyclerSearchResults.isVisible = adapter.itemCount > 0
         }
 
         inputSearchFood.addTextChangedListener {
-            viewModel.searchFoods(it.toString())
+            val query = it?.toString().orEmpty()
+            shouldScrollToTopOnSearch = true
+            if (adapter.itemCount == 0) {
+                bind.progressLoading.isVisible = true
+                bind.layoutEmptyState.isVisible = false
+            } else {
+                bind.progressSearch.isVisible = true
+            }
+            viewModel.searchFoods(query)
         }
 
         inputSearchFood.setOnEditorActionListener { _, actionId, _ ->
@@ -114,147 +109,110 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
         }
     }
 
-    private fun observeData(bind: FragmentSearchFoodBinding) {
+    private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.foodPagingFlow.collectLatest { pagingData ->
-                adapter.submitData(pagingData)
-                bind.recyclerSearchResults.scrollToPosition(0)
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.searchResultCount.collectLatest { count ->
-                val showCount = count != null && count > 0
-                bind.textViewSearchResultsCount.isVisible = showCount
-                if (showCount && count != null) {
-                    bind.textViewSearchResultsCount.text =
-                        bind.root.context.getString(R.string.search_foods_count_format, count)
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.uiState.collect { state ->
+                        renderUi(state)
+                    }
+                }
+                launch {
+                    viewModel.effects.collect { effect ->
+                        handleEffect(effect)
+                    }
+                }
+                launch {
+                    viewModel.foodPagingFlow.collectLatest { pagingData ->
+                        adapter.submitData(pagingData)
+                    }
                 }
             }
         }
     }
 
-    private fun directAdd(foodItem: FoodItem, button: MaterialButton, progress: View) {
-        animateClick(button)
+    private fun renderUi(state: SearchFoodUiState) = with(binding) {
+        val showCount = state.searchResultCount != null && state.searchResultCount > 0
+        textViewSearchResultsCount.isVisible = showCount
+        if (showCount) {
+            textViewSearchResultsCount.text =
+                getString(R.string.search_food_count_format, state.searchResultCount)
+        }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            button.isEnabled = false
-            button.setIconResource(R.drawable.check_ic)
-            progress.isVisible = true
+        renderBanner(state.isPremium)
+    }
 
-            val defaultServing = foodItem.servingSizes.firstOrNull()
-            val weight = defaultServing?.grams ?: 100.0
-            val weightInt = weight.toInt()
-            val quantityDescription = when {
-                defaultServing == null -> "${weightInt} g"
-                defaultServing.description.contains("g)", ignoreCase = true) || defaultServing.description.equals("100 g", ignoreCase = true) -> defaultServing.description
-                defaultServing.description.equals("gramm", ignoreCase = true) -> "${weightInt} g"
-                else -> "1 ${defaultServing.description.lowercase()}"
+    private fun renderBanner(isPremium: Boolean) {
+        binding.bannerContainer.loadBannerAd(AdsConfig.BANNER_LOG_FOOD)
+    }
+
+    private fun handleEffect(effect: SearchFoodUiEffect) {
+        when (effect) {
+            is SearchFoodUiEffect.ShowToastRes -> {
+                showToast(getString(effect.messageResId))
             }
 
-            val calories = (foodItem.caloriesPer100g * weight / 100).toInt()
-            val protein = (foodItem.proteinPer100g * weight / 100)
-            val fat = (foodItem.fatPer100g * weight / 100)
-            val carbs = (foodItem.carbsPer100g * weight / 100)
-
-            val log = FoodLog(
-                description = "${foodItem.name} ($quantityDescription)",
-                calories = calories,
-                protein = protein,
-                fat = fat,
-                carbs = carbs,
-                mealType = mealType,
-                aiGenerated = false,
-                timestamp = System.currentTimeMillis()
-            )
-
-            viewModel.logFood(log, Date(timestamp))
-            Snackbar.make(binding.root, "${foodItem.name} qo'shildi!", Snackbar.LENGTH_SHORT).show()
-
-            delay(200)
-
-            progress.isVisible = false
-            button.setIconResource(R.drawable.add_ic)
-            button.isEnabled = true
+            is SearchFoodUiEffect.ShowFoodAdded -> {
+                val message = if (effect.foodName.isNotBlank()) {
+                    getString(R.string.search_food_added_format, effect.foodName)
+                } else {
+                    getString(R.string.search_food_added_success)
+                }
+                showAppSnackBar(message = message)
+            }
         }
     }
 
-    private fun animateClick(view: View) {
-        view.animate()
-            .scaleX(0.92f)
-            .scaleY(0.92f)
-            .setInterpolator(DecelerateInterpolator())
-            .setDuration(100)
-            .withEndAction {
-                view.animate()
-                    .scaleX(1.0f)
-                    .scaleY(1.0f)
-                    .setInterpolator(DecelerateInterpolator())
-                    .setDuration(150)
-                    .start()
+    private fun directAdd(
+        foodItem: FoodItem, button: MaterialButton, progress: CircularProgressIndicator
+    ) {
+        viewModel.logDirectFood(foodItem)
+
+        val animate = {
+            button.isEnabled = false
+            progress.alpha = 1f
+            progress.progress = 0
+            progress.visibility = View.VISIBLE
+
+            val animator = ValueAnimator.ofInt(0, 100).apply {
+                duration = 200
+                interpolator = DecelerateInterpolator()
+                addUpdateListener { anim ->
+                    progress.progress = anim.animatedValue as Int
+                }
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        progress.animate().alpha(0f).setDuration(100).withEndAction {
+                            progress.visibility = View.INVISIBLE
+                            progress.alpha = 1f
+                            progress.progress = 0
+                        }.start()
+
+                        button.setIconResource(R.drawable.check_ic)
+                        button.animate().scaleX(1.15f).scaleY(1.15f).setDuration(100)
+                            .withEndAction {
+                                button.animate().scaleX(1.0f).scaleY(1.0f).setDuration(100).start()
+                            }.start()
+                    }
+                })
             }
-            .start()
+            animator.start()
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(500.milliseconds)
+                button.setIconResource(R.drawable.add_ic)
+                button.isEnabled = true
+            }
+        }
+        animate()
     }
 
     private fun showSelectionSheet(foodItem: FoodItem) {
+        val currentMealType = viewModel.uiState.value.mealType
         FoodSelectionBottomSheet(
-            foodItem = foodItem,
-            mealType = mealType,
-            onLogAdded = { log ->
-                viewModel.logFood(log, Date(timestamp))
-                Snackbar.make(binding.root, "Qo'shildi!", Snackbar.LENGTH_SHORT).show()
-                binding.inputSearchFood.setText("")
+            foodItem = foodItem, mealType = currentMealType, onLogAdded = { log ->
+                viewModel.logFoodFromSelection(log)
                 hideSoftInput(requireActivity())
-            }
-        ).show(parentFragmentManager, FoodSelectionBottomSheet.TAG)
-    }
-
-    companion object {
-        const val ARG_MEAL_TYPE = "mealType"
-        const val ARG_TIMESTAMP = "timestamp"
-
-        fun navigate(
-            fragment: BaseFragment<*>,
-            mealType: String,
-            timestamp: Long
-        ) {
-            val bundle = Bundle().apply {
-                putString(ARG_MEAL_TYPE, mealType)
-                putLong(ARG_TIMESTAMP, timestamp)
-            }
-            fragment.navigate(
-                R.id.searchFoodFragment,
-                bundle
-            )
-        }
-
-        fun navigate(
-            navController: NavController,
-            mealType: String,
-            timestamp: Long
-        ) {
-            val bundle = Bundle().apply {
-                putString(ARG_MEAL_TYPE, mealType)
-                putLong(ARG_TIMESTAMP, timestamp)
-            }
-            try {
-                navController.navigate(
-                    R.id.searchFoodFragment,
-                    bundle
-                )
-            } catch (e: Exception) {
-                // ignore
-            }
-        }
-    }
-}
-
-private class SafeLinearLayoutManager(context: android.content.Context) : LinearLayoutManager(context) {
-    override fun onLayoutChildren(recycler: RecyclerView.Recycler?, state: RecyclerView.State?) {
-        try {
-            super.onLayoutChildren(recycler, state)
-        } catch (e: IndexOutOfBoundsException) {
-            Log.e("SafeLayoutManager", "IndexOutOfBoundsException in RecyclerView: ${e.message}")
-        }
+            }).show(parentFragmentManager, null)
     }
 }

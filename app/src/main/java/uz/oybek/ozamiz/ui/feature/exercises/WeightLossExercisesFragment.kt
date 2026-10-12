@@ -11,6 +11,7 @@ import uz.oybek.ozamiz.databinding.FragmentWeightLossExercisesBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.base.ListClickListener
 import uz.oybek.ozamiz.ui.base.BaseAdapter
+import uz.oybek.ozamiz.ui.utils.toBundle
 import uz.oybek.ozamiz.ui.utils.visibleOrGone
 
 class WeightLossExercisesFragment : BaseFragment<FragmentWeightLossExercisesBinding>() {
@@ -21,7 +22,10 @@ class WeightLossExercisesFragment : BaseFragment<FragmentWeightLossExercisesBind
         showBottomSheet = true
     }
 
-    override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): FragmentWeightLossExercisesBinding {
+    override fun inflateBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentWeightLossExercisesBinding {
         return FragmentWeightLossExercisesBinding.inflate(inflater, container, false)
     }
 
@@ -41,20 +45,22 @@ class WeightLossExercisesFragment : BaseFragment<FragmentWeightLossExercisesBind
                     bind.layoutVideosContent.visibleOrGone(true)
                 }
             }
+
             override fun onTabUnselected(tab: TabLayout.Tab?) {}
             override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
         val exercisesAdapter = WeightLossExercisesAdapter()
         exercisesAdapter.addClickListener(object : ListClickListener<WeightLossExerciseUiModel>() {
-            override fun onClick(holder: BaseAdapter.ViewHolder<*>, model: WeightLossExerciseUiModel) {
+            override fun onClick(
+                holder: BaseAdapter.ViewHolder<*>,
+                model: WeightLossExerciseUiModel
+            ) {
                 if (model.isLocked) {
                     navigate(R.id.premiumFragment)
                 } else {
-                    val direction = WeightLossExercisesFragmentDirections.actionExercisesToWeightLossExerciseDetailFragment(
-                        model.exercise.id
-                    )
-                    navigate(direction)
+                    val args = WeightLossExerciseArgs(model.exercise.id)
+                    navigate(R.id.weightLossExerciseDetailFragment, args.toBundle())
                 }
             }
         })
@@ -70,10 +76,8 @@ class WeightLossExercisesFragment : BaseFragment<FragmentWeightLossExercisesBind
                 if (model.isLocked) {
                     navigate(R.id.premiumFragment)
                 } else {
-                    val direction = WeightLossExercisesFragmentDirections.actionExercisesToWeightLossVideoDetailFragment(
-                        model.video.id
-                    )
-                    navigate(direction)
+                    val args = WeightLossVideoArgs(model.video.id)
+                    navigate(R.id.weightLossVideoDetailFragment, args.toBundle())
                 }
             }
         })

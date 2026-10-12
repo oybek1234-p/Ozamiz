@@ -50,7 +50,7 @@
             android:layout_marginStart="4dp"
             android:visibility="gone"
             app:srcCompat="@drawable/star_ic"
-            android:tint="@color/yellow"
+            app:tint="?attr/colorStreakActive"
             tools:visibility="visible" />
     </LinearLayout>
 

@@ -7,14 +7,14 @@
     android:background="?selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:minHeight="68dp"
-    android:paddingHorizontal="@dimen/dimen_24"
-    android:paddingVertical="@dimen/dimen_18">
+    android:minHeight="64dp"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="14dp">
 
     <FrameLayout
         android:id="@+id/layout_progress_container"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -25,97 +25,78 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             app:indicatorColor="?attr/colorPrimary"
-            app:indicatorSize="56dp"
+            app:indicatorSize="48dp"
             app:indicatorTrackGapSize="0dp"
-            app:trackColor="?attr/colorSurfaceContainerHigh"
-            app:trackCornerRadius="3dp"
-            app:trackThickness="4.5dp"
+            app:trackColor="?attr/colorSurfaceVariant"
+            app:trackCornerRadius="2dp"
+            app:trackThickness="3dp"
             tools:progress="60" />
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/img_meal_icon"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
-            android:scaleType="centerCrop"
-            tools:src="@drawable/breakfast_simple" />
+            android:scaleType="fitCenter"
+            app:tint="?attr/colorOnSurfaceVariant"
+            tools:src="@drawable/breakfast_ic" />
     </FrameLayout>
 
     <!-- Right Side Add Button -->
     <ImageButton
         android:id="@+id/btn_add_meal"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:padding="10dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_circle_tonal"
+        android:contentDescription="@string/add_food_title"
+        android:padding="8dp"
         android:src="@drawable/add_ic"
-        android:background="@drawable/bg_circle_primary"
-        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="?attr/colorOnPrimary" />
+        app:tint="?attr/colorOnSecondaryContainer" />
 
     <!-- Middle Content Container -->
     <LinearLayout
         android:id="@+id/layout_text_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:layout_marginEnd="@dimen/dimen_18"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="10dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_add_meal"
         app:layout_constraintStart_toEndOf="@id/layout_progress_container"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Top Row: Meal Title (Left) + Time (Right) -->
-        <LinearLayout
+        <!-- Top Row: Meal Title -->
+        <TextView
+            android:id="@+id/text_meal_name"
+            style="@style/TextAppearance.Material3.TitleMedium"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:fontFamily="@font/roboto_bold"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="16sp"
+            tools:text="Nonushta" />
 
-            <TextView
-                android:id="@+id/text_meal_name"
-                style="@style/TextAppearance.Material3.TitleMedium"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/roboto_bold"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp"
-                tools:text="Ertalabki" />
+        <TextView
+            android:id="@+id/text_meal_calories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/text_meal_calories"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:fontFamily="@font/roboto_regular"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="13sp"
-                tools:text="08:00" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_calories"
+        <TextView
+            android:id="@+id/text_last_eaten"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/text_last_eaten"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:ellipsize="end"
-                android:fontFamily="@font/roboto_regular"
-                android:maxLines="1"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="13sp"
-                tools:text="100/450 kkal • Osh, choy" />
-        </LinearLayout>
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/roboto_regular"
+            android:maxLines="1"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            tools:text="629 kal qoldi • Tuxum va non" />
 
     </LinearLayout>
 

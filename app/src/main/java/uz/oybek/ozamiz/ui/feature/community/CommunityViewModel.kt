@@ -1,153 +1,222 @@
 package uz.oybek.ozamiz.ui.feature.community
 
-import uz.oybek.ozamiz.data.community.model.CommunityPostFilter.ALL
-import uz.oybek.ozamiz.data.notification.NotificationRepository
-import uz.oybek.ozamiz.data.notification.model.NotificationModel
-import uz.oybek.ozamiz.data.user.local.LocalUser
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.community.CommunityPostRepository
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import androidx.annotation.Keep
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.data.community.api.CommunityPostRepository
+import uz.oybek.ozamiz.data.community.api.PublicUserRepository
 import uz.oybek.ozamiz.data.community.model.CommunityPost
 import uz.oybek.ozamiz.data.community.model.CommunityPostFilter
-import uz.oybek.ozamiz.data.notification.model.NotificationModel.Companion.TYPE_LIKE
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.data.profile.model.User
+import javax.inject.Inject
 
-@Keep
-data class CommunityState(
+data class CommunityUiState(
+    val filter: CommunityPostFilter = CommunityPostFilter.ALL,
     val posts: List<CommunityPost> = emptyList(),
+    val users: List<User> = emptyList(),
     val isLoading: Boolean = false,
     val isPaging: Boolean = false,
     val hasReachedEnd: Boolean = false,
-    val error: String? = null,
-    val filter: CommunityPostFilter = CommunityPostFilter.WEIGHT_LOSS
+    val currentUserId: String = ""
 )
 
-class CommunityViewModel : ViewModel() {
-    private val _state = MutableStateFlow(CommunityState())
-    val state: StateFlow<CommunityState> = _state
+sealed interface CommunityUiEffect {
+    data object PostDeletedSuccess : CommunityUiEffect
+    data object GenericError : CommunityUiEffect
+}
 
-    private var lastSnapshot: com.google.firebase.firestore.DocumentSnapshot? = null
+@HiltViewModel
+class CommunityViewModel @Inject constructor(
+    private val postRepository: CommunityPostRepository,
+    private val publicUserRepository: PublicUserRepository,
+    profileRepo: ProfileRepo
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(
+        CommunityUiState(currentUserId = profileRepo.userId)
+    )
+    val uiState: StateFlow<CommunityUiState> = _uiState.asStateFlow()
+
+    private val _effectChannel = Channel<CommunityUiEffect>(Channel.BUFFERED)
+    val effect = _effectChannel.receiveAsFlow()
 
     init {
-        loadPosts()
+        loadData(isInitial = true)
     }
 
-    fun setFilter(filter: CommunityPostFilter) {
-        if (_state.value.filter == filter) return
-        _state.update { it.copy(filter = filter, posts = emptyList(), hasReachedEnd = false) }
-        lastSnapshot = null
-        loadPosts()
+    fun setFilter(newFilter: CommunityPostFilter) {
+        if (_uiState.value.filter == newFilter) return
+        _uiState.update {
+            it.copy(
+                filter = newFilter,
+                posts = emptyList(),
+                users = emptyList(),
+                hasReachedEnd = false
+            )
+        }
+        loadData(isInitial = true)
     }
 
     fun refresh() {
-        lastSnapshot = null
-        _state.update { it.copy(hasReachedEnd = false) }
-        loadPosts()
+        _uiState.update { it.copy(hasReachedEnd = false) }
+        loadData(isInitial = true)
     }
 
-    fun loadPosts() {
-        if (_state.value.isLoading || _state.value.isPaging || _state.value.hasReachedEnd) return
+    fun loadNextPage() {
+        val state = _uiState.value
+        if (state.isLoading || state.isPaging || state.hasReachedEnd) return
+        loadData(isInitial = false)
+    }
 
-        val isFirstLoad = lastSnapshot == null
-        _state.update { it.copy(isLoading = isFirstLoad, isPaging = !isFirstLoad, error = null) }
+    private fun loadData(isInitial: Boolean) {
+        val currentFilter = _uiState.value.filter
 
-        val requestLimit = 10L
+        _uiState.update {
+            it.copy(
+                isLoading = isInitial,
+                isPaging = !isInitial
+            )
+        }
 
         viewModelScope.launch {
-            val result = CommunityPostRepository.getPosts(
-                limit = requestLimit,
-                lastSnapshot = lastSnapshot,
-                filter = _state.value.filter
-            )
-            result.onSuccess { fetchResult ->
-                lastSnapshot = fetchResult.lastSnapshot
-                val newPosts = fetchResult.posts
-                val updatedPosts = if (isFirstLoad) newPosts else _state.value.posts + newPosts
-                _state.update {
+            if (currentFilter == CommunityPostFilter.ACTIVE_USERS) {
+                loadUsers(isInitial)
+            } else {
+                loadPosts(isInitial, currentFilter)
+            }
+        }
+    }
+
+    private suspend fun loadPosts(isInitial: Boolean, filter: CommunityPostFilter) {
+        val lastTimestamp = if (isInitial) null else _uiState.value.posts.lastOrNull()?.createdAt
+        val pageSize = 10L
+
+        when (val result = postRepository.getPosts(
+            filter = filter, limit =
+                pageSize, lastTimestamp = lastTimestamp
+        )) {
+            is BaseResult.Success -> {
+                val newPosts = result.data
+                val updatedList = if (isInitial) {
+                    newPosts.distinctBy { it.id }
+                } else {
+                    (_uiState.value.posts + newPosts).distinctBy { it.id }
+                }
+                val reachedEnd = newPosts.size < pageSize
+
+                _uiState.update {
                     it.copy(
-                        posts = updatedPosts,
+                        posts = updatedList,
                         isLoading = false,
                         isPaging = false,
-                        hasReachedEnd = fetchResult.hasReachedEnd
+                        hasReachedEnd = reachedEnd
                     )
                 }
-            }.onFailure { e ->
-                _state.update { it.copy(isLoading = false, isPaging = false, error = e.message) }
+            }
+
+            is BaseResult.Failure -> {
+                _uiState.update {
+                    it.copy(isLoading = false, isPaging = false)
+                }
+                _effectChannel.send(CommunityUiEffect.GenericError)
             }
         }
     }
 
-    fun toggleLike(postId: String) {
-        val user = LocalUser.user
-        if (user.uid.isEmpty()) return
+    private suspend fun loadUsers(isInitial: Boolean) {
+        val lastTimestamp = if (isInitial) null else _uiState.value.users.lastOrNull()?.lastSeenTime
+        val pageSize = 15L
+
+        when (val result =
+            publicUserRepository.getPublicUsers(limit = pageSize, lastTimestamp = lastTimestamp)) {
+            is BaseResult.Success -> {
+                val newUsers = result.data
+                val updatedList = if (isInitial) {
+                    newUsers.distinctBy { it.uid }
+                } else {
+                    (_uiState.value.users + newUsers).distinctBy { it.uid }
+                }
+                val reachedEnd = newUsers.size < pageSize
+
+                _uiState.update {
+                    it.copy(
+                        users = updatedList,
+                        isLoading = false,
+                        isPaging = false,
+                        hasReachedEnd = reachedEnd
+                    )
+                }
+            }
+
+            is BaseResult.Failure -> {
+                _uiState.update {
+                    it.copy(isLoading = false, isPaging = false)
+                }
+                _effectChannel.send(CommunityUiEffect.GenericError)
+            }
+        }
+    }
+
+    fun toggleLike(post: CommunityPost) {
+        val uid = _uiState.value.currentUserId
+        if (uid.isBlank()) return
+
+        val isLiked = post.likedBy.contains(uid)
+        val newCount = if (isLiked) post.likesCount - 1 else post.likesCount + 1
+        val newLikedBy = if (isLiked) post.likedBy - uid else post.likedBy + uid
+        val updatedPost = post.copy(likesCount = newCount, likedBy = newLikedBy)
+
+        _uiState.update { state ->
+            state.copy(
+                posts = state.posts.map { if (it.id == post.id) updatedPost else it }
+            )
+        }
 
         viewModelScope.launch {
-            val post = _state.value.posts.find { it.id == postId } ?: return@launch
-            val result = CommunityPostRepository.toggleLike(postId, user.uid)
-            result.onSuccess { isLiked ->
-                _state.update { currentState ->
-                    val newPosts = currentState.posts.map { p ->
-                        if (p.id == postId) {
-                            val newLikesCount = if (isLiked) p.likesCount + 1 else p.likesCount - 1
-                            val newLikedBy = p.likedBy.toMutableList()
-                            if (isLiked) newLikedBy.add(user.uid) else newLikedBy.remove(user.uid)
-                            p.copy(likesCount = newLikesCount, likedBy = newLikedBy)
-                        } else p
+            postRepository.togglePostLike(post.id)
+        }
+    }
+
+    fun updateCommentCount(postId: String, delta: Int) {
+        if (postId.isBlank() || delta == 0) return
+        _uiState.update { state ->
+            state.copy(
+                posts = state.posts.map { post ->
+                    if (post.id == postId) {
+                        val newCount = (post.commentsCount + delta).coerceAtLeast(0)
+                        post.copy(commentsCount = newCount)
+                    } else {
+                        post
                     }
-                    currentState.copy(posts = newPosts)
                 }
-                if (isLiked && post.userId != user.uid) {
-                    val notification = NotificationModel(
-                        type = TYPE_LIKE,
-                        fromUserId = user.uid,
-                        fromUserName = user.name,
-                        fromUserAvatar = user.avatarUrl,
-                        toUserId = post.userId,
-                        postId = post.id,
-                        message = "Sizning postingizga layk bosdi",
-                        timestamp = java.util.Date()
-                    )
-                    NotificationRepository.sendNotification(
-                        notification
-                    )
-                }
-            }
+            )
         }
     }
 
-    fun deletePost(postId: String) {
+    fun deletePost(post: CommunityPost) {
+        _uiState.update { state ->
+            state.copy(posts = state.posts.filter { it.id != post.id })
+        }
+
         viewModelScope.launch {
-            val isAdmin = UserProfileRepository.user.admin
-            val result = if (isAdmin) {
-                CommunityPostRepository.adminDeletePost(postId)
-            } else {
-                CommunityPostRepository.deletePost(postId)
-            }
-            result.onSuccess {
-                _state.update { currentState ->
-                    val newPosts = currentState.posts.filter { it.id != postId }
-                    currentState.copy(posts = newPosts)
+            when (postRepository.deleteMyPost(post.id)) {
+                is BaseResult.Success -> {
+                    _effectChannel.send(CommunityUiEffect.PostDeletedSuccess)
                 }
-            }.onFailure { e ->
-                _state.update { it.copy(error = "O'chirishda xatolik: ${e.localizedMessage}") }
+
+                is BaseResult.Failure -> {
+                    _effectChannel.send(CommunityUiEffect.GenericError)
+                }
             }
         }
-    }
-
-    fun markViewed(postId: String) {
-        val userId = UserProfileRepository.user.uid
-        if (userId.isEmpty()) return
-        viewModelScope.launch {
-            CommunityPostRepository.markViewed(postId, userId)
-        }
-    }
-
-    fun observeUnReadMessages(action: (Int) -> Unit) {
-        UserProfileRepository.observeUnReadMessages(action)
     }
 }

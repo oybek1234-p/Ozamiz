@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.community
 
+import uz.oybek.ozamiz.common.util.orZero
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,12 +8,16 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.diet.DietEngine
 import uz.oybek.ozamiz.data.level.LevelRepository
 import uz.oybek.ozamiz.databinding.FragmentCommunityProfileBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
+import uz.oybek.ozamiz.ui.utils.loadPhoto
+import uz.oybek.ozamiz.ui.utils.loadUserPhoto
+import uz.oybek.ozamiz.ui.utils.getArgs
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>() {
 
     private val viewModel: CommunityProfileViewModel by viewModels()
@@ -33,8 +38,9 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
             closeFragment()
         }
 
-        val userId = arguments?.getString("userId") ?: return
-        val userName = arguments?.getString("userName") ?: "Foydalanuvchi"
+        val profileArgs = arguments.getArgs<CommunityProfileArgs>()
+        val userId = profileArgs?.userId ?: arguments?.getString("userId") ?: return
+        val userName = profileArgs?.userName ?: arguments?.getString("userName") ?: "Foydalanuvchi"
 
         bind.tvUserNameProfile.text = userName
 
@@ -68,32 +74,24 @@ class CommunityProfileFragment : BaseFragment<FragmentCommunityProfileBinding>()
 
                     bind.tvUserNameProfile.text = name.ifEmpty { initialUserName }
 
-                    fun Double.fmt(): String = if (this % 1.0 == 0.0) this.toInt()
-                        .toString() else String.format(java.util.Locale.US, "%.1f", this)
-
-                    bind.tvCurrentWeight.text = if (weight > 0) "${weight.fmt()} kg" else "--"
-                    bind.tvTargetWeight.text =
-                        if (targetWeight != null) "${targetWeight.fmt()} kg" else "--"
+                    bind.tvCurrentWeight.text = NutritionFormatter.kg(weight, "--")
+                    bind.tvTargetWeight.text = NutritionFormatter.kg(targetWeight, "--")
 
                     if (startWeight > weight && weight > 0) {
                         val lost = startWeight - weight
-                        bind.tvWeightLost.text = "${lost.fmt()} kg"
+                        bind.tvWeightLost.text = NutritionFormatter.kg(lost)
                     } else {
-                        bind.tvWeightLost.text = "0 kg"
+                        bind.tvWeightLost.text = NutritionFormatter.kg(0.0)
                     }
 
-                    bind.tvTargetCalories.text = "$targetCalories kkal"
-                    bind.tvCalorieDeficit.text = "${maxOf(0, deficit)} kkal"
-                    bind.tvActiveDays.text = "${streakInfo?.activeDays ?: 0} kun"
+                    bind.tvTargetCalories.text = NutritionFormatter.kcal(targetCalories)
+                    bind.tvCalorieDeficit.text = NutritionFormatter.kcal(maxOf(0, deficit))
+                    bind.tvActiveDays.text = "${streakInfo?.activeDays.orZero()} kun"
 
                     val level = LevelRepository.getCurrentLevel(points)
                     bind.tvProfileLevel.text = "${level?.emoji} ${level?.name}"
 
-                    com.bumptech.glide.Glide.with(this@CommunityProfileFragment)
-                        .load(avatarUrl)
-                        .placeholder(R.drawable.user_photo_placeholder)
-                        .circleCrop()
-                        .into(bind.imgProfileAvatar)
+                    bind.imgProfileAvatar.loadUserPhoto(avatarUrl)
                 }
 
             } catch (e: Exception) {

@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.data.logs.model.WeightLog
-import uz.oybek.ozamiz.data.utils.formatToDdMmm
-import uz.oybek.ozamiz.data.utils.formatToHhMm
+import uz.oybek.ozamiz.common.util.DateFormatter
 import uz.oybek.ozamiz.databinding.ItemWeightHistoryBinding
+import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
 
 class WeightHistoryAdapter(
     private val onDeleteClick: (WeightLog) -> Unit
@@ -41,20 +41,15 @@ class WeightHistoryAdapter(
 
         holder.binding.apply {
             val dateLong = log.timestampLong
-            tvHistoryDate.text = dateLong.formatToDdMmm()
-            tvHistoryTime.text = dateLong.formatToHhMm()
+            tvHistoryDate.text = DateFormatter.format(dateLong, DateFormatter.PATTERN_DAY_MONTH)
+            tvHistoryTime.text = DateFormatter.format(dateLong, DateFormatter.PATTERN_HOUR_MINUTE)
 
-            tvHistoryWeight.text = "${String.format("%.1f", log.weightKg)} kg"
+            tvHistoryWeight.text = NutritionFormatter.kg(log.weightKg)
 
             // Change
             if (olderLog != null) {
                 val change = log.weightKg - olderLog.weightKg
-                val changeText =
-                    if (change > 0) "+${String.format("%.1f", change)}" else String.format(
-                        "%.1f",
-                        change
-                    )
-                tvHistoryChange.text = changeText
+                tvHistoryChange.text = NutritionFormatter.kgChange(change)
 
                 val color =
                     if (change <= 0) Color.parseColor("#4CAF50") else Color.parseColor("#F44336")

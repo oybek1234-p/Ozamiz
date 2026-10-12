@@ -2,14 +2,12 @@ package uz.oybek.ozamiz.ui.feature.menu
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentPlateSectionDetailBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.getArgs
 
 class PlateSectionDetailFragment : BaseFragment<FragmentPlateSectionDetailBinding>() {
-
-    private val args: PlateSectionDetailFragmentArgs by navArgs()
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -21,11 +19,13 @@ class PlateSectionDetailFragment : BaseFragment<FragmentPlateSectionDetailBindin
             navigateUp()
         }
 
-        setupContent(bind)
+        val sectionType = arguments.getArgs<PlateSectionDetailArgs>()?.sectionType
+            ?: arguments?.getString("sectionType").orEmpty()
+        setupContent(bind, sectionType)
     }
 
-    private fun setupContent(bind: FragmentPlateSectionDetailBinding) {
-        when (args.sectionType) {
+    private fun setupContent(bind: FragmentPlateSectionDetailBinding, sectionType: String) {
+        when (sectionType) {
             "VEGETABLES" -> {
                 bind.tvToolbarTitle.text = "Sabzavotlar"
                 bind.tvBenefits.text = "Vitamin A, C va K, antioksidantlar hamda kletchatka manbai. Oshqozonni to'ydiradi, lekin semirtirmaydi."

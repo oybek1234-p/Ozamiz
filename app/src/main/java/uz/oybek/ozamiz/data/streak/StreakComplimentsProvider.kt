@@ -1,12 +1,14 @@
 package uz.oybek.ozamiz.data.streak
 
-import uz.oybek.ozamiz.data.user.UserProfileRepository
+// import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.user.local.LocalUser
 import uz.oybek.ozamiz.data.user.model.info.Gender
 
 object StreakComplimentsProvider {
 
     fun getComplimentForStreak(streakDays: Int): String {
-        val user = UserProfileRepository.user
+        // val user = UserProfileRepository.user
+        val user = LocalUser.user
         val name = user.name.trim().split(" ").firstOrNull()?.takeIf { it.isNotBlank() } ?: ""
         val isMale = user.gender == Gender.MALE
 

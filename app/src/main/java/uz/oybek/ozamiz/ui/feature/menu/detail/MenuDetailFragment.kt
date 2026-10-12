@@ -13,7 +13,6 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.menu.MenuCategories
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.utils.DataWrapper
 import uz.oybek.ozamiz.databinding.FragmentMenuDetailBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.loadPhoto

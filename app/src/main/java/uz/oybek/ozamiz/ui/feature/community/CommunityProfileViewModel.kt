@@ -1,25 +1,34 @@
 package uz.oybek.ozamiz.ui.feature.community
 
 import androidx.lifecycle.ViewModel
-import uz.oybek.ozamiz.data.community.CommunityPostRepository
-import uz.oybek.ozamiz.data.user.AdminRepository
-import uz.oybek.ozamiz.data.user.UserProfileRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.data.community.api.CommunityPostRepository
+import uz.oybek.ozamiz.data.community.api.PublicUserRepository
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.data.profile.model.User
+import javax.inject.Inject
 
-class CommunityProfileViewModel : ViewModel() {
+@HiltViewModel
+class CommunityProfileViewModel @Inject constructor(
+    private val publicUserRepository: PublicUserRepository,
+    private val postRepository: CommunityPostRepository,
+    private val profileRepo: ProfileRepo
+) : ViewModel() {
 
-    suspend fun getAdminUser(userId: String) = AdminRepository.getAdminUser(userId)
-    
-    suspend fun getPublicUser(userId: String) = AdminRepository.getPublicUser(userId)
-    
-    suspend fun getUserPosts(userId: String, limit: Int = 10, lastVisiblePostId: String? = null) =
-        CommunityPostRepository.getUserPosts(userId, limit.toLong(), lastVisiblePostId)
-        
+    suspend fun getPublicUser(userId: String): User? {
+        return when (val result = publicUserRepository.getUserProfile(userId)) {
+            is BaseResult.Success -> result.data
+            is BaseResult.Failure -> null
+        }
+    }
+
+    suspend fun getUserPosts(userId: String, limit: Long = 20, lastTimestamp: Long? = null) =
+        postRepository.getUserPosts(userId, limit, lastTimestamp)
+
     val currentUserId: String
-        get() = UserProfileRepository.user.uid
+        get() = profileRepo.userId
 
-    suspend fun toggleLike(postId: String, currentUserId: String) =
-        CommunityPostRepository.toggleLike(postId, currentUserId)
-        
-    suspend fun markViewed(postId: String, currentUserId: String) =
-        CommunityPostRepository.markViewed(postId, currentUserId)
+    suspend fun toggleLike(postId: String) =
+        postRepository.togglePostLike(postId)
 }

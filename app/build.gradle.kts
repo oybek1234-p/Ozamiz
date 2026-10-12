@@ -59,6 +59,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -127,13 +128,11 @@ dependencies {
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.2")
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
     implementation("com.squareup.okhttp3:okhttp:5.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
     implementation(libs.google.firebase.ai)
     implementation("com.google.firebase:firebase-functions")
-    implementation("com.facebook.android:facebook-android-sdk:latest.release")
     val cameraxVersion = "1.4.0"
     implementation("androidx.camera:camera-core:$cameraxVersion")
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
@@ -154,6 +153,7 @@ dependencies {
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
     kapt("org.jetbrains.kotlin:kotlin-metadata-jvm:2.1.0")
 
+    implementation(project(":common"))
     implementation(project(":data"))
 
     testImplementation(libs.junit)

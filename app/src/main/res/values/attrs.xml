@@ -2,4 +2,26 @@
 <resources>
     <attr name="customGreen" format="color" />
     <attr name="customYellow" format="color" />
+
+    <!-- Calorie & Streak Semantic Attributes -->
+    <attr name="colorCalorieProgress" format="color" />
+    <attr name="colorCalorieExceeded" format="color" />
+    <attr name="colorStreakActive" format="color" />
+    <attr name="colorStreakFrozen" format="color" />
+    <attr name="colorStreakInactive" format="color" />
+
+    <!-- Macro Semantic Attributes -->
+    <attr name="colorMacroProtein" format="color" />
+    <attr name="colorMacroFat" format="color" />
+    <attr name="colorMacroCarbs" format="color" />
+
+    <!-- Meal Time Semantic Attributes -->
+    <attr name="colorMealBreakfast" format="color" />
+    <attr name="colorMealLunch" format="color" />
+    <attr name="colorMealDinner" format="color" />
+    <attr name="colorMealSnack" format="color" />
+
+    <!-- Water & Exercise Semantic Attributes -->
+    <attr name="colorWaterProgress" format="color" />
+    <attr name="colorExerciseProgress" format="color" />
 </resources>

@@ -27,10 +27,10 @@ import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
 import uz.oybek.ozamiz.data.level.PointsEvent
 import uz.oybek.ozamiz.data.level.PointsRepository
 import uz.oybek.ozamiz.data.logs.model.FoodLog
+import uz.oybek.ozamiz.common.util.dateApiFormat
+import uz.oybek.ozamiz.common.util.orZero
 import uz.oybek.ozamiz.data.streak.StreakRepository
-import uz.oybek.ozamiz.data.utils.dateApiFormat
-import uz.oybek.ozamiz.data.utils.recordException
-import uz.oybek.ozamiz.data.utils.roundTo1Decimal
+import uz.oybek.ozamiz.util.recordException
 import yads.nu
 import yads.tr
 import java.util.Date
@@ -155,14 +155,14 @@ object FoodLogRepository {
                     LogRepository.updateSummary(
                         date = date,
                         caloriesDelta = foodLog.calories,
-                        proteinDelta = foodLog.protein ?: 0.0,
-                        carbsDelta = foodLog.carbs ?: 0.0,
-                        fatDelta = foodLog.fat ?: 0.0,
+                        proteinDelta = foodLog.protein.orZero(),
+                        carbsDelta = foodLog.carbs.orZero(),
+                        fatDelta = foodLog.fat.orZero(),
                         mealsDelta = 1
                     )
                     StreakRepository.updateStreak()
                     PointsRepository.onEvent(
-                        PointsEvent.AddFood(foodLog.healthLevel ?: 0)
+                        PointsEvent.AddFood(foodLog.healthLevel.orZero())
                     )
                 }
                 isSuccess
@@ -210,10 +210,10 @@ object FoodLogRepository {
                 .setValue(updated)
                 .await()
 
-            val calDelta = updated.calories - (oldLog?.calories ?: 0)
-            val proDelta = (updated.protein ?: 0.0) - (oldLog?.protein ?: 0.0)
-            val carbDelta = (updated.carbs ?: 0.0) - (oldLog?.carbs ?: 0.0)
-            val fatDelta = (updated.fat ?: 0.0) - (oldLog?.fat ?: 0.0)
+            val calDelta = updated.calories - (oldLog?.calories.orZero())
+            val proDelta = (updated.protein.orZero()) - (oldLog?.protein.orZero())
+            val carbDelta = (updated.carbs.orZero()) - (oldLog?.carbs.orZero())
+            val fatDelta = (updated.fat.orZero()) - (oldLog?.fat.orZero())
 
             LogRepository.updateSummary(
                 date = date,
@@ -250,9 +250,9 @@ object FoodLogRepository {
                 date = date,
                 targetUid = userId,
                 caloriesDelta = -foodLog.calories,
-                proteinDelta = -(foodLog.protein ?: 0.0),
-                carbsDelta = -(foodLog.carbs ?: 0.0),
-                fatDelta = -(foodLog.fat ?: 0.0),
+                proteinDelta = -(foodLog.protein.orZero()),
+                carbsDelta = -(foodLog.carbs.orZero()),
+                fatDelta = -(foodLog.fat.orZero()),
                 mealsDelta = -1
             )
             true

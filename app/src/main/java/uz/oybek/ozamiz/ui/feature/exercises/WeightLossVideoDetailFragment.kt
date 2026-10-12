@@ -5,18 +5,17 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentWeightLossVideoDetailBinding
 import uz.oybek.ozamiz.databinding.ItemBenefitBulletBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.getArgs
 import uz.oybek.ozamiz.ui.utils.loadPhoto
 import uz.oybek.ozamiz.ui.utils.showToast
 
 class WeightLossVideoDetailFragment : BaseFragment<FragmentWeightLossVideoDetailBinding>() {
 
     private val viewModel: WeightLossVideoDetailViewModel by viewModels()
-    private val args: WeightLossVideoDetailFragmentArgs by navArgs()
 
     init {
         showBottomSheet = false
@@ -27,7 +26,9 @@ class WeightLossVideoDetailFragment : BaseFragment<FragmentWeightLossVideoDetail
     }
 
     override fun viewCreated(bind: FragmentWeightLossVideoDetailBinding) {
-        viewModel.loadVideo(args.videoId)
+        val videoId = arguments.getArgs<WeightLossVideoArgs>()?.videoId
+            ?: arguments?.getString("videoId").orEmpty()
+        viewModel.loadVideo(videoId)
 
         bind.toolbar.setNavigationOnClickListener {
             navigateUp()

@@ -1,17 +1,20 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.databinding.ItemFoodSearchResultBinding
 import kotlin.math.roundToInt
 
 class FoodSearchAdapter(
-    private val onAddClick: (FoodItem, com.google.android.material.button.MaterialButton, android.view.View) -> Unit,
+    private val onAddClick: (FoodItem, MaterialButton, CircularProgressIndicator) -> Unit,
     private val onItemClick: (FoodItem) -> Unit
 ) : PagingDataAdapter<FoodItem, FoodSearchAdapter.FoodViewHolder>(FoodDiffCallback()) {
 
@@ -37,17 +40,34 @@ class FoodSearchAdapter(
 
             val defaultServing = item.servingSizes.firstOrNull()
             val weight = defaultServing?.grams ?: 100.0
-            val calories = (item.caloriesPer100g * weight / 100).roundToInt()
+            val calories = item.caloriesForGrams(weight)
             val weightInt = weight.roundToInt()
+            val context = binding.root.context
 
-            val servingDescription = when {
-                defaultServing == null -> "100 g"
-                defaultServing.description.contains("g)", ignoreCase = true) || defaultServing.description.equals("100 g", ignoreCase = true) -> defaultServing.description
-                defaultServing.description.equals("gramm", ignoreCase = true) -> "100 g"
-                else -> "${defaultServing.description} (${weightInt} g)"
+            val servingDescription = if (defaultServing == null) {
+                context.getString(R.string.food_detail_default_grams)
+            } else {
+                context.getString(
+                    R.string.food_detail_serving_item_format,
+                    defaultServing.description,
+                    weightInt
+                )
             }
 
-            binding.textViewFoodServing.text = "$servingDescription • $calories kkal"
+            binding.textViewFoodServing.text = context.getString(
+                R.string.search_food_item_serving_format,
+                servingDescription,
+                calories
+            )
+
+            // Reset recycled state
+            binding.buttonAddFood.setIconResource(R.drawable.add_ic)
+            binding.buttonAddFood.isEnabled = true
+            binding.buttonAddFood.scaleX = 1f
+            binding.buttonAddFood.scaleY = 1f
+            binding.progressAddFood.visibility = View.INVISIBLE
+            binding.progressAddFood.progress = 0
+            binding.progressAddFood.alpha = 1f
 
             binding.buttonAddFood.setOnClickListener {
                 onAddClick(item, binding.buttonAddFood, binding.progressAddFood)

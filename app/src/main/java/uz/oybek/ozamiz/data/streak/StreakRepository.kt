@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.user.UserProfileRepository
+// import uz.oybek.ozamiz.data.user.UserProfileRepository
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -19,48 +19,48 @@ object StreakRepository {
     }
 
     fun unfreezeStreak() {
-        val currentUser = UserProfileRepository.user
-        if (!currentUser.valid) return
-        val streakInfo = currentUser.streakInfo ?: return
-
-        val today = LocalDate.now()
-        val yesterdayStr = today.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE)
-
-        val updatedStreakInfo = streakInfo.copy(
-            lastActionDate = yesterdayStr
-        )
-        UserProfileRepository.updateStreakInfo(updatedStreakInfo)
+//        val currentUser = UserProfileRepository.user
+//        if (!currentUser.valid) return
+//        val streakInfo = currentUser.streakInfo ?: return
+//
+//        val today = LocalDate.now()
+//        val yesterdayStr = today.minusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE)
+//
+//        val updatedStreakInfo = streakInfo.copy(
+//            lastActionDate = yesterdayStr
+//        )
+//        UserProfileRepository.updateStreakInfo(updatedStreakInfo)
     }
 
     fun resetStreak() {
-        val currentUser = UserProfileRepository.user
-        if (!currentUser.valid) return
-        val streakInfo = currentUser.streakInfo ?: StreakInfo()
-
-        val updatedStreakInfo = streakInfo.copy(
-            currentStreak = 0
-        )
-        UserProfileRepository.updateStreakInfo(updatedStreakInfo)
+//        val currentUser = UserProfileRepository.user
+//        if (!currentUser.valid) return
+//        val streakInfo = currentUser.streakInfo ?: StreakInfo()
+//
+//        val updatedStreakInfo = streakInfo.copy(
+//            currentStreak = 0
+//        )
+//        UserProfileRepository.updateStreakInfo(updatedStreakInfo)
     }
 
     fun updateStreak() {
-        val currentUser = UserProfileRepository.user
-        if (!currentUser.valid) return
-
-        val result = StreakManager.updateUserStreakOnAction(currentUser)
-
-        try {
-            if (result.streakContinued || result.streakBrokenAndReset || result.streakStartedNew || result.isFirstActionToday) {
-                UserProfileRepository.updateStreakInfo(result.updatedUser.streakInfo)
-
-                if (result.streakContinued || result.isFirstActionToday) {
-                    MainScope().launch {
-                        _levelFlow.emit(result)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-
-        }
+//        val currentUser = UserProfileRepository.user
+//        if (!currentUser.valid) return
+//
+//        val result = StreakManager.updateUserStreakOnAction(currentUser)
+//
+//        try {
+//            if (result.streakContinued || result.streakBrokenAndReset || result.streakStartedNew || result.isFirstActionToday) {
+//                UserProfileRepository.updateStreakInfo(result.updatedUser.streakInfo)
+//
+//                if (result.streakContinued || result.isFirstActionToday) {
+//                    MainScope().launch {
+//                        _levelFlow.emit(result)
+//                    }
+//                }
+//            }
+//        } catch (e: Exception) {
+//
+//        }
     }
 }

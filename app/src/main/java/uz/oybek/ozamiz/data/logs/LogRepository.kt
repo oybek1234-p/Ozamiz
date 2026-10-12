@@ -16,20 +16,21 @@ import uz.oybek.ozamiz.data.firebase.getValueSafe
 import uz.oybek.ozamiz.data.logs.model.AdminGenericLog
 import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.DailySummary
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.dateApiFormat
-import uz.oybek.ozamiz.data.utils.recordException
-import uz.oybek.ozamiz.data.utils.roundTo1Decimal
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.common.util.dateApiFormat
+import uz.oybek.ozamiz.common.util.orZero
+import uz.oybek.ozamiz.common.util.round
+import uz.oybek.ozamiz.util.recordException
 import java.util.Date
 import kotlin.coroutines.resume
 
 object LogRepository {
 
-    fun observeDailySummary(date: Date): Flow<DataWrapper<DailySummary>> =
+    fun observeDailySummary(date: Date): Flow<BaseResult<DailySummary, Unit>> =
         callbackFlow {
             val userId = currentUserId
             if (userId.isBlank()) {
-                trySend(DataWrapper.Error())
+                trySend(BaseResult.Failure(Unit))
                 close()
                 return@callbackFlow
             }
@@ -41,11 +42,11 @@ object LogRepository {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val dailyLogs = snapshot.getValueSafe(DailyLogs::class.java)
                     val summary = calculateSummary(dailyLogs)
-                    trySend(DataWrapper.Success(summary))
+                    trySend(BaseResult.Success(summary))
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    trySend(DataWrapper.Error())
+                    trySend(BaseResult.Failure(Unit))
                 }
             }
             reference.addValueEventListener(listener)
@@ -54,11 +55,11 @@ object LogRepository {
             }
         }
 
-    fun observeDailyLogs(date: Date): Flow<DataWrapper<DailyLogs>> =
+    fun observeDailyLogs(date: Date): Flow<BaseResult<DailyLogs, Unit>> =
         callbackFlow {
             val userId = currentUserId
             if (userId.isBlank()) {
-                trySend(DataWrapper.Error())
+                trySend(BaseResult.Failure(Unit))
                 close()
                 return@callbackFlow
             }
@@ -69,11 +70,11 @@ object LogRepository {
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val dailyLogs = snapshot.getValueSafe(DailyLogs::class.java) ?: DailyLogs()
-                    trySend(DataWrapper.Success(dailyLogs))
+                    trySend(BaseResult.Success(dailyLogs))
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    trySend(DataWrapper.Error())
+                    trySend(BaseResult.Failure(Unit))
                 }
             }
             reference.addValueEventListener(listener)
@@ -105,7 +106,7 @@ object LogRepository {
                                     log.fat?.let { "F: ${it}g" }
                                 ).joinToString(", "),
                                 photoUrl = log.photoUrl,
-                                timestamp = (log.timestamp as? Long) ?: 0L,
+                                timestamp = (log.timestamp as? Long).orZero(),
                                 type = "food"
                             )
                         )
@@ -161,9 +162,9 @@ object LogRepository {
         val consumedCalories = foodLogs.filter { it.calories > 0 }.sumOf { it.calories }
         val consumedWaterMl = waterLogs.sumOf { it.amountMl }
         val burnedCalories = exerciseLogs.sumOf { it.caloriesBurned }
-        val consumedProtein = foodLogs.sumOf { it.protein ?: 0.0 }.roundTo1Decimal()
-        val consumedCarbs = foodLogs.sumOf { it.carbs ?: 0.0 }.roundTo1Decimal()
-        val consumedFat = foodLogs.sumOf { it.fat ?: 0.0 }.roundTo1Decimal()
+        val consumedProtein = foodLogs.sumOf { it.protein.orZero() }.round()
+        val consumedCarbs = foodLogs.sumOf { it.carbs.orZero() }.round()
+        val consumedFat = foodLogs.sumOf { it.fat.orZero() }.round()
 
         return DailySummary(
             consumedCalories = consumedCalories,
@@ -339,9 +340,9 @@ object LogRepository {
                     consumedCalories = (current.consumedCalories + caloriesDelta).coerceAtLeast(0),
                     consumedWaterMl = (current.consumedWaterMl + waterDelta).coerceAtLeast(0),
                     burnedCalories = (current.burnedCalories + exerciseDelta).coerceAtLeast(0),
-                    consumedProtein = (current.consumedProtein + proteinDelta).coerceAtLeast(0.0).roundTo1Decimal(),
-                    consumedCarbs = (current.consumedCarbs + carbsDelta).coerceAtLeast(0.0).roundTo1Decimal(),
-                    consumedFat = (current.consumedFat + fatDelta).coerceAtLeast(0.0).roundTo1Decimal(),
+                    consumedProtein = (current.consumedProtein + proteinDelta).coerceAtLeast(0.0).round(),
+                    consumedCarbs = (current.consumedCarbs + carbsDelta).coerceAtLeast(0.0).round(),
+                    consumedFat = (current.consumedFat + fatDelta).coerceAtLeast(0.0).round(),
                     mealsCount = (current.mealsCount + mealsDelta).coerceAtLeast(0),
                     timestamp = System.currentTimeMillis()
                 )

@@ -42,7 +42,7 @@ object FirebasePaths {
 
     object Firestore {
         private const val USERs = "users"
-        private const val POSTS = "communityPosts"
+        private const val POSTS = "posts"
         private const val PUBLIC_USERS = "public_users"
         private const val AI_CHATS = "aiChat"
         private const val MESSAGES = "messages"
@@ -86,7 +86,7 @@ object FirebasePaths {
         fun weightLogs(uid: String) = root.child("weightLog/$uid")
         fun paymentChecks(uid: String) = root.child("payment_checks/$uid")
         fun foodLogs(uid: String) = root.child("loggedFood/$uid")
-        fun communityPosts(uid: String) = root.child("community_posts/$uid")
+        fun communityPosts(uid: String) = root.child("${DatabasePaths.Firestore.COMMUNITY_POSTS}/$uid")
 
         fun avatar(uid: String): StorageReference = avatars(uid)
         fun foodPhoto(uid: String, fileName: String): StorageReference =

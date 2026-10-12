@@ -1,54 +1,56 @@
 package uz.oybek.ozamiz.ui.feature.community.add
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.view.inputmethod.EditorInfo
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.R
+import androidx.lifecycle.repeatOnLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAddPostBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.data.community.model.CommunityPost
-import uz.oybek.ozamiz.data.community.model.PostType
-import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
-import java.util.Date
+import uz.oybek.ozamiz.ui.utils.ImagePicker
+import uz.oybek.ozamiz.ui.utils.createTempCameraUri
+import uz.oybek.ozamiz.ui.utils.hideKeyboard
+import uz.oybek.ozamiz.ui.utils.loadPhoto
+import uz.oybek.ozamiz.ui.utils.registerCameraLauncher
+import uz.oybek.ozamiz.ui.utils.registerImagePicker
+import uz.oybek.ozamiz.ui.utils.toast
 
+@AndroidEntryPoint
 class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
 
     private val viewModel: AddPostViewModel by viewModels()
-    private val selectedImages = mutableListOf<Uri>()
-    private var tempImageUri: Uri? = null
+    private var tempCameraUri: Uri? = null
 
-    private val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
-        uris?.let {
-            if (selectedImages.size + it.size > 5) {
-                Toast.makeText(requireContext(), "Maksimal 5 ta rasm tanlash mumkin", Toast.LENGTH_SHORT).show()
-                selectedImages.addAll(it.take(5 - selectedImages.size))
-            } else {
-                selectedImages.addAll(it)
-            }
-            updateImagesUI()
-        }
+    private val galleryLauncher = registerImagePicker { uri ->
+        viewModel.setSelectedImage(uri)
     }
 
-    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+    private val cameraLauncher = registerCameraLauncher { success ->
         if (success) {
-            tempImageUri?.let {
-                selectedImages.add(it)
-                updateImagesUI()
-            }
+            tempCameraUri?.let { viewModel.setSelectedImage(it) }
         }
     }
 
-    override fun viewCreated(bind: FragmentAddPostBinding) {
-        setupListeners()
-        setupRecyclerView()
+    private val cameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            launchCameraInternal()
+        } else {
+            toast(getString(R.string.permission_denied_camera))
+        }
     }
 
     override fun inflateBinding(
@@ -58,123 +60,166 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
         return FragmentAddPostBinding.inflate(inflater, container, false)
     }
 
-    private fun setupRecyclerView() {
-        binding.rvSelectedImages.adapter = SelectedImageAdapter(selectedImages) { uri ->
-            selectedImages.remove(uri)
-            updateImagesUI()
+    override fun viewCreated(bind: FragmentAddPostBinding) {
+        setupToolbar()
+        setupListeners()
+        observeState()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            binding.root.hideKeyboard()
+            navigateUp()
+        }
+        binding.btnToolbarSubmit.setOnClickListener {
+            submitPost()
         }
     }
 
     private fun setupListeners() {
-        binding.toolbar.setNavigationOnClickListener { navigateUp() }
-
-        binding.btnSelectImages.setOnClickListener {
-            galleryLauncher.launch("image/*")
+        binding.btnSelectGallery.setOnClickListener {
+            galleryLauncher.launch(ImagePicker.IMAGE)
         }
 
-        binding.btnCamera.setOnClickListener {
-            if (selectedImages.size >= 5) {
-                Toast.makeText(requireContext(), "Maksimal 5 ta rasm tanlash mumkin", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        binding.btnSelectCamera.setOnClickListener {
+            launchCamera()
+        }
+
+        binding.btnRemovePhoto.setOnClickListener {
+            viewModel.removeSelectedImage()
+        }
+
+        binding.etDescription.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                binding.root.hideKeyboard()
+                true
+            } else {
+                false
             }
-            openCamera()
         }
 
-        binding.btnSave.setOnClickListener {
-            savePost()
+        binding.etDescription.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.scrollView.postDelayed({
+                    binding.scrollView.fullScroll(View.FOCUS_DOWN)
+                }, 300)
+            }
         }
-    }
 
-    private fun openCamera() {
-        val file = java.io.File(requireContext().cacheDir, "temp_image_${System.currentTimeMillis()}.jpg")
-        val uri = androidx.core.content.FileProvider.getUriForFile(
-            requireContext(),
-            "${requireContext().packageName}.provider",
-            file
-        )
-        tempImageUri = uri
-        try {
-            cameraLauncher.launch(uri)
-        } catch (e: SecurityException) {
-            Toast.makeText(requireContext(), "Kamera ruxsati berilmadi", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Kamerani ochib bo'lmadi", Toast.LENGTH_SHORT).show()
+        binding.etDescription.setOnClickListener {
+            binding.scrollView.postDelayed({
+                binding.scrollView.fullScroll(View.FOCUS_DOWN)
+            }, 300)
+        }
+
+        binding.btnSubmitPost.setOnClickListener {
+            submitPost()
         }
     }
 
-    private fun updateImagesUI() {
-        binding.rvSelectedImages.adapter?.notifyDataSetChanged()
-        binding.btnSelectImages.isEnabled = selectedImages.size < 5
-        binding.btnCamera.isEnabled = selectedImages.size < 5
-        binding.rvSelectedImages.isVisible = selectedImages.isNotEmpty()
-    }
+    private fun submitPost() {
+        binding.root.hideKeyboard()
+        val description = binding.etDescription.text?.toString().orEmpty()
 
-    private fun savePost() {
-        val title = binding.etTitle.text.toString().trim()
-        val description = binding.etDescription.text.toString().trim()
-
-        if (title.isEmpty()) {
-            binding.etTitle.error = "Sarlavha kiriting"
+        if (description.isBlank()) {
+            binding.etDescription.error = getString(R.string.community_add_post_empty_desc_error)
+            binding.etDescription.requestFocus()
             return
         }
 
-        binding.progressBar.isVisible = true
-        binding.btnSave.isEnabled = false
+        viewModel.submitPost(title = null, description = description)
+    }
 
+    private fun launchCamera() {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+        launchCameraInternal()
+    }
+
+    private fun launchCameraInternal() {
+        val uri = createTempCameraUri()
+        if (uri != null) {
+            tempCameraUri = uri
+            cameraLauncher.launch(uri)
+        } else {
+            toast(getString(R.string.permission_denied_camera))
+        }
+    }
+
+    private fun observeState() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val user = LocalUser.user
-            val post = CommunityPost(
-                userId = user.uid,
-                userName = user.name,
-                userAvatarUrl = user.avatarUrl,
-                title = title,
-                description = description,
-                timestamp = Date(),
-                verified = false,
-                isVisible = false,
-                type = PostType.MANUAL,
-                isPremiumUser = PremiumUtils.isPremium(user)
-            )
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.uiState.collect { state ->
+                        renderState(state)
+                    }
+                }
 
-            val result = viewModel.uploadPost(post, selectedImages)
-            binding.progressBar.isVisible = false
-            binding.btnSave.isEnabled = true
-
-            if (result.isSuccess) {
-                Toast.makeText(requireContext(), "Post tekshiruvga yuborildi", Toast.LENGTH_LONG).show()
-                navigateUp()
-            } else {
-                Toast.makeText(requireContext(), "Xatolik: ${result.exceptionOrNull()?.message}", Toast.LENGTH_SHORT).show()
+                launch {
+                    viewModel.effect.collect { effect ->
+                        handleEffect(effect)
+                    }
+                }
             }
         }
     }
 
-    inner class SelectedImageAdapter(
-        private val images: List<Uri>,
-        private val onRemove: (Uri) -> Unit
-    ) : androidx.recyclerview.widget.RecyclerView.Adapter<SelectedImageAdapter.ViewHolder>() {
+    private var lastRenderedUri: Uri? = null
 
-        inner class ViewHolder(private val itemBinding: uz.oybek.ozamiz.databinding.ItemSelectedImageBinding) :
-            androidx.recyclerview.widget.RecyclerView.ViewHolder(itemBinding.root) {
-            fun bind(uri: Uri) {
-                com.bumptech.glide.Glide.with(itemBinding.ivSelectedImage)
-                    .load(uri)
-                    .into(itemBinding.ivSelectedImage)
-                itemBinding.btnRemove.setOnClickListener { onRemove(uri) }
+    private fun renderState(state: AddPostUiState) {
+        val hasImage = state.selectedImageUri != null
+        binding.cardPickPhoto.isVisible = hasImage
+        binding.layoutPhotoButtons.isVisible = !hasImage
+
+        if (state.selectedImageUri != lastRenderedUri) {
+            lastRenderedUri = state.selectedImageUri
+            if (hasImage) {
+                binding.imgPhotoPreview.loadPhoto(state.selectedImageUri)
+            } else {
+                binding.imgPhotoPreview.setImageDrawable(null)
             }
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-            val b = uz.oybek.ozamiz.databinding.ItemSelectedImageBinding.inflate(
-                LayoutInflater.from(parent.context), parent, false
-            )
-            return ViewHolder(b)
-        }
+        // Loading indicator
+        binding.progressBar.isVisible = state.isLoading
 
-        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.bind(images[position])
-        }
+        // Inputs & image actions disabled during loading
+        binding.etDescription.isEnabled = !state.isLoading
+        binding.btnSelectGallery.isEnabled = !state.isLoading
+        binding.btnSelectCamera.isEnabled = !state.isLoading
+        binding.btnRemovePhoto.isEnabled = !state.isLoading
+        binding.btnRemovePhoto.isVisible = hasImage && !state.isLoading
 
-        override fun getItemCount(): Int = images.size
+        // Toolbar submit button disabled during loading
+        binding.btnToolbarSubmit.isEnabled = !state.isLoading
+        binding.btnToolbarSubmit.alpha = if (state.isLoading) 0.3f else 1.0f
+
+        // Submit button loading state: disable, hide text and remove icon while loading
+        binding.btnSubmitPost.isEnabled = !state.isLoading
+        if (state.isLoading) {
+            binding.btnSubmitPost.text = ""
+            binding.btnSubmitPost.icon = null
+        } else {
+            binding.btnSubmitPost.text = getString(R.string.community_add_post_submit)
+            binding.btnSubmitPost.icon = ContextCompat.getDrawable(requireContext(), R.drawable.send_ic)
+        }
+    }
+
+    private fun handleEffect(effect: AddPostUiEffect) {
+        when (effect) {
+            is AddPostUiEffect.Success -> {
+                toast(getString(R.string.community_post_pending_notice))
+                navigateUp()
+            }
+            is AddPostUiEffect.GenericError -> {
+                toast(getString(R.string.community_add_post_error))
+            }
+        }
     }
 }

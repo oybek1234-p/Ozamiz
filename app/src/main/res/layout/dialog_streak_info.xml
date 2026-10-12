@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:backgroundTint="?colorSurfaceContainer"
     android:background="@drawable/bg_bottom_sheet_rounded"
     android:fillViewport="true">
 
@@ -34,7 +35,7 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Orqaga"
+                android:contentDescription="@string/streak_close_desc"
                 android:src="@drawable/close_ic"
                 app:tint="?attr/colorOnSurfaceVariant" />
 
@@ -74,18 +75,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_bold"
-                android:text="12"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="64sp" />
+                android:textSize="64sp"
+                tools:text="12" />
 
             <TextView
+                android:id="@+id/text_streak_days_unit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_marginStart="6dp"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="kun"
+                android:text="@string/streak_dialog_days_unit"
                 android:textColor="?attr/colorPrimary"
                 android:textSize="22sp" />
         </LinearLayout>
@@ -100,7 +102,7 @@
             android:gravity="center"
             android:textColor="?attr/colorOnSurface"
             android:textSize="16sp"
-            android:text="@string/streak_desc_default" />
+            tools:text="@string/streak_increased_title" />
 
         <!-- 1-Week Horizontal Calendar Card -->
         <com.google.android.material.card.MaterialCardView
@@ -108,16 +110,16 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="20dp"
+            app:cardBackgroundColor="?attr/colorSurface"
             app:cardCornerRadius="20dp"
             app:cardElevation="0dp"
-            app:strokeWidth="1dp"
             app:strokeColor="?attr/colorOutlineVariant"
-            app:cardBackgroundColor="?attr/colorSurface">
+            app:strokeWidth="1dp">
 
             <LinearLayout
-                android:background="?colorSurfaceContainerLowest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="?colorSurfaceContainerHigh"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -125,7 +127,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_bold"
-                    android:text="Haftalik faollik"
+                    android:text="@string/streak_weekly_activity"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="15sp" />
 
@@ -192,52 +194,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Active Users Section -->
-        <LinearLayout
-            android:id="@+id/layout_top_users_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/roboto_bold"
-                android:text="Aktiv foydalanuvchilar"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp" />
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="140dp">
-
-                <ProgressBar
-                    android:id="@+id/progress_top_users"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="16dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_top_users"
-                    android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:layout_marginTop="12dp"
-                    android:clipChildren="false"
-                    android:clipToOutline="false"
-                    android:clipToPadding="false"
-                    android:nestedScrollingEnabled="false"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="24dp"
-                    android:paddingVertical="@dimen/dimen_4"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_top_streak_user" />
-            </FrameLayout>
-        </LinearLayout>
-
-        <!-- Continue Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/button_streak_dialog_continue"
             style="@style/FilledButton"
@@ -246,7 +202,7 @@
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="24dp"
             android:fontFamily="@font/roboto_medium"
-            android:text="Davom etish"
+            android:text="@string/streak_idle_btn"
             android:textSize="16sp"
             app:cornerRadius="28dp" />
 

@@ -1,7 +1,7 @@
 package uz.oybek.ozamiz.data.logs.model
 
 import androidx.annotation.Keep
-import uz.oybek.ozamiz.data.ai.analyzer.AnalyzedIngredient
+import uz.oybek.ozamiz.data.analyzer.model.AnalyzedIngredient
 import uz.oybek.ozamiz.data.logs.base.LogItem
 
 @Keep

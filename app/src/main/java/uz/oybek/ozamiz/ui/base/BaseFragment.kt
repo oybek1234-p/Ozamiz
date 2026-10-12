@@ -12,11 +12,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
-import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.food.limit.FoodLimitManager
-import uz.oybek.ozamiz.data.analytics.AnalyticsManager
-import uz.oybek.ozamiz.util.handleException
+import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
 
 abstract class BaseFragment<T : ViewBinding> : Fragment() {
@@ -24,213 +21,148 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     abstract fun viewCreated(bind: T)
 
     var bindingT: T? = null
-    val binding: T get() = bindingT!!
+    val binding: T
+        get() = bindingT!!
 
-    fun mainActivity() = if (activity is MainActivity) activity as MainActivity else null
+    fun mainActivity(): MainActivity? = activity as? MainActivity
 
-    var showBottomSheet = false
+    var showBottomSheet: Boolean = false
 
-    fun navigate(
-        @IdRes resId: Int,
-        args: Bundle? = null,
-        navOptions: NavOptions? = null
-    ) {
-        if (!isAdded || isDetached) return
-        val navController = try {
-            findNavController()
-        } catch (e: Exception) {
-            null
-        } ?: return
-
-        try {
-            val currentDestination = navController.currentDestination
-            if (currentDestination != null) {
-                val action = currentDestination.getAction(resId)
-                if (action != null) {
-                    navController.navigate(resId, args, navOptions)
-                } else if (currentDestination.id != resId) {
-                    navController.navigate(resId, args, navOptions ?: animNavOptions)
-                }
-            } else {
-                navController.navigate(resId, args, navOptions ?: animNavOptions)
-            }
-        } catch (e: Exception) {
-            handleException(e)
-        }
-    }
-
-    fun navigate(
-        directions: androidx.navigation.NavDirections,
-        navOptions: NavOptions? = null
-    ) {
-        if (!isAdded || isDetached) return
-        val navController = try {
-            findNavController()
-        } catch (e: Exception) {
-            null
-        } ?: return
-
-        try {
-            val currentDestination = navController.currentDestination
-            if (currentDestination != null) {
-                val action = currentDestination.getAction(directions.actionId)
-                if (action != null) {
-                    navController.navigate(directions, navOptions)
-                } else {
-                    navController.navigate(directions, navOptions ?: animNavOptions)
-                }
-            } else {
-                navController.navigate(directions, navOptions ?: animNavOptions)
-            }
-        } catch (e: Exception) {
-            handleException(e)
-        }
-    }
-
-    fun popBackStack(): Boolean {
-        if (!isAdded || isDetached || view == null) return false
-        val navController = try {
-            findNavController()
-        } catch (e: Exception) {
-            null
-        } ?: return false
-
-        return try {
-            navController.popBackStack()
-        } catch (e: Exception) {
-            handleException(e)
-            false
-        }
-    }
-
-    fun popBackStack(@IdRes destinationId: Int, inclusive: Boolean = false): Boolean {
-        if (!isAdded || isDetached || view == null) return false
-        val navController = try {
-            findNavController()
-        } catch (e: Exception) {
-            null
-        } ?: return false
-
-        return try {
-            val currentDest = navController.currentDestination
-            if (currentDest != null && currentDest.id == destinationId && !inclusive) {
-                true
-            } else {
-                navController.popBackStack(destinationId, inclusive)
-            }
-        } catch (e: Exception) {
-            handleException(e)
-            false
-        }
-    }
-
-    fun navigateUp(): Boolean {
-        if (!isAdded || isDetached || view == null) return false
-        val navController = try {
-            findNavController()
-        } catch (e: Exception) {
-            null
-        } ?: return false
-
-        return try {
-            navController.navigateUp()
-        } catch (e: Exception) {
-            handleException(e)
-            false
-        }
-    }
-
-    fun checkLimitAndProceed(onProceed: () -> Unit) {
-        if (!isAdded || isDetached) return
-        val act = activity ?: return
-        FoodLimitManager.checkLimitAndProceed(act) {
-            if (isAdded && !isDetached && context != null) {
-                onProceed()
-            }
-        }
-    }
-
-    var transitionAnimating = false
+    var transitionAnimating: Boolean = false
     open fun onTransitionEnd() {}
+    open fun onInternetAvailable() {}
+
+    abstract fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): T
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        bindingT = inflateBinding(inflater, container)
+        return bindingT?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        bindingT?.let { viewCreated(it) }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mainActivity()?.showBottomSheet(showBottomSheet, true)
+    }
+
+    override fun onPause() {
+        activity?.let { hideSoftInput(it) }
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        bindingT = null
+        super.onDestroyView()
+    }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
-        try {
-            val animation =
-                super.onCreateAnimation(transit, enter, nextAnim) ?: AnimationUtils.loadAnimation(
-                    context, nextAnim
-                )
-
-            return animation?.also {
+        if (nextAnim == 0) return null
+        return try {
+            val anim = AnimationUtils.loadAnimation(context, nextAnim)
+            anim?.also {
                 it.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation?) {
+                        transitionAnimating = true
+                    }
+
                     override fun onAnimationEnd(animation: Animation?) {
                         transitionAnimating = false
                         onTransitionEnd()
                     }
 
-                    override fun onAnimationRepeat(animation: Animation?) {
-
-                    }
-
-                    override fun onAnimationStart(animation: Animation?) {
-                        transitionAnimating = true
-                    }
+                    override fun onAnimationRepeat(animation: Animation?) {}
                 })
             }
-        } catch (e: Exception) {
-            return null
+        } catch (_: Exception) {
+            null
         }
     }
 
-    open fun onInternetAvailable() {
-
-    }
-
-    open val screenName: String get() = this::class.java.simpleName
-    private var screenStartTime: Long = 0L
-
-    override fun onResume() {
-        super.onResume()
-        screenStartTime = System.currentTimeMillis()
-        AnalyticsManager.logScreenView(screenName, this::class.java.name)
-        mainActivity()?.showBottomSheet(showBottomSheet, true)
-    }
-
-    abstract fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?): T
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        bindingT = inflateBinding(inflater, container)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewCreated(binding)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        bindingT = null
-    }
-
-    override fun onPause() {
-        activity?.let { hideSoftInput(it) }
-        if (screenStartTime > 0L) {
-            val durationSeconds = (System.currentTimeMillis() - screenStartTime) / 1000L
-            AnalyticsManager.logScreenTimeSpent(screenName, durationSeconds)
-            screenStartTime = 0L
+    fun navController(): NavController? {
+        if (!isAdded || isDetached || view == null) return null
+        return try {
+            findNavController()
+        } catch (_: Exception) {
+            null
         }
-        super.onPause()
     }
 
-    fun closeFragment() {
-        popBackStack()
+    fun navigate(
+        @IdRes resId: Int,
+        args: Bundle? = null,
+        navOptions: NavOptions? = animNavOptions
+    ) {
+        val controller = navController() ?: return
+        try {
+            val currentDestination = controller.currentDestination
+            if (currentDestination != null) {
+                val action = currentDestination.getAction(resId)
+                if (action != null) {
+                    controller.navigate(resId, args, navOptions)
+                } else if (currentDestination.id != resId) {
+                    controller.navigate(resId, args, navOptions ?: animNavOptions)
+                }
+            } else {
+                controller.navigate(resId, args, navOptions ?: animNavOptions)
+            }
+        } catch (_: Exception) {
+        }
+    }
+
+    fun navigate(
+        @IdRes resId: Int,
+        args: Bundle? = null,
+        builder: NavOptions.Builder.() -> Unit
+    ) {
+        navigate(resId, args, navOptions(builder))
+    }
+
+    fun popBackStack(@IdRes destinationId: Int? = null, inclusive: Boolean = false): Boolean {
+        val controller = navController() ?: return false
+        return try {
+            if (destinationId != null) {
+                val currentDest = controller.currentDestination
+                if (currentDest != null && currentDest.id == destinationId && !inclusive) {
+                    true
+                } else {
+                    controller.popBackStack(destinationId, inclusive)
+                }
+            } else {
+                controller.popBackStack()
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    fun closeFragment(): Boolean = popBackStack()
+
+    fun navigateUp(): Boolean = popBackStack()
+
+    fun navOptions(builder: NavOptions.Builder.() -> Unit = {}): NavOptions {
+        return NavOptions.Builder()
+            .setEnterAnim(R.anim.fragment_open_anim)
+            .setExitAnim(R.anim.fragment_close_anim)
+            .setPopEnterAnim(R.anim.fragment_pop_enter)
+            .setPopExitAnim(R.anim.fragment_pop_exit)
+            .apply(builder)
+            .build()
     }
 
     companion object {
-        val animNavOptions = NavOptions.Builder().setEnterAnim(R.anim.fragment_open_anim)
-            .setExitAnim(R.anim.fragment_close_anim).setPopEnterAnim(R.anim.fragment_pop_enter)
-            .setPopExitAnim(R.anim.fragment_pop_exit).build()
+        val animNavOptions: NavOptions = NavOptions.Builder()
+            .setEnterAnim(R.anim.fragment_open_anim)
+            .setExitAnim(R.anim.fragment_close_anim)
+            .setPopEnterAnim(R.anim.fragment_pop_enter)
+            .setPopExitAnim(R.anim.fragment_pop_exit)
+            .build()
     }
 }

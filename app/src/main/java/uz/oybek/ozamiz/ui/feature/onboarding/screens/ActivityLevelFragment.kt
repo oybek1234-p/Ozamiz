@@ -10,6 +10,7 @@ import uz.oybek.ozamiz.databinding.FragmentActivityLevelBinding
 import uz.oybek.ozamiz.ui.base.EmptyDiffUtil
 import uz.oybek.ozamiz.ui.base.SelectableAdapter
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
+import uz.oybek.ozamiz.ui.modelUtils.getFormattedTitle
 
 class ActivityLevelFragment : OnBoardingChildFragment<FragmentActivityLevelBinding>() {
 
@@ -36,13 +37,7 @@ class ActivityLevelFragment : OnBoardingChildFragment<FragmentActivityLevelBindi
             ) {
                 holder.binding.apply {
                     (this as ActivityLevelItemBinding)
-                    val title = root.context.getString(model.titleRes)
-                    val subtitle = root.context.getString(model.subtitleRes)
-                    titleView.text = root.context.getString(
-                        R.string.onboarding_activity_item_format,
-                        title,
-                        subtitle
-                    )
+                    titleView.text = model.getFormattedTitle(root.context)
                 }
             }
 

@@ -20,10 +20,15 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_nav_view"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        app:elevation="8dp"
-        app:itemBackground="?colorSurfaceContainerLowest"
+        android:layout_height="wrap_content"
+        app:elevation="0dp"
+        app:backgroundTint="?colorSurfaceContainerLowest"
+        app:itemActiveIndicatorStyle="@style/Widget.App.BottomNavigationView.ActiveIndicator"
+        app:itemIconTint="@color/bottom_nav_color_selector"
+        app:itemTextAppearanceActive="@style/BottomNav.TextAppearance.Active"
+        app:itemTextAppearanceInactive="@style/BottomNav.TextAppearance.Inactive"
+        app:itemTextColor="@color/bottom_nav_color_selector"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

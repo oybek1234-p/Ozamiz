@@ -134,4 +134,22 @@
         <item name="backgroundTint">?colorSurfaceContainerLow</item>
     </style>
 
+    <style name="Widget.App.BottomNavigationView.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/bottom_nav_indicator</item>
+        <item name="android:height">32dp</item>
+        <item name="android:width">56dp</item>
+    </style>
+
+    <style name="BottomNav.TextAppearance.Active" parent="TextAppearance.Material3.LabelSmall">
+        <item name="fontFamily">@font/roboto_bold</item>
+        <item name="android:fontFamily">@font/roboto_bold</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="BottomNav.TextAppearance.Inactive" parent="TextAppearance.Material3.LabelSmall">
+        <item name="fontFamily">@font/roboto_medium</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

@@ -2,40 +2,55 @@ package uz.oybek.ozamiz.ui.feature.streak
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.user.AdminRepository
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.user.model.UserSortType
+import uz.oybek.ozamiz.data.streak.api.StreakRepo
+import uz.oybek.ozamiz.util.logMessage
+import javax.inject.Inject
 
-class StreakViewModel : ViewModel() {
+@HiltViewModel
+class StreakViewModel @Inject constructor(
+    private val streakRepo: StreakRepo
+) : ViewModel() {
 
-    private val _topUsers = MutableStateFlow<List<User>>(emptyList())
-    val topUsers = _topUsers.asStateFlow()
+    private val _uiState = MutableStateFlow(StreakUiState())
+    val uiState = _uiState.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-    
-    fun loadTopUsers() {
+    private val _effects = Channel<StreakUiEffect>(Channel.BUFFERED)
+    val effects = _effects.receiveAsFlow()
+
+    init {
+        logMessage("StreakView")
+        observeStreakRepo()
+    }
+
+    private fun observeStreakRepo() {
         viewModelScope.launch {
-            _isLoading.value = true
-            val result = AdminRepository.getUsers(
-                limit = 10,
-                sortBy = UserSortType.TOP_STREAK
-            )
-            result.onSuccess { list ->
-                _topUsers.value = list.filter { (it.streakInfo?.currentStreak ?: 0) >= 0 }.take(10)
-            }.onFailure {
-                // Ignore gracefully
+            streakRepo.streakState.collect { state ->
+                _uiState.update { current ->
+                    current.copy(
+                        status = state.status,
+                        streakInfo = state.streakInfo,
+                        weekDays = state.weekDays
+                    )
+                }
             }
-            _isLoading.value = false
+        }
+        viewModelScope.launch {
+            streakRepo.streakEvents.collect {
+                _effects.send(StreakUiEffect.ShowStreakSheet)
+            }
         }
     }
 
-    fun getCurrentUserStreak(): StreakInfo? {
-        return UserProfileRepository.user.streakInfo
+    fun onActionClick() {
+        viewModelScope.launch {
+            _effects.send(StreakUiEffect.Dismiss)
+        }
     }
 }

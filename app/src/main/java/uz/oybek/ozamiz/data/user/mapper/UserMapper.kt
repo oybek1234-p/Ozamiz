@@ -1,12 +1,13 @@
 package uz.oybek.ozamiz.data.user.mapper
 
+import uz.oybek.ozamiz.common.util.orZero
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.firestore.DocumentSnapshot
 import uz.oybek.ozamiz.data.profile.model.UserActivityLevel
 import uz.oybek.ozamiz.data.streak.StreakInfo
 import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.utils.DateUtils
-import uz.oybek.ozamiz.data.utils.roundTo1Decimal
+import uz.oybek.ozamiz.common.util.DateFormatter
+import uz.oybek.ozamiz.common.util.round
 import uz.oybek.ozamiz.util.handleException
 
 object UserMapper {
@@ -26,9 +27,9 @@ object UserMapper {
             User::region.name to u.region,
             User::registerDate.name to u.registerDate,
             User::height.name to u.height,
-            User::weight.name to u.weight.roundTo1Decimal(),
-            User::startWeight.name to u.startWeight?.roundTo1Decimal(),
-            User::targetWeight.name to u.targetWeight?.roundTo1Decimal(),
+            User::weight.name to u.weight.round(),
+            User::startWeight.name to u.startWeight?.round(),
+            User::targetWeight.name to u.targetWeight?.round(),
             User::age.name to u.age,
             User::goal.name to u.goal,
             User::targetCalories.name to u.targetCalories,
@@ -61,9 +62,9 @@ object UserMapper {
             User::region.name to u.region,
             User::age.name to u.age,
             User::height.name to u.height,
-            User::weight.name to u.weight.roundTo1Decimal(),
-            User::targetWeight.name to u.targetWeight?.roundTo1Decimal(),
-            User::startWeight.name to u.startWeight?.roundTo1Decimal(),
+            User::weight.name to u.weight.round(),
+            User::targetWeight.name to u.targetWeight?.round(),
+            User::startWeight.name to u.startWeight?.round(),
             User::goal.name to u.goal,
             User::activityLevel.name to u.activityLevel,
             User::targetCalories.name to u.targetCalories,
@@ -99,10 +100,10 @@ object UserMapper {
         u.name = snapshot.child(User::name.name).value as? String ?: ""
         u.phoneNumber = snapshot.child(User::phoneNumber.name).value as? String ?: ""
         u.gmail = snapshot.child(User::gmail.name).value as? String ?: ""
-        u.lastSeenTime = (snapshot.child(User::lastSeenTime.name).value as? Number)?.toLong() ?: 0L
-        u.unreadMessages = (snapshot.child(User::unreadMessages.name).value as? Number)?.toInt() ?: 0
+        u.lastSeenTime = (snapshot.child(User::lastSeenTime.name).value as? Number)?.toLong().orZero()
+        u.unreadMessages = (snapshot.child(User::unreadMessages.name).value as? Number)?.toInt().orZero()
         u.premium = snapshot.child(User::premium.name).value as? Boolean ?: false
-        u.premiumDate = (snapshot.child(User::premiumDate.name).value as? Number)?.toLong() ?: 0L
+        u.premiumDate = (snapshot.child(User::premiumDate.name).value as? Number)?.toLong().orZero()
         u.isPremiumYearly = snapshot.child(User::isPremiumYearly.name).value as? Boolean ?: false
         u.isMonthlyPremium = snapshot.child(User::isMonthlyPremium.name).value as? Boolean ?: false
         u.gender = (snapshot.child(User::gender.name).value as? Number)?.toInt() ?: -1
@@ -114,10 +115,10 @@ object UserMapper {
         u.startWeight = (snapshot.child(User::startWeight.name).value as? Number)?.toDouble()
         u.goal = (snapshot.child(User::goal.name).value as? String).let { if (it.isNullOrEmpty()) uz.oybek.ozamiz.data.profile.model.UserGoal.LOSE_WEIGHT.key else it }
         u.activityLevel = snapshot.child(User::activityLevel.name).value as? String ?: UserActivityLevel.LIGHTLY_ACTIVE.name
-        u.targetCalories = (snapshot.child(User::targetCalories.name).value as? Number)?.toInt() ?: 0
-        u.targetProtein = (snapshot.child(User::targetProtein.name).value as? Number)?.toInt() ?: 0
-        u.targetFat = (snapshot.child(User::targetFat.name).value as? Number)?.toInt() ?: 0
-        u.targetCarbs = (snapshot.child(User::targetCarbs.name).value as? Number)?.toInt() ?: 0
+        u.targetCalories = (snapshot.child(User::targetCalories.name).value as? Number)?.toInt().orZero()
+        u.targetProtein = (snapshot.child(User::targetProtein.name).value as? Number)?.toInt().orZero()
+        u.targetFat = (snapshot.child(User::targetFat.name).value as? Number)?.toInt().orZero()
+        u.targetCarbs = (snapshot.child(User::targetCarbs.name).value as? Number)?.toInt().orZero()
         u.targetWaterMl = (snapshot.child(User::targetWaterMl.name).value as? Number)?.toInt() ?: 2500
         u.avatarUrl = snapshot.child(User::avatarUrl.name).value as? String
         u.registerDate =
@@ -125,7 +126,7 @@ object UserMapper {
         u.paymentChecking = snapshot.child(User::paymentChecking.name).value as? Boolean ?: false
         u.paymentCheckPhotoUrl = snapshot.child(User::paymentCheckPhotoUrl.name).value as? String
         u.admin = snapshot.child(User::admin.name).value as? Boolean ?: false
-        u.scorePoints = (snapshot.child(User::scorePoints.name).value as? Number)?.toInt() ?: 0
+        u.scorePoints = (snapshot.child(User::scorePoints.name).value as? Number)?.toInt().orZero()
         u.isRated = snapshot.child(User::isRated.name).value as? Boolean ?: false
 
         u.problems = try {
@@ -140,9 +141,9 @@ object UserMapper {
             val streakChild = snapshot.child(User::streakInfo.name)
             if (streakChild.exists()) {
                 val lastActionDate = streakChild.child(StreakInfo::lastActionDate.name).value as? String ?: ""
-                val currentStreak = (streakChild.child(StreakInfo::currentStreak.name).value as? Number)?.toInt() ?: 0
-                val bestStreak = (streakChild.child(StreakInfo::bestStreak.name).value as? Number)?.toInt() ?: 0
-                val activeDays = (streakChild.child(StreakInfo::activeDays.name).value as? Number)?.toInt() ?: 0
+                val currentStreak = (streakChild.child(StreakInfo::currentStreak.name).value as? Number)?.toInt().orZero()
+                val bestStreak = (streakChild.child(StreakInfo::bestStreak.name).value as? Number)?.toInt().orZero()
+                val activeDays = (streakChild.child(StreakInfo::activeDays.name).value as? Number)?.toInt().orZero()
                 val streakGoal = (streakChild.child(StreakInfo::streakGoal.name).value as? Number)?.toInt() ?: 7
                 StreakInfo(
                     lastActionDate = lastActionDate,
@@ -169,13 +170,13 @@ object UserMapper {
         }
 
         fun getLongSafe(field: String, default: Long): Long = try {
-            snapshot.get(field)?.let { DateUtils.toLongTimestamp(it) } ?: default
+            snapshot.get(field)?.let { DateFormatter.toLongTimestamp(it, default) } ?: default
         } catch (e: Exception) {
             default
         }
 
         fun getLongOptionalSafe(field: String): Long? = try {
-            snapshot.get(field)?.let { DateUtils.toLongTimestamp(it) }
+            snapshot.get(field)?.let { DateFormatter.toLongTimestamp(it, 0L) }?.takeIf { it > 0L }
         } catch (e: Exception) {
             null
         }
@@ -254,9 +255,9 @@ object UserMapper {
             val streakMap = snapshot.get(User::streakInfo.name) as? Map<*, *>
             if (streakMap != null) {
                 val lastActionDate = streakMap[StreakInfo::lastActionDate.name]?.toString() ?: ""
-                val currentStreak = (streakMap[StreakInfo::currentStreak.name] as? Number)?.toInt() ?: 0
-                val bestStreak = (streakMap[StreakInfo::bestStreak.name] as? Number)?.toInt() ?: 0
-                val activeDays = (streakMap[StreakInfo::activeDays.name] as? Number)?.toInt() ?: 0
+                val currentStreak = (streakMap[StreakInfo::currentStreak.name] as? Number)?.toInt().orZero()
+                val bestStreak = (streakMap[StreakInfo::bestStreak.name] as? Number)?.toInt().orZero()
+                val activeDays = (streakMap[StreakInfo::activeDays.name] as? Number)?.toInt().orZero()
                 val streakGoal = (streakMap[StreakInfo::streakGoal.name] as? Number)?.toInt() ?: 7
                 StreakInfo(lastActionDate, currentStreak, bestStreak, activeDays, streakGoal)
             } else null

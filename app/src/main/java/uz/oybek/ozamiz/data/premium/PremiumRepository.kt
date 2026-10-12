@@ -1,15 +1,15 @@
 package uz.oybek.ozamiz.data.premium
 
 import kotlinx.coroutines.tasks.await
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.firebase.database
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.recordException
+import uz.oybek.ozamiz.util.recordException
 
 object PremiumRepository {
 
     private val rootReference = database.reference
 
-    suspend fun getPremiumPrices(): DataWrapper<Pair<Long, Long>> {
+    suspend fun getPremiumPrices(): BaseResult<Pair<Long, Long>, String> {
         return try {
             val monthlySnapshot = rootReference.child("premiumPrice").get().await()
 
@@ -19,13 +19,13 @@ object PremiumRepository {
             val yearly = yearlySnapshot.value?.toString()?.replace(" ", "")?.toLongOrNull()
 
             if (monthly != null && yearly != null) {
-                DataWrapper.Success(Pair(monthly, yearly))
+                BaseResult.Success(Pair(monthly, yearly))
             } else {
-                DataWrapper.Error("Narx ma'lumotlari topilmadi")
+                BaseResult.Failure("Narx ma'lumotlari topilmadi")
             }
         } catch (e: Exception) {
             recordException(e)
-            DataWrapper.Error("")
+            BaseResult.Failure(e.message ?: "")
         }
 
     }

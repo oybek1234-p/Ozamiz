@@ -10,8 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.recordException
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.util.recordException
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
@@ -68,17 +68,17 @@ object ImageUploader {
         }
     }
 
-    suspend fun deleteImage(imageUrl: String?): DataWrapper<Unit> = withContext(Dispatchers.IO) {
+    suspend fun deleteImage(imageUrl: String?): BaseResult<Unit, Unit> = withContext(Dispatchers.IO) {
         if (imageUrl.isNullOrEmpty() || !imageUrl.startsWith(FIREBASE_STORAGE_API_PATH)) {
-            return@withContext DataWrapper.Success(Unit)
+            return@withContext BaseResult.Success(Unit)
         }
 
         try {
             Firebase.storage.getReferenceFromUrl(imageUrl).delete().await()
-            DataWrapper.Success(Unit)
+            BaseResult.Success(Unit)
         } catch (e: Exception) {
             recordException(e)
-            DataWrapper.Success(Unit)
+            BaseResult.Success(Unit)
         }
     }
 

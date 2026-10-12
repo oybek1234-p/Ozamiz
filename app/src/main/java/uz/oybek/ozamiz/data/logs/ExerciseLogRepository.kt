@@ -12,8 +12,8 @@ import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.currentUserId
 import uz.oybek.ozamiz.data.logs.base.BaseLogRepository
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.dateApiFormat
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.common.util.dateApiFormat
 import java.util.Date
 
 object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
@@ -95,10 +95,10 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
         awaitClose { query.removeEventListener(listener) }
     }
 
-    fun getLogsFlow(userId: String, dateStr: String): Flow<DataWrapper<List<ExerciseLog>>> =
+    fun getLogsFlow(userId: String, dateStr: String): Flow<BaseResult<List<ExerciseLog>, Unit>> =
         callbackFlow {
             if (userId.isBlank()) {
-                trySend(DataWrapper.Error())
+                trySend(BaseResult.Failure(Unit))
                 close()
                 return@callbackFlow
             }
@@ -106,11 +106,11 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
             val listener = object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val logs = snapshot.children.mapNotNull { it.getValue(ExerciseLog::class.java) }
-                    trySend(DataWrapper.Success(logs))
+                    trySend(BaseResult.Success(logs))
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    trySend(DataWrapper.Error())
+                    trySend(BaseResult.Failure(Unit))
                 }
             }
             query.addValueEventListener(listener)

@@ -40,8 +40,8 @@
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imageView_photo_preview"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="16dp"
                 android:scaleType="centerCrop"
@@ -96,7 +96,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:fontFamily="@font/roboto_bold"
-            android:text="@string/btn_check_analyze"
+            android:text="@string/stop_and_analyze"
             android:textSize="16sp"
             app:cornerRadius="28dp" />
     </FrameLayout>

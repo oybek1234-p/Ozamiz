@@ -3,13 +3,13 @@ package uz.oybek.ozamiz.ui.feature.onboarding.screens
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.profile.model.UserMetricsLimits
 import uz.oybek.ozamiz.databinding.FragmentTargetWeightBinding
 import uz.oybek.ozamiz.ui.feature.onboarding.OnBoardingChildFragment
+import uz.oybek.ozamiz.ui.utils.doubleOrNull
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 
-class TargetWeightFragment
-    : OnBoardingChildFragment<
-        FragmentTargetWeightBinding>() {
+class TargetWeightFragment : OnBoardingChildFragment<FragmentTargetWeightBinding>() {
     override fun viewCreated(bind: FragmentTargetWeightBinding) {
         val (low, high) = viewModel.uiState.value.idealWeight
         bind.tvIdealWeight.text =
@@ -28,17 +28,12 @@ class TargetWeightFragment
         }
 
         bind.button.setOnClickListener {
-            val inputTarget = bind.textInput
-                .editText
-                ?.text
-                ?.toString()
-                ?.toDoubleOrNull()
-
-            if (inputTarget != null && inputTarget >= 40) {
+            val inputTarget = bind.textInput.doubleOrNull()
+            if (UserMetricsLimits.isValidWeight(inputTarget)) {
                 viewModel.updateUser { it.copy(targetWeight = inputTarget) }
                 moveToNextScreen()
             } else {
-                bind.textInput.error = getString(R.string.error_weight)
+                bind.textInput.error = getString(R.string.error_invalid_target_weight)
             }
         }
     }

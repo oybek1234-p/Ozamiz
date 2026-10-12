@@ -1,7 +1,6 @@
 package uz.oybek.ozamiz
 
 import org.junit.Test
-import uz.oybek.ozamiz.util.VertexLogParser
 
 class VertexLogParserTest {
 

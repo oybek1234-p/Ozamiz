@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@drawable/arrow_back"
-        app:title="Saqlanganlar"
+        app:title="@string/food_camera_saved_btn"
         app:titleCentered="true" />
 
     <FrameLayout
@@ -50,8 +50,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Saqlangan ovqatlar shu yerda turadi"
-                android:textColor="?colorOnSurface" />
+                android:text="@string/saved_foods_empty"
+                android:textColor="?attr/colorOnSurface" />
 
         </LinearLayout>
     </FrameLayout>

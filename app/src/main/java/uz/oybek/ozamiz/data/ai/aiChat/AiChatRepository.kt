@@ -19,9 +19,8 @@ import uz.oybek.ozamiz.data.ai.AiPromptBuilder
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatDatabase
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatMessageEntity
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.user.UserProfileRepository.user
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.DateUtils
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.common.util.DateFormatter
 
 object AiChatRepository {
 
@@ -35,7 +34,7 @@ object AiChatRepository {
     }
 
     suspend fun getCachedMessages(): List<AiChatMessageEntity>? {
-        return aiChatDao.getMessagesForDateFlow(DateUtils.todayString()).firstOrNull()
+        return aiChatDao.getMessagesForDateFlow(DateFormatter.todayString()).firstOrNull()
     }
 
     suspend fun saveMessageToFirestore(
@@ -45,21 +44,21 @@ object AiChatRepository {
             val chatRef = FirebasePaths.Firestore.aiChat(chatId)
             val msgRef = FirebasePaths.Firestore.aiMessages(chatId).document()
 
-            chatRef.set(
-                mapOf(
-                    "userId" to user.uid,
-                    "userName" to user.name,
-                    "lastModified" to timestamp
-                ), SetOptions.merge()
-            ).await()
-            msgRef.set(
-                mapOf(
-                    ChatMessage::id.name to msgRef.id,
-                    ChatMessage::text.name to text,
-                    ChatMessage::isUser.name to isUser,
-                    ChatMessage::timestamp.name to timestamp
-                )
-            ).await()
+//            chatRef.set(
+//                mapOf(
+//                    "userId" to user.uid,
+//                    "userName" to user.name,
+//                    "lastModified" to timestamp
+//                ), SetOptions.merge()
+//            ).await()
+//            msgRef.set(
+//                mapOf(
+//                    ChatMessage::id.name to msgRef.id,
+//                    ChatMessage::text.name to text,
+//                    ChatMessage::isUser.name to isUser,
+//                    ChatMessage::timestamp.name to timestamp
+//                )
+//            ).await()
 
             chatRef.update("lastModified", timestamp).await()
         } catch (_: Exception) {
@@ -98,7 +97,7 @@ object AiChatRepository {
             text = text,
             isUser = isUser,
             timestamp = System.currentTimeMillis(),
-            dateString = DateUtils.todayString(),
+            dateString = DateFormatter.todayString(),
             tag = tag
         )
         aiChatDao.insertMessage(entity)
@@ -112,7 +111,7 @@ object AiChatRepository {
         text: String,
         chatId: String?,
         scope: CoroutineScope
-    ): Flow<DataWrapper<String>> = flow {
+    ): Flow<BaseResult<String, Exception?>> = flow {
 
         val delimiterRegex = Regex("---+\\s*suggestions?\\s*---+", RegexOption.IGNORE_CASE)
         val now = System.currentTimeMillis()
@@ -151,7 +150,7 @@ object AiChatRepository {
             android.util.Log.d("DietologAI", "[AI RESPONSE FINAL]:\n$finalCleanText")
 
             if (finalCleanText.isNotBlank()) {
-                emit(DataWrapper.Success(finalCleanText))
+                emit(BaseResult.Success(finalCleanText))
 
                 extractAndEmitSuggestions(fullResponse, delimiterRegex)
 
@@ -193,7 +192,7 @@ object AiChatRepository {
                 } catch (_: Exception) {
                 }
             }
-            emit(DataWrapper.Success(errorMsg))
+            emit(BaseResult.Success(errorMsg))
         }
     }
 
@@ -218,17 +217,20 @@ object AiChatRepository {
         isLiked: Boolean
     ) = withContext(Dispatchers.IO) {
         try {
-            val map = hashMapOf(
-                "userId" to user.uid,
-                "userName" to user.name,
-                "userQuestion" to userQuestion,
-                "aiResponse" to aiResponse,
-                "feedbackType" to if (isLiked) "like" else "dislike",
-                "isLiked" to isLiked,
-                "timestamp" to System.currentTimeMillis()
+//            val map = hashMapOf(
+//                "userId" to user.uid,
+//                "userName" to user.name,
+//                "userQuestion" to userQuestion,
+//                "aiResponse" to aiResponse,
+//                "feedbackType" to if (isLiked) "like" else "dislike",
+//                "isLiked" to isLiked,
+//                "timestamp" to System.currentTimeMillis()
+//            )
+//            FirebasePaths.Firestore.aiChatFeedback().document().set(map).await()
+            android.util.Log.d(
+                "DietologAI",
+                "Saved feedback to root aiChatFeedback collection: isLiked=$isLiked"
             )
-            FirebasePaths.Firestore.aiChatFeedback().document().set(map).await()
-            android.util.Log.d("DietologAI", "Saved feedback to root aiChatFeedback collection: isLiked=$isLiked")
         } catch (e: Exception) {
             android.util.Log.e("DietologAI", "Error saving feedback to Firestore", e)
         }

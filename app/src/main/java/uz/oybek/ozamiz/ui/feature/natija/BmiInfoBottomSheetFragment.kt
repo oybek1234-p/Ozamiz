@@ -1,5 +1,6 @@
 package uz.oybek.ozamiz.ui.feature.natija
 
+import uz.oybek.ozamiz.common.util.orZero
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -28,7 +29,7 @@ class BmiInfoBottomSheetFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         
         // Retrieve args
-        bmi = arguments?.getDouble(ARG_BMI) ?: 0.0
+        bmi = arguments?.getDouble(ARG_BMI).orZero()
         val categoryName = arguments?.getString(ARG_CATEGORY) ?: "NONE"
         category = try {
             BmiCategory.valueOf(categoryName)

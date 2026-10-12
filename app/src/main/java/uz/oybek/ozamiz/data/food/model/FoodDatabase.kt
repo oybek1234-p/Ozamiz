@@ -1,7 +1,11 @@
 package uz.oybek.ozamiz.data.food.model
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import uz.oybek.ozamiz.ui.feature.log.food.SearchNormalizer
+
 object FoodDatabase {
-    val allFoods = listOf(
+    fun createAllFoods(): List<FoodItem> = listOf(
         FoodItem("1", "Oq non",
             265.0, 9.0, 3.0, 49.0,
             listOf(
@@ -19,7 +23,7 @@ object FoodDatabase {
                 ServingSize("Kosa", 250.0),
                 ServingSize("Likop", 350.0),
                 ServingSize("Lagan", 500.0)
-            ), true, "Taomlar", isPopular = true, searchAliases = listOf("osh", "plov", "palov", "choyxona oshi", "toy oshi")),
+            ), true, "Taomlar", isPopular = true, searchAliases = listOf("osh", "plov", "palov", "toy oshi")),
         FoodItem("4", "Sho'rva (go'shtli)",
             85.0, 6.0, 5.0, 4.0,
             listOf(ServingSize("Kosa", 350.0), ServingSize("Katta kosa", 450.0)), true, "Taomlar", isPopular = true, searchAliases = listOf("shorva", "shurva", "goshtli shorva", "soup")),
@@ -1087,8 +1091,93 @@ object FoodDatabase {
             listOf(ServingSize("Bo'lakcha", 10.0)), true, "Shirinliklar va desertlar", searchAliases = listOf("qora shkalad", "99 shokolad")),
         FoodItem("1126", "Hot-dog noni", 260.0, 8.0, 3.0, 48.0,
             listOf(ServingSize("Dona", 60.0)), true, "Non va non mahsulotlari", searchAliases = listOf("xodog non", "xotdog noni")),
+        FoodItem("1127", "Ko'k choy (shakarsiz)", 1.0, 0.0, 0.0, 0.2,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Choynak", 500.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("choy", "kok choy", "ko'k choy", "zeleniy chay", "green tea")),
+        FoodItem("1128", "Qora choy (shakarsiz)", 1.0, 0.0, 0.0, 0.2,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Choynak", 500.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("choy", "qora choy", "chorniy chay", "black tea")),
+        FoodItem("1129", "Limonli choy (shakarsiz)", 5.0, 0.1, 0.0, 1.0,
+            listOf(ServingSize("Piyola", 150.0), ServingSize("Choynak", 500.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("limonli choy", "limon choy", "choy limon bilan")),
+        FoodItem("1130", "Kofe (qora, shakarsiz)", 2.0, 0.2, 0.0, 0.3,
+            listOf(ServingSize("Finjon", 150.0), ServingSize("Katta krujka", 300.0)), true, "Ichimliklar", isPopular = true, searchAliases = listOf("kofe", "qora kofe", "espresso", "amerikano", "coffee")),
 
     )
+
+    @Volatile
+    private var cachedSearchableFoods: List<SearchableFood>? = null
+
+    suspend fun getSearchableFoods(): List<SearchableFood> =
+        withContext(Dispatchers.Default) {
+            cachedSearchableFoods ?: synchronized(FoodDatabase) {
+                cachedSearchableFoods ?: createAllFoods().map { food ->
+                    val lowerName = food.name.lowercase()
+                    val normName = SearchNormalizer.normalize(food.name)
+                    val words = SearchNormalizer.getWords(food.name)
+                    val lowerAliases = food.searchAliases.map { it.lowercase() }
+                    val normAliases = food.searchAliases.map { SearchNormalizer.normalize(it) }
+                    val aliasWords = food.searchAliases.flatMap { SearchNormalizer.getWords(it) }
+                    SearchableFood(
+                        food = food,
+                        lowerName = lowerName,
+                        normName = normName,
+                        words = words,
+                        lowerAliases = lowerAliases,
+                        normAliases = normAliases,
+                        aliasWords = aliasWords
+                    )
+                }.also { cachedSearchableFoods = it }
+            }
+        }
+
+    suspend fun getAllFoods(): List<FoodItem> = getSearchableFoods().map { it.food }
+}
+
+data class SearchableFood(
+    val food: FoodItem,
+    val lowerName: String,
+    val normName: String,
+    val words: List<String>,
+    val lowerAliases: List<String>,
+    val normAliases: List<String>,
+    val aliasWords: List<String>
+) {
+    fun calculateScore(rawQuery: String, normQuery: String, lowerQuery: String): Int {
+        val isExactNormalized = normName == normQuery
+        val isExactName = lowerName == lowerQuery
+        val isStartName = lowerName.startsWith(lowerQuery)
+        val normStartName = normName.startsWith(normQuery)
+        val firstWordExact = words.firstOrNull()?.lowercase() == lowerQuery
+        val anyWordExact = words.any { it.lowercase() == lowerQuery }
+        val anyWordStarts = words.any { it.lowercase().startsWith(lowerQuery) }
+        val containsQuery = normName.contains(normQuery) || lowerName.contains(lowerQuery)
+
+        val exactAliasMatch = lowerAliases.any { it == lowerQuery } || normAliases.any { it == normQuery }
+        val startAliasMatch = lowerAliases.any { it.startsWith(lowerQuery) } || normAliases.any { it.startsWith(normQuery) }
+        val aliasWordExact = aliasWords.any { it.lowercase() == lowerQuery }
+        val aliasWordStarts = aliasWords.any { it.lowercase().startsWith(lowerQuery) }
+        val aliasContains = normAliases.any { it.contains(normQuery) } || lowerAliases.any { it.contains(lowerQuery) }
+
+        val matchScore = when {
+            isExactName || isExactNormalized -> 5000
+            exactAliasMatch -> 4500
+            firstWordExact -> 4000
+            isStartName || normStartName -> 3500
+            startAliasMatch -> 3000
+            anyWordExact -> 2800
+            aliasWordExact -> 2200
+            anyWordStarts -> 1500
+            aliasWordStarts -> 600
+            containsQuery -> 400
+            aliasContains -> 200
+            else -> 0
+        }
+
+        return if (matchScore > 0) {
+            val popularBonus = if (food.isPopular) 500 else 0
+            matchScore + popularBonus
+        } else {
+            0
+        }
+    }
 }
 
 

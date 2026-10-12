@@ -2,8 +2,8 @@ package uz.oybek.ozamiz.data.menu
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.menu.model.Menu
-import uz.oybek.ozamiz.data.utils.DataWrapper
 
 class MenuPagingSource(
     private val categoryId: String?,
@@ -36,7 +36,7 @@ class MenuPagingSource(
             }
 
             when (result) {
-                is DataWrapper.Success -> {
+                is BaseResult.Success -> {
                     val menus = result.data
                     LoadResult.Page(
                         data = menus,
@@ -44,7 +44,7 @@ class MenuPagingSource(
                         nextKey = if (menus.size < params.loadSize) null else menus.lastOrNull()
                     )
                 }
-                is DataWrapper.Error -> {
+                is BaseResult.Failure -> {
                     LoadResult.Error(Exception(result.error ?: "Unknown error"))
                 }
             }

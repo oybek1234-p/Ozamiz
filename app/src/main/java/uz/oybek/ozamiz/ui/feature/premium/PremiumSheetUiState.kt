@@ -2,7 +2,7 @@ package uz.oybek.ozamiz.ui.feature.premium
 
 import uz.oybek.ozamiz.data.premium.PremiumRepository
 import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.utils.DataWrapper.Success
+import uz.oybek.ozamiz.common.result.BaseResult.Success
 
 import androidx.annotation.Keep
 import androidx.lifecycle.LiveData

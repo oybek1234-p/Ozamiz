@@ -1,92 +1,59 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isVisible
-import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.databinding.FragmentWriteFoodBinding
-import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
+import uz.oybek.ozamiz.ui.utils.applyImeBottomPadding
+import uz.oybek.ozamiz.ui.utils.getArgs
 import uz.oybek.ozamiz.ui.utils.hideSoftInput
+import uz.oybek.ozamiz.ui.utils.loadBannerAd
 import uz.oybek.ozamiz.ui.utils.showKeyboard
 import uz.oybek.ozamiz.ui.utils.showToast
+import uz.oybek.ozamiz.ui.utils.toBundle
 
 class WriteFoodFragment : BaseFragment<FragmentWriteFoodBinding>() {
 
-    private val args: WriteFoodFragmentArgs by navArgs()
+    private val writeFoodArgs: WriteFoodArgs? by lazy { arguments.getArgs<WriteFoodArgs>() }
 
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentWriteFoodBinding.inflate(inflater, container, false)
 
-    override fun viewCreated(binding: FragmentWriteFoodBinding) {
-        setupUI(binding)
-        setupKeyboardListener(binding)
-        loadBanner(binding)
+    override fun viewCreated(bind: FragmentWriteFoodBinding) {
+        setupUI(bind)
+        loadBanner(bind)
     }
+
 
     private fun loadBanner(binding: FragmentWriteFoodBinding) {
-        if (user.isPremium()) {
-            binding.bannerContainer.isVisible = false
-            return
-        }
-        try {
-            val bannerView = uz.oybek.ozamiz.data.ads.AdsManager.createBannerView(
-                requireContext(),
-                uz.oybek.ozamiz.data.ads.AdsConfig.BANNER_LOG_FOOD
-            )
-            binding.bannerContainer.removeAllViews()
-            binding.bannerContainer.addView(bannerView)
-            binding.bannerContainer.isVisible = true
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun setupKeyboardListener(binding: FragmentWriteFoodBinding) {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            
-            val bottomPadding = if (imeInsets.bottom == 0) {
-                0
-            } else {
-                maxOf(0, imeInsets.bottom - systemBars.bottom)
-            }
-            v.setPadding(0, 0, 0, bottomPadding)
-            insets
-        }
+        binding.bannerContainer.loadBannerAd(AdsConfig.BANNER_LOG_FOOD)
     }
 
     private fun setupUI(binding: FragmentWriteFoodBinding) = with(binding) {
         toolbar.setNavigationOnClickListener { popBackStack() }
-        
-        inputFoodDescription.postDelayed({
-            inputFoodDescription.showKeyboard()
-        }, 200)
+
+        inputFoodDescription.showKeyboard(delayMs = 200)
 
         buttonAnalyze.setOnClickListener {
             val text = inputFoodDescription.text.toString().trim()
             if (text.isEmpty()) {
-                showToast("Iltimos, nima yeganingizni yozing")
+                showToast(getString(R.string.write_food_empty_input_error))
                 return@setOnClickListener
             }
+            hideSoftInput()
 
-            checkLimitAndProceed {
-                activity?.let { hideSoftInput(it) }
-                val ts = if (args.timestamp > 0) args.timestamp else System.currentTimeMillis()
-                val meal = uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(args.mealType, ts)
-                val bundle = Bundle().apply {
-                    putString(AnalyzeResultFragment.KEY_PENDING_DESCRIPTION, text)
-                    putString(AnalyzeResultFragment.KEY_MEAL_TYPE, meal)
-                    putLong(AnalyzeResultFragment.KEY_TIMESTAMP, ts)
-                }
-                navigate(R.id.analyzeResultFragment, bundle)
+            val analyzeArgs = AnalyzeResultArgs.NewAnalysis(
+                description = text,
+                mealType = writeFoodArgs?.mealType.orEmpty()
+            )
+
+            navigate(R.id.analyzeResultFragment, analyzeArgs.toBundle()) {
+                setPopUpTo(R.id.writeFoodFragment, true)
             }
         }
     }
 }
+
+

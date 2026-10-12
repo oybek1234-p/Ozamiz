@@ -3,41 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?attr/colorSurface">
+    android:background="?attr/colorSurfaceContainerLowest"
+    android:orientation="vertical">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:title="Postlar boshqaruvi"
-        app:navigationIcon="@drawable/arrow_back" />
+        android:background="?attr/colorSurfaceContainerLowest"
+        app:navigationIcon="@drawable/arrow_back"
+        app:title="@string/admin_posts_title"
+        app:titleCentered="true" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_delete_all"
-        style="@style/Widget.Material3.Button.TonalButton"
+    <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:text="Barcha ko'ringanlarni o'chirish"
-        android:textColor="?attr/colorError"
-        app:backgroundTint="?attr/colorErrorContainer" />
+        android:layout_height="1dp"
+        app:dividerColor="?attr/colorSurfaceContainerHigh" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvPosts"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="100dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPosts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="80dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -51,9 +52,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Tasdiqlanmagan postlar yo'q"
+            android:fontFamily="@font/roboto_medium"
+            android:text="@string/admin_posts_empty"
             android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="15sp"
             android:visibility="gone" />
 
     </FrameLayout>
 </LinearLayout>
+

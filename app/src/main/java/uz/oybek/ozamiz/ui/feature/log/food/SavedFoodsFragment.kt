@@ -1,94 +1,57 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.collectLatest
+import androidx.lifecycle.repeatOnLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentSavedFoodsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import java.util.Date
 
+@AndroidEntryPoint
 class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
 
-    private val viewModel: LogFoodViewModel by viewModels()
-    private lateinit var adapter: SavedFoodAdapter
+    private val viewModel: SavedFoodsViewModel by viewModels()
+    private var adapter: SavedFoodAdapter? = null
 
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentSavedFoodsBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentSavedFoodsBinding) {
-        val mealType = arguments?.getString("mealType") ?: ""
-        val timestamp = arguments?.getLong("timestamp") ?: 0L
-        if (mealType.isNotBlank() && timestamp > 0L) {
-            viewModel.setDateAndMeal(Date(timestamp), mealType)
-        }
-        setupUI(bind)
+        setupUI()
         observeData()
     }
 
-    private fun setupUI(bind: FragmentSavedFoodsBinding) {
-        bind.toolbar.setNavigationOnClickListener {
+    private fun setupUI() = with(binding) {
+        toolbar.setNavigationOnClickListener {
             popBackStack()
         }
-        adapter = SavedFoodAdapter(
-            onItemClick = { foodLog ->
-                val rawTs = arguments?.getLong("timestamp", -1L) ?: -1L
-                val timestamp = if (rawTs > 0) rawTs else System.currentTimeMillis()
-                val rawMeal = arguments?.getString("mealType") ?: arguments?.getString("meal") ?: foodLog.mealType
-                val mealType = uz.oybek.ozamiz.data.food.model.MealTime.getValidMeal(rawMeal, timestamp)
-                navigate(
-                    R.id.analyzeResultFragment,
-                    Bundle().apply {
-                        putString(AnalyzeResultFragment.KEY_DESCRIPTION, foodLog.description)
-                        putDouble(AnalyzeResultFragment.KEY_CALORIES, foodLog.calories.toDouble())
-                        putDouble(AnalyzeResultFragment.KEY_PROTEIN, foodLog.protein ?: 0.0)
-                        putDouble(AnalyzeResultFragment.KEY_FAT, foodLog.fat ?: 0.0)
-                        putDouble(AnalyzeResultFragment.KEY_CARBS, foodLog.carbs ?: 0.0)
-                        putString(AnalyzeResultFragment.KEY_PHOTO_URL, foodLog.photoUrl)
-                        putString(AnalyzeResultFragment.KEY_MEAL_TYPE, mealType)
-                        putBoolean(AnalyzeResultFragment.KEY_IS_FROM_FAVORITE, true)
-                        putLong(AnalyzeResultFragment.KEY_TIMESTAMP, timestamp)
-                        putString(AnalyzeResultFragment.KEY_LOG_ID, foodLog.logId)
-                    }
-                )
-            },
-            onAddButtonClick = { foodLog ->
-                checkLimitAndProceed {
-                    viewModel.relogFood(foodLog)
-                }
-            },
-            onDeleteButtonClick = { foodLog ->
-                viewModel.removeFavorite(foodLog)
-            },
-            layoutResId = R.layout.item_saved_food
+        val savedAdapter = SavedFoodAdapter(
+            onItemClick = { },
+            onDeleteButtonClick = { }
         )
-        bind.recyclerSavedFoods.adapter = adapter
+        adapter = savedAdapter
+        recyclerSavedFoods.adapter = savedAdapter
     }
 
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.savedFoods.collectLatest { foods ->
-                binding.layoutEmptySaved.isVisible = foods.isEmpty()
-                binding.recyclerSavedFoods.isVisible = foods.isNotEmpty()
-                adapter.submitList(foods)
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.event.collectLatest {
-                if (it is LogEvent.Message) {
-                    com.google.android.material.snackbar.Snackbar.make(binding.root, it.text, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show()
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.savedFoods.collect { foods ->
+                    binding.layoutEmptySaved.isVisible = foods.isEmpty()
+                    binding.recyclerSavedFoods.isVisible = foods.isNotEmpty()
+                    adapter?.submitList(foods)
                 }
             }
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.loadingFoodIds.collectLatest { ids ->
-                adapter.updateLoadingIds(ids)
-            }
-        }
+    }
+
+    override fun onDestroyView() {
+        adapter = null
+        super.onDestroyView()
     }
 }

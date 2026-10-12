@@ -41,6 +41,7 @@
                 android:layout_marginTop="-28dp"
                 android:background="@drawable/bg_bottom_sheet_top_rounded"
                 android:orientation="vertical"
+                android:backgroundTint="?colorSurfaceContainerLowest"
                 android:paddingHorizontal="20dp"
                 android:paddingTop="20dp">
 
@@ -279,12 +280,6 @@
                         android:paddingVertical="14dp">
 
                         <LinearLayout
-                            android:id="@+id/loading_card"
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:visibility="gone" />
-
-                        <LinearLayout
                             android:id="@+id/calorie_card"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -295,7 +290,7 @@
                                 android:layout_width="38dp"
                                 android:layout_height="38dp"
                                 android:background="@drawable/round_lay"
-                                android:backgroundTint="?attr/colorSurfaceContainerLow">
+                                android:backgroundTint="?attr/colorSurfaceContainer">
 
                                 <ImageView
                                     android:id="@+id/imageView_fire"
@@ -343,15 +338,6 @@
                                         android:textColor="?colorOnSurface"
                                         android:textSize="24sp"
                                         tools:text="450" />
-
-                                    <ImageView
-                                        android:id="@+id/button_edit_calories"
-                                        android:layout_width="18dp"
-                                        android:layout_height="18dp"
-                                        android:layout_marginStart="8dp"
-                                        android:padding="1dp"
-                                        android:src="@drawable/edit"
-                                        app:tint="?colorOutline" />
                                 </LinearLayout>
                             </LinearLayout>
 
@@ -476,17 +462,27 @@
                                 android:textColor="?colorOnSurface"
                                 android:textSize="16sp" />
 
-                            <ImageButton
+                            <com.google.android.material.button.MaterialButton
                                 android:id="@+id/button_add_ingredient"
-                                android:layout_width="32dp"
-                                android:layout_height="32dp"
-                                android:background="@drawable/round_lay_stroke"
-                                android:backgroundTint="?colorSurfaceContainer"
-                                android:contentDescription="Qo'shish"
-                                android:padding="7dp"
-                                android:scaleType="fitCenter"
-                                android:src="@drawable/add_ic"
-                                app:tint="?colorOnSurface" />
+                                style="@style/Widget.Material3.Button.TonalButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:fontFamily="@font/roboto_medium"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:minHeight="0dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="0dp"
+                                android:text="@string/analyze_result_add_ingredient_btn"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="13sp"
+                                app:backgroundTint="?colorSurfaceContainerHigh"
+                                app:cornerRadius="18dp"
+                                app:icon="@drawable/add_ic"
+                                app:iconGravity="textStart"
+                                app:iconPadding="4dp"
+                                app:iconSize="16dp"
+                                app:iconTint="?colorOnSurface" />
 
                         </LinearLayout>
 
@@ -622,7 +618,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="?colorSurfaceContainerLowest"
+        android:background="?colorSurfaceContainer"
         android:elevation="8dp"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"

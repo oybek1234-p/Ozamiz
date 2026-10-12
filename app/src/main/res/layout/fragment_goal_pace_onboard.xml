@@ -21,7 +21,7 @@
 
             <TextView
                 android:id="@+id/text_speed_title"
-                style="@style/Title4_24"
+                style="@style/Title3_17"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dimen_12"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="20dp"
                 android:orientation="horizontal">
 
                 <!-- Normal Speed Card -->
@@ -59,27 +59,14 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp">
-
-                            <FrameLayout
-                                android:id="@+id/frame_pace_normal_icon"
-                                android:layout_width="38dp"
-                                android:layout_height="38dp"
-                                android:layout_alignParentStart="true"
-                                android:background="@drawable/bg_circle_filled">
-
-                                <ImageView
-                                    android:id="@+id/icon_pace_normal"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_pace_normal"
-                                    app:tint="?attr/colorOnSurface" />
-                            </FrameLayout>
-                        </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/icon_pace_normal"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_marginBottom="12dp"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_pace_normal"
+                            app:tint="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/text_pace_normal_label"
@@ -98,9 +85,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/roboto_medium"
-                            tools:text="-1.8 kg / oy"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
+                            android:textSize="14sp"
+                            tools:text="-1.8 kg / oy" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -125,27 +112,14 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <RelativeLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp">
-
-                            <FrameLayout
-                                android:id="@+id/frame_pace_fast_icon"
-                                android:layout_width="38dp"
-                                android:layout_height="38dp"
-                                android:layout_alignParentStart="true"
-                                android:background="@drawable/bg_circle_filled">
-
-                                <ImageView
-                                    android:id="@+id/icon_pace_fast"
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_pace_fast"
-                                    app:tint="?attr/colorOnSurfaceVariant" />
-                            </FrameLayout>
-                        </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/icon_pace_fast"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_marginBottom="12dp"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_pace_fast"
+                            app:tint="?attr/colorOnSurfaceVariant" />
 
                         <TextView
                             android:id="@+id/text_pace_fast_label"
@@ -164,19 +138,40 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:fontFamily="@font/roboto_medium"
-                            tools:text="-2.8 kg / oy"
                             android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="13sp" />
+                            android:textSize="14sp"
+                            tools:text="-2.8 kg / oy" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
+
+            <!-- Diet Plan Type Section -->
+            <TextView
+                android:id="@+id/text_diet_plan_section_title"
+                style="@style/Title3_17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/diet_plan_section_title"
+                android:textColor="?attr/colorOnSurface" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_diet_plan_types"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_diet_plan_type" />
 
             <!-- Daily Targets (Direct Layout - No Card Container) -->
             <TextView
                 style="@style/Title3_17"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="12dp"
                 android:fontFamily="@font/roboto_bold"
                 android:text="@string/onboarding_goalpace_daily_targets_title"

@@ -3,7 +3,8 @@ package uz.oybek.ozamiz.data.level
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.user.UserProfileRepository
+// import uz.oybek.ozamiz.data.user.UserProfileRepository
+import uz.oybek.ozamiz.data.user.local.LocalUser
 
 object PointsRepository {
 
@@ -12,7 +13,8 @@ object PointsRepository {
     )
 
     fun onEvent(event: PointsEvent) {
-        val user = UserProfileRepository.user
+        // val user = UserProfileRepository.user
+        val user = LocalUser.user
         if (user.valid) {
             val nextPoints = user.scorePoints + event.calculatePoints()
             val currentLevel = LevelRepository.getCurrentLevel(user.scorePoints)
@@ -24,7 +26,7 @@ object PointsRepository {
                 }
             }
 
-            UserProfileRepository.updateScorePoints(nextPoints)
+            // UserProfileRepository.updateScorePoints(nextPoints)
         }
     }
 }

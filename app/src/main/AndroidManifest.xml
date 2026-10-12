@@ -6,13 +6,6 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <meta-data
-        android:name="com.facebook.sdk.ApplicationId"
-        android:value="@string/facebook_app_id" />
-
-    <meta-data
-        android:name="com.facebook.sdk.InstallReferrerEncryptionKey"
-        android:value="e0073e60dd8eb40958356cf85b483ca3996823edf9dba8a5a22e247daf04daac" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -31,7 +24,7 @@
 
     <application
         android:name=".Application"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:largeHeap="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -58,15 +51,20 @@
             </intent-filter>
         </activity>
 
-        <meta-data
-            android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />
 
 
         <receiver
             android:name=".data.motivation.NutrientWarningReceiver"
             android:enabled="true"
             android:exported="false" />
+
+        <service
+            android:name=".notification.MessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"

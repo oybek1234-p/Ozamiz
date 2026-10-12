@@ -1,17 +1,19 @@
 package uz.oybek.ozamiz.util
 
-import uz.oybek.ozamiz.data.utils.recordException
+import java.util.concurrent.CancellationException
+import kotlin.coroutines.cancellation.CancellationException as CoroutineCancellationException
 
-fun handleException(e: Exception) {
-    if (e is java.util.concurrent.CancellationException) return
-    e.printStackTrace()
+fun handleException(e: Throwable) {
+    if (e is CancellationException || e is CoroutineCancellationException) return
     recordException(e)
 }
 
 inline fun <T> returnResult(block: () -> T): Result<T> {
     return try {
         Result.success(block())
-    } catch (e: java.util.concurrent.CancellationException) {
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: CoroutineCancellationException) {
         throw e
     } catch (e: Exception) {
         handleException(e)

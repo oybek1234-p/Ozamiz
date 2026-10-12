@@ -1,12 +1,17 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import uz.oybek.ozamiz.common.util.orZero
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.FoodItem
+import uz.oybek.ozamiz.data.food.model.SearchableFood
 
 class FoodPagingSource(
-    private val query: String
+    private val query: String,
+    private val dispatcher: CoroutineDispatcher
 ) : PagingSource<Int, FoodItem>() {
 
     override fun getRefreshKey(state: PagingState<Int, FoodItem>): Int? {
@@ -16,86 +21,49 @@ class FoodPagingSource(
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FoodItem> {
-        val pageNumber = params.key ?: 0
-        val pageSize = params.loadSize
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, FoodItem> =
+        withContext(dispatcher) {
+            val pageNumber = params.key.orZero()
+            val pageSize = params.loadSize
 
-        val allFoods = FoodDatabase.allFoods
+            val searchableFoods = FoodDatabase.getSearchableFoods()
 
-        val filteredFoods = if (query.isBlank()) {
-            allFoods.sortedWith(
-                compareByDescending<FoodItem> { it.isPopular }
-                    .thenBy { allFoods.indexOf(it) }
+            val filteredFoods = if (query.isBlank()) {
+                searchableFoods.sortedWith(
+                    compareByDescending<SearchableFood> { it.food.isPopular }
+                        .thenBy { searchableFoods.indexOf(it) }
+                ).map { it.food }
+            } else {
+                val rawQuery = query.trim()
+                val normQuery = SearchNormalizer.normalize(rawQuery)
+                val lowerQuery = rawQuery.lowercase()
+
+                searchableFoods
+                    .mapNotNull { item ->
+                        val score = item.calculateScore(rawQuery, normQuery, lowerQuery)
+                        if (score > 0) item.food to score else null
+                    }
+                    .sortedWith(
+                        compareByDescending<Pair<FoodItem, Int>> { it.second }
+                            .thenByDescending { it.first.isPopular }
+                            .thenBy { item -> searchableFoods.indexOfFirst { it.food.id == item.first.id } }
+                    )
+                    .map { it.first }
+            }
+
+            val fromIndex = pageNumber * pageSize
+            val toIndex = minOf(fromIndex + pageSize, filteredFoods.size)
+
+            val pageData = if (fromIndex < filteredFoods.size) {
+                filteredFoods.subList(fromIndex, toIndex)
+            } else {
+                emptyList()
+            }
+
+            LoadResult.Page(
+                data = pageData,
+                prevKey = if (pageNumber == 0) null else pageNumber - 1,
+                nextKey = if (toIndex >= filteredFoods.size) null else pageNumber + 1
             )
-        } else {
-            val rawQuery = query.trim()
-            val normQuery = SearchNormalizer.normalize(rawQuery)
-            val lowerQuery = rawQuery.lowercase()
-
-            allFoods
-                .mapNotNull { food ->
-                    val name = food.name
-                    val normName = SearchNormalizer.normalize(name)
-                    val lowerName = name.lowercase()
-                    val words = SearchNormalizer.getWords(name)
-                    
-                    val aliases = food.searchAliases
-
-                    val isExactNormalized = normName == normQuery
-                    val isExactName = lowerName == lowerQuery
-                    val isStartName = lowerName.startsWith(lowerQuery)
-                    val normStartName = normName.startsWith(normQuery)
-                    val firstWordExact = words.firstOrNull()?.lowercase() == lowerQuery
-                    val anyWordExact = words.any { it.lowercase() == lowerQuery }
-                    val anyWordStarts = words.any { it.lowercase().startsWith(lowerQuery) }
-                    val containsQuery = normName.contains(normQuery) || lowerName.contains(lowerQuery)
-
-                    // Check searchAliases matching
-                    val aliasMatch = aliases.any { alias ->
-                        val normAlias = SearchNormalizer.normalize(alias)
-                        normAlias == normQuery || normAlias.startsWith(normQuery) || SearchNormalizer.getWords(alias).any { it.lowercase().startsWith(lowerQuery) }
-                    }
-
-                    val matchScore = when {
-                        isExactName || isExactNormalized -> 3500
-                        aliasMatch -> 3000
-                        firstWordExact -> 2500
-                        isStartName || normStartName -> 2000
-                        anyWordExact -> 1500
-                        anyWordStarts -> 1000
-                        containsQuery -> 500
-                        else -> 0
-                    }
-
-                    if (matchScore > 0) {
-                        val popularBonus = if (food.isPopular) 500 else 0
-                        val totalScore = matchScore + popularBonus
-                        food to totalScore
-                    } else {
-                        null
-                    }
-                }
-                .sortedWith(
-                    compareByDescending<Pair<FoodItem, Int>> { it.second }
-                        .thenByDescending { it.first.isPopular }
-                        .thenBy { allFoods.indexOf(it.first) }
-                )
-                .map { it.first }
         }
-
-        val fromIndex = pageNumber * pageSize
-        val toIndex = minOf(fromIndex + pageSize, filteredFoods.size)
-
-        val pageData = if (fromIndex < filteredFoods.size) {
-            filteredFoods.subList(fromIndex, toIndex)
-        } else {
-            emptyList()
-        }
-
-        return LoadResult.Page(
-            data = pageData,
-            prevKey = if (pageNumber == 0) null else pageNumber - 1,
-            nextKey = if (toIndex >= filteredFoods.size) null else pageNumber + 1
-        )
-    }
 }

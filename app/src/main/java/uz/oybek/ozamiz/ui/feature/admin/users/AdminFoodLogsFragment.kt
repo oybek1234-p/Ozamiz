@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAdminFoodLogsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.toBundle
 
 class AdminFoodLogsFragment : BaseFragment<FragmentAdminFoodLogsBinding>() {
 
@@ -46,12 +47,12 @@ class AdminFoodLogsFragment : BaseFragment<FragmentAdminFoodLogsBinding>() {
     private fun setupRecyclerView(bind: FragmentAdminFoodLogsBinding) {
         adapter = AdminFoodLogsAdapter { log ->
             if (log.type == "food" && log.id.isNotEmpty()) {
-                val bundle = androidx.core.os.bundleOf(
-                    "logId" to log.id,
-                    "timestamp" to log.timestamp,
-                    "userId" to argUserId
+                val args = uz.oybek.ozamiz.ui.feature.log.food.AnalyzeResultArgs.ExistingLog(
+                    logId = log.id,
+                    timestamp = log.timestamp,
+                    userId = argUserId
                 )
-                navigate(R.id.analyzeResultFragment, bundle)
+                navigate(R.id.analyzeResultFragment, args.toBundle())
             }
         }
         bind.recyclerView.layoutManager = LinearLayoutManager(requireContext())

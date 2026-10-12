@@ -15,9 +15,10 @@ import uz.oybek.ozamiz.data.logs.WeightLogRepository
 import uz.oybek.ozamiz.data.logs.model.DailyLogs
 import uz.oybek.ozamiz.data.logs.model.WeightLog
 import androidx.annotation.Keep
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.common.util.dateApiFormat
+import uz.oybek.ozamiz.common.util.orZero
 import uz.oybek.ozamiz.data.user.local.LocalUser
-import uz.oybek.ozamiz.data.utils.DataWrapper
-import uz.oybek.ozamiz.data.utils.dateApiFormat
 import java.util.Date
 
 @Keep
@@ -77,7 +78,7 @@ class NatijaViewModel : ViewModel() {
         if (!user.goal.isNullOrBlank()) {
             return user.goal == uz.oybek.ozamiz.data.profile.model.UserGoal.GAIN_WEIGHT.key
         }
-        val targetW = user.targetWeight ?: 0.0
+        val targetW = user.targetWeight.orZero()
         val currentW = if (user.weight > 0) user.weight else 70.0
         return targetW > 0.0 && targetW > currentW
     }
@@ -101,15 +102,14 @@ class NatijaViewModel : ViewModel() {
         viewModelScope.launch {
             WeightLogRepository.getLogsFlow(user.uid).collect { result ->
                 when (result) {
-                    is DataWrapper.Success -> {
+                    is BaseResult.Success -> {
                         val logs = result.data.sortedBy { it.timestampLong }
                         Log.e("Kot", logs.toString())
                         val validLogs = logs.filter { it.weightKg > 0 }
 
                         if (validLogs.isNotEmpty()) {
                             val currentUser = LocalUser.user
-                            if (currentUser.startWeight == null || (currentUser.startWeight
-                                    ?: 0.0) <= 0.0
+                            if (currentUser.startWeight == null || (currentUser.startWeight.orZero()) <= 0.0
                             ) {
                                 val firstForStart = validLogs.first().weightKg
                                 LocalUser.update { startWeight = firstForStart }
@@ -119,7 +119,7 @@ class NatijaViewModel : ViewModel() {
                         processLogs(logs)
                     }
 
-                    is DataWrapper.Error -> {
+                    is BaseResult.Failure -> {
                         _uiState.update { it.copy(isLoading = false, error = result.error) }
                     }
 
@@ -135,8 +135,7 @@ class NatijaViewModel : ViewModel() {
 
         val currentW =
             validLogs.lastOrNull()?.weightKg ?: (if (user.weight > 0) user.weight else null)
-        val startW = (if ((user.startWeight
-                ?: 0.0) > 0
+        val startW = (if ((user.startWeight.orZero()) > 0
         ) user.startWeight else null) ?: validLogs.firstOrNull()?.weightKg
 
         // Calculate diff (comparison with previous log)
@@ -303,7 +302,7 @@ class NatijaViewModel : ViewModel() {
             val isSurplus = effectiveDailyDeficit < 0
 
             val current = currentW ?: (if (currentUser.weight > 0) currentUser.weight else 70.0)
-            val target = targetW ?: currentUser.targetWeight ?: 0.0
+            val target = targetW ?: currentUser.targetWeight.orZero()
             val isGainGoal = if (!currentUser.goal.isNullOrBlank()) {
                 currentUser.isGainWeight
             } else {
@@ -412,10 +411,10 @@ class NatijaViewModel : ViewModel() {
 
                         val waterInDay =
                             if (summary.consumedWaterMl > 0) summary.consumedWaterMl else (dailyLogs.waterLogs?.values?.sumOf { it.amountMl }
-                                ?: 0)
+                                .orZero())
                         val exerciseInDay =
                             if (summary.burnedCalories > 0) summary.burnedCalories else (dailyLogs.exerciseLogs?.values?.sumOf { it.caloriesBurned }
-                                ?: 0)
+                                .orZero())
 
                         if (waterInDay > 0) {
                             waterDaysCount++

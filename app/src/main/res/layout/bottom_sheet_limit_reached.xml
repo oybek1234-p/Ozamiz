@@ -4,68 +4,141 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bottom_sheet_background"
+    android:background="@drawable/bg_bottom_sheet_top_rounded"
+    android:backgroundTint="?attr/colorSurfaceContainer"
     android:orientation="vertical"
     android:paddingHorizontal="24dp"
     android:paddingTop="12dp"
-    android:paddingBottom="24dp">
+    android:paddingBottom="28dp">
 
+    <!-- Drag Handle -->
     <View
-        android:layout_width="40dp"
+        android:layout_width="36dp"
         android:layout_height="4dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="16dp"
+        android:alpha="0.25"
         android:background="@drawable/drag_handle" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_primary_chip"
+        android:fontFamily="@font/roboto_bold"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="4dp"
+        android:text="@string/food_limit_sheet_badge_tag"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="11sp" />
 
     <TextView
         android:id="@+id/text_limit_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fontFamily="@font/roboto_bold"
-        android:text="Bugungi rasmga olish limitingiz tugadi"
+        android:gravity="center"
+        android:text="@string/food_limit_sheet_title"
         android:textColor="?attr/colorOnSurface"
-        android:textSize="20sp" />
+        android:textSize="21sp" />
 
+    <!-- Subtitle -->
     <TextView
         android:id="@+id/text_limit_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:fontFamily="@font/roboto_regular"
+        android:gravity="center"
+        android:lineSpacingExtra="3dp"
+        android:paddingHorizontal="4dp"
+        android:text="@string/food_limit_sheet_msg"
         android:textColor="?attr/colorOnSurfaceVariant"
-        android:textSize="14sp"
-        tools:text="Ertaga yana 3 ta beriladi. Ovqatni tayyor ro'yxatdan kiriting yoki premium sotib oling" />
+        android:textSize="14sp" />
+
+    <!-- Premium Feature Banner Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/bg_premium_card"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/food_limit_sheet_premium_card_title"
+                android:textColor="?attr/colorStreakActive"
+                android:textSize="15sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_badge_gold"
+                android:fontFamily="@font/roboto_bold"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:text="PRO"
+                android:textColor="#000000"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/roboto_regular"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/food_limit_sheet_premium_card_desc"
+            android:textColor="#E0FFFFFF"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <!-- Action Buttons (No emojis in button text) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_buy_premium"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/roboto_bold"
+        android:text="@string/premiumga_o_tish"
+        android:textAllCaps="false"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="15sp"
+        app:backgroundTint="?attr/colorPrimary"
+        app:cornerRadius="18dp"
+        app:icon="@drawable/star_ic"
+        app:iconGravity="textStart"
+        app:iconPadding="10dp"
+        app:iconTint="?attr/colorOnPrimary" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_manual_search"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="match_parent"
         android:layout_height="54dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/roboto_bold"
-        android:text="Ro'yxatdan kiritish"
+        android:text="@string/food_limit_sheet_btn_search"
         android:textAllCaps="false"
         android:textColor="?attr/colorOnSurface"
         android:textSize="15sp"
         app:backgroundTint="?attr/colorSurfaceContainerHigh"
-        app:cornerRadius="24dp"
+        app:cornerRadius="18dp"
         app:icon="@drawable/ic_search"
         app:iconGravity="textStart"
         app:iconPadding="10dp"
         app:iconTint="?attr/colorOnSurface" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_buy_premium"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:layout_marginTop="10dp"
-        android:fontFamily="@font/roboto_bold"
-        android:text="Premium olish"
-        android:textAllCaps="false"
-        android:textSize="15sp"
-        app:cornerRadius="24dp"
-        app:icon="@drawable/star_ic"
-        app:iconGravity="textStart"
-        app:iconPadding="10dp" />
 
 </LinearLayout>

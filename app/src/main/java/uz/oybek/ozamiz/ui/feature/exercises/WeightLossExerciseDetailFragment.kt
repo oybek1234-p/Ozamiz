@@ -3,18 +3,17 @@ package uz.oybek.ozamiz.ui.feature.exercises
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.navArgs
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentWeightLossExerciseDetailBinding
 import uz.oybek.ozamiz.databinding.ItemBenefitBulletBinding
 import uz.oybek.ozamiz.databinding.ItemInstructionStepBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.utils.getArgs
 import uz.oybek.ozamiz.ui.utils.loadPhoto
 
 class WeightLossExerciseDetailFragment : BaseFragment<FragmentWeightLossExerciseDetailBinding>() {
 
     private val viewModel: WeightLossExerciseDetailViewModel by viewModels()
-    private val args: WeightLossExerciseDetailFragmentArgs by navArgs()
 
     init {
         showBottomSheet = false
@@ -25,7 +24,9 @@ class WeightLossExerciseDetailFragment : BaseFragment<FragmentWeightLossExercise
     }
 
     override fun viewCreated(bind: FragmentWeightLossExerciseDetailBinding) {
-        viewModel.loadExercise(args.exerciseId)
+        val exerciseId = arguments.getArgs<WeightLossExerciseArgs>()?.exerciseId
+            ?: arguments?.getString("exerciseId").orEmpty()
+        viewModel.loadExercise(exerciseId)
 
         bind.toolbar.setNavigationOnClickListener {
             navigateUp()
