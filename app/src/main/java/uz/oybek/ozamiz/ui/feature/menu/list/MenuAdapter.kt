@@ -50,10 +50,10 @@ class MenuAdapter(
                     textMeta.visibility = View.VISIBLE
                     textMeta.text = root.context.getString(
                         R.string.calories_format,
-                        model.calories
+                        model.totalCalories
                     ) + "  " + root.context.getString(
                         R.string.duration_hint
-                    ) + " " + model.preparationTime
+                    ) + " " + (model.prepTimeMinutes ?: 0)
                     premiumOverlay.visibility = View.GONE
                     root.setOnClickListener { onMenuClick(model) }
                 }

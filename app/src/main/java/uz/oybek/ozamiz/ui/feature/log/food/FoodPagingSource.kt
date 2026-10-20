@@ -11,6 +11,7 @@ import uz.oybek.ozamiz.data.food.model.SearchableFood
 
 class FoodPagingSource(
     private val query: String,
+    private val category: FoodSearchCategory? = null,
     private val dispatcher: CoroutineDispatcher
 ) : PagingSource<Int, FoodItem>() {
 
@@ -26,11 +27,16 @@ class FoodPagingSource(
             val pageNumber = params.key.orZero()
             val pageSize = params.loadSize
 
-            val searchableFoods = FoodDatabase.getSearchableFoods()
+            val allSearchableFoods = FoodDatabase.getSearchableFoods()
+            val searchableFoods = if (category == null) {
+                allSearchableFoods
+            } else {
+                allSearchableFoods.filter { category.matches(it.food) }
+            }
 
             val filteredFoods = if (query.isBlank()) {
                 searchableFoods.sortedWith(
-                    compareByDescending<SearchableFood> { it.food.isPopular }
+                    compareByDescending<SearchableFood> { it.food.popularityRank }
                         .thenBy { searchableFoods.indexOf(it) }
                 ).map { it.food }
             } else {
@@ -45,7 +51,7 @@ class FoodPagingSource(
                     }
                     .sortedWith(
                         compareByDescending<Pair<FoodItem, Int>> { it.second }
-                            .thenByDescending { it.first.isPopular }
+                            .thenByDescending { it.first.popularityRank }
                             .thenBy { item -> searchableFoods.indexOfFirst { it.food.id == item.first.id } }
                     )
                     .map { it.first }

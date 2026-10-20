@@ -152,4 +152,9 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="Widget_App_NumberPicker" parent="ThemeOverlay.Material3">
+        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
 </resources>

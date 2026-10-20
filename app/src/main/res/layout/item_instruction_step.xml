@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:layout_marginTop="16dp">
+    android:layout_marginTop="18dp">
 
     <TextView
         android:id="@+id/textStepNumber"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
         android:background="@drawable/oval_back"
         android:backgroundTint="?colorOnSurface"
         android:textColor="?colorSurface"
@@ -28,7 +28,7 @@
         android:fontFamily="@font/roboto_regular"
         android:textColor="?colorOnSurfaceVariant"
         android:textSize="15sp"
-        android:lineSpacingMultiplier="1.2"
+        android:lineSpacingMultiplier="1.35"
         tools:text="Step description"/>
 
 </LinearLayout>

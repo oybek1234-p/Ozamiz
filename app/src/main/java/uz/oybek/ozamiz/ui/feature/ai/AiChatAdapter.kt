@@ -20,6 +20,8 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
 
     var activeTurnMinHeight: Int = 0
     var onFeedbackClick: ((message: ChatMessage, isLiked: Boolean, userQuestion: String) -> Unit)? = null
+    var onConfirmFoodClick: ((message: ChatMessage, payload: uz.oybek.ozamiz.data.dietolog.model.AnalyzedFoodPayload) -> Unit)? = null
+    var onActionClick: ((message: ChatMessage, actionItem: uz.oybek.ozamiz.data.dietolog.model.DietologActionItem) -> Unit)? = null
 
     private var lastAnimatedPosition = -1
     private var isInitialLoad = true
@@ -54,14 +56,6 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
         payloads: MutableList<Any>
     ) {
         val item = getItem(position)
-        val isLastItem = position == itemCount - 1
-
-        if (isLastItem && !item.isUser && activeTurnMinHeight > 0) {
-            holder.itemView.minimumHeight = activeTurnMinHeight
-        } else {
-            holder.itemView.minimumHeight = 0
-        }
-
         if (payloads.contains(PAYLOAD_TEXT_UPDATE)) {
             holder.updateContent(item)
             return
@@ -124,14 +118,66 @@ class AiChatAdapter : ListAdapter<ChatMessage, AiChatAdapter.MessageViewHolder>(
                     binding.aiMessageText.text = MarkdownUtils.formatMarkdown(message.text)
                     binding.feedbackContainer.isVisible = true
 
-                    val defaultColor = com.google.android.material.color.MaterialColors.getColor(
-                        binding.root,
-                        com.google.android.material.R.attr.colorOutline
-                    )
-                    val activeColor = com.google.android.material.color.MaterialColors.getColor(
-                        binding.root,
-                        R.attr.colorPrimary
-                    )
+                    val foodPayload = message.analyzedFood
+                    if (foodPayload != null && foodPayload.items.isNotEmpty()) {
+                        binding.cardFoodAnalysis.isVisible = true
+                        val title = foodPayload.items.joinToString(", ") { it.name }
+                        binding.tvFoodItemsTitle.text = title
+
+                        val context = binding.root.context
+                        binding.tvFoodCaloriesBadge.text = context.getString(
+                            uz.oybek.ozamiz.R.string.dietolog_calories_format,
+                            foodPayload.totalCalories
+                        )
+
+                        binding.tvProteinValue.text = "${foodPayload.totalProtein.toInt()}g"
+                        binding.tvFatValue.text = "${foodPayload.totalFat.toInt()}g"
+                        binding.tvCarbsValue.text = "${foodPayload.totalCarbs.toInt()}g"
+
+                        if (message.isAddedToTracker) {
+                            binding.btnAddToTracker.isEnabled = false
+                            binding.btnAddToTracker.text = context.getString(uz.oybek.ozamiz.R.string.dietolog_action_added_to_tracker)
+                            binding.btnAddToTracker.setIconResource(uz.oybek.ozamiz.R.drawable.add_ic)
+                        } else {
+                            binding.btnAddToTracker.isEnabled = true
+                            binding.btnAddToTracker.text = context.getString(uz.oybek.ozamiz.R.string.dietolog_action_add_to_tracker)
+                            binding.btnAddToTracker.setIconResource(uz.oybek.ozamiz.R.drawable.add_ic)
+                            binding.btnAddToTracker.setOnClickListener {
+                                onConfirmFoodClick?.invoke(message, foodPayload)
+                            }
+                        }
+
+                        // Qo'shimcha xatti-harakatlar ro'yxati (Actions List)
+                        val actions = message.actions
+                        if (actions.isNotEmpty()) {
+                            binding.layoutActionsContainer.removeAllViews()
+                            binding.layoutActionsContainer.isVisible = true
+
+                            for (actionItem in actions) {
+                                val actionButton = com.google.android.material.button.MaterialButton(
+                                    context,
+                                    null,
+                                    com.google.android.material.R.attr.materialButtonOutlinedStyle
+                                ).apply {
+                                    text = actionItem.text
+                                    cornerRadius = (12 * context.resources.displayMetrics.density).toInt()
+                                    isEnabled = !actionItem.isCompleted
+                                    setOnClickListener {
+                                        onActionClick?.invoke(message, actionItem)
+                                    }
+                                }
+                                binding.layoutActionsContainer.addView(actionButton)
+                            }
+                        } else {
+                            binding.layoutActionsContainer.isVisible = false
+                        }
+                    } else {
+                        binding.cardFoodAnalysis.isVisible = false
+                    }
+
+
+                    val defaultColor = uz.oybek.ozamiz.ui.utils.VaznimColors.getOutline(binding.root.context)
+                    val activeColor = uz.oybek.ozamiz.ui.utils.VaznimColors.getPrimary(binding.root.context)
 
                     when (message.feedback) {
                         "like" -> {

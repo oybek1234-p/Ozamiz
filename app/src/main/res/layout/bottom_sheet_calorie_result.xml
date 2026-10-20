@@ -320,7 +320,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/roboto_regular"
-                                    android:text="@string/kaloriya"
+                                    android:text="@string/calories"
                                     android:textColor="?colorOnSurfaceVariant"
                                     android:textSize="12sp" />
 

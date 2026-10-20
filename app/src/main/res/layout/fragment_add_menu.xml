@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:padding="16dp"
-        android:background="?colorSurfaceContainer"
+        android:background="?attr/colorSurfaceContainerLowest"
         android:elevation="0dp"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -24,7 +24,7 @@
             android:background="@drawable/oval_back"
             android:backgroundTint="?colorSurfaceContainerHigh"
             android:src="@drawable/arrow_back"
-            android:contentDescription="Back"
+            android:contentDescription="@string/common_back"
             android:padding="8dp"
             app:tint="?colorOnSurface"/>
 
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Taom qo'shish"
+            android:text="@string/menu_add_title"
             android:textSize="18sp"
             android:fontFamily="@font/roboto_bold"
             android:textColor="?colorOnSurface"
@@ -55,84 +55,149 @@
             android:paddingBottom="100dp"
             android:clipToPadding="false">
             
-            <!-- Image Picker -->
-            <FrameLayout
+            <!-- AI Fill Banner -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAiFill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorPrimaryContainer"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/camera_ic"
+                        app:tint="?attr/colorOnPrimaryContainer" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/menu_ai_generate_title"
+                        android:textColor="?attr/colorOnPrimaryContainer"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/round_lay"
+                        android:backgroundTint="?attr/colorPrimary"
+                        android:fontFamily="@font/roboto_bold"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="AI"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Image Picker Card (16:9 Aspect Ratio) -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardImagePicker"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:background="@drawable/round_lay_stroke"
-                android:padding="24dp">
-                
-                <LinearLayout
-                    android:id="@+id/containerUploadInfo"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical">
-                    
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/containerUploadInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="28dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent">
+
+                        <ImageView
+                            android:layout_width="56dp"
+                            android:layout_height="56dp"
+                            android:background="@drawable/oval_background_with_opacity"
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:src="@drawable/camera_ic"
+                            app:tint="?attr/colorPrimary"
+                            android:padding="14dp"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/menu_add_upload_title"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?colorOnSurface"
+                            android:textSize="16sp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/menu_add_upload_desc"
+                            android:textColor="?colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            android:layout_marginBottom="12dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/menu_add_choose_photo"
+                            android:textColor="?attr/colorPrimary"
+                            android:background="@drawable/round_lay"
+                            android:backgroundTint="?attr/colorPrimaryContainer"
+                            android:paddingHorizontal="20dp"
+                            android:paddingVertical="8dp"
+                            android:textStyle="bold"
+                            android:textSize="12sp"/>
+                    </LinearLayout>
+
                     <ImageView
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/oval_background_with_opacity"
-                        android:backgroundTint="?attr/colorPrimaryContainer"
-                        android:src="@drawable/camera_ic"
-                        app:tint="?attr/colorPrimary"
-                        android:padding="14dp"
-                        android:layout_marginBottom="8dp"/>
-                        
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rasm yuklash"
-                        android:fontFamily="@font/roboto_bold"
-                        android:textColor="?colorOnSurface"
-                        android:textSize="16sp"/>
-                        
-                    <TextView
-                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Taomning chiroyli ko'rinishini suratga oling"
-                        android:textColor="?colorOnSurfaceVariant"
-                        android:textSize="12sp"
-                        android:layout_marginBottom="12dp"/>
-                        
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rasm tanlash"
-                        android:textColor="?attr/colorPrimary"
-                        android:background="@drawable/round_lay"
-                        android:backgroundTint="?attr/colorPrimaryContainer"
-                        android:paddingHorizontal="20dp"
-                        android:paddingVertical="8dp"
-                        android:textStyle="bold"
-                        android:textSize="12sp"/>
-                </LinearLayout>
-                
-                <ImageView
-                    android:id="@+id/imagePreview"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:scaleType="centerCrop"
-                    android:visibility="gone"
-                    android:background="@drawable/round_lay"/>
-            </FrameLayout>
+                        android:id="@+id/imagePreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone"
+                        app:layout_constraintDimensionRatio="16:9"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </com.google.android.material.card.MaterialCardView>
             
-            <!-- Categories Selector Section -->
+            <!-- Hidden legacy button (kept with ID for backward compatibility) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSelectCategories"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:visibility="gone"
                 style="@style/Widget.Material3.Button.OutlinedButton"
-                android:text="@string/select_categories"
-                android:textColor="?attr/colorPrimary"
-                app:strokeColor="?attr/colorPrimary"
-                android:layout_marginBottom="12dp"
-                app:cornerRadius="12dp"
-                android:textAllCaps="false"/>
+                android:text="@string/select_categories"/>
 
-            <!-- Selected Categories Display -->
+            <!-- Selected Categories Display (Universal FoodTags) -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipGroupSelectedCategories"
                 android:layout_width="match_parent"
@@ -143,7 +208,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Taom turi"
+                android:text="@string/menu_add_type_label"
                 android:fontFamily="@font/roboto_medium"
                 android:textColor="?colorOnSurface"
                 android:textSize="14sp"
@@ -160,21 +225,22 @@
                     android:id="@+id/radioMenu"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/menu_type_tab"
+                    android:text="@string/menu_type_badge_menu"
                     android:checked="true"
                     android:layout_marginEnd="24dp"/>
 
                 <RadioButton
-                    android:id="@+id/radioFood"
+                    android:id="@+id/radioRecipe"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/food_type_tab"/>
+                    android:text="@string/menu_type_badge_recipe"/>
             </RadioGroup>
 
             <TextView
+                android:id="@+id/labelName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Taom nomi"
+                android:text="@string/menu_add_name_label_menu"
                 android:fontFamily="@font/roboto_medium"
                 android:textColor="?colorOnSurface"
                 android:textSize="14sp"
@@ -186,7 +252,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/round_lay_stroke"
                 android:padding="12dp"
-                android:hint="Masalan: Pishirilgan somsa"
+                android:hint="@string/menu_add_name_hint_menu"
                 android:inputType="textCapSentences"
                 android:layout_marginBottom="16dp"/>
 
@@ -197,9 +263,10 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/labelItems"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ingredientlar"
+                    android:text="@string/menu_add_foods_label"
                     android:fontFamily="@font/roboto_medium"
                     android:textColor="?colorOnSurface"
                     android:textSize="14sp"
@@ -217,116 +284,125 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:text="@string/add_ingredient"
+                    android:text="@string/menu_add_food_btn"
                     android:textSize="12sp"
                     android:layout_marginBottom="16dp"
                     app:cornerRadius="8dp"
                     android:textAllCaps="false"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Tayyorlash usuli"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="?colorOnSurface"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp"/>
-
+                <!-- Recipe Only: Cooking Steps, Prep Time, Difficulty -->
                 <LinearLayout
-                    android:id="@+id/containerStepsList"
+                    android:id="@+id/containerRecipeFields"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginBottom="8dp"/>
+                    android:visibility="gone">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddStep"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:text="@string/add_step"
-                    android:textSize="12sp"
-                    android:layout_marginBottom="16dp"
-                    app:cornerRadius="8dp"
-                    android:textAllCaps="false"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:baselineAligned="false"
-                    android:layout_marginBottom="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/menu_add_prep_label"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?colorOnSurface"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="4dp"/>
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:id="@+id/containerStepsList"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
+                        android:layout_marginBottom="8dp"/>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tayyorlash vaqti (daq.)"
-                            android:fontFamily="@font/roboto_medium"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="14sp"
-                            android:layout_marginBottom="4dp"/>
-
-                        <EditText
-                            android:id="@+id/editPrepTime"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/round_lay_stroke"
-                            android:padding="12dp"
-                            android:hint="15"
-                            android:inputType="number"/>
-                    </LinearLayout>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAddStep"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:text="@string/add_step"
+                        android:textSize="12sp"
+                        android:layout_marginBottom="16dp"
+                        app:cornerRadius="8dp"
+                        android:textAllCaps="false"/>
 
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="8dp">
+                        android:orientation="horizontal"
+                        android:baselineAligned="false"
+                        android:layout_marginBottom="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Qiyinchilik darajasi"
-                            android:fontFamily="@font/roboto_medium"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="14sp"
-                            android:layout_marginBottom="4dp"/>
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
 
-                        <RadioGroup
-                            android:id="@+id/radioGroupDifficulty"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-
-                            <RadioButton
-                                android:id="@+id/radioDifficultyEasy"
+                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Oson"
-                                android:checked="true"
-                                android:textSize="12sp"/>
+                                android:text="@string/menu_add_prep_time_label"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="14sp"
+                                android:layout_marginBottom="4dp"/>
 
-                            <RadioButton
-                                android:id="@+id/radioDifficultyMedium"
-                                android:layout_width="wrap_content"
-                                  android:layout_height="wrap_content"
-                                  android:text="O'rtacha"
-                                  android:textSize="12sp"/>
+                            <EditText
+                                android:id="@+id/editPrepTime"
+                                android:layout_width="match_parent"
+                                android:layout_height="48dp"
+                                android:background="@drawable/round_lay_stroke"
+                                android:padding="12dp"
+                                android:hint="15"
+                                android:inputType="number"/>
+                        </LinearLayout>
 
-                            <RadioButton
-                                android:id="@+id/radioDifficultyHard"
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+
+                            <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Qiyin"
-                                android:textSize="12sp"/>
-                        </RadioGroup>
+                                android:text="@string/qiyinchilik_darajasi"
+                                android:fontFamily="@font/roboto_medium"
+                                android:textColor="?colorOnSurface"
+                                android:textSize="14sp"
+                                android:layout_marginBottom="4dp"/>
+
+                            <RadioGroup
+                                android:id="@+id/radioGroupDifficulty"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <RadioButton
+                                    android:id="@+id/radioDifficultyEasy"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/oson"
+                                    android:checked="true"
+                                    android:textSize="12sp"/>
+
+                                <RadioButton
+                                    android:id="@+id/radioDifficultyMedium"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/ortacha"
+                                    android:textSize="12sp"/>
+
+                                <RadioButton
+                                    android:id="@+id/radioDifficultyHard"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/qiyin"
+                                    android:textSize="12sp"/>
+                            </RadioGroup>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -335,13 +411,12 @@
                 android:id="@+id/containerFoodFields"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mahsulot haqida"
+                    android:text="@string/menu_add_about_label"
                     android:fontFamily="@font/roboto_medium"
                     android:textColor="?colorOnSurface"
                     android:textSize="14sp"
@@ -354,40 +429,10 @@
                     android:background="@drawable/round_lay_stroke"
                     android:padding="12dp"
                     android:gravity="top|start"
-                    android:hint="Tavsif bu yerda bo'ladi..."
+                    android:hint="@string/menu_add_about_hint"
                     android:inputType="textMultiLine"
                     android:layout_marginBottom="16dp"/>
-
-
             </LinearLayout>
-
-            <EditText
-                android:id="@+id/editDescription"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:visibility="gone"
-                android:background="@android:color/transparent"
-                android:inputType="textMultiLine"
-                android:layout_marginBottom="16dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Xizmat hajmi (Masalan: 1 kosa)"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="?colorOnSurface"
-                android:textSize="14sp"
-                android:layout_marginBottom="4dp"/>
-
-            <EditText
-                android:id="@+id/editServingSize"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:background="@drawable/round_lay_stroke"
-                android:padding="12dp"
-                android:hint="Masalan: 1 kosa osh"
-                android:inputType="textCapSentences"
-                android:layout_marginBottom="16dp"/>
                 
             <!-- Macros Grid -->
             <LinearLayout
@@ -406,7 +451,7 @@
                      <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kaloriya (kcal)"
+                        android:text="@string/calories"
                         android:fontFamily="@font/roboto_medium"
                         android:textColor="?colorOnSurface"
                         android:textSize="14sp"
@@ -417,7 +462,6 @@
                         android:layout_height="48dp"
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
-                        android:hint="0"
                         android:inputType="numberDecimal"
                         android:imeOptions="actionNext"/>
                 </LinearLayout>
@@ -431,7 +475,7 @@
                      <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Oqsillar (g)"
+                        android:text="@string/protein"
                         android:fontFamily="@font/roboto_medium"
                         android:textColor="?colorOnSurface"
                         android:textSize="14sp"
@@ -442,7 +486,6 @@
                         android:layout_height="48dp"
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
-                        android:hint="0"
                         android:inputType="numberDecimal"/>
                 </LinearLayout>
             </LinearLayout>
@@ -463,7 +506,7 @@
                      <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Yog'lar (g)"
+                        android:text="@string/fat"
                         android:fontFamily="@font/roboto_medium"
                         android:textColor="?colorOnSurface"
                         android:textSize="14sp"
@@ -474,7 +517,6 @@
                         android:layout_height="48dp"
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
-                        android:hint="0"
                         android:inputType="numberDecimal"/>
                 </LinearLayout>
 
@@ -487,7 +529,7 @@
                      <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Uglevod (g)"
+                        android:text="@string/carbs"
                         android:fontFamily="@font/roboto_medium"
                         android:textColor="?colorOnSurface"
                         android:textSize="14sp"
@@ -498,7 +540,6 @@
                         android:layout_height="48dp"
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
-                        android:hint="0"
                         android:inputType="numberDecimal"/>
                  </LinearLayout>
             </LinearLayout>
@@ -530,7 +571,6 @@
                         android:layout_height="48dp"
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
-                        android:hint="0"
                         android:inputType="numberDecimal"/>
                 </LinearLayout>
 
@@ -554,7 +594,6 @@
                         android:layout_height="48dp"
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
-                        android:hint="0"
                         android:inputType="numberDecimal"/>
                 </LinearLayout>
             </LinearLayout>
@@ -586,7 +625,6 @@
                         android:layout_height="48dp"
                         android:background="@drawable/round_lay_stroke"
                         android:padding="12dp"
-                        android:hint="0"
                         android:inputType="numberDecimal"
                         android:imeOptions="actionDone"/>
                 </LinearLayout>
@@ -620,7 +658,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:backgroundTint="?attr/colorPrimary"
-            android:text="Saqlash"
+            android:text="@string/menu_add_save_btn"
             android:textColor="?colorOnPrimary"
             android:fontFamily="@font/roboto_bold"
             android:textSize="16sp"
@@ -632,6 +670,7 @@
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_gravity="center"
+             android:indeterminateTint="?attr/colorPrimary"
              android:visibility="gone"/>
     </FrameLayout>
 

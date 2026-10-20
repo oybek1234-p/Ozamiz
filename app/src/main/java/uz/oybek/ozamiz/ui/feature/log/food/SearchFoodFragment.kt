@@ -17,6 +17,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.chip.Chip
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -49,14 +50,65 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
     }
 
     private var shouldScrollToTopOnSearch = false
+    private var allChipId: Int = View.NO_ID
+    private val chipIdToCategoryMap = mutableMapOf<Int, FoodSearchCategory?>()
+    private val categoryToChipIdMap = mutableMapOf<FoodSearchCategory?, Int>()
+    private var isUpdatingChipProgrammatically = false
 
     override fun inflateBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentSearchFoodBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentSearchFoodBinding) {
         setupUI(bind)
+        setupCategoryChips(bind)
         observeState()
         bind.inputSearchFood.showKeyboard()
+    }
+
+    private fun setupCategoryChips(bind: FragmentSearchFoodBinding) {
+        val chipGroup = bind.chipGroupCategories
+        chipGroup.removeAllViews()
+        chipIdToCategoryMap.clear()
+        categoryToChipIdMap.clear()
+
+        // 1. "Hammasi"
+        val chipAll = layoutInflater.inflate(R.layout.item_chip_food_category, chipGroup, false) as Chip
+        chipAll.id = View.generateViewId()
+        chipAll.text = getString(R.string.hammasi)
+        allChipId = chipAll.id
+        chipIdToCategoryMap[allChipId] = null
+        categoryToChipIdMap[null] = allChipId
+        chipGroup.addView(chipAll)
+        chipAll.isChecked = true
+
+        // 2. Quyuq taomlar, Sho'rvalar, Salatlar, Fast-food, Sut mahsulotlari, Shirinliklar, Ichimliklar, Mevalar
+        val categories = listOf(
+            FoodSearchCategory.MAIN_DISHES,
+            FoodSearchCategory.SOUPS,
+            FoodSearchCategory.SALADS,
+            FoodSearchCategory.FAST_FOOD,
+            FoodSearchCategory.DAIRY,
+            FoodSearchCategory.SWEETS,
+            FoodSearchCategory.DRINKS,
+            FoodSearchCategory.FRUITS
+        )
+
+        categories.forEach { category ->
+            val chip = layoutInflater.inflate(R.layout.item_chip_food_category, chipGroup, false) as Chip
+            chip.id = View.generateViewId()
+            chip.text = getString(category.titleRes)
+            chipIdToCategoryMap[chip.id] = category
+            categoryToChipIdMap[category] = chip.id
+            chipGroup.addView(chip)
+        }
+
+        chipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
+            if (isUpdatingChipProgrammatically) return@setOnCheckedStateChangeListener
+            val checkedId = checkedIds.firstOrNull() ?: return@setOnCheckedStateChangeListener
+            val selectedCategory = chipIdToCategoryMap[checkedId]
+            shouldScrollToTopOnSearch = true
+            viewModel.selectCategory(selectedCategory)
+        }
     }
 
     private fun setupUI(bind: FragmentSearchFoodBinding) = with(bind) {
@@ -132,6 +184,13 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
     }
 
     private fun renderUi(state: SearchFoodUiState) = with(binding) {
+        val targetChipId = categoryToChipIdMap[state.selectedCategory] ?: allChipId
+        if (targetChipId != View.NO_ID && chipGroupCategories.checkedChipId != targetChipId) {
+            isUpdatingChipProgrammatically = true
+            chipGroupCategories.check(targetChipId)
+            isUpdatingChipProgrammatically = false
+        }
+
         val showCount = state.searchResultCount != null && state.searchResultCount > 0
         textViewSearchResultsCount.isVisible = showCount
         if (showCount) {

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -19,6 +20,8 @@ import uz.oybek.ozamiz.common.util.dateApiFormat
 import uz.oybek.ozamiz.common.util.isToday
 import uz.oybek.ozamiz.common.util.orZero
 import uz.oybek.ozamiz.common.util.toDayOfMonth
+import uz.oybek.ozamiz.data.dietolog.api.DietologRepository
+import uz.oybek.ozamiz.data.dietolog.engine.DietologEvaluationEngine
 import uz.oybek.ozamiz.data.limit.api.LimitManagerRepo
 import uz.oybek.ozamiz.data.profile.api.ProfileRepo
 import uz.oybek.ozamiz.data.tracker.api.DailyTrackerRepo
@@ -29,6 +32,7 @@ import uz.oybek.ozamiz.data.tracker.session.SelectedDateManager
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.feature.limit.FoodLimitArgs
 import uz.oybek.ozamiz.ui.utils.showToast
+import uz.oybek.ozamiz.common.util.logx
 import java.util.Date
 import javax.inject.Inject
 
@@ -43,7 +47,9 @@ class HomeViewModel @Inject constructor(
     private val foodTrackerRepo: FoodTrackerRepo,
     private val profileRepo: ProfileRepo,
     private val selectedDateManager: SelectedDateManager,
-    private val limitManagerRepo: LimitManagerRepo
+    private val limitManagerRepo: LimitManagerRepo,
+    private val dietologRepository: DietologRepository,
+    private val evaluationEngine: DietologEvaluationEngine
 ) : ViewModel() {
 
     private val _effects = Channel<HomeUiEffect>(Channel.BUFFERED)
@@ -87,6 +93,26 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch { loadCalendarSummaries() }
         observeSelectedDate()
         observeUser()
+        observeDietolog()
+        // Ilovaga kirganda aqlli eslatmalar logikasini baholash
+        viewModelScope.launch {
+            evaluationEngine.evaluateAndTriggerReminders()
+        }
+    }
+
+    private fun observeDietolog() {
+        viewModelScope.launch {
+            dietologRepository.getLatestDietologAutoReminderFlow().collectLatest { latestReminder ->
+                _uiState.update { state ->
+                    state.copy(
+                        dietolog = HomeDietologUiState(
+                            lastMessageText = latestReminder?.text,
+                            messageCount = if (latestReminder != null) 1 else 0
+                        )
+                    )
+                }
+            }
+        }
     }
 
     fun checkDateCalendar() = selectedDateManager.checkDate()
@@ -121,9 +147,10 @@ class HomeViewModel @Inject constructor(
 
     private fun observeUser() {
         viewModelScope.launch {
-            profileRepo.user.map { user ->
+            profileRepo.user.collect { user ->
                 if (user.valid) {
-                    HomeProfileUiState(
+                    val remindersMap = user.mealReminders.associate { it.type to it.time }
+                    val profileState = HomeProfileUiState(
                         userGoal = user.userGoal,
                         showWeightLogCard = user.shouldLogWeight,
                         paymentChecking = user.paymentChecking,
@@ -132,11 +159,11 @@ class HomeViewModel @Inject constructor(
                         isRated = user.isRated,
                         unreadMessages = user.unreadMessages
                     )
+                    _uiState.update { it.copy(profile = profileState, mealReminders = remindersMap) }
                 } else {
-                    HomeProfileUiState()
+                    _uiState.update { it.copy(profile = HomeProfileUiState()) }
                 }
-            }.distinctUntilChanged()
-                .collect { profile -> _uiState.update { it.copy(profile = profile) } }
+            }
         }
     }
 
@@ -180,7 +207,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
     private fun CalendarUiState.selectDate(date: Date): CalendarUiState {
         val updated = items.map { item ->
             val isSelected = DateFormatter.isSameDay(item.date, date)

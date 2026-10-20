@@ -1,46 +1,229 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:background="?colorSurfaceContainerLowest">
+    android:background="?attr/colorSurfaceContainerLowest">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recvMenuList"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainerLowest"
+        app:elevation="0dp">
+
+        <!-- Toolbar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp">
+
+            <!-- Modern Search Bar on Left (with dynamic hints) -->
+            <LinearLayout
+                android:id="@+id/containerSearch"
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/round_lay"
+                android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp">
+
+                <ImageView
+                    android:id="@+id/imageSearchIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+                <EditText
+                    android:id="@+id/editSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:fontFamily="@font/roboto_regular"
+                    android:hint="Taom yoki masalliq qidiring..."
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                    android:textSize="13sp" />
+
+                <ImageButton
+                    android:id="@+id/btnClearSearch"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/close_ic"
+                    android:visibility="gone"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <!-- Meal / Dietary Style Filter Action (hidden) -->
+            <ImageButton
+                android:id="@+id/btnFilter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/menu_filter_tooltip"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/filter_ic"
+                android:visibility="gone"
+                app:tint="?attr/colorPrimary" />
+
+            <!-- AI Menu Action (Screenshot to Menu) -->
+            <ImageButton
+                android:id="@+id/btnAiMenu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/menu_ai_btn_tooltip"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/camera_ic"
+                app:tint="?attr/colorPrimary" />
+
+            <!-- Add Menu Action (only for admins) -->
+            <ImageButton
+                android:id="@+id/btnAddMenu"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="6dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/add_menu"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/add_ic"
+                android:visibility="gone"
+                app:tint="?attr/colorPrimary"
+                tools:visibility="visible" />
+
+            <!-- Liked Menus Action (far right) -->
+            <ImageButton
+                android:id="@+id/btnLikedMenus"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/menu_liked_tooltip"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_heart_filled"
+                app:tint="@color/likeColor" />
+
+        </LinearLayout>
+
+        <!-- Horizontal FoodTag Categories List -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recvCategoryTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="12dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_menu_tag_filter" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Main Feed Content with SwipeRefreshLayout -->
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/item_search_menu"
-        android:clipToPadding="false"
-        android:padding="@dimen/dimen_8"
-        android:paddingBottom="100dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <FrameLayout
-        android:id="@+id/banner_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:minHeight="50dp"
-        android:background="?colorSurfaceContainer" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
+            <!-- Vertical Menu Feed -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recvMenuFeed"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingTop="4dp"
+                android:paddingBottom="96dp"
+                tools:listitem="@layout/item_menu_feed_card" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddFood"
+            <!-- Empty State Container -->
+            <LinearLayout
+                android:id="@+id/layoutEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🍽️"
+                    android:textSize="48sp" />
+
+                <TextView
+                    android:id="@+id/textEmptyTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/menu_feed_empty_title"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/textEmptyDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="@font/roboto_regular"
+                    android:gravity="center"
+                    android:text="@string/menu_feed_empty_desc"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <!-- Initial Center Loading Indicator -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminateTint="?attr/colorPrimary"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Floating Action Button for Adding Menu -->
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabAddMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:src="@drawable/add_ic"
-        android:contentDescription="@string/add_menu"
-        android:visibility="gone"
+        android:fontFamily="@font/roboto_bold"
+        android:text="@string/add_menu"
+        android:textColor="?attr/colorOnPrimary"
         app:backgroundTint="?attr/colorPrimary"
-        app:tint="?attr/colorOnPrimary" />
+        app:icon="@drawable/add_ic"
+        app:iconTint="?attr/colorOnPrimary" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

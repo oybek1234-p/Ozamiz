@@ -50,17 +50,22 @@ class NotificationDisplayManager @Inject constructor(
         type: NotificationType = NotificationType.GENERAL,
         targetId: String? = null,
         actionUrl: String? = null,
-        notificationId: Int = generateNotificationId()
+        notificationId: Int = generateNotificationId(),
+        smallIconRes: Int? = null
     ) {
         showNotification(
             payload = NotificationPayload(
                 title = title, body = body, type = type, targetId = targetId, actionUrl = actionUrl
-            ), notificationId = notificationId
+            ),
+            notificationId = notificationId,
+            smallIconRes = smallIconRes
         )
     }
 
     fun showNotification(
-        payload: NotificationPayload, notificationId: Int = generateNotificationId()
+        payload: NotificationPayload,
+        notificationId: Int = generateNotificationId(),
+        smallIconRes: Int? = null
     ) {
         val title = payload.title?.takeIf { it.isNotBlank() }
             ?: context.getString(R.string.notification_default_title)
@@ -81,8 +86,9 @@ class NotificationDisplayManager @Inject constructor(
 
         createNotificationChannel()
 
+        val icon = smallIconRes ?: R.drawable.new_logo
         val notification =
-            NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(R.drawable.new_logo)
+            NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(icon)
                 .setContentTitle(title).setContentText(body)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body)).setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

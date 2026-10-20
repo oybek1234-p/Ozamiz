@@ -43,6 +43,14 @@ object UserAuthRepository {
                 AiChatDatabase.getDatabase(appContext).clearAllTables()
             }
             runCatching {
+                val db = androidx.room.Room.databaseBuilder(
+                    appContext,
+                    uz.oybek.ozamiz.data.dietolog.local.database.DietologDatabase::class.java,
+                    uz.oybek.ozamiz.data.dietolog.local.database.DietologDatabase.DATABASE_NAME
+                ).build()
+                db.clearAllTables()
+            }
+            runCatching {
                 Glide.get(appContext).clearDiskCache()
             }
             runCatching {

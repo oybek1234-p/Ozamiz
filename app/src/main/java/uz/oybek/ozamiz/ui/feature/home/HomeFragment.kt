@@ -37,8 +37,10 @@ import uz.oybek.ozamiz.ui.utils.animateIntegerText
 import uz.oybek.ozamiz.ui.utils.appColors
 import uz.oybek.ozamiz.ui.utils.collectFlowOnStart
 import uz.oybek.ozamiz.ui.utils.loadBannerAd
+import uz.oybek.ozamiz.ui.utils.reminderType
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.toBundle
+import yads.vi
 import java.util.Locale
 import kotlin.math.absoluteValue
 
@@ -111,6 +113,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.checkDateCalendar()
         updateNotificationBanner()
     }
 
@@ -208,6 +211,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             card.btnAddMeal.setOnSafeClickListener { viewModel.onAddMealClicked(meal.id) }
         }
         collectFlowOnStart(viewModel.uiState.map { it.meals }.distinctUntilChanged(), ::bindMeals)
+        collectFlowOnStart(viewModel.uiState.map { it.mealReminders }
+            .distinctUntilChanged()) { reminders ->
+            MealTime.entries.forEach { meal ->
+                val card = getMealCardBinding(meal)
+                val time = reminders[meal.reminderType]
+                if (!time.isNullOrBlank()) {
+                    card.textMealTime.text = time
+                    card.textMealTime.isVisible = true
+                } else {
+                    card.textMealTime.isVisible = false
+                }
+            }
+        }
     }
 
     private fun initWaterUI(bind: FragmentHomeBinding) = with(bind.cardWater) {
@@ -235,6 +251,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         cardPremiumChecking.root.setOnSafeClickListener { navigate(R.id.premiumFragment) }
         collectFlowOnStart(
             viewModel.uiState.map { it.profile }.distinctUntilChanged(), ::bindProfile
+        )
+        collectFlowOnStart(
+            viewModel.uiState.map { it.dietolog }.distinctUntilChanged(), ::bindDietolog
         )
     }
 
@@ -405,14 +424,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         val litersTarget = state.waterTargetMl / 1000f
         val remainingLiters = maxOf(0f, litersTarget - litersConsumed)
 
-        val remainingStr = if (remainingLiters % 1f == 0f) {
-            remainingLiters.toInt().toString()
+        if (state.waterTargetMl > 0 && remainingLiters <= 0f) {
+            textCurrentWaterLiters.text = getString(R.string.maqsad_bajarildi)
         } else {
-            String.format(Locale.US, "%.1f", remainingLiters)
+            val remainingStr = if (remainingLiters % 1f == 0f) {
+                remainingLiters.toInt().toString()
+            } else {
+                String.format(Locale.US, "%.1f", remainingLiters)
+            }
+            textCurrentWaterLiters.text =
+                getString(R.string.water_remaining_format, remainingStr)
         }
 
-        textCurrentWaterLiters.text =
-            getString(R.string.water_remaining_format, remainingStr)
         progressWater.setIndicatorColor(appColors.colorWaterProgress)
         if (progressWater.progress != state.progressPercent) {
             val shouldAnimate = !isHomeFirstUpdated || progressWater.progress > 0
@@ -422,8 +445,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun bindExercise(state: DailyExerciseSummary) = with(binding.cardExercise) {
         val remainingKcal = maxOf(0, state.exerciseTargetKcal - state.exerciseBurntKcal)
-        textExerciseProgress.text =
-            getString(R.string.meal_calories_remaining_format, remainingKcal)
+
+        if (state.exerciseTargetKcal > 0 && remainingKcal <= 0) {
+            textExerciseProgress.text = getString(R.string.maqsad_bajarildi)
+        } else {
+            textExerciseProgress.text =
+                getString(R.string.meal_calories_remaining_format, remainingKcal)
+        }
+
         progressExercise.setIndicatorColor(appColors.colorExerciseProgress)
         if (progressExercise.progress != state.progressPercent) {
             val shouldAnimate = !isHomeFirstUpdated || progressExercise.progress > 0
@@ -435,6 +464,23 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         cardWeightLog.root.isVisible = state.showWeightLogCard
         cardPremiumChecking.root.isVisible = state.paymentChecking
         bindNotificationBadge(state.unreadMessages)
+    }
+
+    private fun bindDietolog(state: HomeDietologUiState) = with(binding.cardDietologistHome) {
+        val lastMessage = state.lastMessageText?.trim()
+        if (!lastMessage.isNullOrBlank()) {
+            descDietologist.text = lastMessage
+        } else {
+            descDietologist.setText(R.string.home_ai_dietologist_desc)
+        }
+
+        if (state.messageCount > 1) {
+            badgeDietologistCount.isVisible = true
+            badgeDietologistCount.text =
+                if (state.messageCount > 99) "99+" else state.messageCount.toString()
+        } else {
+            badgeDietologistCount.isVisible = false
+        }
     }
 
     private fun bindNotificationBadge(count: Int) = with(binding) {

@@ -17,12 +17,14 @@ import uz.oybek.ozamiz.data.menu.FilterId
 import uz.oybek.ozamiz.data.menu.MenuCategories
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.databinding.FragmentMenuSearchResultsBinding
+import dagger.hilt.android.AndroidEntryPoint
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.getArgs
 import uz.oybek.ozamiz.ui.utils.loadBannerAd
 
+@AndroidEntryPoint
 class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>() {
 
     private val viewModel: MenuSearchViewModel by viewModels()

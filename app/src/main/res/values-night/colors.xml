@@ -35,4 +35,16 @@
     <color name="analysis_btn_text">#003920</color>
     <color name="analysis_points_bg">#384B3D</color>
     <color name="analysis_points_text">#D2E8D4</color>
+
+    <!-- Health Grade Colors (Dark Mode) -->
+    <color name="health_grade_excellent">#4ADE80</color>
+    <color name="health_grade_excellent_bg">#1B3D28</color>
+    <color name="health_grade_good">#6EE7B7</color>
+    <color name="health_grade_good_bg">#163A26</color>
+    <color name="health_grade_moderate">#FBBF24</color>
+    <color name="health_grade_moderate_bg">#3D2E0B</color>
+    <color name="health_grade_caution">#FB923C</color>
+    <color name="health_grade_caution_bg">#3D2110</color>
+    <color name="health_grade_limit">#F87171</color>
+    <color name="health_grade_limit_bg">#3E1818</color>
 </resources>

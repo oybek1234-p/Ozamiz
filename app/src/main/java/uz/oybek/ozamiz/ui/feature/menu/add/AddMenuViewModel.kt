@@ -1,146 +1,166 @@
 package uz.oybek.ozamiz.ui.feature.menu.add
 
-import uz.oybek.ozamiz.common.util.orZero
 import android.net.Uri
+import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.firebase.FirebasePaths
-import uz.oybek.ozamiz.data.firebase.uploader.ImageCompressor
-import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.menu.FilterItem
-import uz.oybek.ozamiz.data.menu.CalorieFilter
-import uz.oybek.ozamiz.data.menu.MenuCategories
-import uz.oybek.ozamiz.data.menu.MenuRepository
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.data.food.model.FoodTag
+import uz.oybek.ozamiz.data.menu.api.MenuRepo
+import uz.oybek.ozamiz.data.menu.model.CreateMenuRequest
 import uz.oybek.ozamiz.data.menu.model.Menu
-import androidx.annotation.Keep
-import java.util.Date
-import java.util.UUID
+import uz.oybek.ozamiz.data.menu.model.MenuDifficulty
+import uz.oybek.ozamiz.data.menu.model.MenuItemFood
+import javax.inject.Inject
 
 @Keep
 data class AddMenuUiState(
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
     val savedMenu: Menu? = null,
-    val isValidationError: Boolean = false
+    val isValidationError: Boolean = false,
+    val selectedTags: Set<FoodTag> = emptySet(),
+    val errorMessage: String? = null
 )
 
-class AddMenuViewModel : ViewModel() {
+sealed interface AddMenuUiEffect {
+    data object SaveSuccess : AddMenuUiEffect
+    data class SaveError(val error: String?) : AddMenuUiEffect
+}
+
+@HiltViewModel
+class AddMenuViewModel @Inject constructor(
+    private val menuRepo: MenuRepo
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMenuUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState: StateFlow<AddMenuUiState> = _uiState.asStateFlow()
 
-    private val _allCategories = MutableStateFlow<List<FilterItem>>(emptyList())
-    val allCategories = _allCategories.asStateFlow()
+    private val _uiEffect = MutableSharedFlow<AddMenuUiEffect>()
+    val uiEffect: SharedFlow<AddMenuUiEffect> = _uiEffect.asSharedFlow()
 
-    private val _selectedCategories = MutableStateFlow<List<FilterItem>>(emptyList())
-    val selectedCategories = _selectedCategories.asStateFlow()
-
-    init {
-        loadCategories()
-    }
-
-    private fun loadCategories() {
-        _allCategories.value = MenuCategories.mainMeals + 
-            MenuCategories.methods + 
-            MenuCategories.diets + 
-            MenuCategories.ingredients
+    companion object {
+        private val MEAL_TAGS = setOf(
+            FoodTag.BREAKFAST,
+            FoodTag.LUNCH,
+            FoodTag.DINNER,
+            FoodTag.SNACK
+        )
     }
 
     fun resetState() {
         _uiState.value = AddMenuUiState()
-        _selectedCategories.value = emptyList()
     }
 
-    fun setSelectedCategories(categories: List<FilterItem>) {
-        _selectedCategories.value = categories
+    fun toggleTag(tag: FoodTag) {
+        if (tag == FoodTag.VEGETABLES_GREENS) return // Keraksiz tag
+
+        _uiState.update { state ->
+            val updated = state.selectedTags.toMutableSet()
+            if (updated.contains(tag)) {
+                updated.remove(tag)
+            } else {
+                // Qat'iy qoida: agar ovqatlanish mahali tanlansa, boshqa har qanday mahal olib tashlanadi
+                if (MEAL_TAGS.contains(tag)) {
+                    updated.removeAll(MEAL_TAGS)
+                }
+
+                // Sho'rva va Salat bir-birini inkor qiladi
+                if (tag == FoodTag.SOUP) {
+                    updated.remove(FoodTag.SALAD_APPETIZER)
+                }
+                if (tag == FoodTag.SALAD_APPETIZER) {
+                    updated.remove(FoodTag.SOUP)
+                }
+
+                updated.add(tag)
+            }
+            state.copy(selectedTags = updated)
+        }
+    }
+
+    fun setSelectedTags(tags: Set<FoodTag>) {
+        val sanitized = tags.toMutableSet().apply {
+            remove(FoodTag.VEGETABLES_GREENS)
+            val selectedMeals = intersect(MEAL_TAGS)
+            if (selectedMeals.size > 1) {
+                val singleMeal = selectedMeals.first()
+                removeAll(MEAL_TAGS)
+                add(singleMeal)
+            }
+            if (contains(FoodTag.SOUP)) {
+                remove(FoodTag.SALAD_APPETIZER)
+            }
+        }
+        _uiState.update { it.copy(selectedTags = sanitized) }
     }
 
     fun saveMenu(
         menuId: String? = null,
-        imageUrl: String? = null,
         name: String,
         description: String,
-        ingredients: List<String>,
-        calories: String,
-        protein: String,
-        fat: String,
-        carbs: String,
-        fiber: String,
-        sugar: String,
-        salt: String,
-        servingSize: String,
-        selectedCategoryIds: List<String>,
+        isRecipe: Boolean,
+        items: List<MenuItemFood>,
+        steps: List<String>,
+        prepTimeMinutes: Int?,
+        difficulty: MenuDifficulty = MenuDifficulty.EASY,
         imageUri: Uri?,
-        type: String,
-        preparationMethod: List<String>,
-        about: String,
-        preparationTime: String
+        existingImageUrl: String?
     ) {
-        if (name.isBlank() || selectedCategoryIds.isEmpty()) {
-            _uiState.value = _uiState.value.copy(isValidationError = true)
+        if (name.isBlank() || items.isEmpty()) {
+            _uiState.update { it.copy(isValidationError = true) }
             return
         }
 
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true, isValidationError = false)
+            _uiState.update { it.copy(isLoading = true, isValidationError = false) }
 
-            val cals = calories.toIntOrNull().orZero()
-            val finalCategoryIds = selectedCategoryIds.filterNot { it.startsWith("CAL_") }.toMutableList()
-            val matchingCalorieFilter = CalorieFilter.entries.find {
-                cals >= it.min && cals <= it.max
-            }
-            if (matchingCalorieFilter != null) {
-                finalCategoryIds.add(matchingCalorieFilter.name)
-            }
-
-            val menu = Menu(
-                id = menuId ?: "",
-                imageUrl = imageUrl,
+            val request = CreateMenuRequest(
+                id = menuId,
                 name = name,
                 description = description,
-                ingredients = ingredients,
-                categoryIds = finalCategoryIds,
-                calories = cals,
-                protein = protein.toDoubleOrNull().orZero(),
-                fat = fat.toDoubleOrNull().orZero(),
-                carbs = carbs.toDoubleOrNull().orZero(),
-                fiber = fiber.toDoubleOrNull().orZero(),
-                sugar = sugar.toDoubleOrNull().orZero(),
-                salt = salt.toDoubleOrNull().orZero(),
-                servingSize = servingSize,
-                type = type,
-                preparationMethod = preparationMethod,
-                about = about,
-                preparationTime = preparationTime.toIntOrNull() ?: 15
+                isRecipe = isRecipe,
+                items = items,
+                steps = steps,
+                prepTimeMinutes = prepTimeMinutes,
+                tags = _uiState.value.selectedTags.map { it.name },
+                difficulty = difficulty,
+                imageUri = imageUri,
+                existingImageUrl = existingImageUrl
             )
 
-            val savedMenu = if (imageUri != null) {
-                val id = menu.id.ifEmpty { UUID.randomUUID().toString() }
-                val compressedUri = ImageCompressor.compressImageToUri(imageUri) ?: imageUri
-                val photoUrl = ImageUploader.uploadImage(compressedUri, FirebasePaths.Storage.menuPhotos(id))
-                menu.copy(id = id, imageUrl = photoUrl, createdAt = menu.createdAt ?: Date())
-            } else {
-                menu.copy(id = menu.id.ifEmpty { UUID.randomUUID().toString() }, createdAt = menu.createdAt ?: Date())
+            when (val result = menuRepo.saveMenu(request)) {
+                is BaseResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSaved = true,
+                            savedMenu = result.data,
+                            errorMessage = null
+                        )
+                    }
+                    _uiEffect.emit(AddMenuUiEffect.SaveSuccess)
+                }
+                is BaseResult.Failure -> {
+                    val errorMsg = result.error?.message
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = errorMsg
+                        )
+                    }
+                    _uiEffect.emit(AddMenuUiEffect.SaveError(errorMsg))
+                }
             }
-
-            val result = MenuRepository.addMenu(savedMenu, null)
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                isSaved = result,
-                savedMenu = if (result) savedMenu else null
-            )
         }
-    }
-
-    fun clearSavedState() {
-        _uiState.value = _uiState.value.copy(isSaved = false, savedMenu = null)
-    }
-
-    fun clearValidationError() {
-        _uiState.value = _uiState.value.copy(isValidationError = false)
     }
 }

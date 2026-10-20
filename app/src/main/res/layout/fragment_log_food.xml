@@ -21,7 +21,55 @@
             app:navigationIcon="@drawable/arrow_back"
             app:titleCentered="true"
             app:titleTextColor="?attr/colorOnSurface"
-            tools:title="Nonushta" />
+            tools:title="Nonushta">
+
+            <ImageButton
+                android:id="@+id/button_saved_foods"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/food_camera_saved_btn"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_bookmark_filled"
+                app:tint="?attr/colorOutline" />
+
+            <LinearLayout
+                android:id="@+id/btn_meal_reminder"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="6dp">
+
+                <ImageView
+                    android:id="@+id/img_toolbar_reminder_icon"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/date_ic"
+                    app:tint="?attr/colorOnSurfaceVariant" />
+
+                <TextView
+                    android:id="@+id/text_toolbar_meal_time"
+                    style="@style/TextAppearance.Material3.LabelMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="13sp"
+                    tools:text="08:00" />
+            </LinearLayout>
+
+        </uz.oybek.ozamiz.ui.base.MyToolBar>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -32,7 +80,7 @@
         android:layout_weight="1"
         android:fillViewport="true">
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipToPadding="false"
@@ -48,12 +96,90 @@
                 android:layout_marginBottom="12dp"
                 android:visibility="gone" />
 
+            <!-- Meal Recommendations Banner Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_meal_recommendations"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="14dp">
+
+                    <ImageView
+                        android:id="@+id/img_recommendations_icon"
+                        android:layout_width="@dimen/dimen_24"
+                        android:layout_height="@dimen/dimen_24"
+                        android:layout_gravity="center"
+                        android:src="@drawable/food_ic"
+                        app:tint="?attr/colorOnSurface" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/text_meal_recommendation_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="15sp"
+                            tools:text="Nonushta tavsiyalari" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:text="@string/log_food_recommendations_subtitle"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- History Section Header -->
+            <TextView
+                android:id="@+id/text_recent_history_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="10dp"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/log_food_recent_history"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="16sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <!-- Empty State -->
             <LinearLayout
                 android:id="@+id/layout_empty_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="56dp"
+                android:layout_marginTop="32dp"
                 android:layout_marginBottom="32dp"
                 android:gravity="center"
                 android:orientation="vertical"
@@ -105,39 +231,168 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_recent_logs"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_todays_food" />
 
-        </FrameLayout>
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom Action Button Container -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurfaceContainerLowest"
-        android:elevation="8dp"
+        android:background="?attr/colorSurfaceContainer"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="@dimen/dimen_12"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp">
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_add_food"
-            style="@style/Widget.Material3.Button"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:backgroundTint="?attr/colorPrimary"
+        <TextView
+            android:id="@+id/text_add_food_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:fontFamily="@font/roboto_bold"
             android:text="@string/add_food_btn"
-            android:textColor="?attr/colorOnPrimary"
-            android:textSize="16sp"
-            app:cornerRadius="27dp"
-            app:icon="@drawable/add_ic"
-            app:iconGravity="textStart"
-            app:iconTint="?attr/colorOnPrimary" />
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="horizontal">
+
+            <!-- 1. Rasm (Camera) Tile -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/button_action_camera"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="8dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/camera_ic"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/log_food_action_camera"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 2. Ro'yxat (Search) Tile -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/button_action_search"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="3dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="8dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_search"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/log_food_action_search"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 3. Yozish (Write) Tile -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/button_action_write"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="4dp"
+                    android:paddingVertical="8dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/edit"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/log_food_action_write"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

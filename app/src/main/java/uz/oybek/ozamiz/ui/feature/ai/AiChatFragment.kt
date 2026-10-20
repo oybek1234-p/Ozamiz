@@ -3,9 +3,6 @@ package uz.oybek.ozamiz.ui.feature.ai
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsAnimationCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -48,7 +45,6 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         setupRecyclerView(bind)
         setupListeners(bind)
         handleInitialArguments()
-        setupKeyboardListener(bind)
         observeState(bind)
 
         bind.sendButton.scaleX = 0.85f
@@ -70,17 +66,62 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                     android.widget.Toast.LENGTH_SHORT
                 ).show()
             }
+            onConfirmFoodClick = { message, payload ->
+                viewModel.confirmFoodIntake(message, payload)
+            }
+            onActionClick = { message, actionItem ->
+                when (actionItem.actionType) {
+                    uz.oybek.ozamiz.data.dietolog.model.DietologActionType.CONFIRM_FOOD_TRACKER -> {
+                        val payload = message.analyzedFood
+                        if (payload != null) {
+                            viewModel.confirmFoodIntake(message, payload)
+                        }
+                    }
+                    uz.oybek.ozamiz.data.dietolog.model.DietologActionType.OPEN_PREMIUM -> {
+                        try {
+                            findNavController().navigate(uz.oybek.ozamiz.R.id.premiumFragment)
+                        } catch (_: Exception) {}
+                    }
+                    uz.oybek.ozamiz.data.dietolog.model.DietologActionType.OPEN_MENU -> {
+                        try {
+                            findNavController().navigate(R.id.menuListFragment)
+                        } catch (_: Exception) {}
+                    }
+                    uz.oybek.ozamiz.data.dietolog.model.DietologActionType.OPEN_WATER_TRACKER -> {
+                        try {
+                            findNavController().navigate(uz.oybek.ozamiz.R.id.logWaterDialog)
+                        } catch (_: Exception) {}
+                    }
+                }
+            }
         }
         bind.chatRecyclerView.apply {
             adapter = chatAdapter
-            layoutManager = LinearLayoutManager(requireContext()).apply {
-                stackFromEnd = false
+            val lm = LinearLayoutManager(requireContext()).apply {
+                stackFromEnd = true
             }
+            layoutManager = lm
             (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
+
+            // Layout o'zgarganda (klaviatura ochilganda yoki ekran balandligi o'zgarganda) eng pastki xabarga siljitish
+            addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
+                if (bottom < oldBottom && chatAdapter.itemCount > 0) {
+                    post {
+                        scrollToPosition(chatAdapter.itemCount - 1)
+                    }
+                }
+            }
         }
     }
 
     private fun focusMessageInput(bind: FragmentAiChatBinding) {
+        bind.messageEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && chatAdapter.itemCount > 0) {
+                bind.chatRecyclerView.postDelayed({
+                    bind.chatRecyclerView.scrollToPosition(chatAdapter.itemCount - 1)
+                }, 150)
+            }
+        }
         bind.messageEditText.showKeyboard()
     }
 
@@ -132,70 +173,6 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
         } else {
             showChatLimitReachedDialog()
         }
-    }
-
-    private fun setupKeyboardListener(bind: FragmentAiChatBinding) {
-        var isImeAnimationRunning = false
-
-        val applyPadding = { insets: WindowInsetsCompat ->
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val bottomMarginOffset = if (showBottomSheet) toDp(56f, requireContext()) else 0
-            val bottomPadding = if (imeInsets.bottom == 0) {
-                0
-            } else {
-                maxOf(0, imeInsets.bottom - bottomMarginOffset - systemBars.bottom)
-            }
-            logMessage(
-                "KeyboardInsets -> ime.bottom: ${imeInsets.bottom}, systemBars.bottom: ${systemBars.bottom}, bottomMarginOffset: $bottomMarginOffset, final bottomPadding: $bottomPadding",
-                tag = "AiChatKeyboard"
-            )
-            bind.root.setPadding(0, 0, 0, bottomPadding)
-        }
-
-        ViewCompat.setOnApplyWindowInsetsListener(bind.root) { _, insets ->
-            if (!isImeAnimationRunning) {
-                applyPadding(insets)
-            }
-            insets
-        }
-
-        ViewCompat.setWindowInsetsAnimationCallback(
-            bind.root,
-            object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
-                override fun onPrepare(animation: WindowInsetsAnimationCompat) {
-                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
-                        isImeAnimationRunning = true
-                    }
-                    super.onPrepare(animation)
-                }
-
-                override fun onStart(
-                    animation: WindowInsetsAnimationCompat,
-                    bounds: WindowInsetsAnimationCompat.BoundsCompat
-                ): WindowInsetsAnimationCompat.BoundsCompat {
-                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
-                        isImeAnimationRunning = true
-                    }
-                    return super.onStart(animation, bounds)
-                }
-
-                override fun onProgress(
-                    insets: WindowInsetsCompat,
-                    runningAnimations: MutableList<WindowInsetsAnimationCompat>
-                ): WindowInsetsCompat {
-                    applyPadding(insets)
-                    return insets
-                }
-
-                override fun onEnd(animation: WindowInsetsAnimationCompat) {
-                    super.onEnd(animation)
-                    if (animation.typeMask and WindowInsetsCompat.Type.ime() != 0) {
-                        isImeAnimationRunning = false
-                    }
-                }
-            }
-        )
     }
 
     private fun handleInitialArguments() {
@@ -358,21 +335,13 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
 
                         if (userPos >= 0) {
                             bind.chatRecyclerView.post {
-                                val lm = bind.chatRecyclerView.layoutManager as? LinearLayoutManager
+                                val lm = bind.chatRecyclerView.layoutManager as? androidx.recyclerview.widget.LinearLayoutManager
                                 val userView = lm?.findViewByPosition(userPos)
                                 val userHeight = userView?.height ?: toDp(60f, requireContext())
                                 val rv = bind.chatRecyclerView
 
                                 val fullOpenRvHeight = rv.height + bind.root.paddingBottom
-                                val availableHeight = maxOf(
-                                    0,
-                                    fullOpenRvHeight - userHeight - rv.paddingBottom - rv.paddingTop
-                                )
-
-                                logMessage(
-                                    "FullOpenCalc -> rv.height: ${rv.height}, rootPaddingBottom: ${bind.root.paddingBottom}, fullOpenRvHeight: $fullOpenRvHeight, userHeight: $userHeight, availableHeight: $availableHeight",
-                                    tag = "AiChatKeyboard"
-                                )
+                                val availableHeight = maxOf(0, fullOpenRvHeight - userHeight - rv.paddingBottom - rv.paddingTop)
 
                                 chatAdapter.activeTurnMinHeight = availableHeight
 
@@ -381,16 +350,11 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                                 }
 
                                 bind.chatRecyclerView.post {
-                                    logMessage(
-                                        "Scrolling -> smooth scroll to userPos: $userPos",
-                                        tag = "AiChatKeyboard"
-                                    )
-                                    val smoothScroller =
-                                        object : LinearSmoothScroller(requireContext()) {
-                                            override fun getVerticalSnapPreference(): Int {
-                                                return SNAP_TO_START
-                                            }
+                                    val smoothScroller = object : androidx.recyclerview.widget.LinearSmoothScroller(requireContext()) {
+                                        override fun getVerticalSnapPreference(): Int {
+                                            return SNAP_TO_START
                                         }
+                                    }
                                     smoothScroller.targetPosition = userPos
                                     lm?.startSmoothScroll(smoothScroller)
                                 }
@@ -398,6 +362,10 @@ class AiChatFragment : BaseFragment<FragmentAiChatBinding>() {
                         }
                     } else if (wasEmpty && messages.isNotEmpty()) {
                         bind.chatRecyclerView.scrollToPosition(messages.size - 1)
+                    } else if (messages.isNotEmpty()) {
+                        bind.chatRecyclerView.post {
+                            bind.chatRecyclerView.smoothScrollToPosition(messages.size - 1)
+                        }
                     }
                 }
             }

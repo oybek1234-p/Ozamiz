@@ -37,6 +37,14 @@ object AiChatRepository {
         return aiChatDao.getMessagesForDateFlow(DateFormatter.todayString()).firstOrNull()
     }
 
+    fun getLatestDietologMessageFlow(): Flow<AiChatMessageEntity?> {
+        return aiChatDao.getLatestAiMessageFlow()
+    }
+
+    fun getMessagesCountFlow(): Flow<Int> {
+        return aiChatDao.getMessagesCountFlow()
+    }
+
     suspend fun saveMessageToFirestore(
         chatId: String, text: String, isUser: Boolean, timestamp: Long
     ): Any? = withContext(Dispatchers.IO) {

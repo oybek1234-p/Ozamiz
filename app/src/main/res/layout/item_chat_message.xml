@@ -36,6 +36,199 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Salom! Men sizning AI diyetologingizman." />
 
+        <!-- Ovqat iste'moli tahlili kartochkasi (Type A - Food Intake Factor) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardFoodAnalysis"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+            app:strokeWidth="1dp"
+            app:strokeColor="?attr/colorOutlineVariant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/aiMessageText"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Header: Taom nomi va Kaloriya ko'rsatkichi -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvFoodItemsTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/roboto_bold"
+                        android:maxLines="2"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp"
+                        tools:text="🍲 Mastava va somsa" />
+
+                    <TextView
+                        android:id="@+id/tvFoodCaloriesBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_macro_icon"
+                        android:backgroundTint="?attr/colorSecondaryContainer"
+                        android:fontFamily="@font/roboto_bold"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="5dp"
+                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:textSize="13sp"
+                        tools:text="🔥 480 kkal" />
+
+                </LinearLayout>
+
+                <!-- Makronutriyentlar (Oqsil, Yog', Uglevod) Pills qatori -->
+                <LinearLayout
+                    android:id="@+id/layoutMacrosRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <!-- Oqsil -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_macro_icon"
+                        android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_regular"
+                            android:text="Oqsil"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvProteinValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="13sp"
+                            tools:text="18g" />
+
+                    </LinearLayout>
+
+                    <!-- Yog' -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="6dp"
+                        android:background="@drawable/bg_macro_icon"
+                        android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_regular"
+                            android:text="Yog'"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvFatValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="13sp"
+                            tools:text="22g" />
+
+                    </LinearLayout>
+
+                    <!-- Uglevod -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_macro_icon"
+                        android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingVertical="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_regular"
+                            android:text="Uglevod"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvCarbsValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="13sp"
+                            tools:text="52g" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Kundalikka qo'shish tugmasi -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddToTracker"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="14dp"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/dietolog_action_add_to_tracker"
+                    android:textSize="14sp"
+                    app:cornerRadius="14dp"
+                    app:icon="@drawable/add_ic"
+                    app:iconGravity="textStart" />
+
+                <!-- Dinamik Harakatlar (Action Buttons Container) -->
+                <LinearLayout
+                    android:id="@+id/layoutActionsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
         <LinearLayout
             android:id="@+id/feedbackContainer"
             android:layout_width="wrap_content"
@@ -46,7 +239,7 @@
             android:orientation="horizontal"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aiMessageText"
+            app:layout_constraintTop_toBottomOf="@id/cardFoodAnalysis"
             tools:visibility="visible">
 
             <ImageView

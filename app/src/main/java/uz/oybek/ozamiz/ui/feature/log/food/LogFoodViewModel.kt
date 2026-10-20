@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.ui.modelUtils.MealTime
+import uz.oybek.ozamiz.data.reminder.model.MealReminderType
 import uz.oybek.ozamiz.data.limit.api.LimitManagerRepo
 import uz.oybek.ozamiz.data.profile.api.ProfileRepo
 import uz.oybek.ozamiz.data.tracker.api.FoodTrackerRepo
@@ -29,6 +30,7 @@ import javax.inject.Inject
 data class LogFoodUiState(
     val date: Date = currentTime(),
     val mealType: String = MealTime.Breakfast.id,
+    val mealTime: String? = null,
     val logs: List<FoodModel> = emptyList(),
     val isPremium: Boolean = false,
     val isLoaded: Boolean = false
@@ -70,8 +72,13 @@ class LogFoodViewModel @Inject constructor(
 
         viewModelScope.launch {
             profileRepo.user.collect { user ->
+                val targetReminderType = MealReminderType.fromIdOrNull(_uiState.value.mealType)
+                val reminderTime = user.mealReminders.find { it.type == targetReminderType }?.time
                 _uiState.update {
-                    it.copy(isPremium = user.isPremiumActive)
+                    it.copy(
+                        isPremium = user.isPremiumActive,
+                        mealTime = reminderTime
+                    )
                 }
             }
         }

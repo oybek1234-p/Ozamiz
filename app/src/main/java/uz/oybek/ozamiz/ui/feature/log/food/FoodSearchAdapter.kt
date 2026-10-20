@@ -1,8 +1,10 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +13,8 @@ import com.google.android.material.progressindicator.CircularProgressIndicator
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.databinding.ItemFoodSearchResultBinding
+import uz.oybek.ozamiz.ui.utils.colorRes
+import uz.oybek.ozamiz.ui.utils.healthRatingInfo
 import kotlin.math.roundToInt
 
 class FoodSearchAdapter(
@@ -36,13 +40,16 @@ class FoodSearchAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: FoodItem) {
+            val context = binding.root.context
+            val gradeColor = ContextCompat.getColor(context, item.healthRatingInfo.colorRes)
+            binding.viewGradeDot.backgroundTintList = ColorStateList.valueOf(gradeColor)
+
             binding.textViewFoodName.text = item.name
 
             val defaultServing = item.servingSizes.firstOrNull()
             val weight = defaultServing?.grams ?: 100.0
             val calories = item.caloriesForGrams(weight)
             val weightInt = weight.roundToInt()
-            val context = binding.root.context
 
             val servingDescription = if (defaultServing == null) {
                 context.getString(R.string.food_detail_default_grams)
@@ -53,14 +60,11 @@ class FoodSearchAdapter(
                     weightInt
                 )
             }
-
             binding.textViewFoodServing.text = context.getString(
                 R.string.search_food_item_serving_format,
                 servingDescription,
                 calories
             )
-
-            // Reset recycled state
             binding.buttonAddFood.setIconResource(R.drawable.add_ic)
             binding.buttonAddFood.isEnabled = true
             binding.buttonAddFood.scaleX = 1f

@@ -65,6 +65,12 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             navigate(R.id.goalInfoFragment)
         }
         setupSection(
+            sectionReminders, R.drawable.date_ic,
+            getString(R.string.profile_section_reminders)
+        ) {
+            navigate(R.id.action_profileFragment_to_remindersFragment)
+        }
+        setupSection(
             sectionSupport, R.drawable.help_ic, getString(R.string.help_and_support)
         ) {
             (activity as? MainActivity)?.showSupportSheet()

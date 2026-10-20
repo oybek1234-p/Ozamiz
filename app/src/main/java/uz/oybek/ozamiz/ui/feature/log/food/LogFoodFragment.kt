@@ -3,6 +3,7 @@ package uz.oybek.ozamiz.ui.feature.log.food
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -11,9 +12,11 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.ui.modelUtils.MealTime
 import uz.oybek.ozamiz.data.tracker.model.FoodModel
+import uz.oybek.ozamiz.data.tracker.model.MealType
 import uz.oybek.ozamiz.databinding.FragmentLogFoodBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.common.dialog.ConfirmDeleteDialog
+import uz.oybek.ozamiz.ui.feature.diet.recommendations.MealRecommendationsFragment
 import uz.oybek.ozamiz.ui.feature.limit.FoodLimitArgs
 import uz.oybek.ozamiz.ui.feature.log.food.history.RecentLogsAdapter
 import uz.oybek.ozamiz.ui.utils.appColors
@@ -62,9 +65,49 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             }
         }
 
-        buttonAddFood.setOnSafeClickListener {
+        buttonSavedFoods.setOnSafeClickListener {
+            val state = viewModel.uiState.value
+            val args = SavedFoodsArgs(
+                mealType = state.mealType,
+                timestamp = state.date.time
+            )
+            navigate(R.id.savedFoodsFragment, args.toBundle())
+        }
+
+        buttonActionCamera.setOnSafeClickListener {
             viewModel.onAddFoodClicked()
         }
+
+        buttonActionSearch.setOnSafeClickListener {
+            val state = viewModel.uiState.value
+            val args = SearchFoodArgs(mealType = state.mealType)
+            navigate(R.id.searchFoodFragment, args.toBundle())
+        }
+
+        buttonActionWrite.setOnSafeClickListener {
+            val state = viewModel.uiState.value
+            val args = WriteFoodArgs(
+                mealType = state.mealType,
+                timestamp = state.date.time
+            )
+            navigate(R.id.writeFoodFragment, args.toBundle())
+        }
+
+        btnMealReminder.setOnSafeClickListener {
+            navigate(R.id.remindersFragment)
+        }
+
+        cardMealRecommendations.setOnSafeClickListener {
+            showMealRecommendations()
+        }
+    }
+
+    private fun showMealRecommendations() {
+        val mealType = MealType.fromId(viewModel.uiState.value.mealType)
+        navigate(
+            R.id.mealRecommendationsFragment,
+            bundleOf(MealRecommendationsFragment.ARG_MEAL_TYPE to mealType.name)
+        )
     }
 
     private fun observeState() {
@@ -76,6 +119,14 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
         val meal = MealTime.fromId(state.mealType)
         val mealName = meal?.let { getString(it.nameRes) } ?: ""
         toolbarLogFood.title = mealName
+        cardMealRecommendations.isVisible = false
+
+        if (!state.mealTime.isNullOrBlank()) {
+            textToolbarMealTime.text = state.mealTime
+            btnMealReminder.isVisible = true
+        } else {
+            btnMealReminder.isVisible = false
+        }
 
         meal?.let {
             imgEmptyMealIcon.setImageResource(it.iconRes)
@@ -86,10 +137,12 @@ class LogFoodFragment : BaseFragment<FragmentLogFoodBinding>() {
             val hasLogs = state.logs.isNotEmpty()
             recentLogsAdapter?.submitList(state.logs) {
                 recyclerRecentLogs.isVisible = hasLogs
+                textRecentHistoryHeader.isVisible = hasLogs
                 layoutEmptyHistory.isVisible = !hasLogs
             }
         } else {
             recyclerRecentLogs.isVisible = false
+            textRecentHistoryHeader.isVisible = false
             layoutEmptyHistory.isVisible = false
         }
 

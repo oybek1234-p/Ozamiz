@@ -18,7 +18,15 @@ data class HomeUiState(
     val water: DailyWaterSummary = DailyWaterSummary(),
     val exercise: DailyExerciseSummary = DailyExerciseSummary(),
     val profile: HomeProfileUiState = HomeProfileUiState(),
+    val dietolog: HomeDietologUiState = HomeDietologUiState(),
+    val mealReminders: Map<uz.oybek.ozamiz.data.reminder.model.MealReminderType, String> = emptyMap(),
     val isLoading: Boolean = false
+)
+
+@Keep
+data class HomeDietologUiState(
+    val lastMessageText: String? = null,
+    val messageCount: Int = 0
 )
 
 @Keep

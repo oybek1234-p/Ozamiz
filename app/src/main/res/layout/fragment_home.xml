@@ -229,7 +229,6 @@
                         android:id="@+id/main_progress"
                         layout="@layout/home_main_progress" />
 
-                    <!-- Notification Permission Banner (Top) -->
                     <include
                         android:id="@+id/layoutNotificationBanner"
                         layout="@layout/layout_notification_permission_banner"
@@ -239,26 +238,29 @@
                         android:layout_marginTop="16dp"
                         android:visibility="gone" />
 
-                    <!-- Premium Payment Verification Pending Card -->
                     <include
                         android:id="@+id/card_premium_checking"
                         layout="@layout/layout_home_premium_checking" />
 
-                    <!-- App Feedback Card -->
                     <include
                         android:id="@+id/card_app_feedback"
                         layout="@layout/layout_home_app_feedback" />
+
+                    <include
+                        android:id="@+id/card_dietologist_home"
+                        layout="@layout/layout_home_ai_dietologist" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="16dp"
-                        android:layout_marginTop="28dp"
+                        android:layout_marginTop="24dp"
                         android:layout_marginBottom="12dp"
                         android:fontFamily="@font/roboto_bold"
                         android:text="@string/home_section_nutrition"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="18sp" />
+
 
                     <!-- Meals Container (4 Meals Only) -->
                     <com.google.android.material.card.MaterialCardView
@@ -358,10 +360,6 @@
                     <include
                         android:id="@+id/card_weight_log"
                         layout="@layout/layout_home_weight_log" />
-
-                    <include
-                        android:id="@+id/card_dietologist_home"
-                        layout="@layout/layout_home_ai_dietologist" />
 
                     <include
                         android:id="@+id/card_goal_prediction"

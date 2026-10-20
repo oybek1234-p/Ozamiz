@@ -10,12 +10,14 @@
     <EditText
         android:id="@+id/editInput"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_weight="1"
         android:background="@drawable/round_lay_stroke"
         android:padding="12dp"
+        android:gravity="top|start"
         android:hint="Kiriting..."
-        android:inputType="textCapSentences" />
+        android:inputType="textMultiLine|textCapSentences" />
 
     <ImageButton
         android:id="@+id/btnRemove"

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.common.util.SearchNormalizer
 import uz.oybek.ozamiz.data.di.DefaultDispatcher
 import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.FoodItem
@@ -55,41 +57,48 @@ class SearchFoodViewModel @Inject constructor(
     val effects = _effects.receiveAsFlow()
 
     private val _query = MutableStateFlow("")
+    private val _selectedCategory = MutableStateFlow<FoodSearchCategory?>(null)
 
     @OptIn(FlowPreview::class)
     private val debouncedQuery = _query
         .debounce { query -> if (query.isEmpty()) 0.milliseconds else 300.milliseconds }
         .distinctUntilChanged()
+
+    private val filterFlow = combine(debouncedQuery, _selectedCategory) { query, category ->
+        query.trim() to category
+    }.distinctUntilChanged()
         .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val foodPagingFlow = debouncedQuery.flatMapLatest { searchInput ->
+    val foodPagingFlow = filterFlow.flatMapLatest { (searchInput, category) ->
         Pager(
             config = PagingConfig(
                 pageSize = 30,
                 enablePlaceholders = false,
                 initialLoadSize = 30
             ),
-            pagingSourceFactory = { FoodPagingSource(searchInput, defaultDispatcher) }
+            pagingSourceFactory = { FoodPagingSource(searchInput, category, defaultDispatcher) }
         ).flow
     }.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch(defaultDispatcher) {
-            debouncedQuery.collect { searchInput ->
+            filterFlow.collect { (searchInput, category) ->
                 val trimmed = searchInput.trim()
-                val count = if (trimmed.isBlank()) {
+                val count = if (trimmed.isBlank() && category == null) {
                     null
                 } else {
-                    val normQuery = SearchNormalizer.normalize(trimmed)
+                    val normQuery = if (trimmed.isNotBlank()) SearchNormalizer.normalize(trimmed) else ""
                     val lowerQuery = trimmed.lowercase()
 
                     val foods = FoodDatabase.getSearchableFoods()
                     foods.count { item ->
-                        item.calculateScore(trimmed, normQuery, lowerQuery) > 0
+                        val matchesCategory = category == null || category.matches(item.food)
+                        if (!matchesCategory) return@count false
+                        if (trimmed.isBlank()) true else item.calculateScore(trimmed, normQuery, lowerQuery) > 0
                     }
                 }
-                _uiState.update { it.copy(searchResultCount = count) }
+                _uiState.update { it.copy(searchResultCount = count, selectedCategory = category) }
             }
         }
 
@@ -111,8 +120,16 @@ class SearchFoodViewModel @Inject constructor(
     }
 
     fun searchFoods(newQuery: String) {
+        if (newQuery.isNotBlank() && _selectedCategory.value != null) {
+            _selectedCategory.value = null
+        }
         _query.value = newQuery
-        _uiState.update { it.copy(query = newQuery) }
+        _uiState.update { it.copy(query = newQuery, selectedCategory = _selectedCategory.value) }
+    }
+
+    fun selectCategory(category: FoodSearchCategory?) {
+        _selectedCategory.value = category
+        _uiState.update { it.copy(selectedCategory = category) }
     }
 
     fun logDirectFood(foodItem: FoodItem) {

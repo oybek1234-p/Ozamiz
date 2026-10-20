@@ -10,6 +10,15 @@ interface AiChatDao {
     @Query("SELECT * FROM ai_chat_messages WHERE dateString = :date ORDER BY timestamp ASC")
     fun getMessagesForDateFlow(date: String): Flow<List<AiChatMessageEntity>>
 
+    @Query("SELECT * FROM ai_chat_messages WHERE isUser = 0 ORDER BY timestamp DESC LIMIT 1")
+    fun getLatestAiMessageFlow(): Flow<AiChatMessageEntity?>
+
+    @Query("SELECT * FROM ai_chat_messages ORDER BY timestamp DESC LIMIT 1")
+    fun getLatestMessageFlow(): Flow<AiChatMessageEntity?>
+
+    @Query("SELECT COUNT(*) FROM ai_chat_messages")
+    fun getMessagesCountFlow(): Flow<Int>
+
     @Insert
     suspend fun insertMessage(message: AiChatMessageEntity)
     

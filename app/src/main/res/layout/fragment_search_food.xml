@@ -48,6 +48,25 @@
             android:paddingVertical="12dp" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Selectable Category Chips -->
+    <HorizontalScrollView
+        android:id="@+id/scroll_categories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_categories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true" />
+    </HorizontalScrollView>
+
     <TextView
         android:id="@+id/text_view_search_results_count"
         android:layout_width="wrap_content"

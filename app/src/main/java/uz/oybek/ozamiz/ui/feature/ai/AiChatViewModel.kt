@@ -8,22 +8,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.ai.aiChat.AiChatRepository
 import uz.oybek.ozamiz.data.ai.aiChat.ChatMessage
+import uz.oybek.ozamiz.data.dietolog.api.DietologRepository
+import uz.oybek.ozamiz.data.dietolog.engine.DietologEvaluationEngine
+import uz.oybek.ozamiz.data.dietolog.model.AnalyzedFoodPayload
+import uz.oybek.ozamiz.data.dietolog.model.DietologSenderType
 import uz.oybek.ozamiz.data.limit.api.LimitManagerRepo
 import uz.oybek.ozamiz.data.limit.api.LimitUpdater
 import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.common.result.BaseResult
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class AiChatViewModel @Inject constructor(
+    private val dietologRepository: DietologRepository,
+    private val evaluationEngine: DietologEvaluationEngine,
     private val limitManagerRepo: LimitManagerRepo,
     private val limitUpdater: LimitUpdater
 ) : ViewModel() {
@@ -31,16 +33,48 @@ class AiChatViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
-    val messages: StateFlow<List<ChatMessage>> = _messages.asStateFlow()
+    /**
+     * SSOT: UI yagona Flow<List<ChatMessage>> oqimiga obuna bo'ladi.
+     * Xabar yuborilayotganda loading (isThinking = true) animatsiyasi ro'yxat oxirida ko'rsatiladi.
+     */
+    val messages: StateFlow<List<ChatMessage>> = kotlinx.coroutines.flow.combine(
+        dietologRepository.getAllMessagesFlow(),
+        _isLoading
+    ) { entities, loading ->
+        val list = entities.map { entity ->
+            ChatMessage(
+                id = entity.id,
+                text = entity.text,
+                isUser = entity.senderType == DietologSenderType.USER,
+                timestamp = entity.timestamp,
+                analyzedFood = entity.analyzedFood,
+                isAddedToTracker = entity.isAddedToTracker,
+                actions = entity.actions
+            )
+        }.toMutableList()
 
-    private var currentChatId: String = generateChatId()
+        if (loading) {
+            list.add(
+                ChatMessage(
+                    id = "thinking_placeholder",
+                    text = "",
+                    isUser = false,
+                    isThinking = true,
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+        }
+        list
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     private val _remainingMessages = MutableStateFlow(getRemainingMessages())
     val remainingMessages: StateFlow<Int> = _remainingMessages.asStateFlow()
 
     private var sendJob: Job? = null
-    private var resetJob: Job? = null
 
     fun getRemainingMessages(): Int = limitManagerRepo.getLimits().remainingChatLimit
     fun canSendMessage(): Boolean = limitManagerRepo.getLimits().canSendMessages
@@ -49,28 +83,22 @@ class AiChatViewModel @Inject constructor(
         _remainingMessages.value = getRemainingMessages()
     }
 
-    private fun generateChatId(): String {
-        return "${user.uid}_${System.currentTimeMillis()}_${UUID.randomUUID().toString().take(8)}"
-    }
-
     init {
         UserProfileRepository.setUnreadNotificationsZero()
         refreshLimitState()
-        resetJob = viewModelScope.launch {
-            AiChatRepository.clearHistory()
+        // Ilovaga yoki chatga kirganda mahalliy eslatmalarni baholash
+        viewModelScope.launch {
+            evaluationEngine.evaluateAndTriggerReminders()
         }
     }
 
     fun startNewChat(clearHistory: Boolean = true) {
         sendJob?.cancel()
-        resetJob?.cancel()
         _isLoading.value = false
-        currentChatId = generateChatId()
         refreshLimitState()
         if (clearHistory) {
-            _messages.value = emptyList()
-            resetJob = viewModelScope.launch {
-                AiChatRepository.clearHistory()
+            viewModelScope.launch {
+                dietologRepository.clearHistory()
             }
         }
     }
@@ -84,7 +112,6 @@ class AiChatViewModel @Inject constructor(
         if (trimmed.isBlank() || _isLoading.value) return
         if (!ignoreLimit && !canSendMessage()) return
 
-        resetJob?.cancel()
         sendJob?.cancel()
 
         viewModelScope.launch {
@@ -92,77 +119,17 @@ class AiChatViewModel @Inject constructor(
             _remainingMessages.value = getRemainingMessages()
         }
 
-        val userMessage = ChatMessage(
-            id = UUID.randomUUID().toString(),
-            text = trimmed,
-            isUser = true
-        )
-        val aiMessage = ChatMessage(
-            id = UUID.randomUUID().toString(),
-            text = "",
-            isUser = false,
-            isThinking = true
-        )
-        _messages.value = _messages.value + listOf(userMessage, aiMessage)
-        android.util.Log.d(
-            "AiChatDebug",
-            "sendMessage: _messages.value SET, new size=${_messages.value.size}"
-        )
-        AiChatRepository.clearReplies()
         _isLoading.value = true
-
-        val chatId = currentChatId
 
         sendJob = viewModelScope.launch {
             try {
-                AiChatRepository.sendMessage(
-                    text = trimmed,
-                    chatId = chatId,
-                    scope = this
-                ).collect { result ->
-                    if (result is BaseResult.Success) {
-                        val displayedText = result.data
-                        val currentList = _messages.value.toMutableList()
-                        val lastAiIndex = currentList.indexOfLast { !it.isUser }
-                        if (lastAiIndex != -1) {
-                            currentList[lastAiIndex] = currentList[lastAiIndex].copy(
-                                text = displayedText,
-                                isThinking = false
-                            )
-                        } else {
-                            currentList.add(
-                                ChatMessage(
-                                    id = UUID.randomUUID().toString(),
-                                    text = displayedText,
-                                    isUser = false,
-                                    isThinking = false
-                                )
-                            )
-                        }
-                        _messages.value = currentList
+                dietologRepository.sendUserMessage(trimmed).collect { result ->
+                    if (result is BaseResult.Failure) {
+                        android.util.Log.e("AiChatViewModel", "sendUserMessage error: ${result.error}")
                     }
                 }
             } catch (e: Exception) {
                 android.util.Log.e("AiChatViewModel", "Error while sending chat message", e)
-                val currentList = _messages.value.toMutableList()
-                val lastAiIndex = currentList.indexOfLast { !it.isUser }
-                val errorMsg = "Kechirasiz, xatolik yuz berdi. Qaytadan urinib ko'ring."
-                if (lastAiIndex != -1) {
-                    currentList[lastAiIndex] = currentList[lastAiIndex].copy(
-                        text = errorMsg,
-                        isThinking = false
-                    )
-                } else {
-                    currentList.add(
-                        ChatMessage(
-                            id = UUID.randomUUID().toString(),
-                            text = errorMsg,
-                            isUser = false,
-                            isThinking = false
-                        )
-                    )
-                }
-                _messages.value = currentList
             } finally {
                 _isLoading.value = false
                 done()
@@ -170,22 +137,22 @@ class AiChatViewModel @Inject constructor(
         }
     }
 
-    fun onFeedbackClick(message: ChatMessage, isLiked: Boolean, userQuestion: String) {
-        val feedbackType = if (isLiked) "like" else "dislike"
-        val currentList = _messages.value.toMutableList()
-        val index =
-            currentList.indexOfFirst { it.id == message.id || (it.timestamp == message.timestamp && !it.isUser) }
-        if (index != -1) {
-            currentList[index] = currentList[index].copy(feedback = feedbackType)
-            _messages.value = currentList
-        }
-
+    /**
+     * Foydalanuvchi «Kunlik hisobga qo'shilsinmi?» tugmasini bosganda:
+     * DailyTracker moduli ishga tushadi: tahlil qilingan kaloriya va makrolar hisobga qo'shiladi
+     * va tugma «Qo'shildi» holatiga o'tadi.
+     */
+    fun confirmFoodIntake(message: ChatMessage, payload: AnalyzedFoodPayload) {
         viewModelScope.launch {
-            AiChatRepository.saveFeedback(
-                userQuestion = userQuestion,
-                aiResponse = message.text,
-                isLiked = isLiked
-            )
+            val result = dietologRepository.confirmAnalyzedFood(message.id, payload)
+            if (result is BaseResult.Success) {
+                // Ovqat qo'shilgach, kunlik limitlar o'zgargani uchun yangi eslatmalar baholanadi
+                evaluationEngine.evaluateAndTriggerReminders(bypassCooldown = true)
+            }
         }
+    }
+
+    fun onFeedbackClick(message: ChatMessage, isLiked: Boolean, userQuestion: String) {
+        // Shaxsiy fikr-mulohaza qayta ishlash
     }
 }

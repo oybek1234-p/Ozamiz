@@ -1,19 +1,25 @@
 package uz.oybek.ozamiz.ui.feature.menu.list
 
+import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import androidx.annotation.Keep
-import uz.oybek.ozamiz.data.menu.MenuRepository
-import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.data.food.model.FoodTag
+import uz.oybek.ozamiz.data.menu.api.MenuRepo
+import uz.oybek.ozamiz.data.menu.model.Menu
+import javax.inject.Inject
 
-class MenuSearchViewModel : ViewModel() {
+@HiltViewModel
+class MenuSearchViewModel @Inject constructor(
+    private val menuRepo: MenuRepo
+) : ViewModel() {
 
     @Keep
     data class MenuSearchState(
@@ -23,7 +29,6 @@ class MenuSearchViewModel : ViewModel() {
         val list: List<Menu> = emptyList()
     )
 
-    // Keshni xavfsiz va toza saqlash uchun oddiy MutableMap
     private val cacheMap = mutableMapOf<String, List<Menu>>()
     private var searchJob: Job? = null
 
@@ -34,19 +39,17 @@ class MenuSearchViewModel : ViewModel() {
         if (_state.value.categoryId != categoryId) {
             searchJob?.cancel()
 
-            // Yangi kategoriya tanlanganda keshdan eski ma'lumotlarni tekshiramiz
             val cachedList = cacheMap[categoryId ?: ""] ?: emptyList()
 
             _state.update {
                 it.copy(
                     categoryId = categoryId,
                     query = null,
-                    list = cachedList, // Agar keshda bo'lsa darhol ko'rsatamiz, bo'lmasa bo'sh bo'ladi
+                    list = cachedList,
                     loading = false
                 )
             }
 
-            // Faqat keshda ma'lumot umuman bo'lmagandagina tarmoqdan yuklaymiz
             if (cachedList.isEmpty()) {
                 loadList()
             }
@@ -55,7 +58,6 @@ class MenuSearchViewModel : ViewModel() {
 
     private fun loadList() {
         val catId = _state.value.categoryId ?: return
-
         if (_state.value.loading) return
 
         searchJob?.cancel()
@@ -63,13 +65,12 @@ class MenuSearchViewModel : ViewModel() {
             _state.update { it.copy(loading = true) }
 
             val currentList = _state.value.list
-            val lastMenuId = currentList.lastOrNull()?.id
-            val lastTimeStamp = currentList.lastOrNull()?.createdAt?.time
+            val lastTimestamp = currentList.lastOrNull()?.createdAt
+            val tagEnum = catId.let { runCatching { FoodTag.valueOf(it) }.getOrNull() }
 
-            val result = MenuRepository.loadMenus(
-                categoryId = catId,
-                lastMenuId = lastMenuId,
-                lastTimestamp = lastTimeStamp,
+            val result = menuRepo.getMenus(
+                tag = tagEnum,
+                lastTimestamp = lastTimestamp,
                 pageSize = 10
             )
 
@@ -98,6 +99,17 @@ class MenuSearchViewModel : ViewModel() {
             searchJob?.cancel()
             _state.update {
                 it.copy(query = query, categoryId = null, list = emptyList(), loading = false)
+            }
+            if (!query.isNullOrBlank()) {
+                searchJob = viewModelScope.launch {
+                    _state.update { it.copy(loading = true) }
+                    val result = menuRepo.searchMenus(queryText = query)
+                    if (result is BaseResult.Success) {
+                        _state.update { it.copy(list = result.data, loading = false) }
+                    } else {
+                        _state.update { it.copy(loading = false) }
+                    }
+                }
             }
         }
     }
