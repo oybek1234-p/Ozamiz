@@ -6,50 +6,54 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingVertical="4dp">
+    android:paddingVertical="3dp">
 
+    <!-- AI Xabari Qismi -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/aiMessageLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="6dp"
         android:visibility="gone"
         tools:visibility="visible">
 
+        <!-- AI Matni (Kompakt va chiroyli pufakcha) -->
         <TextView
             android:id="@+id/aiMessageText"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="40dp"
             android:background="@drawable/bg_chat_ai"
-            android:backgroundTint="?attr/colorSurfaceContainerLowest"
-            android:lineSpacingMultiplier="1.15"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="14dp"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="16sp"
+            android:backgroundTint="?attr/colorSurfaceContainer"
             android:fontFamily="@font/roboto_regular"
+            android:lineSpacingMultiplier="1.2"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="15sp"
             android:visibility="gone"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Salom! Men sizning AI diyetologingizman." />
+            tools:text="Salom! Men sizning shaxsiy diyetologingizman. Bugungi ovqatlaringizni tahlil qilishga tayyorman." />
 
-        <!-- Ovqat iste'moli tahlili kartochkasi (Type A - Food Intake Factor) -->
+        <!-- Ovqat Iste'moli Kartochkasi (Food Intake Card - Zamonaviy va ajralib turadigan dizayn) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardFoodAnalysis"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
             android:visibility="gone"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp"
             app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-            app:strokeWidth="1dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="1dp"
             app:strokeColor="?attr/colorOutlineVariant"
+            app:strokeWidth="1dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/aiMessageText"
@@ -59,68 +63,95 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="14dp">
 
-                <!-- Header: Taom nomi va Kaloriya ko'rsatkichi -->
+                <!-- Header: Taom nomi, Vaqti va Kaloriya badge -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/tvFoodItemsTitle"
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:ellipsize="end"
-                        android:fontFamily="@font/roboto_bold"
-                        android:maxLines="2"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="16sp"
-                        tools:text="🍲 Mastava va somsa" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvFoodItemsTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/roboto_medium"
+                            android:maxLines="2"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="15sp"
+                            tools:text="Mastava va somsa" />
+
+                        <TextView
+                            android:id="@+id/tvFoodMealTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp"
+                            tools:text="Tushlik • 13:45" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvFoodCaloriesBadge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="8dp"
                         android:background="@drawable/bg_macro_icon"
-                        android:backgroundTint="?attr/colorSecondaryContainer"
+                        android:backgroundTint="?attr/colorSurfaceContainerHigh"
                         android:fontFamily="@font/roboto_bold"
                         android:paddingHorizontal="10dp"
-                        android:paddingVertical="5dp"
-                        android:textColor="?attr/colorOnSecondaryContainer"
+                        android:paddingVertical="4dp"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="13sp"
-                        tools:text="🔥 480 kkal" />
+                        tools:text="480 kkal" />
 
                 </LinearLayout>
+
+                <!-- Har xil itemlar kelsa alohida list qilib ko'rsatiladigan Container -->
+                <LinearLayout
+                    android:id="@+id/layoutFoodItemsList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
                 <!-- Makronutriyentlar (Oqsil, Yog', Uglevod) Pills qatori -->
                 <LinearLayout
                     android:id="@+id/layoutMacrosRow"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <!-- Oqsil -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_macro_icon"
-                        android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                        android:backgroundTint="?attr/colorSurfaceContainer"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingVertical="8dp">
+                        android:paddingVertical="6dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Oqsil"
+                            android:text="@string/protein"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="11sp" />
 
@@ -128,7 +159,7 @@
                             android:id="@+id/tvProteinValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="1dp"
                             android:fontFamily="@font/roboto_bold"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="13sp"
@@ -140,19 +171,19 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_macro_icon"
-                        android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                        android:backgroundTint="?attr/colorSurfaceContainer"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingVertical="8dp">
+                        android:paddingVertical="6dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Yog'"
+                            android:text="@string/fat"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="11sp" />
 
@@ -160,7 +191,7 @@
                             android:id="@+id/tvFatValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="1dp"
                             android:fontFamily="@font/roboto_bold"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="13sp"
@@ -174,16 +205,16 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:background="@drawable/bg_macro_icon"
-                        android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                        android:backgroundTint="?attr/colorSurfaceContainer"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingVertical="8dp">
+                        android:paddingVertical="6dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Uglevod"
+                            android:text="@string/carbs"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="11sp" />
 
@@ -191,7 +222,7 @@
                             android:id="@+id/tvCarbsValue"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
+                            android:layout_marginTop="1dp"
                             android:fontFamily="@font/roboto_bold"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="13sp"
@@ -201,19 +232,55 @@
 
                 </LinearLayout>
 
-                <!-- Kundalikka qo'shish tugmasi -->
+                <!-- Kundalikka qo'shish tugmasi (Primary tugma dizayni) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddToTracker"
-                    style="@style/Widget.Material3.Button.TonalButton"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginTop="14dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="12dp"
                     android:fontFamily="@font/roboto_medium"
+                    android:letterSpacing="0"
                     android:text="@string/dietolog_action_add_to_tracker"
-                    android:textSize="14sp"
-                    app:cornerRadius="14dp"
+                    android:textSize="13sp"
+                    app:backgroundTint="?attr/colorPrimary"
+                    app:cornerRadius="12dp"
                     app:icon="@drawable/add_ic"
-                    app:iconGravity="textStart" />
+                    app:iconGravity="textStart"
+                    app:iconPadding="6dp"
+                    app:iconSize="18dp"
+                    app:iconTint="?attr/colorOnPrimary" />
+
+                <!-- Kundalikka qo'shildi holati (Animatsiya bilan ochiladigan badge) -->
+                <LinearLayout
+                    android:id="@+id/layoutAddedStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_macro_icon"
+                    android:backgroundTint="?attr/colorSurfaceContainerHigh"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/check_circle_ic"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/tvAddedStatusText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="@string/dietolog_action_added_to_tracker"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
 
                 <!-- Dinamik Harakatlar (Action Buttons Container) -->
                 <LinearLayout
@@ -229,12 +296,13 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Like / Dislike Container -->
         <LinearLayout
             android:id="@+id/feedbackContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="2dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:visibility="gone"
@@ -244,38 +312,39 @@
 
             <ImageView
                 android:id="@+id/btnLike"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Like"
+                android:contentDescription="@string/ai_chat_like"
                 android:padding="5dp"
                 android:src="@drawable/like_hand"
                 app:tint="?attr/colorOutline" />
 
             <ImageView
                 android:id="@+id/btnDislike"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginStart="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Dislike"
+                android:contentDescription="@string/ai_chat_dislike"
                 android:padding="5dp"
                 android:src="@drawable/hand_dilike"
                 app:tint="?attr/colorOutline" />
 
         </LinearLayout>
 
+        <!-- O'ylayapman Animatsiyasi -->
         <LinearLayout
             android:id="@+id/thinkingContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:background="@drawable/bg_chat_ai"
             android:backgroundTint="?attr/colorSurfaceContainer"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -286,8 +355,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
-                android:text="O'ylayapman"
-                android:textColor="?attr/colorOnSurface" />
+                android:text="@string/ai_chat_thinking"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/dot1"
@@ -295,7 +365,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="."
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <TextView
                 android:id="@+id/dot2"
@@ -303,7 +373,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="."
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
             <TextView
                 android:id="@+id/dot3"
@@ -311,35 +381,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="."
-                android:textColor="?attr/colorOnSurface" />
+                android:textColor="?attr/colorOnSurfaceVariant" />
 
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- User Xabari Qismi -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/userMessageLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="6dp"
         android:visibility="gone"
         tools:visibility="visible">
 
         <TextView
             android:id="@+id/userMessageText"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
+            android:layout_marginStart="48dp"
             android:layout_marginEnd="4dp"
             android:background="@drawable/bg_chat_user"
-            android:backgroundTint="?attr/colorSurfaceContainerHigh"
-            android:lineSpacingExtra="3sp"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="12dp"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="15sp"
             android:fontFamily="@font/roboto_regular"
+            android:lineSpacingMultiplier="1.2"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            android:textColor="?attr/colorOnPrimary"
+            android:textSize="15sp"
+            app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Bugun nima yeyman?" />

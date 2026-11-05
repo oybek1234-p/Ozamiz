@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeRefreshNatija"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/colorSurfaceContainerLowest">
+    android:layout_height="match_parent">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshNatija"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollViewContentNatija"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="32dp">
+            android:paddingBottom="100dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -23,49 +23,120 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <!-- 1. VAZN MAQSADI CARD (No graph, uniform card structure) -->
+                <!-- 1. HERO PROGRESS CARD -->
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardMainProgress"
+                    android:id="@+id/cardGoalHeader"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="20dp">
 
                         <TextView
                             android:id="@+id/tvTotalChangeLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_medium"
-                            android:text="Vazn"
+                            android:text="@string/natija_total_change_label"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="14sp" />
 
-                        <TextView
-                            android:id="@+id/tvWeightDiff"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:fontFamily="@font/roboto_bold"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="18sp"
-                            tools:text="-6.0 kg ozildi" />
-
-                        <!-- 3 Metric Numbers Row -->
+                        <!-- Main stats row: Weight Loss | Measurement Loss -->
                         <LinearLayout
-                            android:id="@+id/layoutMetricsRow"
+                            android:id="@+id/layoutTotalChangeStatsRow"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <!-- Weight Stat -->
+                            <LinearLayout
+                                android:id="@+id/layoutWeightStat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="bottom"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/tvTotalWeightVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="36sp"
+                                    tools:text="-4.8" />
+
+                                <TextView
+                                    android:id="@+id/tvTotalWeightUnit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="4dp"
+                                    android:layout_marginBottom="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/unit_kg_short"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="16sp" />
+                            </LinearLayout>
+
+                            <!-- Vertical Divider -->
+                            <View
+                                android:id="@+id/dividerTotalStats"
+                                android:layout_width="1dp"
+                                android:layout_height="32dp"
+                                android:layout_marginHorizontal="20dp"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <!-- Measurement Stat -->
+                            <LinearLayout
+                                android:id="@+id/layoutMeasurementStat"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="bottom"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/tvTotalMeasurementVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="36sp"
+                                    tools:text="-14" />
+
+                                <TextView
+                                    android:id="@+id/tvTotalMeasurementUnit"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="4dp"
+                                    android:layout_marginBottom="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/unit_sm_short"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="16sp" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Hairline Divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="16dp"
+                            android:background="?attr/colorOutlineVariant" />
+
+                        <!-- Bottom 3 Columns: Start | Current | Goal -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             android:baselineAligned="false"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
@@ -75,29 +146,36 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:gravity="start"
+                                android:gravity="center"
                                 android:orientation="vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="@font/roboto_medium"
-                                    android:text="Boshlang'ich"
+                                    android:letterSpacing="0.05"
+                                    android:text="@string/natija_label_boshlangich"
                                     android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="14sp" />
+                                    android:textSize="11sp" />
 
                                 <TextView
-                                    android:id="@+id/tvStartWeight"
+                                    android:id="@+id/tvStartWeightVal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="4dp"
                                     android:fontFamily="@font/roboto_bold"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="16sp"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="15sp"
                                     tools:text="77.5 kg" />
                             </LinearLayout>
 
-                            <!-- Hozirgi -->
+                            <!-- Vertical Divider -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="24dp"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <!-- Hozir -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -108,68 +186,55 @@
                                 <TextView
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:fontFamily="@font/roboto_medium"
-                                    android:text="Hozirgi"
-                                    android:textColor="?attr/colorPrimary"
-                                    android:textSize="14sp" />
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:letterSpacing="0.05"
+                                    android:text="@string/natija_label_hozir"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="11sp" />
 
                                 <TextView
-                                    android:id="@+id/tvCurrentWeight"
+                                    android:id="@+id/tvCurrentWeightVal"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
+                                    android:layout_marginTop="4dp"
                                     android:fontFamily="@font/roboto_bold"
                                     android:textColor="?attr/colorPrimary"
-                                    android:textSize="16sp"
-                                    tools:text="71.5 kg" />
+                                    android:textSize="15sp"
+                                    tools:text="72.7 kg" />
                             </LinearLayout>
+
+                            <!-- Vertical Divider -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="24dp"
+                                android:background="?attr/colorOutlineVariant" />
 
                             <!-- Maqsad -->
                             <LinearLayout
-                                android:id="@+id/layoutGoalWeight"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:background="?attr/selectableItemBackground"
-                                android:clickable="true"
-                                android:focusable="true"
-                                android:gravity="end"
-                                android:orientation="vertical"
-                                android:padding="2dp">
-
-                                <LinearLayout
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:gravity="center_vertical"
-                                    android:orientation="horizontal">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:fontFamily="@font/roboto_medium"
-                                        android:text="Maqsad"
-                                        android:textColor="?attr/colorOnSurfaceVariant"
-                                        android:textSize="14sp" />
-
-                                    <ImageView
-                                        android:id="@+id/btnEditGoalWeight"
-                                        android:layout_width="16dp"
-                                        android:layout_height="16dp"
-                                        android:layout_marginStart="4dp"
-                                        android:background="?attr/selectableItemBackgroundBorderless"
-                                        app:srcCompat="@drawable/edit"
-                                        app:tint="?attr/colorPrimary" />
-                                </LinearLayout>
+                                android:gravity="center"
+                                android:orientation="vertical">
 
                                 <TextView
-                                    android:id="@+id/tvGoalWeight"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
                                     android:fontFamily="@font/roboto_bold"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="16sp"
-                                    tools:text="65.0 kg" />
+                                    android:letterSpacing="0.05"
+                                    android:text="@string/natija_label_maqsad"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="11sp" />
+
+                                <TextView
+                                    android:id="@+id/tvGoalWeightVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="15sp"
+                                    tools:text="65 kg" />
                             </LinearLayout>
 
                         </LinearLayout>
@@ -177,297 +242,633 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 2. YANGI VAZN KIRITISH CTA CARD (Tepadagi carddan bitta pastda) -->
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cardAddWeight"
+                <!-- 2. FILLED BUTTON (+ Vazn qo'shish) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddWeight"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
+                    android:fontFamily="@font/roboto_bold"
+                    android:text="@string/natija_btn_add_weight" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/roboto_bold"
-                                android:text="Yangi vazn kiritish"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="15sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/roboto_regular"
-                                android:text="Har hafta vazningizni o'lchab boring"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="13sp" />
-                        </LinearLayout>
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnAddWeight"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="Kiritish"
-                            android:textColor="?attr/colorOnPrimary"
-                            app:icon="@drawable/add_ic" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- 3. TAXMIN CARD -->
+                <!-- 3. KUTILAYOTGAN NATIJA CARD -->
                 <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/layoutPredictionCard"
+                    android:id="@+id/cardForecast"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_medium"
-                            android:text="Maqsadga erishasiz"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:id="@+id/tvPredictionHighlight"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
                             android:fontFamily="@font/roboto_bold"
+                            android:text="@string/natija_forecast_card_title"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="18sp"
-                            tools:text="2 oy 5 kun" />
+                            android:textSize="18sp" />
 
-                        <TextView
-                            android:id="@+id/tvPredictionSummary"
+                        <!-- Normal Predictions Container -->
+                        <LinearLayout
+                            android:id="@+id/layoutForecastPredictions"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:fontFamily="@font/roboto_regular"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="15sp"
-                            tools:text="To'g'ri ovqatlansangiz har hafta 0.5 kg ozasiz." />
+                            android:orientation="vertical">
+
+                            <!-- Item 1: Maqsadga yetish -->
+                            <LinearLayout
+                                android:id="@+id/layoutGoalTargetDate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginTop="14dp"
+                                    android:layout_marginBottom="12dp"
+                                    android:alpha="0.25"
+                                    android:background="?attr/colorOutlineVariant" />
+
+                                <TextView
+                                    android:id="@+id/tvGoalTargetDate"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:lineSpacingExtra="3dp"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="14sp"
+                                    tools:text="Maqsadga yetish 18-dekabr, 2026, 10 oy 24 kun qoldi" />
+                            </LinearLayout>
+
+                            <!-- Item 2: Bu hafta -->
+                            <LinearLayout
+                                android:id="@+id/layoutWeeklyPrediction"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginTop="12dp"
+                                    android:layout_marginBottom="12dp"
+                                    android:alpha="0.25"
+                                    android:background="?attr/colorOutlineVariant" />
+
+                                <TextView
+                                    android:id="@+id/tvWeeklyPrediction"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:lineSpacingExtra="3dp"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="14sp"
+                                    tools:text="Bu hafta -0.7 kg, 74.8 kg" />
+                            </LinearLayout>
+
+                            <!-- Item 3: 1 oyda -->
+                            <LinearLayout
+                                android:id="@+id/layoutMonthlyPrediction"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <View
+                                    android:layout_width="match_parent"
+                                    android:layout_height="1dp"
+                                    android:layout_marginTop="12dp"
+                                    android:layout_marginBottom="12dp"
+                                    android:alpha="0.25"
+                                    android:background="?attr/colorOutlineVariant" />
+
+                                <TextView
+                                    android:id="@+id/tvMonthlyPrediction"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:lineSpacingExtra="3dp"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="14sp"
+                                    tools:text="1 oyda -3.2 kg, 72.3 kg" />
+                            </LinearLayout>
+
+                            <!-- Footnote Divider -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="14dp"
+                                android:layout_marginBottom="12dp"
+                                android:alpha="0.25"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <!-- Footnote -->
+                            <TextView
+                                android:id="@+id/tvForecastFootnote"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_regular"
+                                android:lineSpacingExtra="2dp"
+                                android:text="@string/natija_forecast_footnote"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="12sp" />
+
+                        </LinearLayout>
+
+                        <!-- Guidance / Advisory Container (Direct text, no nested card, no icon) -->
+                        <LinearLayout
+                            android:id="@+id/layoutForecastAdvisory"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone"
+                            tools:visibility="visible">
+
+                            <!-- Hairline Divider -->
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginTop="14dp"
+                                android:layout_marginBottom="14dp"
+                                android:alpha="0.25"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <TextView
+                                android:id="@+id/tvForecastAdvisoryTitle"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="15sp"
+                                tools:text="Har bir ovqatingizni qo‘shib boring" />
+
+                            <TextView
+                                android:id="@+id/tvForecastAdvisoryMessage"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:lineSpacingExtra="3dp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="13sp"
+                                tools:text="Kutilayotgan natija va aniq hisob-kitobni ko‘rish uchun kunlik yegan taomlaringizni to‘liq kiritib boring." />
+
+                        </LinearLayout>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- 4. UMUMIY O'ZGARISH (BODY & WEIGHT MEASUREMENTS CARD) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMonthlyChanges"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/natija_total_changes_title"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="18sp" />
+
+                        <!-- 4 Columns Row: Vazn | Qorin | Bo'ksa | Qo'l -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:baselineAligned="false"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <!-- Vazn Column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/weight_ic" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:text="@string/metric_title_weight"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricVaznVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="15sp"
+                                    tools:text="68.5 kg" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricVaznSubVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="14sp"
+                                    tools:text="-4.8 kg" />
+                            </LinearLayout>
+
+                            <!-- Divider -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="44dp"
+                                android:alpha="0.3"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <!-- Qorin Column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/belly_ic" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:text="@string/metric_title_belly"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricQorinVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="15sp"
+                                    tools:text="82 sm" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricQorinSubVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="14sp"
+                                    tools:text="-4 sm" />
+                            </LinearLayout>
+
+                            <!-- Divider -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="44dp"
+                                android:alpha="0.3"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <!-- Bo'ksa Column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/hips_ic" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:text="@string/natija_metric_son"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricSonVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="15sp"
+                                    tools:text="95 sm" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricSonSubVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="14sp"
+                                    tools:text="-3 sm" />
+                            </LinearLayout>
+
+                            <!-- Divider -->
+                            <View
+                                android:layout_width="1dp"
+                                android:layout_height="44dp"
+                                android:alpha="0.3"
+                                android:background="?attr/colorOutlineVariant" />
+
+                            <!-- Qo'l Column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:contentDescription="@null"
+                                    android:src="@drawable/arm_ic" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="6dp"
+                                    android:fontFamily="@font/roboto_regular"
+                                    android:text="@string/metric_title_arm"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="13sp" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricQolVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="4dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="15sp"
+                                    tools:text="30 sm" />
+
+                                <TextView
+                                    android:id="@+id/tvMetricQolSubVal"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:textColor="?attr/colorPrimary"
+                                    android:textSize="14sp"
+                                    tools:text="-2 sm" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- 5. PHOTOS CARD -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardPhotos"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp"
+                    tools:visibility="visible">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="20dp">
 
-                        <RelativeLayout
+                        <!-- Header Row: Title & Vazn tarixi -->
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp">
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/tvPhotosTitle"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/natija_photos_card_title"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="18sp" />
+
+                            <TextView
+                                android:id="@+id/tvWeightHistory"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_centerVertical="true"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:clickable="true"
+                                android:focusable="true"
                                 android:fontFamily="@font/roboto_medium"
-                                android:text="Fotolarim"
-                                android:textColor="?attr/colorOnSurfaceVariant"
-                                android:textSize="15sp" />
-
-                            <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btnWeightHistory"
-                                style="@style/Widget.Material3.Button.TextButton"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerVertical="true"
-                                android:text="Vazn tarixi"
+                                android:padding="4dp"
+                                android:text="@string/weight_history_screen_title"
                                 android:textColor="?attr/colorPrimary"
-                                android:textSize="13sp"
-                                app:icon="@drawable/history_24px"
-                                app:iconPadding="4dp"
-                                app:iconSize="18dp" />
-                        </RelativeLayout>
+                                android:textSize="14sp" />
+                        </LinearLayout>
 
+                        <!-- Photos Grid Row -->
                         <LinearLayout
-                            android:id="@+id/layoutPhotosContent"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:layout_marginTop="16dp"
+                            android:orientation="horizontal">
 
+                            <!-- Before Photo -->
                             <LinearLayout
-                                android:layout_width="match_parent"
+                                android:id="@+id/layoutPhotoBefore"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:baselineAligned="false"
-                                android:gravity="center"
-                                android:orientation="horizontal">
+                                android:layout_marginEnd="8dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:visibility="gone"
+                                tools:visibility="visible">
 
-                                <!-- Before Photo -->
-                                <LinearLayout
-                                    android:id="@+id/layoutPhotoBefore"
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="8dp"
-                                    android:layout_weight="1"
-                                    android:gravity="center_horizontal"
-                                    android:orientation="vertical">
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="180dp"
+                                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                                    app:cardCornerRadius="16dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
 
-                                    <com.google.android.material.imageview.ShapeableImageView
+                                    <ImageView
                                         android:id="@+id/imgPhotoBefore"
                                         android:layout_width="match_parent"
-                                        android:layout_height="150dp"
-                                        android:background="?attr/colorSurfaceContainerHigh"
-                                        android:scaleType="centerCrop"
-                                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
+                                        android:layout_height="match_parent"
+                                        android:contentDescription="@null"
+                                        android:scaleType="centerCrop" />
+                                </com.google.android.material.card.MaterialCardView>
 
-                                    <TextView
-                                        android:id="@+id/tvPhotoBeforeLabel"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_gravity="center_horizontal"
-                                        android:layout_marginTop="8dp"
-                                        android:background="@drawable/round_lay"
-                                        android:fontFamily="@font/roboto_medium"
-                                        android:paddingHorizontal="10dp"
-                                        android:paddingVertical="2dp"
-                                        android:text="Oldin"
-                                        android:textColor="?attr/colorOnSurface"
-                                        android:textSize="12sp" />
-                                </LinearLayout>
-
-                                <!-- After Photo -->
-                                <LinearLayout
-                                    android:id="@+id/layoutPhotoAfter"
-                                    android:layout_width="0dp"
+                                <TextView
+                                    android:id="@+id/tvPhotoBeforeLabel"
+                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="8dp"
-                                    android:layout_weight="1"
-                                    android:gravity="center_horizontal"
-                                    android:orientation="vertical">
+                                    android:layout_gravity="center_horizontal"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="13sp"
+                                    tools:text="Boshida (77.5 kg)" />
+                            </LinearLayout>
 
-                                    <com.google.android.material.imageview.ShapeableImageView
+                            <!-- After Photo -->
+                            <LinearLayout
+                                android:id="@+id/layoutPhotoAfter"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:visibility="gone"
+                                tools:visibility="visible">
+
+                                <com.google.android.material.card.MaterialCardView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="180dp"
+                                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                                    app:cardCornerRadius="16dp"
+                                    app:cardElevation="0dp"
+                                    app:strokeWidth="0dp">
+
+                                    <ImageView
                                         android:id="@+id/imgPhotoAfter"
                                         android:layout_width="match_parent"
-                                        android:layout_height="150dp"
-                                        android:background="?attr/colorSurfaceContainerHigh"
-                                        android:scaleType="centerCrop"
-                                        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium" />
+                                        android:layout_height="match_parent"
+                                        android:contentDescription="@null"
+                                        android:scaleType="centerCrop" />
+                                </com.google.android.material.card.MaterialCardView>
 
-                                    <TextView
-                                        android:id="@+id/tvPhotoAfterLabel"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_gravity="center_horizontal"
-                                        android:layout_marginTop="8dp"
-                                        android:background="@drawable/round_lay"
-                                        android:fontFamily="@font/roboto_medium"
-                                        android:paddingHorizontal="10dp"
-                                        android:paddingVertical="2dp"
-                                        android:text="Hozir"
-                                        android:textColor="?attr/colorOnSurface"
-                                        android:textSize="12sp" />
-                                </LinearLayout>
-
-                                <Space
-                                    android:id="@+id/spacerPhotoBalance"
-                                    android:layout_width="0dp"
-                                    android:layout_height="1dp"
-                                    android:layout_weight="1"
-                                    android:visibility="gone" />
+                                <TextView
+                                    android:id="@+id/tvPhotoAfterLabel"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center_horizontal"
+                                    android:layout_marginTop="8dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="13sp"
+                                    tools:text="Hozir (72.7 kg)" />
                             </LinearLayout>
+
                         </LinearLayout>
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
-                <!-- 4. IDEAL VAZN CARD (Eng pasida) -->
+
+                <!-- 6. IDEAL WEIGHT CARD -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/cardIdealWeight"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
                     app:cardCornerRadius="20dp"
                     app:cardElevation="0dp"
-                    app:strokeColor="?attr/colorOutlineVariant"
-                    app:strokeWidth="1dp">
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto_medium"
-                            android:text="Sizga mos ideal vazn"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:textSize="15sp" />
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/natija_ideal_weight_card_title"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/tvIdealWeightRange"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="8dp"
                             android:fontFamily="@font/roboto_bold"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             tools:text="58 - 72 kg" />
 
                         <TextView
                             android:id="@+id/tvIdealWeightSubtitle"
-                            android:layout_width="wrap_content"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="8dp"
                             android:fontFamily="@font/roboto_regular"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textSize="15sp"
-                            tools:text="Bo'yingiz uchun eng maqbul va sog'lom vazn oralig me'yori." />
+                            android:lineSpacingExtra="2dp"
+                            android:text="@string/natija_ideal_weight_card_subtitle"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp" />
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 5. PHOTOS SECTION CARD -->
-
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <!-- Loading Indicator -->
+        <FrameLayout
+            android:id="@+id/layoutLoadingNatija"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/colorSurfaceContainerLowest"
+            android:clickable="true"
+            android:focusable="true">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                app:indicatorColor="?attr/colorPrimary" />
+        </FrameLayout>
+
+    </FrameLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

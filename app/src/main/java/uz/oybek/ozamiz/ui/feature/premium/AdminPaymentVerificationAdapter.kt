@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.databinding.ItemAdminPaymentVerificationBinding
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,9 +48,9 @@ class AdminPaymentVerificationAdapter(
 
             Glide.with(itemView.context)
                 .load(user.paymentCheckPhotoUrl)
-                .placeholder(R.drawable.placeholder_food) // Generic placeholder
+                .placeholder(R.drawable.placeholder_food)
                 .error(R.drawable.placeholder_food)
-                .override(100,100) // Smaller image for list
+                .override(100, 100)
                 .into(binding.imageViewCheckMini)
         }
     }

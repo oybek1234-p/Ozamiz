@@ -9,12 +9,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import dagger.hilt.android.AndroidEntryPoint
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentOnboardingBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.home.HomeArgs
+import uz.oybek.ozamiz.ui.utils.toBundle
+import uz.oybek.ozamiz.util.logMessage
 
 @AndroidEntryPoint
 class OnBoardingFragment : BaseFragment<FragmentOnboardingBinding>() {
@@ -69,11 +72,12 @@ class OnBoardingFragment : BaseFragment<FragmentOnboardingBinding>() {
             is OnBoardingEffect.NavigateBack -> {
                 navController?.popBackStack()
             }
-
+            
             is OnBoardingEffect.SaveSuccess -> {
+                val bundle = HomeArgs(showPremium = true).toBundle()
                 navigate(
                     R.id.home,
-                    null,
+                    bundle,
                     androidx.navigation.navOptions {
                         popUpTo(R.id.main_navigation) { inclusive = true }
                     }

@@ -18,51 +18,88 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize">
 
-            <LinearLayout
-                android:id="@+id/layoutFilterSelector"
+            <TextView
+                android:id="@+id/tvHeaderTitle"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
-
-                <TextView
-                    android:id="@+id/tvHeaderTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_bold"
-                    android:text="@string/community_main_title"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="20sp" />
-
-                <ImageView
-                    android:id="@+id/imgDropdown"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginStart="4dp"
-                    app:srcCompat="@drawable/ic_arrow_down"
-                    app:tint="?attr/colorOnSurfaceVariant" />
-            </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/btnFilter"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_gravity="end"
-                android:layout_marginEnd="12dp"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center"
-                    app:srcCompat="@drawable/filter_ic"
-                    app:tint="?attr/colorOnSurface" />
-            </FrameLayout>
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/community_main_title"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="20sp" />
 
         </com.google.android.material.appbar.MaterialToolbar>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="10dp"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupFilters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAll"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/community_filter_all"
+                    android:textSize="14sp"
+                    app:checkedIconVisible="false"
+                    app:chipIcon="@drawable/group_ic"
+                    app:chipIconSize="18dp"
+                    app:chipIconVisible="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipOzganlar"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/community_filter_ozganlar"
+                    android:textSize="14sp"
+                    app:checkedIconVisible="false"
+                    app:chipIcon="@drawable/fire_ic"
+                    app:chipIconSize="18dp"
+                    app:chipIconVisible="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipFood"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/community_filter_food"
+                    android:textSize="14sp"
+                    app:checkedIconVisible="false"
+                    app:chipIcon="@drawable/food_ic"
+                    app:chipIconSize="18dp"
+                    app:chipIconVisible="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipUsers"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/community_filter_active_users"
+                    android:textSize="14sp"
+                    app:checkedIconVisible="false"
+                    app:chipIcon="@drawable/people_ic"
+                    app:chipIconSize="18dp"
+                    app:chipIconVisible="true" />
+
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
@@ -84,6 +121,17 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
+                <!-- Small top update indicator -->
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/progressTopSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorColor="?attr/colorPrimary"
+                    app:trackColor="@android:color/transparent" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvPosts"

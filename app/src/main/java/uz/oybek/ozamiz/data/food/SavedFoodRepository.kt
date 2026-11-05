@@ -12,11 +12,10 @@ import uz.oybek.ozamiz.data.firebase.FirebasePaths
 import uz.oybek.ozamiz.data.firebase.currentUserId
 import uz.oybek.ozamiz.data.firebase.generateKey
 import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.data.user.local.user
 
 object SavedFoodRepository {
 
-    private val reference: DatabaseReference get() = FirebasePaths.Database.savedFoods(user.uid)
+    private val reference: DatabaseReference get() = FirebasePaths.Database.savedFoods(currentUserId)
 
     fun getSavedFoods(): Flow<List<FoodLog>> = callbackFlow {
         val userId = currentUserId

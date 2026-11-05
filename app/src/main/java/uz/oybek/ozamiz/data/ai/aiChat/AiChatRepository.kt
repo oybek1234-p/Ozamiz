@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import uz.oybek.ozamiz.appContext
-import uz.oybek.ozamiz.data.ai.AiPromptBuilder
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatDatabase
 import uz.oybek.ozamiz.data.ai.aiChat.local.AiChatMessageEntity
 import uz.oybek.ozamiz.data.firebase.FirebasePaths
@@ -150,7 +149,7 @@ object AiChatRepository {
                 }
             }
 
-            val userContext = AiPromptBuilder.buildUserContext()
+            val userContext = ""
             val fullResponse = callChatFunction(text, historyList, userContext) ?: ""
 
             val finalCleanText =

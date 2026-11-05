@@ -38,13 +38,18 @@
 
     <!-- Health Grade Colors (Dark Mode) -->
     <color name="health_grade_excellent">#4ADE80</color>
-    <color name="health_grade_excellent_bg">#1B3D28</color>
-    <color name="health_grade_good">#6EE7B7</color>
-    <color name="health_grade_good_bg">#163A26</color>
+    <color name="health_grade_excellent_bg">#14532D</color>
+    <color name="health_grade_good">#4ADE80</color>
+    <color name="health_grade_good_bg">#14532D</color>
     <color name="health_grade_moderate">#FBBF24</color>
-    <color name="health_grade_moderate_bg">#3D2E0B</color>
+    <color name="health_grade_moderate_bg">#78350F</color>
     <color name="health_grade_caution">#FB923C</color>
-    <color name="health_grade_caution_bg">#3D2110</color>
+    <color name="health_grade_caution_bg">#7C2D12</color>
     <color name="health_grade_limit">#F87171</color>
-    <color name="health_grade_limit_bg">#3E1818</color>
+    <color name="health_grade_limit_bg">#7F1D1D</color>
+
+    <!-- Food Macro Grade Colors (Dark Mode) -->
+    <color name="macro_grade_good">#4ADE80</color>
+    <color name="macro_grade_moderate">#FBBF24</color>
+    <color name="macro_grade_bad">#F87171</color>
 </resources>

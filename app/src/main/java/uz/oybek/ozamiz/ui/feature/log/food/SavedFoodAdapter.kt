@@ -14,6 +14,7 @@ import uz.oybek.ozamiz.data.savedFood.model.SaveFoodModel
 
 class SavedFoodAdapter(
     private val onItemClick: (SaveFoodModel) -> Unit,
+    private val onAddClick: ((SaveFoodModel) -> Unit)? = null,
     private val onDeleteButtonClick: ((SaveFoodModel) -> Unit)? = null
 ) : ListAdapter<SaveFoodModel, SavedFoodAdapter.SavedFoodViewHolder>(SAVED_FOOD_DIFF_CALLBACK) {
 
@@ -36,6 +37,12 @@ class SavedFoodAdapter(
                 val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     getItem(position)?.let { food -> onItemClick(food) }
+                }
+            }
+            view.findViewById<View>(R.id.btn_add_saved)?.setOnClickListener {
+                val position = bindingAdapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    getItem(position)?.let { food -> onAddClick?.invoke(food) }
                 }
             }
             view.findViewById<View>(R.id.btn_delete_saved)?.setOnClickListener {

@@ -1,10 +1,12 @@
 package uz.oybek.ozamiz.ui.modelUtils
 
+import androidx.annotation.StringRes
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.appContext
 import uz.oybek.ozamiz.common.util.orZero
 import uz.oybek.ozamiz.common.util.readableFormat
 import uz.oybek.ozamiz.common.util.round
+import uz.oybek.ozamiz.data.analyzer.model.Macronutrient
 import kotlin.math.abs
 
 object NutritionFormatter {
@@ -41,6 +43,34 @@ object NutritionFormatter {
             appContext.getString(R.string.unit_weight_change_positive_format, absVal.readableFormat())
         } else {
             appContext.getString(R.string.unit_weight_change_negative_format, absVal.readableFormat())
+        }
+    }
+
+    /**
+     * Kichik vazn o'zgarishlari uchun avtomatik tarzda gramm yoki kilogramm formatini tanlaydi.
+     * Masalan: 1 kg dan kichik bo'lsa "-700 g", aks holda "-1.2 kg".
+     */
+    fun weightChangeDynamic(diff: Double?): String {
+        val safeDiff = diff.orZero().round()
+        val absVal = abs(safeDiff)
+
+        if (absVal < 0.01) {
+            return appContext.getString(R.string.unit_weight_kg_format, "0")
+        }
+
+        return if (absVal < 1.0) {
+            val grams = (absVal * 1000).toInt().toString()
+            if (safeDiff > 0) {
+                "+$grams gram"
+            } else {
+                "-$grams gram"
+            }
+        } else {
+            if (safeDiff > 0) {
+                appContext.getString(R.string.unit_weight_change_positive_format, absVal.readableFormat())
+            } else {
+                appContext.getString(R.string.unit_weight_change_negative_format, absVal.readableFormat())
+            }
         }
     }
 
@@ -128,6 +158,28 @@ object NutritionFormatter {
         return "$a $u".trim()
     }
 
+    /**
+     * Masalliq makrolari (oqsil, yog', uglevod) satrini formatlab qaytaradi.
+     *
+     * Example: "14 gr Oqsil • 18 gr Yog' • 46 gr Uglevod"
+     */
+    fun ingredientMacros(protein: Double?, fat: Double?, carbs: Double?): String {
+        val pStr = gr(protein)
+        val fStr = gr(fat)
+        val cStr = gr(carbs)
+        val pLabel = appContext.getString(R.string.protein)
+        val fLabel = appContext.getString(R.string.fat)
+        val cLabel = appContext.getString(R.string.carbs)
+        return "$pStr $pLabel • $fStr $fLabel • $cStr $cLabel"
+    }
+
+    /**
+     * Masalliq tavsiyasi (tip) formatlaydi.
+     */
+    fun ingredientTip(tip: String?): String {
+        return tip?.trim().orEmpty()
+    }
+
     // ==========================================
     // SUV (WATER)
     // ==========================================
@@ -160,4 +212,46 @@ object NutritionFormatter {
         val liters = ml.orZero() / 1000.0
         return appContext.getString(R.string.unit_nutrition_water_liters_format, liters.readableFormat())
     }
+
+    // ==========================================
+    // HAJM (CM)
+    // ==========================================
+
+    /**
+     * Hajm qiymatini "sm" bilan qaytaradi.
+     */
+    fun cm(value: Double?): String {
+        val safe = value.orZero().round()
+        return "${safe.readableFormat()} sm"
+    }
+
+    /**
+     * Hajm o'zgarishini ishora (+ / -) va "sm" bilan qaytaradi.
+     */
+    fun cmChange(diff: Double?): String {
+        val safeDiff = diff.orZero().round()
+        val absVal = abs(safeDiff)
+        if (absVal < 0.05) {
+            return "0 sm"
+        }
+        return if (safeDiff > 0) "+${absVal.readableFormat()} sm" else "-${absVal.readableFormat()} sm"
+    }
 }
+
+@androidx.annotation.StringRes
+fun Macronutrient.getTitleRes(): Int? = when (this) {
+    Macronutrient.PROTEIN -> R.string.food_macro_protein
+    Macronutrient.FIBER -> R.string.food_macro_fiber
+    Macronutrient.HEALTHY_CARBS -> R.string.food_macro_healthy_carbs
+    Macronutrient.MODERATE_CARBS,
+    Macronutrient.CARBS -> R.string.food_macro_moderate_carbs
+    Macronutrient.UNHEALTHY_CARBS -> R.string.food_macro_unhealthy_carbs
+    Macronutrient.HEALTHY_FAT -> R.string.food_macro_healthy_fat
+    Macronutrient.MODERATE_FAT -> R.string.food_macro_moderate_fat
+    Macronutrient.UNHEALTHY_FAT,
+    Macronutrient.FAT -> R.string.food_macro_unhealthy_fat
+    Macronutrient.UNKNOWN -> null
+}
+
+fun Macronutrient.getDisplayName(): String =
+    getTitleRes()?.let { appContext.getString(it) }.orEmpty()

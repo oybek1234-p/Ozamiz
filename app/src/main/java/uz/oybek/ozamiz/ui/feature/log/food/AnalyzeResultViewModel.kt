@@ -8,7 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -22,13 +21,17 @@ import uz.oybek.ozamiz.data.savedFood.api.SavedFoodRepo
 import uz.oybek.ozamiz.data.tracker.api.FoodTrackerRepo
 import uz.oybek.ozamiz.data.tracker.mapper.toSaveFoodRequest
 import uz.oybek.ozamiz.data.tracker.model.FoodModel
+import uz.oybek.ozamiz.data.tracker.model.MealType
 import uz.oybek.ozamiz.data.tracker.model.toRequest
 import uz.oybek.ozamiz.data.tracker.model.withIngredientAdded
 import uz.oybek.ozamiz.data.tracker.model.withIngredientRemoved
 import uz.oybek.ozamiz.data.tracker.model.withIngredientReplaced
 import uz.oybek.ozamiz.data.tracker.model.withPortionStep
 import uz.oybek.ozamiz.data.tracker.model.withScaledPortion
+import uz.oybek.ozamiz.data.tracker.session.GreatMealPrompt
+import uz.oybek.ozamiz.data.tracker.session.GreatMealPromptManager
 import uz.oybek.ozamiz.common.util.currentTime
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
 import uz.oybek.ozamiz.ui.utils.getArgs
 import java.util.Date
 import javax.inject.Inject
@@ -38,7 +41,9 @@ class AnalyzeResultViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val foodTrackerRepo: FoodTrackerRepo,
     private val savedFoodRepo: SavedFoodRepo,
-    private val foodAnalyzerRepo: FoodAnalyzerRepo
+    private val foodAnalyzerRepo: FoodAnalyzerRepo,
+    profileRepo: ProfileRepo,
+    private val greatMealPromptManager: GreatMealPromptManager,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AnalyzeResultUiState())
@@ -53,6 +58,8 @@ class AnalyzeResultViewModel @Inject constructor(
     private val args = savedStateHandle.getArgs<AnalyzeResultArgs>()
 
     init {
+        val isGain = profileRepo.currentUser.userGoal.isGain
+        _uiState.update { it.copy(isGainWeight = isGain) }
         when (args) {
             is AnalyzeResultArgs.ExistingLog -> {
                 loadLog(
@@ -66,7 +73,38 @@ class AnalyzeResultViewModel @Inject constructor(
                 startAnalyze(args)
             }
 
+            is AnalyzeResultArgs.SavedFoodDetails -> {
+                loadSavedFoodDetails(args)
+            }
+
             null -> Unit
+        }
+    }
+
+    private fun loadSavedFoodDetails(details: AnalyzeResultArgs.SavedFoodDetails) {
+        val now = if (details.timestamp > 0) Date(details.timestamp) else currentTime()
+        val model = FoodModel(
+            logId = "",
+            description = details.foodName,
+            calories = details.calories,
+            protein = details.protein ?: 0.0,
+            fat = details.fat ?: 0.0,
+            carbs = details.carbs ?: 0.0,
+            photoUrl = details.photoUrl,
+            mealType = details.mealType,
+            healthLevel = details.healthLevel ?: 0,
+            timestamp = now.time
+        )
+        _uiState.update {
+            it.copy(
+                logDate = now,
+                food = model,
+                mealType = model.mealType,
+                isLoading = false,
+                isAnalyzing = false,
+                isSaved = false,
+                isFavorite = true
+            )
         }
     }
 
@@ -87,13 +125,16 @@ class AnalyzeResultViewModel @Inject constructor(
         viewModelScope.launch {
             val model = foodTrackerRepo.getFoodLog(logId, date, userId)
             if (model != null) {
-                val isFav = savedFoodRepo.isFoodSaved(model.description)
                 _uiState.update {
                     it.copy(
                         food = model,
-                        isLoading = false,
-                        isFavorite = isFav
+                        mealType = model.mealType,
+                        isLoading = false
                     )
+                }
+                launch {
+                    val isFav = savedFoodRepo.isFoodSaved(model.description)
+                    _uiState.update { it.copy(isFavorite = isFav) }
                 }
             } else {
                 _uiState.update {
@@ -118,6 +159,7 @@ class AnalyzeResultViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 logDate = now,
+                mealType = mealType,
                 isAnalyzing = true,
                 isError = false,
                 isSaved = false,
@@ -130,12 +172,14 @@ class AnalyzeResultViewModel @Inject constructor(
                 imageUri = imageUri,
                 description = description,
                 meal = mealType,
-                date = now
+                date = now,
+                userContext = null
             )
             if (model != null) {
                 _uiState.update {
                     it.copy(
                         food = model,
+                        initialImageUri = model.photoUrl ?: it.initialImageUri,
                         isAnalyzing = false
                     )
                 }
@@ -183,6 +227,31 @@ class AnalyzeResultViewModel @Inject constructor(
                 )
             }
             if (res is BaseResult.Success) {
+                val isMainMeal = when (MealType.fromId(food.mealType, food.timestamp)) {
+                    MealType.BREAKFAST, MealType.LUNCH, MealType.DINNER -> true
+                    else -> false
+                }
+                val isGreatMeal = food.healthLevel >= 8 &&
+                        food.calories >= 200 &&
+                        isMainMeal &&
+                        food.ingredients.size >= 2 &&
+                        !food.photoUrl.isNullOrBlank()
+
+                if (isGreatMeal) {
+                    greatMealPromptManager.setPrompt(
+                        GreatMealPrompt(
+                            photoUrl = food.photoUrl.orEmpty(),
+                            foodName = food.description,
+                            calories = food.calories,
+                            protein = food.protein.toInt(),
+                            carbs = food.carbs.toInt(),
+                            fat = food.fat.toInt(),
+                            mealType = food.mealType,
+                            advice = food.advice,
+                            timestamp = food.timestamp
+                        )
+                    )
+                }
                 _events.send(AnalyzeResultEvent.Saved)
             } else {
                 _uiState.update { it.copy(isSaving = false) }
@@ -281,6 +350,14 @@ class AnalyzeResultViewModel @Inject constructor(
     fun updateProtein(protein: Double) = mutateFood { it.copy(protein = protein) }
     fun updateFat(fat: Double) = mutateFood { it.copy(fat = fat) }
     fun updateCarbs(carbs: Double) = mutateFood { it.copy(carbs = carbs) }
+    fun updateNutrition(calories: Int, protein: Double, carbs: Double, fat: Double) = mutateFood {
+        it.copy(
+            calories = calories,
+            protein = protein,
+            carbs = carbs,
+            fat = fat
+        )
+    }
     fun updateFoodItem(position: Int, item: AnalyzedIngredient) =
         mutateFood { it.withIngredientReplaced(position, item) }
 

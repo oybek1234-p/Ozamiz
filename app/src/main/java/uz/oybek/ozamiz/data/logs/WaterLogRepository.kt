@@ -25,7 +25,7 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
         }
         val success = super.add(log, date)
         if (success) {
-            LogRepository.updateSummary(
+            updateSummary(
                 date = date,
                 waterDelta = log.amountMl
             )
@@ -53,7 +53,7 @@ object WaterLogRepository : BaseLogRepository<WaterLog>() {
         }
 
         if (success && oldLog != null) {
-            LogRepository.updateSummary(
+            updateSummary(
                 date = date,
                 targetUid = userId,
                 waterDelta = -oldLog.amountMl

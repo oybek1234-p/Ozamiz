@@ -7,7 +7,7 @@
         android:title="Asosiy" />
 
     <item
-        android:id="@+id/menuListFragment"
+        android:id="@+id/dailyMenuPlannerFragment"
         android:icon="@drawable/food_ic"
         android:title="Menyular"
         android:visible="true" />

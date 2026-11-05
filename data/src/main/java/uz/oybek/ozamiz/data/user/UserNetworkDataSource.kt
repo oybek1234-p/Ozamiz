@@ -11,6 +11,7 @@ interface UserNetworkDataSource {
         lastUserId: String? = null
     ): BaseResult<List<User>, Exception?>
     fun observeUnreadMessages(userId: String): Flow<Int>
+    fun observeUser(userId: String): Flow<User>
     suspend fun setUnreadMessages(userId: String, count: Int): Boolean
     suspend fun updateLastSeenTime(userId: String, timestamp: Long): Boolean
     suspend fun syncUser(user: User): Boolean

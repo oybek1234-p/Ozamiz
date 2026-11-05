@@ -24,4 +24,9 @@
     <!-- Water & Exercise Semantic Attributes -->
     <attr name="colorWaterProgress" format="color" />
     <attr name="colorExerciseProgress" format="color" />
+
+    <!-- Food Macro Grade Semantic Attributes -->
+    <attr name="colorMacroGood" format="color" />
+    <attr name="colorMacroModerate" format="color" />
+    <attr name="colorMacroBad" format="color" />
 </resources>

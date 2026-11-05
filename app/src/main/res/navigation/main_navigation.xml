@@ -6,12 +6,6 @@
     app:startDestination="@id/home">
 
     <fragment
-        android:id="@+id/tasksFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.tasks.TasksFragment"
-        android:label="Vazifalar"
-        tools:layout="@layout/fragment_tasks" />
-
-    <fragment
         android:id="@+id/profileFragment"
         android:name="uz.oybek.ozamiz.ui.feature.profile.ProfileFragment"
         android:label="@string/profile_title"
@@ -246,13 +240,7 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
-        <action
-            android:id="@+id/action_home_to_aiMealRecommendationFragment"
-            app:destination="@id/aiMealRecommendationFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
+
         <action
             android:id="@+id/action_home_to_dailyGoalAnalysisFragment"
             app:destination="@id/dailyGoalAnalysisFragment"
@@ -369,6 +357,13 @@
             app:exitAnim="@anim/fragment_close_anim"
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
+        <action
+            android:id="@+id/action_logFoodFragment_to_mealConsultantResultFragment"
+            app:destination="@id/mealConsultantResultFragment"
+            app:enterAnim="@anim/fragment_open_anim"
+            app:exitAnim="@anim/fragment_close_anim"
+            app:popEnterAnim="@anim/fragment_pop_enter"
+            app:popExitAnim="@anim/fragment_pop_exit" />
     </fragment>
 
     <fragment
@@ -463,9 +458,6 @@
         android:label="Natija"
         tools:layout="@layout/bottom_sheet_calorie_result">
         <action
-            android:id="@+id/action_analyzeResultFragment_to_mealTipsFragment"
-            app:destination="@id/mealTipsFragment" />
-        <action
             android:id="@+id/action_analyzeResultFragment_to_aiFeedbackFragment"
             app:destination="@id/aiFeedbackFragment"
             app:popUpTo="@id/home"
@@ -489,6 +481,12 @@
         android:name="uz.oybek.ozamiz.ui.feature.log.food.AiFeedbackFragment"
         android:label="Maslahat"
         tools:layout="@layout/fragment_ai_feedback" />
+
+    <fragment
+        android:id="@+id/mealConsultantResultFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.consultant.MealConsultantResultFragment"
+        android:label="AI Maslahat"
+        tools:layout="@layout/fragment_meal_consultant_result" />
 
     <fragment
         android:id="@+id/selectExerciseFragment"
@@ -532,6 +530,11 @@
         android:id="@+id/photoUploadInfoFragment"
         android:name="uz.oybek.ozamiz.ui.feature.log.photo.PhotoUploadInfoFragment"
         android:label="PhotoUploadInfoFragment" />
+    <fragment
+        android:id="@+id/weightLogSuccessFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.log.photo.WeightLogSuccessFragment"
+        android:label="WeightLogSuccessFragment"
+        tools:layout="@layout/fragment_weight_log_success" />
     <fragment
         android:id="@+id/weightPhotoHistoryFragment"
         android:name="uz.oybek.ozamiz.ui.feature.log.photo.WeightPhotoHistoryFragment"
@@ -743,17 +746,16 @@
         tools:layout="@layout/fragment_lipids_guide" />
 
     <fragment
+        android:id="@+id/waterGuideFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.WaterGuideFragment"
+        android:label="@string/water_guide_title"
+        tools:layout="@layout/fragment_water_guide" />
+
+    <fragment
         android:id="@+id/addMenuFragment"
         android:name="uz.oybek.ozamiz.ui.feature.menu.add.AddMenuFragment"
         android:label="AddMenuFragment"
         tools:layout="@layout/fragment_add_menu">
-        <action
-            android:id="@+id/action_addMenuFragment_to_categoryListFragment"
-            app:destination="@id/categoryListFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
         <action
             android:id="@+id/action_addMenuFragment_to_categorySelectionFragment"
             app:destination="@id/categorySelectionFragment"
@@ -768,26 +770,6 @@
         android:name="uz.oybek.ozamiz.ui.feature.menu.add.CategorySelectionFragment"
         android:label="CategorySelectionFragment"
         tools:layout="@layout/fragment_category_select" />
-
-    <fragment
-        android:id="@+id/categoryListFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.menu.category.CategoryListFragment"
-        android:label="CategoryListFragment"
-        tools:layout="@layout/fragment_category_list">
-        <action
-            android:id="@+id/action_categoryListFragment_to_categoryAddFragment"
-            app:destination="@id/categoryAddFragment"
-            app:enterAnim="@anim/fragment_open_anim"
-            app:exitAnim="@anim/fragment_close_anim"
-            app:popEnterAnim="@anim/fragment_pop_enter"
-            app:popExitAnim="@anim/fragment_pop_exit" />
-    </fragment>
-    
-    <fragment
-        android:id="@+id/categoryAddFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.menu.category.CategoryAddFragment"
-        android:label="CategoryAddFragment"
-        tools:layout="@layout/fragment_category_add" />
 
     <fragment
         android:id="@+id/menuDetailFragment"
@@ -876,20 +858,6 @@
         tools:layout="@layout/fragment_level" />
 
 
-    <fragment
-        android:id="@+id/mealTipsFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.log.food.MealTipsFragment"
-        android:label="Tavsiyalar"
-        tools:layout="@layout/fragment_meal_tips" />
-
-
-    <fragment
-        android:id="@+id/aiMealRecommendationFragment"
-        android:name="uz.oybek.ozamiz.ui.feature.home.AiMealRecommendationFragment"
-        android:label="Tavsiyalar"
-        tools:layout="@layout/fragment_ai_meal_recommendations" />
-
-
 
     <fragment
         android:id="@+id/exercises"
@@ -941,5 +909,11 @@
             app:popEnterAnim="@anim/fragment_pop_enter"
             app:popExitAnim="@anim/fragment_pop_exit" />
     </fragment>
+
+    <fragment
+        android:id="@+id/dailyMenuPlannerFragment"
+        android:name="uz.oybek.ozamiz.ui.feature.menu.plan.DailyMenuPlannerFragment"
+        android:label="DailyMenuPlannerFragment"
+        tools:layout="@layout/fragment_daily_menu_planner" />
 
 </navigation>

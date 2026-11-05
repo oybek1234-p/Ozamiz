@@ -4,18 +4,27 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.logs.LogRepository
-import uz.oybek.ozamiz.data.user.UserProfileRepository
 import uz.oybek.ozamiz.common.util.readableFormat
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.data.tracker.api.DailyTrackerRepo
 import uz.oybek.ozamiz.databinding.FragmentDailyGoalAnalysisBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
 import java.util.Date
+import javax.inject.Inject
 import kotlin.math.abs
 
+@AndroidEntryPoint
 class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>() {
+
+    @Inject
+    lateinit var dailyTrackerRepo: DailyTrackerRepo
+
+    @Inject
+    lateinit var profileRepo: ProfileRepo
 
     init {
         showBottomSheet = false
@@ -42,9 +51,9 @@ class DailyGoalAnalysisFragment : BaseFragment<FragmentDailyGoalAnalysisBinding>
 
     private fun loadData(bind: FragmentDailyGoalAnalysisBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val user = UserProfileRepository.user
-            val isGainWeight = user.isGainWeight
-            val summary = LogRepository.getDailySummarySync(Date(), forceRefresh = true)
+            val user = profileRepo.currentUser
+            val isGainWeight = user.userGoal.isGain
+            val summary = dailyTrackerRepo.getDailySummary(Date())
             if (!isAdded || isDetached || context == null) return@launch
 
             val targetCals = if (user.targetCalories > 0) user.targetCalories else 2000

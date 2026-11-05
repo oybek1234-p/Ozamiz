@@ -19,18 +19,26 @@
             android:layout_height="48dp"
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Close"
+            android:contentDescription="@string/cancel"
             android:src="@drawable/close_ic"
             app:tint="?attr/colorOnSurface" />
 
-        <TextView
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_food_list"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:fontFamily="@font/roboto_bold"
-            android:text="Shaxsiy ozish rejasi"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="18sp" />
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:fontFamily="@font/roboto_medium"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="12dp"
+            android:text="@string/premium_sheet_food_list"
+            android:textAllCaps="false"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="13sp" />
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -45,44 +53,55 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="12dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="16dp">
 
+            <!-- Hero Badge Header (Centered Title at Top) -->
             <LinearLayout
-                android:id="@+id/layout_verification_pending"
+                android:id="@+id/layout_hero"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:paddingVertical="40dp"
-                android:visibility="gone">
+                android:paddingVertical="20dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⌛"
-                    android:textSize="48sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="@font/roboto_bold"
+                    android:background="@drawable/bg_premium_card"
                     android:gravity="center"
-                    android:text="24 soat ichida chekni tekshirib, premiumga o'tkazamiz"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="18sp" />
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="20dp"
+                    android:paddingVertical="10dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:contentDescription="@string/premium_hero_badge"
+                        android:src="@drawable/star_ic"
+                        app:tint="#FFD700" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:fontFamily="@font/roboto_bold"
+                        android:text="@string/premium_hero_badge"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- Benefits List: Clean vector icons and generous horizontal padding -->
+            <!-- Benefits List -->
             <LinearLayout
                 android:id="@+id/layout_benefits"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingVertical="4dp">
+                android:paddingVertical="8dp">
 
-                <!-- Benefit 1 -->
+                <!-- Benefit 1: Camera AI -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -91,9 +110,9 @@
                     android:paddingVertical="14dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -102,6 +121,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:layout_gravity="center"
+                            android:contentDescription="@string/premium_benefit_camera_title"
                             android:src="@drawable/camera_ic"
                             app:tint="?attr/colorPrimary" />
                     </com.google.android.material.card.MaterialCardView>
@@ -109,7 +129,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -117,7 +137,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="Kaloriyani rasmga olib sanang"
+                            android:text="@string/premium_benefit_camera_title"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp" />
 
@@ -126,7 +146,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Ovqatni suratga oling, AI kaloriya va oqsillarni o'zi hisoblaydi"
+                            android:text="@string/premium_benefit_camera_desc"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -135,10 +155,10 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="?attr/colorOutlineVariant"
-                    android:alpha="0.25" />
+                    android:alpha="0.15"
+                    android:background="?attr/colorOutlineVariant" />
 
-                <!-- Benefit 2 -->
+                <!-- Benefit 2: AI Dietitian -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -147,9 +167,9 @@
                     android:paddingVertical="14dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -158,6 +178,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:layout_gravity="center"
+                            android:contentDescription="@string/premium_benefit_ai_title"
                             android:src="@drawable/person_ic"
                             app:tint="?attr/colorPrimary" />
                     </com.google.android.material.card.MaterialCardView>
@@ -165,7 +186,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -173,7 +194,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="Sun'iy intellekt dietologi"
+                            android:text="@string/premium_benefit_ai_title"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp" />
 
@@ -182,7 +203,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Sizning maqsadingizga mos kunlik shaxsiy tavsiyalar beradi"
+                            android:text="@string/premium_benefit_ai_desc"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -191,10 +212,10 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="?attr/colorOutlineVariant"
-                    android:alpha="0.25" />
+                    android:alpha="0.15"
+                    android:background="?attr/colorOutlineVariant" />
 
-                <!-- Benefit 3 -->
+                <!-- Benefit 3: Weight Tracking -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -203,9 +224,9 @@
                     android:paddingVertical="14dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -214,6 +235,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:layout_gravity="center"
+                            android:contentDescription="@string/premium_benefit_track_title"
                             android:src="@drawable/trending"
                             app:tint="?attr/colorPrimary" />
                     </com.google.android.material.card.MaterialCardView>
@@ -221,7 +243,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -229,7 +251,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="Vazningizni kuzatib boring"
+                            android:text="@string/premium_benefit_track_title"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp" />
 
@@ -238,7 +260,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Natijalar va vazn o'zgarishini aniq tahlillar bilan ko'ring"
+                            android:text="@string/premium_benefit_track_desc"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -247,10 +269,10 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="?attr/colorOutlineVariant"
-                    android:alpha="0.25" />
+                    android:alpha="0.15"
+                    android:background="?attr/colorOutlineVariant" />
 
-                <!-- Benefit 4 -->
+                <!-- Benefit 4: No Ads -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -259,9 +281,9 @@
                     android:paddingVertical="14dp">
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
                         app:cardCornerRadius="12dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
@@ -270,6 +292,7 @@
                             android:layout_width="22dp"
                             android:layout_height="22dp"
                             android:layout_gravity="center"
+                            android:contentDescription="@string/premium_benefit_no_ads_title"
                             android:src="@drawable/block_24px"
                             app:tint="?attr/colorPrimary" />
                     </com.google.android.material.card.MaterialCardView>
@@ -277,7 +300,7 @@
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
@@ -285,7 +308,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/roboto_bold"
-                            android:text="Reklamalar olib tashlanadi"
+                            android:text="@string/premium_benefit_no_ads_title"
                             android:textColor="?attr/colorOnSurface"
                             android:textSize="15sp" />
 
@@ -294,27 +317,29 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
                             android:fontFamily="@font/roboto_regular"
-                            android:text="Ilovadan uzluksiz va chalg'ishlarsiz foydalaning"
+                            android:text="@string/premium_benefit_no_ads_desc"
                             android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="13sp" />
                     </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Pinned Plan Selection & Action Button -->
+    <!-- Pinned Bottom Container: Plan Selection + Action Button -->
     <LinearLayout
         android:id="@+id/layout_pinned_bottom_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="?attr/colorSurfaceContainer"
+        android:background="?attr/colorSurface"
+        android:elevation="8dp"
         android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="16dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="20dp">
 
         <LinearLayout
             android:id="@+id/layout_selection"
@@ -325,11 +350,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="12dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="Rejani tanlang"
+                android:text="@string/premium_plan_select_title"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp" />
+                android:textSize="16sp" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -341,112 +366,152 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Monthly Plan Card (Top, Primary Option) -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:id="@+id/card_monthly"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="0dp"
-                        app:strokeColor="?attr/colorOutlineVariant"
-                        app:strokeWidth="1dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="16dp">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:fontFamily="@font/roboto_bold"
-                                    android:text="Oylik reja"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="16sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="2dp"
-                                    android:fontFamily="@font/roboto_regular"
-                                    android:text="Sinov uchun qulay"
-                                    android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="13sp" />
-                            </LinearLayout>
-
-                            <TextView
-                                android:id="@+id/text_monthly_price"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/roboto_bold"
-                                android:textColor="?attr/colorOnSurface"
-                                android:textSize="16sp"
-                                tools:text="29,000 sum / oy" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Yearly Plan Card (Bottom Option) -->
+                    <!-- Yearly Plan Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/card_yearly"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                        android:layout_marginBottom="10dp"
+                        app:cardBackgroundColor="?attr/colorSurface"
                         app:cardCornerRadius="16dp"
                         app:cardElevation="0dp"
                         app:strokeColor="?attr/colorOutlineVariant"
                         app:strokeWidth="1dp">
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:padding="16dp">
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="14dp">
+
+                            <!-- Radio / Selection Indicator -->
+                            <ImageView
+                                android:id="@+id/img_yearly_radio"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:contentDescription="@string/premium_plan_yearly_title"
+                                android:src="@drawable/check_circle_ic"
+                                app:tint="?attr/colorPrimary" />
 
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:layout_toStartOf="@+id/text_yearly_monthly_equivalent"
+                                android:layout_toEndOf="@id/img_yearly_radio"
                                 android:orientation="vertical">
 
-                                <TextView
+                                <LinearLayout
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:fontFamily="@font/roboto_bold"
-                                    android:text="Yillik reja"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:textSize="16sp" />
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <TextView
+                                        android:id="@+id/text_yearly_title"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:fontFamily="@font/roboto_bold"
+                                        android:text="@string/premium_plan_yearly_title"
+                                        android:textColor="?attr/colorOnSurface"
+                                        android:textSize="16sp" />
+
+                                </LinearLayout>
 
                                 <TextView
                                     android:id="@+id/text_yearly_price"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="2dp"
-                                    android:fontFamily="@font/roboto_regular"
+                                    android:fontFamily="@font/roboto_medium"
                                     android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="13sp"
-                                    tools:text="149,000 sum / yil" />
+                                    android:textSize="14sp"
+                                    tools:text="149,000 yiliga" />
                             </LinearLayout>
 
                             <TextView
                                 android:id="@+id/text_yearly_monthly_equivalent"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:fontFamily="@font/roboto_bold"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="15sp"
+                                tools:text="12,400 oyiga" />
+
+                        </RelativeLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Monthly Plan Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_monthly"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="?attr/colorSurface"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="?attr/colorOutlineVariant"
+                        app:strokeWidth="1dp">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="16dp"
+                            android:paddingVertical="14dp">
+
+                            <!-- Radio / Selection Indicator -->
+                            <ImageView
+                                android:id="@+id/img_monthly_radio"
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_alignParentStart="true"
+                                android:layout_centerVertical="true"
+                                android:contentDescription="@string/premium_plan_monthly_title"
+                                android:src="@drawable/check_circle_ic"
+                                app:tint="?attr/colorOutlineVariant" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:layout_toStartOf="@+id/text_monthly_price"
+                                android:layout_toEndOf="@id/img_monthly_radio"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/text_monthly_title"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:text="@string/premium_plan_monthly_title"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:fontFamily="@font/roboto_medium"
+                                    android:text="@string/premium_plan_monthly_sub"
+                                    android:textColor="?attr/colorOnSurfaceVariant"
+                                    android:textSize="14sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/text_monthly_price"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
                                 android:fontFamily="@font/roboto_bold"
                                 android:textColor="?attr/colorOnSurface"
-                                android:textSize="16sp"
-                                tools:text="12,400 sum / oy" />
-                        </LinearLayout>
+                                android:textSize="15sp"
+                                tools:text="39,000 oyiga" />
+
+                        </RelativeLayout>
                     </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
@@ -461,34 +526,17 @@
                     app:indicatorSize="28dp"
                     app:trackThickness="3dp" />
             </FrameLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_pinned_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:orientation="vertical">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button"
-                style="@style/Widget.Material3.Button"
+                style="@style/FilledButton"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
+                android:layout_marginTop="16dp"
                 android:fontFamily="@font/roboto_bold"
-                android:text="Sotib olish"
-                android:textSize="16sp"
-                app:cornerRadius="16dp" />
+                android:text="@string/premium_btn_continue"
+                android:textSize="16sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="6dp"
-                android:alpha="0.5"
-                android:text="Istalgan vaqtda bekor qilish imkoniyati"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:textSize="11sp" />
         </LinearLayout>
 
     </LinearLayout>

@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import uz.oybek.ozamiz.common.result.BaseResult
@@ -15,6 +16,7 @@ import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.data.utils.awaitResult
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 internal class UserNetworkDataSourceImpl @Inject constructor(
@@ -24,18 +26,28 @@ internal class UserNetworkDataSourceImpl @Inject constructor(
 
     override suspend fun getUser(userId: String): BaseResult<User, Exception?> {
         if (userId.isBlank()) return BaseResult.Failure()
-        return when (val result = database.getReference(DatabasePaths.Realtime.USERS).child(userId).get().awaitResult()) {
-            is BaseResult.Success -> {
-                val snapshot = result.data
-                if (snapshot.exists()) {
-                    val user = UserMapper.fromSnapshot(snapshot)
-                    BaseResult.Success(user)
-                } else {
-                    BaseResult.Failure(UserNotFoundException())
+        val ref = database.getReference(DatabasePaths.Realtime.USERS).child(userId)
+        var lastError: Exception? = null
+        for (attempt in 0..2) {
+            when (val result = ref.get().awaitResult()) {
+                is BaseResult.Success -> {
+                    val snapshot = result.data
+                    return if (snapshot.exists()) {
+                        val user = UserMapper.fromSnapshot(snapshot)
+                        BaseResult.Success(user)
+                    } else {
+                        BaseResult.Failure(UserNotFoundException())
+                    }
+                }
+                is BaseResult.Failure -> {
+                    lastError = result.error
+                    if (attempt < 2) {
+                        delay((1000L * (attempt + 1)).milliseconds)
+                    }
                 }
             }
-            is BaseResult.Failure -> BaseResult.Failure(result.error)
         }
+        return BaseResult.Failure(lastError)
     }
 
     override suspend fun getUsers(
@@ -64,7 +76,6 @@ internal class UserNetworkDataSourceImpl @Inject constructor(
         val ref = database.getReference(DatabasePaths.Realtime.USERS)
             .child(userId)
             .child(User::unreadMessages.name)
-        ref.keepSynced(true)
         val listener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val count = (snapshot.value as? Number)?.toInt().orZero()
@@ -73,6 +84,32 @@ internal class UserNetworkDataSourceImpl @Inject constructor(
 
             override fun onCancelled(error: DatabaseError) {
                 close()
+            }
+        }
+
+        ref.addValueEventListener(listener)
+
+        awaitClose {
+            ref.removeEventListener(listener)
+        }
+    }
+
+    override fun observeUser(userId: String): Flow<User> = callbackFlow {
+        if (userId.isBlank()) {
+            close()
+            return@callbackFlow
+        }
+        val ref = database.getReference(DatabasePaths.Realtime.USERS).child(userId)
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    val user = UserMapper.fromSnapshot(snapshot)
+                    trySend(user)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                close(error.toException())
             }
         }
 

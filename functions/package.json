@@ -8,7 +8,9 @@
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
     "deploy:analyzeFood": "firebase deploy --only functions:analyzeFood",
+    "deploy:analyzeFoodVer2": "firebase deploy --only functions:analyzeFoodVer2",
     "deploy:chat": "firebase deploy --only functions:chatWithDietolog",
+    "deploy:chatV2": "firebase deploy --only functions:chatWithDietologV2",
     "deploy:notifications": "firebase deploy --only functions:onPostLiked,functions:onCommentCreated,functions:onCommentLiked,functions:onUserStatusChanged",
     "logs": "firebase functions:log"
   },

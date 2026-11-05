@@ -3,25 +3,31 @@ package uz.oybek.ozamiz.ui.feature.premium
 import androidx.annotation.Keep
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.firebase.uploader.ImageUploader
-import uz.oybek.ozamiz.data.user.AdminRepository
-import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.data.premium.api.AdminPremiumRepo
+import uz.oybek.ozamiz.data.profile.model.User
+import javax.inject.Inject
 
 @Keep
 data class AdminPaymentVerificationDetailUiState(
     val isLoading: Boolean = true,
     val user: User? = null,
-    val errorMessage: String? = null,
+    val errorMessageResId: Int? = null,
     val isProcessing: Boolean = false,
     val verificationComplete: Boolean = false
 )
 
-class AdminPaymentVerificationDetailViewModel : ViewModel() {
+@HiltViewModel
+class AdminPaymentVerificationDetailViewModel @Inject constructor(
+    private val adminPremiumRepo: AdminPremiumRepo
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdminPaymentVerificationDetailUiState())
     val uiState: StateFlow<AdminPaymentVerificationDetailUiState> = _uiState.asStateFlow()
@@ -29,17 +35,32 @@ class AdminPaymentVerificationDetailViewModel : ViewModel() {
     private var currentUserData: User? = null
 
     fun loadUserDetails(userId: String) {
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+        _uiState.update { it.copy(isLoading = true, errorMessageResId = null) }
         viewModelScope.launch {
-            val foundUser = AdminRepository.getAdminUser(userId)
-            if (foundUser != null && foundUser.paymentChecking) {
-                currentUserData = foundUser
-                _uiState.update {
-                    it.copy(isLoading = false, user = foundUser)
+            when (val result = adminPremiumRepo.getAdminUser(userId)) {
+                is BaseResult.Success -> {
+                    val foundUser = result.data
+                    if (foundUser.paymentChecking) {
+                        currentUserData = foundUser
+                        _uiState.update {
+                            it.copy(isLoading = false, user = foundUser)
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessageResId = R.string.premium_user_not_pending
+                            )
+                        }
+                    }
                 }
-            } else {
-                _uiState.update {
-                    it.copy(isLoading = false, errorMessage = "Foydalanuvchi topilmadi yoki tekshiruvda emas.")
+                is BaseResult.Failure -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessageResId = R.string.premium_user_not_pending
+                        )
+                    }
                 }
             }
         }
@@ -47,32 +68,44 @@ class AdminPaymentVerificationDetailViewModel : ViewModel() {
 
     fun processPaymentVerification(approve: Boolean) {
         val userToVerify = currentUserData ?: return
-        _uiState.update { it.copy(isProcessing = true, errorMessage = null) }
+        _uiState.update { it.copy(isProcessing = true, errorMessageResId = null) }
 
         viewModelScope.launch {
-            // Approve/Reject Logic
-            AdminRepository.setPremium(userToVerify.uid, approve, approve, userToVerify.isPremiumYearly)
+            val result = adminPremiumRepo.verifyPayment(
+                userId = userToVerify.uid,
+                approve = approve,
+                isYearly = userToVerify.isPremiumYearly,
+                checkPhotoUrl = userToVerify.paymentCheckPhotoUrl
+            )
 
-            if (!approve && !userToVerify.paymentCheckPhotoUrl.isNullOrEmpty()) {
-                ImageUploader.deleteImage(userToVerify.paymentCheckPhotoUrl)
-            }
-
-            _uiState.update {
-                it.copy(
-                    isProcessing = false,
-                    verificationComplete = true,
-                    user = userToVerify.copy(
-                        premium = approve,
-                        paymentChecking = false,
-                        paymentCheckPhotoUrl = if(approve) userToVerify.paymentCheckPhotoUrl else null
-                    )
-                )
+            when (result) {
+                is BaseResult.Success -> {
+                    _uiState.update {
+                        it.copy(
+                            isProcessing = false,
+                            verificationComplete = true,
+                            user = userToVerify.copy(
+                                premium = approve,
+                                paymentChecking = false,
+                                paymentCheckPhotoUrl = if (approve) userToVerify.paymentCheckPhotoUrl else null
+                            )
+                        )
+                    }
+                }
+                is BaseResult.Failure -> {
+                    _uiState.update {
+                        it.copy(
+                            isProcessing = false,
+                            errorMessageResId = R.string.error_upload_check_photo
+                        )
+                    }
+                }
             }
         }
     }
 
     fun clearError() {
-        _uiState.update { it.copy(errorMessage = null) }
+        _uiState.update { it.copy(errorMessageResId = null) }
     }
 
     fun resetVerificationCompleteFlag() {

@@ -12,7 +12,9 @@ import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentWeightPhotoHistoryBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class WeightPhotoHistoryFragment : BaseFragment<FragmentWeightPhotoHistoryBinding>() {
 
     private val viewModel: WeightPhotoHistoryViewModel by viewModels()

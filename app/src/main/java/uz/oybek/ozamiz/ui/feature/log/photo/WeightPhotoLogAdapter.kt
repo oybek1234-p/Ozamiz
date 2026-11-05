@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import uz.oybek.ozamiz.data.logs.model.WeightLog
+import uz.oybek.ozamiz.data.tracker.weight.model.WeightLog
 import uz.oybek.ozamiz.common.util.DateFormatter
 import uz.oybek.ozamiz.databinding.ItemWeightPhotoLogBinding
 import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter

@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -119,6 +120,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
         val layoutManager = LinearLayoutManager(requireContext())
         recyclerSearchResults.layoutManager = layoutManager
         recyclerSearchResults.setHasFixedSize(true)
+        adapter.stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
         recyclerSearchResults.adapter = adapter
 
         adapter.addOnPagesUpdatedListener {
@@ -270,7 +272,7 @@ class SearchFoodFragment : BaseFragment<FragmentSearchFoodBinding>() {
         val currentMealType = viewModel.uiState.value.mealType
         FoodSelectionBottomSheet(
             foodItem = foodItem, mealType = currentMealType, onLogAdded = { log ->
-                viewModel.logFoodFromSelection(log)
+                viewModel.logFoodFromSelection(log, foodItem.id)
                 hideSoftInput(requireActivity())
             }).show(parentFragmentManager, null)
     }

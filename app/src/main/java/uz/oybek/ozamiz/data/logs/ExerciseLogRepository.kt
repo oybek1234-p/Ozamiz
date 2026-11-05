@@ -31,7 +31,7 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
         }
         val success = super.add(log, date)
         if (success) {
-            LogRepository.updateSummary(
+            updateSummary(
                 date = date,
                 exerciseDelta = log.caloriesBurned
             )
@@ -60,7 +60,7 @@ object ExerciseLogRepository : BaseLogRepository<ExerciseLog>() {
         }
 
         if (success && oldLog != null) {
-            LogRepository.updateSummary(
+            updateSummary(
                 date = date,
                 targetUid = userId,
                 exerciseDelta = -oldLog.caloriesBurned

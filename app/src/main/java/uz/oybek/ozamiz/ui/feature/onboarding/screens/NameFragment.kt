@@ -10,6 +10,14 @@ import uz.oybek.ozamiz.ui.utils.showKeyboard
 class NameFragment
     : OnBoardingChildFragment<FragmentNameBinding>() {
     override fun viewCreated(bind: FragmentNameBinding) {
+        val isMale = viewModel.uiState.value.isMale
+        val nameHelperRes = if (isMale) {
+            R.string.onboarding_name_helper_male
+        } else {
+            R.string.onboarding_name_helper_female
+        }
+        bind.textInput.helperText = getString(nameHelperRes)
+
         val currentName = viewModel.uiState.value.user.name
         if (currentName.isNotEmpty()) {
             bind.textInput.editText?.setText(currentName)

@@ -7,8 +7,8 @@
     android:layout_marginHorizontal="12dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="6dp"
-    app:cardBackgroundColor="?attr/colorSurfaceContainer"
-    app:cardCornerRadius="20dp"
+    app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+    app:cardCornerRadius="16dp"
     app:cardElevation="0dp"
     app:strokeColor="?attr/colorSurfaceContainerHigh"
     app:strokeWidth="1dp">
@@ -28,17 +28,15 @@
             android:paddingTop="10dp"
             android:paddingBottom="6dp">
 
-            <!-- User Info Clickable Area (Container with ripple) -->
+            <!-- User Info Clickable Area -->
             <LinearLayout
                 android:id="@+id/layoutUserInfo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/bg_rounded_soft"
-                android:backgroundTint="@android:color/transparent"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="6dp">
@@ -73,14 +71,46 @@
                             android:textSize="15sp"
                             tools:text="Oybek" />
 
-                        <ImageView
-                            android:id="@+id/imgPremium"
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:layout_marginStart="4dp"
+                        <LinearLayout
+                            android:id="@+id/layoutPremiumBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
                             android:visibility="gone"
-                            app:srcCompat="@drawable/star_ic"
-                            app:tint="?attr/colorStreakActive"
+                            tools:visibility="visible">
+
+                            <ImageView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                app:srcCompat="@drawable/star_ic"
+                                app:tint="@color/yellow" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="3dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/premium_badge"
+                                android:textColor="@color/yellow"
+                                android:textSize="10sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvNewBadge"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_rounded_soft"
+                            android:backgroundTint="#4CAF50"
+                            android:fontFamily="@font/roboto_bold"
+                            android:paddingHorizontal="7dp"
+                            android:paddingVertical="2dp"
+                            android:text="Yangi"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp"
+                            android:visibility="gone"
                             tools:visibility="visible" />
 
                         <TextView
@@ -108,6 +138,18 @@
                         android:textColor="?attr/colorOutline"
                         android:textSize="12sp"
                         tools:text="2 soat oldin" />
+
+                    <TextView
+                        android:id="@+id/tvAuthorStats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="@font/roboto_medium"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="11sp"
+                        android:visibility="gone"
+                        tools:text="🔥 4.5 kg ozgan • ⚡ 18 kundan beri shug'ullanmoqda"
+                        tools:visibility="visible" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -139,54 +181,96 @@
             tools:text="Ertalabki nonushta rejasi"
             tools:visibility="visible" />
 
-        <!-- Post Description -->
-        <TextView
-            android:id="@+id/tvPostDescription"
+        <!-- Post Description Container -->
+        <LinearLayout
+            android:id="@+id/layoutPostDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="12dp"
-            android:lineSpacingMultiplier="1.25"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="14sp"
-            tools:text="Bugun ertalab tuxum, bodring va tvorog yedim. Kunni ajoyib boshladim!" />
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
 
-        <!-- Media Container -->
+            <TextView
+                android:id="@+id/tvPostDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:lineSpacingMultiplier="1.25"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="14sp"
+                tools:text="Bugun ertalab tuxum, bodring va tvorog yedim. Kunni ajoyib boshladim!" />
+
+            <TextView
+                android:id="@+id/tvReadMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/community_post_read_more"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="13sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <!-- Media Container (No Inner Border) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/layoutMediaContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="14dp"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="0dp"
-            app:strokeColor="?attr/colorSurfaceContainerHigh"
-            app:strokeWidth="1dp"
+            android:layout_marginBottom="10dp"
             android:visibility="gone"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
             tools:visibility="visible">
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <!-- Single Photo (Food / General) -->
-                <ImageView
-                    android:id="@+id/imgSinglePhoto"
+                <!-- Single Photo Container -->
+                <FrameLayout
+                    android:id="@+id/layoutSinglePhotoContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:scaleType="centerCrop"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorSurfaceContainerLow"
                     android:visibility="gone"
-                    tools:src="@drawable/placeholder_food"
-                    tools:visibility="visible" />
+                    tools:visibility="visible">
+
+                    <ImageView
+                        android:id="@+id/imgSinglePhotoBlur"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:alpha="0.35"
+                        android:visibility="gone"
+                        tools:src="@drawable/placeholder_food"
+                        tools:visibility="visible" />
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imgSinglePhoto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"
+                        app:shapeAppearance="@style/RadiusImageView12"
+                        tools:src="@drawable/placeholder_food"
+                        tools:visibility="visible" />
+
+                </FrameLayout>
 
                 <!-- Photo Comparison (Weight Loss: Before & After) -->
                 <LinearLayout
-                    android:id="@+id/layoutPhotoComparison"
+                    android:id="@+id/layoutPhotoComparisonContainer"
                     android:layout_width="match_parent"
                     android:layout_height="260dp"
                     android:orientation="horizontal"
                     android:visibility="gone"
-                    tools:visibility="gone">
+                    tools:visibility="visible">
 
                     <FrameLayout
                         android:layout_width="0dp"
@@ -250,50 +334,46 @@
             </FrameLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.divider.MaterialDivider
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginHorizontal="16dp"
-            app:dividerColor="?attr/colorSurfaceContainerHigh" />
-
-        <!-- Post Actions Area (Likes & Comments) -->
+        <!-- Post Actions Area (Likes & Comments - Clean & Transparent) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingHorizontal="14dp"
-            android:paddingVertical="8dp">
+            android:paddingTop="2dp"
+            android:paddingBottom="10dp">
 
             <!-- Like Button -->
             <LinearLayout
                 android:id="@+id/btnLike"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:background="@drawable/bg_rounded_soft"
-                android:backgroundTint="?attr/colorSurfaceContainerLow"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="14dp">
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp">
 
                 <ImageView
                     android:id="@+id/imgLike"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
                     app:srcCompat="@drawable/like_ic"
                     app:tint="?attr/colorOnSurface" />
 
+                <!-- Text format: "1 Yoqdi", "14 Foydali", "5 Tabriklayman" -->
                 <TextView
-                    android:id="@+id/tvLikesCount"
+                    android:id="@+id/tvLikeAction"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
-                    android:fontFamily="@font/roboto_bold"
+                    android:fontFamily="@font/roboto_medium"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="13sp"
-                    tools:text="14" />
+                    android:textSize="13.5sp"
+                    tools:text="1 Yoqdi" />
             </LinearLayout>
 
             <!-- Comments Button -->
@@ -301,31 +381,33 @@
                 android:id="@+id/btnComments"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_rounded_soft"
-                android:backgroundTint="?attr/colorSurfaceContainerLow"
+                android:layout_marginStart="14dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="14dp">
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp">
 
                 <ImageView
                     android:id="@+id/imgComment"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
                     app:srcCompat="@drawable/comment_ic"
                     app:tint="?attr/colorOnSurface" />
 
+                <!-- Text format: "8 Fikrlar" or "Fikrlar" -->
                 <TextView
-                    android:id="@+id/tvCommentsCount"
+                    android:id="@+id/tvCommentLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
-                    android:fontFamily="@font/roboto_bold"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="@string/community_post_action_comments"
                     android:textColor="?attr/colorOnSurface"
-                    android:textSize="13sp"
-                    tools:text="8" />
+                    android:textSize="13.5sp"
+                    tools:text="8 Fikrlar" />
             </LinearLayout>
 
         </LinearLayout>

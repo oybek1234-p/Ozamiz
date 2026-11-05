@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.common.util.SearchNormalizer
 import uz.oybek.ozamiz.data.di.DefaultDispatcher
+import uz.oybek.ozamiz.data.food.api.FoodUsageRepo
 import uz.oybek.ozamiz.data.food.model.FoodDatabase
 import uz.oybek.ozamiz.data.food.model.FoodItem
 import uz.oybek.ozamiz.ui.modelUtils.MealTime
@@ -35,7 +36,6 @@ import uz.oybek.ozamiz.data.tracker.api.FoodTrackerRepo
 import uz.oybek.ozamiz.data.tracker.model.AddFoodRequest
 import uz.oybek.ozamiz.data.tracker.session.SelectedDateManager
 import uz.oybek.ozamiz.ui.utils.getArgs
-import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -44,6 +44,7 @@ class SearchFoodViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val selectedDateManager: SelectedDateManager,
     private val foodTrackerRepo: FoodTrackerRepo,
+    private val foodUsageRepo: FoodUsageRepo,
     private val profileRepo: ProfileRepo,
     @param:DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
@@ -69,6 +70,10 @@ class SearchFoodViewModel @Inject constructor(
     }.distinctUntilChanged()
         .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
+    // Ranking faqat birinchi kirilganda olinadi (bir martalik snapshot).
+    // Taom qo'shilganda ro'yxat qayta saralanib yoki update bo'lib tepaga chiqib ketmasligi uchun.
+    private val initialUsageCounts: Map<String, Int> = foodUsageRepo.getUsageCounts()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val foodPagingFlow = filterFlow.flatMapLatest { (searchInput, category) ->
         Pager(
@@ -77,7 +82,14 @@ class SearchFoodViewModel @Inject constructor(
                 enablePlaceholders = false,
                 initialLoadSize = 30
             ),
-            pagingSourceFactory = { FoodPagingSource(searchInput, category, defaultDispatcher) }
+            pagingSourceFactory = {
+                FoodPagingSource(
+                    query = searchInput,
+                    category = category,
+                    foodUsageCounts = initialUsageCounts,
+                    dispatcher = defaultDispatcher
+                )
+            }
         ).flow
     }.cachedIn(viewModelScope)
 
@@ -148,11 +160,12 @@ class SearchFoodViewModel @Inject constructor(
             )
 
             foodTrackerRepo.addFoodLog(request)
+            foodUsageRepo.incrementUsage(foodItem.id)
             _effects.send(SearchFoodUiEffect.ShowFoodAdded(foodItem.name))
         }
     }
 
-    fun logFoodFromSelection(foodLog: FoodLog) {
+    fun logFoodFromSelection(foodLog: FoodLog, foodId: String? = null) {
         viewModelScope.launch {
             val currentState = _uiState.value
             val request = AddFoodRequest(
@@ -166,6 +179,9 @@ class SearchFoodViewModel @Inject constructor(
                 date = selectedDateManager.getSelectedDate()
             )
             foodTrackerRepo.addFoodLog(request)
+            if (!foodId.isNullOrBlank()) {
+                foodUsageRepo.incrementUsage(foodId)
+            }
             _effects.send(SearchFoodUiEffect.ShowFoodAdded(foodLog.description))
         }
     }

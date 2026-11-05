@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import uz.oybek.ozamiz.databinding.ItemAdminUserBinding
-import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.ui.utils.DateExtensions
 import uz.oybek.ozamiz.ui.utils.loadPhoto
 import uz.oybek.ozamiz.ui.utils.loadUserPhoto
@@ -29,9 +29,16 @@ class AdminUsersAdapter(private val onUserClicked: (User) -> Unit) :
 
     inner class UserViewHolder(private val binding: ItemAdminUserBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
-            binding.textViewName.text = user.name.ifEmpty { "Noma'lum foydalanuvchi" }
+            binding.textViewName.text = user.name.ifEmpty { itemView.context.getString(uz.oybek.ozamiz.R.string.admin_unknown_user) }
             
             binding.imageViewAvatar.loadUserPhoto(user.avatarUrl)
+
+            if (user.phoneNumber.isNotBlank()) {
+                binding.textViewPhoneOrUid.text = user.phoneNumber
+                binding.textViewPhoneOrUid.isVisible = true
+            } else {
+                binding.textViewPhoneOrUid.isVisible = false
+            }
 
             binding.textViewLastSeen.text = DateExtensions.formatRelativeTime(itemView.context, user.lastSeenTime)
 
@@ -39,7 +46,7 @@ class AdminUsersAdapter(private val onUserClicked: (User) -> Unit) :
             
             if (user.premium && user.premiumDate > 0) {
                 binding.textViewPremiumDate.isVisible = true
-                binding.textViewPremiumDate.text = "Premium: ${formatDate(user.premiumDate)}"
+                binding.textViewPremiumDate.text = itemView.context.getString(uz.oybek.ozamiz.R.string.admin_premium_prefix, formatDate(user.premiumDate))
             } else {
                 binding.textViewPremiumDate.isVisible = false
             }

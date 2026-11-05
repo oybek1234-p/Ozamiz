@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_rounded_soft"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="8dp">
+
+    <ImageView
+        android:id="@+id/imgMetricIcon"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        app:tint="?attr/colorPrimary"
+        tools:src="@drawable/weight_ic" />
+
+    <TextView
+        android:id="@+id/tvMetricTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="@font/roboto_medium"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="13sp"
+        tools:text="Vazn" />
+
+    <TextView
+        android:id="@+id/tvMetricValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:fontFamily="@font/roboto_bold"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="14sp"
+        tools:text="-4.8 kg 🎉" />
+</LinearLayout>

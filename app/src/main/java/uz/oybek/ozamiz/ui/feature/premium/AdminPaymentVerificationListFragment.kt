@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAdminPaymentVerificationListBinding
@@ -15,6 +16,7 @@ import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.showToast
 import uz.oybek.ozamiz.ui.utils.toBundle
 
+@AndroidEntryPoint
 class AdminPaymentVerificationListFragment :
     BaseFragment<FragmentAdminPaymentVerificationListBinding>() {
 
@@ -42,7 +44,6 @@ class AdminPaymentVerificationListFragment :
 
     private fun setupRecyclerView(bind: FragmentAdminPaymentVerificationListBinding) {
         adapter = AdminPaymentVerificationAdapter { user ->
-            // Navigate to detail screen
             val args = AdminPaymentVerificationDetailArgs(user.uid)
             navigate(R.id.adminPaymentVerificationDetailFragment, args.toBundle())
         }
@@ -58,15 +59,16 @@ class AdminPaymentVerificationListFragment :
                     bind.swipeRefreshLayoutAdminPayments.isRefreshing =
                         state.isLoading && state.pendingUsers.isNotEmpty()
                     bind.textViewNoPendingPayments.isVisible =
-                        !state.isLoading && state.pendingUsers.isEmpty() && state.errorMessage == null
+                        !state.isLoading && state.pendingUsers.isEmpty() && state.errorMessageResId == null
                     bind.recyclerViewAdminPayments.isVisible =
                         !state.isLoading && state.pendingUsers.isNotEmpty()
 
                     adapter.submitList(state.pendingUsers)
 
-                    state.errorMessage?.let {
-                        showToast(it)
-                        bind.textViewNoPendingPayments.text = it
+                    state.errorMessageResId?.let { resId ->
+                        val message = getString(resId)
+                        showToast(message)
+                        bind.textViewNoPendingPayments.text = message
                         bind.textViewNoPendingPayments.isVisible = true
                         viewModel.clearError()
                     }
@@ -77,7 +79,6 @@ class AdminPaymentVerificationListFragment :
 
     override fun onResume() {
         super.onResume()
-        // Reload data when returning to this screen, in case a verification was processed
         viewModel.loadPendingVerifications()
     }
 

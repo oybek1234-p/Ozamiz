@@ -1,8 +1,5 @@
 package uz.oybek.ozamiz.ui.feature.home
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,14 +8,24 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import uz.oybek.ozamiz.data.feedback.AppFeedbackRepository
+import uz.oybek.ozamiz.data.feedback.api.AppFeedbackRepo
+import uz.oybek.ozamiz.data.profile.api.ProfileManagerRepo
 import uz.oybek.ozamiz.databinding.DialogAppFeedbackBinding
 import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.utils.openAppInPlayStore
 import uz.oybek.ozamiz.ui.utils.showKeyboard
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AppFeedbackDialogFragment : DialogFragment() {
+
+    @Inject
+    lateinit var appFeedbackRepo: AppFeedbackRepo
+
+    @Inject
+    lateinit var profileManagerRepo: ProfileManagerRepo
 
     private var _binding: DialogAppFeedbackBinding? = null
     private val binding get() = _binding!!
@@ -66,8 +73,8 @@ class AppFeedbackDialogFragment : DialogFragment() {
 
             lifecycleScope.launch {
                 try {
-                    AppFeedbackRepository.saveAppFeedback(text, "dislike")
-                    uz.oybek.ozamiz.data.user.UserProfileRepository.updateUser { isRated = true }
+                    appFeedbackRepo.saveAppFeedback(text, "dislike")
+                    profileManagerRepo.updateUser { it.apply { isRated = true } }
                     Toast.makeText(context, "Rahmat! Fikringiz qabul qilindi. 🙏", Toast.LENGTH_SHORT).show()
                     onDismissCallback?.invoke()
                     dismiss()
@@ -79,7 +86,9 @@ class AppFeedbackDialogFragment : DialogFragment() {
         }
 
         binding.buttonRateApp.setOnClickListener {
-            uz.oybek.ozamiz.data.user.UserProfileRepository.updateUser { isRated = true }
+            lifecycleScope.launch {
+                profileManagerRepo.updateUser { it.apply { isRated = true } }
+            }
             onDismissCallback?.invoke()
             (activity as? MainActivity)?.requestAppReview()
             openPlayStoreFallback()

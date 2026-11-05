@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.data.logs.model
 
 import androidx.annotation.Keep
+import uz.oybek.ozamiz.data.tracker.weight.model.WeightLog
 
 @Keep
 data class DailyLogs(

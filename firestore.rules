@@ -1,0 +1,165 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Standart bo'yicha barcha hujjatlarga kirishni yopamiz
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Admin ekanligini tekshirish funksiyasi (users kolleksiyasidagi admin maydoniga qaraydi)
+    function isAdmin() {
+      return request.auth != null &&
+             (
+                request.auth.uid == "tUNBRrShogVQffw6JeuPt3VrjM52" ||
+                (
+                  exists(/databases/$(database)/documents/public_users/$(request.auth.uid)) &&
+                  get(/databases/$(database)/documents/public_users/$(request.auth.uid)).data.get('admin', false) == true
+                )
+             );
+    }
+
+    // Hujjat egasi ekanligini tekshirish funksiyasi
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // 1. Users kolleksiyasi
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      // Foydalanuvchi o'z ma'lumotini o'zgartirishi mumkin, lekin 'admin' darajasini o'zi bera olmaydi
+      allow write: if isAdmin() || (isOwner(userId) && (!request.resource.data.keys().hasAny(['admin']) || request.resource.data.admin == false));
+
+      match /weightLogs/{logId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      match /notifications/{notificationId} {
+        allow read, update, delete: if isOwner(userId) || isAdmin();
+        allow create: if request.auth != null;
+      }
+
+      match /savedFoods/{foodId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Yangilangan AiChat qoidalari
+    match /aiChat/{chatId} {
+      allow read, write: if request.auth != null && (
+          resource == null ||
+          resource.data.userId == request.auth.uid ||
+          request.resource.data.userId == request.auth.uid ||
+          isAdmin()
+      );
+
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null && (
+            get(/databases/$(database)/documents/aiChat/$(chatId)).data.userId == request.auth.uid ||
+            isAdmin()
+        );
+      }
+    }
+
+    match /public_users/{userId} {
+      allow read: if request.auth != null;
+      // Faqat foydalanuvchi o'zining ommaviy ma'lumotlarini o'zi yangilay oladi
+      allow write: if request.auth != null && request.auth.uid == userId || isAdmin();
+    }
+
+    // 3. Menyu va Kategoriyalar
+    match /menu_categories/{categoryId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+    match /menus/{menuId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    // 4. Lessonlar (Darslar)
+    match /lesson_sections/{sectionId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    match /lesson_topics/{topicId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    match /lesson_screens/{screenId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+    match /lesson_quizzes/{quizId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /appFeedback/{feedbackId} {
+      // Allows any logged-in user to submit feedback with their own userId
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+
+      // Allows admins to read, update, or delete feedback
+      allow read, update, delete: if request.auth != null &&
+        get(/databases/$(database)/documents/public_users/$(request.auth.uid)).data.admin == true;
+    }
+
+    // 5. Ratings
+    match /foodLogFeedback/{feedBackId} {
+      allow read: if isAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if isAdmin();
+    }
+
+    // AI Chat Feedback (Like / Dislike baholari)
+    match /aiChatFeedback/{feedbackId} {
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 6. Community Posts
+    match /communityPosts/{postId} {
+      allow read, create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if isAdmin() || isOwner(resource.data.userId);
+    }
+    match /posts/{postId} {
+      allow read, create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if isAdmin() || isOwner(resource.data.userId);
+
+      match /comments/{commentId} {
+        allow read: if request.auth != null;
+        allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+        allow update: if request.auth != null;
+        allow delete: if isAdmin() || isOwner(resource.data.userId);
+      }
+    }
+
+    // Yangi Menu va Retseptlar kolleksiyasi
+    match /menu/{menuId} {
+      // Login qilgan barcha foydalanuvchilar o'qiy oladi
+      allow read: if request.auth != null;
+
+      // Yangi menyu qo'shish
+      allow create: if request.auth != null;
+
+      // Layk bosish (toggleLike) va ma'lumotlarni yangilash
+      allow update: if request.auth != null;
+
+      // Menyuni faqat admin o'chira oladi
+      allow delete: if isAdmin();
+    }
+
+    // 7. Foods (Ovqatlar kolleksiyasi - Qidiruv uchun)
+    match /foods/{foodId} {
+      // Hamma login qilgan foydalanuvchilar ovqatlarni qidira oladi
+      allow read: if request.auth != null;
+      // Faqat admin yangi ovqat qo'shishi, tahrirlashi yoki o'chirishi mumkin
+      allow write: if true;
+    }
+  }
+}

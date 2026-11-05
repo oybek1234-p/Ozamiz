@@ -91,7 +91,8 @@ class NotificationDisplayManager @Inject constructor(
             NotificationCompat.Builder(context, CHANNEL_ID).setSmallIcon(icon)
                 .setContentTitle(title).setContentText(body)
                 .setStyle(NotificationCompat.BigTextStyle().bigText(body)).setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setContentIntent(pendingIntent)
                 .build()
@@ -121,6 +122,8 @@ class NotificationDisplayManager @Inject constructor(
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             enableVibration(true)
+            lockscreenVisibility = NotificationCompat.VISIBILITY_PUBLIC
+            setShowBadge(true)
         }
 
         notificationManager.createNotificationChannel(channel)

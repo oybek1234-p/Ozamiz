@@ -1,6 +1,10 @@
 package uz.oybek.ozamiz.ui.feature.log.food
 
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.media.ExifInterface
+import android.net.Uri
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,10 +12,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -20,7 +28,6 @@ import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.analyzer.model.AnalyzedIngredient
 import uz.oybek.ozamiz.data.tracker.model.FoodModel
 import uz.oybek.ozamiz.databinding.BottomSheetCalorieResultBinding
-import uz.oybek.ozamiz.databinding.ItemMacroDisplayBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.common.dialog.ConfirmDeleteDialog
 import uz.oybek.ozamiz.ui.common.dialog.ConfirmSaveDialog
@@ -33,6 +40,7 @@ import uz.oybek.ozamiz.data.tracker.model.MealType
 import uz.oybek.ozamiz.common.util.orZero
 import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
 import uz.oybek.ozamiz.ui.modelUtils.getDisplayName
+import uz.oybek.ozamiz.data.dietolog.engine.DietologMessagePool
 import uz.oybek.ozamiz.ui.utils.loadPhoto
 import uz.oybek.ozamiz.ui.utils.showAppSnackBar
 import kotlin.time.Duration.Companion.milliseconds
@@ -43,6 +51,7 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
     private val viewModel: AnalyzeResultViewModel by viewModels()
     private var ingredientsAdapter: IngredientsAdapter? = null
     private var loadingTextJob: Job? = null
+    private var currentMealHintText: String? = null
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -65,6 +74,7 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
 
     override fun onDestroyView() {
         stopSequentialLoadingText()
+        currentMealHintText = null
         ingredientsAdapter = null
         super.onDestroyView()
     }
@@ -136,6 +146,17 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
         buttonShareFloating.isVisible = !isAnalyzing && state.food != null
 
         if (isAnalyzing) {
+            val resolvedMealType = MealType.fromId(state.mealType ?: state.food?.mealType, state.logDate)
+            val hintText = currentMealHintText ?: when (resolvedMealType) {
+                MealType.BREAKFAST -> DietologMessagePool.breakfastLoseWeightMessages.random()
+                MealType.LUNCH -> DietologMessagePool.lunchAndActivityMessages.random()
+                MealType.DINNER -> DietologMessagePool.dinnerMessages.random()
+                MealType.SNACK -> DietologMessagePool.snackIntervalMessages.random()
+            }.also { currentMealHintText = it }
+
+            textAnalyzingHint.text = hintText
+            textAnalyzingHint.isVisible = true
+
             startSequentialLoadingText()
             renderFoodPhoto(state.initialImageUri)
             state.initialDescription?.takeIf { it.isNotBlank() }?.let {
@@ -163,26 +184,14 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
         layoutFoodName.isVisible = true
         textViewPortionCount.text = NutritionFormatter.portion(state.portionMultiplier)
 
-        bindMacro(
-            layoutProtein, getString(R.string.protein),
-            food.protein,
-            R.drawable.egg_ic
-        )
-        bindMacro(
-            layoutCarbs,
-            getString(R.string.carbs_hint),
-            food.carbs, R.drawable.bread
-        )
-        bindMacro(
-            layoutFats,
-            getString(R.string.fat_hint),
-            food.fat,
-            R.drawable.fat_ic
-        )
+        textViewProteinValue.text = NutritionFormatter.gr(food.protein)
+        textViewCarbsValue.text = NutritionFormatter.gr(food.carbs)
+        textViewFatsValue.text = NutritionFormatter.gr(food.fat)
 
         renderFoodPhoto(food.photoUrl)
         renderTimestamp(food)
-        renderIngredients(food.ingredients)
+        renderIngredients(food.ingredients, state.isGainWeight)
+        renderHealthScore(food.healthLevel)
         renderAdvice(food.advice)
         renderActionButtons(state)
     }
@@ -190,13 +199,103 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
     private fun renderFoodPhoto(photoUrl: String?) {
         binding.imageViewFoodPhoto.isVisible = true
         if (!photoUrl.isNullOrEmpty()) {
-            binding.imageViewFoodPhoto.loadPhoto(photoUrl)
+            tryPrecalculateDimensions(photoUrl)
+            binding.imageViewFoodPhoto.loadPhoto(
+                photo = photoUrl,
+                onResourceReady = { width, height ->
+                    adjustFoodPhotoDimensions(width, height)
+                }
+            )
             binding.imageViewFoodPhoto.setOnClickListener {
                 showFullScreenImage(photoUrl)
             }
         } else {
             binding.imageViewFoodPhoto.loadPhoto(R.drawable.placeholder_food)
             binding.imageViewFoodPhoto.setOnClickListener(null)
+            adjustFoodPhotoDimensions(
+                resources.displayMetrics.widthPixels,
+                (260 * resources.displayMetrics.density).roundToInt()
+            )
+        }
+    }
+
+    private fun adjustFoodPhotoDimensions(imageWidth: Int, imageHeight: Int) {
+        if (imageWidth <= 0 || imageHeight <= 0) return
+
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val maxHeightPx = (260 * displayMetrics.density).roundToInt()
+        val maxWidthPx = screenWidth
+
+        val imageRatio = imageWidth.toFloat() / imageHeight.toFloat()
+        val containerRatio = maxWidthPx.toFloat() / maxHeightPx.toFloat()
+
+        val targetWidth: Int
+        val targetHeight: Int
+
+        if (imageRatio > containerRatio) {
+            // Landscape bo'lsa: kengligi ekran kengligicha, balandligi esa 260dp dan kichik
+            targetWidth = maxWidthPx
+            targetHeight = (maxWidthPx / imageRatio).roundToInt().coerceAtMost(maxHeightPx)
+        } else {
+            // Portrait yoki kvadrat bo'lsa: balandligi 260dp, kengligi esa proporsional hisoblanadi
+            targetHeight = maxHeightPx
+            targetWidth = (maxHeightPx * imageRatio).roundToInt().coerceAtMost(maxWidthPx)
+        }
+
+        binding.imageViewFoodPhoto.updateLayoutParams<ViewGroup.LayoutParams> {
+            width = targetWidth
+            height = targetHeight
+        }
+    }
+
+    private fun tryPrecalculateDimensions(photoUrl: String) {
+        try {
+            val uri = photoUrl.toUri()
+            val ctx = context ?: return
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+
+            val stream = if (uri.scheme == "content") {
+                ctx.contentResolver.openInputStream(uri)
+            } else if (uri.scheme == "file" || uri.scheme == null) {
+                val path = uri.path ?: photoUrl
+                File(path).takeIf { it.exists() }?.inputStream()
+            } else null
+
+            stream?.use {
+                BitmapFactory.decodeStream(it, null, options)
+            }
+
+            if (options.outWidth > 0 && options.outHeight > 0) {
+                val rotation = getExifRotation(ctx, uri, photoUrl)
+                val (w, h) = if (rotation == 90 || rotation == 270) {
+                    options.outHeight to options.outWidth
+                } else {
+                    options.outWidth to options.outHeight
+                }
+                adjustFoodPhotoDimensions(w, h)
+            }
+        } catch (_: Throwable) {
+            // Glide onResourceReady orqali o'rnatadi
+        }
+    }
+
+    private fun getExifRotation(context: Context, uri: Uri, pathOrUrl: String): Int {
+        return try {
+            val exif = if (uri.scheme == "content") {
+                context.contentResolver.openInputStream(uri)?.use { ExifInterface(it) }
+            } else {
+                val path = uri.path ?: pathOrUrl
+                ExifInterface(path)
+            }
+            when (exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+        } catch (_: Throwable) {
+            0
         }
     }
 
@@ -213,34 +312,82 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
         binding.textViewTimestamp.isVisible = true
     }
 
-    private fun renderIngredients(ingredients: List<AnalyzedIngredient>) {
+    private fun renderIngredients(ingredients: List<AnalyzedIngredient>, isGainWeight: Boolean) {
         val show = ingredients.isNotEmpty()
         binding.layoutFoodItemsContainer.isVisible = show
         binding.recyclerFoodItems.isVisible = show
         if (show) {
             val adapter = ingredientsAdapter ?: IngredientsAdapter(
                 ingredients = ingredients,
+                isGainWeight = isGainWeight,
                 onItemClick = { ingredient, position ->
-                    EditIngredientBottomSheet(
-                        args = EditIngredientArgs(ingredient, position),
-                        onSave = { updatedItem -> viewModel.updateFoodItem(position, updatedItem) },
-                        onDelete = { viewModel.deleteFoodItem(position) }
-                    ).show(parentFragmentManager, null)
+                    openEditIngredient(ingredient, position)
+                },
+                onEditClick = { ingredient, position ->
+                    openEditIngredient(ingredient, position)
+                },
+                onDeleteClick = { _, position ->
+                    viewModel.deleteFoodItem(position)
                 }
             ).also {
                 ingredientsAdapter = it
                 binding.recyclerFoodItems.adapter = it
             }
-            adapter.updateData(ingredients)
+            adapter.updateData(ingredients, isGainWeight)
         }
     }
 
+    private fun openEditIngredient(ingredient: AnalyzedIngredient, position: Int) {
+        EditIngredientBottomSheet(
+            args = EditIngredientArgs(ingredient, position),
+            onSave = { updatedItem -> viewModel.updateFoodItem(position, updatedItem) },
+            onDelete = { viewModel.deleteFoodItem(position) }
+        ).show(parentFragmentManager, null)
+    }
+
+    private fun renderHealthScore(score: Int) {
+        binding.tvHealthScoreInline.isVisible = false
+    }
+
+    private var isAdviceExpanded = false
+
     private fun renderAdvice(adviceStr: String?) {
-        val cleanAdvice = adviceStr?.trim()
+        val rawAdvice = adviceStr?.trim()
+        val cleanAdvice = rawAdvice
+            ?.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+
         val showAdvice = !cleanAdvice.isNullOrBlank()
         binding.layoutAdvice.isVisible = showAdvice
         binding.cardAiHealth.isVisible = showAdvice
+        if (!showAdvice) return
+
         binding.textViewAdvice.text = cleanAdvice
+        isAdviceExpanded = false
+        binding.textViewAdvice.maxLines = 4
+        binding.textViewAdviceMore.setText(R.string.analyze_result_advice_more)
+
+        binding.textViewAdvice.post {
+            val layout = binding.textViewAdvice.layout
+            if (layout != null) {
+                val lines = layout.lineCount
+                val isEllipsized =
+                    lines > 4 || (lines > 0 && layout.getEllipsisCount(lines - 1) > 0)
+                binding.textViewAdviceMore.isVisible = isEllipsized
+            }
+        }
+
+        val toggleAction = {
+            isAdviceExpanded = !isAdviceExpanded
+            if (isAdviceExpanded) {
+                binding.textViewAdvice.maxLines = Int.MAX_VALUE
+                binding.textViewAdviceMore.setText(R.string.analyze_result_advice_less)
+            } else {
+                binding.textViewAdvice.maxLines = 2
+                binding.textViewAdviceMore.setText(R.string.analyze_result_advice_more)
+            }
+        }
+        binding.textViewAdviceMore.setOnClickListener { toggleAction() }
+        binding.textViewAdvice.setOnClickListener { toggleAction() }
     }
 
     private fun renderActionButtons(state: AnalyzeResultUiState) = with(binding) {
@@ -281,6 +428,7 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
                 mainActivity()?.showSnackbar(getString(R.string.food_log_relog_success))
                 popBackStack()
             }
+
             is AnalyzeResultEvent.Deleted -> popBackStack()
             is AnalyzeResultEvent.NavigateBack -> popBackStack()
             is AnalyzeResultEvent.FoodSavedToFavorites -> {
@@ -289,6 +437,7 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
                     anchorView = binding.layoutBottomActions
                 )
             }
+
             is AnalyzeResultEvent.PromptShare -> shareFoodAnalysis(event.food)
             is AnalyzeResultEvent.PlayCelebration -> handleCelebration(event.score)
         }
@@ -304,27 +453,18 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
         }
     }
 
-    private fun bindMacro(
-        layout: ItemMacroDisplayBinding,
-        name: String,
-        value: Double?,
-        iconRes: Int
-    ) {
-        layout.imageViewMacroIcon.setImageResource(iconRes)
-        layout.imageViewMacroIcon.isVisible = true
-        layout.textViewMacroName.text = name
-        layout.textViewMacroValue.text = NutritionFormatter.gr(value)
-    }
-
-    private fun openEditField(
-        @StringRes titleRes: Int,
-        value: Double,
-        type: FoodFieldType,
-        onSave: (Double) -> Unit
-    ) {
-        EditFoodFieldBottomSheet(
-            args = EditFoodFieldArgs(titleRes = titleRes, currentValue = value, fieldType = type),
-            onSave = onSave
+    private fun openEditNutrition() {
+        val food = viewModel.uiState.value.food ?: return
+        EditNutritionBottomSheet(
+            args = EditNutritionArgs(
+                calories = food.calories,
+                protein = food.protein.orZero(),
+                carbs = food.carbs.orZero(),
+                fat = food.fat.orZero()
+            ),
+            onSave = { calories, protein, carbs, fat ->
+                viewModel.updateNutrition(calories, protein, carbs, fat)
+            }
         ).show(parentFragmentManager, null)
     }
 
@@ -351,35 +491,8 @@ class AnalyzeResultFragment : BaseFragment<BottomSheetCalorieResultBinding>() {
 
         buttonBackFloating.setOnClickListener { attemptExit() }
 
-        layoutProtein.root.setOnClickListener {
-            val currentVal = viewModel.uiState.value.food?.protein.orZero()
-            openEditField(
-                R.string.analyze_edit_protein_title,
-                currentVal, FoodFieldType.PROTEIN
-            ) {
-                viewModel.updateProtein(it)
-            }
-        }
-
-        layoutCarbs.root.setOnClickListener {
-            val currentVal = viewModel.uiState.value.food?.carbs.orZero()
-            openEditField(
-                R.string.analyze_edit_carbs_title,
-                currentVal, FoodFieldType.CARBS
-            ) {
-                viewModel.updateCarbs(it)
-            }
-        }
-
-        layoutFats.root.setOnClickListener {
-            val currentVal = viewModel.uiState.value.food?.fat.orZero()
-            openEditField(
-                R.string.analyze_edit_fat_title,
-                currentVal, FoodFieldType.FAT
-            ) {
-                viewModel.updateFat(it)
-            }
-        }
+        buttonEditNutrition.setOnClickListener { openEditNutrition() }
+        cardCalorieBanner.setOnClickListener { openEditNutrition() }
 
         buttonAddIngredient.setOnClickListener {
             AddIngredientBottomSheet { ingredient ->

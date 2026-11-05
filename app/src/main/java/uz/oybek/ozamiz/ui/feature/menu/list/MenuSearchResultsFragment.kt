@@ -8,24 +8,27 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
-import uz.oybek.ozamiz.data.ads.AdsManager
 import uz.oybek.ozamiz.data.menu.CategoryType
 import uz.oybek.ozamiz.data.menu.FilterId
 import uz.oybek.ozamiz.data.menu.MenuCategories
 import uz.oybek.ozamiz.data.menu.model.Menu
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
 import uz.oybek.ozamiz.databinding.FragmentMenuSearchResultsBinding
-import dagger.hilt.android.AndroidEntryPoint
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.data.user.local.user
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
 import uz.oybek.ozamiz.ui.utils.getArgs
 import uz.oybek.ozamiz.ui.utils.loadBannerAd
+import uz.oybek.ozamiz.ui.utils.toBundle
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>() {
+
+    @Inject
+    lateinit var profileRepo: ProfileRepo
 
     private val viewModel: MenuSearchViewModel by viewModels()
 
@@ -125,12 +128,17 @@ class MenuSearchResultsFragment : BaseFragment<FragmentMenuSearchResultsBinding>
     }
 
     private fun setupResultsList(bind: FragmentMenuSearchResultsBinding) {
-        menuAdapter = MenuAdapter({ menu ->
-            val bundle = androidx.core.os.bundleOf("menu" to menu)
-          //  navigate(R.id.menuDetailFragment, bundle)
-        }, {
-            viewModel.loadNext()
-        })
+        val isPremium = profileRepo.currentUser.isPremiumActive
+        menuAdapter = MenuAdapter(
+            isPremiumUser = isPremium,
+            onMenuClick = { menu ->
+                val bundle = androidx.core.os.bundleOf("menu" to menu)
+                // navigate(R.id.menuDetailFragment, bundle)
+            },
+            nextLoad = {
+                viewModel.loadNext()
+            }
+        )
 
         bind.recvResultsList.apply {
             layoutManager = LinearLayoutManager(requireContext())

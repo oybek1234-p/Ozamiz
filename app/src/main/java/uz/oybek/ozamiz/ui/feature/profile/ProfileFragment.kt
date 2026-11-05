@@ -15,7 +15,7 @@ import uz.oybek.ozamiz.databinding.FragmentProfileBinding
 import uz.oybek.ozamiz.databinding.ItemProfileSectionBinding
 import uz.oybek.ozamiz.ui.MainActivity
 import uz.oybek.ozamiz.ui.base.BaseFragment
-import uz.oybek.ozamiz.ui.feature.premium.PremiumUtils
+import uz.oybek.ozamiz.ui.feature.premium.PaymentCheckSubmittedBottomSheet
 import uz.oybek.ozamiz.ui.utils.ImagePicker
 import uz.oybek.ozamiz.ui.utils.collectFlowOnStart
 import uz.oybek.ozamiz.ui.utils.openAppInPlayStore
@@ -108,13 +108,17 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             navigate(R.id.adminPostManagerFragment)
         }
 
-        premiumButton.setOnSafeClickListener {
-            navigate(R.id.premiumFragment)
+        val handlePremiumClick = {
+            if (viewModel.userState.value.paymentChecking) {
+                PaymentCheckSubmittedBottomSheet().show(childFragmentManager, "PaymentCheckSubmittedBottomSheet")
+            } else {
+                navigate(R.id.premiumFragment)
+            }
         }
 
-        premiumView.setOnSafeClickListener {
-            navigate(R.id.premiumFragment)
-        }
+        premiumButton.setOnSafeClickListener { handlePremiumClick() }
+        premiumView.setOnSafeClickListener { handlePremiumClick() }
+        premiumStatusText.setOnSafeClickListener { handlePremiumClick() }
 
         cardUserLevel.setOnSafeClickListener {
             navigate(R.id.levelFragment)
@@ -136,6 +140,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             bindUserProfile(bind, user)
         }
 
+        collectFlowOnStart(
+            viewModel.pendingVerificationsCount
+        ) { count ->
+            bind.sectionAdminPremiumUsersContent.textSectionBadgeProfile.isVisible = count > 0
+            bind.sectionAdminPremiumUsersContent.textSectionBadgeProfile.text = count.toString()
+        }
+
         collectFlowOnStart(viewModel.uiEffect) { effect ->
             handleEffect(effect)
         }
@@ -154,7 +165,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding>() {
             textProfileLevelName.text = level.name
             cardUserLevel.isVisible = false
 
-            val isPremiumActive = PremiumUtils.isPremium(user)
+            val isPremiumActive = user.isPremiumActive
             when {
                 isPremiumActive -> {
                     premiumStatusText.isVisible = true

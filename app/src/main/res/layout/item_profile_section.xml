@@ -34,6 +34,23 @@
         android:textSize="15sp"
         tools:text="Sozlamalar" />
 
+    <!-- Badge Count -->
+    <TextView
+        android:id="@+id/text_section_badge_profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_rounded_16"
+        android:backgroundTint="?attr/colorPrimary"
+        android:fontFamily="@font/roboto_bold"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="2dp"
+        android:textColor="?attr/colorOnPrimary"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:text="3"
+        tools:visibility="visible" />
+
     <!-- Chevron -->
     <ImageView
         android:id="@+id/icon_section_chevron"
@@ -45,4 +62,4 @@
         android:src="@drawable/arrow_back"
         app:tint="?attr/colorOutline" />
 
-</LinearLayout>
+</LinearLayout>

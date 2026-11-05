@@ -63,7 +63,7 @@ object NotificationMessages {
         "Kechagi mehnatingizni havoga sovurmang. Yeganlaringizni hoziroq dasturga yozing. ⚠️"
     )
 
-    fun getMessageForType(type: String): String {
+    fun getMessageForType(type: String, userName: String = "do'stim"): String {
         val calendar = Calendar.getInstance()
         val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
 
@@ -81,7 +81,7 @@ object NotificationMessages {
             else -> dailyTips.random()
         }
 
-        val userName = uz.oybek.ozamiz.data.user.local.LocalUser.user.name.ifBlank { "do'stim" }
-        return rawMessage.replace("{name}", userName)
+        val name = userName.ifBlank { "do'stim" }
+        return rawMessage.replace("{name}", name)
     }
 }

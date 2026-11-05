@@ -1,158 +1,172 @@
 package uz.oybek.ozamiz.ui.feature.ai
 
+import androidx.annotation.StringRes
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ai.aiChat.ChatMessage
 import uz.oybek.ozamiz.data.dietolog.api.DietologRepository
-import uz.oybek.ozamiz.data.dietolog.engine.DietologEvaluationEngine
 import uz.oybek.ozamiz.data.dietolog.model.AnalyzedFoodPayload
-import uz.oybek.ozamiz.data.dietolog.model.DietologSenderType
 import uz.oybek.ozamiz.data.limit.api.LimitManagerRepo
 import uz.oybek.ozamiz.data.limit.api.LimitUpdater
-import uz.oybek.ozamiz.data.user.UserProfileRepository
-import uz.oybek.ozamiz.common.result.BaseResult
+import uz.oybek.ozamiz.data.profile.api.ProfileManagerRepo
+import uz.oybek.ozamiz.data.profile.api.ProfileRepo
+import uz.oybek.ozamiz.ui.utils.getArgs
 import javax.inject.Inject
+
+data class AiChatUiState(
+    val messages: List<ChatMessage> = emptyList(),
+    val remainingMessages: Int = 0,
+    val isLoading: Boolean = false,
+    val isPremium: Boolean = false
+)
+
+sealed interface AiChatUiEffect {
+    data class ShowToast(@param:StringRes val messageRes: Int) : AiChatUiEffect
+    data object NavigateToPremium : AiChatUiEffect
+    data class ShowLimitReachedDialog(val isPremium: Boolean) : AiChatUiEffect
+}
 
 @HiltViewModel
 class AiChatViewModel @Inject constructor(
-    private val dietologRepository: DietologRepository,
-    private val evaluationEngine: DietologEvaluationEngine,
+    savedStateHandle: SavedStateHandle,
+    private val dietologRepo: DietologRepository,
+    private val profileRepo: ProfileRepo,
+    private val profileManagerRepo: ProfileManagerRepo,
     private val limitManagerRepo: LimitManagerRepo,
     private val limitUpdater: LimitUpdater
 ) : ViewModel() {
 
+    private val args = savedStateHandle.getArgs<AiChatArgs>()
+
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+    private val _remainingMessages = MutableStateFlow(0)
+    private val _uiEffect = Channel<AiChatUiEffect>(Channel.BUFFERED)
+    val effects = _uiEffect.receiveAsFlow()
 
-    /**
-     * SSOT: UI yagona Flow<List<ChatMessage>> oqimiga obuna bo'ladi.
-     * Xabar yuborilayotganda loading (isThinking = true) animatsiyasi ro'yxat oxirida ko'rsatiladi.
-     */
-    val messages: StateFlow<List<ChatMessage>> = kotlinx.coroutines.flow.combine(
-        dietologRepository.getAllMessagesFlow(),
-        _isLoading
-    ) { entities, loading ->
-        val list = entities.map { entity ->
-            ChatMessage(
-                id = entity.id,
-                text = entity.text,
-                isUser = entity.senderType == DietologSenderType.USER,
-                timestamp = entity.timestamp,
-                analyzedFood = entity.analyzedFood,
-                isAddedToTracker = entity.isAddedToTracker,
-                actions = entity.actions
+    val uiState: StateFlow<AiChatUiState> = combine(
+        dietologRepo.getAllMessagesFlow(),
+        _remainingMessages,
+        _isLoading,
+        profileRepo.user
+    ) { entities, remaining, loading, user ->
+        val chatMessages = entities.map { it.toChatMessage() }
+        val displayedMessages = if (loading) {
+            chatMessages + ChatMessage(
+                id = "thinking_placeholder",
+                isUser = false,
+                isThinking = true,
+                timestamp = System.currentTimeMillis()
             )
-        }.toMutableList()
-
-        if (loading) {
-            list.add(
-                ChatMessage(
-                    id = "thinking_placeholder",
-                    text = "",
-                    isUser = false,
-                    isThinking = true,
-                    timestamp = System.currentTimeMillis()
-                )
-            )
+        } else {
+            chatMessages
         }
-        list
+        AiChatUiState(
+            messages = displayedMessages,
+            remainingMessages = remaining,
+            isLoading = loading,
+            isPremium = user.isPremiumActive
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
+        initialValue = AiChatUiState(
+            remainingMessages = getRemainingMessages(),
+            isPremium = profileRepo.user.value.isPremiumActive
+        )
     )
-
-    private val _remainingMessages = MutableStateFlow(getRemainingMessages())
-    val remainingMessages: StateFlow<Int> = _remainingMessages.asStateFlow()
 
     private var sendJob: Job? = null
 
+    init {
+        viewModelScope.launch {
+            profileManagerRepo.updateUser { it.apply { unreadMessages = 0 } }
+        }
+        refreshLimitState()
+    }
+
     fun getRemainingMessages(): Int = limitManagerRepo.getLimits().remainingChatLimit
+
     fun canSendMessage(): Boolean = limitManagerRepo.getLimits().canSendMessages
 
     fun refreshLimitState() {
         _remainingMessages.value = getRemainingMessages()
     }
 
-    init {
-        UserProfileRepository.setUnreadNotificationsZero()
-        refreshLimitState()
-        // Ilovaga yoki chatga kirganda mahalliy eslatmalarni baholash
-        viewModelScope.launch {
-            evaluationEngine.evaluateAndTriggerReminders()
-        }
-    }
-
-    fun startNewChat(clearHistory: Boolean = true) {
-        sendJob?.cancel()
-        _isLoading.value = false
-        refreshLimitState()
-        if (clearHistory) {
-            viewModelScope.launch {
-                dietologRepository.clearHistory()
-            }
-        }
-    }
-
-    fun sendMessage(
-        text: String,
-        ignoreLimit: Boolean = false,
-        done: () -> Unit = {}
-    ) {
+    fun onSendClicked(text: String) {
         val trimmed = text.trim()
-        if (trimmed.isBlank() || _isLoading.value) return
-        if (!ignoreLimit && !canSendMessage()) return
+        if (trimmed.isBlank()) return
+        if (_isLoading.value) return
 
-        sendJob?.cancel()
-
-        viewModelScope.launch {
-            limitUpdater.incrementChatMessageCount()
-            _remainingMessages.value = getRemainingMessages()
+        if (!canSendMessage()) {
+            val isPremium = profileRepo.user.value.isPremiumActive
+            if (isPremium) {
+                _uiEffect.trySend(AiChatUiEffect.ShowToast(R.string.ai_chat_limit_premium_finished))
+            } else {
+                _uiEffect.trySend(AiChatUiEffect.NavigateToPremium)
+            }
+            return
         }
 
-        _isLoading.value = true
-
+        sendJob?.cancel()
         sendJob = viewModelScope.launch {
+            _isLoading.value = true
             try {
-                dietologRepository.sendUserMessage(trimmed).collect { result ->
-                    if (result is BaseResult.Failure) {
-                        android.util.Log.e("AiChatViewModel", "sendUserMessage error: ${result.error}")
+                when (dietologRepo.sendUserMessage(trimmed)) {
+                    is uz.oybek.ozamiz.common.result.BaseResult.Success -> {
+                        limitUpdater.incrementChatMessageCount()
+                        refreshLimitState()
+                    }
+                    is uz.oybek.ozamiz.common.result.BaseResult.Failure -> {
+                        _uiEffect.trySend(AiChatUiEffect.ShowToast(R.string.common_error_server_unavailable))
                     }
                 }
-            } catch (e: Exception) {
-                android.util.Log.e("AiChatViewModel", "Error while sending chat message", e)
+            } catch (_: Exception) {
+                _uiEffect.trySend(AiChatUiEffect.ShowToast(R.string.common_error_server_unavailable))
             } finally {
                 _isLoading.value = false
-                done()
             }
         }
     }
 
-    /**
-     * Foydalanuvchi «Kunlik hisobga qo'shilsinmi?» tugmasini bosganda:
-     * DailyTracker moduli ishga tushadi: tahlil qilingan kaloriya va makrolar hisobga qo'shiladi
-     * va tugma «Qo'shildi» holatiga o'tadi.
-     */
+    fun onFeedbackClicked(isLiked: Boolean) {
+        // Feedback handling
+    }
+
     fun confirmFoodIntake(message: ChatMessage, payload: AnalyzedFoodPayload) {
         viewModelScope.launch {
-            val result = dietologRepository.confirmAnalyzedFood(message.id, payload)
-            if (result is BaseResult.Success) {
-                // Ovqat qo'shilgach, kunlik limitlar o'zgargani uchun yangi eslatmalar baholanadi
-                evaluationEngine.evaluateAndTriggerReminders(bypassCooldown = true)
+            dietologRepo.confirmAnalyzedFood(message.id, payload)
+        }
+    }
+
+    fun startNewChat(clearOld: Boolean = true) {
+        if (clearOld) {
+            viewModelScope.launch {
+                dietologRepo.clearHistory()
             }
         }
     }
 
-    fun onFeedbackClick(message: ChatMessage, isLiked: Boolean, userQuestion: String) {
-        // Shaxsiy fikr-mulohaza qayta ishlash
+    private fun uz.oybek.ozamiz.data.dietolog.local.entity.DietologMessageEntity.toChatMessage(): ChatMessage {
+        return ChatMessage(
+            id = id,
+            text = text,
+            isUser = senderType == uz.oybek.ozamiz.data.dietolog.model.DietologSenderType.USER,
+            timestamp = timestamp,
+            analyzedFood = analyzedFood,
+            isAddedToTracker = isAddedToTracker,
+            actions = actions
+        )
     }
 }

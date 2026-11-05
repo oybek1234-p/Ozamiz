@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
 import androidx.core.graphics.ColorUtils
-import uz.oybek.ozamiz.data.logs.model.WeightLog
+import uz.oybek.ozamiz.data.tracker.weight.model.WeightLog
 import uz.oybek.ozamiz.ui.utils.VaznimColors
 import java.util.Locale
 

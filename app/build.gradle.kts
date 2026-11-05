@@ -25,8 +25,8 @@ android {
         applicationId = "uz.oybek.ozamiz"
         minSdk = 26
         targetSdk = 37
-        versionCode = 109
-        versionName = "12"
+        versionCode = 122
+        versionName = "13"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations.addAll(listOf("en", "ru", "uz"))
     }
@@ -147,6 +147,10 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.2")
 
     implementation("com.yandex.android:mobileads:8.1.0")
+
+    // Markwon Markdown Parser
+    val markwonVersion = "4.6.2"
+    implementation("io.noties.markwon:core:$markwonVersion")
 
     val hiltVersion = "2.57.1"
     implementation("com.google.dagger:hilt-android:$hiltVersion")

@@ -2,15 +2,21 @@ package uz.oybek.ozamiz.ui.feature.admin.users
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.common.result.BaseResult
 import uz.oybek.ozamiz.data.logs.model.FoodLog
-import uz.oybek.ozamiz.data.user.model.User
-import uz.oybek.ozamiz.data.user.AdminRepository
+import uz.oybek.ozamiz.data.profile.model.User
+import uz.oybek.ozamiz.data.user.api.AdminUserRepo
+import javax.inject.Inject
 
-class AdminUserDetailsViewModel : ViewModel() {
+@HiltViewModel
+class AdminUserDetailsViewModel @Inject constructor(
+    private val adminUserRepo: AdminUserRepo
+) : ViewModel() {
 
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
@@ -24,13 +30,15 @@ class AdminUserDetailsViewModel : ViewModel() {
     fun loadUser(userId: String) {
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                val loadedUser = AdminRepository.getAdminUser(userId)
-                _user.value = loadedUser
-            } catch (e: Exception) {
-            } finally {
-                _isLoading.value = false
+            when (val result = adminUserRepo.getAdminUser(userId)) {
+                is BaseResult.Success -> {
+                    _user.value = result.data
+                }
+                is BaseResult.Failure -> {
+                    _user.value = null
+                }
             }
+            _isLoading.value = false
         }
     }
 
@@ -38,13 +46,13 @@ class AdminUserDetailsViewModel : ViewModel() {
         if (userId.isBlank() || updates.isEmpty()) return
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                AdminRepository.updateAdminUser(userId, updates)
-                loadUser(userId)
-            } catch (e: Exception) {
-                android.util.Log.e("AdminUserDetailsVM", "saveAllFields error for user $userId", e)
-            } finally {
-                _isLoading.value = false
+            when (adminUserRepo.updateAdminUser(userId, updates)) {
+                is BaseResult.Success -> {
+                    loadUser(userId)
+                }
+                is BaseResult.Failure -> {
+                    _isLoading.value = false
+                }
             }
         }
     }
@@ -56,14 +64,15 @@ class AdminUserDetailsViewModel : ViewModel() {
         }
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                AdminRepository.deleteUserAdmin(userId)
-                onSuccess()
-            } catch (e: Exception) {
-                android.util.Log.e("AdminUserDetailsVM", "deleteUser error for user $userId", e)
-                onError(e)
-            } finally {
-                _isLoading.value = false
+            when (val result = adminUserRepo.deleteUserAdmin(userId)) {
+                is BaseResult.Success -> {
+                    _isLoading.value = false
+                    onSuccess()
+                }
+                is BaseResult.Failure -> {
+                    _isLoading.value = false
+                    onError(result.error ?: Exception("Delete failed"))
+                }
             }
         }
     }

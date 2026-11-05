@@ -1,6 +1,7 @@
 package uz.oybek.ozamiz.ui.feature.home
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +18,7 @@ import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.ads.AdsConfig
 import uz.oybek.ozamiz.data.profile.model.UserGoal
 import uz.oybek.ozamiz.data.streak.model.StreakStatus
+import uz.oybek.ozamiz.data.tracker.model.CalorieStatusState
 import uz.oybek.ozamiz.data.tracker.model.DailyCalorieMacroSummary
 import uz.oybek.ozamiz.data.tracker.model.DailyExerciseSummary
 import uz.oybek.ozamiz.data.tracker.model.DailyMealsSummary
@@ -26,9 +28,11 @@ import uz.oybek.ozamiz.databinding.FragmentHomeBinding
 import uz.oybek.ozamiz.databinding.ItemHomeMealCardBinding
 import uz.oybek.ozamiz.notification.permission.NotificationPermissionUtils
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.feature.ai.AiChatArgs
 import uz.oybek.ozamiz.ui.feature.log.food.FoodCameraArgs
 import uz.oybek.ozamiz.ui.feature.log.food.LogFoodArgs
 import uz.oybek.ozamiz.ui.feature.log.water.LogWaterDialog
+import uz.oybek.ozamiz.ui.feature.premium.PaymentCheckSubmittedBottomSheet
 import uz.oybek.ozamiz.ui.feature.streak.StreakInfoSheet
 import uz.oybek.ozamiz.ui.feature.streak.StreakUiEffect
 import uz.oybek.ozamiz.ui.feature.streak.StreakViewModel
@@ -36,11 +40,20 @@ import uz.oybek.ozamiz.ui.modelUtils.MealTime
 import uz.oybek.ozamiz.ui.utils.animateIntegerText
 import uz.oybek.ozamiz.ui.utils.appColors
 import uz.oybek.ozamiz.ui.utils.collectFlowOnStart
+import uz.oybek.ozamiz.ui.utils.getArgs
+import androidx.lifecycle.lifecycleScope
+import androidx.core.os.bundleOf
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.ui.feature.community.add.AddPostArgs
+import uz.oybek.ozamiz.ui.feature.premium.PremiumFragment
+import uz.oybek.ozamiz.ui.utils.loadPhoto
 import uz.oybek.ozamiz.ui.utils.loadBannerAd
 import uz.oybek.ozamiz.ui.utils.reminderType
 import uz.oybek.ozamiz.ui.utils.setOnSafeClickListener
 import uz.oybek.ozamiz.ui.utils.toBundle
-import yads.vi
+import uz.oybek.ozamiz.util.logMessage
 import java.util.Locale
 import kotlin.math.absoluteValue
 
@@ -51,6 +64,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val streakViewModel: StreakViewModel by viewModels()
     private var dateAdapter: DateScrollerAdapter? = null
     private var isHomeFirstUpdated: Boolean = false
+    private var promptTimerJob: Job? = null
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -75,7 +89,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.checkDateCalendar()
+        viewModel.selectCurrentDay()
     }
 
     override fun viewCreated(bind: FragmentHomeBinding) {
@@ -107,13 +121,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             navigate(R.id.notificationsFragment)
         }
 
+        checkInitialPremiumShow()
+
         initNotificationBanner(bind)
+        observeGreatMealPrompt(bind)
         loadBanner()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.checkDateCalendar()
+        viewModel.selectCurrentDay()
         updateNotificationBanner()
     }
 
@@ -135,6 +152,44 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         val context = context ?: return
         val isGranted = NotificationPermissionUtils.isPermissionGranted(context)
         bindingT?.layoutNotificationBanner?.root?.isVisible = !isGranted
+    }
+
+    private fun observeGreatMealPrompt(bind: FragmentHomeBinding) {
+        collectFlowOnStart(viewModel.greatMealPrompt) { prompt ->
+            promptTimerJob?.cancel()
+            GreatMealPromptBinder.bind(
+                binding = bind.cardGreatMealPrompt,
+                prompt = prompt,
+                onCloseClick = { viewModel.clearGreatMealPrompt() },
+                onPostClick = { photoUrl, textDesc ->
+                    viewModel.clearGreatMealPrompt()
+                    val args = AddPostArgs(
+                        imageUri = photoUrl,
+                        initialDescription = textDesc
+                    )
+                    navigate(R.id.addPostFragment, args.toBundle())
+                }
+            )
+            if (prompt != null) {
+                promptTimerJob = viewLifecycleOwner.lifecycleScope.launch {
+                    delay(30_000L)
+                    if (viewModel.greatMealPrompt.value == prompt) {
+                        viewModel.clearGreatMealPrompt()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkInitialPremiumShow() {
+        val homeArgs = arguments.getArgs<HomeArgs>()
+
+        if (homeArgs?.showPremium == true) {
+            runCatching {
+                arguments?.clear()
+                navigate(R.id.premiumFragment)
+            }
+        }
     }
 
     private fun initCalendarUI(bind: FragmentHomeBinding) = with(bind) {
@@ -183,11 +238,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         cardProtein.setOnSafeClickListener { navigate(R.id.proteinGuideFragment) }
         cardFat.setOnSafeClickListener { navigate(R.id.lipidsGuideFragment) }
         cardCarbs.setOnSafeClickListener { navigate(R.id.carbsGuideFragment) }
-        btnHowFatBurned.setOnSafeClickListener {
+        btnProteinInfo.setOnSafeClickListener { navigate(R.id.proteinGuideFragment) }
+        btnFatInfo.setOnSafeClickListener { navigate(R.id.lipidsGuideFragment) }
+        btnCarbsInfo.setOnSafeClickListener { navigate(R.id.carbsGuideFragment) }
+        limitReached.btnHowFatBurned.setOnSafeClickListener {
             showInfoSheet(R.string.how_to_burn_fat_title, R.string.how_to_burn_fat_content)
         }
-        btnHungryWhatToEat.setOnSafeClickListener {
-            showInfoSheet(R.string.hungry_what_to_eat_title, R.string.hungry_what_to_eat_content)
+        limitReached.btnHungryWhatToEat.setOnSafeClickListener {
+            val remainingCals = viewModel.uiState.value.calorieMacro.remainingCalories
+            val prompt = if (remainingCals > 0) {
+                "Bugun $remainingCals kkal qoldi. Nima yeyishni tavsiya berasan?"
+            } else {
+                "Nima yeyishni tavsiya berasan?"
+            }
+            navigate(R.id.aiChatFragment, AiChatArgs(initialPrompt = prompt, showBackButton = true).toBundle())
         }
         collectFlowOnStart(
             viewModel.uiState.map { it.profile.userGoal to it.calorieMacro }.distinctUntilChanged()
@@ -248,7 +312,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         cardWeightLog.btnAddWeightHome.setOnSafeClickListener { navigate(R.id.addWeightPhotoFragment) }
         cardWhatToEat.root.setOnSafeClickListener { navigate(R.id.plateRuleFragment) }
         cardDietologistHome.root.setOnSafeClickListener { navigate(R.id.aiChatFragment) }
-        cardPremiumChecking.root.setOnSafeClickListener { navigate(R.id.premiumFragment) }
+        cardPremiumChecking.root.setOnSafeClickListener {
+            PaymentCheckSubmittedBottomSheet().show(childFragmentManager, "PaymentCheckSubmittedBottomSheet")
+        }
+        cardAppFeedback.root.setOnSafeClickListener {
+            AppFeedbackDialogFragment.newInstance().show(childFragmentManager, "AppFeedbackDialogFragment")
+        }
         collectFlowOnStart(
             viewModel.uiState.map { it.profile }.distinctUntilChanged(), ::bindProfile
         )
@@ -288,8 +357,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
         val showWarning = state.isExceededWarning
         val warningColor = appColors.colorCalorieExceeded
-        textCaloriesRemainingCount.setTextColor(if (showWarning) warningColor else appColors.colorOnSurface)
-        textCaloriesRemainingLabel.setTextColor(if (showWarning) warningColor else appColors.colorOnSurfaceVariant)
+        textCaloriesRemainingCount.setTextColor(appColors.colorOnSurface)
+        textCaloriesRemainingLabel.setTextColor(appColors.colorOnSurfaceVariant)
 
         progressCaloriesCircular.setProgressData(
             consumed = state.consumedCalories,
@@ -299,42 +368,91 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             exceededColor = warningColor
         )
 
-        limitReached.isVisible = state.isLimitReached
-        if (state.isLimitReached) {
-            val isGain = userGoal.isGain
-            textLimitEmoji.text = if (isGain) "🎉" else "🔥"
-            textLimitReachedMessage.setText(
-                if (isGain) R.string.home_goal_reached_gain_message
-                else R.string.home_goal_reached_loss_message
-            )
-            btnHungryWhatToEat.isVisible = !isGain
+        // Smart Limit Status Card Driven By Repository Summary State
+        with(limitReached) {
+            when (state.calorieStatusState) {
+                CalorieStatusState.NEAR_LIMIT -> {
+                    root.isVisible = true
+                    textLimitEmoji.text = "💡"
+                    textLimitReachedMessage.text = getString(
+                        R.string.home_limit_almost_reached_message,
+                        state.remainingCalories
+                    )
+                    btnHowFatBurned.isVisible = false
+                    btnHungryWhatToEat.isVisible = !userGoal.isGain
+                }
+
+                CalorieStatusState.TARGET_PASSED_BUT_DEFICIT -> {
+                    root.isVisible = true
+                    if (userGoal.isGain) {
+                        textLimitEmoji.text = "🎉"
+                        textLimitReachedMessage.setText(R.string.home_goal_reached_gain_message)
+                        btnHowFatBurned.isVisible = false
+                        btnHungryWhatToEat.isVisible = false
+                    } else if (state.consumedCalories > state.targetCalories) {
+                        // Consumed > Target BUT <= Maintenance (TDEE) -> Still in deficit!
+                        textLimitEmoji.text = "🎉"
+                        textLimitReachedMessage.text = getString(
+                            R.string.home_status_target_passed_deficit,
+                            state.calorieDeficit,
+                            state.fatBurnedGrams
+                        )
+                        btnHowFatBurned.isVisible = true
+                        btnHowFatBurned.setText(R.string.home_progress_fat_burned_btn)
+                        btnHungryWhatToEat.isVisible = false
+                    } else {
+                        // Met exact target
+                        textLimitEmoji.text = "🎉"
+                        textLimitReachedMessage.text = getString(
+                            R.string.home_limit_reached_deficit_message,
+                            state.calorieDeficit,
+                            state.fatBurnedGrams
+                        )
+                        btnHowFatBurned.isVisible = true
+                        btnHowFatBurned.setText(R.string.home_progress_fat_burned_btn)
+                        btnHungryWhatToEat.isVisible = false
+                    }
+                }
+
+                CalorieStatusState.MAINTENANCE_EXCEEDED -> {
+                    root.isVisible = true
+                    textLimitEmoji.text = "⚠️"
+                    textLimitReachedMessage.setText(R.string.home_status_maintenance_exceeded)
+                    btnHowFatBurned.isVisible = false
+                    btnHungryWhatToEat.isVisible = false
+                }
+
+                CalorieStatusState.NORMAL -> {
+                    root.isVisible = false
+                }
+            }
         }
 
         bindMacro(
             progress = progressProtein,
             text = textProteinValue,
+            btnInfo = btnProteinInfo,
             consumed = state.proteinConsumed,
             target = state.proteinTarget,
             isExceeded = state.isProteinExceeded,
-            showWarning = state.isProteinWarning,
             normalColor = appColors.colorPrimary
         )
         bindMacro(
             progress = progressFat,
             text = textFatValue,
+            btnInfo = btnFatInfo,
             consumed = state.fatConsumed,
             target = state.fatTarget,
             isExceeded = state.isFatExceeded,
-            showWarning = state.isFatWarning,
             normalColor = appColors.colorPrimary
         )
         bindMacro(
             progress = progressCarbs,
             text = textCarbsValue,
+            btnInfo = btnCarbsInfo,
             consumed = state.carbsConsumed,
             target = state.carbsTarget,
             isExceeded = state.isCarbsExceeded,
-            showWarning = state.isCarbsWarning,
             normalColor = appColors.colorPrimary
         )
 
@@ -344,26 +462,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private fun bindMacro(
         progress: BaseProgressIndicator<*>,
         text: TextView,
+        btnInfo: View,
         consumed: Int,
         target: Int,
         isExceeded: Boolean,
-        showWarning: Boolean = false,
         normalColor: Int
     ) {
-        val warningColor = appColors.colorCalorieExceeded
-        val indicatorExceededColor = if (showWarning) warningColor else normalColor
         progress.setProgressData(
             consumed = consumed,
             target = target,
-            isExceeded = showWarning,
+            isExceeded = false,
             normalColor = normalColor,
-            exceededColor = indicatorExceededColor
+            exceededColor = normalColor
         )
-        text.setTextColor(if (showWarning) warningColor else appColors.colorOnSurfaceVariant)
+        text.setTextColor(appColors.colorOnSurfaceVariant)
         text.text = getString(
             if (isExceeded) R.string.macro_exceeded_format else R.string.macro_remaining_format,
             (target - consumed).absoluteValue
         )
+        btnInfo.isVisible = isExceeded
     }
 
     private fun getMealCardBinding(mealTime: MealTime): ItemHomeMealCardBinding = with(binding) {
@@ -463,16 +580,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private fun bindProfile(state: HomeProfileUiState) = with(binding) {
         cardWeightLog.root.isVisible = state.showWeightLogCard
         cardPremiumChecking.root.isVisible = state.paymentChecking
+        cardAppFeedback.root.isVisible = state.showFeedbackCard
         bindNotificationBadge(state.unreadMessages)
     }
 
     private fun bindDietolog(state: HomeDietologUiState) = with(binding.cardDietologistHome) {
-        val lastMessage = state.lastMessageText?.trim()
-        if (!lastMessage.isNullOrBlank()) {
-            descDietologist.text = lastMessage
-        } else {
-            descDietologist.setText(R.string.home_ai_dietologist_desc)
-        }
+        descDietologist.setText(R.string.home_ai_dietologist_desc)
 
         if (state.messageCount > 1) {
             badgeDietologistCount.isVisible = true
@@ -535,8 +648,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 navigate(R.id.foodCameraFragment, args.toBundle())
             }
 
-            is HomeUiEffect.ShowFoodLimitSheet -> {
-                navigate(R.id.foodLimitBottomSheet, effect.args.toBundle())
+            is HomeUiEffect.NavigateToPremium -> {
+                navigate(R.id.premiumFragment, bundleOf("mealType" to effect.mealType))
+            }
+
+            is HomeUiEffect.ShowPremiumLimitSheet -> {
+                uz.oybek.ozamiz.ui.feature.limit.PremiumLimitSheet.show(
+                    fragmentManager = childFragmentManager,
+                    title = getString(R.string.home_food_limit_premium_title),
+                    message = getString(R.string.home_food_limit_premium_msg),
+                    onFoodListClick = {
+                        val args = uz.oybek.ozamiz.ui.feature.log.food.SearchFoodArgs(mealType = effect.mealType)
+                        navigate(R.id.searchFoodFragment, args.toBundle())
+                    }
+                )
             }
         }
     }

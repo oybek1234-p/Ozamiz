@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import androidx.navigation.fragment.findNavController
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.DialogLogWaterBinding
 import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
@@ -83,6 +84,10 @@ class LogWaterDialog : BottomSheetDialogFragment() {
             cardBottle500.setOnClickListener { animateButton(it) { addWater(500) } }
             cardBottle1000.setOnClickListener { animateButton(it) { addWater(1000) } }
             btnCloseWater.setOnClickListener { dismiss() }
+            cardWaterTip.setOnClickListener {
+                dismiss()
+                findNavController().navigate(R.id.waterGuideFragment)
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {

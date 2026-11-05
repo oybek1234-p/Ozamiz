@@ -2,7 +2,9 @@ package uz.oybek.ozamiz.ui.feature.community.add
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.net.Uri
+import kotlin.math.roundToInt
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +23,7 @@ import uz.oybek.ozamiz.databinding.FragmentAddPostBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.ImagePicker
 import uz.oybek.ozamiz.ui.utils.createTempCameraUri
+import uz.oybek.ozamiz.ui.utils.getArgs
 import uz.oybek.ozamiz.ui.utils.hideKeyboard
 import uz.oybek.ozamiz.ui.utils.loadPhoto
 import uz.oybek.ozamiz.ui.utils.registerCameraLauncher
@@ -64,6 +67,17 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
         setupToolbar()
         setupListeners()
         observeState()
+
+        val args = arguments.getArgs<AddPostArgs>()
+        val isWeightProgressPost = args?.isWeightProgressPost ?: false
+        binding.cardBlurFaceOption.isVisible = isWeightProgressPost
+
+        viewModel.initialDescription?.takeIf { it.isNotBlank() }?.let { desc ->
+            if (binding.etDescription.text.isNullOrBlank()) {
+                binding.etDescription.setText(desc)
+                binding.etDescription.setSelection(desc.length)
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -87,6 +101,14 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
 
         binding.btnRemovePhoto.setOnClickListener {
             viewModel.removeSelectedImage()
+        }
+
+        binding.cbBlurFace.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.toggleFaceBlur(requireContext(), isChecked)
+        }
+
+        binding.cardBlurFaceOption.setOnClickListener {
+            binding.cbBlurFace.isChecked = !binding.cbBlurFace.isChecked
         }
 
         binding.etDescription.setOnEditorActionListener { _, actionId, _ ->
@@ -127,7 +149,15 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
             return
         }
 
-        viewModel.submitPost(title = null, description = description)
+        val args = arguments.getArgs<AddPostArgs>()
+        val isWeightProgressPost = args?.isWeightProgressPost ?: false
+
+        viewModel.submitPost(
+            context = requireContext(),
+            title = null,
+            description = description,
+            shouldBlurFace = isWeightProgressPost && binding.cbBlurFace.isChecked
+        )
     }
 
     private fun launchCamera() {
@@ -173,16 +203,51 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
     private var lastRenderedUri: Uri? = null
 
     private fun renderState(state: AddPostUiState) {
+        val args = arguments.getArgs<AddPostArgs>()
+        val hasBeforeImage = !args?.beforeImageUri.isNullOrBlank()
         val hasImage = state.selectedImageUri != null
-        binding.cardPickPhoto.isVisible = hasImage
-        binding.layoutPhotoButtons.isVisible = !hasImage
 
-        if (state.selectedImageUri != lastRenderedUri) {
-            lastRenderedUri = state.selectedImageUri
-            if (hasImage) {
-                binding.imgPhotoPreview.loadPhoto(state.selectedImageUri)
-            } else {
-                binding.imgPhotoPreview.setImageDrawable(null)
+        val displayAfterUri = if (state.isFaceBlurActive && state.blurredImageUri != null) {
+            state.blurredImageUri
+        } else {
+            state.selectedImageUri
+        }
+
+        val displayBeforeUri = if (state.isFaceBlurActive && state.blurredBeforeImageUri != null) {
+            state.blurredBeforeImageUri
+        } else {
+            args?.beforeImageUri
+        }
+
+        val isDifferentImage = displayBeforeUri?.toString() != displayAfterUri?.toString() &&
+                args?.beforeImageUri != args?.imageUri
+
+        if (hasBeforeImage && hasImage && isDifferentImage) {
+            binding.cardDualPhotoComparison.isVisible = true
+            binding.cardPickPhoto.isVisible = false
+            binding.layoutPhotoButtons.isVisible = false
+            binding.imgBeforePhotoPreview.loadPhoto(displayBeforeUri)
+            binding.imgAfterPhotoPreview.loadPhoto(displayAfterUri)
+        } else {
+            binding.cardDualPhotoComparison.isVisible = false
+            binding.cardPickPhoto.isVisible = hasImage
+            binding.layoutPhotoButtons.isVisible = !hasImage
+
+            if (displayAfterUri != lastRenderedUri) {
+                lastRenderedUri = displayAfterUri
+                if (hasImage) {
+                    tryPrecalculateDimensions(displayAfterUri)
+                    binding.imgPhotoPreview.loadPhoto(
+                        displayAfterUri,
+                        onResourceReady = { width, height ->
+                            adjustPhotoPreviewDimensions(width, height)
+                        }
+                    )
+                    binding.imgPhotoPreviewBlurBg.loadPhoto(displayAfterUri)
+                } else {
+                    binding.imgPhotoPreview.setImageDrawable(null)
+                    binding.imgPhotoPreviewBlurBg.setImageDrawable(null)
+                }
             }
         }
 
@@ -193,14 +258,14 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
         binding.etDescription.isEnabled = !state.isLoading
         binding.btnSelectGallery.isEnabled = !state.isLoading
         binding.btnSelectCamera.isEnabled = !state.isLoading
-        binding.btnRemovePhoto.isEnabled = !state.isLoading
-        binding.btnRemovePhoto.isVisible = hasImage && !state.isLoading
+        val isDualComparison = hasBeforeImage && hasImage && isDifferentImage
+        binding.btnRemovePhoto.isVisible = hasImage && !isDualComparison && !state.isLoading
 
         // Toolbar submit button disabled during loading
         binding.btnToolbarSubmit.isEnabled = !state.isLoading
         binding.btnToolbarSubmit.alpha = if (state.isLoading) 0.3f else 1.0f
 
-        // Submit button loading state: disable, hide text and remove icon while loading
+        // Submit button loading state
         binding.btnSubmitPost.isEnabled = !state.isLoading
         if (state.isLoading) {
             binding.btnSubmitPost.text = ""
@@ -219,6 +284,67 @@ class AddPostFragment : BaseFragment<FragmentAddPostBinding>() {
             }
             is AddPostUiEffect.GenericError -> {
                 toast(getString(R.string.community_add_post_error))
+            }
+        }
+    }
+
+    private fun tryPrecalculateDimensions(uri: Uri?) {
+        if (uri == null) return
+        try {
+            val resolver = requireContext().contentResolver
+            val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            resolver.openInputStream(uri)?.use { stream ->
+                BitmapFactory.decodeStream(stream, null, options)
+            }
+            if (options.outWidth > 0 && options.outHeight > 0) {
+                val rotation = getExifRotation(uri)
+                val (w, h) = if (rotation == 90 || rotation == 270) {
+                    options.outHeight to options.outWidth
+                } else {
+                    options.outWidth to options.outHeight
+                }
+                adjustPhotoPreviewDimensions(w, h)
+            }
+        } catch (_: Exception) {
+            // Glide onResourceReady orqali moslanadi
+        }
+    }
+
+    private fun getExifRotation(uri: Uri): Int {
+        return try {
+            requireContext().contentResolver.openInputStream(uri)?.use { stream ->
+                val exifInterface = androidx.exifinterface.media.ExifInterface(stream)
+                when (exifInterface.getAttributeInt(
+                    androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION,
+                    androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL
+                )) {
+                    androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                    androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                    androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                    else -> 0
+                }
+            } ?: 0
+        } catch (_: Exception) {
+            0
+        }
+    }
+
+    private fun adjustPhotoPreviewDimensions(intrinsicWidth: Int, intrinsicHeight: Int) {
+        if (intrinsicWidth <= 0 || intrinsicHeight <= 0) return
+        val dm = resources.displayMetrics
+        val maxContainerHeight = (270 * dm.density).roundToInt()
+        val minContainerHeight = (140 * dm.density).roundToInt()
+
+        binding.cardPickPhoto.post {
+            val containerWidth = binding.cardPickPhoto.width
+            if (containerWidth > 0) {
+                val targetHeight = (containerWidth * (intrinsicHeight.toFloat() / intrinsicWidth)).roundToInt()
+                    .coerceIn(minContainerHeight, maxContainerHeight)
+                val lp = binding.layoutPhotoPreviewContainer.layoutParams
+                if (lp.height != targetHeight) {
+                    lp.height = targetHeight
+                    binding.layoutPhotoPreviewContainer.layoutParams = lp
+                }
             }
         }
     }

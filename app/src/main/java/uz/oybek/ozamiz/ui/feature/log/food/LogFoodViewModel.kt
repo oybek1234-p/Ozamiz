@@ -33,17 +33,14 @@ data class LogFoodUiState(
     val mealTime: String? = null,
     val logs: List<FoodModel> = emptyList(),
     val isPremium: Boolean = false,
+    val canLog: Boolean = true,
     val isLoaded: Boolean = false
 )
 
 sealed interface LogFoodUiEffect {
     data class ShowToastRes(@param:StringRes val messageResId: Int) : LogFoodUiEffect
     data class NavigateToCamera(val mealType: String) : LogFoodUiEffect
-    data class ShowLimitSheet(
-        val remainingLimit: Int,
-        val targetLimit: Int,
-        val mealType: String
-    ) : LogFoodUiEffect
+    data class NavigateToPremium(val mealType: String) : LogFoodUiEffect
 }
 
 @HiltViewModel
@@ -70,13 +67,23 @@ class LogFoodViewModel @Inject constructor(
         val meal = _uiState.value.mealType
         observeLogs(date, meal)
 
+        val limits = limitManagerRepo.getLimits()
+        _uiState.update {
+            it.copy(
+                isPremium = limits.isFoodUnlimited,
+                canLog = limits.canLogFood
+            )
+        }
+
         viewModelScope.launch {
             profileRepo.user.collect { user ->
+                val updatedLimits = limitManagerRepo.getLimits()
                 val targetReminderType = MealReminderType.fromIdOrNull(_uiState.value.mealType)
                 val reminderTime = user.mealReminders.find { it.type == targetReminderType }?.time
                 _uiState.update {
                     it.copy(
-                        isPremium = user.isPremiumActive,
+                        isPremium = updatedLimits.isFoodUnlimited,
+                        canLog = updatedLimits.canLogFood,
                         mealTime = reminderTime
                     )
                 }
@@ -88,9 +95,12 @@ class LogFoodViewModel @Inject constructor(
         val selectedDate = selectedDateManager.getSelectedDate()
         val rawMealType = args?.mealType
         val validMeal = rawMealType ?: MealTime.getMealByTime().id
+        val limits = limitManagerRepo.getLimits()
         return LogFoodUiState(
             date = selectedDate,
-            mealType = validMeal
+            mealType = validMeal,
+            isPremium = limits.isFoodUnlimited,
+            canLog = limits.canLogFood
         )
     }
 
@@ -128,9 +138,7 @@ class LogFoodViewModel @Inject constructor(
                 )
             } else {
                 _effects.send(
-                    LogFoodUiEffect.ShowLimitSheet(
-                        remainingLimit = limits.remainingFoodLimit,
-                        targetLimit = limits.foodLimit,
+                    LogFoodUiEffect.NavigateToPremium(
                         mealType = state.mealType
                     )
                 )

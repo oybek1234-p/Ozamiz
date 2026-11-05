@@ -36,7 +36,7 @@
     <string name="yopish">Yopish</string>
     <string name="akkauntga_kirish">Akkauntga kirish</string>
     <string name="google_orqali_kirish">Google orqali kirish</string>
-    <string name="auth_logging_in">Akkauntga kirilmoqda…</string>
+    <string name="auth_logging_in">Akkauntga kirilmoqda...</string>
     <string name="keyinroq">Keyinroq</string>
     <string name="davom_etish">Davom etish</string>
     <string name="your_web_client_id">730315334265-u2dvrkqn4mdgdqh1ttd3qo73voc34odh.apps.googleusercontent.com</string>
@@ -46,7 +46,7 @@
     <string name="insert_password">Parolni kiriting</string>
     <string name="invalid_password">Parol kamida 6 ta belgidan iborat</string>
     <string name="retry_later">Keyinroq urinib ko\'ring!</string>
-    <string name="weak_password">Havfsiz paroq kiriting!</string>
+    <string name="weak_password">Xavfsiz parol kiriting!</string>
     <string name="o_tkazib_yuborish">O\'tkazib yuborish</string>
     <string name="email_or_pass_not_valid">Email yoki parol noto\'g\'ri</string>
     <string name="auth_error_user_not_found">Foydalanuvchi topilmadi yoki hisob o\'chirilgan</string>
@@ -67,13 +67,21 @@
     <string name="common_error_unknown">Noma\'lum xatolik yuz berdi</string>
     <string name="operator">Telefon qilish</string>
     <string name="boshlash">Boshlash</string>
-    <string name="ismingizni_kiriting">Izmingizni kiriting</string>
+    <string name="ismingizni_kiriting">Ismingizni kiriting</string>
     <string name="obed">Obed</string>
     <string name="time_ex">13:00</string>
     <string name="calories">Kaloriya</string>
     <string name="protein">Oqsil</string>
     <string name="fat">Yog\'</string>
     <string name="carbs">Uglevod</string>
+    <string name="food_macro_protein">Oqsil</string>
+    <string name="food_macro_fiber">Kletchatka</string>
+    <string name="food_macro_healthy_carbs">To\'yimli uglevod</string>
+    <string name="food_macro_moderate_carbs">Uglevod</string>
+    <string name="food_macro_unhealthy_carbs">Uglevod</string>
+    <string name="food_macro_healthy_fat">Foydali yog\'</string>
+    <string name="food_macro_moderate_fat">Yog\'</string>
+    <string name="food_macro_unhealthy_fat">Yog\'</string>
     <string name="yeyildi">Yeyildi</string>
     <string name="nomi">Nomi</string>
     <string name="natija_title">Natija</string>
@@ -227,7 +235,7 @@
     <string name="logged_item_food_format">%1$s (%2$d kal)</string>
     <string name="logged_item_exercise_format">%1$s (%2$d daq, %3$d kal)</string>
     <string name="reminder_format">%1$s: %2$s</string>
-    <string name="search_food_hint">Ovqat qidirish…</string>
+    <string name="search_food_hint">Ovqat qidirish...</string>
     <string name="or_enter_manually">Yoki qo\'lda kiriting:</string>
     <string name="add_food_photo_optional">Rasm yuklash (ixtiyoriy)</string>
     <string name="calories_hint_required">Kaloriya (Majburiy)</string>
@@ -255,7 +263,7 @@
     <string name="healthiness_moderate">Me\'yorda yeng</string>
     <string name="healthiness_poor">Ehtiyot bo\'ling</string>
     <string name="macro_protein">💪 Kuch (Oqsil)</string>
-    <string name="macro_carbs">⚡️ Energiya (Uglevod)</string>
+    <string name="macro_carbs">⚡ Energiya (Uglevod)</string>
     <string name="macro_fat">🛡️ Himoya (Yog\')</string>
 
     <string name="water_liters_format">%1$s litr ichildi</string>
@@ -273,11 +281,11 @@
     <string name="upload_meal_photo">Kaloriyasini hisoblaymiz</string>
     <string name="tap_to_add_photo">Rasm qo\'shish</string>
     <string name="describe_your_meal">Bugun nima yedingiz?</string>
-    <string name="food_description_hint">Misol: Bir kosa go\'shtli sho‘rva, 2 bo‘lak oq non, stakan kola</string>
+    <string name="food_description_hint">Misol: Bir kosa go\'shtli sho\'rva, 2 bo\'lak oq non, stakan kola</string>
     <string name="analyze_and_save">Taxlil qilish</string>
     <string name="error_photo_required">Iltimos, rasm yuklang</string>
     <string name="error_description_required">Ovqat haqida ma\'lumot kiriting</string>
-    <string name="analyzing">Tahlil qilinmoqda…</string>
+    <string name="analyzing">Tahlil qilinmoqda...</string>
     <string name="learning_benefits_calories">Foydasi, kaloriyasini o\'rganyapmiz</string>
     <string name="edit_calories_title">Kaloriyani o\'zgartirish</string>
     <string name="edit_protein_title">Oqsilni o\'zgartirish (gr)</string>
@@ -287,7 +295,7 @@
     <string name="confirm_delete_log_message">Haqiqatan ham bu yozuvni o\'chirmoqchimisiz?</string>
     <string name="yes">Ha</string>
     <string name="voice_input_pending">Ovozli kiritish...</string>
-    <string name="saving">Saqlanmoqda…</string>
+    <string name="saving">Saqlanmoqda...</string>
     <string name="save_changes">O\'zgarishlarni saqlash</string>
     <string name="analysis_result_title">AI Taxmin Natijasi</string>
     <string name="estimated_calories_format">%d kaloriya</string>
@@ -396,7 +404,7 @@
     <string name="age_hint_asterisk">Yoshingiz</string>
     <string name="height_cm_hint_asterisk">Bo\'yingiz (sm)</string>
     <string name="weight_kg_hint_asterisk">Vazningiz (kg)</string>
-    <string name="ideal_weight_range_info">Siz uchun ideal vazn diapazoni:</string>
+    <string name="ideal_weight_range_info">Ideal vazn oralig\'i:</string>
     <string name="ideal_weight_range_format">%s kg - %s kg</string>
     <string name="ideal_weight_label_format">Ideal vazn: %1$s</string>
     <string name="target_weight_kg_hint_optional">Maqsad vazningiz (kg)</string>
@@ -489,7 +497,7 @@
     <string name="bugunga_yetarli">✔ Yetarli</string>
     <string name="premium">Premium</string>
     <string name="yuborish">Yuborish</string>
-    <string name="ovqatlar_bo_yicha_cheksiz_maslahatlar">Ovqatlar bo‘yicha cheksiz maslahatlar</string>
+    <string name="ovqatlar_bo_yicha_cheksiz_maslahatlar">Ovqatlar bo\'yicha cheksiz maslahatlar</string>
     <string name="reklama_yo_q">Reklamalarsiz foydalaning</string>
     <string name="premium_feature_ai_title">Cheklovsiz ovqat tahlili</string>
     <string name="premium_feature_ai_desc">Ovqatlarni rasmga oling va soniyalar ichida natijani biling.</string>
@@ -531,6 +539,16 @@
     <string name="premium_required_message">Bu funksiyadan foydalanish uchun Premium obunaga o\'ting. Dastlabki 3 kun yoki 3 kunlik ketma-ketlikdan so\'ng bu funksiya pullik bo\'ladi.</string>
     <string name="go_to_premium">Premiumga O\'tish</string>
     <string name="admin_premium_verifications">Premium Tekshiruv</string> <!-- ProfileFragmentdagi button uchun -->
+    <string name="premium_payment_loading">Ma\'lumot yuklanmoqda...</string>
+    <string name="premium_payment_check_required">Iltimos, avval chek rasmini yuklang</string>
+    <string name="premium_payment_approved">To\'lov tasdiqlandi</string>
+    <string name="premium_payment_rejected">To\'lov rad etildi</string>
+    <string name="premium_user_not_pending">Foydalanuvchi topilmadi yoki tekshiruvda emas.</string>
+    <string name="premium_price_not_found">Narx ma\'lumotlari topilmadi</string>
+    <string name="premium_confirm_approve_title">To\'lovni Tasdiqlash</string>
+    <string name="premium_confirm_approve_message">Haqiqatan ham bu foydalanuvchining to\'lovini tasdiqlamoqchimisiz?</string>
+    <string name="premium_confirm_reject_title">To\'lovni Rad Etish</string>
+    <string name="premium_confirm_reject_message">Haqiqatan ham bu foydalanuvchining to\'lovini rad etmoqchimisiz? Bu amalni ortga qaytarib bo\'lmaydi.</string>
     <string name="image_load_error_placeholder_text">Rasmni yuklab bo\'lmadi</string>
     <string name="ovqat_haqida_yozing_ixtiyoriy">Ovqat haqida</string>
 
@@ -546,7 +564,7 @@
     <string name="what_gender_subtitle">Har bir odam uchun maqsad belgilashimiz uchun jinsingiz muhim</string>
     <string name="what_name">Ismingizni kiriting</string>
     <string name="start_stable_loss">Samarali va sog\'lom o\'zgarishni boshlang!</string>
-    <string name="diagram_text_1">🙌 Ozamiz bilan nima xohlasangiz, shuni yeng. Sevimli taomlardan tiyilish va qiyin "qoidalar" endi yo‘q!</string>
+    <string name="diagram_text_1">🙌 Ozamiz bilan nima xohlasangiz, shuni yeng. Sevimli taomlardan tiyilish va qiyin "qoidalar" endi yo\'q!</string>
     <string name="diagram_text_2">🍏 Biz sizga kundalik hayotingizga mos tushadigan, eng muhimi — sog\'lom o\'zgarish yo\'lini o\'rgatamiz.</string>
     <string name="ismingiz">Yozing</string>
     <string name="calorie_info_title">Bu juda oson</string>
@@ -560,17 +578,17 @@
     <string name="how_active_info">Kundalik faollik darajangizni bilish bizga kaloriya ehtiyojingizni aniqroq hisoblashda yordam beradi.</string>
     <string name="what_current_weight">Hozirgi vazningiz qancha?</string>
     <string name="vazningiz_kg">Vazn (kg)</string>
-    <string name="what_target_weight">Keling, siz erishmoqchi bo‘lgan maqsadni belgilaymiz!</string>
-    <string name="see_effect_title">Tez orada sog‘lig‘ingiz va umumiy holatingizda ijobiy o‘zgarishlarni ko‘rasiz.</string>
+    <string name="what_target_weight">Keling, siz erishmoqchi bo\'lgan maqsadni belgilaymiz!</string>
+    <string name="see_effect_title">Tez orada sog\'lig\'ingiz va umumiy holatingizda ijobiy o\'zgarishlarni ko\'rasiz.</string>
     <string name="s_effect_1">🩸 Qandli diabet xavfi kamayadi</string>
     <string name="s_effect_2">📉 Qon bosimi pasayadi</string>
     <string name="s_effect_3">💪 Xolesterin darajasi yaxshilanadi</string>
     <string name="people_belivus">Minglab insonlar Ozamiz bilan maqsadiga yetdi. Navbat sizniki — bugunoq boshlang!</string>
-    <string name="review_1">Eng qulay ilova! Och qolmasdan, to‘g‘ri ovqatlanib qorin yo‘qotish mumkinligiga ishonmasdim</string>
+    <string name="review_1">Eng qulay ilova! Och qolmasdan, to\'g\'ri ovqatlanib qorin yo\'qotish mumkinligiga ishonmasdim</string>
     <string name="aziz_28_yosh">Aziz, 28 yosh</string>
-    <string name="review_2">Ozamiz menga o‘zimni qo‘lga olishga yordam berdi. Kaloriya sanash juda oson va retseptlar bizning oshxonaga mos. 8 kg vazn tashladim!</string>
+    <string name="review_2">Ozamiz menga o\'zimni qo\'lga olishga yordam berdi. Kaloriya sanash juda oson va retseptlar bizning oshxonaga mos. 8 kg vazn tashladim!</string>
     <string name="madina_24_yosh">Madina, 24 yosh</string>
-    <string name="communtity_join">Bizning safimizga qo‘shiling!</string>
+    <string name="communtity_join">Bizning safimizga qo\'shiling!</string>
     <string name="today">Bugun</string>
     <string name="plan_estimated_title">Siz %s da maqsadga erisha olasiz!</string>
 
@@ -591,11 +609,11 @@
     <string name="card_ratings_desc">Qaysi ovqat foydali ekanini bilib oling.</string>
 
     <string name="card_tracking_title">Kaloriya hisobi</string>
-    <string name="card_tracking_desc">Yegan ovqatingizni kiritib, kunlik me’yorni kuzating.</string>
+    <string name="card_tracking_desc">Yegan ovqatingizni kiritib, kunlik me\'yorni kuzating.</string>
     <string name="love_it">Boshlash</string>
     <string name="error_height">Bo\'yingizni to\'g\'ri kiriting</string>
-    <string name="error_weight">Vazn notog\'ri</string>
-    <string name="name_error">Ismingizni tog\'ri kiriting</string>
+    <string name="error_weight">Vazn noto\'g\'ri</string>
+    <string name="name_error">Ismingizni to\'g\'ri kiriting</string>
 
 
     <string name="label_remaining">Remaining</string>
@@ -622,7 +640,7 @@
     <string name="rasmoling">1. Ovqatni rasmga oling.</string>
     <string name="ilovakalhison">2. Ilova kaloriya miqdorini hisoblaydi.</string>
     <string name="log_input_empty">Ovqat haqida kiriting</string>
-    <string name="fix">Tog\'irlash</string>
+    <string name="fix">To\'g\'rilash</string>
     <string name="add_plus">+ Qo\'shish</string>
     <string name="tarkibi">Tarkibi</string>
     <string name="try_not_to_eat_more">Boshqa ovqat yemaslikga harakat qiling</string>
@@ -663,24 +681,24 @@
     <string name="subscription_yearly">Yillik obuna</string>
 
     <string name="snacks_guide_title">Kechki tamaddi</string>
-    <string name="snacks_intro">Oradagi ovqatlar (tamaddilar) asosiy taomlar orasida qorin juda och qolib, tushlik yoki kechki ovqatda ko‘p yeb qo‘yishning oldini olish uchun kerak. Ozish jarayonida oradagi ovqatlanish shirinlik va xamirli narsalar yemaslik uchun juda yaxshi himoya hisoblanadi.</string>
+    <string name="snacks_intro">Oradagi ovqatlar (tamaddilar) asosiy taomlar orasida qorin juda och qolib, tushlik yoki kechki ovqatda ko\'p yeb qo\'yishning oldini olish uchun kerak. Ozish jarayonida oradagi ovqatlanish shirinlik va xamirli narsalar yemaslik uchun juda yaxshi himoya hisoblanadi.</string>
     <string name="snacks_rules_title">Tamaddi qoidalari</string>
     <string name="snacks_rule_time">Nonushta bilan tushlik orasida hamda tushlik bilan kechki ovqat orasida tamaddi qilinadi.</string>
-    <string name="snacks_rule_order">Asosiy ovqatdan kamida 3 soat o‘tgan bo‘lishi shart. Ovqatdan keyin choy ichish tamaddi hisoblanmaydi.</string>
-    <string name="snacks_rule_fruits">Mevalarni faqat kunning birinchi yarmida yeyish mumkin. Kechqurun meva yeyish ozishni to‘xtatadi.</string>
+    <string name="snacks_rule_order">Asosiy ovqatdan kamida 3 soat o\'tgan bo\'lishi shart. Ovqatdan keyin choy ichish tamaddi hisoblanmaydi.</string>
+    <string name="snacks_rule_fruits">Mevalarni faqat kunning birinchi yarmida yeyish mumkin. Kechqurun meva yeyish ozishni to\'xtatadi.</string>
     <string name="snacks_variants_title">Tayyor tamaddi variantlari</string>
     <string name="snacks_morning_label">Kunning birinchi yarmi uchun:</string>
     <string name="snack_variant_1"><b>Yashil olma va bodom:</b> 1 ta yashil olma yoki kivi va 4-5 ta bodom.</string>
-    <string name="snack_variant_2"><b>Pishloqli non:</b> Shakarsiz ko‘k choy va qora non ustiga 1 tilim pishloq.</string>
+    <string name="snack_variant_2"><b>Pishloqli non:</b> Shakarsiz ko\'k choy va qora non ustiga 1 tilim pishloq.</string>
     <string name="snack_variant_3"><b>Mavsumiy mevalar:</b> 1 dona nok, shaftoli yoxud bir siqim gilos.</string>
-    <string name="snack_variant_4"><b>Mevali tvorog:</b> 100 gramm oddiy tvorog, yarimta olma to‘g‘ralgan holda.</string>
+    <string name="snack_variant_4"><b>Mevali tvorog:</b> 100 gramm oddiy tvorog, yarimta olma to\'g\'ralgan holda.</string>
     <string name="snacks_afternoon_label">Kunning ikkinchi yarmi uchun:</string>
-    <string name="snack_variant_5"><b>Ko‘katli qatiq:</b> 1 stakan qatiq yoki kefir, ichiga ozgina ko‘kat to‘g‘ralgan holda.</string>
+    <string name="snack_variant_5"><b>Ko\'katli qatiq:</b> 1 stakan qatiq yoki kefir, ichiga ozgina ko\'kat to\'g\'ralgan holda.</string>
     <string name="snack_variant_6"><b>Tuxum va barra bodring:</b> 1 ta qaynatilgan tuxum va 1 ta barra bodring.</string>
-    <string name="snack_variant_7"><b>Pishloqli xlebtsi:</b> 2-3 ta butun donli quruq non ustiga brinza pishlog‘i.</string>
-    <string name="snack_variant_8"><b>Barra sabzavotlar:</b> Bodring va sabzini uzunchoq to‘g‘rab yeyish.</string>
-    <string name="snack_variant_9"><b>Pista mag\'zi:</b> Bir siqim qovurilmagan va tuzlanmagan kungaboqar yoki qovoq pishgan mag‘zi.</string>
-    <string name="snack_variant_10"><b>Achchiq shokolad:</b> Shakarsiz qahva yoki ko‘k choy va 1 bo‘lak achchiq shokolad.</string>
+    <string name="snack_variant_7"><b>Pishloqli xlebtsi:</b> 2-3 ta butun donli quruq non ustiga brinza pishlog\'i.</string>
+    <string name="snack_variant_8"><b>Barra sabzavotlar:</b> Bodring va sabzini uzunchoq to\'g\'rab yeyish.</string>
+    <string name="snack_variant_9"><b>Pista mag\'zi:</b> Bir siqim qovurilmagan va tuzlanmagan kungaboqar yoki qovoq pishgan mag\'zi.</string>
+    <string name="snack_variant_10"><b>Achchiq shokolad:</b> Shakarsiz qahva yoki ko\'k choy va 1 bo\'lak achchiq shokolad.</string>
     <string name="variant_1">1-variant</string>
     <string name="variant_2">2-variant</string>
     <string name="variant_3">3-variant</string>
@@ -692,18 +710,18 @@
     <string name="variant_9">9-variant</string>
     <string name="variant_10">10-variant</string>
     <string name="snacks_forbidden_title">Nimalar qat\'iy mumkin emas?</string>
-    <string name="snacks_forbidden_content">Perekus sifatida do‘kondagi tayyor pechenyelar, vafli, chips, yong\'oqchalarning sho\'r qadoqlanganlari, quritilgan mevalar (mayiz, turshak — bular shakar va kaloriyaga juda boy) umuman yeyilmaydi.</string>
+    <string name="snacks_forbidden_content">Perekus sifatida do\'kondagi tayyor pechenyelar, vafli, chips, yong\'oqchalarning sho\'r qadoqlanganlari, quritilgan mevalar (mayiz, turshak — bular shakar va kaloriyaga juda boy) umuman yeyilmaydi.</string>
 
     <!-- Breakfast Guide -->
     <string name="breakfast_guide_title">Ertalabki choy</string>
-    <string name="breakfast_intro">Ertalabki choy — organizmni uyg‘otish va kunlik ozish mexanizmini ishga tushirish uchun eng asosiy nuqtadir. Ozish uchun nonushtani qanday boshlash, nimalarga e’tibor berish va qanday ovqatlar tanlash kerakligini tushuntiraman.</string>
+    <string name="breakfast_intro">Ertalabki choy — organizmni uyg\'otish va kunlik ozish mexanizmini ishga tushirish uchun eng asosiy nuqtadir. Ozish uchun nonushtani qanday boshlash, nimalarga e\'tibor berish va qanday ovqatlar tanlash kerakligini tushuntiraman.</string>
     <string name="breakfast_before_title">Nonushtadan oldin: Birinchi navbatda nima qilish kerak</string>
-    <string name="breakfast_before_water">Uyg‘onganingizdan so‘ng, nonushtadan 20–30 daqiqa oldin 1-2 stakan iliq toza suv iching. Bu oshqozon-ichak tizimini yuvadi, o‘t qopini ishga tushiradi.</string>
+    <string name="breakfast_before_water">Uyg\'onganingizdan so\'ng, nonushtadan 20–30 daqiqa oldin 1-2 stakan iliq toza suv iching. Bu oshqozon-ichak tizimini yuvadi, o\'t qopini ishga tushiradi.</string>
     <string name="breakfast_before_exercise">Suv ichgach, kamida 5-10 daqiqa yengil badantarbiya qiling. Bu metabolizmni tezlashtiradi.</string>
     <string name="breakfast_attention_title">Nimalarga qat\'iy e\'tibor berish kerak</string>
-    <string name="breakfast_attention_time">Nonushta uyg‘onganingizdan keyingi 1 soat ichida bo‘lishi kerak.</string>
-    <string name="breakfast_attention_avoid">Shirin choy, oq non, sariyog‘, murabbo, pechenye, kolbasa yoki sosiskalar qondagi shakarni keskin ko‘taradi va qayta kuchli ochlik hissini uyg‘otadi.</string>
-    <string name="breakfast_attention_fluid">Ovqat paytida litrlab choy ichmang. Bu oshqozon shirasi konsentratsiyasini kamaytiradi. Choy yoki kofeni ovqatdan 10-15 daqiqa keyin, shakarsiz ichgan ma’qul.</string>
+    <string name="breakfast_attention_time">Nonushta uyg\'onganingizdan keyingi 1 soat ichida bo\'lishi kerak.</string>
+    <string name="breakfast_attention_avoid">Shirin choy, oq non, sariyog\', murabbo, pechenye, kolbasa yoki sosiskalar qondagi shakarni keskin ko\'taradi va qayta kuchli ochlik hissini uyg\'otadi.</string>
+    <string name="breakfast_attention_fluid">Ovqat paytida litrlab choy ichmang. Bu oshqozon shirasi konsentratsiyasini kamaytiradi. Choy yoki kofeni ovqatdan 10-15 daqiqa keyin, shakarsiz ichgan ma\'qul.</string>
     <string name="breakfast_attention_salt">Ertalab juda sho\'r mahsulotlar yemang, ular organizmda suv ushlab qolib, shish ko\'rsatadi.</string>
     <string name="breakfast_requirements_title">Nima yeyish kerak?</string>
     <string name="breakfast_req_protein">Tuxum, tabiiy tvorog, yog\'siz pishloq, tovuq go\'shti.</string>
@@ -711,23 +729,23 @@
     <string name="breakfast_req_fiber">Bodring, pomidor, ko\'katlar, bulg\'or qalampiri.</string>
     <string name="breakfast_variants_title">Tayyor menyu variantlari</string>
     <string name="breakfast_variant_1_title">Klassik tuxum va bodring</string>
-    <string name="breakfast_variant_1_desc">2 ta qaynatilgan tuxum, 1 bo‘lak qora non, 1 ta barra bodring, shakarsiz ko‘k choy.</string>
+    <string name="breakfast_variant_1_desc">2 ta qaynatilgan tuxum, 1 bo\'lak qora non, 1 ta barra bodring, shakarsiz ko\'k choy.</string>
     <string name="breakfast_variant_2_title">Tuzli \'Ovsyanka\'</string>
-    <string name="breakfast_variant_2_desc">Suvda pishirilgan oddiy ovsyanka (shakarsiz). Ichiga ta’m uchun bir chimdim tuz va tayyor bo‘lgach 2-3 ta yong‘oq mag‘zi solinadi.</string>
+    <string name="breakfast_variant_2_desc">Suvda pishirilgan oddiy ovsyanka (shakarsiz). Ichiga ta\'m uchun bir chimdim tuz va tayyor bo\'lgach 2-3 ta yong\'oq mag\'zi solinadi.</string>
     <string name="breakfast_variant_3_title">Tvorog va qatiq aralashmasi</string>
-    <string name="breakfast_variant_3_desc">150 gramm oddiy bozor tvorogi. Ustiga shakar o‘rniga 2-3 qoshiq oddiy qatiq solib aralashtiriladi.</string>
-    <string name="breakfast_variant_4_title">Ko‘k piyozli quymoq</string>
-    <string name="breakfast_variant_4_desc">2 ta tuxum va to‘g‘ralgan ko‘k piyoz. Tovaga juda kam yog‘ surtib pishiriladi. 1 bo‘lak qora non bilan yeyiladi.</string>
+    <string name="breakfast_variant_3_desc">150 gramm oddiy bozor tvorogi. Ustiga shakar o\'rniga 2-3 qoshiq oddiy qatiq solib aralashtiriladi.</string>
+    <string name="breakfast_variant_4_title">Ko\'k piyozli quymoq</string>
+    <string name="breakfast_variant_4_desc">2 ta tuxum va to\'g\'ralgan ko\'k piyoz. Tovaga juda kam yog\' surtib pishiriladi. 1 bo\'lak qora non bilan yeyiladi.</string>
     <string name="breakfast_variant_5_title">Suzmali nonushta</string>
-    <string name="breakfast_variant_5_desc">3-4 qoshiq suzmaga ozgina ko‘kat to‘g‘rab aralashtiriladi. 1-2 bo‘lak qora non ustiga surtib, choy bilan yeyiladi.</string>
+    <string name="breakfast_variant_5_desc">3-4 qoshiq suzmaga ozgina ko\'kat to\'g\'rab aralashtiriladi. 1-2 bo\'lak qora non ustiga surtib, choy bilan yeyiladi.</string>
     <string name="breakfast_variant_6_title">Sutli ovsyanka</string>
-    <string name="breakfast_variant_6_desc">Yarmiga suv, yarmiga kam yog‘li sut quyib pishirilgan ovsyanka. Yoniga 1 ta qaynatilgan tuxum.</string>
+    <string name="breakfast_variant_6_desc">Yarmiga suv, yarmiga kam yog\'li sut quyib pishirilgan ovsyanka. Yoniga 1 ta qaynatilgan tuxum.</string>
     <string name="breakfast_variant_7_title">Tovuqli yengil buterbrod</string>
-    <string name="breakfast_variant_7_desc">1 bo‘lak qora non. Ustiga: kechadan qolgan qaynatilgan tovuq go‘shti bo‘laklari va bodring tilimlari.</string>
+    <string name="breakfast_variant_7_desc">1 bo\'lak qora non. Ustiga: kechadan qolgan qaynatilgan tovuq go\'shti bo\'laklari va bodring tilimlari.</string>
     <string name="breakfast_variant_8_title">Pomidorli tuxum</string>
-    <string name="breakfast_variant_8_desc">Tovaga pomidorni to‘g‘rab solib, biroz dimlaysiz (suvida pishadi). Ustiga 2 ta tuxumni chaqib, qopqog‘ini yopib pishirasiz.</string>
+    <string name="breakfast_variant_8_desc">Tovaga pomidorni to\'g\'rab solib, biroz dimlaysiz (suvida pishadi). Ustiga 2 ta tuxumni chaqib, qopqog\'ini yopib pishirasiz.</string>
     <string name="breakfast_variant_9_title">Qatiqli nonushta</string>
-    <string name="breakfast_variant_9_desc">1 kosacha quyuq uy qatig‘i, 1 bo‘lak qora non va 1 ta barra bodring.</string>
+    <string name="breakfast_variant_9_desc">1 kosacha quyuq uy qatig\'i, 1 bo\'lak qora non va 1 ta barra bodring.</string>
     <string name="breakfast_variant_10_title">Tuxum va pishloq</string>
     <string name="breakfast_variant_10_desc">2 ta qaynatilgan tuxum, 1 tilim oddiy qattiq pishloq. Shakarsiz kofe yoki choy.</string>
     <string name="breakfast_tip">Maslahat: Har kuni bir xil narsa yemang. Ertalabki choy uchun variantlarni almashtirib turing, shunda parhez joningizga tegmaydi.</string>
@@ -768,38 +786,38 @@
 
     <!-- Dinner Guide -->
     <string name="dinner_guide_title">Kechki ovqat</string>
-    <string name="dinner_intro">Kechqurun eng asosiysi — ovqatning engil bo‘lishi va qon shakarini ko‘tarmasligi. Buning uchun bizga tuxum, qatiq, tvorog va arzon mavsumiy sabzavotlar (karam, bodring, ko‘katlar) yordamga keladi.</string>
+    <string name="dinner_intro">Kechqurun eng asosiysi — ovqatning yengil bo\'lishi va qon shakarini ko\'tarmasligi. Buning uchun bizga tuxum, qatiq, tvorog va arzon mavsumiy sabzavotlar (karam, bodring, ko\'katlar) yordamga keladi.</string>
     <string name="dinner_before_title">Ovqatdan oldin nima qilish kerak</string>
     <string name="dinner_before_time">Uxlashdan kamida 3 soat oldin ovqatlaning. Masalan, soat 22:00 da uxlasangiz, kechki ovqat 19:00 dan kechikmasligi kerak.</string>
-    <string name="dinner_before_water">Ovqatdan 15-20 daqiqa oldin 1 stakan toza suv iching. Bu ko‘p yeb qo‘yishning oldini oladi.</string>
+    <string name="dinner_before_water">Ovqatdan 15-20 daqiqa oldin 1 stakan toza suv iching. Bu ko\'p yeb qo\'yishning oldini oladi.</string>
     <string name="dinner_limits_title">Qat\'iy cheklovlar</string>
-    <string name="dinner_limit_carbs">Kechqurun osh, non, manti, guruch, makaron va kartoshka yemang. Kechasi tana bu energiyani yog‘ga aylantiradi.</string>
-    <string name="dinner_limit_fruits">Olma, banan yoki qovun-tarvuzni kechasi yeyish ozishni to\'xtatadi. Fruktoza kechasi jigarda yog‘ bo‘lib yig‘iladi.</string>
-    <string name="dinner_limit_salt">Sho‘r pishloq, sho\'r go\'sht, tuzlamalar kechasi suvni ushlab qoladi va yuzda shish paydo qiladi.</string>
-    <string name="dinner_variants_title">Go‘shtsiz va Arzon 10 ta Kechki Ovqat Menyusi</string>
+    <string name="dinner_limit_carbs">Kechqurun osh, non, manti, guruch, makaron va kartoshka yemang. Kechasi tana bu energiyani yog\'ga aylantiradi.</string>
+    <string name="dinner_limit_fruits">Olma, banan yoki qovun-tarvuzni kechasi yeyish ozishni to\'xtatadi. Fruktoza kechasi jigarda yog\' bo\'lib yig\'iladi.</string>
+    <string name="dinner_limit_salt">Sho\'r pishloq, sho\'r go\'sht, tuzlamalar kechasi suvni ushlab qoladi va yuzda shish paydo qiladi.</string>
+    <string name="dinner_variants_title">Go\'shtsiz va Arzon 10 ta Kechki Ovqat Menyusi</string>
     <string name="dinner_variant_1_title">Tuxum va ko\'katlar</string>
-    <string name="dinner_variant_1_desc">2 ta qaynatilgan tuxum + barra bodring va ko‘p miqdorda ko‘katlar.</string>
+    <string name="dinner_variant_1_desc">2 ta qaynatilgan tuxum + barra bodring va ko\'p miqdorda ko\'katlar.</string>
     <string name="dinner_variant_2_title">Ko\'katli omlet</string>
-    <string name="dinner_variant_2_desc">2 ta tuxumni chaqib, ko‘p to‘g\'ralgan ko‘katlar bilan aralashtirib, tovada juda kam yog\'da pishirasiz. Yoniga 1 ta pomidor.</string>
+    <string name="dinner_variant_2_desc">2 ta tuxumni chaqib, ko\'p to\'g\'ralgan ko\'katlar bilan aralashtirib, tovada juda kam yog\'da pishirasiz. Yoniga 1 ta pomidor.</string>
     <string name="dinner_variant_3_title">Tvorog va qatiq</string>
     <string name="dinner_variant_3_desc">150 gramm oddiy bozor tvorogi + yoniga 3-4 qoshiq qatiq.</string>
     <string name="dinner_variant_4_title">Karamli salat</string>
-    <string name="dinner_variant_4_desc">Oddiy oq karamni mayda to‘g‘rab, tuz bilan ezasiz, bodring va ko‘katlar qo‘shib, 1 choy qoshiq o‘simlik yog‘i bilan aralashtirasiz. Yoniga 1 ta qaynatilgan tuxum.</string>
+    <string name="dinner_variant_4_desc">Oddiy oq karamni mayda to\'g\'rab, tuz bilan ezasiz, bodring va ko\'katlar qo\'shib, 1 choy qoshiq o\'simlik yog\'i bilan aralashtirasiz. Yoniga 1 ta qaynatilgan tuxum.</string>
     <string name="dinner_variant_5_title">Dimlangan sabzavotlar</string>
-    <string name="dinner_variant_5_desc">Karam, sabzi, piyoz va bulg‘or qalampirini qozonchada, ozgina suv va 1 qoshiq yog‘ bilan o‘z sharbatida dimlab pishirasiz.</string>
+    <string name="dinner_variant_5_desc">Karam, sabzi, piyoz va bulg\'or qalampirini qozonchada, ozgina suv va 1 qoshiq yog\' bilan o\'z sharbatida dimlab pishirasiz.</string>
     <string name="dinner_variant_6_title">Qatiqli salat</string>
-    <string name="dinner_variant_6_desc">1 stakan quyuq qatiq + ichiga to‘g‘ralgan bodring va ko‘katlar.</string>
+    <string name="dinner_variant_6_desc">1 stakan quyuq qatiq + ichiga to\'g\'ralgan bodring va ko\'katlar.</string>
     <string name="dinner_variant_7_title">Tovuqli ujin</string>
-    <string name="dinner_variant_7_desc">Agar tovuq bo‘lsa, ozgina tovuq go‘shtini qaynatib, faqat barra sabzavotlar bilan yeyish.</string>
+    <string name="dinner_variant_7_desc">Agar tovuq bo\'lsa, ozgina tovuq go\'shtini qaynatib, faqat barra sabzavotlar bilan yeyish.</string>
     <string name="dinner_variant_8_title">Glazuyniya</string>
-    <string name="dinner_variant_8_desc">2 ta tuxumdan tayyorlangan sarig‘i pishgan-pishmagan tuxum + 1 ta bodring.</string>
+    <string name="dinner_variant_8_desc">2 ta tuxumdan tayyorlangan sarig\'i pishgan-pishmagan tuxum + 1 ta bodring.</string>
     <string name="dinner_variant_9_title">Tvorogli sho\'r pasta</string>
-    <string name="dinner_variant_9_desc">100 gramm tvorogga mayda to‘g‘ralgan ko‘katlar, yarimta tish sarimsog‘ va ozgina tuz qo‘shib aralashtirasiz. Buni qoshiqlab bodring bilan birga yeysiz.</string>
-    <string name="dinner_variant_10_title">Juda kech bo‘lganda</string>
-    <string name="dinner_variant_10_desc">Agar soat 21:00 dan o‘tib ketgan bo‘lsa va qorin juda och bo‘lsa — shunchaki 1 stakan iliq qatiq ichib uxlang. Shunda oshqozon zo‘riqmaydi va ozish jarayoni to‘xtamaydi.</string>
+    <string name="dinner_variant_9_desc">100 gramm tvorogga mayda to\'g\'ralgan ko\'katlar, yarimta tish sarimsog\' va ozgina tuz qo\'shib aralashtirasiz. Buni qoshiqlab bodring bilan birga yeysiz.</string>
+    <string name="dinner_variant_10_title">Juda kech bo\'lganda</string>
+    <string name="dinner_variant_10_desc">Agar soat 21:00 dan o\'tib ketgan bo\'lsa va qorin juda och bo\'lsa — shunchaki 1 stakan iliq qatiq ichib uxlang. Shunda oshqozon zo\'riqmaydi va ozish jarayoni to\'xtamaydi.</string>
 
     <string name="plate_rule_title">Tarelka qoidasi</string>
-    <string name="plate_rule_intro">Standart diametri 20–22 sm bo‘lgan tarelka olinadi va ko‘z bilan 4 qismga bo‘linadi:</string>
+    <string name="plate_rule_intro">Standart diametri 20–22 sm bo\'lgan tarelka olinadi va ko\'z bilan 4 qismga bo\'linadi:</string>
     <string name="plate_rule_section_1_title">Tarelkani yarmi sabzavotlar soling</string>
     <string name="plate_rule_veg_intro">Oshqozonni to\'ldirish va uzoq vaqt to\'q tutish uchun xizmat qiladi.</string>
     <string name="plate_rule_veg_items">Karam, bodring, pomidor, ko\'katlar va qovoqchalar iste\'mol qilinadi.</string>
@@ -831,67 +849,155 @@
 
     <!-- Oqsilli Taomlar (Protein Foods) -->
     <string name="protein_menu_desc">Mushaklarni mustahkamlash va to\'qlik</string>
-    <string name="protein_guide_title">Oqsilli taomlar</string>
-    <string name="protein_intro">Oqsil — organizmimiz uchun asosiy qurilish materiali hisoblanadi. U mushaklarimizni asraydi, terini taranglashtiradi va uzoq vaqt davomida to‘qlik hissini beradi. Ozish jarayonida oqsil yetishmovchiligi mushaklarning yo‘qolishiga olib keladi.</string>
-    <string name="protein_sources_title">Oqsil manbalari</string>
-    <string name="protein_sources_intro">Oqsillar hayvonot va o‘simlik manbalaridan olinadi. Har bir taomingizda oqsil bo‘lishi muhimdir.</string>
-    <string name="protein_sources_animal">Hayvonot mahsulotlari: Yog‘siz mol go‘shti, tovuq go‘shti, baliq va tuxum.</string>
-    <string name="protein_sources_plant">O‘simlik mahsulotlari: Mosh, no‘xat, yasmiq, loviya va yong‘oqlar.</string>
-    <string name="protein_uzbek_variants_title">O‘zbekistonda oson topiladigan oqsilli taomlar</string>
-    <string name="protein_variant_1_title">Dimlangan mol go\'shti yoki Tovuq filesi</string>
-    <string name="protein_variant_1_desc">150 gramm yog‘siz mol go‘shti yoki tovuq go‘shtini sabzavotlar bilan o‘z sharbatida dimlab pishirish. Bu eng toza oqsil manbaidir.</string>
-    <string name="protein_variant_2_title">Bozor tvorogi va Chakka</string>
-    <string name="protein_variant_2_desc">150 gramm kam yog‘li nordon tvorog yoki chakka. Bu mahsulotlar kazein oqsiliga boy bo‘lib, uzoq vaqt to‘q tutadi.</string>
-    <string name="protein_variant_3_title">Qaynatilgan Tuxum</string>
-    <string name="protein_variant_3_desc">2-3 ta qaynatilgan tuxum (oqsil miqdorini oshiradi va kaloriyani kamaytiradi).</string>
-    <string name="protein_variant_4_title">Pechda pishirilgan baliq</string>
-    <string name="protein_variant_4_desc">Sazan, sudak yoki marinka balig‘ini pechda folga qog‘oziga o‘rab, yog‘siz pishirish. Haftada kamida 1-2 marta yeyish tavsiya etiladi.</string>
-    <string name="protein_variant_5_title">Moshxo\'rda yoki No\'xatli sho\'rva</string>
-    <string name="protein_variant_5_desc">Go‘shti yog‘siz bo‘lgan, lekin no‘xat yoki mosh ko‘p solingan quvvatli va foydali suyuq ovqatlar (kartoshkasiz va kam guruchli).</string>
- 
+    <string name="protein_guide_title">Oqsil haqida</string>
+    <string name="protein_intro_title">Oqsil o\'zi nima va nega kerak?</string>
+    <string name="protein_intro">Oqsil mushaklarni tiklash, to\'qlik hissini berish va immunitetni mustahkamlash uchun zarur. U qorinni uzoq vaqt to\'q tutadi hamda ozish jarayonida mushak massasi yo\'qolishining oldini oladi.</string>
+
+    <string name="protein_good_header">Foydali oqsillar</string>
+    <string name="protein_good_egg_title">🥚 Tuxum</string>
+    <string name="protein_good_egg_desc">Qaynatilgan tuxum, ayniqsa oqi eng toza oqsil manbai hisoblanadi.</string>
+    <string name="protein_good_poultry_title">🍗 Tovuq go\'shti</string>
+    <string name="protein_good_poultry_desc">Yog\'siz tovuq ko\'kragi filesi, bug\'da pishirilgan tovuq kotleti va dimlangan tovuq.</string>
+    <string name="protein_good_meat_title">🥩 Yog\'siz mol go\'shti</string>
+    <string name="protein_good_meat_desc">Sho\'rvadagi qaynatilgan go\'sht, dimlangan mol go\'shti hamda yog\'siz kabob.</string>
+    <string name="protein_good_dairy_title">🧀 Tvorog, qatiq va suzma</string>
+    <string name="protein_good_dairy_desc">Kam yog\'li tvorog, suzma, qatiq hamda chalap.</string>
+    <string name="protein_good_fish_title">🐟 Baliq</string>
+    <string name="protein_good_fish_desc">Qaynatilgan va duxovkada pishirilgan oq baliqlar.</string>
+    <string name="protein_good_plant_title">🌱 O\'simlik oqsillari</string>
+    <string name="protein_good_plant_desc">Moshkichiri, no\'xatsho\'rva, moshxorda hamda loviyali sho\'rva.</string>
+
+    <string name="protein_bad_header">Zararli oqsillar</string>
+    <string name="protein_bad_sausage_title">🌭 Kolbasa va sosiskalar</string>
+    <string name="protein_bad_sausage_desc">Har xil hisoblanmagan tuz, un va zararli yog\'lar to\'la qayta ishlangan go\'shtlar.</string>
+    <string name="protein_bad_fried_title">🍳 Ko\'p yog\'da qovurilgan go\'shtlar</string>
+    <string name="protein_bad_fried_desc">Qozon kabob, qovurma lag\'mon, fri va o\'ta yog\'li qiyma.</string>
+    <string name="protein_bad_smoked_title">🥓 Dudlangan go\'shtlar</string>
+    <string name="protein_bad_smoked_desc">Dudlangan kolbasa, dudlangan baliq va go\'shtlar.</string>
+
+    <string name="protein_faq_header">Tez-tez beriladigan savollar</string>
+    <string name="protein_faq_1_q">Qornim juda tez ochyapti, nima qilsam bo\'ladi?</string>
+    <string name="protein_faq_1_a">Javob: Ratsioningizda oqsil kam! Har ovqatga 1 ta tuxum, ozgina tvorog yoki go\'sht qo\'shing. Oqsil hazm bo\'lishi uchun ko\'p vaqt ketadi va sizni 3-4 soat och qoldirmaydi.</string>
+    <string name="protein_faq_2_q">Tuxumning sarig\'i semirtiradimi?</string>
+    <string name="protein_faq_2_a">Javob: Yo\'q, me\'yorida kuniga 1-2 ta yeyilsa semirtirmaydi. Lekin faqat oqsilini o\'zini yesangiz, kaloriyasi deyarli nolga teng bo\'ladi.</string>
+    <string name="protein_faq_3_q">Go\'sht yeyishga imkonim yo\'q, nima yeyay?</string>
+    <string name="protein_faq_3_a">Javob: Go\'sht o\'rnini moshkichiri, no\'xatsho\'rva, qatiq, tvorog va tuxum bemalol bosa oladi.</string>
+
     <!-- Uglevodli Taomlar (Carbohydrates) -->
     <string name="carbs_menu_desc">Yaxshi va yomon quvvat manbalari</string>
-    <string name="carbs_guide_title">Uglevodli taomlar</string>
-    <string name="carbs_intro">Uglevodlar — organizmimiz uchun asosiy energiya manbai. Biroq, ozish jarayonida uglevodlarni to‘g‘ri tanlay bilish shart. Ular yaxshi va yomon turlarga bo‘linadi.</string>
-    <string name="carbs_good_title">Yaxshi uglevodlar</string>
-    <string name="carbs_good_intro">Yaxshi uglevodlar past glikemik indeksga ega, qonga asta-sekin so‘riladi, kun davomida quvvat beradi va tezda och qolishga yo‘l qo‘ymaydi.</string>
-    <string name="carbs_good_items">Nimalar kiradi: Grechka, suli yormasi, devzira guruch, mosh va no‘xat, javdar noni, sabzavotlar.</string>
-    <string name="carbs_bad_title">Yomon uglevodlar</string>
-    <string name="carbs_bad_intro">Yomon uglevodlar qondagi qand miqdorini keskin ko‘taradi. Ular tezda hazm bo‘lib, yog‘ bo‘lib yig‘iladi va ko‘p o‘tmay yana kuchli ochlik hissini uyg‘otadi.</string>
-    <string name="carbs_bad_items">Nimalar kiradi: Oq un, oq non, xamir ovqatlar, shirinliklar, murabbo, gazlangan shirin suvlar, kartoshka.</string>
-    <string name="carbs_uzbek_variants_title">Milliy taomlarda uglevodlarni boshqarish</string>
-    <string name="carbs_variant_1_title">Bug\'da pishgan grechka yoki mosh</string>
-    <string name="carbs_variant_1_desc">Kun davomida garnir sifatida oq guruch yoki makaron o‘rniga grechka, mosh yoki no‘xatni pishirib yeyish.</string>
-    <string name="carbs_variant_2_title">Javdar noni</string>
-    <string name="carbs_variant_2_desc">Oq patir non yoki yopgan nondan butunlay voz kechib, har safar faqat 1-2 bo‘lak qora non yeyish.</string>
-    <string name="carbs_variant_3_title">Oq guruch o\'rniga jigarrang guruch</string>
-    <string name="carbs_variant_3_desc">Agar juda palov sog‘ingan bo‘lsangiz, uni devzira yoki jigarrang guruchda, kamroq o‘simlik yog‘i qo‘shib tayyorlash.</string>
-    <string name="carbs_variant_4_title">Barra sabzavotlar to\'plami</string>
-    <string name="carbs_variant_4_desc">Pomidor, bodring, karam va ko‘katlardan tayyorlangan yangi salat uglevodlarni qonga sekinroq so‘rilishiga yordam beradi.</string>
-    <string name="carbs_variant_5_title">Zararli uglevodlardan tiyilish</string>
-    <string name="carbs_variant_5_desc">Fast-fud, do‘kondagi shakarli shokolad va pechenyelar, uylarda ko‘p tayyorlanadigan xamirli xonim va chuchvaralardan uzoqroq bo‘lish.</string>
- 
+    <string name="carbs_guide_title">Uglevod haqida</string>
+    <string name="carbs_intro_title">Uglevod o\'zi nima va nega kerak?</string>
+    <string name="carbs_intro">Uglevod bu tanamiz va miyamiz uchun asosiy energiya manbai. Lekin uning ortiqchasi to\'g\'ridan-to\'g\'ri qorinda yog\' bo\'lib yig\'iladi. Uglevodni butunlay kesib tashlash holsizlikka olib keladi, shuning uchun faqat foydalisini yeyish kerak.</string>
+
+    <string name="carbs_good_header">Foydali uglevodlar</string>
+    <string name="carbs_good_grains_title">🌾 Grechka va Ovsyanka</string>
+    <string name="carbs_good_grains_desc">Grechka, ovsyanka (suli bo\'tqasi), sabzavotli mastava, moshxorda va moshkichiri.</string>
+    <string name="carbs_good_bread_title">🍞 Qora va rjanoy non</string>
+    <string name="carbs_good_bread_desc">Qora non hamda rjanoy non. Kuniga 1-2 bo\'lak.</string>
+    <string name="carbs_good_veg_title">🥒 Barra sabzavotlar va ko\'katlar</string>
+    <string name="carbs_good_veg_desc">Achchiq-chuchuk salat, bodring, pomidor, karam, sabzi va ko\'katlar.</string>
+    <string name="carbs_good_fruits_title">🍎 Past shakarli mevalar</string>
+    <string name="carbs_good_fruits_desc">Yashil olma, kivi, qulpnay, apelsin va limon. Kunning birinchi yarmida.</string>
+
+    <string name="carbs_bad_header">Zararli uglevodlar</string>
+    <string name="carbs_bad_white_bread_title">🥖 Oq unli pishiriqlar</string>
+    <string name="carbs_bad_white_bread_desc">Oq patir non, somsa, xonim, bulochkalar, cheburek va pirojki.</string>
+    <string name="carbs_bad_sweets_title">🍬 Shirinliklar va shakar</string>
+    <string name="carbs_bad_sweets_desc">Shakar, novvot, holva, tort, vafli va do\'kondagi shokoladlar.</string>
+    <string name="carbs_bad_drinks_title">🥤 Shirin va gazli ichimliklar</string>
+    <string name="carbs_bad_drinks_desc">Kola, Fanta, qadoqlangan soklar va shirin choylar.</string>
+    <string name="carbs_bad_instant_title">🍜 Tez tayyorlanadigan lapshalar</string>
+    <string name="carbs_bad_instant_desc">Tayyor tezpishar lapshalar va makaronlar.</string>
+
+    <string name="carbs_faq_header">Tez-tez beriladigan savollar</string>
+    <string name="carbs_faq_1_q">Mevalar qovun, tarvuz, uzum semirtiradimi?</string>
+    <string name="carbs_faq_1_a">Javob: Ha! Mevalarda fruktoza ya\'ni tabiiy shakar bor. Kun bo\'yi faqat tarvuz yoki qovun yeyish qondagi shakarni oshirib, semirtiradi. Mevalarni kunning birinchi yarmida, 150-200 grammdan oshirmay yeng.</string>
+    <string name="carbs_faq_2_q">Shirinlik xumor qilsa nima qilish kerak?</string>
+    <string name="carbs_faq_2_a">Javob: Shirinlik xohlayotganingiz organizmda oqsil yetishmayotganidan darak. Shirinlik o\'rniga 1-2 bo\'lak qora shokolad 70% yoki bir hovuch mayiz va turshak yeng.</string>
+    <string name="carbs_faq_3_q">Nonni butunlay tashlashim shartmi?</string>
+    <string name="carbs_faq_3_a">Javob: Yo\'q. Oq nonni qora nonga almashtiring va uni faqat ertalab yoki tushlikda 1-2 bo\'lak yeng. Kechki ovqatda non yemang.</string>
+
     <!-- Yog'li Taomlar (Fats) -->
     <string name="fats_menu_desc">Sog\'lom va zararli lipidlar tasnifi</string>
-    <string name="fats_guide_title">Yog\'li taomlar</string>
-    <string name="fats_intro">Ko‘pchilik ozish uchun yog‘dan butunlay voz kechadi, lekin bu noto‘g‘ri! Sog‘lom gormonlar, miya faoliyati, soch mustahkamligi va terining chiroyli bo‘lishi uchun yog‘lar juda muhim. Ularni ham foydali va zararli turlarga ajratamiz.</string>
-    <string name="fats_good_title">Yaxshi yog\'lar</string>
-    <string name="fats_good_intro">Foydali yog‘lar hujayralarni tiklaydi va yurak-qon tomir tizimiga ijobiy ta’sir ko‘rsatadi.</string>
-    <string name="fats_good_items">Nimalar kiradi: Zaytun yog‘i, kolza yoki zig‘ir yog‘i, yong‘oqlar, pista, baliq yog‘i, tuxum sarig‘i.</string>
-    <string name="fats_bad_title">Yomon yog\'lar</string>
-    <string name="fats_bad_intro">Zararli yog‘lar xolesterinni oshiradi, tomirlarni tiqadi va to‘g‘ridan-to‘g‘ri teri osti yog‘iga aylanadi. Trans-yog‘lar eng xavflisidir.</string>
-    <string name="fats_bad_items">Nimalar kiradi: Qayta qovurilgan yog‘, margarin, spred, dumba yog‘i va charvi, pista yog\'ning qayta qizdirilgani.</string>
-    <string name="fats_uzbek_variants_title">Yog\'larni to\'g\'ri iste\'mol qilish qoidalari</string>
-    <string name="fats_variant_1_title">Salatlarni zaytun yog\'i bilan bezash</string>
-    <string name="fats_variant_1_desc">Salatga mayonez yoki oddiy pista yog‘i o‘rniga 1 choy qoshiq sovuq siqilgan zaytun yog‘idan qo‘shing.</string>
-    <string name="fats_variant_2_title">Xom yong\'oq mag\'zi</string>
-    <string name="fats_variant_2_desc">Kuniga 4-5 ta oddiy O‘zbekiston tog‘larida pishgan grek yong‘og‘i yoki bodom mag‘zini xomligicha yeyish.</string>
-    <string name="fats_variant_3_title">Oltin rang Baliq go\'shti</string>
-    <string name="fats_variant_3_desc">Baliqda omega-3 yog‘ kislotalari mavjud. Mahalliy Amudaryo yoki Sirdaryo sazanini bug‘da pishirib, foydali yog‘larini olish.</string>
-    <string name="fats_variant_4_title">Qaynatilgan tuxum sarig\'i</string>
-    <string name="fats_variant_4_desc">Tuxum sariqlaridan butunlay voz kechmang. Kuniga 1-2 ta tuxum sarig‘ini yeyish gormonlar uchun juda foydalidir.</string>
-    <string name="fats_variant_5_title">Trans-yog\'lardan va Qovurmalardan qochish</string>
-    <string name="fats_variant_5_desc">Ko‘chadagi qovurilgan somsalar, chuchvara, bo‘g‘irsoqlar, margarin bilan tayyorlangan qatlama va pishiriqlardan butunlay saqlaning.</string>
+    <string name="fats_guide_title">Yog\' haqida</string>
+    <string name="fats_intro_title">Yog\' o\'zi nima va nega kerak?</string>
+    <string name="fats_intro">Sog\'lom yog\'lar gormonlar va tana salomatligi uchun muhim. Lekin yog\'lar o\'ta kaloriyali bo\'lib (1 grammida 9 kkal bor), ozish jarayonida uning miqdorini qat\'iy nazorat qilish va faqat foydali turlarini me\'yorida iste\'mol qilish zarur.</string>
+
+    <string name="fats_good_header">Foydali yog\'lar</string>
+    <string name="fats_good_nuts_title">🥜 Yong\'oq va xom mag\'izlar</string>
+    <string name="fats_good_nuts_desc">Oddiy yong\'oq, bodom va xom mag\'izlar. Kuniga 1 hovuch.</string>
+    <string name="fats_good_oils_title">🧈 Sifatli o\'simlik va sariyog\'</string>
+    <string name="fats_good_oils_desc">Zaytun yog\'i salatlar uchun, sariyog\' kuniga 10-15 gramm.</string>
+    <string name="fats_good_others_title">🍳 Tuxum sarig\'i va urug\'lar</string>
+    <string name="fats_good_others_desc">Tuxum sarig\'i va kunchut urug\'i.</string>
+
+    <string name="fats_bad_header">Zararli yog\'lar</string>
+    <string name="fats_bad_trans_title">🧈 Trans-yog\'lar</string>
+    <string name="fats_bad_trans_desc">Mayonez, margarin, spred va qatlama pishiriqlar.</string>
+    <string name="fats_bad_fried_title">🍳 Qayta qizdirilgan va paxta yog\'i</string>
+    <string name="fats_bad_fried_desc">Paxta yog\'ida qovurilgan bo\'g\'irsoq, chuchvara, cheburek va fri.</string>
+    <string name="fats_bad_fastfood_title">🍟 Fast-fud va chipslar</string>
+    <string name="fats_bad_fastfood_desc">Gamburger, lavash mayonezi, chips va suxariklar.</string>
+    <string name="fats_bad_seeds_title">🌻 Qora pista semichka</string>
+    <string name="fats_bad_seeds_desc">Oddiy qora pista juda kaloriyali, 100 grammida 600 kaloriya bor. Kechasi chaqish semirtiradi.</string>
+
+    <string name="fats_faq_header">Tez-tez beriladigan savollar</string>
+    <string name="fats_faq_1_q">Emizikli onalar yog\' yeyishi kerakmi?</string>
+    <string name="fats_faq_1_a">Javob: Albatta! Sutingiz to\'yimli va sifatli bo\'lishi uchun sariyog\', yong\'oqlar va foydali yog\'lar juda muhim. Emizikli onalarga yog\'ni butunlay kesish taqiqlanadi.</string>
+    <string name="fats_faq_2_q">Yog\'li ovqat osh, qozon kabob yesam nima bo\'ladi?</string>
+    <string name="fats_faq_2_a">Javob: Yog\'li ovqatlarning kaloriyasi juda ko\'p bo\'ladi. Agar osh yesangiz, porsiyani kamaytiring va yoniga juda ko\'p sabzavotli salat achchiq-chuchuk qo\'shib yeng.</string>
+    <string name="fats_faq_3_q">Pista semichka chaqsam semiramanmi?</string>
+    <string name="fats_faq_3_a">Javob: Ha. 100 gramm pistada taxminan 600 kaloriya bor, bu 2 kosa ovqat degani! Kechqurun televizor ko\'rib pista chaqish vazn tashlashni to\'xtatib qo\'yadi.</string>
+
+    <!-- Macro Daily Status Strings -->
+    <string name="macro_today_consumed_format">Bugun: %1$s / %2$s</string>
+    <string name="macro_today_remaining_format">Qoldi: %1$s</string>
+    <string name="macro_today_exceeded_format">%1$s oshdi</string>
+    <string name="protein_today_status_header">Bugungi oqsil ko\'rsatkichi</string>
+    <string name="carbs_today_status_header">Bugungi uglevod ko\'rsatkichi</string>
+    <string name="fats_today_status_header">Bugungi yog\' ko\'rsatkichi</string>
+    <string name="protein_exceeded_title">Oqsil me\'yordan oshdi!</string>
+    <string name="protein_exceeded_desc">Oqsil oshsa xavotir olmang! U mushaklarni oziqlantiradi, to\'qlik hissini beradi va ozishda teringiz osilib qolmasligini ta\'minlaydi. Oqsilning biroz oshib ketishi mutlaqo beziyon hamda foydali.</string>
+    <string name="carbs_exceeded_title">Uglevod oshib ketdi!</string>
+    <string name="carbs_exceeded_desc">Uglevod oshishi darhol semirtirmaydi, lekin u tanada suv ushlaydi va umumiy kaloriyani oshirishi mumkin. Bugun shirinlik va xamirli taomlardan tiyilib turing.</string>
+    <string name="fats_exceeded_title">Yashirin yog\'lar ko\'payib ketdi!</string>
+    <string name="fats_exceeded_desc">Yog\'lar o\'ta kaloriyali (1g = 9 kkal) bo\'lgani uchun umumiy kunlik kaloriyani tez oshirib yuboradi. Bugun yog\'li va qovurilgan taomlar yemang.</string>
+
+    <!-- Suv Qo'llanmasi (Water Guide) -->
+    <string name="water_guide_title">Suv haqida</string>
+    <string name="water_today_status_header">Bugungi suv ko\'rsatkichi</string>
+
+    <string name="water_intro_title">Suv — tana va metabolizm uchun hayotiy manba</string>
+    <string name="water_intro_desc">Suv tanadagi zaharli moddalarni yuvib chiqaradi va metabolizmni ya\'ni yog\' erishini tezlashtiradi. Ko\'pincha miyamiz chanqoqlikni ochlik bilan adashtiradi. Qorningiz ochganda 1 stakan suv ichib ko\'ring, ochlik hissi o\'tib ketishi mumkin!</string>
+
+    <string name="water_rules_header">Suv ichishning oltin qoidalari</string>
+    <string name="water_rules_sipping_title">💧 Kichik qultumlar bilan iching</string>
+    <string name="water_rules_sipping_desc">1 litr suvni bir ko\'tarishda ichmang, bu buyrakka og\'irlik qiladi. Har soatda 1 stakandan ichish eng to\'g\'risi.</string>
+    <string name="water_rules_before_meal_title">⏰ Ovqatdan oldin</string>
+    <string name="water_rules_before_meal_desc">Har ovqatlanishdan 20-30 daqiqa oldin 1 stakan iliq suv iching. Bu oshqozonni tayyorlaydi va kamroq ovqat yeyishingizga yordam beradi.</string>
+    <string name="water_rules_night_title">🌙 Kechasi ko\'p ichmang</string>
+    <string name="water_rules_night_desc">Ertalab yuzingiz va ko\'zlaringiz shishib uyg\'onmasligi uchun, kunlik suvning asosiy qismini soat 18:00 gacha ichib bo\'ling. Uxlashdan 2 soat oldin suv ichishni to\'xtating.</string>
+
+    <string name="water_not_water_header">Nimalar suv hisoblanmaydi?</string>
+    <string name="water_not_water_soda_title">🥤 Shirin gazli suvlar va qadoqlangan soklar</string>
+    <string name="water_not_water_soda_desc">Bular suv emas, suyuq qand hisoblanadi. Ular chanqoqni bosmaydi, aksincha semirtiradi.</string>
+
+    <string name="water_faq_header">Tez-tez beriladigan savollar</string>
+    <string name="water_faq_2_q">Suv ichsam shishib ketyapman otyok bo\'lyapman, nega?</string>
+    <string name="water_faq_2_a">Javob: Suv o\'z-o\'zidan shish qildirmaydi. Agar siz sho\'r, achchiq yoki xamirli ovqat yeb ketidan suv ichsangiz, tuz suvni tanada ushlab qoladi. Yoki suvni kechasi uxlashdan oldin ko\'p ichyapsiz. Tuzni kamaytiring, shishlar yo\'qoladi.</string>
+    <string name="water_faq_3_q">Suv ichganda yog\' yoqish jarayoni to\'xtab qolmaydimi?</string>
+    <string name="water_faq_3_a">Javob: Mutlaqo yo\'q! Aksincha, yog\'lar faqat suvli muhitda eriydi. Suv kam bo\'lsa, yog\' erishi sekinlashadi.</string>
+    <string name="water_faq_4_q">Suvni sovuq ichaymi yoki issiq?</string>
+    <string name="water_faq_4_a">Javob: Xona haroratidagi yoki biroz iliq suv eng foydalisi. Muzdek suv oshqozonni spazm qilib, hazm sekinlashishiga olib keladi.</string>
+    <string name="water_faq_5_q">Limonli yoki asal qo\'shilgan suv ichsam bo\'ladimi?</string>
+    <string name="water_faq_5_a">Javob: Limonli suv shakarsiz juda foydali, u detoks vazifasini bajaradi. Asal qo\'shsangiz kaloriya beradi, uni faqat ertalab me\'yorida ichish mumkin.</string>
+
+    <!-- Home Smart Limit Messages -->
+    <string name="home_limit_almost_reached_message">Sizda atigi %1$d kkal qoldi. Bugun limitdan oshmaslikka harakat qiling va kuningizni yengil taom bilan yakunlang.</string>
+    <string name="home_limit_reached_deficit_message">Ajoyib! Bugun tana kerakli ozuqani oldi. Bugun %1$d kkal kamroq yedik (taxminan %2$d gr yog\' eriydi!). Ertagacha boshqa ovqat yemay turing.</string>
+    <string name="home_limit_exceeded_message">Bugun kunlik energiya me\'yoridan oshib o\'tildi va yog\' erishi vaqtincha to\'xtadi. Hech qisi yo\'q, xavotir olmang! Ertaga yangi kun va yangi imkoniyat — birgalikda maqsad sari davom etamiz.</string>
+    <string name="home_status_target_passed_deficit">Ajoyib! Bugun tanangiz yetarli quvvatni oldi. Bugun %1$d kal defitsit bo\'ladi va %2$d gr yog\' yoqiladi. Ertagacha boshqa ovqat yemay turing.</string>
+    <string name="home_status_maintenance_exceeded">Bugun kunlik energiya me\'yoridan oshib o\'tildi va yog\' erishi vaqtincha to\'xtadi. Hech qisi yo\'q, xavotir olmang! Ertaga yangi kun va yangi imkoniyat — birgalikda maqsad sari davom etamiz.</string>
 
     <string name="phone_onboard_title">Bog\'lanish uchun</string>
     <string name="phone_onboard_hint">Telefon raqamingiz</string>
@@ -900,7 +1006,7 @@
     <string name="phone_onboard_error">Iltimos, raqamni to\'g\'ri kiriting yoki o\'tkazib yuboring</string>
 
     <string-array name="late_food_warnings">
-        <item>Kechasi soat 21:00dan keyin ovqatlanish tavsiya etilmaydi. Uxlashdan kamida 3 soat oldin ovqat yemang, chunki bu vaqtda hazm qilish jarayoni uyqu sifatini buzagi.</item>
+        <item>Kechasi soat 21:00dan keyin ovqatlanish tavsiya etilmaydi. Uxlashdan kamida 3 soat oldin ovqat yemang, chunki bu vaqtda hazm qilish jarayoni uyqu sifatini buzadi.</item>
         <item>Kechki payt yuqori kaloriyali taom iste\'mol qilish jigarga og\'irlik qiladi. Uxlashga yotishdan 3 soat oldin ovqatlanishni butunlay to\'xtatish shart.</item>
         <item>Kechki ovqat hazm bo\'lishi uchun kamida 3 soat talab etiladi. Soat 21:00 dan keyin 100 kaloriyadan oshiq ovqat yeyish vazn ortishiga zamin yaratadi.</item>
         <item>Uxlashdan oldin yeyilgan har qanday 100 kaloriyadan yuqori taom yog\' zaxirasiga aylanadi. Uxlashga 3 soat qolganda ovqatlanishni yakunlang.</item>
@@ -922,13 +1028,15 @@
         <item>Kechasi 100 kaloriyadan oshiq ovqat yeyish ozish jarayonini butunlay ortga tortadi. Uxlashga 3 soat qolganda ovqat yemang.</item>
     </string-array>
     <string name="admin_user_uid">UID: %1$s</string>
-    <string name="admin_search_hint">Ism yoki UID bo\'yicha qidirish...</string>
+    <string name="admin_search_hint">Ism, telefon raqam yoki UID bo\'yicha qidirish...</string>
     <string name="admin_delete_profile">Profilni o\'chirish</string>
     <string name="admin_delete_confirm_msg_1">Ushbu foydalanuvchi profilini o\'chirishni xohlaysizmi?</string>
     <string name="admin_delete_confirm_title_2">Aniq ishonchingiz komilmi?</string>
     <string name="admin_delete_confirm_msg_2">Bu amalni ortga qaytarib bo\'lmaydi. Barcha ma\'lumotlar o\'chib ketadi!</string>
     <string name="wait_seconds">Kuting (%1$d)</string>
     <string name="profile_deleted_success">Profil muvaffaqiyatli o\'chirildi</string>
+    <string name="admin_unknown_user">Noma\'lum foydalanuvchi</string>
+    <string name="admin_premium_prefix">Premium: %1$s</string>
     <string name="user_search_empty">Qidiruv bo\'yicha foydalanuvchilar topilmadi</string>
     <string name="daily_food_limit_title">Bugungi rasmga olish limitingiz tugadi</string>
     <string name="daily_food_limit_msg">Ertaga yana 3 ta beriladi. Ovqatni tayyor ro\'yxatdan kiriting yoki premium sotib oling</string>
@@ -936,7 +1044,20 @@
     <string name="ai_chat_limit_title">Bugungi limit tugadi</string>
     <string name="ai_chat_limit_msg_free">Ertaga yana 3 ta beriladi. Cheksiz muloqot uchun Premium oling.</string>
     <string name="ai_chat_limit_msg_premium">Bugun kunlik 30 ta xabar limitingizga yetdingiz. Ertaga yangilanadi, ertaga kiring.</string>
-    <string name="ai_chat_limit_hint">Bugungi limit tugadi. Ertaga kiring</string>
+    <string name="ai_chat_limit_hint">Bugun yetarlicha ishlatdingiz. Ertaga kiring</string>
+    <string name="ai_chat_input_hint_default">Xabar yozing...</string>
+    <string name="ai_chat_feedback_liked">Fikringiz uchun rahmat!</string>
+    <string name="ai_chat_feedback_disliked">Fikringiz qabul qilindi</string>
+    <string name="ai_chat_greeting_1">Bugun sizga qanday yordam bera olaman?</string>
+    <string name="ai_chat_greeting_2">Ovqatlanish yoki vazn haqida istalgan savolingizni bering</string>
+    <string name="ai_chat_greeting_3">Savolingiz bormi? Maslahat berishga tayyorman</string>
+    <string name="ai_chat_greeting_4">Ratsioningiz yoki kaloriyangiz haqida gaplashamizmi?</string>
+    <string name="ai_chat_greeting_5">Sog\'lom turmush tarzi bo\'yicha qanday yordam kerak?</string>
+    <string name="ai_chat_new_chat">Yangi</string>
+    <string name="ai_chat_empty_title">Salom! Bugun nima haqida bilmoqchisiz?</string>
+    <string name="ai_chat_thinking">O\'ylayapman</string>
+    <string name="ai_chat_like">Like</string>
+    <string name="ai_chat_dislike">Dislike</string>
     <string name="premium_sheet_benefit_dietologist">Shaxsiy dietolog, ozishga har kuni yordam beradi</string>
     <string name="premium_sheet_benefit_analysis">Oson ozish</string>
     <string name="premium_sheet_benefit_recommendations">Kunlik foydali tavsiyalar</string>
@@ -1004,9 +1125,9 @@
     <string name="health_tip_1_desc">Ovqatlanishdan 15-20 daqiqa oldin suv ichishni odat qiling. Bu metabolizmni 30% gacha tezlashtiradi.</string>
     <string name="health_tip_2_title">Oqsil va kletchatkani ko\'paytiring 🥚 🥦</string>
     <string name="health_tip_2_desc">Ratsioningizda oqsil (tuxum, go\'sht) va kletchatka (sabzavotlar) miqdorini oshiring. Ular sizni uzoq vaqt to\'q tutadi.</string>
-    <string name="health_tip_3_title">Shirinlik va xamirdan qoching 🧁 ❌</string>
+    <string name="health_tip_3_title">Shirinlik va xamirdan qoching 🍩 ❌</string>
     <string name="health_tip_3_desc">Shakar va xamirli taomlar qondagi insulin miqdorini keskin oshirib, yog\' yig\'ilishiga sabab bo\'ladi.</string>
-    <string name="health_tip_4_title">Sog\'lom uyquga amal qiling 💤</string>
+    <string name="health_tip_4_title">Sog\'lom uyquga amal qiling 🛌</string>
     <string name="health_tip_4_desc">Kuniga 7-8 soat uxlashga harakat qiling. Uyqu yetishmasligi stress gormonlarini oshiradi va qorin qismida yog\' yig\'ilishiga olib keladi.</string>
     <string name="health_tip_5_title">To\'g\'ri yeyish muhim 🥗</string>
     <string name="health_tip_5_desc">Ozish — bu kam yeyish emas, balki to\'g\'ri yeyishdir. Sifatli mahsulotlarni tanlang va tanangizga g\'amxo\'rlik qiling.</string>
@@ -1059,7 +1180,7 @@
     <string name="exercise_benefit_item_5">🧠 Stressni kamaytiradi va kayfiyatni ko\'taradi</string>
     <string name="exercise_benefit_item_6">🦴 Suyaklarni mustahkamlaydi</string>
     <string name="exercise_benefit_item_7">🧘 Diqqatni jamlashni yaxshilaydi</string>
-    <string name="exercise_benefit_item_8">🩸 Qon bosimini normallashtirishga yordam beradi</string>
+    <string name="exercise_benefit_item_8">🩺 Qon bosimini normallashtirishga yordam beradi</string>
     <string name="exercise_benefit_item_9">🏃 Chidamlilikni oshiradi</string>
     <string name="exercise_benefit_item_10">🧬 Qarish jarayonini sekinlashtiradi</string>
     <string name="exercise_benefits_ajoyib">Ajoyib 🏃</string>
@@ -1110,8 +1231,8 @@
 
     <string name="exercise_duration_format">%d daqiqa</string>
     <string name="how_to_burn_fat_title">Yog\' yoqish qoidalari ⚡</string>
-    <string name="how_to_burn_fat_content">Tanangiz yog\' yoqish rejimiga o\'tishi uchun quyidagi tavsiyalarga amal qiling:\n\n💧 <b>Ko\'proq suv iching:</b> Suv metabolizmni tezlashtiradi va ochlik hissini kamaytiradi.\n🚶 <b>Jismoniy faollik:</b> Kuniga kamida 30-40 daqiqa piyoda yuring yoki engil mashqlar bajaring.\n🛌 <b>Sifatli uyqu:</b> Sutka davomida 7-8 soat uxlash gormonal muvozanat uchun juda muhim.\n🍏 <b>Kamroq shirinlik:</b> Qand va tezkor uglevodlarni cheklang, ular yog\' to\'planishini osonlashtiradi.\n🔥 <b>Defitsit:</b> Kundalik kaloriya sarfi iste\'mol qilinganidan ko\'proq bo\'lishini ta\'minlang.</string>
-    <string name="hungry_what_to_eat_title">Ochlikda nima yeyish mumkin? 🍏</string>
+    <string name="how_to_burn_fat_content">Tanangiz yog\' yoqish rejimiga o\'tishi uchun quyidagi tavsiyalarga amal qiling:\n\n💧 <b>Ko\'proq suv iching:</b> Suv metabolizmni tezlashtiradi va ochlik hissini kamaytiradi.\n🚶 <b>Jismoniy faollik:</b> Kuniga kamida 30-40 daqiqa piyoda yuring yoki yengil mashqlar bajaring.\n🛌 <b>Sifatli uyqu:</b> Sutka davomida 7-8 soat uxlash gormonal muvozanat uchun juda muhim.\n🍏 <b>Kamroq shirinlik:</b> Qand va tezkor uglevodlarni cheklang, ular yog\' to\'planishini osonlashtiradi.\n🔥 <b>Defitsit:</b> Kundalik kaloriya sarfi iste\'mol qilinganidan ko\'proq bo\'lishini ta\'minlang.</string>
+    <string name="hungry_what_to_eat_title">Ochlikda nima yeyish mumkin? 🍽️</string>
     <string name="hungry_what_to_eat_content">Agar belgilangan limitdan keyin qattiq ochlik his qilsangiz, quyidagi past kaloriyali mahsulotlarni tanlang:\n\n🥒 <b>Bodring va ko\'katlar:</b> Deyarli kaloriyasiz va oshqozonni to\'ldiradi.\n🥛 <b>Kefir yoki qatiq:</b> Past yog\'li sut mahsulotlari hazm qilishni yaxshilaydi.\n🥚 <b>Tuxum oqi:</b> Sof oqsil manbai, uzoq vaqt to\'q tutadi.\n🍵 <b>Ko\'k choy:</b> Shakar qo\'shmasdan iching, u ochlik gormonlarini bostiradi.\n🥬 <b>Karam salati:</b> Kletchatkaga boy va kkal darajasi juda past.</string>
 
     <string name="boshlangich">Boshlang\'ich</string>
@@ -1190,7 +1311,7 @@
     <string name="warning_limit_bread_title">Kunlik non me\'yoriga yetib keldik! Bugun boshqa non va xamirli taomlar yemay turishga kelishdikmi? Bu bilan maqsadimizga yana bir qadam yaqinlashamiz. 🌾</string>
     <string name="warning_soda_drink_title">Shakarli va gazli ichimliklar ozish jarayonini sekinlashtiradi. Bugun ularning o\'rniga toza suv yoki ko\'k choy tanlashga nima deysiz? 🍵</string>
     <string name="warning_heavy_dinner_title">Kechqurun me\'yordan ortiq yeyish tanamizni biroz toliqtirishi mumkin. Bir oz piyoda yurib, tanamizga metabolizmni tiklashga yordam beraylik! 🚶</string>
-    <string name="warning_limit_calorie_title">Qoyil! Bugungi kaloriya me\'yorini to\'liq bajardingiz! Endi ertagacha toza suv ichib tursangiz, tanangiz tun boyi faol yog\' yoqish rejimida ishlaydi. 🎉</string>
+    <string name="warning_limit_calorie_title">Qoyil! Bugungi kaloriya me\'yorini to\'liq bajardingiz! Endi ertagacha toza suv ichib tursangiz, tanangiz tun bo\'yi faol yog\' yoqish rejimida ishlaydi. 🎉</string>
     <string name="warning_water_before_meal_title">Ovqatlanishdan 15-20 daqiqa oldin 1 stakan iliq suv ichishni odat qiling! Bu me\'dani to\'q tutadi va yog\' parchalanishini sezilarli tezlashtiradi. 💧</string>
     <string name="streak_desc_day_1">Ozishga birinchi qadam tashlandi.</string>
     <string name="streak_desc_day_2">Ajoyib boshlanish! Ertaga ham sizni kutib qolaman.</string>
@@ -1218,21 +1339,21 @@
     <string name="exercise_tip_1">🏃 Muntazam mashqlar metabolizmni 24 soatgacha yuqori darajada ushlab turadi.</string>
     <string name="exercise_tip_2">🔥 30 daqiqa piyoda yurish organizmda yog\' yoqish gormonlarini faollashtiradi.</string>
     <string name="exercise_tip_3">💪 Mushak massasining ko\'payishi hatto dam olayotganingizda ham ko\'proq kaloriya sarflashga yordam beradi.</string>
-    <string name="exercise_tip_4">🍎 Sport bilan shug\'ullanish noto\'g\'ri ovqatlarga bo\'lgan ishtiyoqni pasaytiradi.</string>
+    <string name="exercise_tip_4">ðŸŽ Sport bilan shug\'ullanish noto\'g\'ri ovqatlarga bo\'lgan ishtiyoqni pasaytiradi.</string>
     <string name="exercise_tip_5">⚡ Ertalabki badantarbiya kun bo\'yi tetiklik va yuqori energiya beradi.</string>
-    <string name="exercise_tip_6">🛌 Jismoniy faollik uyqu sifatini yaxshilaydi, bu esa vazn nazorati uchun juda muhim.</string>
+    <string name="exercise_tip_6">ðŸ›Œ Jismoniy faollik uyqu sifatini yaxshilaydi, bu esa vazn nazorati uchun juda muhim.</string>
     <string name="exercise_tip_7">🎯 Kuniga 10 000 qadam bosish semirish xavfini 50% ga kamaytiradi.</string>
-    <string name="exercise_tip_8">🧬 Mashqlar insulin sezgirligini oshirib, qandli diabetdan himoya qiladi.</string>
-    <string name="exercise_tip_9">🧘 Sport stress gormoni — kortizolni kamaytiradi, bu esa qorin qismidagi yog\'larni eritishga yordam beradi.</string>
+    <string name="exercise_tip_8">🧠¬ Mashqlar insulin sezgirligini oshirib, qandli diabetdan himoya qiladi.</string>
+    <string name="exercise_tip_9">🧠˜ Sport stress gormoni — kortizolni kamaytiradi, bu esa qorin qismidagi yog\'larni eritishga yordam beradi.</string>
     <string name="exercise_tip_10">❤️ Faol hayot tarzi yurakni baquvvat qiladi va qon aylanishini yaxshilaydi.</string>
     <string name="exercise_tip_11">🚶 Har bir qadam — sog\'lom vazn sari tashlangan qadamdir.</string>
     <string name="exercise_tip_12">🥗 Sport va to\'g\'ri ovqatlanish birgalikda natijani 3 barobar tezlashtiradi.</string>
-    <string name="exercise_tip_13">💦 Mashq paytida suv ichishni unutmang, bu yog\' parchalanishiga yordam beradi.</string>
+    <string name="exercise_tip_13">ðŸ’¦ Mashq paytida suv ichishni unutmang, bu yog\' parchalanishiga yordam beradi.</string>
     <string name="exercise_tip_14">📉 Haftasiga 150 daqiqa mashq qilish sog\'lom ozish uchun ideal me\'yordir.</string>
     <string name="exercise_tip_15">🔥 Kuch ishlatiladigan mashqlar suyaklarni mustahkamlaydi va qomatni go\'zal qiladi.</string>
     <string name="exercise_tip_16">🌟 Bugungi mashg\'ulot — ertangi go\'zal qomatingiz garovidir.</string>
-    <string name="exercise_tip_17">🧠 Jismoniy tarbiya miyani kislorod bilan to\'yintiradi va xotirani kuchaytiradi.</string>
-    <string name="exercise_tip_18">🍃 Tabiat qo\'ynida sayr qilish ruhni orom oldiradi va kaloriyalarni yoqadi.</string>
+    <string name="exercise_tip_17">🧠  Jismoniy tarbiya miyani kislorod bilan to\'yintiradi va xotirani kuchaytiradi.</string>
+    <string name="exercise_tip_18">🌲 Tabiat qo\'ynida sayr qilish ruhni orom oldiradi va kaloriyalarni yoqadi.</string>
     <string name="exercise_tip_19">🚀 Ozishni istasangiz, harakatni hoziroq boshlang, natija sizni kuttirmaydi.</string>
     <string name="exercise_tip_20">🏆 Eng qiyini — boshlash, qolgani intizom va vaqt masalasidir.</string>
 
@@ -1262,24 +1383,24 @@
     <string name="diet_plan_section_title">Rejani tanlang</string>
 
     <string name="diet_plan_loss_standard_title">Uy taomlari bilan</string>
-    <string name="diet_plan_loss_standard_subtitle">Xalq taomlari (osh, sho‘rva, non) bilan qiynalmasdan ozish</string>
-    <string name="diet_plan_loss_standard_protein">0.8 – 1.0 gr/kg</string>
+    <string name="diet_plan_loss_standard_subtitle">Xalq taomlari (osh, sho\'rva, non) bilan qiynalmasdan ozish</string>
+    <string name="diet_plan_loss_standard_protein">0.8 - 1.0 gr/kg</string>
 
-    <string name="diet_plan_loss_high_protein_title">Ko‘p oqsilli</string>
-    <string name="diet_plan_loss_high_protein_subtitle">Go‘sht, tuxum, tvorog ko‘p yeydiganlar uchun</string>
-    <string name="diet_plan_loss_high_protein_protein">1.4 – 1.6 gr/kg</string>
+    <string name="diet_plan_loss_high_protein_title">Ko\'p oqsilli</string>
+    <string name="diet_plan_loss_high_protein_subtitle">Go\'sht, tuxum, tvorog ko\'p yeydiganlar uchun</string>
+    <string name="diet_plan_loss_high_protein_protein">1.4 - 1.6 gr/kg</string>
 
     <string name="diet_plan_loss_low_carb_title">Kam uglevodli</string>
-    <string name="diet_plan_loss_low_carb_subtitle">Non va xamirli ovqatlarni qat’iy kamaytirib tezroq natija</string>
-    <string name="diet_plan_loss_low_carb_protein">1.1 – 1.3 gr/kg</string>
+    <string name="diet_plan_loss_low_carb_subtitle">Non va xamirli ovqatlarni qat\'iy kamaytirib tezroq natija</string>
+    <string name="diet_plan_loss_low_carb_protein">1.1 - 1.3 gr/kg</string>
 
-    <string name="diet_plan_gain_full_body_title">To‘lishish</string>
-    <string name="diet_plan_gain_full_body_subtitle">Yuz to‘lishishi, tanaga et yugurishi va sog‘lom vazn olish</string>
-    <string name="diet_plan_gain_full_body_protein">1.0 – 1.2 gr/kg</string>
+    <string name="diet_plan_gain_full_body_title">To\'lishish</string>
+    <string name="diet_plan_gain_full_body_subtitle">Yuz to\'lishishi, tanaga et yugurishi va sog\'lom vazn olish</string>
+    <string name="diet_plan_gain_full_body_protein">1.0 - 1.2 gr/kg</string>
 
-    <string name="diet_plan_gain_muscle_title">Mushak o‘stirish</string>
-    <string name="diet_plan_gain_muscle_subtitle">Mashg‘ulot qilib faqat mushak va gavdani kattalashtirish</string>
-    <string name="diet_plan_gain_muscle_protein">1.6 – 2.0 gr/kg</string>
+    <string name="diet_plan_gain_muscle_title">Mushak o\'stirish</string>
+    <string name="diet_plan_gain_muscle_subtitle">Mashg\'ulot qilib faqat mushak va gavdani kattalashtirish</string>
+    <string name="diet_plan_gain_muscle_protein">1.6 - 2.0 gr/kg</string>
 
     <!-- Onboarding Goals -->
     <string name="onboarding_goal_title">Asosiy maqsadingiz nima?</string>
@@ -1292,7 +1413,7 @@
     <string name="onboarding_activity_sedentary_subtitle">Ofis ishi yoki uyda</string>
     <string name="onboarding_activity_lightly_active_title">Yengil faol</string>
     <string name="onboarding_activity_lightly_active_subtitle">Yurish, uy ishlar</string>
-    <string name="onboarding_activity_moderately_active_title">O‘rtacha faol</string>
+    <string name="onboarding_activity_moderately_active_title">O\'rtacha faol</string>
     <string name="onboarding_activity_moderately_active_subtitle">Kunlik yengil ish</string>
     <string name="onboarding_activity_very_active_title">Juda faol</string>
     <string name="onboarding_activity_very_active_subtitle">Doimiy jismoniy ish</string>
@@ -1333,13 +1454,15 @@
     <string name="onboarding_multiple_challenge_1">50 kun (Afsona 🔥)</string>
     <string name="onboarding_multiple_challenge_2">30 kun (Qoyilmaqom 🚀)</string>
     <string name="onboarding_multiple_challenge_3">14 kun (Ajoyib 👌)</string>
-    <string name="onboarding_multiple_challenge_4">7 kun (Yaxshi 👍)</string>
+    <string name="onboarding_multiple_challenge_4">7 kun (Yaxshi 👍)</string>
 
     <!-- Onboarding Target Weight -->
     <string name="onboarding_target_weight_ideal_format">Siz uchun ideal vazn: %1$d - %2$d kg</string>
 
     <!-- Onboarding Name & Phone Helpers -->
-    <string name="onboarding_name_helper">Masalan: Oybek</string>
+    <string name="onboarding_name_helper">Ismingizni kiriting</string>
+    <string name="onboarding_name_helper_male">Masalan: Jasur</string>
+    <string name="onboarding_name_helper_female">Masalan: Madina</string>
     <string name="onboarding_phone_helper">Masalan: 971871415</string>
 
     <!-- Onboarding Plan Dialogs -->
@@ -1418,7 +1541,7 @@
     <string name="food_detail_decrease_amount">Kamaytirish</string>
     <string name="food_detail_increase_amount">Oshirish</string>
     <string name="exercise_add_burned_result_format">🔥 %1$d kkal • %2$.1f g yog\' yoqildi</string>
-    <string name="exercise_add_praise">Barakalla! Ajoyib natija 👏</string>
+    <string name="exercise_add_praise">Barakalla! Ajoyib natija 👍</string>
     <string name="exercise_select_recommendation_title">Kunlik tavsiya</string>
     <string name="exercise_select_recommendation_badge">30–45 daqiqa</string>
     <string name="exercise_select_recommendation_headline">Kuniga kamida 30 daqiqa faol harakat</string>
@@ -1428,7 +1551,7 @@
     <string name="exercise_goal_reached_desc">Bugungi jismoniy faollik me\'yoringiz muvaffaqiyatli bajarildi.</string>
     <string name="exercise_today_activity_title">Bugungi faollik</string>
     <string name="exercise_today_burned_format">%1$d yoqildi</string>
-    <string name="exercise_goal_reached_sub">Maqsad: %1$d kkal to\'liq bajarildi! 👏</string>
+    <string name="exercise_goal_reached_sub">Maqsad: %1$d kkal to\'liq bajarildi! 👍</string>
     <string name="exercise_goal_zero_sub">Maqsad %1$d kkal, 30-40 daqiqa piyoda yurishga teng.</string>
 
     <!-- Analyze Result -->
@@ -1437,10 +1560,10 @@
     <string name="analyze_loading_ready">Tayyor!</string>
     <string name="analyze_share_chooser_title">Ovqat tahlilini ulashish</string>
     <string name="analyze_share_clipboard_label">Ovqat tahlili</string>
-    <string name="analyze_share_meal_format">🍽 Mahall: %1$s\n</string>
+    <string name="analyze_share_meal_format">🍽️ Mahall: %1$s\n</string>
     <string name="analyze_share_calorie_format">🔥 Kaloriya: %1$d kkal\n</string>
-    <string name="analyze_share_macros_format">🥩 Oqsil: %1$dg | 🥑 Yog\': %2$dg | 🍞 Uglevod: %3$dg\n\n</string>
-    <string name="analyze_share_advice_format">💡 Tavsiya:\n%1$s\n\n</string>
+    <string name="analyze_share_macros_format">ðŸ¥© Oqsil: %1$dg | ðŸ¥‘ Yog\': %2$dg | ðŸž Uglevod: %3$dg\n\n</string>
+    <string name="analyze_share_advice_format">ðŸ’¡ Tavsiya:\n%1$s\n\n</string>
     <string name="analyze_share_footer">📱 Vaznim ilovasi orqali tahlil qilindi</string>
     <string name="analyze_edit_ingredient_title">Ovqatni tahrirlash</string>
     <string name="analyze_edit_ingredient_name_hint">Ovqat nomi</string>
@@ -1456,6 +1579,7 @@
     <string name="analyze_edit_protein_title">Oqsil miqdorini o\'zgartirish</string>
     <string name="analyze_edit_carbs_title">Uglevod miqdorini o\'zgartirish</string>
     <string name="analyze_edit_fat_title">Yog\' miqdorini o\'zgartirish</string>
+    <string name="analyze_edit_nutrition_title">Kaloriya va makrolar</string>
     <string name="analyze_edit_field_hint">Yangi qiymatni kiriting</string>
 
     <!-- Formatting Units & Patterns -->
@@ -1478,34 +1602,34 @@
     <string name="analyze_result_confirm_save_message">Chiqishdan oldin taom ma\'lumotlari kunlik hisobotingizga saqlansinmi?</string>
     <string name="analyze_result_confirm_save_btn_save">Saqlash</string>
     <string name="analyze_result_confirm_save_btn_cancel">Saqlanmasin</string>
-    <string name="analyze_result_add_ingredient_btn">Yangi</string>
+    <string name="analyze_result_add_ingredient_btn">Ovqat qo\'shish</string>
     <string name="write_food_title">Nima yedingiz?</string>
     <string name="write_food_input_hint">Masalan: 1 o\'rtacha kosa moshxurda va 1 tarelka pomidor salat...</string>
     <string name="write_food_btn_analyze">Tahlil qilish</string>
     <string name="write_food_empty_input_error">Iltimos, nima yeganingizni yozing</string>
-    <string name="food_log_relog_success">Ovqat qayta qo‘shildi</string>
+    <string name="food_log_relog_success">Ovqat qayta qo\'shildi</string>
 
     <string name="streak_dialog_days_unit">kun</string>
     <string name="streak_increased_title">%1$d kunlik ketma-ketlik!</string>
-    <string name="streak_active_desc_1">Ajoyib start! O‘zingiz uchun eng to‘g‘ri qadamni tashladingiz.</string>
+    <string name="streak_active_desc_1">Ajoyib start! O\'zingiz uchun eng to\'g\'ri qadamni tashladingiz.</string>
     <string name="streak_active_desc_3">Qoyilmaqom natija! Irodangiz va intizomingizga tasanno.</string>
-    <string name="streak_active_desc_5">Haqiqiy kuchli xarakter! Harakatingiz o‘z mevasini bermoqda.</string>
-    <string name="streak_active_desc_7">A’lo darajadagi g‘alaba! Siz buni qoyilmaqom uddalayapsiz.</string>
+    <string name="streak_active_desc_5">Haqiqiy kuchli xarakter! Harakatingiz o\'z mevasini bermoqda.</string>
+    <string name="streak_active_desc_7">A\'lo darajadagi g\'alaba! Siz buni qoyilmaqom uddalayapsiz.</string>
     <string name="streak_active_desc_14">Haqiqiy faxr va ilhom manbayisiz! Shunchaki tahsinga loyiq!</string>
     <string name="streak_active_desc_30">Namunali intizom va ulkan zafar! Siz tengsizsiz!</string>
-    <string name="streak_active_desc_default">Ajoyib intizom! Harakatingiz va g‘ayratingizga tasanno!</string>
+    <string name="streak_active_desc_default">Ajoyib intizom! Harakatingiz va g\'ayratingizga tasanno!</string>
     <string name="streak_active_btn">Davom etish</string>
 
     <string name="streak_idle_title">Birinchi qadam!</string>
     <string name="streak_idle_desc">Bugungi ilk ovqatingizni kiritib, ketma-ketlikni boshlang!</string>
-    <string name="streak_idle_btn">Albatta qo‘shaman</string>
+    <string name="streak_idle_btn">Albatta qo\'shaman</string>
 
     <string name="streak_frozen_title">Ketma-ketlik muzlatildi!</string>
-    <string name="streak_frozen_desc">Kecha ilovaga ovqat kiritmadingiz, shuning uchun ketma-ketlik muzlatildi. Bugun ovqat qo‘shing va ketma-ketlikni saqlab qoling!</string>
+    <string name="streak_frozen_desc">Kecha ilovaga ovqat kiritmadingiz, shuning uchun ketma-ketlik muzlatildi. Bugun ovqat qo\'shing va ketma-ketlikni saqlab qoling!</string>
     <string name="streak_frozen_btn">Davom etish</string>
 
     <string name="streak_broken_title">Ketma-ketlik uzildi</string>
-    <string name="streak_broken_desc">2 kun ovqat kiritilmagani sababli ketma-ketlik uzildi. Yangi natijalar sari bugun ovqat qo‘shing va davom eting!</string>
+    <string name="streak_broken_desc">2 kun ovqat kiritilmagani sababli ketma-ketlik uzildi. Yangi natijalar sari bugun ovqat qo\'shing va davom eting!</string>
     <string name="streak_broken_btn">Davom etish</string>
 
     <string name="streak_weekly_activity">Haftalik faollik</string>
@@ -1602,9 +1726,10 @@
     <string name="community_main_title">Postlar</string>
     <string name="community_filter_title">Filtr</string>
     <string name="community_filter_all">Barchasi</string>
-    <string name="community_filter_weight_loss">Ozganlar natijalari</string>
-    <string name="community_filter_food">Taomnomalar</string>
-    <string name="community_filter_active_users">Faol foydalanuvchilar</string>
+    <string name="community_filter_ozganlar">Ozganlar</string>
+    <string name="community_filter_weight_loss">Ozganlar</string>
+    <string name="community_filter_food">Ovqatlar</string>
+    <string name="community_filter_active_users">Faollar</string>
     <string name="community_filter_apply">Qo\'llash</string>
     <string name="community_post_create_title">Post yaratish</string>
     <string name="community_post_create_food">Taomnoma ulashish</string>
@@ -1682,8 +1807,8 @@
     <string name="notification_banner_btn_enable">Yoqish</string>
     <string name="home_payment_checking_title">To\'lov tekshirilmoqda</string>
     <string name="home_payment_checking_desc">24 soat ichida chekni tekshirib, premiumga o\'tkazamiz</string>
-    <string name="home_feedback_title">Ilovamiz sizga manzur bo\'lyaptimi? ⭐</string>
-    <string name="home_feedback_desc">Fikringizni qoldiring</string>
+    <string name="home_feedback_title">Ilova sizga yoqyaptimi? ⭐</string>
+    <string name="home_feedback_desc">Fikringiz biz uchun muhim, 1 daqiqada baholang</string>
     <string name="home_weight_log_title">Vazningizni qo\'shing</string>
     <string name="home_weight_log_desc">Yangi natijani bugun qayd eting.</string>
     <string name="home_weight_log_btn_add">Qo\'shish</string>
@@ -1693,8 +1818,13 @@
     <string name="home_goal_prediction_title">Bugun ajoyib ketyapsiz! 🌟</string>
     <string name="home_progress_eaten">Yeyildi</string>
     <string name="home_progress_burned">Yoqildi</string>
-    <string name="home_progress_fat_burned_btn">Qanday qilib yog\' yoqiladi?</string>
-    <string name="home_progress_hungry_btn">Qornim ochdi</string>
+    <string name="home_progress_fat_burned_btn">Batafsil</string>
+    <string name="home_progress_hungry_btn">Tavsiya olish</string>
+    <string name="home_great_meal_title">Namunali taom yedingiz!</string>
+    <string name="home_great_meal_post_btn">Post qilish</string>
+    <string name="home_great_meal_desc_format">%1$s — Jamiyatga post qilib ulashasizmi?</string>
+    <string name="home_great_meal_post_text_format">🥗 %1$s: %2$s\n🔥 %3$d kkal • Oqsil: %4$dg • Uglevod: %5$dg • Yog\': %6$dg</string>
+    <string name="home_great_meal_post_no_advice_format">🥗 %1$s: %2$s\n🔥 %3$d kkal</string>
     <string name="home_hero_settings_desc">Sozlamalar</string>
     <string name="notification_screen_title">Bildirishnomalar</string>
     <string name="notification_screen_empty_title">Bildirishnomalar yo\'q</string>
@@ -1711,7 +1841,6 @@
     <string name="community_post_detail_delete_message">Haqiqatan ham bu postni o\'chirmoqchimisiz?</string>
 
     <!-- Daily Menu Planner Feature -->
-    <string name="daily_menu_planner_title">Kunlik taomnoma</string>
     <string name="daily_menu_planner_yesterday">Oldingi kun</string>
     <string name="daily_menu_planner_tomorrow">Keyingi kun</string>
     <string name="daily_menu_card_title">Bugungi menyu</string>
@@ -1722,7 +1851,7 @@
     <string name="daily_menu_planner_protein_format">Oqsil: %1$sg / %2$dg</string>
     <string name="daily_menu_planner_fat_format">Yog\': %1$sg / %2$dg</string>
     <string name="daily_menu_planner_carbs_format">Uglevod: %1$sg / %2$dg</string>
-    <string name="daily_menu_planner_advice_title">Dietolog tavsiyasi</string>
+    <string name="daily_menu_planner_advice_title">Kungi tavsiya</string>
     <string name="daily_menu_planner_empty">Ushbu kun uchun taomnoma topilmadi</string>
     <string name="daily_menu_planner_error">Taomnomani yuklashda xatolik yuz berdi</string>
     <string name="daily_menu_planner_macro_format">%1$d kkal • O: %2$sg • Y: %3$sg • U: %4$sg</string>
@@ -1771,11 +1900,11 @@
     <string name="daily_menu_dinner_principle">Oshqozonni zo\'riqtirmaydigan yengil oqsil va kletchatka. Uxlashdan kamida 3 soat oldin yakunlang.</string>
     <string name="daily_menu_dinner_allowed">• Dimlangan baliq yoki tovuq filesi\n• Yashil bargli sabzavotlar, bodring, ko\'katlar\n• Kam yog\'li qatiq yoki kefir\n• Moychechak yoki yalpizli issiq damlama</string>
     <string name="daily_menu_dinner_forbidden">• Qovurilgan qizil go\'sht, yog\'li ovqatlar\n• Xamir ovqatlar, makaron, non\n• Kechasi shirin mevalar (uzum, banan)\n• Shirinliklar va og\'ir gazaklar</string>
-    <string name="daily_menu_dinner_tip">Kechki ovqatdan so\'ng 20–30 daqiqa yengil piyoda yurish oshqozonga ovqatni yengil hazm qilishga yordam beradi.</string>
+    <string name="daily_menu_dinner_tip">Kechki ovqatdan so\'ng 20-30 daqiqa yengil piyoda yurish oshqozonga ovqatni yengil hazm qilishga yordam beradi.</string>
 
     <!-- Snack Details -->
     <string name="daily_menu_snack_principle">Oraliq ochlik xurujini oldini olish va moddalar almashinuvini bir tekis ushlash uchun yengil oraliq taom.</string>
-    <string name="daily_menu_snack_allowed">• 1 dona yashil olma yoki nok\n• 1 siqim (15–20 g) yong\'oq, bodom\n• Kam yog\'li qatiq (1 stakan)</string>
+    <string name="daily_menu_snack_allowed">• 1 dona yashil olma yoki nok\n• 1 siqim (15-20 g) yong\'oq, bodom\n• Kam yog\'li qatiq (1 stakan)</string>
     <string name="daily_menu_snack_forbidden">• Pechene, shokolad, konfetlar\n• Pista, chips, krakerlar\n• Shirin muzqaymoqlar</string>
     <string name="daily_menu_snack_tip">Gazakni asosiy ovqatlardan kamida 2 soat keyin iste\'mol qiling va ortiqcha to\'yib ketmang.</string>
 
@@ -2084,6 +2213,7 @@
     <string name="food_category_healthy_snacks">Foydali tamaddilar</string>
     <string name="food_category_sweets_desserts">Shirinliklar va desertlar</string>
     <string name="food_category_sauces_oils">Souslar va yog\'lar</string>
+    <string name="food_category_fast_food">Fast-fud</string>
 
     <!-- Food Search Filter Categories -->
     <string name="food_filter_main_dishes">Quyuq taomlar</string>
@@ -2187,7 +2317,7 @@
     <!-- AI Menu Generator -->
     <string name="menu_ai_generate_title">AI menyu yaratish</string>
     <string name="menu_ai_generate_desc">Instagram yoki boshqa joydan olingan skrinshotni yuklang. AI taom tarkibini, ozuqaviy qiymatini hisoblab, 16:9 formatda taom rasmini chizib beradi.</string>
-    <string name="menu_ai_generate_loading">AI menyuni tahlil qilmoqda va taom rasmini chizmoqda…</string>
+    <string name="menu_ai_generate_loading">AI menyuni tahlil qilmoqda va taom rasmini chizmoqdaâ€¦</string>
     <string name="menu_ai_generate_loading_hint">Bu jarayon 15–30 soniya vaqt olishi mumkin</string>
     <string name="menu_ai_generate_btn_upload">Skrinshotni tanlash</string>
     <string name="menu_ai_generate_error">Menyuni yaratishda xatolik yuz berdi. Qayta urinib ko\'ring.</string>
@@ -2208,6 +2338,7 @@
     <string name="dietolog_action_added_to_tracker">Kundalikka qo\'shildi ✓</string>
     <string name="dietolog_calories_format">%1$d kkal</string>
     <string name="dietolog_bju_format">O: %1$.1fg | Y: %2$.1fg | U: %3$.1fg</string>
+    <string name="dietolog_macro_gram_format">%1$dg</string>
 
     <!-- Reminders Feature -->
     <string name="profile_section_reminders">Eslatmalar</string>
@@ -2226,9 +2357,493 @@
     <string name="reminder_dinner_notification_title">Kechki ovqat yaqinlashyapti</string>
     <string name="reminder_dinner_notification_body">1 stakan suv ichib oling. 💧 Bu hazm qilishni yengillashtiradi va me\'yorida taomlanishga yordam beradi</string>
     <string name="reminder_meal_notification_body">%1$s vaqti bo\'ldi! 🍽️ Sog\'lom va me\'yorida taomlanishni unutmang.</string>
-    <string name="reminder_exercise_notification_body">Mashg\'ulot vaqti bo\'ldi! 🏃‍♂️ Ozgina jismoniy harakat bilan kunni sermahsul yakunlang.</string>
+    <string name="reminder_exercise_notification_body">Mashg\'ulot vaqti bo\'ldi! 🏃â€â™‚ï¸ Ozgina jismoniy harakat bilan kunni sermahsul yakunlang.</string>
+    <string name="reminder_title_breakfast">Nonushta vaqti</string>
+    <string name="reminder_title_lunch">Tushlik vaqti</string>
+    <string name="reminder_title_dinner">Kechki ovqat vaqti</string>
+    <string name="reminder_title_snack">Yengil tamaddi vaqti</string>
+    <string name="reminder_title_water">Suv ichib oling</string>
+    <string name="reminder_title_exercise">Harakat vaqti</string>
+    <string name="reminder_title_wake_up">Uyg\'onish vaqti</string>
+
+    <string-array name="reminder_breakfast_messages">
+        <item>Nonushtada oqsilga (tuxum, tvorog) ko\'proq urg\'u bering — bu sizni tushlikkacha to\'q tutadi va kun bo\'yi shirinlikka bo\'lgan istakni kamaytiradi.</item>
+        <item>Ertalabki nonushtani to\'yimli qiling: murakkab uglevodlar (suli, grechka) va sabzavotlar kun davomida quvvatingizni bir maromda ushlab turadi.</item>
+        <item>Nonushtada qon shakarini tez ko\'taruvchi shirinlik va oq nonni kamaytiring. Oqsil va foydali yog\'lar (yong\'oq, zaytun) — eng ideal tanlov.</item>
+        <item>Taomni yaxshilab chaynash va shoshilmay nonushta qilish hazm a\'zolariga ortiqcha yuk tushishining oldini oladi.</item>
+        <item>Nonushtaga 2 dona qaynatilgan tuxum, yangi ko\'katlar va butun donli non — sog\'lom ozish uchun mukammal formula.</item>
+        <item>Ertalab qabul qilingan sifatli ozuqa kun bo\'yi energiya almashinuvini faollashtiradi. Nonushtani aslo o\'tkazib yubormang.</item>
+        <item>Choy yoki qahvani nonushtadan 20-30 daqiqa keyin ichsangiz, taomdagi temir va foydali minerallar organizmga to\'liq so\'riladi.</item>
+        <item>Nonushtada yetarli oqsil va kletchatka iste\'mol qilsangiz, kechqurungi ortiqcha ovqatlanish xavfi 50% ga kamayadi.</item>
+        <item>Ertalabki omletga yangi pomidor va ismaloq qo\'shing — bu tanangizni vitamin va oqsil bilan to\'liq quvvatlaydi.</item>
+        <item>Bugungi nonushtangiz — kunlik yaxshi kayfiyatingiz va maqsadingiz sari qo\'yilgan ilk muhim qadamdir.</item>
+    </string-array>
+
+    <string-array name="reminder_lunch_messages">
+        <item>Tushlikda \'Likopcha qoidasi\'ga amal qiling: likopchaning yarmi yangi sabzavotlar, to\'rtdan biri go\'sht yoki baliq, to\'rtdan biri esa garnir bo\'lsin.</item>
+        <item>Tushlikdan so\'ng uyqu bosmasligi va holsizlik bo\'lmasligi uchun xamirli og\'ir taomlardan ko\'ra go\'sht va ko\'p sabzavotli taomlarni tanlang.</item>
+        <item>Taomni sekin va xotirjam iste\'mol qiling. To\'qlik signali miyaga 15-20 daqiqada yetadi — shoshmaslik me\'yordan ortiq yeb qo\'yishdan asraydi.</item>
+        <item>Tushlikdagi salatlarga mayonez o\'rniga ozgina zaytun moyi yoki limon sharbati qo\'shing — bu sifatli yog\'lar bilan ta\'minlaydi.</item>
+        <item>Tushlik vaqtida oqsil va murakkab uglevodlar kombinatsiyasi (guruch, grechka + go\'sht) kechgacha yetadigan barqaror energiya beradi.</item>
+        <item>Qovurilgan yog\'li taomlar o\'rniga qaynatilgan, bug\'da pishgan yoki duxovkada pishirilgan taomlarni afzal biling.</item>
+        <item>Tushlikdan so\'ng 10-15 daqiqa yengil piyoda sayr qiling — bu qondagi qand miqdorini me\'yorda ushlab, hazmni osonlashtiradi.</item>
+        <item>Tushlik bilan birga shirin gazlangan ichimliklar ichmang — ular keraksiz yashirin kaloriya beradi. Oddiy toza suv afzal.</item>
+        <item>Har bir taomni me\'yorida va o\'z vaqtida iste\'mol qilish — sog\'lom vaznning eng asosiy kalitidir.</item>
+    </string-array>
+
+    <string-array name="reminder_dinner_messages">
+        <item>Kechki ovqat yengil va oqsilga boy bo\'lishi lozim (tovuq go\'shti, baliq, tuxum yoki tvorog). Bu kechasi tanaga yuklama bermaydi.</item>
+        <item>Kechqurun xamir, guruch va shirin mevalarni kamaytiring. Ular uyqu vaqtida yog\' to\'planishiga sabab bo\'ladi.</item>
+        <item>Kechki taomni uyqudan kamida 2.5-3 soat oldin yakunlang — bu chuqur, sifatli uyqu va ertalab tetik uyg\'onish kafolati.</item>
+        <item>Kechki ovqatga yengil sabzavotli salat (bodring, ko\'katlar, karam) qo\'shsangiz, ichaklar hazm faoliyati yaxshilanadi.</item>
+        <item>Kechki payt ortiqcha tuzli taomlar yemang — tuz suvni ushlab qolib, ertalab yuz va ko\'z atrofida shish keltirib chiqarishi mumkin.</item>
+        <item>Kechqurun qorin juda ochsa, og\'ir ovqat emas, 1 stakan qatiq yoki ozgina qaynatilgan oqsil bilan cheklaning.</item>
+        <item>Bugungi kunlik ratsioningizni ilovaga kiritishni unutmang. Rejaga amal qilish sizni maqsadingizga yaqinlashtiradi.</item>
+        <item>Kechki taomni kichik likopchada tanovul qiling — bu porsiyani ko\'zga to\'liq ko\'rsatib, ortiqcha yeb qo\'yishdan saqlaydi.</item>
+        <item>Tunda sog\'lom ozish siri — kechki yengil ovqatlanishda. Ertaga ertalabki yengillik sizga yoqadi!</item>
+    </string-array>
+
+    <string-array name="reminder_water_messages">
+        <item>Taomlanishdan 30 daqiqa oldin 1 stakan toza suv ichish oshqozonni tayyorlaydi va me\'yoridan ortiq yeb qo\'yishdan asraydi.</item>
+        <item>Bir stakan iliq suv ichib oling. Bu metabolizmni tezlashtiradi va hazm fermentlarini faollashtiradi.</item>
+        <item>Hozir 1 stakan suv ichish vaqti. Suv ovqat hazm bo\'lishini yengillashtiradi va tana suv balansini tiklaydi.</item>
+        <item>Chanqoqlik ko\'pincha ochlik hissi bilan adashadi. Ovqatdan oldin suv ichish orqali haqiqiy to\'qlik darajangizni bilib olasiz.</item>
+        <item>1 stakan toza suv ichib oling. Ichak faoliyati yaxshilanadi va tetiklik baxsh etadi.</item>
+        <item>Suv — metabolizmning eng asosiy yoqilg\'isi. Ovqatlanishdan oldin ichilgan suv ozuqa moddalarining yaxshi so\'rilishiga yordam beradi.</item>
+        <item>Kunlik suv me\'yorini to\'ldirish vazn tashlash jarayonini tezlashtiradi. Suv ichishni unutmang!</item>
+        <item>Suvni shoshmasdan, mayda qultumlar bilan iching — bu organizmga eng foydali ta\'sir ko\'rsatadi.</item>
+        <item>Ovqatdan oldingi 1 stakan suv ortiqcha ishtahani jilovlaydi. O\'zingizga g\'amxo\'rlik qiling!</item>
+    </string-array>
+
+    <string-array name="reminder_snack_messages">
+        <item>Kechki ovqatgacha qattiq ochib qolmaslik uchun yengil tamaddi qilib oling: 1 dona olma yoki 5-6 dona bodom ayni muddao.</item>
+        <item>Oraliq vaqtda shirin choy yoki pishiriqlar emas, 1 stakan qatiq yoki yangi meva tanlang — qon shakari barqaror turadi.</item>
+        <item>Bir hovuch yong\'oq (grek yong\'og\'i yoki bodom) miya faoliyatini kuchaytiradi va foydali omega-3 yog\'larini beradi.</item>
+        <item>Tamaddida sabzi yoki bodring yeyish kletchatka hisobiga uzoq to\'qlik beradi va kaloriyasi juda kam.</item>
+        <item>Ishxonadagi pechenye va konfetlar tuzog\'iga tushmang — ular tezda qorinni qayta ochiradi. Foydali gazak tanlang.</item>
+        <item>Yengil tamaddi metabolizmni so\'nmasdan ishlashini ta\'minlaydi. Me\'yor: 150-200 kaloriyadan oshmasin.</item>
+    </string-array>
+
+    <string-array name="reminder_exercise_messages">
+        <item>Kun davomida kamida 20-30 daqiqa faol harakat qilish qon aylanishini yaxshilaydi va ortiqcha kaloriyalarni sarflaydi.</item>
+        <item>Ozgina piyoda sayr yoki yengil jismoniy mashqlar kayfiyatingizni ko\'tarib, stress gormonlarini kamaytiradi.</item>
+        <item>Harakat — salomatlik garovi! Bir nechta yengil mashqlar orqali tanangizga tetiklik baxsh eting.</item>
+        <item>Mashg\'ulotlar nafaqat vazn tashlash, balki yurak-qon tomir tizimini mustahkamlash uchun ham bebahodir.</item>
+        <item>Kun davomida o\'tirib ishlagan bo\'lsangiz, bo\'yin va bel mushaklarini cho\'zish mashqlarini bajarib oling.</item>
+    </string-array>
+
     <string name="reminder_permission_rationale">Eslatmalar o\'z vaqtida kelishi uchun bildirishnomalarga ruxsat bering</string>
+
+    <!-- AI Chat Suggestions -->
+    <string name="ai_chat_suggestion_daily_analysis">Bugungi kunimni tahlil qil</string>
+    <string name="ai_chat_suggestion_meal_breakfast">Nonushtaga nima yesam bo\'ladi?</string>
+    <string name="ai_chat_suggestion_meal_lunch">Tushlikka nima yesam bo\'ladi?</string>
+    <string name="ai_chat_suggestion_meal_dinner">Kechki ovqatga nima yesam bo\'ladi?</string>
+    <string name="ai_chat_suggestion_meal_snack">Kechqurun qorin ochsa nima yesam bo\'ladi?</string>
+
+    <!-- AI Chat Suggestion Pool (20 items) -->
+    <string name="ai_chat_suggestion_pool_1">Nonni qanday kamaytirsam bo\'ladi?</string>
+    <string name="ai_chat_suggestion_pool_2">Shirinlik yegim kelyapti, nima qilsam bo\'ladi?</string>
+    <string name="ai_chat_suggestion_pool_3">Tushlikka palov yesam bo\'ladimi?</string>
+    <string name="ai_chat_suggestion_pool_4">Somsa ozishga qanchalik zarar?</string>
+    <string name="ai_chat_suggestion_pool_5">Kechki 18:00 dan keyin ovqat yeyish mumkinmi?</string>
+    <string name="ai_chat_suggestion_pool_6">Kuniga necha litr suv ichishim kerak?</string>
+    <string name="ai_chat_suggestion_pool_7">Mehmonda yoki to\'yda nima yeyishni maslahat berasan?</string>
+    <string name="ai_chat_suggestion_pool_8">Qaysi mevalar ozishga yordam beradi?</string>
+    <string name="ai_chat_suggestion_pool_9">Metabolizmni qanday tezlashtirish mumkin?</string>
+    <string name="ai_chat_suggestion_pool_10">Tez-tez qornim ochaveradi, nima sababdan?</string>
+    <string name="ai_chat_suggestion_pool_11">Tuxumni sarig\'i bilan yegan ma\'qulmi yoki oqi?</string>
+    <string name="ai_chat_suggestion_pool_12">Ozish jarayonida qanday salatlar tavsiya qilasiz?</string>
+    <string name="ai_chat_suggestion_pool_13">Kofe va choy ichish ozishga ta\'sir qiladimi?</string>
+    <string name="ai_chat_suggestion_pool_14">Qorin sohasidagi yog\'larni qanday ketkazsa bo\'ladi?</string>
+    <string name="ai_chat_suggestion_pool_15">Yong\'oq va quruq mevalar me\'yori qancha?</string>
+    <string name="ai_chat_suggestion_pool_16">Kechqurun och qolsam qanday yengil tamaddi qilsam bo\'ladi?</string>
+    <string name="ai_chat_suggestion_pool_17">Mashg\'ulotdan oldin va keyin nima yeyish kerak?</string>
+    <string name="ai_chat_suggestion_pool_18">Bugun rejadagidan ko\'p yeb qo\'ydim, endi nima qilay?</string>
+    <string name="ai_chat_suggestion_pool_19">Vazn tashlash to\'xtab qoldi, nima qilish kerak?</string>
+    <string name="ai_chat_suggestion_pool_20">Vaznim Premium qanday imkoniyatlar beradi?</string>
+
+    <!-- Analyze Result Health Score & Badges -->
+    <string name="analyze_result_health_score_title">Sog\'lik bahosi</string>
+    <string name="analyze_result_health_score_excellent">Ajoyib tanlov</string>
+    <string name="analyze_result_health_score_good">Foydali taom</string>
+    <string name="analyze_result_health_score_moderate">Me\'yorda</string>
+    <string name="analyze_result_health_score_poor">Ehtiyot bo\'ling</string>
+    <string name="analyze_result_health_score_inline_format">%1$s • %2$d/10 ball</string>
+    <string name="analyze_result_advice_more">Ko\'proq</string>
+    <string name="analyze_result_advice_less">Kamroq</string>
+    <string name="analyze_result_ingredient_subtitle">%1$s • %2$s</string>
+    <string name="analyze_result_health_score_simple">%1$d ball</string>
+
+    <!-- Modern Premium Paywall Strings -->
+    <string name="premium_screen_title">Shaxsiy ozish rejasi</string>
+    <string name="premium_hero_badge">VAZNIM PREMIUM</string>
+    <string name="premium_hero_headline">Maqsadingizga 2 baravar tezroq erishing!</string>
+    <string name="premium_social_proof">93% foydalanuvchilarimiz 1-oyda natijaga erishishgan</string>
+    <string name="premium_benefit_top_badge">TOP</string>
+    <string name="premium_benefit_camera_title">Kaloriyani rasmga olib sanang</string>
+    <string name="premium_benefit_camera_desc">Ovqatni suratga oling, AI kaloriya va oqsillarni o\'zi hisoblaydi</string>
+    <string name="premium_benefit_ai_title">Sun\'iy intellekt dietologi</string>
+    <string name="premium_benefit_ai_desc">Sizning maqsadingizga mos kunlik shaxsiy tavsiyalar beradi</string>
+    <string name="premium_benefit_track_title">Vazningizni kuzatib boring</string>
+    <string name="premium_benefit_track_desc">Natijalar va vazn o\'zgarishini aniq tahlillar bilan ko\'ring</string>
+    <string name="premium_benefit_no_ads_title">Reklamasiz interfeys</string>
+    <string name="premium_benefit_no_ads_desc">Ilovadan uzluksiz va chalg\'ishlarsiz foydalaning</string>
+    <string name="premium_plan_select_title">Rejani tanlang</string>
+    <string name="premium_plan_yearly_title">Yillik</string>
+    <string name="premium_plan_monthly_title">Oylik</string>
+    <string name="premium_plan_monthly_sub">Sinov uchun qulay</string>
+    <string name="premium_badge_popular">ENG MASHHUR</string>
+    <string name="premium_badge_discount">-%1$d%% TEJAMKOR</string>
+    <string name="premium_price_per_month">%1$s oyiga</string>
+    <string name="premium_price_per_year">%1$s yiliga</string>
+    <string name="premium_btn_activate">Faollashtirish</string>
+    <string name="premium_btn_continue">Davom etish</string>
+    <string name="premium_btn_continue_with_price">Davom etish • %1$s</string>
+    <string name="premium_footer_guarantee">⚡ Tezkor faollashtirish | 🔒 Xavfsiz to\'lov</string>
+    <string name="premium_pending_title">24 soat ichida chekni tekshirib, premiumga o\'tkazamiz</string>
+
+    <!-- Payment Check Submission Strings -->
+    <string name="payment_check_screen_title">Tarifga to\'lov</string>
+    <string name="payment_check_amount_label">To\'lov summasi</string>
+    <string name="payment_check_card_label">Karta raqami (To\'lov uchun)</string>
+    <string name="payment_check_copy_btn">Nusxalash</string>
+    <string name="payment_check_tariff_yearly">Yillik Premium</string>
+    <string name="payment_check_tariff_monthly">Oylik Premium</string>
+    <string name="payment_check_security_badge">🔒 100% Xavfsiz to\'lov va maxfiylik kafolati</string>
+    <string name="payment_check_steps_title">To\'lov va yuborish tartibi</string>
+    <string name="payment_check_step_1">Yuqoridagi karta raqamiga kerakli summani o\'tkazing</string>
+    <string name="payment_check_step_2">To\'lov chekini rasmga oling yoki skrinshot qiling</string>
+    <string name="payment_check_step_3">Pastdagi tugma orqali chek rasmini yuklang va yuboring</string>
+    <string name="payment_check_attach_photo">Chek rasmini yuklash</string>
+    <string name="payment_check_change_photo">Chek rasmini almashtirish</string>
+    <string name="payment_check_submit_btn">Chekni yuborish</string>
+    <string name="payment_check_success_title">Chek yuborildi!</string>
+    <string name="payment_check_success_desc">Admin 24 soat ichida chekni tekshirib, Premium obunangizni faollashtiradi.</string>
+    <string name="payment_check_status_tip">Sizga bu haqida habar beramiz</string>
+    <string name="payment_check_understand_btn">Tushundim</string>
+
+    <!-- Weight Tracker Metric Info & Insights -->
+    <string name="metric_title_weight">Vazn</string>
+    <string name="metric_title_belly">Qorin</string>
+    <string name="metric_title_hips">Bo‘ksa / Bedra</string>
+    <string name="metric_title_arm">Qo‘l</string>
+    <string name="metric_insight_weight">Vazn me’yorida tushmoqda.</string>
+    <string name="metric_insight_belly">Qorindagi ichki yog‘lar va shishlar ketmoqda! Qorin mushaklari taranglashmoqda.</string>
+    <string name="metric_insight_hips">Kiyimlaringiz kengayib qolgani bejiz emas — bo‘ksa hajmi kichraymoqda.</string>
+    <string name="metric_insight_arm">Qo‘l sohasidagi shishlar ketib, mushaklar konturi bilinmoqda.</string>
+
+    <!-- Weight Tracker Measurement Instructions -->
+    <string name="metric_instruction_weight">Ertalab och qoringa, hojatxonadan so\'ng va eng kam kiyimda taroziga chiqing.</string>
+    <string name="metric_instruction_belly">Kindik chizig\'i bo\'ylab qorinni tortmasdan, tasmada gorizontal o\'lchang.</string>
+    <string name="metric_instruction_hips">Son va bo\'kchaning eng keng (chiqib turgan) joyidan o\'lchang.</string>
+    <string name="metric_instruction_arm">Elka va tirsak orasidagi o\'rta qismdan (qo\'l bo\'shashgan holatda) o\'lchang.</string>
+
+    <!-- Natija Screen UI Strings -->
+    <string name="natija_highlights_title">Natijalar</string>
+    <string name="natija_boshidan_buyon">Boshidan buyon</string>
+    <string name="natija_umumiy_hajm_ketishi">Umumiy hajm ketishi</string>
+    <string name="natija_kutilayotgan_natijalar">Kutilayotgan natijalar</string>
+    <string name="natija_bu_hafta">Bu hafta</string>
+    <string name="natija_bir_oyda">1 oyda</string>
+    <string name="natija_maqsadga_erishish">Maqsadga erishish</string>
+    <string name="natija_ideal_weight_subtitle_with_height">Bo\'yingiz (%1$d cm) uchun eng maqbul va sog\'lom vazn oralig\'i.</string>
+    <string name="natija_ideal_weight_subtitle_default">Bo\'yingiz uchun eng maqbul va sog\'lom vazn oralig\'i.</string>
+    <string name="natija_calorie_card_title">Kaloriya va taqchillik normasi</string>
+    <string name="natija_tdee_label">Kunlik sarf (TDEE)</string>
+    <string name="natija_target_cal_label">Maqsadli norma</string>
+    <string name="natija_avg_consumed_label">O‘rtacha yeyilgan</string>
+    <string name="natija_weekly_deficit_label">1 haftalik jami defitsit</string>
+    <string name="natija_planned_deficit_label">Maqsadli defitsit</string>
+    <string name="natija_tdee_human_label">Tana bir kunda sarflaydigan kaloriya</string>
+    <string name="natija_target_cal_human_label">Maqsad uchun kaloriya normasi</string>
+    <string name="natija_avg_consumed_human_label">O\'rtacha yeyilayotgan kaloriya</string>
+    <string name="natija_remaining_to_goal">Maqsadga yana %s qoldi 🎉</string>
+    <string name="natija_goal_reached">Tabriklaymiz! Maqsadga erishdingiz! 🎉</string>
+    <string name="natija_milestones_title">Erishilgan natijalar</string>
+    <string name="natija_smart_plan_title">Aqlli bashorat va energiya rejasi</string>
+    <string name="natija_tdee_natural_label">Kunlik energiya sarfingiz (TDEE)</string>
+    <string name="natija_target_cal_natural_label">Tavsiya etilgan ovqatlanish normasi</string>
+    <string name="natija_deficit_natural_label">Rejadagi kunlik kaloriya taqchilligi</string>
+
+    <!-- Natija Screen Redesign Strings -->
+    <string name="natija_total_change_label">Jami o\'zgarish</string>
+    <string name="natija_total_lost_label">Jami o\'zgarish</string>
+    <string name="natija_total_gained_label">Jami o\'zgarish</string>
+    <string name="natija_total_lost_unit_format">kg kamaydi</string>
+    <string name="natija_total_gained_unit_format">kg ko\'paydi</string>
+    <string name="natija_label_boshlangich">Boshlang\'ich</string>
+    <string name="natija_label_hozir">Hozir</string>
+    <string name="natija_label_maqsad">Maqsad</string>
+    <string name="natija_btn_add_weight">+ Vazn qo\'shish</string>
+
+    <string name="natija_forecast_card_title">Kutilayotgan natija</string>
+    <string name="natija_target_reach_label">Maqsadga yetish</string>
+    <string name="natija_remaining_months_days_format">%1$d oy %2$d kun qoldi</string>
+    <string name="natija_remaining_months_format">%1$d oy qoldi</string>
+    <string name="natija_remaining_days_format">%1$d kun qoldi</string>
+    <string name="natija_this_week_label">Bu hafta</string>
+    <string name="natija_one_month_label">1 oyda</string>
+    <string name="natija_expected_decrease_sub">kutilayotgan kamayish</string>
+    <string name="natija_expected_increase_sub">kutilayotgan ko\'payish</string>
+
+    <string name="natija_predicted_decrease_format">-%1$s kg</string>
+    <string name="natija_predicted_increase_format">+%1$s kg</string>
+    <string name="natija_predicted_no_change">0 kg</string>
+
+    <string name="natija_target_reach_value_format">%1$s (%2$s)</string>
+    <string name="natija_change_with_expected_weight_format">%1$s, yani %2$s</string>
+
+    <string name="natija_target_reach_line_format">Maqsadga yetish %1$s, %2$s</string>
+    <string name="natija_weekly_line_format">Bu hafta taxmin %1$s</string>
+    <string name="natija_monthly_line_format">1 oyda taxmin %1$s</string>
+
+    <string name="natija_forecast_footnote">Bu taxminlar oxirgi 7 kunlik ovqatlanish ma\'lumotlaringiz asosida hisoblangan, hayotda farq qilishi mumkin!</string>
+    <string name="natija_forecast_footnote_planned">Bu taxminlar rejadagi kaloriya me\'yoringiz asosida hisoblangan.</string>
+    <string name="natija_forecast_need_logs_title">Har bir ovqatingizni qo\'shib boring</string>
+    <string name="natija_forecast_need_logs_message">Kutilayotgan natija va aniq hisob-kitobni ko\'rish uchun kunlik yegan taomlaringizni to\'liq kiritib boring. Kamida 3 kunlik ovqatlar kiritilgach, shaxsiy prognozingiz chiqariladi.</string>
+    <string name="natija_forecast_advisory_loss_surplus_title">Ovqatlanish me\'yoriga e\'tibor bering</string>
+    <string name="natija_forecast_advisory_loss_surplus_message">So\'nggi kunlardagi ovqatlanish tahlilingizga ko\'ra, iste\'mol qilingan kaloriya sarflanganidan yuqori bo\'lmoqda. Ozish maqsadiga erishish uchun kunlik taom me\'yorini nazorat qilib, yuqori kaloriyali va shirin yeguliklarni cheklang. Tartibli rejim bilan vazn kamayishini tezda qayta tiklaysiz!</string>
+    <string name="natija_forecast_advisory_gain_deficit_title">Kunlik kaloriyani oshiring</string>
+    <string name="natija_forecast_advisory_gain_deficit_message">So\'nggi kunlardagi ovqatlanish tahlilingizga ko\'ra, iste\'mol qilingan kaloriya tana sarfidan kam bo\'lib qolmoqda. Vazn to\'plash va mushak massasini oshirish uchun kunlik taom porsiyasini kattalashtiring, foydali yong\'oqlar, oqsil va to\'yimli taomlar iste\'molini ko\'paytiring!</string>
+
+    <string name="natija_monthly_changes_title">Umumiy o\'zgarish</string>
+    <string name="natija_total_changes_title">Umumiy o\'zgarish</string>
+    <string name="natija_vazn_ozgarishi_title">Vazn o\'zgarishi</string>
+    <string name="natija_ideal_weight_card_title">Sizning ideal vazningiz</string>
+    <string name="natija_ideal_weight_card_subtitle">Bo\'yingiz va ma\'lumotlaringiz hisobga olinib ideal vazn chiqariladi.</string>
+    <string name="natija_metric_bel">Bel</string>
+    <string name="natija_metric_qorin">Qorin</string>
+    <string name="natija_metric_son">Bo\'ksa</string>
+    <string name="natija_metric_qol">Qo\'l</string>
+
+    <string name="unit_kg_short">kg</string>
+    <string name="unit_sm_short">sm</string>
+    <string name="unit_g_short">g</string>
+    <string name="change_no_change">—</string>
+    <string name="change_no_change_sm">—</string>
+
+    <string name="add_weight_screen_title">Vazn kiritish</string>
+    <string name="add_photo_card_title">Rasm yuklash</string>
+    <string name="add_photo_card_subtitle">Natijalarni solishtiring</string>
+    <string name="add_photo_option_camera">Kameradan suratga olish</string>
+    <string name="add_photo_option_gallery">Galereyadan tanlash</string>
+    <string name="add_metric_optional_card_title">Tana o\'lchovlari (Ixtiyoriy)</string>
+    <string name="photo_prompt_dialog_title">Rasm yuklang</string>
+    <string name="photo_prompt_dialog_message">Natijangiz va vizual o\'zgarishingizni doimiy kuzatib borish uchun foto yuklash juda foydali.</string>
+    <string name="photo_prompt_skip_button">Suratsiz saqlash</string>
+    <string name="photo_rules_toolbar_title">Foto yuklash qoidalari</string>
+    <string name="photo_rules_section_title">Qanday rasmga tushish kerak?</string>
+    <string name="photo_rule_1">Har doim bir xil kiyimda va bir xil fonda suratga tushing.</string>
+    <string name="photo_rule_2">Kamerani ko\'krak balandligida ushlab, to\'liq tanani ko\'rsating.</string>
+    <string name="photo_rule_3">Yaxshi yoritilgan joyda, tabiiy holatda turing.</string>
+    <string name="photo_rules_confirm_button">Tushundim, davom etish</string>
+    <string name="natija_photos_card_title">Oldin va Hozir suratlaringiz</string>
+    <string name="weight_success_share_button">Natijani ulashish</string>
+    <string name="weight_success_share_info">Natijangizni boshqalar bilan bo\'lishing</string>
+    <string name="weight_success_title_loss">Tabriklaymiz! Vazningiz %1$s ga kamaydi!</string>
+    <string name="weight_success_title_loss_total">Tabriklaymiz! Vazningiz %1$s kg ga kamaydi (Jami: %2$s kg ozdingiz)! 🎉</string>
+    <string name="weight_success_title_recomposition_fmt">Ajoyib! Tana hajmidan %1$d sm kamaydi!</string>
+    <string name="weight_success_title_gain">Tabriklaymiz! Vazningiz %1$s ga ko\'paydi!</string>
+    <string name="weight_success_title_gained_lose">Vazningiz %1$s ga ko\'paydi</string>
+    <string name="weight_success_title_lost_gain">Vazningiz %1$s ga kamaydi</string>
+    <string name="weight_success_share_desc_loss_fmt">🔥 Ozish natijam: %1$d kunda %2$s\n\n⚖️ Boshlang\'ich vazn: %3$s\n🎯 Hozirgi vazn: %4$s\n📅 Muddat: %1$d kun</string>
+    <string name="weight_success_share_desc_gain_fmt">💪 Vazn olish natijam: %1$d kunda %2$s\n\n⚖️ Boshlang\'ich vazn: %3$s\n🎯 Hozirgi vazn: %4$s\n📅 Muddat: %1$d kun</string>
+    <string name="add_post_blur_face_title">Yuzni hiralashtirish</string>
+    <string name="add_post_blur_face_subtitle">Maxfiylik uchun rasmdagi yuz sohasiga hiralashtirish berish</string>
+
+    <!-- Lose Weight Success -->
+    <string name="lose_success_1">Siz haqiqiy qahramonsiz! Har bir bosgan qadamingiz maqsadingiz sari elatmoqda! 🌟</string>
+    <string name="lose_success_2">Ajoyib natija! Intizom va sabringiz o\'z mevasini bermoqda! 🎉</string>
+    <string name="lose_success_3">Siz bilan faxrlanamiz! Xuddi shunday g\'ayrat bilan davom eting! 💪</string>
+    <string name="lose_success_4">Barakalla! Kichik g\'alabalar katta zafarlarga olib keladi! 🏆</string>
+    <string name="lose_success_5">Siz to\'xtatib bo\'lmas kuchga aylandingiz! Natijalar shuning isbotidir! 🔥</string>
+
+    <!-- Recomposition (Body Measurement Loss) -->
+    <string name="recomposition_1">Vazningiz o\'zgarmagan bo\'lsa ham, tana o\'lchovlaringizdan (hajmdan) %1$d sm ketibdi! Bu degani mushaklaringiz tiklanib, yog\' eriyapti! 💪</string>
+    <string name="recomposition_2">Juda ajoyib! Vazn tarozida ko\'rinmasa ham, tana o\'lchovlaringiz %1$d sm ga kamaydi! Yog\' qatlami erimoqda! ✨</string>
+    <string name="recomposition_3">Tabriklaymiz! Tana hajmingiz %1$d sm ga qisqardi. Mushak mustahkamlanib, yog\'lar parchalanmoqda! 🏋️</string>
+    <string name="recomposition_4">Tarozidan ko\'ra kiyimingiz kengaygani muhimroq! O\'lchovlar %1$d sm ga kamaygani ajoyib progress! 🔥</string>
+    <string name="recomposition_5">Siz to\'g\'ri yo\'ldasiz! Tana o\'lchovingizdan %1$d sm yo\'qotildi — bu haqiqiy yog\' erishining belgisidir! 🌟</string>
+
+    <!-- Lose Weight Plateau / Water Retention -->
+    <string name="weight_success_title_unchanged">Vazningiz o\'zgarmadi</string>
+    <string name="weight_success_message_unchanged_lose">Hech qisi yo\'q! Boshlang\'ich haftalarda yoki faol mashg\'ulotlardan so\'ng tana vaqtincha suv ushlab turishi, mushaklar tiklanishi yoki ovqat hazm bo\'lish jarayoni sababli tarozida vazn o\'zgarmasligi mumkin. Xavotir olmang, tartibli ovqatlanishda davom etsangiz yog\' erishi to\'xtamaydi! 💪</string>
+    <string name="weight_success_message_unchanged_gain">Hech qisi yo\'q! Semirish jarayonida tana sarflayotgan kaloriyasidan ko\'proq energiya olishi kerak. Taom porsiyasini oshirib, ko\'proq ovqat yeng! 💪</string>
+    <string name="lose_plateau_1">Hech qisi yo\'q! Boshlang\'ich haftalarda tana vaqtincha suv ushlab turishi yoki moslashishi mumkin. Xavotir olmang, tartibli ovqatlanishni davom ettiring — natija tez orada ko\'rinadi! 🌱</string>
+    <string name="lose_plateau_2">Kichik turg\'unliklar — bu tabiiy jarayon. Tana yangi vaznga moslashmoqda, harakatni to\'xtatmang! 💪</string>
+    <string name="lose_plateau_3">Suv balansi va tana qayta tiklanishi sababli vazn bir oz turg\'un turishi mumkin. Sabr bilan davom eting! ✨</string>
+    <string name="lose_plateau_4">Esteressiz, tartibli rejimda davom eting. Tana tez orada yog\'larni qayta yoqa boshlaydi! 🎯</string>
+    <string name="lose_plateau_5">Tarozidagi son vaqtincha to\'xtashi mumkin, ammo intizomingiz o\'z mevasini albatta beradi! 🔥</string>
+
+    <!-- Lose Weight Gained Advice -->
+    <string name="lose_gained_advice_1">Vazn bir oz ko\'paygani sho\'r ovqat, kechki ovqatlanish yoki vaqtincha suv yig\'ilishi bilan bog\'liq bo\'lishi mumkin. Xavotir olmang, rejimga qayting! 📊</string>
+    <string name="lose_gained_advice_2">Kichik tebranishlar har bir insonda bo\'ladi. Suv ichishni ko\'paytiring va rejadagi kaloriya me\'yoriga amal qiling! 💧</string>
+    <string name="lose_gained_advice_3">Aksariyat hollarda bu yog\' emas, balki tana ushlab turgan vaqtincha suvdir. Tushkunlikka tushmang va davom eting! 💪</string>
+    <string name="lose_gained_advice_4">Mashqlardan so\'ng mushaklar suv yig\'ishi mumkin. Kunlik suv va kaloriya balansingizni ushlang! 🏋️</string>
+    <string name="lose_gained_advice_5">Sabrli bo\'ling. Bir kungi ko\'rsatkich butun jarayonni belgilamaydi, ertadan rejimda davom eting! 🎯</string>
+
+    <!-- Gain Weight Success -->
+    <string name="gain_success_1">Tabriklaymiz! Semirish va mushak yig\'ish maqsadingiz sari ajoyib ilgarilash! 🎉</string>
+    <string name="gain_success_2">Barakalla! Tana sifatli kaloriya olib, sog\'lom vazn va mushak yig\'ishni boshladi! 💪</string>
+    <string name="gain_success_3">Ajoyib natija! Kunlik kaloriya profitsitiga amal qilganingiz o\'z mevasini bermoqda! 🏆</string>
+    <string name="gain_success_4">Qoyil! Sog\'lom va baquvvat tana sari tashlangan ajoyib qadam! ✨</string>
+    <string name="gain_success_5">Super! Shunday to\'g\'ri oziqlanish va tartib bilan davom eting! 🔥</string>
+
+    <!-- Gain Weight Lost Advice -->
+    <string name="gain_lost_advice_1">Vazn yig\'ish uchun ko\'proq va to\'yimliroq ovqat yeng! Kunlik taom porsiyangizni oshiring! 💪</string>
+    <string name="gain_lost_advice_2">Kaloriya yetishmovchiligi sezilmoqda. Kunlik taom va porsiyangizni ko\'paytirib, ko\'proq ovqat yeng! 🍛</string>
+    <string name="gain_lost_advice_3">Katta porsiyalarda yeyish qiyin bo\'lsa, kuniga 4-5 mahal tez-tez va ko\'proq ovqat yeng! 🍱</string>
+    <string name="gain_lost_advice_4">Tana ko\'p kaloriya sarflamoqda. Vazn yig\'ish uchun taom porsiyangizni oshirib, ko\'proq ovqat yeng! ⚡</string>
+    <string name="gain_lost_advice_5">Sog\'lom semirish uchun har kungi ovqat porsiyasini ko\'paytirib, to\'yib ovqatlaning! 🎯</string>
+
+    <!-- Premium Limits -->
+    <string name="home_food_limit_premium_title">Bugungi limit tugadi</string>
+    <string name="home_food_limit_premium_msg">Siz bugungi 30 ta taom kiritish limitingizdan to\'liq foydalandingiz. Ro\'yxatdan qidirib qo\'shishingiz mumkin.</string>
+    <string name="ai_chat_limit_premium_finished">Bugunga limit tugadi, ertaga kiring</string>
+    <string name="premium_sheet_food_list">Ovqatlar ro\'yxati</string>
+
+    <!-- Weight History Strings -->
+    <string name="weight_history_screen_title">Vazn tarixi</string>
+    <string name="weight_history_empty_title">Hali vazn kiritilmagan</string>
+    <string name="weight_history_add_button">Vazn kiritish</string>
+    <string name="weight_history_delete_dialog_title">Vaznni o\'chirish</string>
+    <string name="weight_history_delete_dialog_message">Haqiqatan ham bu vazn ko\'rsatkichini o\'chirmoqchimisiz?</string>
+    <string name="weight_history_delete_dialog_positive">O\'chirish</string>
+    <string name="weight_history_delete_dialog_negative">Bekor qilish</string>
+    <string name="weight_history_metric_belly">Bel</string>
+    <string name="weight_history_metric_hips">Bo\'ksa</string>
+    <string name="weight_history_metric_arm">Qo\'l</string>
+    <string name="weight_history_metric_format">%1$s: %2$s</string>
+
+    <!-- Log Food Empty State Tips -->
+    <string name="log_food_empty_tip_1_title">Suv ichishni unutmang</string>
+    <string name="log_food_empty_tip_1_desc">Har bir taomdan 20 daqiqa oldin bir stakan iliq suv ichish hazm tizimini faollashtiradi va ortiqcha ovqatlanishdan asraydi.</string>
+    <string name="log_food_empty_tip_2_title">Oqsilga e\'tibor qarating</string>
+    <string name="log_food_empty_tip_2_desc">Har bir ovqatlanishda oqsilli mahsulotlar (tuxum, go\'sht, tvorog, dukkaklilar) bo\'lishi to\'qlik hissini uzoq vaqt saqlab beradi.</string>
+    <string name="log_food_empty_tip_3_title">Sekin va xotirjam chaynang</string>
+    <string name="log_food_empty_tip_3_desc">Miyaga to\'qlik signali 15-20 daqiqadan keyin yetib boradi. Shoshilmasdan chaynash me\'yorni to\'g\'ri his qilishga yordam beradi.</string>
+    <string name="log_food_empty_tip_4_title">Kletchatka va ko\'katlar</string>
+    <string name="log_food_empty_tip_4_desc">Taom bilan birga sabzavot va ko\'katlar iste\'mol qilish ichaklar faoliyatini yaxshilaydi va qondagi shakarni bir maromda ushlaydi.</string>
+    <string name="log_food_empty_tip_5_title">Tartib va intizom</string>
+    <string name="log_food_empty_tip_5_desc">Bir xil vaqtda ovqatlanish tartibiga rioya qilish moddalar almashinuvini yaxshilaydi va kutilmagan ochlik xurujlarini oldini oladi.</string>
+    <string name="log_food_empty_tip_6_title">80% to\'qlik qoidasi</string>
+    <string name="log_food_empty_tip_6_desc">Oshqozon to\'liq to\'lishidan sal avvalroq ovqatlanishni yakunlang. Bu tanada yengillik va yuqori faollikni ta\'minlaydi.</string>
+    <string name="log_food_empty_tip_7_title">Yashirin kaloriyalar</string>
+    <string name="log_food_empty_tip_7_desc">Shirin gazli ichimliklar va yog\'li souslar o\'rniga toza suv yoki ko\'k choy ichishni odat qiling.</string>
+    <string name="log_food_empty_tip_8_title">Foydali gazaklar</string>
+    <string name="log_food_empty_tip_8_desc">Asosiy ovqatlar oralig\'ida och qolsangiz, shirinlik o\'rniga bir hovuch yong\'oq yoki meva tanlash organizmga quvvat beradi.</string>
+    <string name="log_food_empty_tip_9_title">Rang-barang likopcha</string>
+    <string name="log_food_empty_tip_9_desc">Likopchangiz turli rangdagi sabzavotlarga boy bo\'lsa, tanangiz shunchalik ko\'p vitamin va minerallarni qabul qiladi.</string>
+    <string name="log_food_empty_tip_10_title">Tana signallarini tinglang</string>
+    <string name="log_food_empty_tip_10_desc">Hissiy ochlik bilan haqiqiy jismoniy ochlikni ajrating: haqiqiy ochlik paytida har qanday foydali taom ishtaha bilan tanovul qilinadi.</string>
+
+    <!-- Food Analyzer Meal Hints -->
+    <string name="analyzer_hint_breakfast_title">Nonushta maslahati</string>
+    <string name="analyzer_hint_breakfast_1">Nonushtada oqsilli mahsulotlar (tuxum, tvorog) va murakkab uglevodlar (suli yormasi) tanlash kun bo\'yi quvvat beradi va shirinlikka bo\'lgan ehtiyojni kamaytiradi.</string>
+    <string name="analyzer_hint_breakfast_2">Ertalab nonushtadan 15-20 daqiqa oldin bir stakan iliq suv ichish oshqozon-ichak tizimini uyg\'otishga va hazmni yaxshilashga yordam beradi.</string>
+    <string name="analyzer_hint_lunch_title">Tushlik maslahati</string>
+    <string name="analyzer_hint_lunch_1">Tushlikda likopchangizning teng yarmini yangi sabzavot va salatlar, to\'rtdan birini oqsil va to\'rtdan birini murakkab uglevodlar bilan to\'ldirish ayni muddao.</string>
+    <string name="analyzer_hint_lunch_2">Tushlikdan so\'ng darhol yotish yoki uxlashdan saqlaning. 10-15 daqiqalik yengil piyoda yurish hazmni osonlashtiradi va energiya bag\'ishlaydi.</string>
+    <string name="analyzer_hint_dinner_title">Kechki ovqat maslahati</string>
+    <string name="analyzer_hint_dinner_1">Kechki ovqatni uxlashdan kamida 2-3 soat oldin yakunlash oshqozonning tun bo\'yi dam olishiga va sifatli uyquga yordam beradi.</string>
+    <string name="analyzer_hint_dinner_2">Kechki payt og\'ir qovurilgan va yog\'li ovqatlardan ko\'ra sabzavotlar, yengil sho\'rva, dimlangan tovuq yoki baliq go\'shti afzalroqdir.</string>
+    <string name="analyzer_hint_snack_title">Gazak maslahati</string>
+    <string name="analyzer_hint_snack_1">Gazak sifatida bir hovuch yong\'oq, qatiq yoki bitta meva tanlash qondagi shakar miqdorini barqaror saqlab, asosiy taomda ortiqcha yeb qo\'yishdan asraydi.</string>
+    <string name="analyzer_hint_snack_2">Gazak paytida ham shoshilmasdan, chalg\'imasdan iste\'mol qilish to\'qlik hissini to\'g\'ri baholashga imkon beradi.</string>
+
+    <!-- AI Meal Consultant Strings -->
+    <string name="consultant_can_i_eat_btn">Qancha yesam bo\'ladi?</string>
+    <string name="consultant_can_i_eat_sub">Aniq me\'yori va porsiyasini bilib oling</string>
+    <string name="consultant_what_to_eat_btn">Menyu tuzish</string>
+    <string name="consultant_what_to_eat_sub">Sizning me\'yoringizga mos menyu tuzamiz</string>
+    <string name="consultant_can_i_eat_sheet_title">Qancha yesam bo\'ladi?</string>
+    <string name="consultant_can_i_eat_sheet_desc">Taomni yozing yoki suratga oling</string>
+    <string name="consultant_food_input_hint">Masalan: Lavash yoki 2 ta somsa va kola...</string>
+    <string name="consultant_camera_pick">Rasmga olish</string>
+    <string name="consultant_gallery_pick">Galereyadan</string>
+    <string name="consultant_analyze_btn">Me\'yorni hisoblash</string>
+
+    <string name="consultant_choose_option_title_format">%1$s menyusini tuzish</string>
+    <string name="consultant_option_smart_title">5 ta tavsiya</string>
+    <string name="consultant_option_smart_sub">Me\'yoringizga mos 5 ta menyu</string>
+    <string name="consultant_option_home_title">Uydagi ovqatlardan tuzish</string>
+    <string name="consultant_option_home_sub">Oshxonangizdagi bor masalliqlar asosida</string>
+    <string name="consultant_option_outside_title">Ko\'chadaman</string>
+    <string name="consultant_option_outside_sub">Kafe, oshxona yoki tez tayyor taomlar</string>
+
+    <string name="consultant_input_home_title">Oshxonangizdagi masalliq yoki ovqatni ayting</string>
+    <string name="consultant_input_outside_title">Qayerdasiz yoki qanday taom qidiryapsiz?</string>
+    <string name="consultant_input_home_hint">Masalan: 2 ta tuxum, qatiq, pomidor...</string>
+    <string name="consultant_input_outside_hint">Masalan: Choyxona palovi yoki lavash...</string>
+    <string name="consultant_generate_menu_btn">Menyu tuzish</string>
+
+    <string name="consultant_result_title">Qancha yesam bo\'ladi?</string>
+    <string name="consultant_loading_title">Tahlil qilinmoqda...</string>
+    <string name="consultant_loading_can_i_eat">Porsiya va me\'yor hisoblanmoqda...</string>
+    <string name="consultant_loading_what_to_eat">Menyu tuzilmoqda...</string>
+    <string name="consultant_loading_desc">Sizning kaloriyangiz, maqsadlaringiz va milliy taomlarimiz bazasi tahlil qilinmoqda.</string>
+    <string name="consultant_alternatives_title">O\'rniga nima yeyish mumkin?</string>
+    <string name="consultant_menus_title">Tavsiya etilgan menyular</string>
+    <string name="consultant_options_header">Aynan siz uchun 5 xil menyu varianti:</string>
+    <string name="consultant_nutritionist_advice">Dietolog tavsiyasi</string>
+    <string name="consultant_portion_label">Porsiya:</string>
+    <string name="consultant_retry">Qaytadan urinish</string>
+    <string name="consultant_error_generic">Tavsiyalarni olishda xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.</string>
+    <string name="consultant_validation_empty_input">Iltimos, ovqat nomini yozing yoki suratini yuklang</string>
+    <string name="consultant_validation_empty_home">Iltimos, mavjud masalliqlar yoki ovqat nomini kiriting</string>
+    <string name="consultant_portions_header_title">Ruxsat etilgan me\'yor</string>
+    <string name="consultant_portions_header_subtitle">Sizning mahalingiz va kaloriyangizga moslangan porsiya</string>
+    <string name="consultant_portions_total_format">Jami: ~%1$d kkal</string>
+    <string name="consultant_item_calories_format">%1$d kkal</string>
+    <string name="consultant_item_serving_format">%1$s - %2$s</string>
+    <string name="consultant_smart_addition_default_title">Dietolog maslahati</string>
+    <string name="consultant_add_to_diary_btn">Kundalikka qo\'shish</string>
+    <string name="consultant_added_to_diary_done">Kundalikka qo\'shildi ✓</string>
+    <string name="consultant_adding_to_diary">Qo\'shilmoqda...</string>
+    <string name="consultant_added_to_diary_toast">Taom kundalikka muvaffaqiyatli qo\'shildi</string>
+    <string name="consultant_menu_main_title_format">%1$s uchun menyular</string>
+    <string name="consultant_menu_subtitle_format">Ushbu mahal me\'yori: ~%1$d kkal</string>
+    <string name="consultant_menu_variant_format">%1$d-variant</string>
+    <string name="consultant_menu_total_cal_format">Jami: ~%1$d kkal</string>
+    <string name="consultant_what_to_eat_budget_badge">Me\'yor: ~%1$d kkal</string>
+
+    <!-- Daily Menu Planner -->
+    <string name="daily_menu_planner_title">Menyular</string>
+    <string name="daily_menu_planner_empty_title">Bugungi taomnoma hali tuzilmagan</string>
+    <string name="daily_menu_planner_empty_desc">AI sizning me\'yoringiz va maqsadingizga mos sog\'lom, to\'yimli kunlik taomnoma tuzib beradi.</string>
+    <string name="daily_menu_planner_generate_btn">Menyu tuzish</string>
+    <string name="daily_menu_planner_regenerate_day_btn">Qayta tuzish</string>
+    <string name="daily_menu_planner_dialog_title">Menyu qanday tuzilsin?</string>
+    <string name="daily_menu_planner_option_recommendation">Tavsiya bo\'yicha</string>
+    <string name="daily_menu_planner_option_recommendation_desc">AI o\'zi serverdagi milliy va foydali taomlar bazasidan kaloriya me\'yoringizga mos menyu tuzadi</string>
+    <string name="daily_menu_planner_option_home_foods">Uydagi ovqatlar yoki masalliqlardan</string>
+    <string name="daily_menu_planner_option_home_foods_desc">Uyda bor masalliqlar yoki yemoqchi bo\'lgan taomlaringiz asosida moslab tuziladi</string>
+    <string name="daily_menu_planner_home_foods_hint">Masalan: tuxum, pomidor, tovuq go\'shti, qora non, suzma...</string>
+    <string name="daily_menu_planner_dialog_confirm_btn">Menyu yaratish</string>
+    <string name="daily_menu_planner_replace_dialog_title">Mahal taomnomasini o\'zgartirish</string>
+    <string name="daily_menu_planner_custom_input_error">Iltimos, taom yoki masalliq nomini kiriting</string>
+    <string name="daily_menu_planner_replace_option_rec">Tavsiya bo\'yicha yangi variant</string>
+    <string name="daily_menu_planner_replace_option_custom">Boshqa ovqat yoki masalliq kiritish</string>
+    <string name="daily_menu_planner_replace_custom_hint">Yemoqchi bo\'lgan ovqat yoki masalliqni kiriting...</string>
+    <string name="daily_menu_planner_replace_btn">O\'zgartirish</string>
+    <string name="daily_menu_planner_meal_replace_action">O\'zgartirish</string>
+    <string name="daily_menu_planner_meal_add_diary_action">Kundalikka qo\'shish</string>
+    <string name="daily_menu_planner_meal_added_diary_label">Qo\'shildi &#10003;</string>
+    <string name="daily_menu_planner_water_title">Suv me\'yori</string>
+    <string name="daily_menu_planner_loading_title">AI kunlik taomnoma tuzmoqda...</string>
+    <string name="daily_menu_planner_loading_subtitle">Kaloriya me\'yorlaringizga mos sog\'lom variantlar tayyorlanmoqda</string>
+    <string name="daily_menu_planner_log_success">Taom kundalikka muvaffaqiyatli qo\'shildi</string>
+    <string name="daily_menu_planner_error_generic">Xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.</string>
+    <!-- Community Post Actions -->
+    <string name="community_post_like_useful">Foydali</string>
+    <string name="community_post_like_congrats">Tabriklayman</string>
+    <string name="community_post_like_general">Yoqdi</string>
+    <string name="community_post_action_comments">Fikrlar</string>
+    <string name="community_post_read_more">Ko\'proq o\'qish</string>
+    <string name="community_post_read_less">Qisqartirish</string>
 </resources>
+
 
 
 

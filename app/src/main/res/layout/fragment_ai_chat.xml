@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurfaceContainerLowest"
-    android:fitsSystemWindows="false">
+    android:fitsSystemWindows="false"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
@@ -21,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorSurfaceContainerLowest"
-            app:title="Dietolog"
+            app:title="@string/ai_chatbot_title"
             app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.Material3.TitleLarge">
 
@@ -30,7 +32,7 @@
                 style="@style/TextAppearance.AppCompat.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Yangi"
+                android:text="@string/ai_chat_new_chat"
                 android:textAllCaps="false"
                 android:layout_gravity="end"
                 android:layout_marginEnd="12dp"
@@ -48,23 +50,22 @@
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="gone"
         android:clipToPadding="false"
-        android:overScrollMode="never"
-        android:paddingHorizontal="8dp"
-        android:paddingTop="0dp"
-        android:paddingBottom="16dp"
+        android:overScrollMode="always"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
         tools:listitem="@layout/item_chat_message" />
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/emptyStateLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingHorizontal="32dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="always"
         android:visibility="gone"
         tools:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/bottomContainer"
@@ -72,25 +73,185 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appBarLayout">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="🥗"
-            android:textSize="52sp"
-            android:layout_marginBottom="16dp" />
-
-        <TextView
-            android:id="@+id/emptyStateTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_medium"
             android:gravity="center"
-            android:text="Salom! Bugun nima haqida bilmoqchisiz?"
-            android:textAlignment="center"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="20sp" />
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="16dp">
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🥗"
+                android:textSize="44sp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/emptyStateTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:gravity="center"
+                android:text="@string/ai_chat_empty_title"
+                tools:text="Salom! Bugun nima haqida bilmoqchisiz?"
+                android:textAlignment="center"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:id="@+id/suggestionsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <!-- Card 1 (Daily analysis) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSuggestion1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:id="@+id/tvSuggestionIcon1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:textSize="18sp"
+                            tools:text="📊" />
+
+                        <TextView
+                            android:id="@+id/tvSuggestionText1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            tools:text="Bugungi kunimni tahlil qil" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/arrow_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Card 2 (Time-based meal) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSuggestion2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:id="@+id/tvSuggestionIcon2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:textSize="18sp"
+                            tools:text="🥗" />
+
+                        <TextView
+                            android:id="@+id/tvSuggestionText2"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            tools:text="Tushlikka nima yesam bo'ladi?" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/arrow_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Card 3 (Random Pool) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSuggestion3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:id="@+id/tvSuggestionIcon3"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:textSize="18sp"
+                            tools:text="🍞" />
+
+                        <TextView
+                            android:id="@+id/tvSuggestionText3"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/roboto_medium"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            tools:text="Nonni qanday kamaytirsam bo'ladi?" />
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/arrow_right"
+                            app:tint="?attr/colorOnSurfaceVariant" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/bottomContainer"
@@ -122,7 +283,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:hint="Xabar yozing..."
+                android:hint="@string/ai_chat_input_hint_default"
                 android:importantForAutofill="no"
                 android:inputType="textMultiLine|textCapSentences"
                 android:maxLines="5"
@@ -141,7 +302,8 @@
                 android:background="@drawable/bg_macro_icon"
                 android:backgroundTint="?attr/colorPrimary"
                 android:src="@drawable/arrow_right"
-                app:tint="@color/white" />
+                android:tint="?attr/colorOnPrimary"
+                app:tint="?attr/colorOnPrimary" />
 
         </LinearLayout>
 

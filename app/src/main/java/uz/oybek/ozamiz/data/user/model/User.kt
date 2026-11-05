@@ -54,6 +54,20 @@ data class User(
     val isGainWeight: Boolean
         get() = userGoal.isGain
 
+    val isPremiumActive: Boolean
+        get() {
+            if (!premium) return false
+            if (premiumDate <= 0L) return true
+            val normalizedDate = if (premiumDate < 10_000_000_000L) premiumDate * 1000L else premiumDate
+            val durationDays = when {
+                isPremiumYearly -> 365L
+                isMonthlyPremium -> 30L
+                else -> 30L
+            }
+            val durationMs = durationDays * 86_400_000L
+            return (System.currentTimeMillis() - normalizedDate) <= durationMs
+        }
+
     constructor() : this(
         uid = "",
         name = "",

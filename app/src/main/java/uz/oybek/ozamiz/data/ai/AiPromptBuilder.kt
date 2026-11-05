@@ -1,38 +1,70 @@
 package uz.oybek.ozamiz.data.ai
 
-import uz.oybek.ozamiz.data.logs.LogRepository
-import uz.oybek.ozamiz.data.user.local.user
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.firstOrNull
+import uz.oybek.ozamiz.R
+import uz.oybek.ozamiz.common.util.DateFormatter
+import uz.oybek.ozamiz.common.util.DateFormatter.PATTERN_HOUR_MINUTE
+import uz.oybek.ozamiz.data.profile.model.User
+import uz.oybek.ozamiz.data.tracker.api.DailyTrackerRepo
+import uz.oybek.ozamiz.data.tracker.api.FoodTrackerRepo
+import uz.oybek.ozamiz.data.tracker.model.MealType
+import uz.oybek.ozamiz.ui.modelUtils.getDisplayName
+import java.util.Date
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object AiPromptBuilder {
+@Singleton
+class AiPromptBuilder @Inject constructor(
+    private val dailyTrackerRepo: DailyTrackerRepo,
+    private val foodTrackerRepo: FoodTrackerRepo,
+    @param:ApplicationContext private val context: Context
+) {
 
-    const val MODEL_CHAT = "gemini-flash-latest"
-
-    private suspend fun getGroupedFoodLogs(): String {
-        val today = java.util.Date()
-        val logs = LogRepository.getDailyLogsSync(today)?.foodLogs?.values
+    private suspend fun getGroupedFoodLogs(date: Date = Date()): String {
+        val logs = foodTrackerRepo.observeFoodLogs(date).firstOrNull()
         if (logs.isNullOrEmpty()) return "Bugun hali hech qanday ovqat kiritilmagan."
 
-        return logs.groupBy { it.mealType }.map { (mealType, list) ->
-                "• $mealType: " + list.joinToString("; ") { food ->
-                    val macros =
-                        "oqsil: ${food.protein}g, yog': ${food.fat}g, uglevod: ${food.carbs}g"
-                    "${food.description} (${food.calories} kkal, $macros)"
-                }
-            }.joinToString("\n")
+        return logs.groupBy { food ->
+            val meal = food.mealType
+            MealType.fromIdOrNull(meal)?.getDisplayName(context)
+                ?: meal.takeIf { it.isNotBlank() }?.replaceFirstChar { it.uppercase() }
+                ?: context.getString(R.string.admin_field_unknown)
+        }.map { (mealTitle, list) ->
+            "• $mealTitle: " + list.joinToString("; ") { food ->
+                val foodName = food.description.ifBlank { "Taom" }
+                val macros =
+                    "oqsil: ${food.protein}g, yog': ${food.fat}g, uglevod: ${food.carbs}g"
+                "$foodName (${food.calories} kkal, $macros)"
+            }
+        }.joinToString("\n")
     }
 
-    suspend fun buildUserContext(): String {
-        val today = java.util.Date()
-        val dailySummary = LogRepository.getDailySummarySync(today)
-        val genderText = if (user.gender == 1) "Ayol" else "Erkak"
-        val remainingCalories =
-            (user.targetCalories - dailySummary.consumedCalories).coerceAtLeast(0)
+    suspend fun buildFoodAnalysisContext(user: User, mealType: String?, timestamp: Long): String {
+        val date = Date(timestamp)
+        val timeStr = DateFormatter.format(date, PATTERN_HOUR_MINUTE)
+        val dailySummary = dailyTrackerRepo.getDailySummary(date)
+        val goalText = user.goal
+        val genderText = if (user.gender == 1) {
+            context.getString(R.string.gender_female)
+        } else {
+            context.getString(R.string.gender_male)
+        }
+        val remainingCalories = (user.targetCalories - dailySummary.consumedCalories).coerceAtLeast(0)
+        val safeMeal = mealType?.takeIf { it.isNotBlank() }
+            ?.let { MealType.fromIdOrNull(it)?.getDisplayName(context) ?: it }
+            ?: context.getString(R.string.admin_field_unknown)
 
         return """
-            Profil: ${user.age} yosh, $genderText, ${user.weight} kg, ${user.height} sm. Maqsad: ${if (user.isGainWeight) "Vazn yig'ish" else "Ozish"}.
-            Bugungi holat: Kaloriya: ${dailySummary.consumedCalories}/${user.targetCalories} kkal (Qoldi: $remainingCalories kkal), Suv: ${dailySummary.consumedWaterMl}/${user.targetWaterMl} ml, Oqsil: ${dailySummary.consumedProtein}g, Yog': ${dailySummary.consumedFat}g, Uglevod: ${dailySummary.consumedCarbs}g.
-            Bugun yeyilganlar:
-            ${getGroupedFoodLogs()}
+            Foydalanuvchi maqsadi: $goalText.
+            Profil: ${user.age} yosh, $genderText, vazn: ${user.weight} kg, bo'y: ${user.height} sm.
+            Ovqatlanish vaqti: $timeStr, Taom mahali: $safeMeal.
+            Bugungi me'yor va statistika:
+            - Kaloriya: ${dailySummary.consumedCalories}/${user.targetCalories} kkal (Qolgan limit: $remainingCalories kkal)
+            - Oqsil: ${dailySummary.consumedProtein}g, Yog': ${dailySummary.consumedFat}g, Uglevod: ${dailySummary.consumedCarbs}g.
+            Bugun hozirgacha yeyilgan ovqatlar:
+            ${getGroupedFoodLogs(date)}
         """.trimIndent()
     }
 }

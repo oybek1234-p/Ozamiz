@@ -3,17 +3,16 @@ package uz.oybek.ozamiz.ui.feature.menu.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DiffUtil
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.data.menu.model.Menu
 import uz.oybek.ozamiz.databinding.ItemSearchMenuBinding
 import uz.oybek.ozamiz.ui.base.BaseAdapter
 import uz.oybek.ozamiz.ui.utils.loadPhoto
-import androidx.fragment.app.FragmentActivity
-import uz.oybek.ozamiz.ui.feature.premium.isPremium
-import uz.oybek.ozamiz.data.user.local.user
 
 class MenuAdapter(
+    private val isPremiumUser: Boolean = false,
     private val onMenuClick: (Menu) -> Unit,
     private val nextLoad: () -> Unit
 ) : BaseAdapter<Menu, ItemSearchMenuBinding>(R.layout.item_search_menu, MenuDiffCallback()) {
@@ -32,7 +31,6 @@ class MenuAdapter(
             }
             binding.apply {
                 (this as ItemSearchMenuBinding)
-                val isPremiumUser = user.isPremium()
                 val isLocked = !isPremiumUser && pos >= 3
 
                 if (isLocked) {

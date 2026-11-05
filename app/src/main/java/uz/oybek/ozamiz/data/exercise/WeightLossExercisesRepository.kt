@@ -5,19 +5,12 @@ import uz.oybek.ozamiz.data.exercise.model.HomeExercise
 import uz.oybek.ozamiz.data.exercise.model.HomeVideo
 import uz.oybek.ozamiz.data.logs.ExerciseLogRepository
 import uz.oybek.ozamiz.data.logs.model.ExerciseLog
-import uz.oybek.ozamiz.data.user.local.user
+import uz.oybek.ozamiz.data.profile.model.User
 
 object WeightLossExercisesRepository {
 
-    fun isPremiumUser(): Boolean {
-        val u = user
-        if (!u.premium) return false
-        val durationMs = when {
-            u.isPremiumYearly -> 365L
-            u.isMonthlyPremium -> 30L
-            else -> 30L
-        } * 24L * 60 * 60 * 1000
-        return (System.currentTimeMillis() - u.premiumDate) <= durationMs
+    fun isPremiumUser(user: User? = null): Boolean {
+        return user?.isPremiumActive ?: false
     }
 
     fun getHomeExercises(): List<HomeExercise> {

@@ -89,7 +89,7 @@
 
     <color name="md_theme_light_surfaceContainerLowest">#FFFFFF</color>
     <color name="md_theme_light_surfaceContainerLow">#F8F9FA</color>
-    <color name="md_theme_light_surfaceContainer">#F3F4F6</color>
+    <color name="md_theme_light_surfaceContainer">#F2F2F2</color>
     <color name="md_theme_light_surfaceContainerHigh">#E5E7EB</color>
     <color name="md_theme_light_surfaceContainerHighest">#D1D5DB</color>
 
@@ -163,14 +163,26 @@
     <color name="analysis_points_text">#FFFFFF</color>
 
     <!-- Health Grade Colors (Vivid & clearly visible backgrounds) -->
-    <color name="health_grade_excellent">#007950</color>
-    <color name="health_grade_excellent_bg">#BCEFD4</color>
-    <color name="health_grade_good">#186B33</color>
-    <color name="health_grade_good_bg">#C5ECCF</color>
-    <color name="health_grade_moderate">#C27300</color>
-    <color name="health_grade_moderate_bg">#FFE3A8</color>
-    <color name="health_grade_caution">#C25300</color>
-    <color name="health_grade_caution_bg">#FFCEAC</color>
-    <color name="health_grade_limit">#B71C1C</color>
-    <color name="health_grade_limit_bg">#FFC5C8</color>
+    <color name="health_grade_excellent">#15803D</color>
+    <color name="health_grade_excellent_bg">#DCFCE7</color>
+    <color name="health_grade_good">#16A34A</color>
+    <color name="health_grade_good_bg">#DCFCE7</color>
+    <color name="health_grade_moderate">#D97706</color>
+    <color name="health_grade_moderate_bg">#FEF3C7</color>
+    <color name="health_grade_caution">#EA580C</color>
+    <color name="health_grade_caution_bg">#FFEDD5</color>
+    <color name="health_grade_limit">#DC2626</color>
+    <color name="health_grade_limit_bg">#FEE2E2</color>
+
+    <!-- Food Macro Grade Colors -->
+    <color name="macro_grade_good">#15803D</color>
+    <color name="macro_grade_moderate">#D97706</color>
+    <color name="macro_grade_bad">#DC2626</color>
+
+    <!-- Natija Screen Colors -->
+    <color name="natija_hero_bg">#006C4C</color>
+    <color name="natija_hero_accent">#60E2A8</color>
+    <color name="natija_card_stroke">#E3EAE6</color>
+    <color name="natija_text_green">#006C4C</color>
+    <color name="natija_text_muted">#737A75</color>
 </resources>

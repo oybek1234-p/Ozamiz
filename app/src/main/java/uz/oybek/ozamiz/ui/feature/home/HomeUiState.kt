@@ -55,5 +55,6 @@ data class HomeProfileUiState(
     val userPoints: Int = 0,
     val daysFromRegister: Int = 0,
     val isRated: Boolean = false,
-    val unreadMessages: Int = 0
+    val unreadMessages: Int = 0,
+    val showFeedbackCard: Boolean = false
 )

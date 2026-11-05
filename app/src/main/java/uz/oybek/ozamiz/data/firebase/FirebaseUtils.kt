@@ -1,7 +1,7 @@
 package uz.oybek.ozamiz.data.firebase
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
-import uz.oybek.ozamiz.data.user.local.user
 import uz.oybek.ozamiz.data.user.mapper.UserMapper
 import uz.oybek.ozamiz.data.user.model.User
 
@@ -20,6 +20,6 @@ fun <T> DataSnapshot.getValueSafe(type: Class<T>, default: T? = null): T? {
 fun DataSnapshot.toUserSafe(): User = UserMapper.fromSnapshot(this)
 
 val currentUserId: String
-    get() = user.uid
+    get() = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
 
 fun generateKey() = System.currentTimeMillis().toString()

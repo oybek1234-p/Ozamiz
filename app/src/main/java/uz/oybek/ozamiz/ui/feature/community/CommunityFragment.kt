@@ -33,6 +33,9 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
     private var usersAdapter: CommunityUsersAdapter? = null
     private var usersLoadingAdapter: PagingLoadItemAdapter? = null
 
+    private var isManualRefresh = false
+    private var shouldScrollToTopOnNextList = true
+
     init {
         showBottomSheet = true
     }
@@ -111,6 +114,7 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
+            isManualRefresh = true
             viewModel.refresh()
         }
     }
@@ -120,20 +124,22 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
             navigate(R.id.addPostFragment)
         }
 
-        val openFilter = {
-            PostFilterBottomSheet(
-                currentFilter = viewModel.uiState.value.filter
-            ) { selectedFilter ->
-                viewModel.setFilter(selectedFilter)
-            }.show(childFragmentManager, PostFilterBottomSheet.TAG)
+        binding.chipGroupFilters.setOnCheckedStateChangeListener { _, checkedIds ->
+            val targetFilter = when {
+                checkedIds.contains(binding.chipOzganlar.id) -> CommunityPostFilter.WEIGHT_LOSS
+                checkedIds.contains(binding.chipFood.id) -> CommunityPostFilter.FOOD
+                checkedIds.contains(binding.chipUsers.id) -> CommunityPostFilter.ACTIVE_USERS
+                else -> CommunityPostFilter.ALL
+            }
+            if (viewModel.uiState.value.filter != targetFilter) {
+                shouldScrollToTopOnNextList = true
+                viewModel.setFilter(targetFilter)
+            }
         }
-
-        binding.layoutFilterSelector.setOnClickListener { openFilter() }
-        binding.btnFilter.setOnClickListener { openFilter() }
     }
 
     private fun openCommentsSheet(post: CommunityPost) {
-        val sheet = PostCommentsBottomSheet(post.id)
+        val sheet = PostCommentsBottomSheet.newInstance(post.id)
         sheet.onCommentCountChanged = { targetPostId, delta ->
             viewModel.updateCommentCount(targetPostId, delta)
         }
@@ -183,36 +189,79 @@ class CommunityFragment : BaseFragment<FragmentCommunityBinding>() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        (activity as? uz.oybek.ozamiz.ui.MainActivity)?.clearCommunityBadge()
+        shouldScrollToTopOnNextList = true
+        binding.rvPosts.scrollToPosition(0)
+        isManualRefresh = false
+        viewModel.refresh()
+    }
+
     private fun renderState(state: CommunityUiState) {
-        // Title update based on filter
-        val titleRes = when (state.filter) {
-            CommunityPostFilter.ALL -> R.string.community_main_title
-            CommunityPostFilter.WEIGHT_LOSS -> R.string.community_filter_weight_loss
-            CommunityPostFilter.FOOD -> R.string.community_filter_food
-            CommunityPostFilter.ACTIVE_USERS -> R.string.community_filter_active_users
+        // Sync filter chip selection
+        when (state.filter) {
+            CommunityPostFilter.WEIGHT_LOSS -> if (!binding.chipOzganlar.isChecked) binding.chipOzganlar.isChecked = true
+            CommunityPostFilter.FOOD -> if (!binding.chipFood.isChecked) binding.chipFood.isChecked = true
+            CommunityPostFilter.ACTIVE_USERS -> if (!binding.chipUsers.isChecked) binding.chipUsers.isChecked = true
+            CommunityPostFilter.ALL -> if (!binding.chipAll.isChecked) binding.chipAll.isChecked = true
         }
-        binding.tvHeaderTitle.text = getString(titleRes)
+
+        binding.tvHeaderTitle.text = getString(R.string.community_main_title)
 
         val isUsers = state.filter == CommunityPostFilter.ACTIVE_USERS
         binding.rvPosts.isVisible = !isUsers
         binding.rvUsers.isVisible = isUsers
 
-        binding.swipeRefresh.isRefreshing = state.isLoading
-        binding.progressBar.isVisible = false
+        if (state.isLoading) {
+            if (isManualRefresh) {
+                binding.swipeRefresh.isRefreshing = true
+                binding.progressTopSmall.isVisible = false
+                binding.progressBar.isVisible = false
+            } else if (state.posts.isNotEmpty()) {
+                binding.swipeRefresh.isRefreshing = false
+                binding.progressTopSmall.isVisible = true
+                binding.progressBar.isVisible = false
+            } else {
+                binding.swipeRefresh.isRefreshing = false
+                binding.progressTopSmall.isVisible = false
+                binding.progressBar.isVisible = true
+            }
+        } else {
+            isManualRefresh = false
+            binding.swipeRefresh.isRefreshing = false
+            binding.progressTopSmall.isVisible = false
+            binding.progressBar.isVisible = false
+        }
 
         // Pagination loading item at bottom
         postsLoadingAdapter?.isVisible = !isUsers && state.isPaging
         usersLoadingAdapter?.isVisible = isUsers && state.isPaging
 
-        postsAdapter?.updateCurrentUserId(state.currentUserId)
-
         if (isUsers) {
-            usersAdapter?.submitList(state.users)
+            usersAdapter?.submitList(state.users) {
+                if (shouldScrollToTopOnNextList) {
+                    binding.rvUsers.post {
+                        binding.rvUsers.scrollToPosition(0)
+                    }
+                    shouldScrollToTopOnNextList = false
+                }
+            }
             val isEmpty = !state.isLoading && state.users.isEmpty()
             binding.layoutEmpty.isVisible = isEmpty
-            binding.tvEmpty.text = getString(R.string.community_users_empty)
+            binding.tvEmpty.text = getString(R.string.community_posts_empty)
         } else {
-            postsAdapter?.submitList(state.posts)
+            postsAdapter?.updateCurrentUserId(state.currentUserId)
+            postsAdapter?.updateLastSeenTimestamp(state.lastSeenTimestamp)
+
+            postsAdapter?.submitList(state.posts) {
+                if (shouldScrollToTopOnNextList) {
+                    binding.rvPosts.post {
+                        binding.rvPosts.scrollToPosition(0)
+                    }
+                    shouldScrollToTopOnNextList = false
+                }
+            }
             val isEmpty = !state.isLoading && state.posts.isEmpty()
             binding.layoutEmpty.isVisible = isEmpty
             binding.tvEmpty.text = getString(R.string.community_posts_empty)

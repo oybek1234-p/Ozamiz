@@ -1,24 +1,27 @@
 package uz.oybek.ozamiz.ui.feature.admin.users
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.core.widget.doAfterTextChanged
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentAdminUsersListBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 
+@AndroidEntryPoint
 class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
 
     private val viewModel: AdminUsersListViewModel by viewModels()
-    private lateinit var adapter: AdminUsersAdapter
+    private var adapter: AdminUsersAdapter? = null
 
     override fun inflateBinding(
         inflater: LayoutInflater,
@@ -50,20 +53,22 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
     }
 
     private fun setupRecyclerView(bind: FragmentAdminUsersListBinding) {
-        adapter = AdminUsersAdapter { selectedUser ->
+        val usersAdapter = AdminUsersAdapter { selectedUser ->
             val bundle = bundleOf("userId" to selectedUser.uid)
             navigate(R.id.adminUserDetailsFragment, bundle)
         }
-        bind.recyclerUsers.adapter = adapter
-        
-        bind.recyclerUsers.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: androidx.recyclerview.widget.RecyclerView, dx: Int, dy: Int) {
+        adapter = usersAdapter
+        bind.recyclerUsers.adapter = usersAdapter
+
+        bind.recyclerUsers.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                val layoutManager = recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager
+                if (dy <= 0) return
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
                 val totalItemCount = layoutManager.itemCount
                 val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
 
-                if (lastVisibleItemPosition + 5 >= totalItemCount) {
+                if (lastVisibleItemPosition >= totalItemCount - 3 && totalItemCount >= 20) {
                     viewModel.loadNextPage()
                 }
             }
@@ -73,24 +78,22 @@ class AdminUsersListFragment : BaseFragment<FragmentAdminUsersListBinding>() {
     private fun observeViewModel(bind: FragmentAdminUsersListBinding) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.users.collect { users ->
-                        adapter.submitList(users)
-                    }
-                }
-                launch {
-                    viewModel.isLoading.collect { loading ->
-                        bind.progressBar.isVisible = loading
-                    }
-                }
-                launch {
-                    viewModel.isPremiumFilterActive.collect { isActive ->
-                        if (bind.chipPremiumOnly.isChecked != isActive) {
-                            bind.chipPremiumOnly.isChecked = isActive
-                        }
+                viewModel.uiState.collect { state ->
+                    adapter?.submitList(state.users)
+                    bind.progressBar.isVisible = state.isLoading && state.users.isEmpty()
+                    bind.progressBarBottom.isVisible = state.isLoading && state.users.isNotEmpty()
+                    bind.textViewEmpty.isVisible = !state.isLoading && state.users.isEmpty() && state.searchQuery.isNotBlank()
+                    if (bind.chipPremiumOnly.isChecked != state.isPremiumFilterActive) {
+                        bind.chipPremiumOnly.isChecked = state.isPremiumFilterActive
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        bindingT?.recyclerUsers?.adapter = null
+        adapter = null
+        super.onDestroyView()
     }
 }

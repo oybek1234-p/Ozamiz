@@ -152,7 +152,7 @@ object FoodLogRepository {
                     if (foodLog.aiGenerated) {
                         AppPreference.incrementFoodLogLimitCount()
                     }
-                    LogRepository.updateSummary(
+                    updateSummary(
                         date = date,
                         caloriesDelta = foodLog.calories,
                         proteinDelta = foodLog.protein.orZero(),
@@ -215,7 +215,7 @@ object FoodLogRepository {
             val carbDelta = (updated.carbs.orZero()) - (oldLog?.carbs.orZero())
             val fatDelta = (updated.fat.orZero()) - (oldLog?.fat.orZero())
 
-            LogRepository.updateSummary(
+            updateSummary(
                 date = date,
                 targetUid = userId,
                 caloriesDelta = calDelta,
@@ -246,7 +246,7 @@ object FoodLogRepository {
                 .removeValue()
                 .await()
 
-            LogRepository.updateSummary(
+            updateSummary(
                 date = date,
                 targetUid = userId,
                 caloriesDelta = -foodLog.calories,
@@ -262,4 +262,13 @@ object FoodLogRepository {
         }
     }
 
+    private suspend fun updateSummary(
+        date: Date,
+        targetUid: String? = null,
+        caloriesDelta: Int = 0,
+        proteinDelta: Double = 0.0,
+        carbsDelta: Double = 0.0,
+        fatDelta: Double = 0.0,
+        mealsDelta: Int = 0
+    ) = ""
 }

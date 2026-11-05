@@ -57,9 +57,6 @@ class AddMenuFragment : BaseFragment<FragmentAddMenuBinding>() {
     ) = FragmentAddMenuBinding.inflate(inflater, container, false)
 
     override fun viewCreated(bind: FragmentAddMenuBinding) {
-        menuToEdit = arguments.getArgs<Menu>() 
-            ?: arguments.getArgs<Menu>("menuToEdit") 
-            ?: arguments.getArgs<Menu>("menu")
 
         viewModel.resetState()
         setupListeners(bind)

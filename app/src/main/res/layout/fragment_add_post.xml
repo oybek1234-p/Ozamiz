@@ -61,11 +61,11 @@
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="15sp" />
 
-            <!-- Photo Preview Banner (shown ONLY when image is selected) -->
+            <!-- Single Photo Preview Banner (shown when 1 photo is selected) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardPickPhoto"
                 android:layout_width="match_parent"
-                android:layout_height="320dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
@@ -76,14 +76,27 @@
                 tools:visibility="visible">
 
                 <FrameLayout
+                    android:id="@+id/layoutPhotoPreviewContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content">
 
                     <ImageView
-                        android:id="@+id/imgPhotoPreview"
+                        android:id="@+id/imgPhotoPreviewBlurBg"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
+                        android:alpha="0.25"
+                        android:importantForAccessibility="no" />
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/imgPhotoPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter"
+                        app:shapeAppearanceOverlay="@style/RadiusImageView16"
+                        android:contentDescription="@null"
                         tools:src="@drawable/placeholder_food" />
 
                     <!-- Delete Selected Photo Button -->
@@ -109,6 +122,112 @@
                             app:tint="@color/white" />
                     </com.google.android.material.card.MaterialCardView>
                 </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Dual Photo Comparison Card (shown when Before & After photos exist) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDualPhotoComparison"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:orientation="horizontal"
+                            app:layout_constraintDimensionRatio="4:3"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <!-- Before Photo Column -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginEnd="6dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <ImageView
+                                    android:id="@+id/imgBeforePhotoPreview"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="@null"
+                                    android:scaleType="centerCrop" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="@string/community_photo_oldin"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- After Photo Column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_marginStart="6dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                                app:cardCornerRadius="12dp"
+                                app:cardElevation="0dp"
+                                app:strokeWidth="0dp">
+
+                                <ImageView
+                                    android:id="@+id/imgAfterPhotoPreview"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:contentDescription="@null"
+                                    android:scaleType="centerCrop" />
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="4dp"
+                                android:fontFamily="@font/roboto_medium"
+                                android:text="@string/community_photo_hozir"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+                        </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- Photo Selection Buttons (shown when no photo is selected) -->
@@ -149,6 +268,60 @@
                     app:iconGravity="textStart"
                     app:iconPadding="8dp" />
             </LinearLayout>
+
+            <!-- Blur Face Checkbox Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBlurFaceOption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
+
+                    <com.google.android.material.checkbox.MaterialCheckBox
+                        android:id="@+id/cbBlurFace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/add_post_blur_face_title"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:text="@string/add_post_blur_face_subtitle"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Description Label & Input -->
             <TextView

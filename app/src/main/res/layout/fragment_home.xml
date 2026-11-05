@@ -202,12 +202,14 @@
                 android:id="@+id/contentScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingBottom="88dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
                     android:clipToPadding="false"
                     android:gravity="end"
                     android:orientation="vertical"
@@ -225,6 +227,7 @@
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="18sp" />
 
+                    <!-- Great Meal Post Prompt Banner -->
                     <include
                         android:id="@+id/main_progress"
                         layout="@layout/home_main_progress" />
@@ -239,16 +242,16 @@
                         android:visibility="gone" />
 
                     <include
+                        android:id="@+id/cardGreatMealPrompt"
+                        layout="@layout/layout_home_great_meal_prompt" />
+
+                    <include
                         android:id="@+id/card_premium_checking"
                         layout="@layout/layout_home_premium_checking" />
 
                     <include
                         android:id="@+id/card_app_feedback"
                         layout="@layout/layout_home_app_feedback" />
-
-                    <include
-                        android:id="@+id/card_dietologist_home"
-                        layout="@layout/layout_home_ai_dietologist" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -352,6 +355,10 @@
 
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
+
+                    <include
+                        android:id="@+id/card_dietologist_home"
+                        layout="@layout/layout_home_ai_dietologist" />
 
                     <include
                         android:id="@+id/card_what_to_eat"

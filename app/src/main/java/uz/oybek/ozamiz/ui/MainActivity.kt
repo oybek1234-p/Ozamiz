@@ -33,6 +33,7 @@ import uz.oybek.ozamiz.databinding.ActivityMainBinding
 import uz.oybek.ozamiz.databinding.NoInternetDialogBinding
 import uz.oybek.ozamiz.databinding.SupportSheetBinding
 import uz.oybek.ozamiz.notification.NotificationDisplayManager
+import uz.oybek.ozamiz.notification.reminders.AppReminderScheduler
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.showAppSnackBar
 import uz.oybek.ozamiz.ui.utils.visibleOrGone
@@ -116,8 +117,49 @@ class MainActivity : AppCompatActivity() {
 
         observeInternetConnectivity()
         observeAuthState()
+        observeReminders()
+        observeCommunityBadge()
         appUpdateHelper.checkForAppUpdate(this, updateLauncher)
         fcmTokenManager.syncToken()
+    }
+
+    private fun observeCommunityBadge() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.unreadPostsCount.collect { count ->
+                    updateCommunityBadge(count)
+                }
+            }
+        }
+    }
+
+    private fun updateCommunityBadge(count: Int) {
+        val menuItemId = R.id.communityFragment
+        if (count > 0) {
+            val badge = binding.bottomNavView.getOrCreateBadge(menuItemId)
+            badge.isVisible = true
+            badge.number = count
+            badge.backgroundColor = androidx.core.content.ContextCompat.getColor(this, android.R.color.holo_green_dark)
+            badge.badgeTextColor = androidx.core.content.ContextCompat.getColor(this, android.R.color.white)
+        } else {
+            binding.bottomNavView.removeBadge(menuItemId)
+        }
+    }
+
+    fun clearCommunityBadge() {
+        binding.bottomNavView.removeBadge(R.id.communityFragment)
+    }
+
+    private fun observeReminders() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.reminders.collect { reminders ->
+                    runCatching {
+                        AppReminderScheduler.scheduleAll(this@MainActivity, reminders)
+                    }
+                }
+            }
+        }
     }
 
     private fun observeAuthState() {
@@ -130,14 +172,14 @@ class MainActivity : AppCompatActivity() {
 
                     is MainNavCommand.NavigateToHome -> {
                         val currentId = navController.currentDestination?.id
-                        if (currentId == R.id.authFragment || currentId == R.id.onboarding) {
+                        if (currentId == R.id.authFragment || currentId == R.id.loginGmailFragment) {
                             navigateToRootDestination(R.id.home)
                         }
                     }
 
                     is MainNavCommand.NavigateToOnboarding -> {
                         val currentId = navController.currentDestination?.id
-                        if (currentId == R.id.authFragment) {
+                        if (currentId == R.id.authFragment || currentId == R.id.loginGmailFragment) {
                             navigateToRootDestination(R.id.onboarding)
                         }
                     }
@@ -162,7 +204,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         viewModel.updateLastSeenTime()
-        viewModel.checkPremium()
+        viewModel.checkUnreadPosts()
         NotificationSchedular.rescheduleToday(this)
         appUpdateHelper.completeUpdateIfDownloaded()
     }

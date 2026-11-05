@@ -62,6 +62,16 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/textView_phone_or_uid"
+                style="@style/TextAppearance.Material3.BodySmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:visibility="gone"
+                tools:text="+998 90 123 45 67" />
+
+            <TextView
                 android:id="@+id/textView_last_seen"
                 style="@style/TextAppearance.Material3.BodySmall"
                 android:layout_width="wrap_content"

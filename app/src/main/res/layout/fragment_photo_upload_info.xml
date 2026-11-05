@@ -3,25 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainer">
+    android:animateLayoutChanges="true"
+    android:background="?attr/colorSurfaceContainerLowest">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_photo_info"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?colorSurfaceContainer"
+        android:background="?attr/colorSurfaceContainerLowest"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/arrow_back"
-        app:title="Foto qoidalari"
         app:titleTextAppearance="@style/Title2_20" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="100dp"
+        android:paddingBottom="90dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar_photo_info">
 
@@ -29,22 +29,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="8dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="12dp">
 
+            <!-- Hero Illustration Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="220dp"
-                android:layout_marginTop="24dp"
-                app:cardCornerRadius="24dp"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                android:backgroundTint="?attr/colorSurfaceContainerLow">
+                app:strokeWidth="0dp">
 
                 <ImageView
                     android:id="@+id/img_main_rule"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:contentDescription="@null"
                     android:scaleType="centerCrop"
                     android:src="@drawable/weight_log_photo" />
             </com.google.android.material.card.MaterialCardView>
@@ -52,20 +54,19 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:layout_marginBottom="16dp"
-                android:text="Qanday rasmga olish"
-                android:textColor="?colorOnSurface"
+                android:layout_marginBottom="12dp"
                 android:fontFamily="@font/roboto_bold"
+                android:text="@string/photo_rules_section_title"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="17sp" />
 
             <!-- Guidelines Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                android:backgroundTint="?attr/colorSurfaceContainerLowest"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -78,91 +79,125 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="start">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <TextView
-                            android:layout_width="24dp"
-                            android:layout_height="wrap_content"
-                            android:text="1"
-                            android:textColor="?attr/colorPrimary"
-                            android:fontFamily="@font/roboto_bold"
-                            android:textSize="18sp"
-                            android:layout_marginEnd="12dp" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="1"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="15sp" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
                             android:layout_weight="1"
-                            android:text="Har doim bir xil kiyimda va bir xil fonda suratga tushing"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="16sp"
-                            android:lineSpacingExtra="2dp" />
+                            android:fontFamily="@font/roboto_regular"
+                            android:lineSpacingExtra="2dp"
+                            android:text="@string/photo_rule_1"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="16dp"
-                        android:alpha="0.08"
-                        android:background="?colorOnSurface" />
+                        android:alpha="0.2"
+                        android:background="?attr/colorOutlineVariant" />
 
                     <!-- Rule 2 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="start">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <TextView
-                            android:layout_width="24dp"
-                            android:layout_height="wrap_content"
-                            android:text="2"
-                            android:textColor="?attr/colorPrimary"
-                            android:fontFamily="@font/roboto_bold"
-                            android:textSize="18sp"
-                            android:layout_marginEnd="12dp" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="2"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="15sp" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
                             android:layout_weight="1"
-                            android:text="Kamerani ko'krak balandligida ushlab, to'liq tanani ko'rsating"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="16sp"
-                            android:lineSpacingExtra="2dp" />
+                            android:fontFamily="@font/roboto_regular"
+                            android:lineSpacingExtra="2dp"
+                            android:text="@string/photo_rule_2"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginVertical="16dp"
-                        android:alpha="0.08"
-                        android:background="?colorOnSurface" />
+                        android:alpha="0.2"
+                        android:background="?attr/colorOutlineVariant" />
 
+                    <!-- Rule 3 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="start">
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
 
-                        <TextView
-                            android:layout_width="24dp"
-                            android:layout_height="wrap_content"
-                            android:text="3"
-                            android:textColor="?attr/colorPrimary"
-                            android:fontFamily="@font/roboto_bold"
-                            android:textSize="18sp"
-                            android:layout_marginEnd="12dp" />
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="0dp"
+                            app:strokeWidth="0dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="3"
+                                android:textColor="?attr/colorPrimary"
+                                android:textSize="15sp" />
+                        </com.google.android.material.card.MaterialCardView>
 
                         <TextView
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
                             android:layout_weight="1"
-                            android:text="Yaxshi yoritilgan joyda, tabiiy holatda turing"
-                            android:textColor="?colorOnSurface"
-                            android:textSize="16sp"
-                            android:lineSpacingExtra="2dp" />
+                            android:fontFamily="@font/roboto_regular"
+                            android:lineSpacingExtra="2dp"
+                            android:text="@string/photo_rule_3"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -171,31 +206,31 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Button -->
+    <!-- Bottom Button Container -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="?attr/colorSurfaceContainerLowest"
         app:cardCornerRadius="0dp"
         app:cardElevation="8dp"
-        android:backgroundTint="?colorSurfaceContainerLowest"
         app:layout_constraintBottom_toBottomOf="parent"
         app:strokeWidth="0dp">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="20dp"
-            android:paddingVertical="16dp">
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_confirm_photo_info"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:text="Fotosurat kiritish"
-                android:textSize="16sp"
+                android:layout_height="52dp"
                 android:fontFamily="@font/roboto_bold"
+                android:text="@string/photo_rules_confirm_button"
+                android:textSize="16sp"
                 app:cornerRadius="16dp" />
         </FrameLayout>
 

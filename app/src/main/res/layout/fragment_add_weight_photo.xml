@@ -4,18 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?colorSurfaceContainer"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    android:background="?attr/colorSurfaceContainerLowest">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_add_weight_photo"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?colorSurfaceContainer"
+        android:background="?attr/colorSurfaceContainerLowest"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/arrow_back"
-        app:title="Vazn qo'shish"
-        app:titleTextAppearance="@style/Title2_20" />
+        app:title="@string/add_weight_screen_title"
+        app:titleTextAppearance="@style/Title2_20">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_toolbar_save"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="@font/roboto_bold"
+            android:text="@string/save"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="15sp" />
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -30,192 +44,564 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="16dp"
-            android:paddingTop="16dp"
+            android:paddingTop="12dp"
             android:paddingBottom="24dp">
 
-            <!-- Photo Upload Card -->
+            <!-- 1. TOP PHOTO UPLOAD BUTTON CARD (DEFAULT STATE) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_image_picker_weight_log"
                 android:layout_width="match_parent"
-                android:layout_height="280dp"
-                android:layout_marginBottom="12dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                android:backgroundTint="?attr/colorSurfaceContainerLowest">
+                app:strokeWidth="0dp">
 
-                <FrameLayout
-                    android:id="@+id/layout_add_image_placeholder"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?attr/colorSurfaceContainerLowest">
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center_vertical"
+                        android:contentDescription="@null"
+                        android:src="@drawable/camera_ic"
+                        app:tint="?attr/colorOnPrimary" />
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="24dp">
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:minHeight="180dp"
-                            app:cardCornerRadius="16dp"
-                            app:cardElevation="0dp"
-                            app:strokeColor="?attr/colorOutlineVariant"
-                            app:strokeWidth="2dp"
-                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest">
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/add_photo_card_title"
+                            android:textColor="?attr/colorOnPrimary"
+                            android:textSize="15sp" />
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:gravity="center"
-                                android:orientation="vertical"
-                                android:padding="24dp">
-
-                                <ImageView
-                                    android:layout_width="48dp"
-                                    android:layout_height="48dp"
-                                    android:src="@drawable/camera_ic"
-                                    app:tint="?attr/colorPrimary" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="16dp"
-                                    android:text="Fotosurat yuklash"
-                                    android:textColor="?attr/colorOnSurface"
-                                    android:fontFamily="@font/roboto_bold"
-                                    android:textSize="17sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginTop="6dp"
-                                    android:text="Bosib suratingizni yuklang"
-                                    android:textColor="?attr/colorOnSurfaceVariant"
-                                    android:textSize="14sp" />
-
-                            </LinearLayout>
-                        </com.google.android.material.card.MaterialCardView>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:text="@string/add_photo_card_subtitle"
+                            android:textColor="?attr/colorOnPrimary"
+                            android:textSize="13sp" />
 
                     </LinearLayout>
-                </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/imageView_picked"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:visibility="gone" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/button_remove_image"
-                    style="@style/Widget.Material3.Button.IconButton.Filled"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:layout_margin="12dp"
-                    android:visibility="gone"
-                    app:icon="@drawable/close_ic"
-                    app:iconTint="@color/white" />
+                </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Weight Input Card -->
+            <!-- 1.1 PICKED PHOTO PREVIEW CARD (SHOWN WHEN PHOTO IS SELECTED) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_picked_photo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="?attr/colorSurfaceContainerHigh"
+                app:strokeWidth="1dp"
+                tools:visibility="visible">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:layout_constraintDimensionRatio="4:3"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <ImageView
+                            android:id="@+id/imageView_picked"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="@null"
+                            android:scaleType="centerCrop" />
+
+                        <!-- Delete Selected Photo Button (Matching AddPost style) -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/button_remove_image"
+                            android:layout_width="42dp"
+                            android:layout_height="42dp"
+                            android:layout_gravity="top|end"
+                            android:layout_margin="12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            app:cardBackgroundColor="@color/red"
+                            app:cardCornerRadius="21dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="1dp">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@string/delete"
+                                app:srcCompat="@drawable/delete_ic"
+                                app:tint="@color/white" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                    </FrameLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <!-- 2. WEIGHT INPUT CARD -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/layout_row_weight"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="top"
+                        android:layout_marginTop="2dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/weight_ic" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/metric_title_weight"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="15sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/roboto_regular"
+                            android:text="@string/metric_instruction_weight"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="13sp" />
+
+                    </LinearLayout>
+
+                    <!-- Input Field Box -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="72dp"
+                            android:layout_height="40dp"
+                            app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                            app:cardCornerRadius="10dp"
+                            app:cardElevation="0dp"
+                            app:strokeColor="?attr/colorOutlineVariant"
+                            app:strokeWidth="1dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/editText_weight"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@null"
+                                android:fontFamily="@font/roboto_bold"
+                                android:gravity="center"
+                                android:hint="00.0"
+                                android:inputType="numberDecimal"
+                                android:maxLength="5"
+                                android:padding="0dp"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textColorHint="?attr/colorOnSurfaceVariant"
+                                android:textSize="15sp" />
+
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="6dp"
+                            android:fontFamily="@font/roboto_bold"
+                            android:text="@string/unit_kg_short"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 3. BODY MEASUREMENTS CARD (OPTIONAL) -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/colorSurfaceContainer"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                android:backgroundTint="?attr/colorSurfaceContainerLowest">
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center_horizontal"
-                    android:padding="24dp">
+                    android:padding="16dp">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Bugungi vazningiz"
-                        android:textColor="?colorOnSurface"
+                        android:layout_marginBottom="14dp"
                         android:fontFamily="@font/roboto_bold"
-                        android:textSize="18sp" />
+                        android:text="@string/add_metric_optional_card_title"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="15sp" />
 
-                    <!-- Prominent Weight Input -->
+                    <!-- ITEM 2: QORIN (BELLY) -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:id="@+id/layout_row_belly"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:gravity="bottom"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/editText_weight"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@null"
-                            android:gravity="center"
-                            android:hint="00.0"
-                            android:inputType="numberDecimal"
-                            android:maxLength="5"
-                            android:minWidth="100dp"
-                            android:padding="0dp"
-                            android:textColor="?attr/colorPrimary"
-                            android:fontFamily="@font/roboto_medium"
-                            android:textSize="48sp" />
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="top"
+                            android:layout_marginTop="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/belly_ic" />
 
-                        <TextView
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/metric_title_belly"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:text="@string/metric_instruction_belly"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+
+                        <!-- Input Field Box -->
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="10dp"
-                            android:layout_marginStart="6dp"
-                            android:text="kg"
-                            android:textColor="?attr/colorPrimary"
-                            android:fontFamily="@font/roboto_bold"
-                            android:textSize="18sp" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="72dp"
+                                android:layout_height="40dp"
+                                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="?attr/colorOutlineVariant"
+                                app:strokeWidth="1dp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/editText_belly"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@null"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:gravity="center"
+                                    android:hint="00"
+                                    android:inputType="numberDecimal"
+                                    android:maxLength="5"
+                                    android:padding="0dp"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                                    android:textSize="15sp" />
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/unit_sm_short"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
                     </LinearLayout>
 
+                    <!-- Divider -->
                     <View
-                        android:layout_width="120dp"
-                        android:layout_height="3dp"
-                        android:layout_marginTop="8dp"
-                        android:background="?attr/colorPrimaryContainer"
-                        android:alpha="0.5" />
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="14dp"
+                        android:alpha="0.3"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <!-- ITEM 3: BO'KSA (HIPS) -->
+                    <LinearLayout
+                        android:id="@+id/layout_row_hips"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="top"
+                            android:layout_marginTop="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/hips_ic" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/metric_title_hips"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:text="@string/metric_instruction_hips"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+
+                        <!-- Input Field Box -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="72dp"
+                                android:layout_height="40dp"
+                                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="?attr/colorOutlineVariant"
+                                app:strokeWidth="1dp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/editText_hips"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@null"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:gravity="center"
+                                    android:hint="00"
+                                    android:inputType="numberDecimal"
+                                    android:maxLength="5"
+                                    android:padding="0dp"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                                    android:textSize="15sp" />
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/unit_sm_short"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="14dp"
+                        android:alpha="0.3"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <!-- ITEM 4: QO'L (ARM) -->
+                    <LinearLayout
+                        android:id="@+id/layout_row_arm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="top"
+                            android:layout_marginTop="2dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/arm_ic" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/metric_title_arm"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textSize="15sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/roboto_regular"
+                                android:text="@string/metric_instruction_arm"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="13sp" />
+
+                        </LinearLayout>
+
+                        <!-- Input Field Box -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:layout_width="72dp"
+                                android:layout_height="40dp"
+                                app:cardBackgroundColor="?attr/colorSurfaceContainerLowest"
+                                app:cardCornerRadius="10dp"
+                                app:cardElevation="0dp"
+                                app:strokeColor="?attr/colorOutlineVariant"
+                                app:strokeWidth="1dp">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/editText_arm"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:background="@null"
+                                    android:fontFamily="@font/roboto_bold"
+                                    android:gravity="center"
+                                    android:hint="00"
+                                    android:inputType="numberDecimal"
+                                    android:maxLength="5"
+                                    android:padding="0dp"
+                                    android:textColor="?attr/colorOnSurface"
+                                    android:textColorHint="?attr/colorOnSurfaceVariant"
+                                    android:textSize="15sp" />
+
+                            </com.google.android.material.card.MaterialCardView>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:fontFamily="@font/roboto_bold"
+                                android:text="@string/unit_sm_short"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Bottom Save Button Container (Inside Scroll View) -->
+            <!-- 4. SUBMIT BUTTON CONTAINER -->
             <FrameLayout
                 android:id="@+id/save_button_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="4dp"
                 android:layout_marginBottom="16dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/button_save_weight_photo"
                     style="@style/Widget.Material3.Button"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="Saqlash"
-                    android:textSize="16sp"
+                    android:layout_height="52dp"
                     android:fontFamily="@font/roboto_bold"
-                    app:cornerRadius="16dp" />
+                    android:text="@string/save"
+                    android:textSize="16sp" />
 
                 <ProgressBar
                     android:id="@+id/progressBar_save_weight_photo"
                     style="?android:attr/progressBarStyle"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:layout_gravity="center"
                     android:visibility="gone" />
             </FrameLayout>

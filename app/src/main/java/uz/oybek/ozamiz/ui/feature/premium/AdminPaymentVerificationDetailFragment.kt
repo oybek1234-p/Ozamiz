@@ -9,9 +9,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.user.model.User
+import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.databinding.FragmentAdminPaymentVerificationDetailBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.utils.getArgs
@@ -19,6 +20,7 @@ import uz.oybek.ozamiz.ui.utils.showToast
 import java.text.SimpleDateFormat
 import java.util.*
 
+@AndroidEntryPoint
 class AdminPaymentVerificationDetailFragment :
     BaseFragment<FragmentAdminPaymentVerificationDetailBinding>() {
 
@@ -29,7 +31,7 @@ class AdminPaymentVerificationDetailFragment :
     ): FragmentAdminPaymentVerificationDetailBinding {
         return FragmentAdminPaymentVerificationDetailBinding.inflate(inflater, container, false)
     }
-    
+
     override fun viewCreated(bind: FragmentAdminPaymentVerificationDetailBinding) {
         val userId = arguments.getArgs<AdminPaymentVerificationDetailArgs>()?.userId
             ?: arguments?.getString("userId").orEmpty()
@@ -37,14 +39,6 @@ class AdminPaymentVerificationDetailFragment :
 
         bind.toolbarAdminPaymentDetail.setNavigationOnClickListener {
             popBackStack()
-        }
-
-        bind.imageViewPaymentCheckAdmin.setOnClickListener {
-            viewModel.uiState.value.user?.paymentCheckPhotoUrl?.let { url ->
-                if (url.isNotEmpty()) {
-                //    bind.imageViewPaymentCheckAdmin.openImageViewer(listOf(url))
-                }
-            }
         }
 
         bind.buttonApprovePayment.setOnClickListener {
@@ -66,12 +60,13 @@ class AdminPaymentVerificationDetailFragment :
                     bind.scrollViewAdminPaymentDetail.isVisible =
                         !state.isLoading && state.user != null
                     bind.textViewErrorAdminPaymentDetail.isVisible =
-                        !state.isLoading && state.user == null && state.errorMessage != null
+                        !state.isLoading && state.user == null && state.errorMessageResId != null
 
                     state.user?.let { displayUserDetails(bind, it) }
-                    state.errorMessage?.let {
-                        bind.textViewErrorAdminPaymentDetail.text = it
-                        showToast(it)
+                    state.errorMessageResId?.let { resId ->
+                        val message = getString(resId)
+                        bind.textViewErrorAdminPaymentDetail.text = message
+                        showToast(message)
                         viewModel.clearError()
                     }
 
@@ -88,7 +83,13 @@ class AdminPaymentVerificationDetailFragment :
                     }
 
                     if (state.verificationComplete) {
-                        showToast(if (state.user?.premium == true) "To'lov tasdiqlandi" else "To'lov rad etildi")
+                        showToast(
+                            if (state.user?.premium == true) {
+                                getString(R.string.premium_payment_approved)
+                            } else {
+                                getString(R.string.premium_payment_rejected)
+                            }
+                        )
                         popBackStack()
                         viewModel.resetVerificationCompleteFlag()
                     }
@@ -114,17 +115,30 @@ class AdminPaymentVerificationDetailFragment :
     }
 
     private fun showConfirmationDialog(approve: Boolean) {
-        val title = if (approve) "To'lovni Tasdiqlash" else "To'lovni Rad Etish"
-        val message =
-            if (approve) "Haqiqatan ham bu foydalanuvchining to'lovini tasdiqlamoqchimisiz?"
-            else "Haqiqatan ham bu foydalanuvchining to'lovini rad etmoqchimisiz? Bu amalni ortga qaytarib bo'lmaydi."
-        val positiveButtonText = if (approve) "Tasdiqlash" else "Rad Etish"
+        val title = if (approve) {
+            getString(R.string.premium_confirm_approve_title)
+        } else {
+            getString(R.string.premium_confirm_reject_title)
+        }
+        val message = if (approve) {
+            getString(R.string.premium_confirm_approve_message)
+        } else {
+            getString(R.string.premium_confirm_reject_message)
+        }
+        val positiveButtonText = if (approve) {
+            getString(R.string.approve_payment)
+        } else {
+            getString(R.string.reject_payment)
+        }
 
-        AlertDialog.Builder(requireContext()).setTitle(title).setMessage(message)
+        AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
             .setPositiveButton(positiveButtonText) { dialog, _ ->
                 viewModel.processPaymentVerification(approve)
                 dialog.dismiss()
-            }.setNegativeButton(R.string.cancel, null).show()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
-
 }

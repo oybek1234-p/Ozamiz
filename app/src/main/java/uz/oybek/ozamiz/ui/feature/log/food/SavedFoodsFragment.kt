@@ -9,8 +9,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import uz.oybek.ozamiz.R
 import uz.oybek.ozamiz.databinding.FragmentSavedFoodsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
+import uz.oybek.ozamiz.ui.common.dialog.ConfirmDeleteDialog
+import uz.oybek.ozamiz.ui.utils.showToast
+import uz.oybek.ozamiz.ui.utils.toBundle
 
 @AndroidEntryPoint
 class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
@@ -31,8 +35,33 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
             popBackStack()
         }
         val savedAdapter = SavedFoodAdapter(
-            onItemClick = { },
-            onDeleteButtonClick = { }
+            onItemClick = { food ->
+                val detailsArgs = AnalyzeResultArgs.SavedFoodDetails(
+                    foodName = food.name.ifBlank { food.description },
+                    calories = food.calories,
+                    protein = food.protein,
+                    fat = food.fat,
+                    carbs = food.carbs,
+                    photoUrl = food.photoUrl,
+                    mealType = food.mealType,
+                    healthLevel = food.healthScore ?: food.healthLevel
+                )
+                navigate(R.id.analyzeResultFragment, detailsArgs.toBundle())
+            },
+            onAddClick = { food ->
+                viewModel.logSavedFood(food)
+            },
+            onDeleteButtonClick = { food ->
+                val ctx = context ?: return@SavedFoodAdapter
+                ConfirmDeleteDialog.show(
+                    context = ctx,
+                    titleRes = R.string.log_food_delete_confirm_title,
+                    messageRes = R.string.log_food_delete_confirm_msg,
+                    onConfirm = {
+                        viewModel.deleteSavedFood(food)
+                    }
+                )
+            }
         )
         adapter = savedAdapter
         recyclerSavedFoods.adapter = savedAdapter
@@ -41,10 +70,21 @@ class SavedFoodsFragment : BaseFragment<FragmentSavedFoodsBinding>() {
     private fun observeData() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.savedFoods.collect { foods ->
-                    binding.layoutEmptySaved.isVisible = foods.isEmpty()
-                    binding.recyclerSavedFoods.isVisible = foods.isNotEmpty()
-                    adapter?.submitList(foods)
+                launch {
+                    viewModel.savedFoods.collect { foods ->
+                        binding.layoutEmptySaved.isVisible = foods.isEmpty()
+                        binding.recyclerSavedFoods.isVisible = foods.isNotEmpty()
+                        adapter?.submitList(foods)
+                    }
+                }
+                launch {
+                    viewModel.effects.collect { effect ->
+                        when (effect) {
+                            is SavedFoodsUiEffect.ShowToast -> {
+                                context?.let { ctx -> showToast(effect.message, ctx) }
+                            }
+                        }
+                    }
                 }
             }
         }

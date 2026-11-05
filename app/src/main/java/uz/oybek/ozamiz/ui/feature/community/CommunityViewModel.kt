@@ -26,7 +26,8 @@ data class CommunityUiState(
     val isLoading: Boolean = false,
     val isPaging: Boolean = false,
     val hasReachedEnd: Boolean = false,
-    val currentUserId: String = ""
+    val currentUserId: String = "",
+    val lastSeenTimestamp: Long = 0L
 )
 
 sealed interface CommunityUiEffect {
@@ -99,6 +100,7 @@ class CommunityViewModel @Inject constructor(
     private suspend fun loadPosts(isInitial: Boolean, filter: CommunityPostFilter) {
         val lastTimestamp = if (isInitial) null else _uiState.value.posts.lastOrNull()?.createdAt
         val pageSize = 10L
+        val previousLastSeen = if (isInitial) postRepository.getLastSeenTimestamp() else _uiState.value.lastSeenTimestamp
 
         when (val result = postRepository.getPosts(
             filter = filter, limit =
@@ -116,10 +118,16 @@ class CommunityViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         posts = updatedList,
+                        lastSeenTimestamp = previousLastSeen,
                         isLoading = false,
                         isPaging = false,
                         hasReachedEnd = reachedEnd
                     )
+                }
+
+                val maxCreatedAt = newPosts.maxOfOrNull { it.createdAt } ?: 0L
+                if (maxCreatedAt > 0L) {
+                    postRepository.setLastSeenTimestamp(maxCreatedAt)
                 }
             }
 

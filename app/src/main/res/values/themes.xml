@@ -74,6 +74,11 @@
         <!-- Water & Exercise Semantic Colors -->
         <item name="colorWaterProgress">@color/water_progress_light</item>
         <item name="colorExerciseProgress">@color/exercise_progress_light</item>
+
+        <!-- Food Macro Grade Semantic Colors -->
+        <item name="colorMacroGood">@color/macro_grade_good</item>
+        <item name="colorMacroModerate">@color/macro_grade_moderate</item>
+        <item name="colorMacroBad">@color/macro_grade_bad</item>
     </style>
 
     <style name="Theme.Ozamiz" parent="Base.Ozamiz" />

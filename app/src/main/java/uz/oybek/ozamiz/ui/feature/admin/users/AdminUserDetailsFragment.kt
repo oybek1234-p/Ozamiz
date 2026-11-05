@@ -16,9 +16,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.launch
 import uz.oybek.ozamiz.R
-import uz.oybek.ozamiz.data.streak.StreakInfo
-import uz.oybek.ozamiz.data.user.model.User
+import dagger.hilt.android.AndroidEntryPoint
+import uz.oybek.ozamiz.data.profile.model.User
 import uz.oybek.ozamiz.common.util.DateFormatter
+import uz.oybek.ozamiz.data.streak.model.StreakInfo
 import uz.oybek.ozamiz.databinding.FragmentAdminUserDetailsBinding
 import uz.oybek.ozamiz.databinding.ItemAdminUserFieldBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
@@ -26,6 +27,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@AndroidEntryPoint
 class AdminUserDetailsFragment : BaseFragment<FragmentAdminUserDetailsBinding>() {
 
     private val viewModel: AdminUserDetailsViewModel by viewModels()

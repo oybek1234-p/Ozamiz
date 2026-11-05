@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import uz.oybek.ozamiz.databinding.FragmentDailyFoodLogsBinding
 import uz.oybek.ozamiz.ui.base.BaseFragment
 import uz.oybek.ozamiz.ui.feature.log.food.history.TodaysFoodAdapter
+import uz.oybek.ozamiz.ui.modelUtils.NutritionFormatter
 import uz.oybek.ozamiz.ui.utils.toBundle
 import java.util.Date
 
@@ -21,6 +22,7 @@ class DailyFoodLogsFragment : BaseFragment<FragmentDailyFoodLogsBinding>() {
     private val viewModel: DailyFoodLogsViewModel by viewModels()
     private val adapter by lazy {
         TodaysFoodAdapter { foodLog ->
+            NutritionFormatter
             val args = AnalyzeResultArgs.ExistingLog(
                 logId = foodLog.logId,
                 timestamp = arguments?.getLong("timestamp") ?: System.currentTimeMillis()
